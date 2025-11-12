@@ -1,0 +1,32 @@
+# Backend .gitignore
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Binarios de Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# Archivos de test
+*.test
+*.out
+
+# Dependencias
+vendor/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

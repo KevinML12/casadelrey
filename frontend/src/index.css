@@ -1,0 +1,11 @@
+/* frontend/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globales para la fuente principal */
+body {
+  /* La fuente se define completamente en tailwind.config.js (Paso 2) */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

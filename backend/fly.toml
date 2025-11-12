@@ -1,0 +1,17 @@
+# fly.toml app configuration file generated for casa-del-rey-mvp on 2025-11-10
+#
+# See https://fly.io/docs/reference/configuration/ for information about this file.
+
+app = "casa-del-rey-mvp"
+primary_region = "scl" # Región de ejemplo (Chile), ajustar si es necesario.
+
+[build]
+  builder = "paketobuildpacks/builder-jammy-full"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
