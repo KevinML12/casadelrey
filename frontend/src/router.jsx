@@ -1,27 +1,42 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import LoginPage from './pages/auth/LoginPage';
-import AdminLayout from './layouts/AdminLayout';
 import App from './App';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import DonationPage from './pages/DonationPage';
+import AdminLayout from './layouts/AdminLayout';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardPage from './pages/admin/DashboardPage';
 import ProfilePage from './pages/admin/ProfilePage';
 import DonationHistoryPage from './pages/admin/DonationHistoryPage';
-import MyGroupsPage from './pages/admin/MyGroupsPage';
+import GroupsPage from './pages/admin/GroupsPage';
 
 const router = createBrowserRouter([
+  // Rutas Públicas
   {
     path: '/',
     element: <App />,
   },
-  // Ruta de Autenticación
+  {
+    path: '/donaciones',
+    element: <DonationPage />,
+  },
   {
     path: '/login',
     element: <LoginPage />,
   },
+  {
+    path: '/registro',
+    element: <RegisterPage />,
+  },
   
-  // Rutas Protegidas del Dashboard
+  // Rutas Protegidas (Admin)
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     children: [
         {
             index: true,
@@ -41,9 +56,8 @@ const router = createBrowserRouter([
         },
         {
             path: 'grupos',
-            element: <MyGroupsPage />
+            element: <GroupsPage />
         },
-        // ... otras rutas de admin
     ]
   },
   // Ruta 404

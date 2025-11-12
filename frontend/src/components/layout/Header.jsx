@@ -1,90 +1,106 @@
-// src/components/layout/Header.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Button from '../ui/Button';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const menuItems = [
-    { name: 'Inicio', href: '/' },
-    { name: 'Nuestra Historia', href: '#historia' },
-    { name: 'Eventos', href: '#eventos' },
-    { name: 'Galería', href: '#galeria' },
-    { name: 'Donaciones', href: '#donaciones' },
-    { name: 'Contacto', href: '#contacto' },
+  const navLinks = [
+    { name: 'Inicio', path: '/' },
+    { name: 'Historia', path: '/historia' },
+    { name: 'Eventos', path: '/eventos' },
+    { name: 'Donaciones', path: '/donaciones' }
   ];
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleMemberAreaClick = () => {
+    navigate('/login');
+  };
+
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-blue-600">Casa del Rey</span>
-            </Link>
-          </div>
+          <NavLink to="/" className="flex items-center space-x-2">
+            <div className="text-2xl font-bold text-blue-600">
+              Casa del Rey
+            </div>
+          </NavLink>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
-            {menuItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition duration-150"
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={({ isActive }) =>
+                  `text-sm font-medium transition-colors hover:text-blue-600 ${
+                    isActive ? 'text-blue-600' : 'text-gray-700'
+                  }`
+                }
               >
-                {item.name}
-              </a>
+                {link.name}
+              </NavLink>
             ))}
-            <Link
-              to="/login"
-              className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-150"
+            <Button
+              variant="primary"
+              onClick={handleMemberAreaClick}
+              className="ml-4"
             >
-              Iniciar Sesión
-            </Link>
-          </div>
+              Área de Miembros
+            </Button>
+          </nav>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 focus:outline-none"
-            >
-              {isMenuOpen ? (
-                <XMarkIcon className="h-6 w-6" />
-              ) : (
-                <Bars3Icon className="h-6 w-6" />
-              )}
-            </button>
-          </div>
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleMenu}
+            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? (
+              <XMarkIcon className="h-6 w-6" />
+            ) : (
+              <Bars3Icon className="h-6 w-6" />
+            )}
+          </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden pb-4">
-            <div className="flex flex-col space-y-2">
-              {menuItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 text-base font-medium"
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <nav className="flex flex-col space-y-4">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
                   onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `text-sm font-medium transition-colors hover:text-blue-600 ${
+                      isActive ? 'text-blue-600' : 'text-gray-700'
+                    }`
+                  }
                 >
-                  {item.name}
-                </a>
+                  {link.name}
+                </NavLink>
               ))}
-              <Link
-                to="/login"
-                className="bg-blue-600 text-white px-4 py-2 rounded-full text-base font-medium hover:bg-blue-700 text-center"
-                onClick={() => setIsMenuOpen(false)}
+              <Button
+                variant="primary"
+                onClick={() => {
+                  handleMemberAreaClick();
+                  setIsMenuOpen(false);
+                }}
+                className="w-full"
               >
-                Iniciar Sesión
-              </Link>
-            </div>
+                Área de Miembros
+              </Button>
+            </nav>
           </div>
         )}
-      </nav>
+      </div>
     </header>
   );
 };

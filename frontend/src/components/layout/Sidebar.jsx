@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { 
   HomeIcon, 
   UserIcon, 
@@ -8,22 +9,20 @@ import {
 } from '@heroicons/react/24/outline';
 
 const Sidebar = () => {
-  const location = useLocation();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: HomeIcon },
-    { name: 'Mi Perfil', path: '/admin/profile', icon: UserIcon },
-    { name: 'Mis Donaciones', path: '/admin/donations', icon: CurrencyDollarIcon },
-    { name: 'Mis Grupos', path: '/admin/groups', icon: UserGroupIcon },
+    { name: 'Mi Perfil', path: '/admin/perfil', icon: UserIcon },
+    { name: 'Mis Donaciones', path: '/admin/historial', icon: CurrencyDollarIcon },
+    { name: 'Mis Grupos', path: '/admin/grupos', icon: UserGroupIcon },
   ];
 
-  const isActive = (path) => location.pathname === path;
-
   return (
-    <div className="w-64 min-h-screen bg-gray-800 text-white p-4">
-      {/* Logo Placeholder */}
-      <div className="mb-8 p-4">
-        <div className="flex items-center space-x-2">
+    <div className="w-64 min-h-screen bg-gray-800 text-white flex flex-col">
+      {/* Logo */}
+      <div className="p-6 border-b border-gray-700">
+        <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-xl font-bold">CR</span>
           </div>
@@ -32,37 +31,47 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="space-y-2">
+      <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
-            <Link
+            <NavLink
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-3 p-3 rounded-lg transition duration-200 ${
-                isActive(item.path)
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-700'
-              }`}
+              className={({ isActive }) =>
+                `flex items-center space-x-3 p-3 rounded-lg transition duration-200 ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-300 hover:bg-gray-700'
+                }`
+              }
             >
               <Icon className="w-5 h-5" />
-              <span>{item.name}</span>
-            </Link>
+              <span className="font-medium">{item.name}</span>
+            </NavLink>
           );
         })}
+      </nav>
 
-        {/* Separador */}
-        <div className="border-t border-gray-700 my-4"></div>
+      {/* User Info & Logout */}
+      <div className="p-4 border-t border-gray-700">
+        {/* User Email */}
+        <div className="mb-3 px-3">
+          <p className="text-xs text-gray-400 mb-1">Conectado como:</p>
+          <p className="text-sm text-white truncate font-medium">
+            {user?.email || 'usuario@ejemplo.com'}
+          </p>
+        </div>
 
-        {/* Salir */}
-        <Link
-          to="/login"
-          className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-200"
+        {/* Logout Button */}
+        <button
+          onClick={logout}
+          className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-200"
         >
           <ArrowRightOnRectangleIcon className="w-5 h-5" />
-          <span>Salir</span>
-        </Link>
-      </nav>
+          <span className="font-medium">Salir</span>
+        </button>
+      </div>
     </div>
   );
 };
