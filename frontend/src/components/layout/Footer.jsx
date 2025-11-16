@@ -1,10 +1,11 @@
 import { PhoneIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline';
+import NewsletterSignup from '../NewsletterSignup';
 
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300 py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Llámenos */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
@@ -66,6 +67,11 @@ const Footer = () => {
                 <span>7:00 PM - 10:00 PM</span>
               </p>
             </div>
+          </div>
+
+          {/* Newsletter */}
+          <div className="space-y-4">
+            <NewsletterSignup />
           </div>
         </div>
 

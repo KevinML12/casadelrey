@@ -1,34 +1,51 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PlayCircleIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import YouTubeCard from './YouTubeCard';
 
 const MultimediaSection = () => {
-  const videos = [
-    {
-      id: 1,
-      title: 'Último Servicio Dominical',
-      thumbnail: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=600&h=400&fit=crop',
-      duration: '1:45:00'
-    },
-    {
-      id: 2,
-      title: 'Testimonio: Una Vida Transformada',
-      thumbnail: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&h=400&fit=crop',
-      duration: '12:30'
-    },
-    {
-      id: 3,
-      title: 'Alabanza y Adoración en Vivo',
-      thumbnail: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=400&fit=crop',
-      duration: '25:15'
-    }
+  const [activeTab, setActiveTab] = useState('predicas');
+  const [videos, setVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const tabs = [
+    { id: 'predicas', label: 'Predicas' },
+    { id: 'musica', label: 'Música' },
+    { id: 'seminarios', label: 'Seminarios' }
   ];
 
-  const gallery = [
-    'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=400&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=400&h=300&fit=crop'
-  ];
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/multimedia?filter=${activeTab}`);
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar los videos');
+        }
+        
+        const data = await response.json();
+        setVideos(data);
+      } catch (error) {
+        console.error('Error fetching multimedia:', error);
+        setVideos([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, [activeTab]);
+
+  // Skeleton Loader
+  const SkeletonCard = () => (
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="h-48 bg-gray-200 animate-pulse"></div>
+      <div className="p-4 space-y-2">
+        <div className="h-5 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+      </div>
+    </div>
+  );
 
   return (
     <section className="py-16 bg-white">
@@ -44,84 +61,69 @@ const MultimediaSection = () => {
             Multimedia
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Explora nuestros servicios, testimonios y momentos especiales
+            Explora nuestros contenidos de predicas, música y seminarios
           </p>
         </motion.div>
 
-        {/* Videos Section */}
-        <div className="mb-16">
-          <motion.h3
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
-          >
-            <PlayCircleIcon className="h-8 w-8 mr-2 text-blue-600" />
-            Videos Recientes
-          </motion.h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {videos.map((video, index) => (
-              <motion.div
-                key={video.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group cursor-pointer"
+        {/* Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex justify-center mb-8"
+        >
+          <div className="inline-flex bg-gray-100 rounded-lg p-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-700 hover:text-blue-600'
+                }`}
               >
-                <div className="relative rounded-lg overflow-hidden shadow-lg">
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                    <PlayCircleIcon className="h-16 w-16 text-white opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
-                  </div>
-                  <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                    {video.duration}
-                  </div>
-                </div>
-                <h4 className="mt-3 font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                  {video.title}
-                </h4>
-              </motion.div>
+                {tab.label}
+              </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Gallery Section */}
-        <div>
-          <motion.h3
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
-          >
-            <PhotoIcon className="h-8 w-8 mr-2 text-blue-600" />
-            Galería de Fotos
-          </motion.h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {gallery.map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-              >
-                <img
-                  src={image}
-                  alt={`Galería ${index + 1}`}
-                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        {/* Videos Grid */}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          ) : videos.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {videos.map((video, index) => (
+                <motion.div
+                  key={video.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <YouTubeCard video={video} />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">
+                No hay contenido disponible en esta categoría
+              </p>
+            </div>
+          )}
+        </motion.div>
       </div>
     </section>
   );
