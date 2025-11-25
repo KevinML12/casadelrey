@@ -15,8 +15,7 @@ const ProfilePage = () => {
 
   const handlePersonalUpdate = (e) => {
     e.preventDefault();
-    console.log('Actualizando información personal:', { name, phone });
-    // Lógica de API para actualizar info personal
+    // TODO: Lógica de API para actualizar info personal
   };
 
   const handleChangePassword = (e) => {
@@ -25,8 +24,7 @@ const ProfilePage = () => {
         alert('La nueva contraseña y la confirmación no coinciden.');
         return;
     }
-    console.log('Cambiando contraseña:', { currentPassword, newPassword });
-    // Lógica de API para cambiar contraseña
+    // TODO: Lógica de API para cambiar contraseña
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
@@ -34,7 +32,7 @@ const ProfilePage = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900">
+      <h1 className="text-3xl font-display font-bold text-dark-text dark:text-white">
         Mi Perfil
       </h1>
 

@@ -56,42 +56,42 @@ const Multimedia = () => {
   };
 
   return (
-    <section id="multimedia" className="py-16 sm:py-24 bg-white">
+    <section id="multimedia" className="py-24 sm:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-24">
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-display font-bold text-dark-text dark:text-white mb-6 tracking-tight transition-colors">
             Recursos Multimedia
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl font-normal text-dark-text/70 dark:text-gray-400 max-w-4xl mx-auto transition-colors tracking-normal leading-relaxed">
             Mensajes, alabanzas y recursos para tu crecimiento espiritual
           </p>
         </div>
 
         {/* Videos Destacados */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">Videos Recientes</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mb-20">
+          <h3 className="text-3xl font-display font-bold text-dark-text dark:text-white mb-12 tracking-tight transition-colors">Videos Recientes</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {videos.map((video) => (
               <a
                 key={video.id}
                 href={video.url}
-                className="group block bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300"
+                className="group block bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
               >
-                <div className="relative">
+                <div className="relative aspect-video overflow-hidden">
                   <img 
                     src={video.thumbnail} 
                     alt={video.titulo}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition flex items-center justify-center">
-                    <PlayCircleIcon className="w-16 h-16 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition" />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all flex items-center justify-center">
+                    <PlayCircleIcon className="w-16 h-16 text-white" />
                   </div>
                 </div>
-                <div className="p-4">
-                  <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition">
+                <div className="p-6 border-t border-gray-200/50 dark:border-gray-800/50 transition-colors">
+                  <p className="text-xs font-semibold text-dark-text/50 dark:text-gray-500 mb-2 uppercase tracking-widest transition-colors">{video.fecha}</p>
+                  <h4 className="font-display font-bold text-dark-text dark:text-white text-base mb-2 line-clamp-2 tracking-tight transition-colors">
                     {video.titulo}
                   </h4>
-                  <p className="text-sm text-gray-600">{video.fecha}</p>
                 </div>
               </a>
             ))}
@@ -100,22 +100,22 @@ const Multimedia = () => {
 
         {/* Recursos Adicionales */}
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Más Recursos</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <h3 className="text-3xl font-display font-bold text-dark-text dark:text-white mb-10 text-center tracking-tight transition-colors">Más Recursos</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {recursos.map((recurso, index) => {
               const Icon = recurso.icon;
               return (
                 <div
                   key={index}
-                  className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300 text-center group cursor-pointer"
+                  className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-xl p-10 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 text-center group cursor-pointer"
                 >
-                  <div className={`inline-flex p-4 rounded-full ${colorClasses[recurso.color]} mb-4 group-hover:scale-110 transition`}>
-                    <Icon className="w-8 h-8" />
+                  <div className="inline-flex p-4 bg-accent-blue/10 dark:bg-accent-blue/20 rounded-lg mb-6 transition-all group-hover:bg-accent-blue/20">
+                    <Icon className="w-8 h-8 text-accent-blue" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">
+                  <h4 className="text-xl font-display font-bold text-dark-text dark:text-white mb-3 tracking-tight transition-colors">
                     {recurso.titulo}
                   </h4>
-                  <p className="text-gray-600">
+                  <p className="text-sm font-normal text-dark-text/70 dark:text-gray-400 transition-colors">
                     {recurso.descripcion}
                   </p>
                 </div>
@@ -125,10 +125,10 @@ const Multimedia = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="mt-12 text-center">
+        <div className="mt-20 text-center">
           <a
             href="#"
-            className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
+            className="inline-flex items-center gap-4 bg-accent-blue text-white px-10 py-3 font-semibold hover:bg-blue-700 transition-all duration-300 rounded-lg text-xs uppercase tracking-widest"
           >
             Ver Todos los Videos
           </a>

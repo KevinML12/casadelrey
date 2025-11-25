@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -21,70 +21,71 @@ import {
 import StatCard from '../../components/admin/StatCard';
 import SkeletonCard from '../../components/admin/SkeletonCard';
 
-const DashboardPage = () => {
-  const [kpisData, setKpisData] = useState(null);
-  const [chartData, setChartData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const fetchDashboardData = async () => {
+  // Simular llamada a API
+  // const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+  // const response = await fetch(`${apiUrl}/api/admin/kpis`, {
+  //   headers: {
+  //     'Authorization': `Bearer ${localStorage.getItem('token')}`
+  //   }
+  // });
+  // if (!response.ok) throw new Error('Error al cargar los KPIs');
+  // return response.json();
+  
+  // Datos simulados
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  const mockKpis = {
+    donations: { value: '$3,210.00', icon: CurrencyDollarIcon },
+    members: { value: '152', icon: UsersIcon },
+    events: { value: '24', icon: CalendarIcon },
+    groups: { value: '8', icon: UserGroupIcon }
+  };
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  const mockMonthlyData = [
+    { mes: 'Ene', donaciones: 2400, miembros: 140 },
+    { mes: 'Feb', donaciones: 1398, miembros: 145 },
+    { mes: 'Mar', donaciones: 3800, miembros: 148 },
+    { mes: 'Abr', donaciones: 3908, miembros: 150 },
+    { mes: 'May', donaciones: 4800, miembros: 152 },
+    { mes: 'Jun', donaciones: 3800, miembros: 155 },
+  ];
 
-  const fetchDashboardData = async () => {
-    setIsLoading(true);
-    try {
-      // Simular llamada a API
-      // const response = await fetch('http://localhost:8080/api/admin/kpis');
-      // const data = await response.json();
-      
-      // Datos simulados
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simular delay
-      
-      const mockKpis = {
-        donations: { value: '$3,210.00', icon: CurrencyDollarIcon },
-        members: { value: '152', icon: UsersIcon },
-        events: { value: '24', icon: CalendarIcon },
-        groups: { value: '8', icon: UserGroupIcon }
-      };
+  const mockDonationsData = [
+    { mes: 'Ene', monto: 2400 },
+    { mes: 'Feb', monto: 1398 },
+    { mes: 'Mar', monto: 3800 },
+    { mes: 'Abr', monto: 3908 },
+    { mes: 'May', monto: 4800 },
+    { mes: 'Jun', monto: 3800 },
+  ];
 
-      const mockMonthlyData = [
-        { mes: 'Ene', donaciones: 2400, miembros: 140 },
-        { mes: 'Feb', donaciones: 1398, miembros: 145 },
-        { mes: 'Mar', donaciones: 3800, miembros: 148 },
-        { mes: 'Abr', donaciones: 3908, miembros: 150 },
-        { mes: 'May', donaciones: 4800, miembros: 152 },
-        { mes: 'Jun', donaciones: 3800, miembros: 155 },
-      ];
-
-      const mockDonationsData = [
-        { mes: 'Ene', monto: 2400 },
-        { mes: 'Feb', monto: 1398 },
-        { mes: 'Mar', monto: 3800 },
-        { mes: 'Abr', monto: 3908 },
-        { mes: 'May', monto: 4800 },
-        { mes: 'Jun', monto: 3800 },
-      ];
-
-      setKpisData(mockKpis);
-      setChartData({
-        monthly: mockMonthlyData,
-        donations: mockDonationsData
-      });
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setIsLoading(false);
+  return {
+    kpis: mockKpis,
+    charts: {
+      monthly: mockMonthlyData,
+      donations: mockDonationsData
     }
   };
+};
+
+const DashboardPage = () => {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['dashboard-kpis'],
+    queryFn: fetchDashboardData
+  });
+
+  const kpisData = data?.kpis;
+  const chartData = data?.charts;
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Resumen de KPIs
+      <h1 className="text-5xl font-display font-bold text-dark-text dark:text-white mb-12 tracking-tight transition-colors">
+        Dashboard
       </h1>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
         {isLoading ? (
           <>
             <SkeletonCard />

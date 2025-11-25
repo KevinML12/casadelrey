@@ -1,65 +1,59 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { SparklesIcon } from '@heroicons/react/24/solid';
+import { SparklesIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const HistorySection = () => {
   return (
-    <section className="py-16 sm:py-24 bg-gray-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section className="py-24 sm:py-32 bg-white dark:bg-gray-950 transition-colors border-b border-gray-200/50 dark:border-gray-800/50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Título Principal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
+          className="text-center mb-20"
         >
-          <SparklesIcon className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+          <h2 className="text-6xl md:text-7xl lg:text-8xl font-display font-bold text-dark-text dark:text-white mb-6 tracking-tight transition-colors">
+            NUESTRA HISTORIA
+          </h2>
+          <p className="text-xl md:text-2xl text-dark-text/70 dark:text-gray-300 max-w-3xl mx-auto transition-colors font-normal">
+            Un legado de fe, esperanza y comunidad transformada
+          </p>
         </motion.div>
-        
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10"
-        >
-          Nuestra Historia: Más que un Edificio
-        </motion.h2>
-        
+
+        {/* Previsualización de Historia */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white p-8 md:p-12 rounded-2xl shadow-2xl border-t-4 border-blue-600 transition duration-500 hover:shadow-blue-600/20"
+          transition={{ duration: 0.6 }}
+          className="bg-gray-50 dark:bg-gray-900 rounded-xl p-12 lg:p-16 max-w-4xl mx-auto border border-gray-200/50 dark:border-gray-800/50 transition-colors"
         >
-          <div className="md:flex md:space-x-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="md:w-1/2 text-left mb-6 md:mb-0"
+          <div className="space-y-6 text-dark-text/70 dark:text-gray-300 leading-relaxed text-lg font-normal transition-colors">
+            <p>
+              Hace más de 15 años, en un pequeño salón de reuniones, un grupo de
+              creyentes apasionados por Dios se reunió con el deseo de crear una
+              iglesia diferente: una comunidad donde cada persona pudiera
+              experimentar el amor de Cristo de manera tangible y transformadora.
+            </p>
+            <p>
+              Hoy, la Casa del Rey es una iglesia vibrante donde cientos de
+              personas se reúnen semanalmente para adorar, aprender y servir.
+              Hemos crecido no solo en números, sino en madurez espiritual y en
+              nuestro impacto genuino en la comunidad.
+            </p>
+          </div>
+
+          {/* Botón Explorar Más */}
+          <div className="mt-12 text-center">
+            <Link
+              to="/historia"
+              className="inline-flex items-center gap-3 bg-accent-blue text-white font-semibold py-3 px-8 hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 uppercase text-xs tracking-widest rounded-lg"
             >
-              <h3 className="text-xl font-bold text-blue-600 mb-4">
-                Iniciamos con una Visión
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Nacimos hace más de 15 años con la firme convicción de impactar a nuestra ciudad. Desde reuniones en una pequeña sala, crecimos impulsados por el amor de Jesús y el deseo de ver vidas transformadas y familias restauradas.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="md:w-1/2 text-left"
-            >
-              <h3 className="text-xl font-bold text-blue-600 mb-4">
-                Hoy: Una Comunidad Viva
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Hoy, Casa del Rey es una comunidad vibrante de jóvenes, familias y líderes que buscan a Dios con pasión. Creemos que el mejor momento de la iglesia está por venir, y estamos listos para alcanzar a la próxima generación.
-              </p>
-            </motion.div>
+              <span>Ver Historia Completa</span>
+              <ArrowRightIcon className="w-4 h-4" />
+            </Link>
           </div>
         </motion.div>
       </div>

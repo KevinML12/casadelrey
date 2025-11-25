@@ -19,19 +19,19 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 min-h-screen bg-gray-800 text-white flex flex-col">
+    <div className="w-64 min-h-screen bg-dark-text text-white flex flex-col transition-colors">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
+      <div className="p-6 border-b border-gray-700 transition-colors">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-xl font-bold">CR</span>
+          <div className="w-12 h-12 bg-accent-blue flex items-center justify-center">
+            <span className="text-xl font-black">CR</span>
           </div>
-          <span className="text-lg font-bold">Casa del Rey</span>
+          <span className="text-lg font-black uppercase tracking-tight">Casa del Rey</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -39,15 +39,15 @@ const Sidebar = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center space-x-3 p-3 rounded-lg transition duration-200 ${
+                `flex items-center space-x-3 p-4 transition-colors duration-200 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-300 hover:bg-gray-700'
+                    ? 'bg-accent-blue text-white font-black'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800 font-bold'
                 }`
               }
             >
-              <Icon className="w-5 h-5" />
-              <span className="font-medium">{item.name}</span>
+              <Icon className="w-6 h-6" />
+              <span className="text-sm uppercase tracking-wide">{item.name}</span>
             </NavLink>
           );
         })}
@@ -56,9 +56,9 @@ const Sidebar = () => {
       {/* User Info & Logout */}
       <div className="p-4 border-t border-gray-700">
         {/* User Email */}
-        <div className="mb-3 px-3">
-          <p className="text-xs text-gray-400 mb-1">Conectado como:</p>
-          <p className="text-sm text-white truncate font-medium">
+        <div className="mb-4 px-4">
+          <p className="text-xs text-gray-500 mb-2 font-black uppercase tracking-widest">Conectado como:</p>
+          <p className="text-sm text-white truncate font-bold">
             {user?.email || 'usuario@ejemplo.com'}
           </p>
         </div>
@@ -66,10 +66,10 @@ const Sidebar = () => {
         {/* Logout Button */}
         <button
           onClick={logout}
-          className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-200"
+          className="w-full flex items-center space-x-3 p-4 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors duration-200"
         >
-          <ArrowRightOnRectangleIcon className="w-5 h-5" />
-          <span className="font-medium">Salir</span>
+          <ArrowRightOnRectangleIcon className="w-6 h-6" />
+          <span className="font-bold text-sm uppercase tracking-wide">Salir</span>
         </button>
       </div>
     </div>

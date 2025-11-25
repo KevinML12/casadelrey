@@ -1,5 +1,7 @@
 // frontend/src/components/Forms/PrayerForm.jsx
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 const PrayerForm = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +29,7 @@ const PrayerForm = () => {
 
     try {
       // UTILIZAR LA VARIABLE DE ENTORNO EN LUGAR DE LA URL HARDCODEADA
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       
       const response = await fetch(`${apiUrl}/api/contact/petition`, {
         method: 'POST',
@@ -58,27 +60,40 @@ const PrayerForm = () => {
   };
 
   return (
-    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border-t-4 border-yellow-400 w-full max-w-2xl mx-auto">
-      <h3 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+    <div className="bg-white dark:bg-gray-900 p-6 sm:p-8 rounded-xl border border-gray-200/50 dark:border-gray-800/50 w-full max-w-2xl mx-auto shadow-sm hover:shadow-md transition-all">
+      <h3 className="text-3xl font-display font-bold text-dark-text dark:text-white mb-4 text-center tracking-tight">
         {formData.is_prayer ? 'Petición de Oración' : 'Formulario de Contacto'}
       </h3>
-      <p className="text-center text-gray-600 mb-8">
+      <p className="text-center text-dark-text/70 dark:text-gray-400 mb-8 font-normal">
         Queremos saber de ti. Llénalo y nos pondremos en contacto o estaremos orando.
       </p>
 
       {/* Mensaje de Estado */}
       {status !== 'idle' && status !== 'loading' && (
-        <div className={`p-4 mb-4 rounded-lg font-medium text-center ${
-          status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`}>
-          {message}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-4 mb-6 rounded-lg font-medium text-center flex items-center justify-center gap-2 ${
+            status === 'success' 
+              ? 'bg-green-50/50 text-green-700 border border-green-200/50 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50' 
+              : 'bg-red-50/50 text-red-700 border border-red-200/50 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50'
+          }`}
+        >
+          {status === 'success' ? (
+            <CheckCircleIcon className="w-5 h-5" />
+          ) : (
+            <ExclamationCircleIcon className="w-5 h-5" />
+          )}
+          <span className="text-sm">{message}</span>
+        </motion.div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Input: Nombre */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre Completo <span className="text-red-500">*</span></label>
+          <label htmlFor="name" className="block text-sm font-semibold text-dark-text dark:text-white mb-2">
+            Nombre Completo <span className="text-accent-blue">*</span>
+          </label>
           <input
             type="text"
             id="name"
@@ -86,13 +101,16 @@ const PrayerForm = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2.5 border border-gray-200/50 dark:border-gray-800/50 rounded-lg bg-white dark:bg-gray-800 text-dark-text dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all font-normal text-sm"
+            placeholder="Tu nombre"
           />
         </div>
 
         {/* Input: Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo Electrónico <span className="text-red-500">*</span></label>
+          <label htmlFor="email" className="block text-sm font-semibold text-dark-text dark:text-white mb-2">
+            Correo Electrónico <span className="text-accent-blue">*</span>
+          </label>
           <input
             type="email"
             id="email"
@@ -100,26 +118,32 @@ const PrayerForm = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2.5 border border-gray-200/50 dark:border-gray-800/50 rounded-lg bg-white dark:bg-gray-800 text-dark-text dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all font-normal text-sm"
+            placeholder="tu@email.com"
           />
         </div>
 
         {/* Input: Teléfono (Opcional) */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Teléfono (Opcional)</label>
+          <label htmlFor="phone" className="block text-sm font-semibold text-dark-text dark:text-white mb-2">
+            Teléfono <span className="text-dark-text/50 dark:text-gray-500">(Opcional)</span>
+          </label>
           <input
             type="tel"
             id="phone"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2.5 border border-gray-200/50 dark:border-gray-800/50 rounded-lg bg-white dark:bg-gray-800 text-dark-text dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all font-normal text-sm"
+            placeholder="+56 9 XXXX XXXX"
           />
         </div>
 
         {/* Textarea: Mensaje */}
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700">Tu Mensaje / Petición <span className="text-red-500">*</span></label>
+          <label htmlFor="message" className="block text-sm font-semibold text-dark-text dark:text-white mb-2">
+            Tu Mensaje / Petición <span className="text-accent-blue">*</span>
+          </label>
           <textarea
             id="message"
             name="message"
@@ -127,22 +151,23 @@ const PrayerForm = () => {
             value={formData.message}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2.5 border border-gray-200/50 dark:border-gray-800/50 rounded-lg bg-white dark:bg-gray-800 text-dark-text dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all font-normal text-sm resize-none"
+            placeholder="Cuéntanos tu petición o mensaje..."
           ></textarea>
         </div>
         
         {/* Checkbox: Tipo de Petición */}
-        <div className="flex items-center">
+        <div className="flex items-start gap-3 py-2">
           <input
             id="is_prayer"
             name="is_prayer"
             type="checkbox"
             checked={formData.is_prayer}
             onChange={handleChange}
-            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="w-5 h-5 text-accent-blue border border-gray-200/50 dark:border-gray-800/50 rounded focus:ring-2 focus:ring-accent-blue mt-0.5 cursor-pointer"
           />
-          <label htmlFor="is_prayer" className="ml-2 block text-sm text-gray-900">
-            Marcar si es una <strong>Petición de Oración</strong> (Dejar sin marcar para Contacto General).
+          <label htmlFor="is_prayer" className="text-sm font-normal text-dark-text/70 dark:text-gray-400 cursor-pointer">
+            Marcar si es una <span className="font-semibold text-dark-text dark:text-white">Petición de Oración</span> (Dejar sin marcar para Contacto General).
           </label>
         </div>
 
@@ -150,10 +175,10 @@ const PrayerForm = () => {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-gray-900 transition duration-300 transform ${
+          className={`w-full py-2.5 px-4 rounded-lg font-semibold text-xs uppercase tracking-widest text-center transition-all duration-300 ${
             status === 'loading'
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-yellow-400 hover:bg-yellow-300 hover:scale-[1.01]'
+              ? 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+              : 'bg-accent-blue text-white hover:bg-blue-700 hover:shadow-md'
           }`}
         >
           {status === 'loading' ? 'Enviando...' : 'Enviar Petición'}

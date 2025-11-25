@@ -13,13 +13,13 @@ const donations = [
 
 const DonationHistoryPage = () => {
   const handleDownload = (receiptFile) => {
-    console.log(`Descargando recibo: ${receiptFile}`);
     // Lógica para iniciar la descarga del archivo (API GO Endpoint)
+    window.open(receiptFile, '_blank');
   };
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+      <h1 className="text-3xl font-display font-bold text-dark-text dark:text-white mb-6">
         Historial de Donaciones
       </h1>
 

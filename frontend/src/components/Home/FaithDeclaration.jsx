@@ -11,27 +11,27 @@ const FaithDeclaration = () => {
   ];
 
   return (
-    <section className="py-16 sm:py-24 bg-blue-600">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl font-bold text-white text-center mb-12">
+    <section className="py-24 sm:py-32 bg-white dark:bg-gray-950 transition-colors border-b border-gray-200/50 dark:border-gray-800/50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-6xl sm:text-7xl lg:text-8xl font-display font-bold text-dark-text dark:text-white text-center mb-20 tracking-tight transition-colors">
           Lo que Creemos
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-400">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="bg-white dark:bg-gray-800 p-10 rounded-xl border border-gray-200/50 dark:border-gray-700/50 transition-colors">
+            <h3 className="text-3xl font-display font-bold text-dark-text dark:text-white mb-6 transition-colors">
               Declaración de Fe
             </h3>
-            <p className="text-gray-600 mb-6">
-              Nuestra fe se basa en principios bíblicos inamovibles que nos dan dirección y propósito. Creemos en un Dios vivo y activo.
+            <p className="text-dark-text/70 dark:text-gray-300 text-lg font-normal leading-relaxed transition-colors">
+              Nuestra fe se basa en principios bíblicos inamovibles que nos dan dirección y propósito. Creemos en un Dios vivo, activo y presente en nuestras vidas.
             </p>
           </div>
           
           <ul className="space-y-4">
             {beliefs.map((belief, index) => (
-              <li key={index} className="flex items-start space-x-3 p-4 bg-blue-700 rounded-lg shadow-md hover:bg-blue-800 transition">
-                <CheckBadgeIcon className="flex-shrink-0 w-6 h-6 text-yellow-400 mt-1" />
-                <span className="text-white font-medium">{belief}</span>
+              <li key={index} className="flex items-start gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/50 dark:border-gray-700/50 hover:border-accent-blue/50 dark:hover:border-accent-blue/50 transition-all">
+                <CheckBadgeIcon className="flex-shrink-0 w-6 h-6 text-accent-blue mt-0.5" />
+                <span className="text-dark-text/70 dark:text-gray-300 font-normal text-base transition-colors">{belief}</span>
               </li>
             ))}
           </ul>

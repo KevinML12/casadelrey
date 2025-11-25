@@ -39,7 +39,7 @@ const GroupsPage = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-display font-bold text-dark-text dark:text-white mb-2">
           Mis Grupos
         </h1>
         <p className="text-gray-600">

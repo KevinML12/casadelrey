@@ -1,14 +1,12 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
+import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
 const RegisterPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -20,75 +18,51 @@ const RegisterPage = () => {
 
   const password = watch('password');
 
-  const onSubmit = async (data) => {
-    try {
-      setIsLoading(true);
-      setError('');
-
-      // Simular fetch a /api/register
-      const response = await fetch('/api/register', {
+  const registerMutation = useMutation({
+    mutationFn: async ({ name, email, password }) => {
+      const response = await fetch('http://localhost:8080/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.message || 'Error al registrarse');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al registrarse');
       }
 
-      // Éxito
-      setSuccess(true);
-
-      // Redirigir a /login después de 2 segundos
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success('¡Cuenta creada exitosamente! Redirigiendo...');
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-    } catch (err) {
-      setError(err.message || 'El email ya existe');
-    } finally {
-      setIsLoading(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || 'El email ya existe');
     }
+  });
+
+  const onSubmit = (data) => {
+    registerMutation.mutate({
+      name: data.name,
+      email: data.email,
+      password: data.password
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center py-12 px-4 transition-colors">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-white p-10 rounded-xl shadow-xl"
+        className="max-w-md w-full bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 p-10 rounded-xl shadow-sm hover:shadow-md transition-all"
       >
-        <h2 className="text-center text-3xl font-bold text-gray-900 mb-6">
+        <h2 className="text-center text-3xl font-display font-bold text-dark-text dark:text-white mb-8 tracking-tight transition-colors">
           Crear una Cuenta
         </h2>
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg"
-          >
-            {error}
-          </motion.div>
-        )}
-
-        {success && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg"
-          >
-            ¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión...
-          </motion.div>
-        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
@@ -152,16 +126,15 @@ const RegisterPage = () => {
           <Button
             type="submit"
             variant="primary"
-            isLoading={isLoading}
-            disabled={success}
+            isLoading={registerMutation.isPending}
             className="w-full"
           >
-            {isLoading ? 'Registrando...' : 'Registrarse'}
+            Registrarse
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <Link to="/login" className="text-sm text-blue-600 hover:underline">
+        <div className="mt-8 pt-8 border-t border-gray-200/50 dark:border-gray-800/50 text-center space-y-3 transition-colors">
+          <Link to="/login" className="block text-sm font-semibold text-accent-blue hover:text-blue-700 uppercase tracking-widest transition-colors">
             ¿Ya tienes cuenta? Inicia sesión aquí
           </Link>
         </div>
