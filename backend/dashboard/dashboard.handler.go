@@ -3,9 +3,9 @@ package dashboard
 import (
 	"net/http"
 
-	"casa-del-rey/backend/auth"
-	"casa-del-rey/backend/donation"
-	"casa-del-rey/backend/petition"
+	"casadelrey/backend/auth"
+	"casadelrey/backend/donation"
+	"casadelrey/backend/petition"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"

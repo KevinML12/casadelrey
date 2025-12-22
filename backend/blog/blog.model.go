@@ -1,7 +1,7 @@
 package blog
 
 import (
-	"casa-del-rey/backend/auth"
+	"casadelrey/backend/auth"
 
 	"gorm.io/gorm"
 )

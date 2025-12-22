@@ -3,7 +3,7 @@ package auth
 import (
 	"time"
 
-	"casa-del-rey/backend/config"
+	"casadelrey/backend/config"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"

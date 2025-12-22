@@ -1,37 +1,38 @@
-// frontend/src/App.jsx
+import { Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { AuthProvider } from './context/AuthContext';
+import { SiteConfigProvider } from './context/SiteConfigContext';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
 import { Toaster } from 'react-hot-toast';
-import Home from './pages/Home';
 
-function App() {
+export default function App() {
+  useEffect(() => {
+    // Inicializar tema desde localStorage o preferencia del sistema
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   return (
-    <>
-      <Home />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#4ade80',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
-    </>
+    <SiteConfigProvider>
+      <AuthProvider>
+        <div className="min-h-screen flex flex-col bg-bg-light dark:bg-dark-bg text-text-primary dark:text-dark-text-primary transition-colors duration-200">
+          <Header />
+          <main className="flex-1 w-full py-8">
+            <div className="container mx-auto">
+              <Outlet />
+            </div>
+          </main>
+          <Footer />
+        </div>
+        <Toaster position="bottom-right" />
+      </AuthProvider>
+    </SiteConfigProvider>
   );
 }
-
-export default App;

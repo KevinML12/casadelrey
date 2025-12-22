@@ -2,24 +2,13 @@ package handlers
 
 import (
 	"log"
-	"net/http"
+	"strconv"
 
-	"casa-del-rey/backend/auth"
+	"casadelrey/backend/models"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
-
-// Post representa el modelo de post de blog
-type Post struct {
-	gorm.Model
-	Title    string    `json:"title" gorm:"not null"`
-	Slug     string    `json:"slug" gorm:"unique;not null"`
-	Content  string    `json:"content" gorm:"type:text;not null"`
-	AuthorID uint      `json:"author_id" gorm:"not null"`
-	Status   string    `json:"status" gorm:"default:draft"`
-	Author   auth.User `json:"author" gorm:"foreignKey:AuthorID"`
-}
 
 // BlogHandler maneja las operaciones de blog
 type BlogHandler struct {
@@ -32,40 +21,40 @@ func NewBlogHandler(db *gorm.DB) *BlogHandler {
 }
 
 // GetPublishedPosts lista todos los posts publicados
-func (h *BlogHandler) GetPublishedPosts(c echo.Context) error {
-	var posts []Post
+func (h *BlogHandler) GetPublishedPosts(c *fiber.Ctx) error {
+	var posts []models.Post
 	if result := h.DB.Where("status = ?", "published").Preload("Author").Order("created_at DESC").Find(&posts); result.Error != nil {
 		log.Printf("Error al obtener posts: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al obtener los posts",
 		})
 	}
 
-	return c.JSON(http.StatusOK, posts)
+	return c.Status(fiber.StatusOK).JSON(posts)
 }
 
 // GetPostBySlug obtiene un post por su slug
-func (h *BlogHandler) GetPostBySlug(c echo.Context) error {
-	slug := c.Param("slug")
+func (h *BlogHandler) GetPostBySlug(c *fiber.Ctx) error {
+	slug := c.Params("slug")
 
-	var post Post
+	var post models.Post
 	if result := h.DB.Where("slug = ? AND status = ?", slug, "published").Preload("Author").First(&post); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return c.JSON(http.StatusNotFound, map[string]string{
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Post no encontrado",
 			})
 		}
 		log.Printf("Error al obtener post: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al obtener el post",
 		})
 	}
 
-	return c.JSON(http.StatusOK, post)
+	return c.Status(fiber.StatusOK).JSON(post)
 }
 
 // CreatePost crea un nuevo post (solo admin)
-func (h *BlogHandler) CreatePost(c echo.Context) error {
+func (h *BlogHandler) CreatePost(c *fiber.Ctx) error {
 	type CreatePostRequest struct {
 		Title   string `json:"title" validate:"required"`
 		Slug    string `json:"slug" validate:"required"`
@@ -74,13 +63,13 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 	}
 
 	req := new(CreatePostRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos"})
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Datos de entrada inválidos"})
 	}
 
 	// Validaciones
 	if req.Title == "" || req.Slug == "" || req.Content == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Título, slug y contenido son requeridos",
 		})
 	}
@@ -90,18 +79,21 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 	}
 
 	// Verificar que el slug no exista
-	var existingPost Post
+	var existingPost models.Post
 	if result := h.DB.Where("slug = ?", req.Slug).First(&existingPost); result.Error == nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Ya existe un post con ese slug",
 		})
 	}
 
 	// Obtener el user_id del contexto (establecido por AuthMiddleware)
-	userID := c.Get("user_id").(uint)
+	userID, ok := c.Locals("user_id").(uint)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "No se pudo obtener el ID de usuario"})
+	}
 
 	// Crear el post
-	post := Post{
+	post := models.Post{
 		Title:    req.Title,
 		Slug:     req.Slug,
 		Content:  req.Content,
@@ -111,7 +103,7 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 
 	if result := h.DB.Create(&post); result.Error != nil {
 		log.Printf("Error al crear post: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al crear el post",
 		})
 	}
@@ -119,14 +111,14 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 	// Cargar el autor para devolverlo en la respuesta
 	h.DB.Preload("Author").First(&post, post.ID)
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Post creado exitosamente",
 		"post":    post,
 	})
 }
 
 // UpdatePost actualiza un post existente (solo admin)
-func (h *BlogHandler) UpdatePost(c echo.Context) error {
+func (h *BlogHandler) UpdatePost(c *fiber.Ctx) error {
 	type UpdatePostRequest struct {
 		Title   string `json:"title"`
 		Slug    string `json:"slug"`
@@ -134,24 +126,28 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 		Status  string `json:"status" validate:"omitempty,oneof=draft published"`
 	}
 
-	postID := c.Param("id")
+	postIDStr := c.Params("id")
+	postID, err := strconv.ParseUint(postIDStr, 10, 32)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "ID de post inválido"})
+	}
 
 	// Buscar el post
-	var post Post
-	if result := h.DB.First(&post, postID); result.Error != nil {
+	var post models.Post
+	if result := h.DB.First(&post, uint(postID)); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return c.JSON(http.StatusNotFound, map[string]string{
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Post no encontrado",
 			})
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al buscar el post",
 		})
 	}
 
 	req := new(UpdatePostRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos"})
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Datos de entrada inválidos"})
 	}
 
 	// Actualizar campos si se proporcionan
@@ -160,9 +156,9 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 	}
 	if req.Slug != "" {
 		// Verificar que el nuevo slug no exista (excepto en este post)
-		var existingPost Post
+		var existingPost models.Post
 		if result := h.DB.Where("slug = ? AND id != ?", req.Slug, post.ID).First(&existingPost); result.Error == nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Ya existe otro post con ese slug",
 			})
 		}
@@ -180,7 +176,7 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 	// Guardar cambios
 	if result := h.DB.Save(&post); result.Error != nil {
 		log.Printf("Error al actualizar post: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al actualizar el post",
 		})
 	}
@@ -188,8 +184,9 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 	// Cargar el autor para devolverlo en la respuesta
 	h.DB.Preload("Author").First(&post, post.ID)
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Post actualizado exitosamente",
 		"post":    post,
 	})
 }
+

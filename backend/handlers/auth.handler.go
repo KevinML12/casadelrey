@@ -2,24 +2,16 @@ package handlers
 
 import (
 	"log"
-	"net/http"
 	"os"
 	"time"
 
+	"casadelrey/backend/models"
+
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
-
-// User representa el modelo de usuario
-type User struct {
-	gorm.Model
-	Name     string `json:"name" gorm:"not null"`
-	Email    string `json:"email" gorm:"unique;not null"`
-	Password string `json:"-" gorm:"not null"`
-	Role     string `json:"role" gorm:"default:member"`
-}
 
 // JWTClaims define los claims del JWT
 type JWTClaims struct {
@@ -48,7 +40,7 @@ func GetJWTSecret() []byte {
 }
 
 // Register registra un nuevo usuario
-func (h *AuthHandler) Register(c echo.Context) error {
+func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	type RegisterRequest struct {
 		Name     string `json:"name" validate:"required"`
 		Email    string `json:"email" validate:"required,email"`
@@ -56,34 +48,34 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	}
 
 	req := new(RegisterRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos"})
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Datos de entrada inválidos"})
 	}
 
 	// Validaciones básicas
 	if req.Name == "" || req.Email == "" || req.Password == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nombre, email y contraseña son requeridos"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nombre, email y contraseña son requeridos"})
 	}
 
 	if len(req.Password) < 6 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "La contraseña debe tener al menos 6 caracteres"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "La contraseña debe tener al menos 6 caracteres"})
 	}
 
 	// Verificar si el email ya existe
-	var existingUser User
+	var existingUser models.User
 	if result := h.DB.Where("email = ?", req.Email).First(&existingUser); result.Error == nil {
-		return c.JSON(http.StatusConflict, map[string]string{"error": "El email ya está registrado"})
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "El email ya está registrado"})
 	}
 
 	// Hashear la contraseña
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("Error al hashear contraseña: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al procesar la contraseña"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al procesar la contraseña"})
 	}
 
 	// Crear el nuevo usuario
-	user := User{
+	user := models.User{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: string(hashedPassword),
@@ -92,12 +84,12 @@ func (h *AuthHandler) Register(c echo.Context) error {
 
 	if result := h.DB.Create(&user); result.Error != nil {
 		log.Printf("Error al crear usuario: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear el usuario"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al crear el usuario"})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Usuario registrado exitosamente. Por favor, inicia sesión.",
-		"user": map[string]interface{}{
+		"user": fiber.Map{
 			"id":    user.ID,
 			"name":  user.Name,
 			"email": user.Email,
@@ -107,26 +99,26 @@ func (h *AuthHandler) Register(c echo.Context) error {
 }
 
 // Login autentica un usuario y genera un token JWT
-func (h *AuthHandler) Login(c echo.Context) error {
+func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	type LoginRequest struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required"`
 	}
 
 	req := new(LoginRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos"})
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Datos de entrada inválidos"})
 	}
 
 	// Buscar usuario por email
-	var user User
+	var user models.User
 	if result := h.DB.Where("email = ?", req.Email).First(&user); result.Error != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Credenciales inválidas"})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Credenciales inválidas"})
 	}
 
 	// Comparar contraseña
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Credenciales inválidas"})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Credenciales inválidas"})
 	}
 
 	// Generar token JWT
@@ -143,12 +135,12 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	tokenString, err := token.SignedString(GetJWTSecret())
 	if err != nil {
 		log.Printf("Error al generar token: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al generar el token"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al generar el token"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": tokenString,
-		"user": map[string]interface{}{
+		"user": fiber.Map{
 			"id":    user.ID,
 			"name":  user.Name,
 			"email": user.Email,

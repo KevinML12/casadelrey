@@ -1,30 +1,16 @@
 package handlers
 
 import (
-	"log"
-	"net/http"
+	"fmt"
+	"time"
 
-	"casa-del-rey/backend/config"
+	"casadelrey/backend/models"
 
-	"github.com/labstack/echo/v4"
-	"github.com/stripe/stripe-go/v79"
-	"github.com/stripe/stripe-go/v79/paymentintent"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
-// Donation representa el modelo de donación (debe coincidir con models.Donation)
-type Donation struct {
-	gorm.Model
-	Name          string  `json:"name"`
-	Email         string  `json:"email" validate:"required,email"`
-	Amount        float64 `json:"amount" validate:"required,gt=0"`
-	PaymentMethod string  `json:"payment_method"`
-	Message       string  `json:"message"`
-	Status        string  `json:"status"`
-	TransactionID string  `json:"transaction_id"`
-}
-
-// DonationHandler maneja las donaciones
+// DonationHandler maneja las operaciones de donaciones
 type DonationHandler struct {
 	DB *gorm.DB
 }
@@ -34,90 +20,49 @@ func NewDonationHandler(db *gorm.DB) *DonationHandler {
 	return &DonationHandler{DB: db}
 }
 
-// CreateStripePaymentIntent crea y confirma un PaymentIntent de Stripe
-func (h *DonationHandler) CreateStripePaymentIntent(c echo.Context) error {
-	var input struct {
-		Amount          float64 `json:"amount" validate:"required,gt=0"`
-		PaymentMethodID string  `json:"payment_method_id" validate:"required"`
-		Email           string  `json:"email" validate:"required,email"`
-		Name            string  `json:"name" validate:"required"`
-		Message         string  `json:"message"`
-	}
 
-	if err := c.Bind(&input); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Datos de entrada inválidos",
+// SimulateDonation maneja la recepción y registro de donaciones simuladas.
+func (h *DonationHandler) SimulateDonation(c *fiber.Ctx) error {
+	donation := new(models.Donation)
+
+	// 1. Parsear el cuerpo de la solicitud JSON
+	if err := c.BodyParser(donation); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "Revise los campos enviados para la donación.",
+			"details": err.Error(),
 		})
 	}
 
-	// Validar con el validador registrado
-	if err := c.Validate(&input); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
+	// 2. Validación simple (Campos obligatorios)
+	if donation.Amount <= 0 || donation.Name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "El nombre y el monto de la donación son obligatorios.",
 		})
 	}
 
-	// Configurar la clave secreta de Stripe desde config
-	if config.AppConfig.StripeKey == "" {
-		log.Println("Error: STRIPE_SECRET_KEY no está configurada")
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Configuración de pago no disponible",
-		})
+	// 3. Simulación de Transacción
+	donation.TransactionID = fmt.Sprintf("SIM-CDR-%d", time.Now().UnixNano())
+	if donation.PaymentMethod == "" {
+		donation.PaymentMethod = "Simulated Payment" // Asegura que no sea nulo
 	}
-	stripe.Key = config.AppConfig.StripeKey
+	donation.IsSuccessful = true // Forzamos a true para MVP
 
-	// Convertir amount a centavos (Stripe usa centavos)
-	amountInCents := int64(input.Amount * 100)
-
-	// Crear el PaymentIntent
-	params := &stripe.PaymentIntentParams{
-		Amount:        stripe.Int64(amountInCents),
-		Currency:      stripe.String("usd"),
-		PaymentMethod: stripe.String(input.PaymentMethodID),
-		Confirm:       stripe.Bool(true),
-		ReceiptEmail:  stripe.String(input.Email),
-		Description:   stripe.String("Donación a Casa del Rey - " + input.Name),
-	}
-
-	pi, err := paymentintent.New(params)
-	if err != nil {
-		log.Printf("Error al crear PaymentIntent de Stripe: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Error al procesar el pago",
+	// 4. Guardar en la base de datos
+	result := h.DB.Create(donation)
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "No se pudo registrar la donación.",
+			"details": result.Error.Error(),
 		})
 	}
 
-	// Verificar que el pago fue exitoso
-	if pi.Status != stripe.PaymentIntentStatusSucceeded {
-		log.Printf("PaymentIntent no exitoso: %s", pi.Status)
-		return c.JSON(http.StatusPaymentRequired, map[string]string{
-			"error":  "El pago no se completó",
-			"status": string(pi.Status),
-		})
-	}
-
-	// Crear registro de donación con estado Completed
-	donation := Donation{
-		Name:          input.Name,
-		Email:         input.Email,
-		Amount:        input.Amount,
-		PaymentMethod: "Stripe",
-		Message:       input.Message,
-		Status:        "Completed",
-		TransactionID: pi.ID,
-	}
-
-	if result := h.DB.Create(&donation); result.Error != nil {
-		log.Printf("Error al registrar donación: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "El pago fue procesado pero no se pudo registrar la donación",
-		})
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":        "Donación procesada exitosamente",
-		"transaction_id": pi.ID,
-		"amount":         input.Amount,
-		"status":         "Completed",
+	// 5. Respuesta de éxito
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"error":   false,
+		"message": "Donación registrada con éxito!",
+		"data":    donation,
 	})
 }

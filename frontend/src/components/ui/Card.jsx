@@ -1,14 +1,35 @@
-import React from 'react';
-
-const Card = ({ children, className = '', ...props }) => {
+export default function Card({ children, className = '', title, ...props }) {
   return (
-    <div 
-      className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 sm:p-8 border border-transparent dark:border-gray-700 transition-colors ${className}`}
+    <div
+      className={`bg-card-bg dark:bg-dark-card-bg rounded-lg shadow-sm hover:shadow-base transition-soft border border-border-light dark:border-dark-border p-6 ${className}`}
       {...props}
     >
+      {title && <CardHeader>{title}</CardHeader>}
       {children}
     </div>
   );
-};
+}
 
-export default Card;
+export function CardHeader({ children, className = '', ...props }) {
+  return (
+    <div className={`mb-4 pb-4 border-b border-border-light dark:border-dark-border text-primary font-semibold ${className}`} {...props}>
+      {children}
+    </div>
+  );
+}
+
+export function CardContent({ children, className = '', ...props }) {
+  return (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  );
+}
+
+export function CardFooter({ children, className = '', ...props }) {
+  return (
+    <div className={`mt-6 pt-4 border-t border-border-light dark:border-dark-border flex gap-3 ${className}`} {...props}>
+      {children}
+    </div>
+  );
+}

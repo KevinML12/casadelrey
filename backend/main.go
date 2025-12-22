@@ -1,65 +1,68 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"net/http"
+	"os"
 
-	"casa-del-rey/backend/auth"
-	"casa-del-rey/backend/blog"
-	"casa-del-rey/backend/config"
-	"casa-del-rey/backend/database"
-	"casa-del-rey/backend/donation"
-	"casa-del-rey/backend/events"
-	customMiddleware "casa-del-rey/backend/middleware"
-	"casa-del-rey/backend/petition"
-	"casa-del-rey/backend/router"
-	"casa-del-rey/backend/utils"
+	"casadelrey/backend/auth"
+	"casadelrey/backend/config"
+	"casadelrey/backend/handlers"
+	"casadelrey/backend/middleware"
+	"casadelrey/backend/routes"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Cargar configuración desde variables de entorno
-	cfg := config.LoadConfig()
+	// 1. Cargar Configuración y Variables de Entorno
+	config.LoadConfig()
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Advertencia: no se pudo cargar el archivo .env")
+	}
 
-	// Inicializar la base de datos con todos los modelos
-	database.InitDB(
-		cfg.DatabaseURL,
-		&auth.User{},         // Usuario del módulo auth
-		&petition.Petition{}, // Petición del módulo petition
-		&donation.Donation{}, // Donación del módulo donation
-		&blog.Post{},         // Post del módulo blog
-		&events.Event{},      // Evento del módulo events
-	)
+	// 2. Conectar a la Base de Datos
+	db, err := config.InitDB()
+	if err != nil {
+		log.Fatalf("Error fatal: no se pudo conectar a la base de datos: %v", err)
+	}
 
-	// Crear instancia de Echo
-	e := echo.New()
+	// 3. Inicializar Fiber
+	app := fiber.New()
 
-	// Registrar manejador de errores personalizado
-	e.HTTPErrorHandler = customMiddleware.CustomErrorHandler
-
-	// Registrar validador personalizado
-	e.Validator = &utils.CustomValidator{Validator: validator.New()}
-
-	// Middleware de seguridad básico y logs
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	// Configuración CORS profesional
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{cfg.ClientURL},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	// 4. Configurar Middleware Global (CORS)
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173, https://casadelreyhue.org",
+		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
 
-	// Configurar todas las rutas
-	router.SetupRoutes(e, database.DB)
+	// 5. Inyección de Dependencias: Crear Instancias de Handlers y Middleware
+	authHandler := auth.NewHandler(db)
+	blogHandler := handlers.NewBlogHandler(db)
+	petitionHandler := handlers.NewPetitionHandler(db)
+	donationHandler := handlers.NewDonationHandler(db)
+	
+	supabaseAuth := middleware.NewSupabaseAuthMiddleware(db, config.AppConfig.JWTSecret)
 
-	// Iniciar el servidor
-	log.Printf("Iniciando servidor en el puerto: %s", cfg.Port)
-	if err := e.Start(":" + cfg.Port); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Error al iniciar el servidor: %v", err)
+	// 6. Configurar Rutas Modulares
+	routes.SetupRoutes(app, &routes.Handlers{
+		Auth:     authHandler,
+		Blog:     blogHandler,
+		Petition: petitionHandler,
+		Donation: donationHandler,
+	}, supabaseAuth)
+
+
+	// 7. Iniciar Servidor
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
+
+	fmt.Printf("Servidor Go Fiber iniciado en http://localhost:%s\n", port)
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }

@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"casadelrey/backend/models"
+
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -21,7 +23,7 @@ func NewHandler(db *gorm.DB) *Handler {
 // GetPublicPosts devuelve todos los posts publicados
 // GET /api/blog/posts
 func (h *Handler) GetPublicPosts(c echo.Context) error {
-	var posts []Post
+	var posts []models.Post
 
 	result := h.DB.Where("status = ?", "published").
 		Preload("Author").
@@ -43,7 +45,7 @@ func (h *Handler) GetPublicPosts(c echo.Context) error {
 func (h *Handler) GetPostBySlug(c echo.Context) error {
 	slug := c.Param("slug")
 
-	var post Post
+	var post models.Post
 	result := h.DB.Where("slug = ? AND status = ?", slug, "published").
 		Preload("Author").
 		First(&post)
@@ -66,14 +68,7 @@ func (h *Handler) GetPostBySlug(c echo.Context) error {
 // CreatePost crea un nuevo post (solo admin)
 // POST /api/admin/blog
 func (h *Handler) CreatePost(c echo.Context) error {
-	type CreatePostRequest struct {
-		Title   string `json:"title" validate:"required"`
-		Slug    string `json:"slug" validate:"required"`
-		Content string `json:"content" validate:"required"`
-		Status  string `json:"status" validate:"required,oneof=draft published"`
-	}
-
-	req := new(CreatePostRequest)
+	req := new(models.Post)
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Datos de entrada inválidos",
@@ -88,7 +83,7 @@ func (h *Handler) CreatePost(c echo.Context) error {
 	}
 
 	// Verificar que el slug no exista
-	var existingPost Post
+	var existingPost models.Post
 	if result := h.DB.Where("slug = ?", req.Slug).First(&existingPost); result.Error == nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Ya existe un post con ese slug",
@@ -104,7 +99,7 @@ func (h *Handler) CreatePost(c echo.Context) error {
 	}
 
 	// Crear el post
-	post := Post{
+	post := models.Post{
 		Title:    req.Title,
 		Slug:     req.Slug,
 		Content:  req.Content,
@@ -131,17 +126,10 @@ func (h *Handler) CreatePost(c echo.Context) error {
 // UpdatePost actualiza un post existente (solo admin)
 // PUT /api/admin/blog/:id
 func (h *Handler) UpdatePost(c echo.Context) error {
-	type UpdatePostRequest struct {
-		Title   string `json:"title"`
-		Slug    string `json:"slug"`
-		Content string `json:"content"`
-		Status  string `json:"status" validate:"omitempty,oneof=draft published"`
-	}
-
 	postID := c.Param("id")
 
 	// Buscar el post
-	var post Post
+	var post models.Post
 	if result := h.DB.First(&post, postID); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, map[string]string{
@@ -153,7 +141,7 @@ func (h *Handler) UpdatePost(c echo.Context) error {
 		})
 	}
 
-	req := new(UpdatePostRequest)
+	req := new(models.Post)
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Datos de entrada inválidos",
@@ -173,7 +161,7 @@ func (h *Handler) UpdatePost(c echo.Context) error {
 	}
 	if req.Slug != "" {
 		// Verificar que el nuevo slug no exista (excepto en este post)
-		var existingPost Post
+		var existingPost models.Post
 		if result := h.DB.Where("slug = ? AND id != ?", req.Slug, post.ID).First(&existingPost); result.Error == nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"error": "Ya existe otro post con ese slug",

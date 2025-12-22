@@ -1,29 +1,109 @@
-const Input = ({ id, label, type = 'text', value, onChange, placeholder, error, className = '', ...props }) => {
-  const inputClasses = error
-    ? 'w-full px-4 py-3 border border-red-400 dark:border-red-600 rounded-lg bg-white dark:bg-gray-800 text-dark-text dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent dark:focus:ring-red-400 transition-all font-normal text-base shadow-sm'
-    : 'w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-dark-text dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent dark:focus:ring-accent-blue transition-all font-normal text-base shadow-sm';
+import React from 'react';
+
+export default function Input({
+  label,
+  error,
+  helperText,
+  size = 'md',
+  className = '',
+  ...props
+}) {
+  const sizes = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-4 py-3 text-lg',
+  };
+
+  const baseClasses = `
+    w-full
+    border border-border-light
+    dark:border-dark-border
+    rounded-lg
+    bg-card-bg
+    dark:bg-dark-card-bg
+    text-text-primary
+    dark:text-dark-text-primary
+    focus:outline-none
+    focus:border-primary
+    dark:focus:border-primary-light
+    focus:ring-2
+    focus:ring-primary focus:ring-opacity-10
+    dark:focus:ring-primary-light dark:focus:ring-opacity-20
+    transition-soft duration-200
+    font-sans
+    placeholder:text-text-muted
+    dark:placeholder:text-dark-text-muted
+  `;
+
+  const sizeClasses = sizes[size] || sizes.md;
+  const errorClasses = error ? 'border-error focus:border-error focus:ring-error dark:border-error' : '';
 
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={id} className="block text-dark-text dark:text-white font-semibold mb-2 text-sm transition-colors">
+        <label className="block text-sm font-semibold text-text-dark mb-2">
           {label}
         </label>
       )}
       <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={`${inputClasses} ${className}`}
+        className={`${baseClasses} ${sizeClasses} ${errorClasses} ${className} bg-white border border-[#0066FF] shadow-[0_2px_8px_rgba(0,102,255,0.03)]`}
         {...props}
       />
       {error && (
-        <p className="mt-2 text-xs text-red-600 dark:text-red-400 transition-colors font-normal">{error}</p>
+        <p className="mt-1 text-sm text-error font-medium">{error.message}</p>
+      )}
+      {helperText && !error && (
+        <p className="mt-1 text-sm text-text-muted">{helperText}</p>
       )}
     </div>
   );
-};
+}
 
-export default Input;
+export function Textarea({
+  label,
+  error,
+  helperText,
+  rows = 4,
+  className = '',
+  ...props
+}) {
+  const baseClasses = `
+    w-full
+    px-4 py-2
+    border border-border-light
+    rounded-input
+    bg-card-bg
+    text-text-dark
+    focus:outline-none
+    focus:border-caoba
+    focus:ring-2
+    focus:ring-caoba focus:ring-opacity-20
+    transition-soft duration-200
+    font-sans
+    placeholder:text-text-muted
+    resize-vertical
+  `;
+
+  const errorClasses = error ? 'border-error focus:border-error focus:ring-error' : '';
+
+  return (
+    <div className="w-full">
+      {label && (
+        <label className="block text-sm font-semibold text-text-dark mb-2">
+          {label}
+        </label>
+      )}
+      <textarea
+        rows={rows}
+        className={`${baseClasses} ${errorClasses} ${className}`}
+        {...props}
+      />
+      {error && (
+        <p className="mt-1 text-sm text-error font-medium">{error.message}</p>
+      )}
+      {helperText && !error && (
+        <p className="mt-1 text-sm text-text-muted">{helperText}</p>
+      )}
+    </div>
+  );
+}

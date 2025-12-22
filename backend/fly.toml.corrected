@@ -1,0 +1,16 @@
+# fly.toml app configuration file for casa-del-rey-mvp
+# See https://fly.io/docs/reference/configuration/ for information about this file.
+
+app = "casa-del-rey-mvp"
+primary_region = "scl"
+
+# RECOMENDACIÓN: La sección [build] ha sido eliminada.
+# Al no especificar un builder, Fly.io detectará y usará tu Dockerfile automáticamente.
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]

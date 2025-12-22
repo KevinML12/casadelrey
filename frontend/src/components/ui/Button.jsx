@@ -1,52 +1,35 @@
-const Button = ({ children, variant = 'primary', className = '', isLoading = false, disabled = false, ...props }) => {
-  const baseStyle = 'py-3 px-6 font-semibold text-sm uppercase tracking-widest transition-all duration-300 w-full flex justify-center items-center rounded-lg shadow-sm hover:shadow-md';
-  
-  // Azul brillante para interfaces (Login, Formularios, Admin)
-  const primaryStyle = 'bg-accent-blue text-white hover:bg-blue-700 dark:bg-accent-blue dark:hover:bg-blue-600 hover:scale-[1.02] transition-all';
-  
-  // Botón inverso para Hero Section (Blanco con texto Negro)
-  const heroInverseStyle = 'bg-white text-dark-text hover:bg-gray-100 dark:bg-white dark:hover:bg-gray-200 dark:text-dark-text shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all';
-  
-  // Outline minimalista
-  const outlineStyle = 'bg-transparent text-white border-2 border-white hover:bg-white hover:text-dark-text dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-dark-text transition-all';
-  
-  // Secondary con menos prominencia
-  const secondaryStyle = 'bg-gray-100 text-dark-text hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all';
-
-  const disabledStyle = disabled || isLoading ? 'opacity-50 cursor-not-allowed hover:scale-100' : '';
-
-  let variantStyle;
-  switch (variant) {
-    case 'hero-inverse':
-      variantStyle = heroInverseStyle;
-      break;
-    case 'outline':
-      variantStyle = outlineStyle;
-      break;
-    case 'secondary':
-      variantStyle = secondaryStyle;
-      break;
-    case 'primary':
-    default:
-      variantStyle = primaryStyle;
-  }
-
+export default function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  className = '',
+  ...props
+}) {
+  const variants = {
+    primary: 'bg-primary text-white hover:bg-primary-dark shadow-sm hover:shadow-base font-semibold transition-soft',
+    secondary: 'bg-white border border-border-light text-text-primary hover:bg-bg-light-alt hover:border-border-medium shadow-sm hover:shadow-sm font-semibold transition-soft',
+    outline: 'border border-primary text-primary hover:bg-primary hover:text-white font-semibold transition-soft',
+    ghost: 'text-primary hover:bg-bg-light-alt font-semibold transition-soft',
+    accent: 'bg-primary text-white hover:bg-primary-dark shadow-sm hover:shadow-base font-semibold transition-soft',
+    danger: 'bg-error text-white hover:bg-red-700 shadow-sm hover:shadow-base font-semibold transition-soft',
+  };
+  const sizes = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg',
+    xl: 'px-8 py-4 text-xl',
+  };
+  const baseClasses = 'rounded-lg font-medium inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-bg';
+  const variantClasses = variants[variant] || variants.primary;
+  const sizeClasses = sizes[size] || sizes.md;
   return (
     <button
-      className={`${baseStyle} ${variantStyle} ${disabledStyle} ${className}`}
-      disabled={disabled || isLoading}
+      className={`${baseClasses} ${variantClasses} ${sizeClasses} ${className}`}
+      disabled={disabled}
       {...props}
     >
-      {isLoading ? (
-        <>
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-          <span>Cargando...</span>
-        </>
-      ) : (
-        children
-      )}
+      {children}
     </button>
   );
-};
-
-export default Button;
+}

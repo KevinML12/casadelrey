@@ -2,23 +2,15 @@ package handlers
 
 import (
 	"log"
-	"net/http"
+	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"casadelrey/backend/models"
+
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
-// Petition representa el modelo de petición (debe coincidir con models.Petition)
-type Petition struct {
-	gorm.Model
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Phone    string `json:"phone"`
-	Message  string `json:"message" validate:"required"`
-	IsPrayer bool   `json:"is_prayer"`
-}
-
-// PetitionHandler maneja las peticiones
+// PetitionHandler maneja las peticiones de oración
 type PetitionHandler struct {
 	DB *gorm.DB
 }
@@ -28,27 +20,54 @@ func NewPetitionHandler(db *gorm.DB) *PetitionHandler {
 	return &PetitionHandler{DB: db}
 }
 
+
 // CreatePetition crea una nueva petición
-func (h *PetitionHandler) CreatePetition(c echo.Context) error {
-	p := new(Petition)
-	if err := c.Bind(p); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos"})
+func (h *PetitionHandler) CreatePetition(c *fiber.Ctx) error {
+	p := new(models.Petition)
+	if err := c.BodyParser(p); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Datos de entrada inválidos"})
 	}
 
-	// Validar con el validador registrado
-	if err := c.Validate(p); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
-		})
-	}
+	// TODO: Add validation
 
 	if result := h.DB.Create(&p); result.Error != nil {
 		log.Printf("Error al guardar petición: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Fallo al guardar la petición."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Fallo al guardar la petición."})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Petición guardada con éxito",
 		"id":      p.ID,
 	})
+}
+
+// GetAllPetitions obtiene todas las peticiones (solo admin)
+func (h *PetitionHandler) GetAllPetitions(c *fiber.Ctx) error {
+	var petitions []models.Petition
+	if result := h.DB.Order("created_at desc").Find(&petitions); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error al obtener las peticiones",
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(petitions)
+}
+
+// MarkAsRead marca una petición como leída (solo admin)
+func (h *PetitionHandler) MarkAsRead(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "ID de petición inválido"})
+	}
+
+	var petition models.Petition
+	if result := h.DB.First(&petition, id); result.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Petición no encontrada"})
+	}
+
+	petition.IsAnswered = true
+	if result := h.DB.Save(&petition); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "No se pudo actualizar la petición"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(petition)
 }

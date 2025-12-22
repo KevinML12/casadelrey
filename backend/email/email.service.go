@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"casa-del-rey/backend/config"
+	"casadelrey/backend/config"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"

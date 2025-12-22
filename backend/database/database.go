@@ -2,7 +2,9 @@ package database
 
 import (
 	"log"
+	"os"
 
+	"casadelrey/backend/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -10,7 +12,8 @@ import (
 var DB *gorm.DB
 
 // InitDB inicializa la conexión a la base de datos y ejecuta las migraciones
-func InitDB(databaseURL string, models ...interface{}) {
+func InitDB() {
+	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
 		log.Fatal("Error: DATABASE_URL no está configurada. ¡Requerida para seguridad!")
 	}
@@ -23,7 +26,7 @@ func InitDB(databaseURL string, models ...interface{}) {
 
 	// Migración: Crea las tablas si no existen
 	log.Println("Iniciando migración de la base de datos...")
-	err = DB.AutoMigrate(models...)
+	err = DB.AutoMigrate(&models.User{}, &models.Post{}, &models.Petition{}, &models.Donation{})
 	if err != nil {
 		log.Fatalf("Error durante la migración: %v", err)
 	}

@@ -1,13 +1,12 @@
 package auth
 
 import (
-	"casa-del-rey/backend/email"
+	"casadelrey/backend/email"
 	"log"
-	"net/http"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +21,7 @@ func NewHandler(db *gorm.DB) *Handler {
 }
 
 // Register registra un nuevo usuario
-func (h *Handler) Register(c echo.Context) error {
+func (h *Handler) Register(c *fiber.Ctx) error {
 	type RegisterRequest struct {
 		Name     string `json:"name" validate:"required"`
 		Email    string `json:"email" validate:"required,email"`
@@ -30,23 +29,16 @@ func (h *Handler) Register(c echo.Context) error {
 	}
 
 	req := new(RegisterRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Datos de entrada inválidos",
-		})
-	}
-
-	// Validar con el validador registrado
-	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
 		})
 	}
 
 	// Verificar si el email ya existe
 	var existingUser User
 	if result := h.DB.Where("email = ?", req.Email).First(&existingUser); result.Error == nil {
-		return c.JSON(http.StatusConflict, map[string]string{
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"error": "El email ya está registrado",
 		})
 	}
@@ -55,7 +47,7 @@ func (h *Handler) Register(c echo.Context) error {
 	hashedPassword, err := HashPassword(req.Password)
 	if err != nil {
 		log.Printf("Error al hashear contraseña: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al procesar la contraseña",
 		})
 	}
@@ -70,7 +62,7 @@ func (h *Handler) Register(c echo.Context) error {
 
 	if result := h.DB.Create(&user); result.Error != nil {
 		log.Printf("Error al crear usuario: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al crear el usuario",
 		})
 	}
@@ -82,9 +74,9 @@ func (h *Handler) Register(c echo.Context) error {
 		email.GetWelcomeTemplate(user.Name),
 	)
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Usuario registrado exitosamente. Por favor, inicia sesión.",
-		"user": map[string]interface{}{
+		"user": fiber.Map{
 			"id":    user.ID,
 			"name":  user.Name,
 			"email": user.Email,
@@ -94,37 +86,30 @@ func (h *Handler) Register(c echo.Context) error {
 }
 
 // Login autentica un usuario y genera un token JWT
-func (h *Handler) Login(c echo.Context) error {
+func (h *Handler) Login(c *fiber.Ctx) error {
 	type LoginRequest struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required"`
 	}
 
 	req := new(LoginRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Datos de entrada inválidos",
-		})
-	}
-
-	// Validar con el validador registrado
-	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
 		})
 	}
 
 	// Buscar usuario por email
 	var user User
 	if result := h.DB.Where("email = ?", req.Email).First(&user); result.Error != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Credenciales inválidas",
 		})
 	}
 
 	// Comparar contraseña
 	if err := ComparePassword(user.Password, req.Password); err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Credenciales inválidas",
 		})
 	}
@@ -133,14 +118,14 @@ func (h *Handler) Login(c echo.Context) error {
 	token, err := GenerateJWT(user.ID, user.Role)
 	if err != nil {
 		log.Printf("Error al generar token: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al generar el token",
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": token,
-		"user": map[string]interface{}{
+		"user": fiber.Map{
 			"id":    user.ID,
 			"name":  user.Name,
 			"email": user.Email,
@@ -150,22 +135,15 @@ func (h *Handler) Login(c echo.Context) error {
 }
 
 // ForgotPassword maneja la solicitud de reseteo de contraseña
-func (h *Handler) ForgotPassword(c echo.Context) error {
+func (h *Handler) ForgotPassword(c *fiber.Ctx) error {
 	type ForgotPasswordRequest struct {
 		Email string `json:"email" validate:"required,email"`
 	}
 
 	req := new(ForgotPasswordRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Datos de entrada inválidos",
-		})
-	}
-
-	// Validar con el validador registrado
-	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
 		})
 	}
 
@@ -173,7 +151,7 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 	var user User
 	if result := h.DB.Where("email = ?", req.Email).First(&user); result.Error != nil {
 		// Por seguridad, devolver el mismo mensaje aunque el usuario no exista
-		return c.JSON(http.StatusOK, map[string]string{
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "Si el email existe, recibirás un correo con instrucciones para resetear tu contraseña",
 		})
 	}
@@ -188,7 +166,7 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 
 	if result := h.DB.Save(&user); result.Error != nil {
 		log.Printf("Error al guardar token de reseteo: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al procesar la solicitud",
 		})
 	}
@@ -200,43 +178,36 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 		email.GetPasswordResetTemplate(resetToken),
 	)
 
-	return c.JSON(http.StatusOK, map[string]string{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Si el email existe, recibirás un correo con instrucciones para resetear tu contraseña",
 	})
 }
 
 // ResetPassword maneja la actualización de la contraseña con el token
-func (h *Handler) ResetPassword(c echo.Context) error {
+func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 	type ResetPasswordRequest struct {
 		Token       string `json:"token" validate:"required"`
 		NewPassword string `json:"newPassword" validate:"required,min=6"`
 	}
 
 	req := new(ResetPasswordRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Datos de entrada inválidos",
-		})
-	}
-
-	// Validar con el validador registrado
-	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
 		})
 	}
 
 	// Buscar usuario por token de reseteo
 	var user User
 	if result := h.DB.Where("reset_token = ?", req.Token).First(&user); result.Error != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Token inválido o expirado",
 		})
 	}
 
 	// Verificar si el token ha expirado
 	if user.ResetTokenExpiry == nil || time.Now().After(*user.ResetTokenExpiry) {
-		return c.JSON(http.StatusBadRequest, map[string]string{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Token inválido o expirado",
 		})
 	}
@@ -245,7 +216,7 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 	hashedPassword, err := HashPassword(req.NewPassword)
 	if err != nil {
 		log.Printf("Error al hashear contraseña: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al procesar la contraseña",
 		})
 	}
@@ -257,12 +228,12 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 
 	if result := h.DB.Save(&user); result.Error != nil {
 		log.Printf("Error al actualizar contraseña: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al actualizar la contraseña",
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Contraseña actualizada exitosamente. Por favor, inicia sesión con tu nueva contraseña.",
 	})
 }

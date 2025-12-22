@@ -1,61 +1,31 @@
-import { createContext, useContext } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { createContext, useState, useContext, useEffect } from 'react';
 
-const SiteConfigContext = createContext(null);
+export const SiteConfigContext = createContext();
 
-export const SiteConfigProvider = ({ children }) => {
-  const { data: config, isLoading, isError, error } = useQuery({
-    queryKey: ['site-config'],
-    queryFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-      const response = await fetch(`${apiUrl}/api/site/config`);
-
-      if (!response.ok) {
-        throw new Error('Error al cargar la configuración del sitio');
-      }
-
-      return response.json();
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutos - la configuración no cambia frecuentemente
-    cacheTime: 30 * 60 * 1000, // 30 minutos en cache
-    retry: 2,
-    refetchOnWindowFocus: false
+export function SiteConfigProvider({ children }) {
+  const [config, setConfig] = useState({
+    appId: import.meta.env.VITE_APP_ID || 'casa-del-rey',
+    appTitle: import.meta.env.VITE_APP_TITLE || 'Casa del Rey',
+    apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+    stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY || '',
   });
 
-  // Configuración por defecto mientras se carga o si hay error
-  const defaultConfig = {
-    facebook_url: '',
-    instagram_url: '',
-    youtube_url: '',
-    twitter_url: '',
-    address: '',
-    phone: '',
-    email: '',
-    church_name: 'Casa del Rey',
-    description: '',
-    logo_url: ''
-  };
-
-  const value = {
-    config: config || defaultConfig,
-    isLoading,
-    isError,
-    error
-  };
+  useEffect(() => {
+    // Aquí puedes cargar configuración desde un endpoint si es necesario
+    console.log('App Config loaded:', config);
+  }, [config]);
 
   return (
-    <SiteConfigContext.Provider value={value}>
+    <SiteConfigContext.Provider value={config}>
       {children}
     </SiteConfigContext.Provider>
   );
-};
+}
 
-export const useSiteConfig = () => {
+export function useSiteConfig() {
   const context = useContext(SiteConfigContext);
   if (!context) {
-    throw new Error('useSiteConfig debe ser usado dentro de un SiteConfigProvider');
+    throw new Error('useSiteConfig debe ser usado dentro de SiteConfigProvider');
   }
   return context;
-};
-
-export default SiteConfigContext;
+}
