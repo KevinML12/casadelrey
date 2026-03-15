@@ -1,96 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import { Check, Inbox } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
-import { Eye, Trash2, Mail, User, Phone } from 'lucide-react';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
+import toast from 'react-hot-toast';
 
 export default function AdminPetitions() {
-    const [petitions, setPetitions] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [petitions, setPetitions] = useState([]);
+  const [loading,   setLoading]   = useState(true);
 
-    const fetchPetitions = async () => {
-        setLoading(true);
-        try {
-            const response = await apiClient.get('/admin/petitions');
-            setPetitions(response.data || []);
-        } catch (error) {
-            toast.error("Error al cargar las peticiones.");
-            console.error("Error fetching petitions", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const load = () =>
+    apiClient.get('/admin/petitions')
+      .then(r => setPetitions(r.data || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
 
-    useEffect(() => {
-        fetchPetitions();
-    }, []);
-    
-    const handleMarkAsRead = async (petitionId) => {
-        try {
-            await apiClient.put(`/admin/petitions/${petitionId}/read`);
-            toast.success('Petición marcada como leída.');
-            fetchPetitions(); // Refresh the list
-        } catch (error) {
-            toast.error('Error al marcar como leída.');
-            console.error("Error marking petition as read", error);
-        }
-    };
-    
-    const handleDelete = async (petitionId) => {
-        // TODO: Backend no tiene endpoint para eliminar peticiones (DELETE /api/admin/petitions/:id)
-        toast.error('La funcionalidad de eliminar aún no está implementada en el backend.');
-    };
+  useEffect(() => { load(); }, []);
 
-    if (loading) {
-        return (
-          <div className="min-h-screen bg-bg-light dark:bg-dark-bg flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          </div>
-        );
+  const markRead = async (id) => {
+    try {
+      await apiClient.put(`/admin/petitions/${id}/read`);
+      setPetitions(prev => prev.map(p => p.id === id ? { ...p, read: true } : p));
+    } catch {
+      toast.error('Error al actualizar');
     }
+  };
 
-    return (
-        <div className="min-h-screen bg-bg-light dark:bg-dark-bg py-12">
-            <div className="container mx-auto px-6">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-4xl font-black text-text-primary dark:text-dark-text-primary">Administrar Peticiones de Oración</h1>
-                </div>
+  const unread = petitions.filter(p => !p.read).length;
 
-                <Card>
-                    <div className="space-y-6">
-                        {petitions.length > 0 ? petitions.map(petition => (
-                            <div key={petition.ID} className={`p-4 rounded-lg shadow-soft-sm border ${petition.read ? 'bg-gray-50 dark:bg-dark-bg' : 'bg-white dark:bg-dark-card-bg border-primary'}`}>
-                                <div className={`transition-opacity ${petition.read ? 'opacity-60' : 'opacity-100'}`}>
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="font-mono text-xs text-text-muted dark:text-dark-text-muted">ID: {petition.ID}</p>
-                                            <p className="mt-4 text-base text-text-primary dark:text-dark-text-primary">{petition.request}</p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            {!petition.read && (
-                                                <Button variant="ghost" size="sm" onClick={() => handleMarkAsRead(petition.ID)} title="Marcar como leída">
-                                                    <Eye size={16} />
-                                                </Button>
-                                            )}
-                                            <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(petition.ID)} title="Eliminar">
-                                                <Trash2 size={16} />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className="border-t dark:border-dark-border my-3"></div>
-                                    <div className="text-sm text-text-muted dark:text-dark-text-muted flex flex-wrap items-center gap-x-4 gap-y-1">
-                                        <span className="flex items-center gap-2"><User size={14} /> {petition.name}</span>
-                                        <span className="flex items-center gap-2"><Mail size={14} /> {petition.email}</span>
-                                        {petition.phone && <span className="flex items-center gap-2"><Phone size={14} /> {petition.phone}</span>}
-                                        <span className="flex items-center gap-2"><Calendar size={14} /> {new Date(petition.CreatedAt).toLocaleString('es-ES')}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )) : <p className="text-center text-text-muted dark:text-dark-text-muted py-8">No hay peticiones de oración.</p>}
-                    </div>
-                </Card>
-            </div>
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black text-ink">Peticiones</h1>
+          {unread > 0 && (
+            <p className="text-xs text-ink-3 mt-0.5">{unread} sin leer</p>
+          )}
         </div>
-    );
+        {unread > 0 && (
+          <span className="px-2.5 py-1 rounded-full bg-blue/10 text-blue text-xs font-bold">{unread} nueva{unread > 1 ? 's' : ''}</span>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="w-6 h-6 rounded-full border-2 border-line border-t-blue animate-spin" />
+        </div>
+      ) : petitions.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-line rounded-xl">
+          <Inbox size={32} className="mx-auto text-ink-3 mb-3" />
+          <p className="text-ink-3 text-sm">No hay peticiones aún.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {petitions.map(p => (
+            <div key={p.id}
+              className={`bg-card border rounded-xl p-5 transition-all ${p.read ? 'border-line opacity-70' : 'border-blue/20 shadow-sm'}`}>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="font-semibold text-ink text-sm">{p.name}</span>
+                    {!p.read && (
+                      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue/10 text-blue">Nueva</span>
+                    )}
+                  </div>
+                  {p.email && <p className="text-xs text-ink-3">{p.email}</p>}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs text-ink-3">
+                    {new Date(p.CreatedAt).toLocaleDateString('es-ES')}
+                  </span>
+                  {!p.read && (
+                    <button onClick={() => markRead(p.id)}
+                      className="w-7 h-7 rounded-lg bg-ok/10 text-ok hover:bg-ok/20 flex items-center justify-center transition-colors"
+                      title="Marcar como leída">
+                      <Check size={13} />
+                    </button>
+                  )}
+                </div>
+              </div>
+              {p.request && (
+                <p className="text-sm text-ink-2 leading-relaxed bg-bg-2 border border-line rounded-lg px-4 py-3 mt-2">
+                  {p.request}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

@@ -1,87 +1,61 @@
-import React, { useState } from 'react';
-import { Lock, ArrowLeft } from 'lucide-react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { KeyRound } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
 
 export default function ResetPassword() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const { token } = useParams();
-  const navigate = useNavigate();
-  const { resetPassword, loading } = useAuth();
+  const [password, setPassword]   = useState('');
+  const [confirm,  setConfirm]    = useState('');
+  const [loading,  setLoading]    = useState(false);
+  const { resetPassword } = useAuth();
+  const { token }  = useParams();
+  const navigate   = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error('Las contraseñas no coinciden.');
-      return;
-    }
-    
+    if (password !== confirm) { toast.error('Las contraseñas no coinciden'); return; }
+    if (password.length < 6)  { toast.error('Mínimo 6 caracteres'); return; }
+    setLoading(true);
     const { success, error } = await resetPassword(token, password);
-
-    if (success) {
-      toast.success('Tu contraseña ha sido restablecida exitosamente.');
-      navigate('/login');
-    } else {
-      toast.error(error || 'El enlace es inválido o ha expirado. Por favor, solicita uno nuevo.');
-    }
+    setLoading(false);
+    if (success) { toast.success('Contraseña actualizada'); navigate('/login'); }
+    else toast.error(error);
   };
 
-  const pageBgClass = "bg-bg-light dark:bg-dark-bg";
-
   return (
-    <div className={`min-h-screen flex items-center justify-center py-12 px-4 ${pageBgClass} font-sans`}>
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-           <h1 className="text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-            Crear Nueva Contraseña
-          </h1>
-          <p className="text-text-secondary dark:text-dark-text-secondary">
-            Ingresa tu nueva contraseña.
-          </p>
+    <div className="min-h-screen bg-bg flex items-center justify-center p-6">
+      <div className="w-full max-w-sm">
+        <div className="mb-8">
+          <div className="w-12 h-12 rounded-xl bg-card-2 border border-line flex items-center justify-center mb-5">
+            <KeyRound size={22} className="text-ink-2" />
+          </div>
+          <h1 className="text-2xl font-black text-ink mb-1">Nueva contraseña</h1>
+          <p className="text-ink-3 text-sm">Elige una contraseña segura para tu cuenta.</p>
         </div>
 
-        <Card>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
-                label="Nueva Contraseña"
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
-             <Input
-                label="Confirmar Nueva Contraseña"
-                type="password"
-                name="confirmPassword"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-            />
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full mt-6"
-              disabled={loading}
-            >
-              {loading ? 'Guardando...' : 'Guardar Contraseña'}
-            </Button>
-          </form>
-           <div className="mt-6 border-t border-border-light dark:border-dark-border pt-6 text-center">
-             <Link to="/login" className="text-primary font-semibold hover:underline flex items-center justify-center gap-2">
-                <ArrowLeft size={16} /> Volver a Iniciar Sesión
-            </Link>
-          </div>
-        </Card>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            label="Nueva contraseña"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            helperText="Mínimo 6 caracteres"
+            required
+          />
+          <Input
+            label="Confirmar contraseña"
+            type="password"
+            value={confirm}
+            onChange={e => setConfirm(e.target.value)}
+            required
+          />
+          <Button type="submit" variant="navy" size="lg" className="w-full" disabled={loading}>
+            {loading ? 'Guardando...' : 'Guardar contraseña'}
+          </Button>
+        </form>
       </div>
     </div>
   );

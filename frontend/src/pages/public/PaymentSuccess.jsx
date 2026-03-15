@@ -1,31 +1,25 @@
-import React from 'react';
-import { CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function PaymentSuccess() {
-  const pageBgClass = "bg-gray-50 dark:bg-gray-900";
-
   return (
-    <div className={`min-h-screen flex items-center justify-center py-12 px-4 ${pageBgClass} font-inter`}>
-      <div className="w-full max-w-md text-center">
-        <Card>
-          <div className="p-6">
-            <div className="flex justify-center mb-4">
-              <CheckCircle className="text-green-500" size={64} />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-3 dark:text-white">
-              ¡Pago Exitoso!
-            </h1>
-            <p className="text-gray-600 mb-8 dark:text-gray-400">
-              Muchas gracias por tu generosa donación. Tu apoyo es invaluable para nosotros.
-            </p>
-            <Button as={Link} to="/" variant="primary" size="lg" className="w-full">
-              Volver al Inicio
-            </Button>
-          </div>
-        </Card>
+    <div className="min-h-screen bg-bg flex items-center justify-center p-6">
+      <div className="text-center max-w-sm animate-fade-in">
+        <div className="w-16 h-16 rounded-full bg-ok/10 flex items-center justify-center mx-auto mb-5">
+          <CheckCircle size={32} className="text-ok" />
+        </div>
+        <h1 className="text-2xl font-black text-ink mb-2">¡Donación exitosa!</h1>
+        <p className="text-ink-2 text-sm leading-relaxed mb-2">
+          Gracias por tu generosidad. Tu donación ha sido registrada correctamente.
+        </p>
+        <p className="text-ink-3 text-xs mb-8">
+          Dios multiplica cada semilla sembrada con fe.
+        </p>
+        <Link to="/"
+          className="group inline-flex items-center gap-2 px-6 py-3 bg-navy text-white font-semibold rounded-md hover:bg-navy-d transition-colors">
+          Volver al inicio
+          <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
     </div>
   );

@@ -1,59 +1,78 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import apiClient from '../lib/apiClient';
 
-export const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser({
-          id: decoded.id,
-          email: decoded.email,
-          role: decoded.role,
-        });
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        setToken(null);
-        localStorage.removeItem('token');
-      }
+  const user = (() => {
+    if (!token) return null;
+    try { return jwtDecode(token); } catch { return null; }
+  })();
+
+  useEffect(() => { setLoading(false); }, []);
+
+  // ── Guardar / limpiar token ──────────────────────────────────
+  const saveToken = (t) => { localStorage.setItem('token', t); setToken(t); };
+  const clearToken = () => { localStorage.removeItem('token'); setToken(null); };
+
+  // ── Auth actions ─────────────────────────────────────────────
+
+  const login = (newToken) => saveToken(newToken);
+
+  const logout = () => clearToken();
+
+  const register = async (email, password, name) => {
+    try {
+      const res = await apiClient.post('/auth/register', { email, password, name });
+      if (res.data?.token) saveToken(res.data.token);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Error al registrarse' };
     }
-    setLoading(false);
-  }, [token]);
-
-  const login = (newToken) => {
-    setToken(newToken);
-    localStorage.setItem('token', newToken);
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
+  const forgotPassword = async (email) => {
+    try {
+      await apiClient.post('/auth/forgot-password', { email });
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Error al enviar el correo' };
+    }
   };
 
-  const value = {
-    token,
-    user,
-    isAuthenticated: !!token,
-    isAdmin: user?.role === 'admin',
-    loading,
-    login,
-    logout,
+  const resetPassword = async (resetToken, password) => {
+    try {
+      await apiClient.post('/auth/reset-password', { token: resetToken, password });
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Error al restablecer la contraseña' };
+    }
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{
+      token,
+      user,
+      loading,
+      isAuthenticated: !!token,
+      isAdmin: user?.role === 'admin',
+      login,
+      logout,
+      register,
+      forgotPassword,
+      resetPassword,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth debe usarse dentro de <AuthProvider>');
+  return ctx;
+};

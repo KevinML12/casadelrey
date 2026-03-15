@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Deploy Backend → Azure Container Apps
+# ─────────────────────────────────────────────────────────────────────────────
+# Se activa con cada push a `main` que toque archivos en backend/.
+#
+# Secrets requeridos en GitHub (Settings → Secrets → Actions):
+#   AZURE_CREDENTIALS    → JSON del Service Principal (ver paso 8 del script)
+#   AZURE_REGISTRY_NAME  → nombre del ACR (ej: casadelreyreg)
+#   DATABASE_URL         → URL de Supabase Session Pooler
+#   JWT_SECRET           → Clave aleatoria ≥32 chars
+#   CLIENT_URL           → URL del frontend en Vercel
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+
+env:
+  SERVICE: casadelrey-backend
+  RESOURCE_GROUP: casadelrey-rg
+  ENVIRONMENT: casadelrey-env
+  LOCATION: eastus
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Autenticación con Azure usando Service Principal
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Login al Azure Container Registry
+      - name: Login to ACR
+        run: |
+          az acr login --name ${{ secrets.AZURE_REGISTRY_NAME }}
+
+      # Construir y subir imagen con ACR Tasks (sin Docker local)
+      - name: Build and push image to ACR
+        run: |
+          az acr build \
+            --registry ${{ secrets.AZURE_REGISTRY_NAME }} \
+            --image ${{ env.SERVICE }}:${{ github.sha }} \
+            --image ${{ env.SERVICE }}:latest \
+            ./backend
+
+      # Desplegar la nueva imagen en Container Apps
+      - name: Deploy to Azure Container Apps
+        run: |
+          az containerapp update \
+            --name ${{ env.SERVICE }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.SERVICE }}:${{ github.sha }}
+
+      # Obtener y mostrar la URL del servicio
+      - name: Get service URL
+        run: |
+          URL=$(az containerapp show \
+            --name ${{ env.SERVICE }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          echo "✓ Backend desplegado en: https://$URL"
+          echo "  Health: https://$URL/health"

@@ -1,167 +1,54 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { usePost } from '../../hooks/useApiCall'; // Asumimos este hook existe
-import toast from 'react-hot-toast';
-import Card from '../../components/ui/Card';
-import Input from '../../components/ui/Input';
+import DonationCard from '../../components/sections/DonationCard';
+import PageHero from '../../components/layout/PageHero';
+import { Heart, Shield, Globe, BookOpen } from 'lucide-react';
 
-// URL ajustada al backend /api/v1 y al handler de simulación
-const DONATE_URL = '/donations/simulate';
+const IMPACT = [
+  { icon: Heart,    title: 'Células',   desc: 'Equipando líderes de casa en cada barrio' },
+  { icon: Globe,    title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
+  { icon: BookOpen, title: 'Educación', desc: 'Materiales y estudios bíblicos gratuitos' },
+  { icon: Shield,   title: 'Familias',  desc: 'Apoyo integral a familias en necesidad' },
+];
 
-// Montos y propósitos sugeridos
-const suggestedAmounts = [10.00, 25.00, 50.00, 100.00];
-const purposes = ['Diezmo', 'Ofrenda', 'Misiones', 'Proyectos Especiales'];
-
-
-export default function DonatePage () {
-  // Inicializamos el formulario con un monto sugerido
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm({
-    defaultValues: {
-        amount: 10.00,
-        donation_purpose: 'Ofrenda',
-        name: '',
-        email: ''
-    }
-  });
-  const [paymentMethod, setPaymentMethod] = useState('Stripe Card'); // Estado para seleccionar método
-  const currentAmount = watch('amount');
-
-  const mutation = usePost({
-    url: DONATE_URL,
-    onSuccess: (data) => {
-        // En un escenario real, aquí se usaría data.clientSecret para montar el elemento Stripe o redirigir a PayPal
-        toast.success(`Donación de $${data.data.Amount} registrada como ${paymentMethod}. Gracias por tu generosidad.`);
-        reset();
-    },
-    onError: (error) => {
-        const message = error.response?.data?.message || 'Error al procesar la donación.';
-        toast.error(message);
-    }
-  });
-
-  const handleAmountSelect = (amount) => {
-    setValue('amount', amount, { shouldValidate: true });
-  };
-
-  const onSubmit = (data) => {
-    if (data.amount <= 0) {
-        toast.error("El monto debe ser mayor a cero.");
-        return;
-    }
-
-    const payload = {
-        name: data.name,
-        email: data.email,
-        amount: data.amount,
-        donation_purpose: data.donation_purpose,
-        currency: 'USD', // Hardcodeado a USD para MVP
-        payment_method: paymentMethod // Enviamos el método seleccionado al backend
-    };
-
-    mutation.mutate(payload);
-  };
-
+export default function DonatePage() {
   return (
-    <div className="min-h-screen bg-bg-light py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <Card title="Tu Donación Transforma Vidas" className="shadow-lg border-t-4 border-accent">
-          <p className="text-center text-text-secondary mb-8">
-            Selecciona el monto y método de pago. El 100% se destina a la misión de la iglesia.
-          </p>
+    <main className="min-h-screen bg-bg">
+      <PageHero icon={Heart} title="Tu Generosidad Transforma" subtitle="Cada quetzal sembrado con fe produce fruto eterno." />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="container mx-auto px-6 py-16">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
-            {/* Monto de la Donación */}
-            <div>
-              <label className="block text-lg font-semibold text-text-primary mb-3">
-                Monto Sugerido ($USD) *
-              </label>
-              <div className="flex flex-wrap gap-3 mb-4">
-                {suggestedAmounts.map(amt => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => handleAmountSelect(amt)}
-                    className={`py-2 px-4 rounded-button font-medium transition duration-fast
-                      ${currentAmount === amt
-                        ? 'bg-primary text-text-light shadow-md'
-                        : 'bg-bg-light-alt text-text-primary hover:bg-bg-secondary'
-                      }`}
-                  >
-                    ${amt.toFixed(2)}
-                  </button>
-                ))}
-              </div>
-              <Input
-                label="Monto Personalizado"
-                type="number"
-                step="0.01"
-                min="1"
-                {...register("amount", { valueAsNumber: true, required: "El monto es obligatorio" })}
-                error={errors.amount}
-                className="text-xl"
-              />
-            </div>
-
-            {/* Propósito y Datos Personales */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label htmlFor="donation_purpose" className="block text-sm font-semibold text-text-primary mb-2">
-                        Propósito
-                    </label>
-                    <select
-                        id="donation_purpose"
-                        {...register("donation_purpose")}
-                        className="w-full p-3 border border-border-light bg-bg-light-alt rounded-input focus:border-primary focus:ring-1 focus:ring-primary transition duration-200"
-                    >
-                        {purposes.map(p => (
-                            <option key={p} value={p}>{p}</option>
-                        ))}
-                    </select>
+          {/* Destinos */}
+          <div>
+            <h2 className="text-2xl font-black text-ink mb-6">¿A dónde va tu donación?</h2>
+            <div className="space-y-3 mb-8">
+              {IMPACT.map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex items-start gap-4 p-4 rounded-lg bg-card border border-line dark:border-transparent hover:border-blue/20 dark:hover:bg-card-2 transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-blue/5 flex items-center justify-center shrink-0">
+                    <Icon size={18} className="text-blue" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-ink text-sm">{title}</h3>
+                    <p className="text-xs text-ink-3 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-                <Input label="Tu Nombre *" type="text" {...register("name", { required: "El nombre es obligatorio" })} error={errors.name} />
-                <Input label="Correo Electrónico" type="email" {...register("email")} error={errors.email} />
+              ))}
             </div>
 
-            {/* Opciones de Pago */}
-            <div className="space-y-3 pt-4">
-                <label className="block text-lg font-semibold text-text-primary">
-                    Selecciona tu Método de Pago
-                </label>
-                <div className="flex flex-wrap gap-4">
-                    {['Stripe Card', 'PayPal'].map(method => (
-                        <button
-                            key={method}
-                            type="button"
-                            onClick={() => setPaymentMethod(method)}
-                            className={`flex items-center space-x-2 p-3 border-2 rounded-input font-medium transition duration-fast ${
-                                paymentMethod === method
-                                ? 'border-primary bg-bg-light shadow-md'
-                                : 'border-border-light bg-bg-light-alt hover:border-primary-light'
-                            }`}
-                        >
-                            <span>{method}</span>
-                        </button>
-                    ))}
-                </div>
-                <p className="text-sm text-text-secondary pt-2">
-                    Nota: En el MVP, el monto se registra en el historial. La pasarela de pago real se completará en la Fase 2.
-                </p>
-            </div>
+            <blockquote className="p-5 rounded-xl bg-navy border border-white/10">
+              <p className="text-white/70 text-sm italic leading-relaxed mb-2">
+                "El que siembra escasamente, también segará escasamente; y el que siembra generosamente, generosamente también segará."
+              </p>
+              <cite className="text-gold text-xs font-semibold not-italic">— 2 Corintios 9:6</cite>
+            </blockquote>
+          </div>
 
-
-            {/* Botón Final */}
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              className={`w-full btn-primary py-4 text-lg transition duration-base ${mutation.isPending ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {mutation.isPending ? 'Registrando Donación...' : 'Donar y Registrar'}
-            </button>
-
-          </form>
-        </Card>
+          {/* Formulario */}
+          <div className="bg-card border border-line dark:border-transparent rounded-2xl shadow-card p-7">
+            <h2 className="text-xl font-black text-ink mb-5">Haz tu donación</h2>
+            <DonationCard />
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

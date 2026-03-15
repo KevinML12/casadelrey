@@ -1,100 +1,65 @@
+// Package config gestiona la carga y validación de variables de entorno.
+// Expone AppConfig como singleton global para compatibilidad con paquetes
+// que lo referencian directamente (ej: auth.service.go).
 package config
 
 import (
 	"log"
 	"os"
-
-	"casadelrey/backend/models"
-
-	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-// Config almacena toda la configuración de la aplicación
+// Config agrupa toda la configuración de la aplicación, cargada
+// desde variables de entorno o desde un archivo .env en desarrollo.
 type Config struct {
-	DatabaseURL  string
-	JWTSecret    string
-	StripeKey    string
-	SendGridKey  string
-	ClientURL    string
-	Port         string
-	SupabaseURL  string
-	SupabaseKey  string
+	DatabaseURL string // Requerida: URL de conexión a PostgreSQL
+	JWTSecret   string // Requerida: clave secreta para firmar tokens JWT
+	ClientURL   string // URL del frontend (para CORS dinámico)
+	StripeKey   string // Clave secreta de Stripe (pagos, opcional en MVP)
+	SendGridKey string // Clave de SendGrid (envío de emails)
+	SupabaseURL string // URL de Supabase (si se usa como proveedor de auth)
+	SupabaseKey string // Clave de Supabase
+	Port        string // Puerto HTTP del servidor (default: 8080)
 }
 
-// AppConfig es la instancia global de configuración
+// AppConfig es la instancia global de configuración.
+// Se inicializa llamando a Load() en main.go.
 var AppConfig *Config
 
-// LoadConfig carga las variables de entorno y devuelve la configuración
-func LoadConfig() *Config {
-	// Cargar .env solo en desarrollo (no en producción)
-	if os.Getenv("ENV") != "production" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Println("Advertencia: No se pudo cargar el archivo .env")
-		}
+// Load carga las variables de entorno y retorna la configuración validada.
+// Termina la aplicación (log.Fatal) si alguna variable crítica está ausente.
+// También asigna la instancia a AppConfig para acceso global.
+func Load() *Config {
+	cfg := &Config{
+		DatabaseURL: os.Getenv("DATABASE_URL"),
+		JWTSecret:   os.Getenv("JWT_SECRET"),
+		ClientURL:   os.Getenv("CLIENT_URL"),
+		StripeKey:   os.Getenv("STRIPE_SECRET_KEY"),
+		SendGridKey: os.Getenv("SENDGRID_API_KEY"),
+		SupabaseURL: os.Getenv("SUPABASE_URL"),
+		SupabaseKey: os.Getenv("SUPABASE_KEY"),
+		Port:        getEnvOrDefault("PORT", "8080"),
 	}
 
-	config := &Config{
-		DatabaseURL:  os.Getenv("DATABASE_URL"),
-		JWTSecret:    os.Getenv("JWT_SECRET"),
-		StripeKey:    os.Getenv("STRIPE_SECRET_KEY"),
-		SendGridKey:  os.Getenv("SENDGRID_API_KEY"),
-		ClientURL:    os.Getenv("CLIENT_URL"),
-		Port:         getEnvWithDefault("PORT", "8080"),
-		SupabaseURL:  os.Getenv("SUPABASE_URL"),
-		SupabaseKey:  os.Getenv("SUPABASE_KEY"),
+	// Variables críticas sin las cuales la aplicación no puede funcionar.
+	if cfg.DatabaseURL == "" {
+		log.Fatal("FATAL: DATABASE_URL no está configurada. Es requerida.")
+	}
+	if cfg.JWTSecret == "" {
+		log.Fatal("FATAL: JWT_SECRET no está configurada. Es requerida.")
 	}
 
-	// Validar configuraciones críticas
-	if config.DatabaseURL == "" {
-		log.Fatal("Error: DATABASE_URL no está configurada")
-	}
-	if config.JWTSecret == "" {
-		log.Fatal("Error: JWT_SECRET no está configurada")
-	}
-	if config.SupabaseURL == "" {
-		log.Fatal("Error: SUPABASE_URL no está configurada")
-	}
-	if config.SupabaseKey == "" {
-		log.Fatal("Error: SUPABASE_KEY no está configurada")
-	}
+	// Asignar singleton global para retrocompatibilidad con otros paquetes.
+	AppConfig = cfg
 
-	// Guardar en variable global para acceso desde otros paquetes
-	AppConfig = config
-
-	log.Println("Configuración cargada exitosamente")
-	return config
+	log.Println("[Config] Variables de entorno cargadas correctamente.")
+	return cfg
 }
 
-// getEnvWithDefault obtiene una variable de entorno o devuelve un valor por defecto
-func getEnvWithDefault(key, defaultValue string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return defaultValue
+// getEnvOrDefault retorna el valor de una variable de entorno
+// o el valor por defecto si la variable no está definida.
+func getEnvOrDefault(key, defaultValue string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
 	}
-	return value
-}
-
-// InitDB inicializa la conexión a la base de datos y ejecuta las migraciones
-func InitDB() (*gorm.DB, error) {
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		log.Fatal("Error: DATABASE_URL no está configurada. ¡Requerida para seguridad!")
-	}
-
-	db, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	// Migración: Crea las tablas si no existen
-	log.Println("Iniciando migración de la base de datos...")
-	err = db.AutoMigrate(&models.User{}, &models.Post{}, &models.Petition{}, &models.Donation{})
-	if err != nil {
-		return nil, err
-	}
-	log.Println("Migración completada con éxito.")
-	return db, nil
+	return defaultValue
 }

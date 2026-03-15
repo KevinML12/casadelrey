@@ -1,3 +1,5 @@
+// Punto de entrada del servidor backend de Casa del Rey.
+// Usa el framework Echo v4 con middlewares de Logger, Recover y CORS.
 package main
 
 import (
@@ -5,64 +7,70 @@ import (
 	"log"
 	"os"
 
-	"casadelrey/backend/auth"
 	"casadelrey/backend/config"
-	"casadelrey/backend/handlers"
-	"casadelrey/backend/middleware"
+	"casadelrey/backend/database"
 	"casadelrey/backend/routes"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	// 1. Cargar Configuración y Variables de Entorno
-	config.LoadConfig()
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("Advertencia: no se pudo cargar el archivo .env")
+	// 1. Cargar .env solo en desarrollo.
+	//    En producción (Dokploy/Docker), las vars se inyectan directamente.
+	if os.Getenv("ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("[Config] Archivo .env no encontrado — usando variables del sistema.")
+		}
 	}
 
-	// 2. Conectar a la Base de Datos
-	db, err := config.InitDB()
+	// 2. Cargar y validar la configuración desde variables de entorno.
+	//    Termina con log.Fatal si DATABASE_URL o JWT_SECRET están ausentes.
+	cfg := config.Load()
+
+	// 3. Conectar a PostgreSQL (singleton GORM) y ejecutar AutoMigrate.
+	//    Solo se abre UNA conexión durante todo el ciclo de vida del servidor.
+	db, err := database.Connect(cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("Error fatal: no se pudo conectar a la base de datos: %v", err)
+		log.Fatalf("[DB] Error fatal al conectar: %v", err)
 	}
 
-	// 3. Inicializar Fiber
-	app := fiber.New()
+	// 4. Crear la instancia de Echo.
+	e := echo.New()
+	e.HideBanner = true // Silenciar el banner ASCII en producción
 
-	// 4. Configurar Middleware Global (CORS)
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173, https://casadelreyhue.org",
-		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+	// 5. ─── Middlewares Globales ────────────────────────────────────────────
+
+	// Logger: registra cada petición HTTP con método, ruta, status y latencia.
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "${time_rfc3339} | ${status} | ${latency_human} | ${remote_ip} | ${method} ${uri}\n",
 	}))
 
-	// 5. Inyección de Dependencias: Crear Instancias de Handlers y Middleware
-	authHandler := auth.NewHandler(db)
-	blogHandler := handlers.NewBlogHandler(db)
-	petitionHandler := handlers.NewPetitionHandler(db)
-	donationHandler := handlers.NewDonationHandler(db)
-	
-	supabaseAuth := middleware.NewSupabaseAuthMiddleware(db, config.AppConfig.JWTSecret)
+	// Recover: captura panics inesperados y responde 500 en lugar de crashear.
+	e.Use(middleware.Recover())
 
-	// 6. Configurar Rutas Modulares
-	routes.SetupRoutes(app, &routes.Handlers{
-		Auth:     authHandler,
-		Blog:     blogHandler,
-		Petition: petitionHandler,
-		Donation: donationHandler,
-	}, supabaseAuth)
-
-
-	// 7. Iniciar Servidor
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	// CORS: permite peticiones desde el frontend (local y producción).
+	//       AllowOrigins acepta la URL del frontend configurada en CLIENT_URL.
+	allowedOrigins := []string{
+		"http://localhost:5173",        // Vite dev server
+		"http://localhost:3000",        // Alternativa local
+		"https://casadelreyhue.org",    // Producción
 	}
+	if cfg.ClientURL != "" {
+		allowedOrigins = append(allowedOrigins, cfg.ClientURL)
+	}
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: allowedOrigins,
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+	}))
 
-	fmt.Printf("Servidor Go Fiber iniciado en http://localhost:%s\n", port)
-	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
+	// 6. Registrar todas las rutas (públicas y protegidas).
+	routes.Register(e, db, cfg)
+
+	// 7. Iniciar el servidor en el puerto configurado.
+	port := cfg.Port
+	fmt.Printf("\n✓ CasaDelRey Backend iniciado → http://0.0.0.0:%s\n\n", port)
+	log.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }

@@ -1,109 +1,121 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Mic } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
+import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
 
-const PostDetailView = ({ post }) => (
-    <div>
-        <Link to="/blog" className="text-primary hover:underline mb-8 inline-block">
-            &larr; Volver al Blog
-        </Link>
-        <div className="flex justify-between items-start mb-4">
-            <h1 className="text-4xl font-bold text-text-dark-church">{post.title}</h1>
-            <Button variant="secondary" size="sm">
-                <Mic size={16} className="mr-2" />
-                Escuchar
-            </Button>
-        </div>
-        <p className="text-text-muted mb-8">
-            Publicado el {new Date(post.created_at).toLocaleDateString('es-ES')}
-        </p>
-        <div 
-            className="prose dark:prose-invert lg:prose-xl max-w-full" 
-            dangerouslySetInnerHTML={{ __html: post.content }} 
-        />
+function Loader() {
+  return (
+    <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-blue animate-spin" />
     </div>
-);
+  );
+}
 
-const PostListView = ({ posts }) => (
-    <div>
-        <h1 className="text-4xl font-bold text-text-dark-church mb-12">Blog</h1>
-        {posts.length === 0 ? (
-            <Card className="text-center py-12">
-                <p className="text-text-muted">No hay publicaciones disponibles aún.</p>
-            </Card>
-        ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {posts.map(post => (
-                    <Card key={post.id} className="h-full flex flex-col">
-                        <div className="flex-grow">
-                            <Link to={`/blog/${post.slug}`}>
-                                <h3 className="text-xl font-semibold mb-2 text-text-dark-church hover:text-primary transition-colors">
-                                    {post.title}
-                                </h3>
-                            </Link>
-                            <p className="text-text-muted mb-4 line-clamp-3">
-                                {post.excerpt || post.content?.substring(0, 150)}
-                            </p>
-                        </div>
-                        <div className="flex justify-between items-center pt-4 border-t border-border-church mt-auto">
-                            <span className="text-sm text-text-muted">
-                                {new Date(post.created_at).toLocaleDateString('es-ES')}
-                            </span>
-                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); alert('Próximamente: Escucharás el audio de este artículo.'); }}>
-                                <Mic size={16} />
-                            </Button>
-                        </div>
-                    </Card>
-                ))}
+function PostDetail({ post }) {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink mb-8 transition-colors">
+        <ArrowLeft size={14} /> Volver al Blog
+      </Link>
+      <p className="text-ink-3 text-xs flex items-center gap-1.5 mb-4">
+        <Calendar size={12} />
+        {new Date(post.created_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </p>
+      <h1 className="text-4xl font-black text-ink leading-tight mb-8">{post.title}</h1>
+      <div className="prose prose-slate max-w-full text-ink-2 leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: post.content }} />
+    </div>
+  );
+}
+
+function PostList({ posts }) {
+  if (posts.length === 0) {
+    return (
+      <Card className="text-center py-16">
+        <p className="text-ink-2">No hay publicaciones disponibles aún.</p>
+      </Card>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.map(p => (
+        <Link key={p.id} to={`/blog/${p.slug}`}>
+          <Card className="h-full flex flex-col hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200">
+            <div className="flex-1">
+              <h3 className="font-bold text-ink mb-2 hover:text-blue transition-colors leading-snug">
+                {p.title}
+              </h3>
+              <p className="text-ink-3 text-sm leading-relaxed line-clamp-3">
+                {p.excerpt || p.content?.substring(0, 140)}
+              </p>
             </div>
-        )}
+            <div className="pt-4 mt-4 border-t border-line flex items-center justify-between">
+              <span className="text-xs text-ink-3 flex items-center gap-1">
+                <Calendar size={11} />
+                {new Date(p.created_at).toLocaleDateString('es-ES')}
+              </span>
+              <span className="text-xs font-medium text-blue">Leer →</span>
+            </div>
+          </Card>
+        </Link>
+      ))}
     </div>
-);
-
+  );
+}
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState([]);
-  const [post, setPost] = useState(null);
+  const [posts,   setPosts]   = useState([]);
+  const [post,    setPost]    = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(false);
   const { slug } = useParams();
 
   useEffect(() => {
-    const fetchPostOrPosts = async () => {
-        setLoading(true);
-        try {
-            if (slug) {
-                const response = await apiClient.get(`/blog/posts/${slug}`);
-                setPost(response.data);
-            } else {
-                const response = await apiClient.get('/blog/posts');
-                setPosts(response.data || []);
-            }
-        } catch (error) {
-            console.error('Error fetching blog data:', error);
-        } finally {
-            setLoading(false);
+    setLoading(true);
+    setError(false);
+    (async () => {
+      try {
+        if (slug) {
+          const r = await apiClient.get(`/blog/${slug}`);
+          setPost(r.data);
+        } else {
+          const r = await apiClient.get('/blog/posts');
+          setPosts(r.data || []);
         }
-    };
-
-    fetchPostOrPosts();
+      } catch (err) {
+        console.error(err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-bg-cream flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-caoba"></div>
+  if (loading) return <Loader />;
+
+  if (error) return (
+    <main className="min-h-screen bg-bg">
+      <PageHero title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
+      <div className="container mx-auto px-6 py-24 text-center">
+        <p className="text-ink-3 text-sm">No se pudo conectar con el servidor. Asegúrate de que el backend está corriendo.</p>
       </div>
+    </main>
+  );
+
+  if (slug && post) {
+    return (
+      <main className="min-h-screen bg-bg py-16">
+        <div className="container mx-auto px-6"><PostDetail post={post} /></div>
+      </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-bg-cream py-12">
-      <div className="container mx-auto px-4">
-        {slug && post ? <PostDetailView post={post} /> : <PostListView posts={posts} />}
-      </div>
+    <main className="min-h-screen bg-bg">
+      <PageHero title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
+      <div className="container mx-auto px-6 py-16"><PostList posts={posts} /></div>
     </main>
   );
 }

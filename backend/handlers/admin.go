@@ -1,13 +1,16 @@
 package handlers
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
-// AdminDashboardPlaceholder simula la futura lógica del dashboard de admin.
-func AdminDashboardPlaceholder(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+// AdminDashboardPlaceholder es un handler temporal para el dashboard de administración.
+// Implementar con métricas reales cuando el MVP esté estabilizado.
+func AdminDashboardPlaceholder(c echo.Context) error {
+	return c.JSON(http.StatusServiceUnavailable, map[string]interface{}{
 		"error":   true,
-		"message": "Funcionalidad de Dashboard de Admin no implementada en el MVP.",
+		"message": "Dashboard de Admin — próximamente disponible.",
 	})
 }

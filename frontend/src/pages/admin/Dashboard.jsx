@@ -1,132 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { Users, BarChart, DollarSign, Mail, AlertTriangle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Users, DollarSign, MessageSquare, TrendingUp } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 
-const StatCard = ({ icon, title, value, change, changeType }) => (
-    <div className="bg-white dark:bg-dark-card-bg p-6 rounded-2xl shadow-soft-lg">
-        <div className="flex items-center justify-between">
-            <div>
-                <p className="text-sm font-medium text-text-muted dark:text-dark-text-muted">{title}</p>
-                <p className="text-3xl font-black text-text-primary dark:text-dark-text-primary">{value}</p>
-            </div>
-            <div className="bg-primary/10 p-3 rounded-full">
-                {icon}
-            </div>
+function StatCard({ icon: Icon, label, value, color = 'text-blue' }) {
+  return (
+    <div className="bg-card border border-line rounded-xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs font-semibold text-ink-3 uppercase tracking-widest">{label}</p>
+        <div className={`w-8 h-8 rounded-lg bg-current/5 flex items-center justify-center ${color}`}>
+          <Icon size={15} />
         </div>
-        {change && (
-            <p className={`text-sm mt-2 ${changeType === 'increase' ? 'text-green-500' : 'text-red-500'}`}>
-                {change}
-            </p>
-        )}
+      </div>
+      <p className="text-3xl font-black text-ink">{value ?? '—'}</p>
     </div>
-);
-
-const DonationRow = ({ donation }) => (
-    <tr className="border-b border-border-light dark:border-dark-border">
-        <td className="py-4 px-6">{donation.ID}</td>
-        <td className="py-4 px-6">{donation.Name}</td>
-        <td className="py-4 px-6">${(donation.Amount / 100).toFixed(2)}</td>
-        <td className="py-4 px-6">{new Date(donation.CreatedAt).toLocaleDateString()}</td>
-    </tr>
-);
-
+  );
+}
 
 export default function Dashboard() {
-    const [kpis, setKpis] = useState(null);
-    const [donations, setDonations] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [kpis,      setKpis]      = useState(null);
+  const [donations, setDonations] = useState([]);
+  const [loading,   setLoading]   = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const [kpisResponse, donationsResponse] = await Promise.all([
-                    apiClient.get('/admin/kpis'),
-                    apiClient.get('/admin/donations')
-                ]);
-                setKpis(kpisResponse.data);
-                setDonations(donationsResponse.data);
-            } catch (err) {
-                console.error("Error fetching dashboard data", err);
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    Promise.all([
+      apiClient.get('/admin/kpis').then(r => setKpis(r.data)),
+      apiClient.get('/admin/donations').then(r => setDonations(r.data || [])),
+    ]).catch(console.error).finally(() => setLoading(false));
+  }, []);
 
-        fetchData();
-    }, []);
+  return (
+    <div className="p-6 max-w-5xl mx-auto">
+      <h1 className="text-2xl font-black text-ink mb-6">Dashboard</h1>
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-bg-light dark:bg-dark-bg py-12 flex items-center justify-center">
-                <p className="text-text-primary dark:text-dark-text-primary">Cargando dashboard...</p>
-            </div>
-        );
-    }
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard icon={Users}        label="Usuarios"     value={kpis?.total_users}     color="text-blue" />
+        <StatCard icon={DollarSign}   label="Donaciones"   value={kpis?.total_donations}  color="text-gold" />
+        <StatCard icon={MessageSquare}label="Peticiones"   value={kpis?.total_petitions}  color="text-ok" />
+        <StatCard icon={TrendingUp}   label="Crecimiento"  value={kpis?.monthly_growth ? `+${kpis.monthly_growth}%` : '—'} color="text-info" />
+      </div>
 
-    if (error) {
-        return (
-            <div className="min-h-screen bg-bg-light dark:bg-dark-bg py-12 flex items-center justify-center">
-                <div className="text-center p-8 bg-white dark:bg-dark-card-bg rounded-2xl shadow-soft-lg max-w-lg mx-auto">
-                    <AlertTriangle className="mx-auto h-12 w-12 text-error" />
-                    <h2 className="mt-4 text-2xl font-black text-text-primary dark:text-dark-text-primary">Error al Cargar el Dashboard</h2>
-                    <p className="mt-2 text-text-secondary dark:text-dark-text-secondary">
-                        No se pudieron obtener los datos del servidor. Por favor, inténtelo de nuevo más tarde.
-                    </p>
-                    <p className="mt-4 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded-md text-error font-mono">
-                        {error.message || 'Ocurrió un error desconocido.'}
-                    </p>
-                </div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="min-h-screen bg-bg-light dark:bg-dark-bg py-12">
-            <div className="container mx-auto px-6">
-                <h1 className="text-4xl font-black text-text-primary dark:text-dark-text-primary mb-8">Dashboard de Administración</h1>
-                
-                {kpis && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                      <StatCard icon={<Users className="text-primary" />} title="Total de Usuarios" value={kpis.total_users} change={kpis.monthly_growth} changeType="increase" />
-                      <StatCard icon={<DollarSign className="text-primary" />} title="Donaciones Totales" value={kpis.total_donations} />
-                      <StatCard icon={<Mail className="text-primary" />} title="Peticiones Totales" value={kpis.total_petitions} />
-                      <StatCard icon={<BarChart className="text-primary" />} title="Crecimiento Mensual" value={kpis.monthly_growth} />
-                  </div>
-                )}
-
-                <div className="bg-white dark:bg-dark-card-bg p-8 rounded-2xl shadow-soft-lg">
-                    <h2 className="text-2xl font-black text-text-primary dark:text-dark-text-primary mb-6">Donaciones Recientes</h2>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-text-secondary dark:text-dark-text-secondary">
-                            <thead className="text-xs uppercase bg-bg-light dark:bg-dark-bg">
-                                <tr>
-                                    <th className="py-3 px-6">ID</th>
-                                    <th className="py-3 px-6">Nombre</th>
-                                    <th className="py-3 px-6">Monto</th>
-                                    <th className="py-3 px-6">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {donations && donations.length > 0 ? (
-                                    donations.slice(0, 5).map(donation => (
-                                        <DonationRow key={donation.ID} donation={donation} />
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="text-center py-8 text-text-muted dark:text-dark-text-muted">
-                                            No hay donaciones recientes.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
+      {/* Tabla donaciones */}
+      <div className="bg-card border border-line rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-line">
+          <h2 className="font-bold text-ink text-sm">Últimas Donaciones</h2>
         </div>
-    );
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="w-6 h-6 rounded-full border-2 border-line border-t-blue animate-spin" />
+          </div>
+        ) : donations.length === 0 ? (
+          <div className="text-center py-12 text-ink-3 text-sm">No hay donaciones registradas.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line bg-bg-2">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">ID</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Nombre</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Monto</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Fecha</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {donations.slice(0, 10).map(d => (
+                  <tr key={d.ID} className="hover:bg-bg transition-colors">
+                    <td className="px-5 py-3 text-ink-3 font-mono text-xs">{d.ID?.slice(0, 8)}…</td>
+                    <td className="px-5 py-3 text-ink font-medium">{d.Name}</td>
+                    <td className="px-5 py-3 text-gold font-bold">Q{(d.Amount / 100).toFixed(2)}</td>
+                    <td className="px-5 py-3 text-ink-3 text-xs">
+                      {new Date(d.CreatedAt).toLocaleDateString('es-ES')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

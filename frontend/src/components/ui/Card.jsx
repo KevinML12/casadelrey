@@ -1,10 +1,9 @@
-export default function Card({ children, className = '', title, ...props }) {
+export default function Card({ children, className = '', ...props }) {
   return (
     <div
-      className={`bg-card-bg dark:bg-dark-card-bg rounded-lg shadow-sm hover:shadow-base transition-soft border border-border-light dark:border-dark-border p-6 ${className}`}
+      className={`bg-card border border-line rounded-xl shadow-card p-6 ${className}`}
       {...props}
     >
-      {title && <CardHeader>{title}</CardHeader>}
       {children}
     </div>
   );
@@ -12,23 +11,19 @@ export default function Card({ children, className = '', title, ...props }) {
 
 export function CardHeader({ children, className = '', ...props }) {
   return (
-    <div className={`mb-4 pb-4 border-b border-border-light dark:border-dark-border text-primary font-semibold ${className}`} {...props}>
+    <div className={`pb-4 mb-4 border-b border-line ${className}`} {...props}>
       {children}
     </div>
   );
 }
 
 export function CardContent({ children, className = '', ...props }) {
-  return (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  );
+  return <div className={className} {...props}>{children}</div>;
 }
 
 export function CardFooter({ children, className = '', ...props }) {
   return (
-    <div className={`mt-6 pt-4 border-t border-border-light dark:border-dark-border flex gap-3 ${className}`} {...props}>
+    <div className={`pt-4 mt-4 border-t border-line flex items-center gap-3 ${className}`} {...props}>
       {children}
     </div>
   );

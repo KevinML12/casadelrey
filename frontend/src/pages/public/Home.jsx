@@ -1,183 +1,288 @@
 import { Link } from 'react-router-dom';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
-import { BookOpen, Calendar, MessageSquare, Heart, Users, Zap, Sparkles, ArrowRight, Star, HandHeart, Newspaper, PlayCircle } from 'lucide-react';
+import { ArrowRight, MessageSquare, Heart, BookOpen, Calendar, Users, Clock, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+
+const ease = [0.25, 0.1, 0.25, 1];
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+function Hero() {
+  return (
+    <section className="relative min-h-screen bg-navy flex items-center overflow-hidden">
+      {/* Dot grid background */}
+      <div className="absolute inset-0 opacity-[0.06]"
+        style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+      {/* Gradient accent */}
+      <div className="absolute inset-0 bg-gradient-to-br from-navy-d via-navy to-navy-l opacity-80" />
+
+      <div className="relative z-10 container mx-auto px-6 py-32 md:py-40">
+        <div className="max-w-3xl">
+          {/* Tag */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-white/5 mb-8"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+            <span className="text-white/70 text-xs font-medium tracking-widest uppercase">Iglesia en Huehuetenango, Guatemala</span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease }}
+            className="text-7xl md:text-8xl lg:text-9xl font-black text-white leading-none tracking-tight mb-6"
+          >
+            Casa<br />
+            <span className="text-gold">del Rey</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.35, ease }}
+            className="text-white/60 text-lg md:text-xl max-w-lg leading-relaxed mb-10"
+          >
+            Una comunidad que cree en la transformación real de vidas a través de la fe, el amor y el servicio.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.48, ease }}
+            className="flex flex-col sm:flex-row gap-3"
+          >
+            <Link to="/register" className="group inline-flex items-center gap-2 px-7 py-3.5 bg-gold text-white font-bold rounded-md hover:bg-gold-d transition-colors shadow-gold-glow">
+              Únete a la comunidad
+              <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link to="/events" className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/20 text-white font-medium rounded-md hover:bg-white/5 transition-colors">
+              Ver próximos eventos
+            </Link>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.65, ease }}
+            className="flex flex-wrap gap-x-10 gap-y-4 mt-14 pt-10 border-t border-white/10"
+          >
+            {[
+              { value: '5K+',  label: 'Miembros' },
+              { value: '200+', label: 'Eventos al año' },
+              { value: '15+',  label: 'Años de historia' },
+            ].map((s, i) => (
+              <motion.div key={s.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.7 + i * 0.08, ease }}
+              >
+                <div className="text-3xl font-black text-white">{s.value}</div>
+                <div className="text-white/40 text-sm mt-0.5">{s.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Ministerios ──────────────────────────────────────────────────────────────
+
+const AREAS = [
+  { icon: MessageSquare, label: 'Oración',   desc: 'Comparte tu carga. Una comunidad entera intercede contigo.', to: '/prayer' },
+  { icon: Calendar,      label: 'Eventos',   desc: 'Domingo Service, Primicias, retiros y mucho más.', to: '/events' },
+  { icon: BookOpen,      label: 'Blog',       desc: 'Enseñanzas y reflexiones para tu crecimiento.', to: '/blog' },
+  { icon: Heart,         label: 'Donaciones', desc: 'Tu generosidad enciende la visión del ministerio.', to: '/donate' },
+];
+
+function Ministerios() {
+  return (
+    <section className="py-24 bg-bg">
+      <div className="container mx-auto px-6">
+        <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-2">Ministerios</p>
+            <h2 className="text-4xl font-black text-ink leading-tight">
+              Todo lo que necesitas,<br />en un solo lugar
+            </h2>
+          </div>
+          <Link to="/about" className="text-sm font-medium text-ink-2 hover:text-ink flex items-center gap-1.5 shrink-0">
+            Conócenos <ArrowRight size={14} />
+          </Link>
+        </Reveal>
+
+        <RevealList className="divide-y divide-line">
+          {AREAS.map(({ icon: Icon, label, desc, to }) => (
+            <RevealItem key={to}>
+              <Link to={to}
+                className="group flex items-center justify-between py-6 hover:pl-2 transition-all duration-200">
+                <div className="flex items-center gap-5">
+                  <div className="w-10 h-10 rounded-lg bg-card-2 border border-line flex items-center justify-center shrink-0 group-hover:border-blue/30 group-hover:bg-blue/5 transition-colors">
+                    <Icon size={18} className="text-ink-3 group-hover:text-blue transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-ink group-hover:text-blue transition-colors">{label}</h3>
+                    <p className="text-sm text-ink-3 leading-snug mt-0.5">{desc}</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} className="text-ink-3 group-hover:text-blue group-hover:translate-x-0.5 transition-all shrink-0 ml-4" />
+              </Link>
+            </RevealItem>
+          ))}
+        </RevealList>
+      </div>
+    </section>
+  );
+}
+
+// ─── Domingo ──────────────────────────────────────────────────────────────────
+
+function Domingo() {
+  return (
+    <section className="bg-navy py-20">
+      <div className="container mx-auto px-6">
+        <Reveal className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div>
+            <p className="text-gold font-bold text-xs uppercase tracking-widest mb-3">Cada semana</p>
+            <h2 className="text-5xl font-black text-white leading-none mb-4">
+              Sunday<br />Service
+            </h2>
+            <div className="flex flex-col gap-2 text-white/60 text-sm">
+              <span className="flex items-center gap-2"><Clock size={14} className="text-gold" /> Domingos 10:00 AM</span>
+              <span className="flex items-center gap-2"><MapPin size={14} className="text-gold" /> 7a. Calle 12-66, Huehuetenango</span>
+            </div>
+          </div>
+          <Link to="/events" className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-white font-semibold rounded-md hover:bg-gold-d transition-colors shrink-0">
+            Ver calendario <ArrowRight size={15} />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ─── Oración CTA ──────────────────────────────────────────────────────────────
+
+function OracionCTA() {
+  return (
+    <section className="py-24 bg-bg-2">
+      <div className="container mx-auto px-6">
+        <Reveal className="max-w-2xl">
+          <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-3">Estamos aquí</p>
+          <h2 className="text-4xl md:text-5xl font-black text-ink mb-5 leading-tight">
+            ¿Tienes una petición de oración?
+          </h2>
+          <p className="text-ink-2 text-lg leading-relaxed mb-8">
+            No estás solo. Nuestra comunidad intercede por cada necesidad con amor y fe. Comparte tu petición y cientos de personas orarán por ti.
+          </p>
+          <Link to="/prayer" className="group inline-flex items-center gap-2 px-7 py-3.5 bg-navy text-white font-semibold rounded-md hover:bg-navy-d transition-colors">
+            Enviar petición de oración
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ─── Donaciones ───────────────────────────────────────────────────────────────
+
+function Donaciones() {
+  return (
+    <section className="py-24 bg-bg">
+      <div className="container mx-auto px-6">
+        <Reveal className="bg-navy rounded-2xl p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center gap-10">
+          <div className="flex-1">
+            <p className="text-gold font-bold text-xs uppercase tracking-widest mb-3">Siembra y Ofrenda</p>
+            <h2 className="text-4xl font-black text-white leading-tight mb-4">
+              Tu generosidad<br />transforma vidas
+            </h2>
+            <p className="text-white/50 leading-relaxed text-sm max-w-sm">
+              Cada donación alimenta células, equipa ministerios y lleva la luz a comunidades que más lo necesitan.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 w-full md:w-auto">
+            {['Q50', 'Q100', 'Q250'].map(a => (
+              <Link key={a} to="/donate"
+                className="px-8 py-3 rounded-md border border-white/15 bg-white/5 text-white text-center font-bold hover:bg-white/10 hover:border-gold/40 transition-all">
+                {a}
+              </Link>
+            ))}
+            <Link to="/donate" className="px-8 py-3 rounded-md bg-gold text-white font-bold text-center hover:bg-gold-d transition-colors shadow-gold-glow">
+              Donar ahora →
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ─── Células ──────────────────────────────────────────────────────────────────
+
+function Celulas() {
+  return (
+    <section className="py-24 bg-bg-2">
+      <div className="container mx-auto px-6">
+        <div className="flex flex-col md:flex-row items-start gap-16">
+          <Reveal className="flex-1">
+            <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-3">Comunidad</p>
+            <h2 className="text-4xl font-black text-ink leading-tight mb-5">
+              Crecer juntos,<br />casa por casa
+            </h2>
+            <p className="text-ink-2 leading-relaxed mb-8">
+              Las células son el corazón de Casa del Rey. Pequeños grupos que se reúnen cada semana para orar, estudiar y apoyarse mutuamente.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link to="/register" className="group inline-flex items-center gap-2 px-6 py-3 bg-navy text-white font-semibold rounded-md hover:bg-navy-d transition-colors">
+                <Users size={16} /> Unirme a una célula
+              </Link>
+              <Link to="/about" className="inline-flex items-center gap-2 px-6 py-3 border border-line text-ink-2 font-medium rounded-md hover:border-blue hover:text-blue transition-colors">
+                Conócenos
+              </Link>
+            </div>
+          </Reveal>
+
+          <RevealList className="flex-1 grid grid-cols-2 gap-4" stagger={0.08} delay={0.1}>
+            {[
+              { n: '5K+', l: 'Miembros activos' },
+              { n: '80+', l: 'Células activas' },
+              { n: '15+', l: 'Años de historia' },
+              { n: '4',   l: 'Sedes regionales' },
+            ].map(({ n, l }) => (
+              <RevealItem key={l}>
+                <div className="p-6 rounded-xl bg-card border border-line">
+                  <div className="text-4xl font-black text-ink mb-1">{n}</div>
+                  <div className="text-ink-3 text-sm">{l}</div>
+                </div>
+              </RevealItem>
+            ))}
+          </RevealList>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden bg-bg-light dark:bg-dark-bg">
-      {/* Hero Section */}
-      <section className="relative py-40 overflow-hidden bg-primary text-white">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-8 border border-white/20 hover:border-white/40 transition-all">
-              <Sparkles size={16} className="text-white" />
-              <span className="text-sm font-medium text-white">Bienvenido a Casa del Rey</span>
-            </div>
-            <h1 className="text-6xl md:text-7xl font-black text-white mb-6 leading-tight">
-              Casa del <span className="text-blue-300">Rey</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-white mb-12 max-w-3xl mx-auto font-light leading-relaxed opacity-90">
-              Tu comunidad de fe, crecimiento espiritual y transformación integral
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Link to="/register">
-                <Button variant="primary" size="lg">
-                  <span className="flex items-center gap-2">Comenzar Ahora <ArrowRight size={20} /></span>
-                </Button>
-              </Link>
-              <Link to="/events">
-                 <Button variant="primary" size="lg">
-                  Explorar Eventos
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-24 bg-gray-50 dark:bg-dark-card-bg">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center group">
-              <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 bg-primary rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition"></div>
-                <div className="relative bg-primary text-white p-6 rounded-2xl">
-                  <Users size={40} />
-                </div>
-              </div>
-              <div className="text-5xl font-black text-primary dark:text-primary-light mb-2">5K+</div>
-              <p className="text-xl text-text-primary dark:text-dark-text-primary font-semibold">Miembros Activos</p>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mt-2">Creciendo cada día en comunidad</p>
-            </div>
-            <div className="text-center group">
-               <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 bg-primary rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition"></div>
-                <div className="relative bg-primary text-white p-6 rounded-2xl">
-                  <Calendar size={40} />
-                </div>
-              </div>
-              <div className="text-5xl font-black text-primary dark:text-primary-light mb-2">200+</div>
-              <p className="text-xl text-text-primary dark:text-dark-text-primary font-semibold">Eventos Anuales</p>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mt-2">Actividades diversas para conectar</p>
-            </div>
-            <div className="text-center group">
-               <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 bg-primary rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition"></div>
-                <div className="relative bg-primary text-white p-6 rounded-2xl">
-                  <Zap size={40} />
-                </div>
-              </div>
-              <div className="text-5xl font-black text-primary dark:text-primary-light mb-2">24/7</div>
-              <p className="text-xl text-text-primary dark:text-dark-text-primary font-semibold">Apoyo Continuo</p>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mt-2">Siempre aquí para ti</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 bg-white dark:bg-dark-bg">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary dark:text-primary-light mb-4 font-semibold text-sm">
-              <Star size={16} />
-              Nuestros Servicios
-            </div>
-            <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">Lo que nos hace especial</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Múltiples formas de conectar, crecer y hacer un impacto real en tu comunidad
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Link to="/prayer">
-              <Card className="text-center group h-full">
-                  <div className="mb-4 inline-block p-4 rounded-2xl bg-primary/10">
-                    <MessageSquare size={32} className="text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary mb-2">Oración</h3>
-                  <p className="text-text-secondary dark:text-dark-text-secondary text-sm leading-relaxed">
-                    Comparte tus peticiones con una comunidad que se preocupa genuinamente por ti.
-                  </p>
-              </Card>
-            </Link>
-
-            <Link to="/events">
-              <Card className="text-center group h-full">
-                  <div className="mb-4 inline-block p-4 rounded-2xl bg-primary/10">
-                    <Calendar size={32} className="text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary mb-2">Eventos</h3>
-                  <p className="text-text-secondary dark:text-dark-text-secondary text-sm leading-relaxed">
-                    Participa en reuniones, talleres y celebraciones que transforman vidas.
-                  </p>
-              </Card>
-            </Link>
-
-            <Link to="/blog">
-              <Card className="text-center group h-full">
-                  <div className="mb-4 inline-block p-4 rounded-2xl bg-primary/10">
-                    <BookOpen size={32} className="text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary mb-2">Blog</h3>
-                  <p className="text-text-secondary dark:text-dark-text-secondary text-sm leading-relaxed">
-                    Artículos profundos, reflexiones y enseñanzas para tu crecimiento espiritual.
-                  </p>
-              </Card>
-            </Link>
-
-            <Link to="/donate">
-              <Card className="text-center group h-full">
-                  <div className="mb-4 inline-block p-4 rounded-2xl bg-primary/10">
-                    <Heart size={32} className="text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary mb-2">Donativos</h3>
-                  <p className="text-text-secondary dark:text-dark-text-secondary text-sm leading-relaxed">
-                    Apoya nuestro ministerio y amplifica el impacto en vidas y comunidades.
-                  </p>
-              </Card>
-            </Link>
-          </div>
-        </div>
-      </section>
-      
-      {/* Volunteer Section */}
-      <section className="py-24 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
-            <HandHeart size={48} className="text-white mx-auto mb-6" />
-            <h2 className="text-5xl font-black text-white mb-6">Sé Parte del Cambio</h2>
-            <p className="text-xl text-white mb-12 max-w-3xl mx-auto font-light leading-relaxed opacity-90">
-              Tu tiempo y talentos pueden hacer una gran diferencia. Únete a uno de nuestros equipos de voluntariado.
-            </p>
-            <Link to="/volunteering">
-              <Button variant="primary-on-dark" size="lg">
-                Quiero Servir
-              </Button>
-            </Link>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="relative py-40 bg-gray-50 dark:bg-dark-card-bg">
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-5xl font-black text-text-primary dark:text-dark-text-primary mb-6">¿Listo para transformar tu vida?</h2>
-          <p className="text-xl text-text-secondary dark:text-dark-text-secondary mb-12 max-w-2xl mx-auto">
-            Miles de personas ya están experimentando fe, comunidad y propósito. Únete hoy mismo.
-          </p>
-          
-          <Link to="/register">
-            <Button variant="primary" size="lg">
-              <span className="flex items-center gap-2">
-                Crear mi Cuenta Ahora <ArrowRight size={20} />
-              </span>
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-    </main>
+    <>
+      <Hero />
+      <Ministerios />
+      <Domingo />
+      <OracionCTA />
+      <Donaciones />
+      <Celulas />
+    </>
   );
 }

@@ -1,90 +1,96 @@
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
+import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+
+const LINKS = [
+  { label: 'Conócenos',  to: '/about' },
+  { label: 'Blog',       to: '/blog' },
+  { label: 'Eventos',    to: '/events' },
+  { label: 'Oración',    to: '/prayer' },
+  { label: 'Donaciones', to: '/donate' },
+  { label: 'Voluntarios',to: '/volunteering' },
+];
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="bg-white dark:bg-dark-bg border-t border-border-light dark:border-dark-border mt-16">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Logo y Descripción */}
-          <div>
-            <h3 className="text-xl font-bold text-primary dark:text-primary-light mb-2">Casa del Rey</h3>
-            <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
-              Comunidad de fe dedicada al servicio, la oración y el crecimiento espiritual.
+    <footer className="bg-navy text-white/70">
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                <span className="text-gold font-black text-sm">CR</span>
+              </div>
+              <span className="font-black text-white text-base">Casa del Rey</span>
+            </div>
+            <p className="text-sm leading-relaxed mb-5">
+              Iglesia en Huehuetenango, Guatemala. Luz para las naciones, amor para cada vida.
             </p>
+            <div className="flex items-center gap-3">
+              <a href="https://www.facebook.com/casadelreyhuehue" target="_blank" rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center transition-colors">
+                <Facebook size={15} />
+              </a>
+              <a href="https://www.instagram.com/ig.casadelrey/" target="_blank" rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center transition-colors">
+                <Instagram size={15} />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center transition-colors">
+                <Youtube size={15} />
+              </a>
+            </div>
           </div>
 
-          {/* Enlaces Rápidos */}
+          {/* Navegación */}
           <div>
-            <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary mb-4">Navegación</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light transition-colors">
-                  Inicio
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to="/events" className="text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light transition-colors">
-                  Eventos
-                </Link>
-              </li>
-              <li>
-                <Link to="/prayer" className="text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light transition-colors">
-                  Oración
-                </Link>
-              </li>
+            <h4 className="text-white font-semibold text-sm mb-4">Navegación</h4>
+            <ul className="space-y-2.5">
+              {LINKS.map(l => (
+                <li key={l.to}>
+                  <Link to={l.to} className="text-sm hover:text-white transition-colors">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Servicios */}
+          <div>
+            <h4 className="text-white font-semibold text-sm mb-4">Servicios</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li>Domingo 10:00 AM</li>
+              <li>Miércoles 7:00 PM</li>
+              <li className="pt-1 text-white/50 text-xs">Células cada semana</li>
             </ul>
           </div>
 
           {/* Contacto */}
           <div>
-            <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary mb-4">Contacto</h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-text-secondary dark:text-dark-text-secondary">
-                <Mail size={16} />
-                <a href="mailto:info@casadelrey.com" className="hover:text-primary dark:hover:text-primary-light transition-colors">
-                  info@casadelrey.com
-                </a>
+            <h4 className="text-white font-semibold text-sm mb-4">Contacto</h4>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-2.5">
+                <MapPin size={14} className="mt-0.5 shrink-0 text-gold" />
+                <span>7a. Calle 12-66, Huehuetenango, Guatemala</span>
               </li>
-              <li className="flex items-center gap-2 text-text-secondary dark:text-dark-text-secondary">
-                <Phone size={16} />
-                <a href="tel:+1234567890" className="hover:text-primary dark:hover:text-primary-light transition-colors">
-                  +1 (234) 567-890
-                </a>
+              <li className="flex items-center gap-2.5">
+                <Phone size={14} className="shrink-0 text-gold" />
+                <a href="tel:+50254260369" className="hover:text-white transition-colors">+502 5426-0369</a>
               </li>
-              <li className="flex items-center gap-2 text-text-secondary dark:text-dark-text-secondary">
-                <MapPin size={16} />
-                <span>Calle Principal 123</span>
+              <li className="flex items-center gap-2.5">
+                <Mail size={14} className="shrink-0 text-gold" />
+                <a href="mailto:info@casadelreyhuehue.com" className="hover:text-white transition-colors">
+                  info@casadelreyhuehue.com
+                </a>
               </li>
             </ul>
           </div>
-
-          {/* Redes Sociales */}
-          <div>
-            <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary mb-4">Síguenos</h4>
-            <div className="flex gap-4">
-              <a href="https://facebook.com" className="text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="https://instagram.com" className="text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light transition-colors">
-                <Instagram size={20} />
-              </a>
-            </div>
-          </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-border-light dark:border-dark-border pt-8">
-          <p className="text-center text-text-muted dark:text-dark-text-muted text-sm">
-            © {currentYear} Casa del Rey. Todos los derechos reservados.
-          </p>
+        {/* Bottom */}
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
+          <span>© {new Date().getFullYear()} Casa del Rey — Huehuetenango, Guatemala</span>
+          <span>Hecho con fe</span>
         </div>
       </div>
     </footer>

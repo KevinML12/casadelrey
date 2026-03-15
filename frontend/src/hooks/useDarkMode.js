@@ -1,23 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export function useDarkMode() {
+export default function useDarkMode() {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
-    const isDarkMode = isDark;
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+    const root = document.documentElement;
+    // Activa la clase sin bloquear transiciones
+    if (isDark) {
+      root.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
 
-  const toggle = () => setIsDark(!isDark);
+  const toggle = () => setIsDark(prev => !prev);
 
   return { isDark, toggle };
 }

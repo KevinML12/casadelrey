@@ -1,13 +1,16 @@
 package handlers
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
-// GetEventsPlaceholder simula la futura lógica de obtener eventos.
-func GetEventsPlaceholder(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+// GetEventsPlaceholder es un handler temporal para el listado de eventos.
+// Implementar con GORM y un modelo Event cuando sea requerido.
+func GetEventsPlaceholder(c echo.Context) error {
+	return c.JSON(http.StatusServiceUnavailable, map[string]interface{}{
 		"error":   true,
-		"message": "Funcionalidad de Obtener Eventos no implementada en el MVP.",
+		"message": "Módulo de Eventos — próximamente disponible.",
 	})
 }

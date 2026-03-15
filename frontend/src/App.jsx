@@ -1,38 +1,70 @@
-import { Outlet } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
+import { Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { SiteConfigProvider } from './context/SiteConfigContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
-import { Toaster } from 'react-hot-toast';
+import useDarkMode from './hooks/useDarkMode';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
+});
+
+function PageWrapper() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function AppShell() {
+  useDarkMode(); // inicializa clase `dark` en <html> desde localStorage
+  return (
+    <div className="min-h-screen flex flex-col bg-bg text-ink">
+      <Header />
+      <main className="flex-1 w-full">
+        <PageWrapper />
+      </main>
+      <Footer />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'var(--card)',
+            color: 'var(--ink)',
+            border: '1px solid var(--line)',
+            borderRadius: '10px',
+            fontSize: '14px',
+            fontFamily: 'Inter, sans-serif',
+          },
+          success: { iconTheme: { primary: '#10B981', secondary: 'white' } },
+          error:   { iconTheme: { primary: '#EF4444', secondary: 'white' } },
+        }}
+      />
+    </div>
+  );
+}
 
 export default function App() {
-  useEffect(() => {
-    // Inicializar tema desde localStorage o preferencia del sistema
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
   return (
-    <SiteConfigProvider>
-      <AuthProvider>
-        <div className="min-h-screen flex flex-col bg-bg-light dark:bg-dark-bg text-text-primary dark:text-dark-text-primary transition-colors duration-200">
-          <Header />
-          <main className="flex-1 w-full py-8">
-            <div className="container mx-auto">
-              <Outlet />
-            </div>
-          </main>
-          <Footer />
-        </div>
-        <Toaster position="bottom-right" />
-      </AuthProvider>
-    </SiteConfigProvider>
+    <QueryClientProvider client={queryClient}>
+      <SiteConfigProvider>
+        <AuthProvider>
+          <AppShell />
+        </AuthProvider>
+      </SiteConfigProvider>
+    </QueryClientProvider>
   );
 }

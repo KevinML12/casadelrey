@@ -1,54 +1,29 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
 const apiClient = axios.create({
-  baseURL: API_URL,
-  timeout: 10000,
+  baseURL: BASE_URL,
+  timeout: 5_000,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor para agregar token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// Agrega el token JWT a cada request
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-// Response interceptor para manejar errores
-
+// Limpia el token si el servidor responde 401
 apiClient.interceptors.response.use(
-
-  (response) => response,
-
-  (error) => {
-
-    if (error.response?.status === 401) {
-
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
       localStorage.removeItem('token');
-
-      // window.location.href = '/login';
-
     }
-
-    return Promise.reject(error);
-
-  }
-
+    return Promise.reject(err);
+  },
 );
-
-
-
-export const login = (credentials) => {
-
-    return apiClient.post('/auth/login', credentials);
-
-}
-
-
 
 export default apiClient;

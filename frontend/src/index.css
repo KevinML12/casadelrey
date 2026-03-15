@@ -4,506 +4,129 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ────────────────────────────────────────────────────────────────
+   DESIGN TOKENS
+──────────────────────────────────────────────────────────────── */
+
 :root {
-  /* Light Mode Colors */
-  --primary: #0066FF;
-  --primary-dark: #003D99;
-  --primary-light: #4D94FF;
-  
-  --bg-light: #FFFFFF;
-  --bg-light-alt: #F8F9FA;
-  --bg-secondary: #F3F4F6;
-  --card-bg: #FFFFFF;
-  
-  --text-primary: #1A1A1A;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
-  
-  --border-light: #E2E8F0;
-  --border-medium: #CBD5E1;
-  
-  /* States */
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #DC2626;
-  --info: #06B6D4;
+  /* Fondos — escala de grises cálidos */
+  --bg:     #F7F9FC;
+  --bg-2:   #ECF0F8;
+  --card:   #FFFFFF;
+  --card-2: #F0F4FA;
+
+  /* Texto */
+  --ink:    #0B1524;
+  --ink-2:  #475569;
+  --ink-3:  #94A3B8;
+
+  /* Bordes */
+  --line:   #DDE4F0;
+
+  /* Tema */
+  color-scheme: light;
 }
 
-/* Dark Mode */
 html.dark {
-  --primary: #4D94FF;
-  --primary-dark: #0066FF;
-  --primary-light: #6DA7FF;
-  
-  --bg-light: #0F172A;
-  --bg-light-alt: #1E293B;
-  --bg-secondary: #334155;
-  --card-bg: #1E293B;
-  
-  --text-primary: #F1F5F9;
-  --text-secondary: #CBD5E1;
-  --text-muted: #94A3B8;
-  
-  --border-light: #475569;
-  --border-medium: #64748B;
+  /* Fondos — navy profundo con separación clara entre capas */
+  --bg:     #07101E;
+  --bg-2:   #0B1828;
+  --card:   #0F2035;
+  --card-2: #142538;
+
+  /* Texto — azulado premium */
+  --ink:    #E6EEFF;
+  --ink-2:  #7DA8CF;
+  --ink-3:  #3F637F;
+
+  /* Bordes — invisible en dark mode, las cards se elevan por background, no por borde */
+  --line:   transparent;
+
+  color-scheme: dark;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body, #root { width: 100%; height: 100%; }
+/* ────────────────────────────────────────────────────────────────
+   TRANSICIÓN SUAVE AL CAMBIAR TEMA
+   Solo propiedades visuales — no transiciona transforms ni opacity
+──────────────────────────────────────────────────────────────── */
 
 html {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
 }
 
-body {
-  background-color: var(--bg-light);
-  color: var(--text-primary);
-  transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
-              color 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--text-primary);
-  transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+/* Excluir elementos que no deben transicionar sus colores */
+*:focus-visible,
+[data-no-transition],
+.animate-spin,
+.animate-pulse,
+[class*="animate-"] {
+  transition: none !important;
 }
 
-h1 { font-size: 2.5rem; font-weight: 700; }
-h2 { font-size: 2rem; font-weight: 700; }
-h3 { font-size: 1.5rem; font-weight: 600; }
-h4 { font-size: 1.25rem; font-weight: 600; }
-h5 { font-size: 1.1rem; font-weight: 600; }
-h6 { font-size: 1rem; font-weight: 600; }
+/* ────────────────────────────────────────────────────────────────
+   BASE GLOBAL
+──────────────────────────────────────────────────────────────── */
 
-p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-small {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-a:hover {
-  color: var(--primary-dark);
-}
-
-/* ============================================================================
-   NEUMORPHIC SHADOWS (Apple/Shopify Style)
-   ============================================================================ */
-
-.shadow-neumorphic-sm {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-.shadow-neumorphic-md {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-neumorphic-lg {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.shadow-neumorphic-xl {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
-}
-
-html.dark .shadow-neumorphic-sm {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-html.dark .shadow-neumorphic-md {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-html.dark .shadow-neumorphic-lg {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-}
-
-html.dark .shadow-neumorphic-xl {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-/* ============================================================================
-   CARD COMPONENT
-   ============================================================================ */
-
-.card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card:hover {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  border-color: var(--border-medium);
-}
-
-.card-header {
-  padding: 20px;
-  border-bottom: 1px solid var(--border-light);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.card-body {
-  padding: 20px;
-}
-
-.card-footer {
-  padding: 16px 20px;
-  border-top: 1px solid var(--border-light);
-}
-
-/* ============================================================================
-   FORM ELEMENTS
-   ============================================================================ */
-
-input,
-textarea,
-select {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  background-color: var(--card-bg);
-  color: var(--text-primary);
-  padding: 10px 14px;
-  font-size: 14px;
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-muted);
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
-}
-
-html.dark input:focus,
-html.dark textarea:focus,
-html.dark select:focus {
-  box-shadow: 0 0 0 3px rgba(77, 148, 255, 0.15);
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  accent-color: var(--primary);
-}
-
-/* ============================================================================
-   ANIMATIONS
-   ============================================================================ */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@layer base {
+  html {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    scroll-behavior: smooth;
   }
-  to {
-    opacity: 1;
-  }
-}
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-slideUp {
-  animation: slideUp 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-slideDown {
-  animation: slideDown 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-scaleIn {
-  animation: scaleIn 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* ============================================================================
-   UTILITY CLASSES
-   ============================================================================ */
-
-/* Transitions */
-.transition-soft {
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.transition-fast {
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.transition-slow {
-  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Text Utilities */
-.text-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.text-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.text-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Dividers */
-.divider {
-  height: 1px;
-  background-color: var(--border-light);
-}
-
-.divider-vertical {
-  width: 1px;
-  height: auto;
-  background-color: var(--border-light);
-}
-
-/* Disabled State */
-.disabled,
-[disabled],
-input:disabled,
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Focus Rings */
-.focus-ring {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-
-.focus-ring:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body, #root {
-  width: 100%;
-  height: 100%;
-}
-
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-light);
-  color: var(--text-primary);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-h4 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-small {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-/* Link Styles */
-a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: var(--primary-dark);
-}
-
-/* ============================================================================
-   SCROLLBAR STYLING
-   ============================================================================ */
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-light-alt);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-html.dark ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-/* ============================================================================
-   RESPONSIVE UTILITIES
-   ============================================================================ */
-
-@media (max-width: 640px) {
-  .hide-mobile {
-    display: none;
-  }
-}
-
-@media (min-width: 641px) {
-  .show-mobile {
-    display: none;
-  }
-}
-
-/* ============================================================================
-   PRINT STYLES
-   ============================================================================ */
-
-@media print {
   body {
-    background: white;
-    color: black;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
-  .no-print {
-    display: none;
+
+  ::selection {
+    background: rgba(37, 99, 235, 0.18);
   }
 }
 
-/* ============================================================================
-   ACCESSIBILITY
-   ============================================================================ */
+/* ────────────────────────────────────────────────────────────────
+   DARK MODE — bordes invisibles en todos los contenedores
+   Tailwind compila border-line con rgb() así que la variable
+   transparent no basta; necesitamos override directo.
+──────────────────────────────────────────────────────────────── */
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Solo divs y secciones estructurales pierden el borde —
+   botones, inputs y selects conservan su dark:border-white/10 */
+html.dark div.border-line,
+html.dark section.border-line,
+html.dark article.border-line,
+html.dark header.border-line,
+html.dark aside.border-line {
+  border-color: transparent;
 }
 
-/* High contrast mode */
-@media (prefers-contrast: more) {
-  body {
-    color: var(--text-primary);
-    background-color: var(--bg-light);
-  }
+/* Divisores entre items (divide-y divide-line) */
+html.dark .divide-line > * + * {
+  border-color: rgba(255, 255, 255, 0.05);
 }
+
+html.dark .shadow-card {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.35);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   SCROLLBAR (webkit)
+──────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #CBD5E1; border-radius: 3px; }
+
+html.dark ::-webkit-scrollbar-thumb { background: #1C3550; }

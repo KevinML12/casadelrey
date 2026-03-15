@@ -12,6 +12,10 @@
 *.so
 *.dylib
 main
+casadelrey-backend
+
+# Archivos subidos por usuarios (runtime, no se versiona)
+uploads/
 
 # Archivos de test
 *.test

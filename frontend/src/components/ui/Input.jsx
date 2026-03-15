@@ -1,4 +1,13 @@
-import React from 'react';
+const fieldBase = [
+  'w-full rounded-md border border-line dark:border-white/10 bg-transparent text-ink',
+  'placeholder:text-ink-3',
+  'focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/15',
+  'transition-all duration-150 text-sm',
+].join(' ');
+
+const labelCls  = 'block text-sm font-medium text-ink mb-1.5';
+const errorCls  = 'mt-1 text-xs text-err font-medium';
+const helperCls = 'mt-1 text-xs text-ink-3';
 
 export default function Input({
   label,
@@ -8,53 +17,15 @@ export default function Input({
   className = '',
   ...props
 }) {
-  const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-4 py-3 text-lg',
-  };
-
-  const baseClasses = `
-    w-full
-    border border-border-light
-    dark:border-dark-border
-    rounded-lg
-    bg-card-bg
-    dark:bg-dark-card-bg
-    text-text-primary
-    dark:text-dark-text-primary
-    focus:outline-none
-    focus:border-primary
-    dark:focus:border-primary-light
-    focus:ring-2
-    focus:ring-primary focus:ring-opacity-10
-    dark:focus:ring-primary-light dark:focus:ring-opacity-20
-    transition-soft duration-200
-    font-sans
-    placeholder:text-text-muted
-    dark:placeholder:text-dark-text-muted
-  `;
-
-  const sizeClasses = sizes[size] || sizes.md;
-  const errorClasses = error ? 'border-error focus:border-error focus:ring-error dark:border-error' : '';
+  const sizeClass = size === 'sm' ? 'px-3 py-2' : size === 'lg' ? 'px-4 py-3.5' : 'px-4 py-2.5';
+  const errRing   = error ? 'border-err focus:border-err focus:ring-err/15' : '';
 
   return (
     <div className="w-full">
-      {label && (
-        <label className="block text-sm font-semibold text-text-dark mb-2">
-          {label}
-        </label>
-      )}
-      <input
-        className={`${baseClasses} ${sizeClasses} ${errorClasses} ${className} bg-white border border-[#0066FF] shadow-[0_2px_8px_rgba(0,102,255,0.03)]`}
-        {...props}
-      />
-      {error && (
-        <p className="mt-1 text-sm text-error font-medium">{error.message}</p>
-      )}
-      {helperText && !error && (
-        <p className="mt-1 text-sm text-text-muted">{helperText}</p>
-      )}
+      {label && <label className={labelCls}>{label}</label>}
+      <input className={`${fieldBase} ${sizeClass} ${errRing} ${className}`} {...props} />
+      {error     && <p className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
+      {helperText && !error && <p className={helperCls}>{helperText}</p>}
     </div>
   );
 }
@@ -67,43 +38,18 @@ export function Textarea({
   className = '',
   ...props
 }) {
-  const baseClasses = `
-    w-full
-    px-4 py-2
-    border border-border-light
-    rounded-input
-    bg-card-bg
-    text-text-dark
-    focus:outline-none
-    focus:border-caoba
-    focus:ring-2
-    focus:ring-caoba focus:ring-opacity-20
-    transition-soft duration-200
-    font-sans
-    placeholder:text-text-muted
-    resize-vertical
-  `;
-
-  const errorClasses = error ? 'border-error focus:border-error focus:ring-error' : '';
+  const errRing = error ? 'border-err focus:border-err focus:ring-err/15' : '';
 
   return (
     <div className="w-full">
-      {label && (
-        <label className="block text-sm font-semibold text-text-dark mb-2">
-          {label}
-        </label>
-      )}
+      {label && <label className={labelCls}>{label}</label>}
       <textarea
         rows={rows}
-        className={`${baseClasses} ${errorClasses} ${className}`}
+        className={`${fieldBase} px-4 py-2.5 resize-none ${errRing} ${className}`}
         {...props}
       />
-      {error && (
-        <p className="mt-1 text-sm text-error font-medium">{error.message}</p>
-      )}
-      {helperText && !error && (
-        <p className="mt-1 text-sm text-text-muted">{helperText}</p>
-      )}
+      {error     && <p className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
+      {helperText && !error && <p className={helperCls}>{helperText}</p>}
     </div>
   );
 }

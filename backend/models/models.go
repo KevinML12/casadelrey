@@ -20,7 +20,7 @@ type Post struct {
 	gorm.Model
 	Title    string `json:"title" gorm:"not null"`
 	Slug     string `json:"slug" gorm:"unique;not null"`
-	Content  string `json::"content" gorm:"type:text;not null"`
+	Content  string `json:"content" gorm:"type:text;not null"`
 	AuthorID uint   `json:"author_id" gorm:"not null"`
 	Status   string `json:"status" gorm:"default:draft"`
 	Author   User   `json:"author" gorm:"foreignKey:AuthorID"`
