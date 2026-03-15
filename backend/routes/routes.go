@@ -72,7 +72,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 
 	// ── 4. Donaciones (envío público) ─────────────────────────────────────
 	donationsGroup := api.Group("/donations")
-	donationsGroup.POST("/simulate", donationHandler.SimulateDonation)
+	donationsGroup.POST("/simulate",              donationHandler.SimulateDonation)
+	donationsGroup.POST("/create-payment-intent", donationHandler.CreatePaymentIntent)
+	// El webhook NO lleva authMW: Stripe firma sus propias peticiones.
+	donationsGroup.POST("/webhook", donationHandler.HandleWebhook)
 
 	// ── 5. Eventos (placeholder) ──────────────────────────────────────────
 	eventsGroup := api.Group("/events")
