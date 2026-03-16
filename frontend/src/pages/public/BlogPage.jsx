@@ -39,7 +39,9 @@ function TTSPlayer({ content }) {
             {isLoading ? 'Preparando…' : isPlaying ? 'Leyendo…' : isPaused ? 'Pausado' : isDone ? '✓ Completado' : 'Escuchar este post'}
           </p>
           <p className={`text-xs mt-0.5 ${isActive ? 'text-white/50' : 'text-ink-3'}`}>
-            {isActive ? 'Voz en español' : engine === 'elevenlabs' ? 'Voz IA · ElevenLabs' : 'El post se leerá en voz alta'}
+            {isActive
+              ? `Voz en español${engine ? ` · ${engine === 'elevenlabs' ? 'ElevenLabs' : engine === 'google-cloud' ? 'Google Cloud' : 'Google Translate'}` : ''}`
+              : engine ? `Motor: ${engine === 'elevenlabs' ? 'ElevenLabs (IA)' : engine === 'google-cloud' ? 'Google Cloud' : 'Google Translate'}` : 'El post se leerá en voz alta'}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
