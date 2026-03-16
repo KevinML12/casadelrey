@@ -70,6 +70,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.Event{},       // Tabla: events (eventos de la iglesia)
 			&models.CellReport{},  // Tabla: cell_reports (reportes de células)
 			&models.UserGoal{},    // Tabla: user_goals (metas personales)
+			&models.Volunteer{},   // Tabla: volunteers (inscripciones voluntariado)
 			&models.SocialPost{},  // Tabla: social_posts (FB/IG para feed)
 		); err != nil {
 			connectErr = err

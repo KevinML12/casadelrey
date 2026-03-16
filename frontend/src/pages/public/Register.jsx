@@ -1,33 +1,7 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
+import { Link } from 'react-router-dom';
+import { UserPlus } from 'lucide-react';
 
 export default function Register() {
-  const [form, setForm]       = useState({ name: '', email: '', password: '', confirm: '' });
-  const [submitting, setSubmitting] = useState(false);
-  const { register } = useAuth();
-  const navigate = useNavigate();
-
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (form.password !== form.confirm) { toast.error('Las contraseñas no coinciden'); return; }
-    if (form.password.length < 6)       { toast.error('La contraseña debe tener al menos 6 caracteres'); return; }
-    setSubmitting(true);
-    const { success, error } = await register(form.email, form.password, form.name);
-    setSubmitting(false);
-    if (success) {
-      toast.success('¡Cuenta creada! Inicia sesión para continuar.');
-      navigate('/login');
-    } else {
-      toast.error(error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-bg flex">
       {/* Panel decorativo */}
@@ -48,29 +22,25 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Formulario */}
+      {/* Mensaje: no hay registro público */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <div className="mb-8">
-            <h1 className="text-2xl font-black text-ink mb-1">Crear cuenta</h1>
-            <p className="text-ink-3 text-sm">Únete a la comunidad de Casa del Rey</p>
+        <div className="w-full max-w-sm text-center">
+          <div className="w-14 h-14 rounded-xl bg-navy/10 flex items-center justify-center mx-auto mb-6">
+            <UserPlus size={28} className="text-navy" />
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input label="Nombre completo" type="text" value={form.name} onChange={set('name')} required />
-            <Input label="Correo electrónico" type="email" value={form.email} onChange={set('email')} required />
-            <Input label="Contraseña" type="password" value={form.password} onChange={set('password')} helperText="Mínimo 6 caracteres" required />
-            <Input label="Confirmar contraseña" type="password" value={form.confirm} onChange={set('confirm')} required />
-
-            <Button type="submit" variant="navy" size="lg" className="w-full" disabled={submitting}>
-              {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
-            </Button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-ink-3">
-            ¿Ya tienes cuenta?{' '}
-            <Link to="/login" className="text-blue font-medium hover:underline">Inicia sesión</Link>
+          <h1 className="text-2xl font-black text-ink mb-2">Obtener una cuenta</h1>
+          <p className="text-ink-3 text-sm leading-relaxed mb-6">
+            Las cuentas son creadas por líderes o administradores. Si quieres unirte, contacta a un líder de tu célula o a alguien del equipo para que te den acceso.
           </p>
+          <p className="text-ink-3 text-sm mb-6">
+            ¿Te interesa servir? Inscríbete como <Link to="/volunteering" className="text-blue font-medium hover:underline">voluntario</Link> y el equipo se comunicará contigo.
+          </p>
+          <Link
+            to="/login"
+            className="inline-block px-6 py-3 rounded-lg bg-navy text-white font-semibold hover:opacity-90 transition"
+          >
+            Ya tengo cuenta — Iniciar sesión
+          </Link>
         </div>
       </div>
     </div>

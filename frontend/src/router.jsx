@@ -35,6 +35,7 @@ import AdminIndex      from './pages/admin/AdminIndex';
 import AdminBlog        from './pages/admin/AdminBlog';
 import AdminEvents      from './pages/admin/AdminEvents';
 import AdminPetitions   from './pages/admin/AdminPetitions';
+import AdminVolunteers  from './pages/admin/AdminVolunteers';
 import AdminCellReports from './pages/admin/AdminCellReports';
 import AdminSocial      from './pages/admin/AdminSocial';
 import ProfilePage      from './pages/public/ProfilePage';
@@ -43,6 +44,7 @@ import ProfilePage      from './pages/public/ProfilePage';
 import LeaderLayout    from './components/layout/LeaderLayout';
 import LeaderIndex     from './pages/leader/LeaderIndex';
 import LeaderReports   from './pages/leader/LeaderReports';
+import LeaderVolunteers from './pages/leader/LeaderVolunteers';
 
 export const router = createBrowserRouter([
 
@@ -59,6 +61,7 @@ export const router = createBrowserRouter([
       { path: 'blog',      element: <AdminBlog /> },
       { path: 'events',    element: <AdminEvents /> },
       { path: 'petitions',     element: <AdminPetitions /> },
+      { path: 'volunteers',    element: <AdminVolunteers /> },
       { path: 'cell-reports', element: <AdminCellReports /> },
       { path: 'social',       element: <AdminSocial /> },
       { path: 'profile',      element: <ProfilePage /> },
@@ -76,6 +79,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <LeaderIndex /> },
       { path: 'reports', element: <LeaderReports /> },
+      { path: 'volunteers', element: <LeaderVolunteers /> },
       { path: 'profile', element: <ProfilePage /> },
     ],
   },

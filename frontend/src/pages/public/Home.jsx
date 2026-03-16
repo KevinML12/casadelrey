@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MessageSquare, Heart, BookOpen, Calendar, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { ArrowRight, MessageSquare, Heart, BookOpen, Calendar, Clock, MapPin, ChevronRight, HandHelping } from 'lucide-react';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
 import SocialSection from '../../components/sections/SocialSection';
@@ -66,10 +66,11 @@ function Hero() {
 // ─── Ministerios ──────────────────────────────────────────────────────────────
 
 const AREAS = [
-  { icon: BookOpen,      label: 'Enseñanzas',  desc: 'Mensajes y reflexiones que nutren tu fe cada semana.',      to: '/blog' },
-  { icon: Calendar,      label: 'Eventos',      desc: 'Sunday Service, Primicias, retiros y más. Vive con nosotros.', to: '/events' },
-  { icon: MessageSquare, label: 'Oración',      desc: 'Comparte tu carga. Una comunidad entera intercede contigo.', to: '/prayer' },
-  { icon: Heart,         label: 'Donaciones',   desc: 'Tu generosidad equipa ministerios y transforma familias.',  to: '/donate' },
+  { icon: BookOpen,      label: 'Enseñanzas',   desc: 'Mensajes y reflexiones que nutren tu fe cada semana.',      to: '/blog' },
+  { icon: Calendar,      label: 'Eventos',       desc: 'Sunday Service, Primicias, retiros y más. Vive con nosotros.', to: '/events' },
+  { icon: MessageSquare, label: 'Oración',       desc: 'Comparte tu carga. Una comunidad entera intercede contigo.', to: '/prayer' },
+  { icon: HandHelping,   label: 'Voluntariado',  desc: 'Sirve con tus talentos y haz la diferencia en la comunidad.', to: '/volunteering' },
+  { icon: Heart,         label: 'Donaciones',     desc: 'Tu generosidad equipa ministerios y transforma familias.',  to: '/donate' },
 ];
 
 function Ministerios() {
@@ -251,34 +252,6 @@ function ProximosEventos() {
   );
 }
 
-// ─── Domingo ──────────────────────────────────────────────────────────────────
-
-function Domingo() {
-  return (
-    <section className="bg-navy py-20">
-      <div className="container mx-auto px-6">
-        <Reveal className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <div>
-            <p className="text-gold font-bold text-xs uppercase tracking-widest mb-3">Cada semana</p>
-            <h2 className="text-4xl font-black text-white leading-none mb-4">
-              Sunday<br />Service
-            </h2>
-            <div className="flex flex-col gap-2 text-white/60 text-sm">
-              <span className="flex items-center gap-2"><Clock size={14} className="text-gold" /> Domingos 10:00 AM</span>
-              <span className="flex items-center gap-2"><Clock size={14} className="text-gold" /> Miércoles 7:00 PM</span>
-              <span className="flex items-center gap-2"><MapPin size={14} className="text-gold" /> 7a. Calle 12-66, Huehuetenango</span>
-            </div>
-          </div>
-          <Link to="/events"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-white font-semibold rounded-md hover:bg-gold-d transition-colors shrink-0">
-            Ver calendario <ArrowRight size={15} />
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 // ─── Oración CTA ──────────────────────────────────────────────────────────────
 
 function OracionCTA() {
@@ -347,7 +320,6 @@ export default function Home() {
       <Ministerios />
       <UltimasEnseñanzas />
       <ProximosEventos />
-      <Domingo />
       <OracionCTA />
       <SocialSection title="Lo último en redes" showDirectAccess />
       <Donaciones />

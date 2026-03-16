@@ -1,6 +1,11 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Send } from 'lucide-react';
 import PageHero from '../../components/layout/PageHero';
+import Input from '../../components/ui/Input';
+import { Textarea } from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
+import apiClient from '../../lib/apiClient';
+import toast from 'react-hot-toast';
 
 const AREAS = [
   { title: 'Equipo de Bienvenida',    desc: 'Recibe a cada persona con calidez y haz que se sienta en casa desde el primer momento.' },
@@ -10,6 +15,64 @@ const AREAS = [
   { title: 'Equipo de Alcance',       desc: 'Lleva el amor de Dios a la comunidad a través de servicio práctico y evangelismo.' },
   { title: 'Ministerio de Oración',   desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
 ];
+
+function VolunteerForm() {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', area: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim()) {
+      toast.error('Nombre y correo son requeridos');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await apiClient.post('/volunteer/register', form);
+      setSent(true);
+      toast.success('¡Gracias! Nos comunicaremos contigo pronto.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al enviar. Intenta de nuevo.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div className="text-center py-6 bg-green-500/10 border border-green-500/20 rounded-xl">
+        <p className="text-green-700 dark:text-green-400 font-medium">¡Inscripción recibida!</p>
+        <p className="text-ink-3 text-sm mt-1">Nuestro equipo se pondrá en contacto contigo.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input label="Nombre completo" value={form.name} onChange={set('name')} required />
+      <Input label="Correo electrónico" type="email" value={form.email} onChange={set('email')} required />
+      <Input label="Teléfono" type="tel" value={form.phone} onChange={set('phone')} placeholder="Opcional" />
+      <div>
+        <label className="block text-sm font-medium text-ink mb-1.5">Área de interés</label>
+        <select
+          className="w-full rounded-md border border-line bg-transparent px-4 py-2.5 text-sm text-ink"
+          value={form.area}
+          onChange={(e) => setForm(p => ({ ...p, area: e.target.value }))}
+        >
+          <option value="">Selecciona un área</option>
+          {AREAS.map(a => <option key={a.title} value={a.title}>{a.title}</option>)}
+        </select>
+      </div>
+      <Textarea label="Mensaje" rows={3} value={form.message} onChange={set('message')} placeholder="Cuéntanos por qué quieres servir..." />
+      <Button type="submit" variant="navy" size="lg" className="w-full" disabled={submitting}>
+        {submitting ? 'Enviando...' : <>Enviar inscripción <Send size={14} /></>}
+      </Button>
+    </form>
+  );
+}
 
 export default function VolunteeringPage() {
   return (
@@ -33,17 +96,13 @@ export default function VolunteeringPage() {
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="text-center p-8 rounded-2xl bg-bg-2 border border-line">
-            <h3 className="text-2xl font-black text-ink mb-3">¿Listo para servir?</h3>
-            <p className="text-ink-2 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
-              Envíanos una petición de contacto y nuestro equipo se comunicará contigo para orientarte.
+          {/* Formulario de inscripción */}
+          <div className="p-8 rounded-2xl bg-bg-2 border border-line">
+            <h3 className="text-2xl font-black text-ink mb-2">¿Listo para servir?</h3>
+            <p className="text-ink-2 text-sm mb-6 leading-relaxed">
+              Completa el formulario y nuestro equipo se comunicará contigo para orientarte.
             </p>
-            <Link to="/prayer"
-              className="group inline-flex items-center gap-2 px-7 py-3 bg-navy text-white font-semibold rounded-md hover:bg-navy-d transition-colors">
-              Quiero ser voluntario
-              <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+            <VolunteerForm />
           </div>
         </div>
       </div>

@@ -103,6 +103,18 @@ type UserGoal struct {
 	Completed   bool   `json:"completed" gorm:"default:false"`
 }
 
+// Volunteer representa una inscripción de interés en voluntariado (no es usuario aún).
+type Volunteer struct {
+	gorm.Model
+	Name             string `json:"name" gorm:"type:varchar(100);not null"`
+	Email            string `json:"email" gorm:"type:varchar(100);not null;index"`
+	Phone            string `json:"phone" gorm:"type:varchar(30)"`
+	Area             string `json:"area" gorm:"type:varchar(100)"` // área de interés
+	Message          string `json:"message" gorm:"type:text"`
+	AssignedLeaderID *uint  `json:"assigned_leader_id" gorm:"index"` // líder asignado por admin
+	Status           string `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente, asignado, coordinando, usuario_creado
+}
+
 // SocialPost representa una publicación de FB/IG para mostrar en el feed.
 type SocialPost struct {
 	gorm.Model

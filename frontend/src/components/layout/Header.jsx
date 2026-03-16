@@ -5,11 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 import useDarkMode from '../../hooks/useDarkMode';
 
 const NAV_LINKS = [
-  { label: 'Conócenos',  to: '/about' },
-  { label: 'Blog',       to: '/blog' },
-  { label: 'Eventos',    to: '/events' },
-  { label: 'Oración',    to: '/prayer' },
-  { label: 'Donaciones', to: '/donate' },
+  { label: 'Conócenos',   to: '/about' },
+  { label: 'Blog',        to: '/blog' },
+  { label: 'Eventos',     to: '/events' },
+  { label: 'Oración',     to: '/prayer' },
+  { label: 'Voluntariado', to: '/volunteering' },
+  { label: 'Donaciones',  to: '/donate' },
 ];
 
 const activeCls = 'text-blue font-semibold';

@@ -24,6 +24,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	socialHandler    := handlers.NewSocialHandler(db)
 	adminHandler     := handlers.NewAdminHandler(db)
 	profileHandler   := handlers.NewProfileHandler(db)
+	volunteerHandler := handlers.NewVolunteerHandler(db)
 	uploadHandler   := handlers.NewUploadHandler()
 
 	// ── Middlewares ───────────────────────────────────────────────────────────
@@ -46,9 +47,12 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// ── API v1 ────────────────────────────────────────────────────────────────
 	api := e.Group("/api/v1")
 
-	// Auth (público)
+	// Voluntariado (público: inscripción de interés)
+	api.POST("/volunteer/register", volunteerHandler.Register)
+
+	// Auth (público; registro desactivado: solo admin/líder crean usuarios)
 	authGroup := api.Group("/auth")
-	authGroup.POST("/register",        authHandler.Register)
+	authGroup.POST("/register",        authHandler.RegisterDisabled)
 	authGroup.POST("/login",           authHandler.Login)
 	authGroup.GET("/verify-email",     authHandler.VerifyEmail)
 	authGroup.POST("/forgot-password", authHandler.ForgotPassword)
@@ -100,6 +104,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	adminGroup.GET("/kpis",      adminHandler.GetKPIs)
 	adminGroup.GET("/donations", adminHandler.GetDonations)
 	adminGroup.PUT("/users/:id/role", adminHandler.UpdateUserRole)
+	adminGroup.GET("/leaders",       adminHandler.GetLeaders)
+	adminGroup.PUT("/volunteers/:id/assign", volunteerHandler.Assign)
 
 	// Blog admin
 	adminBlog := adminGroup.Group("/blog")
@@ -112,8 +118,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	adminGroup.GET("/petitions",           petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read",  petitionHandler.MarkAsRead)
 
-	// Reportes de células: admin y leader (import, bulk, ver)
+	// Admin o líder: crear usuarios, voluntarios, células
 	adminOrLeader := api.Group("/admin", authMW, adminOrLeaderMW)
+	adminOrLeader.POST("/users", adminHandler.CreateUser)
+	adminOrLeader.GET("/volunteers", volunteerHandler.GetAll)
+	adminOrLeader.POST("/volunteers/:id/create-user", volunteerHandler.CreateUserFromVolunteer)
 	adminOrLeader.POST("/cell-report", cellReportHandler.CreateCellReport)
 	adminOrLeader.POST("/cell-reports/bulk", cellReportHandler.BulkCreateCellReports)
 	adminOrLeader.POST("/cell-reports/import", cellReportHandler.ImportCellReportsCSV)

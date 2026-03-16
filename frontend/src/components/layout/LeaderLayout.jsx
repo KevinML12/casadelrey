@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, User, LogOut, Menu, X, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, User, LogOut, Menu, X, Globe } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const NAV = [
   { to: '/leader', icon: LayoutDashboard, label: 'Inicio', exact: true },
   { to: '/leader/reports', icon: Users, label: 'Células' },
+  { to: '/leader/volunteers', icon: UserPlus, label: 'Voluntarios' },
   { to: '/leader/profile', icon: User, label: 'Perfil' },
 ];
 

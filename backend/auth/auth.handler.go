@@ -22,6 +22,14 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{DB: db}
 }
 
+// RegisterDisabled responde 403: el registro público está desactivado.
+// Solo admin y líderes pueden crear usuarios desde sus paneles.
+func (h *Handler) RegisterDisabled(c echo.Context) error {
+	return c.JSON(http.StatusForbidden, map[string]string{
+		"error": "El registro público está desactivado. Contacta a un líder o administrador para obtener tu cuenta.",
+	})
+}
+
 // Register godoc
 // POST /api/v1/auth/register
 // Registra un nuevo usuario con nombre, email y contraseña hasheada (bcrypt).

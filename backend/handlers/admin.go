@@ -3,9 +3,13 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
+	"casadelrey/backend/auth"
+	"casadelrey/backend/email"
 	"casadelrey/backend/models"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -105,4 +109,92 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Rol actualizado."})
+}
+
+// GetLeaders GET /api/v1/admin/leaders — admin obtiene lista de líderes para asignar voluntarios.
+func (h *AdminHandler) GetLeaders(c echo.Context) error {
+	var leaders []struct {
+		ID    uint   `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}
+	if err := h.DB.Model(&models.User{}).Where("role = ?", "leader").Select("id, name, email").Find(&leaders).Error; err != nil {
+		log.Printf("[Admin] Error al obtener líderes: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener líderes."})
+	}
+	return c.JSON(http.StatusOK, leaders)
+}
+
+// CreateUser POST /api/v1/admin/users — admin o líder crea un usuario (solo ellos pueden crear cuentas).
+func (h *AdminHandler) CreateUser(c echo.Context) error {
+	var req struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+	}
+	if req.Name == "" || req.Email == "" || len(req.Password) < 6 {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Nombre, email y contraseña (mín. 6 caracteres) son requeridos.",
+		})
+	}
+	role := req.Role
+	if role == "" {
+		role = "member"
+	}
+	if role != "member" && role != "leader" && role != "admin" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader o admin."})
+	}
+	// Solo admin puede crear líderes o admins
+	if role != "member" {
+		if r, _ := c.Get("user_role").(string); r != "admin" {
+			return c.JSON(http.StatusForbidden, map[string]string{"error": "Solo un administrador puede crear líderes o admins."})
+		}
+	}
+
+	var existing models.User
+	if h.DB.Where("email = ?", req.Email).First(&existing).Error == nil {
+		return c.JSON(http.StatusConflict, map[string]string{"error": "Este email ya está registrado."})
+	}
+
+	hashedPassword, err := auth.HashPassword(req.Password)
+	if err != nil {
+		log.Printf("[Admin] Error al hashear contraseña: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al procesar la contraseña."})
+	}
+
+	verificationToken := uuid.New().String()
+	verificationExpiry := time.Now().Add(24 * time.Hour)
+
+	user := models.User{
+		Name:                    req.Name,
+		Email:                   req.Email,
+		Password:                hashedPassword,
+		Role:                    role,
+		VerificationToken:       &verificationToken,
+		VerificationTokenExpiry: &verificationExpiry,
+	}
+	if err := h.DB.Create(&user).Error; err != nil {
+		log.Printf("[Admin] Error al crear usuario: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear el usuario."})
+	}
+
+	email.SendEmailAsync(
+		user.Email,
+		"Verifica tu correo — Casa del Rey",
+		email.GetVerificationEmailTemplate(user.Name, verificationToken),
+	)
+
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"message": "Usuario creado. Se envió un correo de verificación.",
+		"user": map[string]interface{}{
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+			"role":  user.Role,
+		},
+	})
 }
