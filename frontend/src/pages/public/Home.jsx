@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MessageSquare, Heart, BookOpen, Calendar, Clock, MapPin, ChevronRight, Share2 } from 'lucide-react';
+import { ArrowRight, MessageSquare, Heart, BookOpen, Calendar, Clock, MapPin, ChevronRight } from 'lucide-react';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
+import SocialSection from '../../components/sections/SocialSection';
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -303,54 +304,6 @@ function OracionCTA() {
   );
 }
 
-// ─── Feed Redes ───────────────────────────────────────────────────────────────
-
-function SocialFeed() {
-  const [posts, setPosts] = useState([]);
-
-  useEffect(() => {
-    apiClient.get('/social/feed').then(r => setPosts(r.data || [])).catch(() => {});
-  }, []);
-
-  if (posts.length === 0) return null;
-
-  const getEmbedUrl = (url, platform) => {
-    if (platform === 'instagram') {
-      const match = url.match(/instagram\.com\/p\/([^/]+)/);
-      return match ? `https://www.instagram.com/p/${match[1]}/embed` : url;
-    }
-    return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&width=500&show_text=true`;
-  };
-
-  return (
-    <section className="py-24 bg-bg-2">
-      <div className="container mx-auto px-6">
-        <Reveal className="mb-12">
-          <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-2">Síguenos</p>
-          <h2 className="text-4xl font-black text-ink">Lo último en redes</h2>
-        </Reveal>
-        <RevealList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map(p => (
-            <RevealItem key={p.ID}>
-              <a href={p.post_url} target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden border border-line bg-card hover:border-blue/30 transition-colors">
-                <div className="aspect-square bg-bg">
-                  <iframe
-                    src={getEmbedUrl(p.post_url, p.platform)}
-                    className="w-full h-full"
-                    style={{ minHeight: 320 }}
-                    title={p.caption || p.platform}
-                  />
-                </div>
-                {p.caption && <p className="p-4 text-sm text-ink-2 line-clamp-2">{p.caption}</p>}
-              </a>
-            </RevealItem>
-          ))}
-        </RevealList>
-      </div>
-    </section>
-  );
-}
-
 // ─── Donaciones ───────────────────────────────────────────────────────────────
 
 function Donaciones() {
@@ -396,7 +349,7 @@ export default function Home() {
       <ProximosEventos />
       <Domingo />
       <OracionCTA />
-      <SocialFeed />
+      <SocialSection title="Lo último en redes" showDirectAccess />
       <Donaciones />
     </>
   );
