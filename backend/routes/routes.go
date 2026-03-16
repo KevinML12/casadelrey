@@ -99,6 +99,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 
 	// Reportes de células admin
 	adminGroup.GET("/cell-reports", cellReportHandler.GetAllCellReports)
+	adminGroup.POST("/cell-reports/import", cellReportHandler.ImportCellReportsCSV)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")
