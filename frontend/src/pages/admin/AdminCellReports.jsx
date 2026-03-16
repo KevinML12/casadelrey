@@ -92,9 +92,9 @@ export default function AdminCellReports() {
       {/* Formato esperado */}
       <details className="mb-6 p-4 rounded-xl bg-bg border border-line text-sm text-ink-2">
         <summary className="font-medium text-ink cursor-pointer">Formato CSV (Excel → Guardar como CSV)</summary>
-        <p className="text-xs font-mono mt-2">líder, célula, fecha, asistencia, visitantes, notas</p>
-        <p className="text-xs mt-1">También: leader_name, cell_name, meeting_date, attendance, new_visitors, notes</p>
-        <p className="text-xs mt-2 text-ink-3">Puedes subir varios archivos CSV a la vez.</p>
+        <p className="text-xs mt-2">Reconocemos automáticamente muchas variaciones de columnas:</p>
+        <p className="text-xs font-mono mt-1">líder/leader/encargado · célula/cell/grupo · fecha/date · asistencia/visitantes/notas</p>
+        <p className="text-xs mt-1 text-ink-3">Soporta comas, punto y coma o tabulador. Varios archivos a la vez.</p>
       </details>
 
       {loading ? (

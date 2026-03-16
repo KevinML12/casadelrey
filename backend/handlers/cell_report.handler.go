@@ -65,13 +65,26 @@ func (h *CellReportHandler) GetAllCellReports(c echo.Context) error {
 	return c.JSON(http.StatusOK, reports)
 }
 
-// colIndex devuelve el índice de la columna por nombre (flexible: español, inglés, API).
+// normalizar quita acentos, espacios y pasa a minúsculas para matching flexible.
+func normalizar(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "_", "")
+	s = strings.ReplaceAll(s, "á", "a")
+	s = strings.ReplaceAll(s, "é", "e")
+	s = strings.ReplaceAll(s, "í", "i")
+	s = strings.ReplaceAll(s, "ó", "o")
+	s = strings.ReplaceAll(s, "ú", "u")
+	return s
+}
+
+// colIndex devuelve el índice de la columna por nombre (exacto o contiene).
 func colIndex(headers []string, names ...string) int {
-	lower := func(s string) string { return strings.ToLower(strings.TrimSpace(s)) }
 	for i, h := range headers {
-		hl := lower(h)
+		hn := normalizar(h)
 		for _, n := range names {
-			if hl == lower(n) {
+			nn := normalizar(n)
+			if hn == nn || strings.Contains(hn, nn) || strings.Contains(nn, hn) {
 				return i
 			}
 		}
@@ -124,10 +137,13 @@ func (h *CellReportHandler) ImportCellReportsCSV(c echo.Context) error {
 			continue
 		}
 
-		// Detectar separador: ',' o ';' (Excel en español suele usar ;)
+		// Detectar separador: ',' ';' o '\t' (según Excel/exportación)
 		firstLine := strings.SplitN(string(content), "\n", 2)[0]
 		comma := rune(',')
-		if strings.Count(firstLine, ";") > strings.Count(firstLine, ",") {
+		switch {
+		case strings.Count(firstLine, "\t") > strings.Count(firstLine, ";") && strings.Count(firstLine, "\t") > strings.Count(firstLine, ","):
+			comma = '\t'
+		case strings.Count(firstLine, ";") > strings.Count(firstLine, ","):
 			comma = ';'
 		}
 
@@ -148,18 +164,36 @@ func (h *CellReportHandler) ImportCellReportsCSV(c echo.Context) error {
 		}
 
 		headers := rows[0]
-		idxLeader := colIndex(headers, "leader_name", "leader", "líder", "lider")
-		idxCell := colIndex(headers, "cell_name", "cell", "célula", "celula")
-		idxDate := colIndex(headers, "meeting_date", "date", "fecha")
-		idxAtt := colIndex(headers, "attendance", "asistencia")
+		// Muchas variaciones: Excel puede exportar con nombres distintos según plantilla/idioma
+		idxLeader := colIndex(headers,
+			"leader_name", "leader", "líder", "lider", "nombre líder", "nombrelider", "encargado",
+			"responsable", "coordinador", "anfitrion", "host", "nombre", "name",
+		)
+		idxCell := colIndex(headers,
+			"cell_name", "cell", "célula", "celula", "grupo", "group", "nombre célula",
+			"nombrecelula", "casa", "reunion", "ministerio",
+		)
+		idxDate := colIndex(headers,
+			"meeting_date", "date", "fecha", "fechareunion", "dia", "día", "fechas",
+			"meeting date", "fecha de reunion",
+		)
+		idxAtt := colIndex(headers,
+			"attendance", "asistencia", "asistentes", "presentes", "total", "cantidad",
+			"numero", "número", "asistieron", "participantes",
+		)
+		idxVisitors := colIndex(headers,
+			"new_visitors", "visitors", "visitantes", "nuevos", "invitados", "nuevos visitantes",
+			"first timers", "primera vez",
+		)
+		idxNotes := colIndex(headers,
+			"notes", "notas", "observaciones", "comentarios", "comments", "observacion",
+			"nota", "descripcion", "descripción",
+		)
 
 		if idxLeader < 0 || idxCell < 0 || idxDate < 0 {
-			errors = append(errors, fh.Filename+": faltan columnas requeridas (líder, célula, fecha)")
+			errors = append(errors, fh.Filename+": faltan columnas (busca: líder/leader, célula/cell, fecha/date). Encontradas: "+strings.Join(headers, ", "))
 			continue
 		}
-
-		idxVisitors := colIndex(headers, "new_visitors", "visitors", "visitantes")
-		idxNotes := colIndex(headers, "notes", "notas")
 
 		for i := 1; i < len(rows); i++ {
 			row := rows[i]
