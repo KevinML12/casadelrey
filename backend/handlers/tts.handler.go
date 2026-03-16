@@ -1,142 +1,168 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/labstack/echo/v4"
 )
 
-// TTSHandler convierte texto a voz usando la API REST de Google Cloud TTS.
-// No requiere SDK adicional — solo net/http.
+// TTSHandler convierte texto a voz.
+//
+// Motor primario  : Google Cloud TTS  (si GOOGLE_TTS_KEY está configurada)
+// Motor de reserva: Google Translate  (gratis, sin API key, buena calidad)
 type TTSHandler struct{}
 
 func NewTTSHandler() *TTSHandler { return &TTSHandler{} }
 
-// Límite de Google TTS por petición (en caracteres)
-const maxCharsPerRequest = 4800
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-// googleTTSRequest es el body que espera la API de Google
-type googleTTSRequest struct {
-	Input       ttsInput       `json:"input"`
-	Voice       ttsVoice       `json:"voice"`
-	AudioConfig ttsAudioConfig `json:"audioConfig"`
-}
-
-type ttsInput struct {
-	Text string `json:"text"`
-}
-
-type ttsVoice struct {
-	LanguageCode string `json:"languageCode"`
-	Name         string `json:"name"`
-}
-
-type ttsAudioConfig struct {
-	AudioEncoding string  `json:"audioEncoding"`
-	SpeakingRate  float64 `json:"speakingRate"`
-	Pitch         float64 `json:"pitch"`
-}
-
-// googleTTSResponse solo nos importa el audio en base64
-type googleTTSResponse struct {
-	AudioContent string `json:"audioContent"`
-}
-
-// splitText parte el texto en chunks ≤ maxCharsPerRequest respetando palabras completas
-func splitText(text string, maxChars int) []string {
-	var chunks []string
-	words := strings.Fields(text)
-	current := strings.Builder{}
-
-	for _, word := range words {
-		// +1 por el espacio
-		if utf8.RuneCountInString(current.String())+utf8.RuneCountInString(word)+1 > maxChars {
-			if current.Len() > 0 {
-				chunks = append(chunks, strings.TrimSpace(current.String()))
-				current.Reset()
-			}
-		}
-		if current.Len() > 0 {
-			current.WriteString(" ")
-		}
-		current.WriteString(word)
+// splitSentences divide el texto en frases ≤ maxLen caracteres
+// intentando cortar en puntos, comas o espacios.
+func splitSentences(text string, maxLen int) []string {
+	text = strings.TrimSpace(text)
+	if utf8.RuneCountInString(text) <= maxLen {
+		return []string{text}
 	}
 
-	if current.Len() > 0 {
-		chunks = append(chunks, strings.TrimSpace(current.String()))
+	// Dividir por oraciones primero
+	re := regexp.MustCompile(`[^.!?]*[.!?]+`)
+	sentences := re.FindAllString(text, -1)
+	if len(sentences) == 0 {
+		sentences = []string{text}
+	}
+
+	var chunks []string
+	cur := ""
+	for _, s := range sentences {
+		s = strings.TrimSpace(s)
+		if s == "" {
+			continue
+		}
+		if utf8.RuneCountInString(cur)+utf8.RuneCountInString(s)+1 <= maxLen {
+			if cur != "" {
+				cur += " "
+			}
+			cur += s
+		} else {
+			if cur != "" {
+				chunks = append(chunks, cur)
+			}
+			// Si la frase sola es más larga que maxLen, la cortamos por palabras
+			if utf8.RuneCountInString(s) > maxLen {
+				words := strings.Fields(s)
+				tmp := ""
+				for _, w := range words {
+					if utf8.RuneCountInString(tmp)+utf8.RuneCountInString(w)+1 > maxLen {
+						if tmp != "" {
+							chunks = append(chunks, tmp)
+						}
+						tmp = w
+					} else {
+						if tmp != "" {
+							tmp += " "
+						}
+						tmp += w
+					}
+				}
+				cur = tmp
+			} else {
+				cur = s
+			}
+		}
+	}
+	if cur != "" {
+		chunks = append(chunks, cur)
 	}
 	return chunks
 }
 
-// synthesizeChunk llama a la API de Google TTS y devuelve el audio en base64
-func synthesizeChunk(text, apiKey string) (string, error) {
-	payload := googleTTSRequest{
-		Input: ttsInput{Text: text},
-		Voice: ttsVoice{
-			LanguageCode: "es-US",
-			Name:         "es-US-Neural2-A", // Voz femenina neural en español latinoamericano
-		},
-		AudioConfig: ttsAudioConfig{
-			AudioEncoding: "MP3",
-			SpeakingRate:  0.9,
-			Pitch:         0.0,
-		},
-	}
+// ── Motor 1: Google Translate TTS (gratis, sin API key) ──────────────────────
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", err
-	}
-
-	url := fmt.Sprintf(
-		"https://texttospeech.googleapis.com/v1/text:synthesize?key=%s",
-		apiKey,
+func fetchGoogleTranslateTTS(text string) ([]byte, error) {
+	endpoint := fmt.Sprintf(
+		"https://translate.google.com/translate_tts?ie=UTF-8&tl=es&client=tw-ob&q=%s",
+		url.QueryEscape(text),
 	)
 
-	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
-		return "", fmt.Errorf("error al llamar Google TTS: %w", err)
+		return nil, err
+	}
+	// Cabeceras necesarias para que Google no bloquee la petición
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; CasaDelReyBot/1.0)")
+	req.Header.Set("Referer", "https://translate.google.com/")
+	req.Header.Set("Accept", "audio/mpeg,audio/*;q=0.9,*/*;q=0.8")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("Google TTS respondió %d: %s", resp.StatusCode, string(respBody))
+		return nil, fmt.Errorf("Google Translate TTS respondió %d", resp.StatusCode)
 	}
 
-	var result googleTTSResponse
-	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", err
-	}
-
-	return result.AudioContent, nil
+	return io.ReadAll(resp.Body)
 }
+
+// ── Motor 2: Google Cloud TTS (mejor calidad, requiere GOOGLE_TTS_KEY) ───────
+
+func fetchGoogleCloudTTS(text, apiKey string) ([]byte, error) {
+	payload := fmt.Sprintf(`{
+		"input":      { "text": %q },
+		"voice":      { "languageCode": "es-US", "name": "es-US-Neural2-A" },
+		"audioConfig":{ "audioEncoding": "MP3", "speakingRate": 0.9 }
+	}`, text)
+
+	endpoint := "https://texttospeech.googleapis.com/v1/text:synthesize?key=" + apiKey
+	resp, err := http.Post(endpoint, "application/json", strings.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Google Cloud TTS respondió %d: %s", resp.StatusCode, body)
+	}
+
+	// Extraer audioContent del JSON sin importar libraries extra
+	// Formato: {"audioContent":"BASE64..."}
+	s := string(body)
+	start := strings.Index(s, `"audioContent":"`)
+	if start == -1 {
+		return nil, fmt.Errorf("respuesta inesperada de Google Cloud TTS")
+	}
+	start += len(`"audioContent":"`)
+	end := strings.Index(s[start:], `"`)
+	if end == -1 {
+		return nil, fmt.Errorf("respuesta inesperada de Google Cloud TTS (cierre)")
+	}
+	b64 := s[start : start+end]
+
+	return base64.StdEncoding.DecodeString(b64)
+}
+
+// ── Handler principal ─────────────────────────────────────────────────────────
 
 // Synthesize godoc
 // POST /api/v1/tts
 // Body: { "text": "..." }
-// Respuesta: { "audio": "<base64 MP3>", "chunks": N }
-// Público — no requiere auth.
+// Devuelve: { "audio": "<base64 MP3>" }
 func (h *TTSHandler) Synthesize(c echo.Context) error {
-	apiKey := os.Getenv("GOOGLE_TTS_KEY")
-	if apiKey == "" {
-		return c.JSON(http.StatusServiceUnavailable, map[string]string{
-			"error": "TTS no configurado. Contacta al administrador.",
-		})
-	}
-
 	var req struct {
 		Text string `json:"text"`
 	}
@@ -146,32 +172,52 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 		})
 	}
 
-	// Limitar a 15.000 chars para evitar abuso
+	// Limitar a 12.000 chars para evitar peticiones abusivas
 	text := req.Text
-	if utf8.RuneCountInString(text) > 15_000 {
-		text = string([]rune(text)[:15_000])
+	if utf8.RuneCountInString(text) > 12_000 {
+		runes := []rune(text)
+		text = string(runes[:12_000])
 	}
 
-	chunks := splitText(text, maxCharsPerRequest)
+	apiKey := os.Getenv("GOOGLE_TTS_KEY")
+	useCloud := apiKey != ""
 
-	// Para textos cortos (1 chunk) respondemos directamente
-	// Para textos largos concatenamos el base64 de cada chunk
-	// Nota: base64 de MP3 se puede concatenar y el navegador lo reproduce como uno solo
-	var audioB64 strings.Builder
+	// Tamaño máximo por chunk: Cloud soporta 5000 chars, Translate ~180
+	maxChunk := 180
+	if useCloud {
+		maxChunk = 4800
+	}
+
+	chunks := splitSentences(text, maxChunk)
+	var combined []byte
 
 	for i, chunk := range chunks {
-		b64, err := synthesizeChunk(chunk, apiKey)
+		var audio []byte
+		var err error
+
+		if useCloud {
+			audio, err = fetchGoogleCloudTTS(chunk, apiKey)
+		} else {
+			audio, err = fetchGoogleTranslateTTS(chunk)
+		}
+
 		if err != nil {
-			log.Printf("[TTS] Error en chunk %d: %v", i, err)
+			log.Printf("[TTS] Error en chunk %d (%s): %v", i, map[bool]string{true: "Cloud", false: "Translate"}[useCloud], err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": "Error al generar audio. Inténtalo de nuevo.",
+				"error": "Error al generar el audio. Intenta de nuevo.",
 			})
 		}
-		audioB64.WriteString(b64)
+		combined = append(combined, audio...)
+	}
+
+	engine := "google-translate"
+	if useCloud {
+		engine = "google-cloud"
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"audio":  audioB64.String(),
+		"audio":  base64.StdEncoding.EncodeToString(combined),
+		"engine": engine,
 		"chunks": len(chunks),
 	})
 }
