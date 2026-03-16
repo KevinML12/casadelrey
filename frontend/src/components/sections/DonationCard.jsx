@@ -12,7 +12,10 @@ import toast from 'react-hot-toast';
 import Button from '../ui/Button';
 
 // ── Stripe init ──────────────────────────────────────────────────────────────
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Carga Stripe solo si la clave está definida (evita crash en entornos sin Stripe)
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 // ── Constantes ───────────────────────────────────────────────────────────────
 const AMOUNTS = [50, 100, 250, 500];
@@ -244,7 +247,7 @@ export default function DonationCard() {
     setDonationData(null);
   };
 
-  if (step === 2 && clientSecret) {
+  if (step === 2 && clientSecret && stripePromise) {
     // Opciones de apariencia para que Stripe Elements herede el tema de la app
     const appearance = {
       theme: 'stripe',
