@@ -233,6 +233,29 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 		switch engine {
 		case "elevenlabs":
 			audio, err = fetchElevenLabsTTS(chunk, elevenKey)
+			// Fallback: si ElevenLabs falla (401/403, sin permisos, plan free bloqueado), usar Google Translate
+			if err != nil && (strings.Contains(err.Error(), "401") || strings.Contains(err.Error(), "403") ||
+				strings.Contains(err.Error(), "missing_permissions") || strings.Contains(err.Error(), "detected_unusual_activity")) {
+				log.Printf("[TTS] ElevenLabs no disponible, usando Google Translate: %v", err)
+				engine = "google-translate"
+				chunks = splitSentences(text, 200)
+				combined = nil
+				for j, ch := range chunks {
+					audio, err = fetchGoogleTranslateTTS(ch)
+					if err != nil {
+						log.Printf("[TTS] Error chunk %d: %v", j, err)
+						return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+							"error": "Error al generar el audio.", "detail": err.Error(), "engine": "google-translate",
+						})
+					}
+					combined = append(combined, audio...)
+				}
+				return c.JSON(http.StatusOK, map[string]interface{}{
+					"audio": base64.StdEncoding.EncodeToString(combined),
+					"engine": "google-translate",
+					"chunks": len(chunks),
+				})
+			}
 		case "google-cloud":
 			audio, err = fetchGoogleCloudTTS(chunk, googleKey)
 		default:
