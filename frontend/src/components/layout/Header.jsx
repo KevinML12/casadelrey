@@ -82,36 +82,54 @@ export default function Header() {
           </button>
 
           {isAuthenticated ? (
-            <div className="relative" ref={dropRef}>
-              <button
-                onClick={() => setDropOpen(p => !p)}
-                className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-lg text-sm font-medium text-ink-2 hover:bg-card-2 hover:text-ink transition-all"
-              >
-                <div className="w-6 h-6 rounded-full bg-blue/10 flex items-center justify-center">
-                  <span className="text-blue text-xs font-bold">{user?.email?.[0]?.toUpperCase()}</span>
-                </div>
-                <ChevronDown size={14} className={`transition-transform ${dropOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {dropOpen && (
-                <div style={{ backgroundColor: 'var(--card)', borderColor: 'var(--line)' }} className="absolute right-0 top-full mt-2 w-48 border rounded-xl shadow-lg py-1 animate-fade-in">
-                  <Link to="/admin/profile" onClick={() => setDropOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
-                    <User size={14} /> Perfil
-                  </Link>
-                  {isAdmin && (
-                    <Link to="/admin" onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
-                      <LayoutDashboard size={14} /> Dashboard
-                    </Link>
-                  )}
-                  <div className="my-1 border-t border-line" />
-                  <button onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-err hover:bg-err/5 transition-colors">
-                    <LogOut size={14} /> Cerrar sesión
-                  </button>
-                </div>
+            <div className="flex items-center gap-2">
+              {/* Botón visible de panel admin */}
+              {isAdmin && (
+                <Link to="/admin"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy text-gold hover:bg-navy-d transition-colors">
+                  <LayoutDashboard size={13} /> Admin
+                </Link>
               )}
+
+              {/* Avatar + dropdown */}
+              <div className="relative" ref={dropRef}>
+                <button
+                  onClick={() => setDropOpen(p => !p)}
+                  className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-lg text-sm font-medium text-ink-2 hover:bg-card-2 hover:text-ink transition-all"
+                >
+                  <div className="w-6 h-6 rounded-full bg-blue/10 flex items-center justify-center">
+                    <span className="text-blue text-xs font-bold">
+                      {(user?.name || user?.email || '?')[0].toUpperCase()}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className={`transition-transform ${dropOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {dropOpen && (
+                  <div style={{ backgroundColor: 'var(--card)', borderColor: 'var(--line)' }}
+                    className="absolute right-0 top-full mt-2 w-48 border rounded-xl shadow-lg py-1 animate-fade-in z-50">
+                    <div className="px-4 py-2 border-b border-line">
+                      <p className="text-xs font-semibold text-ink truncate">{user?.name || 'Usuario'}</p>
+                      <p className="text-xs text-ink-3 truncate">{user?.email}</p>
+                    </div>
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
+                        <LayoutDashboard size={14} /> Panel Admin
+                      </Link>
+                    )}
+                    <Link to="/admin/profile" onClick={() => setDropOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
+                      <User size={14} /> Mi perfil
+                    </Link>
+                    <div className="my-1 border-t border-line" />
+                    <button onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/5 transition-colors">
+                      <LogOut size={14} /> Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <Link to="/login">
