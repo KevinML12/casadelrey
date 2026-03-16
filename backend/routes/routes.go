@@ -81,6 +81,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 
 	// Blog admin
 	adminBlog := adminGroup.Group("/blog")
+	adminBlog.GET("/",     blogHandler.GetAllPosts) // Todos los posts (borradores + publicados)
 	adminBlog.POST("/",    blogHandler.CreatePost)
 	adminBlog.PUT("/:id",  blogHandler.UpdatePost)
 

@@ -69,6 +69,26 @@ func (h *BlogHandler) GetPostBySlug(c echo.Context) error {
 	return c.JSON(http.StatusOK, post)
 }
 
+// GetAllPosts godoc
+// GET /api/v1/admin/blog/  [Requiere auth + rol admin]
+// Retorna TODOS los posts (borradores y publicados), para el panel de administración.
+func (h *BlogHandler) GetAllPosts(c echo.Context) error {
+	var posts []models.Post
+	result := h.DB.
+		Preload("Author").
+		Order("created_at DESC").
+		Find(&posts)
+
+	if result.Error != nil {
+		log.Printf("[Blog] Error al obtener posts (admin): %v", result.Error)
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Error al obtener los posts.",
+		})
+	}
+
+	return c.JSON(http.StatusOK, posts)
+}
+
 // CreatePost godoc
 // POST /api/v1/admin/blog  [Requiere auth + rol admin]
 // Crea un nuevo post de blog. El author_id se toma del JWT, no del body.
