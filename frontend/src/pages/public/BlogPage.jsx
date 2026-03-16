@@ -19,12 +19,22 @@ function PostDetail({ post }) {
       <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink mb-8 transition-colors">
         <ArrowLeft size={14} /> Volver al Blog
       </Link>
+
+      {/* Imagen de portada */}
+      {post.cover_image && (
+        <img
+          src={post.cover_image}
+          alt={post.title}
+          className="w-full max-h-80 object-cover rounded-xl mb-8 border border-line"
+        />
+      )}
+
       <p className="text-ink-3 text-xs flex items-center gap-1.5 mb-4">
         <Calendar size={12} />
         {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
       </p>
       <h1 className="text-4xl font-black text-ink leading-tight mb-8">{post.title}</h1>
-      <div className="prose prose-slate max-w-full text-ink-2 leading-relaxed"
+      <div className="prose max-w-full text-ink-2 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: post.content }} />
     </div>
   );
@@ -42,21 +52,29 @@ function PostList({ posts }) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {posts.map(p => (
         <Link key={p.ID} to={`/blog/${p.slug}`}>
-          <Card className="h-full flex flex-col hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200">
-            <div className="flex-1">
+          <Card className="h-full flex flex-col hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden p-0">
+            {/* Imagen de portada de la tarjeta */}
+            {p.cover_image ? (
+              <img src={p.cover_image} alt={p.title} className="w-full h-44 object-cover" />
+            ) : (
+              <div className="w-full h-44 bg-navy-gradient flex items-center justify-center">
+                <span className="text-gold font-black text-3xl opacity-30">CR</span>
+              </div>
+            )}
+            <div className="flex-1 flex flex-col p-5">
               <h3 className="font-bold text-ink mb-2 hover:text-blue transition-colors leading-snug">
                 {p.title}
               </h3>
-              <p className="text-ink-3 text-sm leading-relaxed line-clamp-3">
-                {p.excerpt || p.content?.substring(0, 140)}
+              <p className="text-ink-3 text-sm leading-relaxed line-clamp-3 flex-1">
+                {p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 140)}
               </p>
-            </div>
-            <div className="pt-4 mt-4 border-t border-line flex items-center justify-between">
-              <span className="text-xs text-ink-3 flex items-center gap-1">
-                <Calendar size={11} />
-                {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES') : ''}
-              </span>
-              <span className="text-xs font-medium text-blue">Leer →</span>
+              <div className="pt-4 mt-4 border-t border-line flex items-center justify-between">
+                <span className="text-xs text-ink-3 flex items-center gap-1">
+                  <Calendar size={11} />
+                  {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES') : ''}
+                </span>
+                <span className="text-xs font-medium text-blue">Leer →</span>
+              </div>
             </div>
           </Card>
         </Link>
