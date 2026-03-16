@@ -21,7 +21,7 @@ function PostDetail({ post }) {
       </Link>
       <p className="text-ink-3 text-xs flex items-center gap-1.5 mb-4">
         <Calendar size={12} />
-        {new Date(post.created_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+        {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
       </p>
       <h1 className="text-4xl font-black text-ink leading-tight mb-8">{post.title}</h1>
       <div className="prose prose-slate max-w-full text-ink-2 leading-relaxed"
@@ -41,7 +41,7 @@ function PostList({ posts }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {posts.map(p => (
-        <Link key={p.id} to={`/blog/${p.slug}`}>
+        <Link key={p.ID} to={`/blog/${p.slug}`}>
           <Card className="h-full flex flex-col hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200">
             <div className="flex-1">
               <h3 className="font-bold text-ink mb-2 hover:text-blue transition-colors leading-snug">
@@ -54,7 +54,7 @@ function PostList({ posts }) {
             <div className="pt-4 mt-4 border-t border-line flex items-center justify-between">
               <span className="text-xs text-ink-3 flex items-center gap-1">
                 <Calendar size={11} />
-                {new Date(p.created_at).toLocaleDateString('es-ES')}
+                {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES') : ''}
               </span>
               <span className="text-xs font-medium text-blue">Leer →</span>
             </div>
@@ -81,7 +81,7 @@ export default function BlogPage() {
           const r = await apiClient.get(`/blog/${slug}`);
           setPost(r.data);
         } else {
-          const r = await apiClient.get('/blog/posts');
+          const r = await apiClient.get('/blog/');
           setPosts(r.data || []);
         }
       } catch (err) {
