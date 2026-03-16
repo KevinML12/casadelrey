@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+// Base URL del backend. Debe terminar en /api/v1 para que las rutas coincidan.
+const raw = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const BASE_URL = raw.endsWith('/api/v1') ? raw : raw.replace(/\/?$/, '') + '/api/v1';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
