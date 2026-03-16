@@ -7,6 +7,7 @@ import apiClient from '../lib/apiClient';
 export default function useTTS(text) {
   const [status, setStatus] = useState('idle');
   const [progress, setProgress] = useState(0);
+  const [engine, setEngine] = useState(null); // 'elevenlabs' | 'google-cloud' | 'google-translate'
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -28,6 +29,7 @@ export default function useTTS(text) {
     try {
       const res = await apiClient.post('/tts', { text });
       const b64 = res.data.audio;
+      setEngine(res.data.engine || null);
 
       const binary = atob(b64);
       const bytes = new Uint8Array(binary.length);
@@ -98,5 +100,5 @@ export default function useTTS(text) {
     setProgress(0);
   }, []);
 
-  return { status, progress, play, pause, resume, stop, supported: true };
+  return { status, progress, play, pause, resume, stop, engine, supported: true };
 }

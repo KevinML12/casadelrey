@@ -16,7 +16,7 @@ function Loader() {
 
 function TTSPlayer({ content }) {
   const plainText = content?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || '';
-  const { status, progress, play, pause, resume, stop } = useTTS(plainText);
+  const { status, progress, play, pause, resume, stop, engine } = useTTS(plainText);
 
   const isPlaying = status === 'playing';
   const isPaused = status === 'paused';
@@ -39,7 +39,7 @@ function TTSPlayer({ content }) {
             {isLoading ? 'Preparando…' : isPlaying ? 'Leyendo…' : isPaused ? 'Pausado' : isDone ? '✓ Completado' : 'Escuchar este post'}
           </p>
           <p className={`text-xs mt-0.5 ${isActive ? 'text-white/50' : 'text-ink-3'}`}>
-            {isActive ? 'Voz en español' : 'El post se leerá en voz alta'}
+            {isActive ? 'Voz en español' : engine === 'elevenlabs' ? 'Voz IA · ElevenLabs' : 'El post se leerá en voz alta'}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

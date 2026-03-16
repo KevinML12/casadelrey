@@ -16,8 +16,9 @@ import (
 )
 
 // TTSHandler — Texto a voz.
-// Motor 1: Google Cloud TTS (si GOOGLE_TTS_KEY está configurada)
-// Motor 2: Google Translate TTS (gratis, sin API key)
+// Motor 1: ElevenLabs (si ELEVENLABS_API_KEY) — voz IA, muy natural
+// Motor 2: Google Cloud TTS (si GOOGLE_TTS_KEY)
+// Motor 3: Google Translate TTS (gratis, sin API key)
 type TTSHandler struct{}
 
 func NewTTSHandler() *TTSHandler { return &TTSHandler{} }
@@ -74,6 +75,34 @@ func splitSentences(text string, maxLen int) []string {
 		chunks = append(chunks, cur)
 	}
 	return chunks
+}
+
+// Voz Rachel de ElevenLabs — funciona muy bien en español con eleven_multilingual_v2
+const elevenLabsVoiceID = "21m00Tcm4TlvDq8ikWAM"
+
+func fetchElevenLabsTTS(text, apiKey string) ([]byte, error) {
+	payload := fmt.Sprintf(`{"text":%q,"model_id":"eleven_multilingual_v2"}`, text)
+	endpoint := fmt.Sprintf("https://api.elevenlabs.io/v1/text-to-speech/%s", elevenLabsVoiceID)
+
+	req, err := http.NewRequest("POST", endpoint, strings.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("xi-api-key", apiKey)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "audio/mpeg")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("ElevenLabs respondió %d: %s", resp.StatusCode, body)
+	}
+	return io.ReadAll(resp.Body)
 }
 
 func fetchGoogleTranslateTTS(text string) ([]byte, error) {
@@ -153,11 +182,20 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 		text = string(runes[:12_000])
 	}
 
-	apiKey := os.Getenv("GOOGLE_TTS_KEY")
-	useCloud := apiKey != ""
+	// Prioridad: ElevenLabs (IA) > Google Cloud > Google Translate (gratis)
+	elevenKey := os.Getenv("ELEVENLABS_API_KEY")
+	googleKey := os.Getenv("GOOGLE_TTS_KEY")
+
+	var engine string
 	maxChunk := 180
-	if useCloud {
+	if elevenKey != "" {
+		engine = "elevenlabs"
+		maxChunk = 2500 // límite recomendado por ElevenLabs por request
+	} else if googleKey != "" {
+		engine = "google-cloud"
 		maxChunk = 4800
+	} else {
+		engine = "google-translate"
 	}
 
 	chunks := splitSentences(text, maxChunk)
@@ -167,9 +205,12 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 		var audio []byte
 		var err error
 
-		if useCloud {
-			audio, err = fetchGoogleCloudTTS(chunk, apiKey)
-		} else {
+		switch engine {
+		case "elevenlabs":
+			audio, err = fetchElevenLabsTTS(chunk, elevenKey)
+		case "google-cloud":
+			audio, err = fetchGoogleCloudTTS(chunk, googleKey)
+		default:
 			audio, err = fetchGoogleTranslateTTS(chunk)
 		}
 
@@ -184,6 +225,7 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"audio":  base64.StdEncoding.EncodeToString(combined),
+		"engine": engine,
 		"chunks": len(chunks),
 	})
 }
