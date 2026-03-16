@@ -4,7 +4,8 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 5_000,
+  // Railway free tier tiene cold starts que pueden tardar hasta 10-15 segundos
+  timeout: 15_000,
   headers: { 'Content-Type': 'application/json' },
 });
 
