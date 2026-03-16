@@ -1,117 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, Play, Pause, Square, Volume2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
-import useTTS from '../../hooks/useTTS';
 
 function Loader() {
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
       <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-blue animate-spin" />
-    </div>
-  );
-}
-
-// ── Reproductor TTS ───────────────────────────────────────────────────────────
-function TTSPlayer({ content }) {
-  const plainText = content?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || '';
-  const { status, progress, play, pause, resume, stop, supported } = useTTS(plainText);
-
-  if (!supported) return null;
-
-  const isPlaying = status === 'playing';
-  const isPaused  = status === 'paused';
-  const isLoading = status === 'loading';
-  const isActive  = isPlaying || isPaused || isLoading;
-  const isDone    = status === 'done';
-
-  return (
-    <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-      isActive ? 'bg-navy border-navy-l shadow-lg' : 'bg-card-2 border-line'
-    }`}>
-      <div className="flex items-center gap-4 px-5 py-4">
-
-        {/* Ícono animado */}
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-          isActive ? 'bg-white/10' : 'bg-blue/10'
-        }`}>
-          {isLoading
-            ? <Loader2 size={22} className="text-gold animate-spin" />
-            : <Volume2 size={22} className={isActive ? 'text-gold' : 'text-blue'} />
-          }
-        </div>
-
-        {/* Texto */}
-        <div className="flex-1 min-w-0">
-          <p className={`font-semibold text-sm ${isActive ? 'text-white' : 'text-ink'}`}>
-            {isLoading ? 'Preparando voz…'   :
-             isPlaying  ? 'Leyendo el post…'  :
-             isPaused   ? 'Pausado'           :
-             isDone     ? '✓ Lectura completa':
-             'Escuchar este post'}
-          </p>
-          <p className={`text-xs mt-0.5 ${isActive ? 'text-white/50' : 'text-ink-3'}`}>
-            {isActive ? 'Voz en español · Web Speech API' : 'El navegador leerá el contenido en voz alta'}
-          </p>
-        </div>
-
-        {/* Controles */}
-        <div className="flex items-center gap-2 shrink-0">
-          {!isActive && !isDone && (
-            <button
-              onClick={play}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue text-white text-sm font-semibold hover:bg-blue-d transition-colors"
-            >
-              <Play size={15} /> Escuchar
-            </button>
-          )}
-          {isDone && (
-            <button
-              onClick={play}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-line text-ink-2 text-sm font-medium hover:bg-card-2 transition-colors"
-            >
-              <Play size={14} /> Repetir
-            </button>
-          )}
-          {isPlaying && (
-            <button
-              onClick={pause}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors"
-            >
-              <Pause size={14} /> Pausar
-            </button>
-          )}
-          {isPaused && (
-            <button
-              onClick={resume}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-d transition-colors"
-            >
-              <Play size={14} /> Continuar
-            </button>
-          )}
-          {isActive && (
-            <button
-              onClick={stop}
-              title="Detener"
-              className="w-9 h-9 rounded-lg bg-white/10 text-white/70 flex items-center justify-center hover:bg-white/20 hover:text-white transition-colors"
-            >
-              <Square size={13} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Barra de progreso */}
-      {isActive && (
-        <div className="h-1 bg-white/10">
-          <div
-            className="h-full bg-gold transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      )}
     </div>
   );
 }
@@ -137,12 +34,7 @@ function PostDetail({ post }) {
         <Calendar size={12} />
         {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
       </p>
-      <h1 className="text-4xl font-black text-ink leading-tight mb-6">{post.title}</h1>
-
-      {/* Reproductor TTS */}
-      <div className="mb-8">
-        <TTSPlayer content={post.content} />
-      </div>
+      <h1 className="text-4xl font-black text-ink leading-tight mb-8">{post.title}</h1>
 
       <div className="prose max-w-full text-ink-2 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: post.content }} />
