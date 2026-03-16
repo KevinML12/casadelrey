@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Calendar, MessageSquare, User, LogOut, Menu, X } from 'lucide-react';
+import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, FileText, Calendar, MessageSquare, User, LogOut, Menu, X, Globe } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -11,6 +11,8 @@ const NAV = [
   { to: '/admin/petitions', icon: MessageSquare,     label: 'Peticiones' },
   { to: '/admin/profile',   icon: User,              label: 'Perfil' },
 ];
+
+const SITE_LINK = { to: '/', icon: null, label: '← Ver sitio web' };
 
 function SidebarNav({ onClose }) {
   const { logout, user } = useAuth();
@@ -59,10 +61,18 @@ function SidebarNav({ onClose }) {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 pb-4 border-t border-white/10 pt-3">
-        <div className="px-3 py-2 mb-1">
-          <p className="text-xs text-white/40 truncate">{user?.email}</p>
+      <div className="px-3 pb-4 border-t border-white/10 pt-3 space-y-0.5">
+        <div className="px-3 py-2">
+          <p className="text-xs font-medium text-white/70 truncate">{user?.name || user?.email}</p>
+          <p className="text-xs text-white/30 truncate">{user?.email}</p>
         </div>
+        <Link
+          to="/"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white transition-colors"
+          onClick={onClose}
+        >
+          <Globe size={16} /> Ver sitio web
+        </Link>
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white transition-colors"
