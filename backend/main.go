@@ -9,6 +9,7 @@ import (
 
 	"casadelrey/backend/config"
 	"casadelrey/backend/database"
+	"casadelrey/backend/handlers"
 	"casadelrey/backend/routes"
 
 	"github.com/joho/godotenv"
@@ -68,6 +69,11 @@ func main() {
 
 	// 6. Registrar todas las rutas (públicas y protegidas).
 	routes.Register(e, db, cfg)
+
+	// 6b. TTS — registrado aquí explícitamente para asegurar que esté en el deploy
+	tts := handlers.NewTTSHandler()
+	e.POST("/api/v1/tts", tts.Synthesize)
+	e.GET("/api/v1/tts/health", tts.Health)
 
 	// 7. Iniciar el servidor en el puerto configurado.
 	port := cfg.Port
