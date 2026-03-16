@@ -20,21 +20,44 @@ export default function useTTS(text, lang = 'es-GT') {
     };
   }, [supported]);
 
-  const play = useCallback(() => {
+  // Obtiene la mejor voz en español disponible, esperando si es necesario
+  const getSpanishVoice = useCallback(() => {
+    return new Promise((resolve) => {
+      const pick = () => {
+        const voices = window.speechSynthesis.getVoices();
+        // Preferencia: GT > MX > ES > cualquier español > null (usa la del sistema)
+        const found =
+          voices.find(v => v.lang === 'es-GT') ||
+          voices.find(v => v.lang === 'es-MX') ||
+          voices.find(v => v.lang === 'es-ES') ||
+          voices.find(v => v.lang.startsWith('es'));
+        resolve(found || null);
+      };
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        pick();
+      } else {
+        // Chrome y Safari cargan voces de forma asíncrona
+        window.speechSynthesis.addEventListener('voiceschanged', pick, { once: true });
+        // Timeout de seguridad: si voiceschanged nunca llega, seguimos sin voz específica
+        setTimeout(() => resolve(null), 2000);
+      }
+    });
+  }, []);
+
+  const play = useCallback(async () => {
     if (!supported || !text) return;
     window.speechSynthesis.cancel();
+    setStatus('loading');
 
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang  = lang;
-    utt.rate  = 0.92;
+    utt.rate  = 0.9;
     utt.pitch = 1.0;
 
-    // Intentar voz en español
-    const voices = window.speechSynthesis.getVoices();
-    const spanish = voices.find(v =>
-      v.lang.startsWith('es') && (v.lang.includes('MX') || v.lang.includes('ES') || v.lang.includes('GT'))
-    ) || voices.find(v => v.lang.startsWith('es'));
-    if (spanish) utt.voice = spanish;
+    const voice = await getSpanishVoice();
+    if (voice) utt.voice = voice;
 
     utt.onstart  = () => { setStatus('playing'); setProgress(0); };
     utt.onend    = () => { setStatus('done');    setProgress(100); };
@@ -42,10 +65,9 @@ export default function useTTS(text, lang = 'es-GT') {
     utt.onpause  = () => setStatus('paused');
     utt.onresume = () => setStatus('playing');
 
-    // Progreso aproximado por palabras
-    let wordCount   = 0;
+    let wordCount    = 0;
     const totalWords = text.split(/\s+/).length;
-    utt.onboundary = (e) => {
+    utt.onboundary   = (e) => {
       if (e.name === 'word') {
         wordCount++;
         setProgress(Math.round((wordCount / totalWords) * 100));
@@ -53,13 +75,8 @@ export default function useTTS(text, lang = 'es-GT') {
     };
 
     utterRef.current = utt;
-    setStatus('loading');
-
-    // Algunos navegadores necesitan un pequeño delay para cargar voces
-    setTimeout(() => {
-      window.speechSynthesis.speak(utt);
-    }, 100);
-  }, [text, lang, supported]);
+    window.speechSynthesis.speak(utt);
+  }, [text, lang, supported, getSpanishVoice]);
 
   const pause = useCallback(() => {
     if (supported && status === 'playing') {
