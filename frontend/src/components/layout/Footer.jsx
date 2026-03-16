@@ -6,7 +6,6 @@ const LINKS = [
   { label: 'Blog',       to: '/blog' },
   { label: 'Eventos',    to: '/events' },
   { label: 'Oración',    to: '/prayer' },
-  { label: 'Células',    to: '/cells' },
   { label: 'Donaciones', to: '/donate' },
   { label: 'Voluntarios',to: '/volunteering' },
 ];

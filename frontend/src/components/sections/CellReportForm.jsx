@@ -1,22 +1,25 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Send, CheckCircle, Loader2, Users } from 'lucide-react';
+import { CheckCircle, Loader2, Users } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 
 const inputCls = 'w-full px-4 py-2.5 rounded-md border border-line dark:border-white/10 bg-transparent text-ink placeholder:text-ink-3 text-sm focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/15 transition-all';
 
-export default function CellReportForm() {
+export default function CellReportForm({ onSuccess }) {
+  const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
+  const leaderDefault = user?.role === 'leader' ? (user?.name || '') : '';
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
-    defaultValues: { leader_name: '', cell_name: '', meeting_date: '', attendance: 0, new_visitors: 0, notes: '' },
+    defaultValues: { leader_name: leaderDefault, cell_name: '', meeting_date: '', attendance: 0, new_visitors: 0, notes: '' },
   });
 
   const onSubmit = async (data) => {
     try {
-      await apiClient.post('/cells/report', {
+      await apiClient.post('/admin/cell-report', {
         leader_name: data.leader_name,
         cell_name: data.cell_name,
         meeting_date: data.meeting_date,
@@ -26,6 +29,7 @@ export default function CellReportForm() {
       });
       setSubmitted(true);
       reset();
+      onSuccess?.();
     } catch (err) {
       toast.error(err.response?.data?.error || 'No se pudo enviar. Intenta de nuevo.');
     }
@@ -61,6 +65,7 @@ export default function CellReportForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre del líder *"
             error={errors.leader_name}
+            readOnly={user?.role === 'leader'}
             {...register('leader_name', { required: 'El nombre del líder es requerido' })} />
           <Input label="Nombre de la célula *"
             error={errors.cell_name}

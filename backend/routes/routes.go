@@ -21,12 +21,14 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	donationHandler := handlers.NewDonationHandler(db)
 	eventHandler    := handlers.NewEventHandler(db)
 	cellReportHandler := handlers.NewCellReportHandler(db)
-	adminHandler    := handlers.NewAdminHandler(db)
+	socialHandler    := handlers.NewSocialHandler(db)
+	adminHandler     := handlers.NewAdminHandler(db)
 	uploadHandler   := handlers.NewUploadHandler()
 
 	// ── Middlewares ───────────────────────────────────────────────────────────
-	authMW  := middleware.NewAuthMiddleware(cfg.JWTSecret)
-	adminMW := middleware.AdminMiddleware()
+	authMW           := middleware.NewAuthMiddleware(cfg.JWTSecret)
+	adminMW          := middleware.AdminMiddleware()
+	adminOrLeaderMW  := middleware.AdminOrLeaderMiddleware()
 
 	// ── Health check ──────────────────────────────────────────────────────────
 	e.GET("/health", func(c echo.Context) error {
@@ -47,6 +49,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	authGroup := api.Group("/auth")
 	authGroup.POST("/register",        authHandler.Register)
 	authGroup.POST("/login",           authHandler.Login)
+	authGroup.GET("/verify-email",     authHandler.VerifyEmail)
 	authGroup.POST("/forgot-password", authHandler.ForgotPassword)
 	authGroup.POST("/reset-password",  authHandler.ResetPassword)
 
@@ -71,6 +74,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	eventsGroup := api.Group("/events")
 	eventsGroup.GET("/", eventHandler.GetEvents)
 
+	// Feed social (público)
+	api.GET("/social/feed", socialHandler.GetSocialFeed)
+
 	// Reportes de células (público: solo escritura)
 	cellsGroup := api.Group("/cells")
 	cellsGroup.POST("/report", cellReportHandler.CreateCellReport)
@@ -85,6 +91,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Dashboard KPIs y donaciones
 	adminGroup.GET("/kpis",      adminHandler.GetKPIs)
 	adminGroup.GET("/donations", adminHandler.GetDonations)
+	adminGroup.PUT("/users/:id/role", adminHandler.UpdateUserRole)
 
 	// Blog admin
 	adminBlog := adminGroup.Group("/blog")
@@ -97,13 +104,24 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	adminGroup.GET("/petitions",           petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read",  petitionHandler.MarkAsRead)
 
-	// Reportes de células admin
-	adminGroup.GET("/cell-reports", cellReportHandler.GetAllCellReports)
-	adminGroup.POST("/cell-reports/import", cellReportHandler.ImportCellReportsCSV)
+	// Reportes de células: admin y leader (import, bulk, ver)
+	adminOrLeader := api.Group("/admin", authMW, adminOrLeaderMW)
+	adminOrLeader.POST("/cell-report", cellReportHandler.CreateCellReport)
+	adminOrLeader.POST("/cell-reports/bulk", cellReportHandler.BulkCreateCellReports)
+	adminOrLeader.POST("/cell-reports/import", cellReportHandler.ImportCellReportsCSV)
+	adminOrLeader.GET("/cell-reports", cellReportHandler.GetAllCellReports)
+	adminOrLeader.GET("/cell-reports/stats", cellReportHandler.GetCellStats)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")
 	adminEvents.POST("/",    eventHandler.CreateEvent)
 	adminEvents.PUT("/:id",  eventHandler.UpdateEvent)
 	adminEvents.DELETE("/:id", eventHandler.DeleteEvent)
+
+	// Social (admin)
+	adminSocial := adminGroup.Group("/social")
+	adminSocial.GET("/",    socialHandler.GetAllSocialPosts)
+	adminSocial.POST("/",   socialHandler.CreateSocialPost)
+	adminSocial.PUT("/:id", socialHandler.UpdateSocialPost)
+	adminSocial.DELETE("/:id", socialHandler.DeleteSocialPost)
 }

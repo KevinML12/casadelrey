@@ -1,6 +1,10 @@
 package email
 
-import "fmt"
+import (
+	"fmt"
+
+	"casadelrey/backend/config"
+)
 
 // GetWelcomeTemplate devuelve la plantilla HTML de bienvenida
 func GetWelcomeTemplate(name string) string {
@@ -69,9 +73,52 @@ func GetWelcomeTemplate(name string) string {
 `, name)
 }
 
+func baseURL() string {
+	if config.AppConfig != nil && config.AppConfig.ClientURL != "" {
+		return config.AppConfig.ClientURL
+	}
+	return "https://casadelreyhue.org"
+}
+
+// GetVerificationEmailTemplate devuelve la plantilla HTML para verificación de correo
+func GetVerificationEmailTemplate(name, token string) string {
+	verifyURL := fmt.Sprintf("%s/verify-email?token=%s", baseURL(), token)
+	return fmt.Sprintf(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica tu correo — Casa del Rey</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #27AE60; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .button { display: inline-block; padding: 12px 30px; background-color: #27AE60; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        .warning { background-color: #FFF3CD; border-left: 4px solid #FFC107; padding: 15px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>Verifica tu correo</h1></div>
+    <div class="content">
+        <h2>Hola, %s</h2>
+        <p>Gracias por registrarte en Casa del Rey. Para activar tu cuenta, haz clic en el botón:</p>
+        <a href="%s" class="button">Verificar mi correo</a>
+        <div class="warning">
+            <strong>Nota:</strong> Este enlace expira en 24 horas. Si no creaste esta cuenta, ignora este correo.
+        </div>
+        <p>Si el botón no funciona, copia este enlace: %s</p>
+    </div>
+    <div class="footer"><p>© 2025 Casa del Rey. Correo automático.</p></div>
+</body>
+</html>
+`, name, verifyURL, verifyURL)
+}
+
 // GetPasswordResetTemplate devuelve la plantilla HTML para reseteo de contraseña
 func GetPasswordResetTemplate(token string) string {
-	resetURL := fmt.Sprintf("https://casadelrey.com/reset-password?token=%s", token)
+	resetURL := fmt.Sprintf("%s/reset-password?token=%s", baseURL(), token)
 
 	return fmt.Sprintf(`
 <!DOCTYPE html>

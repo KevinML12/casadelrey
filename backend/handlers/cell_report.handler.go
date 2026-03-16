@@ -54,15 +54,107 @@ func (h *CellReportHandler) CreateCellReport(c echo.Context) error {
 	})
 }
 
-// GetAllCellReports GET /api/v1/admin/cell-reports — admin, lista todos los reportes.
+// BulkCreateCellReports POST /api/v1/admin/cell-reports/bulk — admin/leader, crea varios reportes desde JSON.
+func (h *CellReportHandler) BulkCreateCellReports(c echo.Context) error {
+	var req struct {
+		Reports []struct {
+			LeaderName  string `json:"leader_name"`
+			CellName    string `json:"cell_name"`
+			MeetingDate string `json:"meeting_date"`
+			Attendance  int    `json:"attendance"`
+			NewVisitors int    `json:"new_visitors"`
+			Notes       string `json:"notes"`
+		} `json:"reports"`
+	}
+	if err := c.Bind(&req); err != nil || len(req.Reports) == 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Se requiere un array 'reports' con al menos un elemento."})
+	}
+
+	leaderName := ""
+	if role, _ := c.Get("user_role").(string); role == "leader" {
+		if n, ok := c.Get("user_name").(string); ok {
+			leaderName = strings.TrimSpace(n)
+		}
+	}
+
+	created := 0
+	for _, r := range req.Reports {
+		ln := strings.TrimSpace(r.LeaderName)
+		if leaderName != "" {
+			ln = leaderName
+		}
+		if ln == "" || strings.TrimSpace(r.CellName) == "" || strings.TrimSpace(r.MeetingDate) == "" {
+			continue
+		}
+		rec := models.CellReport{
+			LeaderName:  ln,
+			CellName:    strings.TrimSpace(r.CellName),
+			MeetingDate: strings.TrimSpace(r.MeetingDate),
+			Attendance:  r.Attendance,
+			NewVisitors: r.NewVisitors,
+			Notes:       strings.TrimSpace(r.Notes),
+		}
+		if h.DB.Create(&rec).Error == nil {
+			created++
+		}
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Reportes guardados.",
+		"created": created,
+	})
+}
+
+// GetAllCellReports GET /api/v1/admin/cell-reports — admin ve todo, leader solo los suyos.
 func (h *CellReportHandler) GetAllCellReports(c echo.Context) error {
+	q := h.DB.Order("created_at DESC")
+	if role, _ := c.Get("user_role").(string); role == "leader" {
+		if name, ok := c.Get("user_name").(string); ok && name != "" {
+			q = q.Where("LOWER(TRIM(leader_name)) = LOWER(TRIM(?))", name)
+		}
+	}
 	var reports []models.CellReport
-	if result := h.DB.Order("created_at DESC").Find(&reports); result.Error != nil {
+	if result := q.Find(&reports); result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error al obtener los reportes.",
 		})
 	}
 	return c.JSON(http.StatusOK, reports)
+}
+
+// GetCellStats GET /api/v1/admin/cell-reports/stats — admin ve todo, leader solo sus células.
+func (h *CellReportHandler) GetCellStats(c echo.Context) error {
+	base := h.DB.Model(&models.CellReport{})
+	if role, _ := c.Get("user_role").(string); role == "leader" {
+		if name, ok := c.Get("user_name").(string); ok && name != "" {
+			base = base.Where("LOWER(TRIM(leader_name)) = LOWER(TRIM(?))", name)
+		}
+	}
+
+	var totalReports int64
+	var totalAttendance int64
+	var totalVisitors int64
+	base.Count(&totalReports)
+	base.Select("COALESCE(SUM(attendance), 0)").Scan(&totalAttendance)
+	base.Select("COALESCE(SUM(new_visitors), 0)").Scan(&totalVisitors)
+
+	type CellSum struct {
+		CellName   string `gorm:"column:cell_name"`
+		Reports    int64  `gorm:"column:reports"`
+		Attendance int64  `gorm:"column:attendance"`
+		Visitors   int64  `gorm:"column:visitors"`
+	}
+	var byCell []CellSum
+	base.Select("cell_name, COUNT(*) as reports, COALESCE(SUM(attendance), 0) as attendance, COALESCE(SUM(new_visitors), 0) as visitors").
+		Group("cell_name").
+		Scan(&byCell)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"total_reports":    totalReports,
+		"total_attendance": totalAttendance,
+		"total_visitors":   totalVisitors,
+		"by_cell":          byCell,
+	})
 }
 
 // normalizar quita acentos, espacios y pasa a minúsculas para matching flexible.

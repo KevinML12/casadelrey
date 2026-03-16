@@ -9,12 +9,15 @@ import (
 // User represents the user model
 type User struct {
 	gorm.Model
-	Name             string     `json:"name" gorm:"not null"`
-	Email            string     `json:"email" gorm:"unique;not null"`
-	Password         string     `json:"-" gorm:"not null"`
-	Role             string     `json:"role" gorm:"default:member"`
-	ResetToken       *string    `json:"-" gorm:"index"`
-	ResetTokenExpiry *time.Time `json:"-"`
+	Name                  string     `json:"name" gorm:"not null"`
+	Email                 string     `json:"email" gorm:"unique;not null"`
+	Password              string     `json:"-" gorm:"not null"`
+	Role                  string     `json:"role" gorm:"default:member"`
+	ResetToken            *string    `json:"-" gorm:"index"`
+	ResetTokenExpiry      *time.Time `json:"-"`
+	EmailVerified         bool       `json:"email_verified" gorm:"default:false"`
+	VerificationToken     *string    `json:"-" gorm:"index"`
+	VerificationTokenExpiry *time.Time `json:"-"`
 }
 
 // Post represents the blog post model
@@ -27,6 +30,7 @@ type Post struct {
 	Excerpt    string `json:"excerpt" gorm:"type:text"`
 	AuthorID   uint   `json:"author_id" gorm:"not null"`
 	Status     string `json:"status" gorm:"default:draft"`
+	ViewCount  int64  `json:"view_count" gorm:"default:0"`
 	Author     User   `json:"author" gorm:"foreignKey:AuthorID"`
 }
 
@@ -87,4 +91,15 @@ type CellReport struct {
 	Attendance   int    `json:"attendance" gorm:"default:0"`
 	NewVisitors  int    `json:"new_visitors" gorm:"default:0"`
 	Notes        string `json:"notes" gorm:"type:text"`
+}
+
+// SocialPost representa una publicación de FB/IG para mostrar en el feed.
+type SocialPost struct {
+	gorm.Model
+	Platform   string `json:"platform" gorm:"type:varchar(20);not null"` // facebook, instagram
+	PostURL    string `json:"post_url" gorm:"type:varchar(500);not null"`
+	Caption    string `json:"caption" gorm:"type:varchar(500)"`
+	ImageURL   string `json:"image_url" gorm:"type:varchar(500)"`
+	IsActive   bool   `json:"is_active" gorm:"default:true"`
+	SortOrder  int    `json:"sort_order" gorm:"default:0"`
 }

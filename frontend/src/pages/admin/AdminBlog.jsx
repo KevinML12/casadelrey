@@ -355,6 +355,7 @@ export default function AdminBlog() {
 
                   {/* Acciones */}
                   <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs text-ink-3" title="Vistas">{post.view_count ?? 0} 👁</span>
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                       post.status === 'published' ? 'bg-ok/10 text-ok' : 'bg-line text-ink-3'
                     }`}>

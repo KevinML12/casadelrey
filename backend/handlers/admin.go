@@ -48,11 +48,23 @@ func (h *AdminHandler) GetKPIs(c echo.Context) error {
 		log.Printf("[Admin] Error al calcular ingresos: %v", err)
 	}
 
+	var totalBlogViews int64
+	if err := h.DB.Model(&models.Post{}).Select("COALESCE(SUM(view_count), 0)").Scan(&totalBlogViews).Error; err != nil {
+		log.Printf("[Admin] Error al contar vistas blog: %v", err)
+	}
+
+	var totalCellReports int64
+	if err := h.DB.Model(&models.CellReport{}).Count(&totalCellReports).Error; err != nil {
+		log.Printf("[Admin] Error al contar reportes células: %v", err)
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"total_users":     totalUsers,
-		"total_donations": totalDonations,
-		"total_petitions": totalPetitions,
-		"total_revenue":   totalRevenue,
+		"total_users":      totalUsers,
+		"total_donations":  totalDonations,
+		"total_petitions":  totalPetitions,
+		"total_revenue":    totalRevenue,
+		"total_blog_views": totalBlogViews,
+		"total_cell_reports": totalCellReports,
 	})
 }
 
@@ -75,4 +87,22 @@ func (h *AdminHandler) GetDonations(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, donations)
+}
+
+// UpdateUserRole PUT /api/v1/admin/users/:id/role — admin, actualizar rol (member, leader, admin).
+func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
+	id := c.Param("id")
+	var req struct {
+		Role string `json:"role"`
+	}
+	if err := c.Bind(&req); err != nil || req.Role == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Se requiere el campo 'role'."})
+	}
+	if req.Role != "member" && req.Role != "leader" && req.Role != "admin" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader o admin."})
+	}
+	if result := h.DB.Model(&models.User{}).Where("id = ?", id).Update("role", req.Role); result.Error != nil || result.RowsAffected == 0 {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "Rol actualizado."})
 }

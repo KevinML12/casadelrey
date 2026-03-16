@@ -1,0 +1,7 @@
+email,name,role,password
+admin@casadelrey.org,Administrador,admin,Admin123!
+lider1@casadelrey.org,María Líder,leader,Lider123!
+lider2@casadelrey.org,Juan Coordinador,leader,Lider123!
+usuario@casadelrey.org,Pedro Miembro,member,Usuario123!
+ana@casadelrey.org,Ana García,member,Usuario123!
+carlos@casadelrey.org,Carlos López,member,Usuario123!

@@ -61,10 +61,11 @@ func NewAuthMiddleware(jwtSecret string) echo.MiddlewareFunc {
 			}
 
 			role, _ := claims["role"].(string)
+			name, _ := claims["name"].(string)
 
-			// 4. Inyectar identidad del usuario en el contexto de Echo
-			c.Set("user_id", uint(uidFloat)) // Disponible en handlers con c.Get("user_id").(uint)
-			c.Set("user_role", role)          // Disponible en handlers con c.Get("user_role").(string)
+			c.Set("user_id", uint(uidFloat))
+			c.Set("user_role", role)
+			c.Set("user_name", name)
 
 			return next(c)
 		}
@@ -72,8 +73,7 @@ func NewAuthMiddleware(jwtSecret string) echo.MiddlewareFunc {
 }
 
 // AdminMiddleware debe aplicarse DESPUÉS de NewAuthMiddleware.
-// Verifica que el usuario autenticado tenga el rol "admin" para acceder
-// a las rutas protegidas del panel de administración.
+// Solo permite rol "admin".
 func AdminMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -81,6 +81,21 @@ func AdminMiddleware() echo.MiddlewareFunc {
 			if role != "admin" {
 				return c.JSON(http.StatusForbidden, map[string]string{
 					"error": "Acceso denegado. Se requiere rol de administrador.",
+				})
+			}
+			return next(c)
+		}
+	}
+}
+
+// AdminOrLeaderMiddleware permite admin o leader (células, reportes).
+func AdminOrLeaderMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			role, _ := c.Get("user_role").(string)
+			if role != "admin" && role != "leader" {
+				return c.JSON(http.StatusForbidden, map[string]string{
+					"error": "Acceso denegado. Se requiere rol de administrador o líder.",
 				})
 			}
 			return next(c)

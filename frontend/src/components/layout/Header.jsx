@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { label: 'Blog',       to: '/blog' },
   { label: 'Eventos',    to: '/events' },
   { label: 'Oración',    to: '/prayer' },
-  { label: 'Células',    to: '/cells' },
   { label: 'Donaciones', to: '/donate' },
 ];
 
@@ -85,10 +84,10 @@ export default function Header() {
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
               {/* Botón visible de panel admin */}
-              {isAdmin && (
-                <Link to="/admin"
+              {(isAdmin || user?.role === 'leader') && (
+                <Link to={isAdmin ? "/admin" : "/admin/cell-reports"}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy text-gold hover:bg-navy-d transition-colors">
-                  <LayoutDashboard size={13} /> Admin
+                  <LayoutDashboard size={13} /> {isAdmin ? 'Admin' : 'Células'}
                 </Link>
               )}
 
@@ -113,10 +112,10 @@ export default function Header() {
                       <p className="text-xs font-semibold text-ink truncate">{user?.name || 'Usuario'}</p>
                       <p className="text-xs text-ink-3 truncate">{user?.email}</p>
                     </div>
-                    {isAdmin && (
-                      <Link to="/admin" onClick={() => setDropOpen(false)}
+                    {(isAdmin || user?.role === 'leader') && (
+                      <Link to={isAdmin ? "/admin" : "/leader"} onClick={() => setDropOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
-                        <LayoutDashboard size={14} /> Panel Admin
+                        <LayoutDashboard size={14} /> {isAdmin ? 'Panel Admin' : 'Panel líder'}
                       </Link>
                     )}
                     <Link to="/admin/profile" onClick={() => setDropOpen(false)}
@@ -171,9 +170,9 @@ export default function Header() {
           <div className="pt-2 border-t border-line mt-2">
             {isAuthenticated ? (
               <>
-                <Link to="/admin" onClick={() => setMenuOpen(false)}
+                <Link to={isAdmin ? "/admin" : "/leader"} onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-ink-2 hover:text-ink">
-                  <LayoutDashboard size={15} /> Dashboard
+                  <LayoutDashboard size={15} /> {isAdmin ? 'Admin' : 'Panel líder'}
                 </Link>
                 <button onClick={() => { handleLogout(); setMenuOpen(false); }}
                   className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-err w-full text-left">

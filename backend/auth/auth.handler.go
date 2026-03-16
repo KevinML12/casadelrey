@@ -63,11 +63,16 @@ func (h *Handler) Register(c echo.Context) error {
 		})
 	}
 
+	verificationToken := uuid.New().String()
+	verificationExpiry := time.Now().Add(24 * time.Hour)
+
 	user := User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: hashedPassword,
-		Role:     "member", // Rol por defecto; solo admins pueden promover a otros
+		Name:                    req.Name,
+		Email:                   req.Email,
+		Password:                hashedPassword,
+		Role:                    "member", // Rol por defecto; solo admins pueden promover a otros
+		VerificationToken:       &verificationToken,
+		VerificationTokenExpiry: &verificationExpiry,
 	}
 
 	if result := h.DB.Create(&user); result.Error != nil {
@@ -77,15 +82,15 @@ func (h *Handler) Register(c echo.Context) error {
 		})
 	}
 
-	// Email de bienvenida en goroutine (no bloquea la respuesta HTTP)
+	// Email de verificación (en lugar de bienvenida hasta que verifique)
 	email.SendEmailAsync(
 		user.Email,
-		"Bienvenido a Casa del Rey",
-		email.GetWelcomeTemplate(user.Name),
+		"Verifica tu correo — Casa del Rey",
+		email.GetVerificationEmailTemplate(user.Name, verificationToken),
 	)
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"message": "Usuario registrado exitosamente. Por favor inicia sesión.",
+		"message": "Usuario registrado. Revisa tu correo para verificar tu cuenta antes de iniciar sesión.",
 		"user": map[string]interface{}{
 			"id":    user.ID,
 			"name":  user.Name,
@@ -123,6 +128,13 @@ func (h *Handler) Login(c echo.Context) error {
 	if err := ComparePassword(user.Password, req.Password); err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": "Credenciales inválidas.",
+		})
+	}
+
+	// Bloquear login si el correo no está verificado
+	if !user.EmailVerified {
+		return c.JSON(http.StatusForbidden, map[string]string{
+			"error": "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.",
 		})
 	}
 
@@ -252,5 +264,45 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{
 		"message": "Contraseña actualizada exitosamente. Ya puedes iniciar sesión.",
+	})
+}
+
+// VerifyEmail godoc
+// GET /api/v1/auth/verify-email?token=xxx
+// Valida el token de verificación y marca el correo como verificado.
+func (h *Handler) VerifyEmail(c echo.Context) error {
+	token := c.QueryParam("token")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Token de verificación requerido.",
+		})
+	}
+
+	var user User
+	if result := h.DB.Where("verification_token = ?", token).First(&user); result.Error != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Token inválido o expirado.",
+		})
+	}
+
+	if user.VerificationTokenExpiry == nil || time.Now().After(*user.VerificationTokenExpiry) {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Token inválido o expirado.",
+		})
+	}
+
+	user.EmailVerified = true
+	user.VerificationToken = nil
+	user.VerificationTokenExpiry = nil
+
+	if result := h.DB.Save(&user); result.Error != nil {
+		log.Printf("[Auth] Error al verificar correo: %v", result.Error)
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Error interno al verificar el correo.",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Correo verificado exitosamente. Ya puedes iniciar sesión.",
 	})
 }

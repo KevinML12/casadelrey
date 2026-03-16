@@ -69,6 +69,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.PayPalOrder{}, // Tabla: paypal_orders (órdenes pendientes)
 			&models.Event{},       // Tabla: events (eventos de la iglesia)
 			&models.CellReport{},  // Tabla: cell_reports (reportes de células)
+			&models.SocialPost{},  // Tabla: social_posts (FB/IG para feed)
 		); err != nil {
 			connectErr = err
 			return

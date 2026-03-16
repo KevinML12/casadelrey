@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, DollarSign, MessageSquare, Heart } from 'lucide-react';
+import { Users, DollarSign, MessageSquare, Heart, Eye, BarChart3 } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 
 function StatCard({ icon: Icon, label, value, color = 'text-blue', sub }) {
@@ -34,7 +34,7 @@ export default function Dashboard() {
       <h1 className="text-2xl font-black text-ink mb-6">Dashboard</h1>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
         <StatCard
           icon={Users} label="Usuarios" color="text-blue"
           value={loading ? '…' : kpis?.total_users ?? 0}
@@ -51,6 +51,14 @@ export default function Dashboard() {
         <StatCard
           icon={Heart} label="Recaudado" color="text-error"
           value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : '0'}
+        />
+        <StatCard
+          icon={Eye} label="Vistas blog" color="text-blue"
+          value={loading ? '…' : kpis?.total_blog_views ?? 0}
+        />
+        <StatCard
+          icon={BarChart3} label="Reportes células" color="text-ok"
+          value={loading ? '…' : kpis?.total_cell_reports ?? 0}
         />
       </div>
 

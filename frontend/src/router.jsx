@@ -10,10 +10,10 @@ import Login            from './pages/public/Login';
 import Register         from './pages/public/Register';
 import ForgotPassword   from './pages/public/ForgotPassword';
 import ResetPassword    from './pages/public/ResetPassword';
+import VerifyEmail      from './pages/public/VerifyEmail';
 import BlogPage         from './pages/public/BlogPage';
 import EventsPage       from './pages/public/EventsPage';
 import PrayerPage       from './pages/public/PrayerPage';
-import CellReportPage   from './pages/public/CellReportPage';
 import VolunteeringPage from './pages/public/VolunteeringPage';
 import AboutPage        from './pages/public/AboutPage';
 import NotFound         from './pages/NotFound';
@@ -31,18 +31,22 @@ function PageFallback() {
 }
 
 // Páginas admin
-import Dashboard        from './pages/admin/Dashboard';
+import AdminIndex      from './pages/admin/AdminIndex';
 import AdminBlog        from './pages/admin/AdminBlog';
 import AdminEvents      from './pages/admin/AdminEvents';
 import AdminPetitions   from './pages/admin/AdminPetitions';
 import AdminCellReports from './pages/admin/AdminCellReports';
+import AdminSocial      from './pages/admin/AdminSocial';
 import Profile          from './pages/admin/Profile';
+
+// Páginas líder
+import LeaderLayout    from './components/layout/LeaderLayout';
+import LeaderIndex     from './pages/leader/LeaderIndex';
+import LeaderReports   from './pages/leader/LeaderReports';
 
 export const router = createBrowserRouter([
 
   // ── Panel Admin ────────────────────────────────────────────────────────────
-  // Layout propio (sidebar sin header/footer público).
-  // Los providers (Auth, QueryClient) viven en main.jsx, disponibles aquí.
   {
     path: '/admin',
     element: (
@@ -51,12 +55,28 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true,       element: <Dashboard /> },
+      { index: true,       element: <AdminIndex /> },
       { path: 'blog',      element: <AdminBlog /> },
       { path: 'events',    element: <AdminEvents /> },
       { path: 'petitions',     element: <AdminPetitions /> },
       { path: 'cell-reports', element: <AdminCellReports /> },
+      { path: 'social',       element: <AdminSocial /> },
       { path: 'profile',      element: <Profile /> },
+    ],
+  },
+
+  // ── Panel Líder ────────────────────────────────────────────────────────────
+  {
+    path: '/leader',
+    element: (
+      <ProtectedRoute leaderOnly>
+        <LeaderLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <LeaderIndex /> },
+      { path: 'reports', element: <LeaderReports /> },
+      { path: 'profile', element: <Profile /> },
     ],
   },
 
@@ -72,13 +92,13 @@ export const router = createBrowserRouter([
       { path: 'blog/:slug',            element: <BlogPage /> },
       { path: 'events',                element: <EventsPage /> },
       { path: 'prayer',                element: <PrayerPage /> },
-      { path: 'cells',                 element: <CellReportPage /> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },
       { path: 'login',                 element: <Login /> },
       { path: 'register',              element: <Register /> },
       { path: 'forgot-password',       element: <ForgotPassword /> },
+      { path: 'verify-email',          element: <VerifyEmail /> },
       { path: 'reset-password/:token', element: <ResetPassword /> },
       { path: '*',                     element: <NotFound /> },
     ],

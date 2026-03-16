@@ -66,6 +66,9 @@ func (h *BlogHandler) GetPostBySlug(c echo.Context) error {
 		})
 	}
 
+	h.DB.Model(&post).UpdateColumn("view_count", gorm.Expr("view_count + 1"))
+	post.ViewCount++
+
 	return c.JSON(http.StatusOK, post)
 }
 

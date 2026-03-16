@@ -1,20 +1,28 @@
 import { useEffect, useState } from 'react';
-import { Inbox, Upload } from 'lucide-react';
+import { Inbox, Upload, BarChart3 } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
+import CellReportForm from '../../components/sections/CellReportForm';
 
 const loadReports = () => apiClient.get('/admin/cell-reports').then(r => r.data || []);
+const loadStats = () => apiClient.get('/admin/cell-reports/stats').then(r => r.data).catch(() => null);
 
 export default function AdminCellReports() {
   const [reports, setReports] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   const refresh = () => {
     setLoading(true);
-    loadReports()
-      .then(setReports)
+    Promise.all([loadReports(), loadStats()])
+      .then(([reps, st]) => {
+        setReports(reps || []);
+        setStats(st);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   };
@@ -54,20 +62,26 @@ export default function AdminCellReports() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-black text-ink">Reportes de Células</h1>
+        {isAdmin && (
+          <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue/10 text-blue hover:bg-blue/20 cursor-pointer transition-colors text-sm font-medium">
+            <Upload size={16} />
+            {importing ? 'Importando...' : 'Importar CSV'}
+            <input type="file" accept=".csv" multiple className="hidden" onChange={handleImport} disabled={importing} />
+          </label>
+        )}
+      </div>
 
-        {/* Import CSV */}
-        <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue/10 text-blue hover:bg-blue/20 cursor-pointer transition-colors text-sm font-medium">
-          <Upload size={16} />
-          {importing ? 'Importando...' : 'Importar CSV'}
-          <input
-            type="file"
-            accept=".csv"
-            multiple
-            className="hidden"
-            onChange={handleImport}
-            disabled={importing}
-          />
-        </label>
+      {/* Formulario rápido */}
+      <div className="mb-8">
+        {!showForm ? (
+          <button onClick={() => setShowForm(true)} className="text-sm font-medium text-blue hover:text-blue-d">
+            + Nuevo reporte manual
+          </button>
+        ) : (
+          <div className="p-6 rounded-2xl bg-card border border-line">
+            <CellReportForm onSuccess={() => { setShowForm(false); refresh(); }} />
+          </div>
+        )}
       </div>
 
       {/* Resultado de importación */}
@@ -108,16 +122,34 @@ export default function AdminCellReports() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-card border border-line rounded-xl p-5">
+              <p className="text-xs font-semibold text-ink-3 uppercase tracking-widest mb-1">Reportes</p>
+              <p className="text-3xl font-black text-ink">{stats?.total_reports ?? reports.length}</p>
+            </div>
             <div className="bg-card border border-line rounded-xl p-5">
               <p className="text-xs font-semibold text-ink-3 uppercase tracking-widest mb-1">Total asistentes</p>
-              <p className="text-3xl font-black text-ink">{totalAttendance}</p>
+              <p className="text-3xl font-black text-ink">{stats?.total_attendance ?? totalAttendance}</p>
             </div>
             <div className="bg-card border border-line rounded-xl p-5">
               <p className="text-xs font-semibold text-ink-3 uppercase tracking-widest mb-1">Visitantes nuevos</p>
-              <p className="text-3xl font-black text-ink">{totalVisitors}</p>
+              <p className="text-3xl font-black text-ink">{stats?.total_visitors ?? totalVisitors}</p>
             </div>
           </div>
+
+          {stats?.by_cell?.length > 0 && (
+            <div className="mb-8 p-5 rounded-xl bg-card border border-line">
+              <h3 className="font-bold text-ink mb-4 flex items-center gap-2"><BarChart3 size={18} /> Por célula</h3>
+              <div className="space-y-2">
+                {stats.by_cell.map((c, i) => (
+                  <div key={i} className="flex justify-between items-center py-2 border-b border-line last:border-0">
+                    <span className="font-medium text-ink text-sm">{c.cell_name}</span>
+                    <span className="text-ink-3 text-sm">{c.reports} reportes · {c.attendance} asistentes · {c.visitors} visitantes</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3">
             {reports.map(r => (
