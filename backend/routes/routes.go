@@ -22,6 +22,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	eventHandler    := handlers.NewEventHandler(db)
 	adminHandler    := handlers.NewAdminHandler(db)
 	uploadHandler   := handlers.NewUploadHandler()
+	ttsHandler      := handlers.NewTTSHandler()
 
 	// ── Middlewares ───────────────────────────────────────────────────────────
 	authMW  := middleware.NewAuthMiddleware(cfg.JWTSecret)
@@ -67,6 +68,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Eventos (público: solo lectura)
 	eventsGroup := api.Group("/events")
 	eventsGroup.GET("/", eventHandler.GetEvents)
+
+	api.POST("/tts", ttsHandler.Synthesize)
 
 	// Upload (requiere login)
 	uploadGroup := api.Group("/upload", authMW)
