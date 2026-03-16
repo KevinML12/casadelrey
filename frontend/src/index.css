@@ -1,11 +1,132 @@
-/* frontend/src/index.css */
+@import url('https://rsms.me/inter/inter.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos globales para la fuente principal */
-body {
-  /* La fuente se define completamente en tailwind.config.js (Paso 2) */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ────────────────────────────────────────────────────────────────
+   DESIGN TOKENS
+──────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Fondos — escala de grises cálidos */
+  --bg:     #F7F9FC;
+  --bg-2:   #ECF0F8;
+  --card:   #FFFFFF;
+  --card-2: #F0F4FA;
+
+  /* Texto */
+  --ink:    #0B1524;
+  --ink-2:  #475569;
+  --ink-3:  #94A3B8;
+
+  /* Bordes */
+  --line:   #DDE4F0;
+
+  /* Tema */
+  color-scheme: light;
 }
+
+html.dark {
+  /* Fondos — navy profundo con separación clara entre capas */
+  --bg:     #07101E;
+  --bg-2:   #0B1828;
+  --card:   #0F2035;
+  --card-2: #142538;
+
+  /* Texto — azulado premium */
+  --ink:    #E6EEFF;
+  --ink-2:  #7DA8CF;
+  --ink-3:  #3F637F;
+
+  /* Bordes — invisible en dark mode, las cards se elevan por background, no por borde */
+  --line:   transparent;
+
+  color-scheme: dark;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   TRANSICIÓN SUAVE AL CAMBIAR TEMA
+   Solo propiedades visuales — no transiciona transforms ni opacity
+──────────────────────────────────────────────────────────────── */
+
+html {
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
+}
+
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+/* Excluir elementos que no deben transicionar sus colores */
+*:focus-visible,
+[data-no-transition],
+.animate-spin,
+.animate-pulse,
+[class*="animate-"] {
+  transition: none !important;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   BASE GLOBAL
+──────────────────────────────────────────────────────────────── */
+
+@layer base {
+  html {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(37, 99, 235, 0.18);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   DARK MODE — bordes invisibles en todos los contenedores
+   Tailwind compila border-line con rgb() así que la variable
+   transparent no basta; necesitamos override directo.
+──────────────────────────────────────────────────────────────── */
+
+/* Solo divs y secciones estructurales pierden el borde —
+   botones, inputs y selects conservan su dark:border-white/10 */
+html.dark div.border-line,
+html.dark section.border-line,
+html.dark article.border-line,
+html.dark header.border-line,
+html.dark aside.border-line {
+  border-color: transparent;
+}
+
+/* Divisores entre items (divide-y divide-line) */
+html.dark .divide-line > * + * {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+html.dark .shadow-card {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.35);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   SCROLLBAR (webkit)
+──────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #CBD5E1; border-radius: 3px; }
+
+html.dark ::-webkit-scrollbar-thumb { background: #1C3550; }

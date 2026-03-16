@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — Desarrollo Local
+# ─────────────────────────────────────────────────────────────────────────────
+# Este archivo levanta el backend Go apuntando a Supabase como base de datos.
+# La DB ya NO corre localmente: se usa el PostgreSQL de Supabase en la nube.
+#
+# Comandos útiles:
+#   docker compose up --build          → construir y levantar el backend
+#   docker compose up -d               → levantar en background
+#   docker compose logs -f backend     → ver logs del backend en tiempo real
+#   docker compose down                → detener y eliminar contenedores
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: '3.8'
+
+services:
+
+  # ── Backend Go/Echo ──────────────────────────────────────────────────────────
+  # Construye la imagen desde el Dockerfile multi-stage en backend/.
+  # Conecta a Supabase via DATABASE_URL definida en backend/.env
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: casadelrey_backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      # Crea backend/.env copiando backend/.env.example y rellenando los valores reales.
+      - ./backend/.env
+    volumes:
+      # Persistir archivos subidos entre reinicios del contenedor.
+      # En Dokploy, reemplazar por un Volume gestionado desde el dashboard.
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  # Volumen para los archivos subidos via POST /api/upload
+  uploads_data:

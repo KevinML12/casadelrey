@@ -1,56 +1,69 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import LoginPage from './pages/auth/LoginPage';
-import AdminLayout from './layouts/AdminLayout';
+import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
-import DashboardPage from './pages/admin/DashboardPage';
-import ProfilePage from './pages/admin/ProfilePage';
-import DonationHistoryPage from './pages/admin/DonationHistoryPage';
-import MyGroupsPage from './pages/admin/MyGroupsPage';
+import ProtectedRoute from './components/layout/ProtectedRoute';
+import AdminLayout from './components/layout/AdminLayout';
 
-const router = createBrowserRouter([
+// Páginas públicas
+import Home            from './pages/public/Home';
+import Login           from './pages/public/Login';
+import Register        from './pages/public/Register';
+import ForgotPassword  from './pages/public/ForgotPassword';
+import ResetPassword   from './pages/public/ResetPassword';
+import BlogPage        from './pages/public/BlogPage';
+import EventsPage      from './pages/public/EventsPage';
+import PrayerPage      from './pages/public/PrayerPage';
+import DonatePage      from './pages/public/DonatePage';
+import PaymentSuccess  from './pages/public/PaymentSuccess';
+import VolunteeringPage from './pages/public/VolunteeringPage';
+import AboutPage       from './pages/public/AboutPage';
+import NotFound        from './pages/NotFound';
+
+// Páginas admin
+import Dashboard       from './pages/admin/Dashboard';
+import AdminBlog       from './pages/admin/AdminBlog';
+import AdminEvents     from './pages/admin/AdminEvents';
+import AdminPetitions  from './pages/admin/AdminPetitions';
+import Profile         from './pages/admin/Profile';
+
+export const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-  },
-  // Ruta de Autenticación
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  
-  // Rutas Protegidas del Dashboard
-  {
-    path: '/admin',
-    element: <AdminLayout />,
     children: [
-        {
-            index: true,
-            element: <Navigate to="/admin/dashboard" replace />
-        },
-        {
-            path: 'dashboard',
-            element: <DashboardPage />
-        },
-        {
-            path: 'perfil',
-            element: <ProfilePage />
-        },
-        {
-            path: 'historial',
-            element: <DonationHistoryPage />
-        },
-        {
-            path: 'grupos',
-            element: <MyGroupsPage />
-        },
-        // ... otras rutas de admin
-    ]
-  },
-  // Ruta 404
-  {
-    path: '*',
-    element: <Navigate to="/" replace />
-  }
-]);
+      // ── Rutas públicas ──────────────────────────────────────────
+      { index: true,                    element: <Home /> },
+      { path: 'about',                  element: <AboutPage /> },
+      { path: 'blog',                   element: <BlogPage /> },
+      { path: 'blog/:slug',             element: <BlogPage /> },
+      { path: 'events',                 element: <EventsPage /> },
+      { path: 'prayer',                 element: <PrayerPage /> },
+      { path: 'donate',                 element: <DonatePage /> },
+      { path: 'payment-success',        element: <PaymentSuccess /> },
+      { path: 'volunteering',           element: <VolunteeringPage /> },
+      { path: 'login',                  element: <Login /> },
+      { path: 'register',               element: <Register /> },
+      { path: 'forgot-password',        element: <ForgotPassword /> },
+      { path: 'reset-password/:token',  element: <ResetPassword /> },
 
-export default router;
+      // ── Rutas admin (requieren autenticación + role admin) ──────
+      {
+        path: 'admin',
+        element: (
+          <ProtectedRoute adminOnly>
+            <AdminLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true,          element: <Dashboard /> },
+          { path: 'blog',         element: <AdminBlog /> },
+          { path: 'events',       element: <AdminEvents /> },
+          { path: 'petitions',    element: <AdminPetitions /> },
+          { path: 'profile',      element: <Profile /> },
+        ],
+      },
+
+      // ── 404 ─────────────────────────────────────────────────────
+      { path: '*', element: <NotFound /> },
+    ],
+  },
+]);

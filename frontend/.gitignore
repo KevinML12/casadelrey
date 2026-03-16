@@ -1,39 +1,24 @@
-# Frontend .gitignore
-
-# Dependencias
-node_modules/
-pnpm-lock.yaml
-
-# Variables de entorno
-.env
-.env.local
-.env.production
-.env.*.local
-
-# Build
-dist/
-dist-ssr/
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Sistema operativo
-.DS_Store
-Thumbs.db
-
 # Logs
+logs
 *.log
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Testing
-coverage/
+node_modules
+dist
+dist-ssr
+*.local
 
-# Vite
-.vite/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
