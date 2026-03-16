@@ -93,6 +93,16 @@ type CellReport struct {
 	Notes        string `json:"notes" gorm:"type:text"`
 }
 
+// UserGoal representa una meta personal del usuario.
+type UserGoal struct {
+	gorm.Model
+	UserID      uint   `json:"user_id" gorm:"not null;index"`
+	Title       string `json:"title" gorm:"type:varchar(255);not null"`
+	Description string `json:"description" gorm:"type:text"`
+	TargetDate  string `json:"target_date" gorm:"type:varchar(20)"` // YYYY-MM-DD
+	Completed   bool   `json:"completed" gorm:"default:false"`
+}
+
 // SocialPost representa una publicación de FB/IG para mostrar en el feed.
 type SocialPost struct {
 	gorm.Model

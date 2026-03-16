@@ -23,6 +23,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	cellReportHandler := handlers.NewCellReportHandler(db)
 	socialHandler    := handlers.NewSocialHandler(db)
 	adminHandler     := handlers.NewAdminHandler(db)
+	profileHandler   := handlers.NewProfileHandler(db)
 	uploadHandler   := handlers.NewUploadHandler()
 
 	// ── Middlewares ───────────────────────────────────────────────────────────
@@ -80,6 +81,13 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Reportes de células (público: solo escritura)
 	cellsGroup := api.Group("/cells")
 	cellsGroup.POST("/report", cellReportHandler.CreateCellReport)
+
+	// Perfil y metas (cualquier usuario autenticado)
+	profileGroup := api.Group("/profile", authMW)
+	profileGroup.GET("/goals",    profileHandler.GetGoals)
+	profileGroup.POST("/goals",   profileHandler.CreateGoal)
+	profileGroup.PUT("/goals/:id", profileHandler.UpdateGoal)
+	profileGroup.DELETE("/goals/:id", profileHandler.DeleteGoal)
 
 	// Upload (requiere login)
 	uploadGroup := api.Group("/upload", authMW)

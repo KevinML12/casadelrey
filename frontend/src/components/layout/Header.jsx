@@ -85,9 +85,9 @@ export default function Header() {
             <div className="flex items-center gap-2">
               {/* Botón visible de panel admin */}
               {(isAdmin || user?.role === 'leader') && (
-                <Link to={isAdmin ? "/admin" : "/admin/cell-reports"}
+                <Link to={isAdmin ? "/admin" : "/leader"}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy text-gold hover:bg-navy-d transition-colors">
-                  <LayoutDashboard size={13} /> {isAdmin ? 'Admin' : 'Células'}
+                  <LayoutDashboard size={13} /> {isAdmin ? 'Admin' : 'Panel líder'}
                 </Link>
               )}
 
@@ -118,7 +118,7 @@ export default function Header() {
                         <LayoutDashboard size={14} /> {isAdmin ? 'Panel Admin' : 'Panel líder'}
                       </Link>
                     )}
-                    <Link to="/admin/profile" onClick={() => setDropOpen(false)}
+                    <Link to="/profile" onClick={() => setDropOpen(false)}
                       className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
                       <User size={14} /> Mi perfil
                     </Link>
@@ -170,9 +170,15 @@ export default function Header() {
           <div className="pt-2 border-t border-line mt-2">
             {isAuthenticated ? (
               <>
-                <Link to={isAdmin ? "/admin" : "/leader"} onClick={() => setMenuOpen(false)}
+                {(isAdmin || user?.role === 'leader') && (
+                  <Link to={isAdmin ? "/admin" : "/leader"} onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-ink-2 hover:text-ink">
+                    <LayoutDashboard size={15} /> {isAdmin ? 'Admin' : 'Panel líder'}
+                  </Link>
+                )}
+                <Link to="/profile" onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-ink-2 hover:text-ink">
-                  <LayoutDashboard size={15} /> {isAdmin ? 'Admin' : 'Panel líder'}
+                  <User size={15} /> Mi perfil
                 </Link>
                 <button onClick={() => { handleLogout(); setMenuOpen(false); }}
                   className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-err w-full text-left">

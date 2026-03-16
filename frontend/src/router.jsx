@@ -37,7 +37,7 @@ import AdminEvents      from './pages/admin/AdminEvents';
 import AdminPetitions   from './pages/admin/AdminPetitions';
 import AdminCellReports from './pages/admin/AdminCellReports';
 import AdminSocial      from './pages/admin/AdminSocial';
-import Profile          from './pages/admin/Profile';
+import ProfilePage      from './pages/public/ProfilePage';
 
 // Páginas líder
 import LeaderLayout    from './components/layout/LeaderLayout';
@@ -61,7 +61,7 @@ export const router = createBrowserRouter([
       { path: 'petitions',     element: <AdminPetitions /> },
       { path: 'cell-reports', element: <AdminCellReports /> },
       { path: 'social',       element: <AdminSocial /> },
-      { path: 'profile',      element: <Profile /> },
+      { path: 'profile',      element: <ProfilePage /> },
     ],
   },
 
@@ -76,7 +76,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <LeaderIndex /> },
       { path: 'reports', element: <LeaderReports /> },
-      { path: 'profile', element: <Profile /> },
+      { path: 'profile', element: <ProfilePage /> },
     ],
   },
 
@@ -95,6 +95,7 @@ export const router = createBrowserRouter([
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },
+      { path: 'profile',               element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
       { path: 'login',                 element: <Login /> },
       { path: 'register',              element: <Register /> },
       { path: 'forgot-password',       element: <ForgotPassword /> },

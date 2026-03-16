@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 const NAV = [
   { to: '/leader', icon: LayoutDashboard, label: 'Inicio', exact: true },
-  { to: '/leader/reports', icon: Users, label: 'Reportes' },
+  { to: '/leader/reports', icon: Users, label: 'Células' },
   { to: '/leader/profile', icon: User, label: 'Perfil' },
 ];
 
