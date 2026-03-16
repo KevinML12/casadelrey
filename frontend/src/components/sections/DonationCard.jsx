@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+// Importamos desde /pure para evitar que Stripe inyecte su script en TODAS
+// las páginas del sitio. El script solo se carga cuando el usuario llega a /donate.
+import { loadStripe } from '@stripe/stripe-js/pure';
 import {
   Elements,
   PaymentElement,
