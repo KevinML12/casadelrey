@@ -70,6 +70,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	eventsGroup.GET("/", eventHandler.GetEvents)
 
 	api.POST("/tts", ttsHandler.Synthesize)
+	api.GET("/tts/health", ttsHandler.Health)
 
 	// Upload (requiere login)
 	uploadGroup := api.Group("/upload", authMW)

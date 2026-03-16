@@ -166,6 +166,14 @@ func fetchGoogleCloudTTS(text, apiKey string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(b64)
 }
 
+// Health — GET /api/v1/tts/health — para verificar que el servicio TTS está desplegado
+func (h *TTSHandler) Health(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{
+		"status": "ok",
+		"tts":    "available",
+	})
+}
+
 func (h *TTSHandler) Synthesize(c echo.Context) error {
 	var req struct {
 		Text string `json:"text"`
