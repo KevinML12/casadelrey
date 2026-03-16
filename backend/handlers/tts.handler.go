@@ -207,20 +207,32 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 		text = string(runes[:12_000])
 	}
 
-	// Prioridad: ElevenLabs (IA) > Google Cloud > Google Translate (gratis)
+	// Motor: TTS_ENGINE fuerza uno, o auto: ElevenLabs > Google Cloud > Google Translate
+	forceEngine := strings.ToLower(strings.TrimSpace(os.Getenv("TTS_ENGINE")))
 	elevenKey := os.Getenv("ELEVENLABS_API_KEY")
 	googleKey := os.Getenv("GOOGLE_TTS_KEY")
 
 	var engine string
 	maxChunk := 180
-	if elevenKey != "" {
+	switch forceEngine {
+	case "elevenlabs":
 		engine = "elevenlabs"
-		maxChunk = 2500 // límite recomendado por ElevenLabs por request
-	} else if googleKey != "" {
+		maxChunk = 2500
+	case "google-cloud":
 		engine = "google-cloud"
 		maxChunk = 4800
-	} else {
+	case "google-translate":
 		engine = "google-translate"
+	default:
+		if elevenKey != "" {
+			engine = "elevenlabs"
+			maxChunk = 2500
+		} else if googleKey != "" {
+			engine = "google-cloud"
+			maxChunk = 4800
+		} else {
+			engine = "google-translate"
+		}
 	}
 
 	chunks := splitSentences(text, maxChunk)
