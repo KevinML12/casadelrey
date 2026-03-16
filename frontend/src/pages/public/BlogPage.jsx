@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Play, Pause, Square, Volume2, Loader2 } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
+import useTTS from '../../hooks/useTTS';
 
 function Loader() {
   return (
@@ -13,6 +14,75 @@ function Loader() {
   );
 }
 
+// ── Reproductor TTS ───────────────────────────────────────────────────────────
+function TTSPlayer({ content }) {
+  // Limpia el HTML y obtiene solo el texto plano
+  const plainText = content?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || '';
+  const { status, progress, play, pause, resume, stop, supported } = useTTS(plainText);
+
+  if (!supported) return null;
+
+  const isPlaying = status === 'playing';
+  const isPaused  = status === 'paused';
+  const isLoading = status === 'loading';
+  const isActive  = isPlaying || isPaused || isLoading;
+
+  return (
+    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+      isActive ? 'bg-navy border-navy-l' : 'bg-card-2 border-line'
+    }`}>
+      <Volume2 size={15} className={isActive ? 'text-gold' : 'text-ink-3'} />
+
+      <span className={`text-xs font-medium ${isActive ? 'text-white/70' : 'text-ink-3'}`}>
+        {isLoading ? 'Preparando…' :
+         isPlaying  ? 'Leyendo el post…' :
+         isPaused   ? 'Pausado' :
+         status === 'done' ? 'Lectura completada' :
+         'Escuchar este post'}
+      </span>
+
+      {/* Barra de progreso */}
+      {isActive && (
+        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gold rounded-full transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
+
+      <div className="flex items-center gap-1.5 ml-auto shrink-0">
+        {isLoading ? (
+          <Loader2 size={16} className="text-gold animate-spin" />
+        ) : isPlaying ? (
+          <button onClick={pause} title="Pausar"
+            className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors">
+            <Pause size={13} />
+          </button>
+        ) : isPaused ? (
+          <button onClick={resume} title="Reanudar"
+            className="w-7 h-7 rounded-full bg-gold text-white flex items-center justify-center hover:bg-gold-d transition-colors">
+            <Play size={13} />
+          </button>
+        ) : (
+          <button onClick={play} title="Escuchar"
+            className="w-7 h-7 rounded-full bg-blue text-white flex items-center justify-center hover:bg-blue-d transition-colors">
+            <Play size={13} />
+          </button>
+        )}
+
+        {isActive && (
+          <button onClick={stop} title="Detener"
+            className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors">
+            <Square size={11} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Detalle del post ──────────────────────────────────────────────────────────
 function PostDetail({ post }) {
   return (
     <div className="max-w-2xl mx-auto">
@@ -33,7 +103,13 @@ function PostDetail({ post }) {
         <Calendar size={12} />
         {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
       </p>
-      <h1 className="text-4xl font-black text-ink leading-tight mb-8">{post.title}</h1>
+      <h1 className="text-4xl font-black text-ink leading-tight mb-6">{post.title}</h1>
+
+      {/* Reproductor TTS */}
+      <div className="mb-8">
+        <TTSPlayer content={post.content} />
+      </div>
+
       <div className="prose max-w-full text-ink-2 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: post.content }} />
     </div>
