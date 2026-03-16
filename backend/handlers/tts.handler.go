@@ -106,6 +106,10 @@ func fetchElevenLabsTTS(text, apiKey string) ([]byte, error) {
 }
 
 func fetchGoogleTranslateTTS(text string) ([]byte, error) {
+	// Límite ~200 chars por request (Google Translate)
+	if utf8.RuneCountInString(text) > 200 {
+		text = string([]rune(text)[:200])
+	}
 	endpoint := fmt.Sprintf(
 		"https://translate.google.com/translate_tts?ie=UTF-8&tl=es&client=tw-ob&q=%s",
 		url.QueryEscape(text),
@@ -114,20 +118,33 @@ func fetchGoogleTranslateTTS(text string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; CasaDelReyBot/1.0)")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://translate.google.com/")
 	req.Header.Set("Accept", "audio/mpeg,audio/*;q=0.9,*/*;q=0.8")
+	req.Header.Set("Accept-Language", "es-ES,es;q=0.9,en;q=0.8")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("conexión: %w", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Google Translate TTS respondió %d", resp.StatusCode)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
-	return io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		preview := string(body)
+		if len(preview) > 200 {
+			preview = preview[:200]
+		}
+		return nil, fmt.Errorf("Google Translate respondió %d: %s", resp.StatusCode, preview)
+	}
+	// Verificar que sea audio (empieza con ID3 o similar), no HTML
+	if len(body) < 100 {
+		return nil, fmt.Errorf("respuesta demasiado corta (%d bytes)", len(body))
+	}
+	return body, nil
 }
 
 func fetchGoogleCloudTTS(text, apiKey string) ([]byte, error) {
@@ -223,9 +240,11 @@ func (h *TTSHandler) Synthesize(c echo.Context) error {
 		}
 
 		if err != nil {
-			log.Printf("[TTS] Error en chunk %d: %v", i, err)
-			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": "Error al generar el audio. Intenta de nuevo.",
+			log.Printf("[TTS] Error en chunk %d (%s): %v", i, engine, err)
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"error":  "Error al generar el audio.",
+				"detail": err.Error(),
+				"engine": engine,
 			})
 		}
 		combined = append(combined, audio...)

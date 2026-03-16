@@ -74,7 +74,8 @@ export default function useTTS(text) {
 
       audio.play();
     } catch (err) {
-      console.error('[TTS]', err);
+      const detail = err.response?.data?.detail || err.response?.data?.error || err.message;
+      console.error('[TTS]', detail, err);
       setStatus('error');
     }
   }, [text, status]);
