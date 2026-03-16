@@ -6,8 +6,9 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
-  const { register, loading } = useAuth();
+  const [form, setForm]       = useState({ name: '', email: '', password: '', confirm: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
@@ -15,10 +16,16 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password !== form.confirm) { toast.error('Las contraseñas no coinciden'); return; }
-    if (form.password.length < 6) { toast.error('La contraseña debe tener al menos 6 caracteres'); return; }
+    if (form.password.length < 6)       { toast.error('La contraseña debe tener al menos 6 caracteres'); return; }
+    setSubmitting(true);
     const { success, error } = await register(form.email, form.password, form.name);
-    if (success) { toast.success('¡Cuenta creada!'); navigate('/admin'); }
-    else toast.error(error);
+    setSubmitting(false);
+    if (success) {
+      toast.success('¡Cuenta creada! Inicia sesión para continuar.');
+      navigate('/login');
+    } else {
+      toast.error(error);
+    }
   };
 
   return (
@@ -55,8 +62,8 @@ export default function Register() {
             <Input label="Contraseña" type="password" value={form.password} onChange={set('password')} helperText="Mínimo 6 caracteres" required />
             <Input label="Confirmar contraseña" type="password" value={form.confirm} onChange={set('confirm')} required />
 
-            <Button type="submit" variant="navy" size="lg" className="w-full" disabled={loading}>
-              {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+            <Button type="submit" variant="navy" size="lg" className="w-full" disabled={submitting}>
+              {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
             </Button>
           </form>
 

@@ -22,7 +22,7 @@ export default function Login() {
       toast.success('¡Bienvenido!');
       navigate('/admin');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Credenciales incorrectas');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Credenciales incorrectas');
     } finally {
       setLoading(false);
     }
