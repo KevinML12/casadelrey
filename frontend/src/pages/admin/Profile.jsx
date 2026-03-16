@@ -15,11 +15,14 @@ export default function Profile() {
       {/* Avatar */}
       <div className="flex items-center gap-4 mb-8">
         <div className="w-14 h-14 rounded-xl bg-blue/10 flex items-center justify-center">
-          <span className="text-blue font-black text-xl">{user?.email?.[0]?.toUpperCase()}</span>
+          <span className="text-blue font-black text-xl">
+            {(user?.name || user?.email || '?')[0].toUpperCase()}
+          </span>
         </div>
         <div>
-          <p className="font-bold text-ink">{user?.email}</p>
-          <p className="text-sm text-ink-3 capitalize">{user?.role || 'usuario'}</p>
+          <p className="font-bold text-ink">{user?.name || 'Sin nombre'}</p>
+          <p className="text-sm text-ink-3">{user?.email}</p>
+          <p className="text-xs text-ink-3 capitalize mt-0.5">{user?.role || 'usuario'}</p>
         </div>
       </div>
 
@@ -29,7 +32,7 @@ export default function Profile() {
           <Mail size={15} className="text-ink-3" />
           <div>
             <p className="text-xs text-ink-3 font-medium">Correo electrónico</p>
-            <p className="text-sm text-ink font-medium mt-0.5">{user?.email}</p>
+            <p className="text-sm text-ink font-medium mt-0.5">{user?.email || '—'}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 px-5 py-4 border-b border-line">

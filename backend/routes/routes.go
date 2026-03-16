@@ -1,6 +1,3 @@
-// Package routes centraliza el registro de todas las rutas del servidor Echo.
-// Agrupa las rutas por dominio (auth, blog, peticiones, donaciones, admin)
-// y aplica los middlewares de autenticación a las rutas protegidas.
 package routes
 
 import (
@@ -15,88 +12,85 @@ import (
 	"gorm.io/gorm"
 )
 
-// Register registra todos los grupos de rutas en la instancia de Echo.
-// Crea las instancias de los handlers con inyección de dependencias (DB).
-//
-// Parámetros:
-//   - e:   Instancia de Echo configurada en main.go
-//   - db:  Conexión singleton a PostgreSQL
-//   - cfg: Configuración cargada desde variables de entorno
 func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 
-	// ── Instanciar los handlers con sus dependencias ──────────────────────
+	// ── Instanciar handlers ───────────────────────────────────────────────────
 	authHandler     := auth.NewHandler(db)
 	blogHandler     := handlers.NewBlogHandler(db)
 	petitionHandler := handlers.NewPetitionHandler(db)
 	donationHandler := handlers.NewDonationHandler(db)
+	eventHandler    := handlers.NewEventHandler(db)
+	adminHandler    := handlers.NewAdminHandler(db)
 	uploadHandler   := handlers.NewUploadHandler()
 
-	// ── Middlewares de autenticación y autorización ───────────────────────
-	// authMW: valida el JWT y carga user_id + user_role en el contexto
-	// adminMW: verifica que user_role == "admin" (aplicar DESPUÉS de authMW)
+	// ── Middlewares ───────────────────────────────────────────────────────────
 	authMW  := middleware.NewAuthMiddleware(cfg.JWTSecret)
 	adminMW := middleware.AdminMiddleware()
 
-	// ── Health Check ──────────────────────────────────────────────────────
-	// Usado por Dokploy, Docker Healthcheck y balanceadores de carga.
+	// ── Health check ──────────────────────────────────────────────────────────
 	e.GET("/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"status":  "ok",
 			"service": "CasaDelRey Backend",
-			"version": "1.0.0",
+			"version": "2.0.0",
 		})
 	})
 
-	// ── Servir archivos subidos de forma estática ─────────────────────────
-	// Los archivos en ./uploads/ son accesibles en GET /uploads/<filename>
+	// Servir archivos subidos desde /uploads
 	e.Static("/uploads", "./uploads")
 
-	// ── API v1 ────────────────────────────────────────────────────────────
+	// ── API v1 ────────────────────────────────────────────────────────────────
 	api := e.Group("/api/v1")
 
-	// ── 1. Auth (rutas públicas) ──────────────────────────────────────────
+	// Auth (público)
 	authGroup := api.Group("/auth")
 	authGroup.POST("/register",        authHandler.Register)
 	authGroup.POST("/login",           authHandler.Login)
 	authGroup.POST("/forgot-password", authHandler.ForgotPassword)
 	authGroup.POST("/reset-password",  authHandler.ResetPassword)
 
-	// ── 2. Blog (lectura pública) ─────────────────────────────────────────
+	// Blog (público: lectura)
 	blogGroup := api.Group("/blog")
-	blogGroup.GET("/",     blogHandler.GetPublishedPosts)
+	blogGroup.GET("/",      blogHandler.GetPublishedPosts)
 	blogGroup.GET("/:slug", blogHandler.GetPostBySlug)
 
-	// ── 3. Peticiones de Oración (envío público) ──────────────────────────
+	// Peticiones de oración (público: solo escritura)
 	contactGroup := api.Group("/contact")
 	contactGroup.POST("/petition", petitionHandler.CreatePetition)
 
-	// ── 4. Donaciones (envío público) ─────────────────────────────────────
+	// Donaciones (público: crear payment intent y webhook)
 	donationsGroup := api.Group("/donations")
-	donationsGroup.POST("/simulate",              donationHandler.SimulateDonation)
 	donationsGroup.POST("/create-payment-intent", donationHandler.CreatePaymentIntent)
-	// El webhook NO lleva authMW: Stripe firma sus propias peticiones.
-	donationsGroup.POST("/webhook", donationHandler.HandleWebhook)
+	donationsGroup.POST("/webhook",               donationHandler.HandleWebhook) // firmado por Stripe, sin authMW
+	donationsGroup.POST("/simulate",              donationHandler.SimulateDonation)
 
-	// ── 5. Eventos (placeholder) ──────────────────────────────────────────
+	// Eventos (público: solo lectura)
 	eventsGroup := api.Group("/events")
-	eventsGroup.GET("/", handlers.GetEventsPlaceholder)
+	eventsGroup.GET("/", eventHandler.GetEvents)
 
-	// ── 6. Upload de Archivos (requiere autenticación) ────────────────────
-	// Protegido para evitar abuso del almacenamiento del servidor.
+	// Upload (requiere login)
 	uploadGroup := api.Group("/upload", authMW)
 	uploadGroup.POST("", uploadHandler.UploadFile)
 
-	// ── 7. Admin (requiere auth + rol admin) ──────────────────────────────
-	// El orden de middlewares es importante: primero authMW, luego adminMW.
+	// ── Admin (requiere auth + rol admin) ─────────────────────────────────────
 	adminGroup := api.Group("/admin", authMW, adminMW)
-	adminGroup.GET("/dashboard", handlers.AdminDashboardPlaceholder)
 
-	// Admin Blog
+	// Dashboard KPIs y donaciones
+	adminGroup.GET("/kpis",      adminHandler.GetKPIs)
+	adminGroup.GET("/donations", adminHandler.GetDonations)
+
+	// Blog admin
 	adminBlog := adminGroup.Group("/blog")
 	adminBlog.POST("/",    blogHandler.CreatePost)
 	adminBlog.PUT("/:id",  blogHandler.UpdatePost)
 
-	// Admin Peticiones
-	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
-	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
+	// Peticiones admin
+	adminGroup.GET("/petitions",           petitionHandler.GetAllPetitions)
+	adminGroup.PUT("/petitions/:id/read",  petitionHandler.MarkAsRead)
+
+	// Eventos admin
+	adminEvents := adminGroup.Group("/events")
+	adminEvents.POST("/",    eventHandler.CreateEvent)
+	adminEvents.PUT("/:id",  eventHandler.UpdateEvent)
+	adminEvents.DELETE("/:id", eventHandler.DeleteEvent)
 }

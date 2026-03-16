@@ -12,6 +12,8 @@ import (
 // JWTClaims define los claims personalizados del JWT
 type JWTClaims struct {
 	UserID uint   `json:"user_id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
 	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
@@ -30,11 +32,12 @@ func ComparePassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-// GenerateJWT genera un token JWT para un usuario
-func GenerateJWT(userID uint, role string) (string, error) {
-	// Crear los claims
+// GenerateJWT genera un token JWT con los datos básicos del usuario
+func GenerateJWT(userID uint, name, email, role string) (string, error) {
 	claims := &JWTClaims{
 		UserID: userID,
+		Name:   name,
+		Email:  email,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),

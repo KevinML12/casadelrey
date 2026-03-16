@@ -127,7 +127,7 @@ func (h *Handler) Login(c echo.Context) error {
 	}
 
 	// Generar el token JWT (válido 24h, firmado con JWT_SECRET)
-	token, err := GenerateJWT(user.ID, user.Role)
+	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role)
 	if err != nil {
 		log.Printf("[Auth] Error al generar JWT: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{

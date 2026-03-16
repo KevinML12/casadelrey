@@ -66,6 +66,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.Post{},     // Tabla: posts
 			&models.Petition{}, // Tabla: petitions (peticiones de oración)
 			&models.Donation{}, // Tabla: donations (donaciones registradas)
+			&models.Event{},    // Tabla: events (eventos de la iglesia)
 		); err != nil {
 			connectErr = err
 			return

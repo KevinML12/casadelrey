@@ -44,9 +44,18 @@ type Donation struct {
 	Name            string  `json:"name" gorm:"type:varchar(100);not null"`
 	Email           string  `json:"email" gorm:"type:varchar(100);index"`
 	Amount          float64 `json:"amount" gorm:"type:decimal(10,2);not null"`
-	Currency        string  `json:"currency" gorm:"type:varchar(3);default:'USD'"`
+	Currency        string  `json:"currency" gorm:"type:varchar(3);default:'GTQ'"`
 	PaymentMethod   string  `json:"payment_method" gorm:"type:varchar(50)"`
 	TransactionID   string  `json:"transaction_id" gorm:"type:varchar(255);index"`
 	IsSuccessful    bool    `json:"is_successful" gorm:"default:true"`
 	DonationPurpose string  `json:"donation_purpose" gorm:"type:varchar(255)"`
+}
+
+type Event struct {
+	gorm.Model
+	Title       string `json:"title" gorm:"type:varchar(255);not null"`
+	Date        string `json:"date" gorm:"type:varchar(20)"`
+	Location    string `json:"location" gorm:"type:varchar(255)"`
+	Description string `json:"description" gorm:"type:text"`
+	IsActive    bool   `json:"is_active" gorm:"default:true"`
 }

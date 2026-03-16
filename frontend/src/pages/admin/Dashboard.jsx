@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Users, DollarSign, MessageSquare, TrendingUp } from 'lucide-react';
+import { Users, DollarSign, MessageSquare, Heart } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 
-function StatCard({ icon: Icon, label, value, color = 'text-blue' }) {
+function StatCard({ icon: Icon, label, value, color = 'text-blue', sub }) {
   return (
     <div className="bg-card border border-line rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
@@ -12,6 +12,7 @@ function StatCard({ icon: Icon, label, value, color = 'text-blue' }) {
         </div>
       </div>
       <p className="text-3xl font-black text-ink">{value ?? '—'}</p>
+      {sub && <p className="text-xs text-ink-3 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -34,10 +35,23 @@ export default function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={Users}        label="Usuarios"     value={kpis?.total_users}     color="text-blue" />
-        <StatCard icon={DollarSign}   label="Donaciones"   value={kpis?.total_donations}  color="text-gold" />
-        <StatCard icon={MessageSquare}label="Peticiones"   value={kpis?.total_petitions}  color="text-ok" />
-        <StatCard icon={TrendingUp}   label="Crecimiento"  value={kpis?.monthly_growth ? `+${kpis.monthly_growth}%` : '—'} color="text-info" />
+        <StatCard
+          icon={Users} label="Usuarios" color="text-blue"
+          value={loading ? '…' : kpis?.total_users ?? 0}
+        />
+        <StatCard
+          icon={DollarSign} label="Donaciones" color="text-gold"
+          value={loading ? '…' : kpis?.total_donations ?? 0}
+          sub={kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(2)} total` : undefined}
+        />
+        <StatCard
+          icon={MessageSquare} label="Peticiones" color="text-ok"
+          value={loading ? '…' : kpis?.total_petitions ?? 0}
+        />
+        <StatCard
+          icon={Heart} label="Recaudado" color="text-error"
+          value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : '0'}
+        />
       </div>
 
       {/* Tabla donaciones */}
@@ -55,21 +69,23 @@ export default function Dashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-line bg-bg-2">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">ID</th>
+                <tr className="border-b border-line bg-bg">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">#</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Nombre</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Destino</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Monto</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Fecha</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {donations.slice(0, 10).map(d => (
+                {donations.slice(0, 15).map(d => (
                   <tr key={d.ID} className="hover:bg-bg transition-colors">
-                    <td className="px-5 py-3 text-ink-3 font-mono text-xs">{d.ID?.slice(0, 8)}…</td>
-                    <td className="px-5 py-3 text-ink font-medium">{d.Name}</td>
-                    <td className="px-5 py-3 text-gold font-bold">Q{(d.Amount / 100).toFixed(2)}</td>
+                    <td className="px-5 py-3 text-ink-3 font-mono text-xs">{d.ID}</td>
+                    <td className="px-5 py-3 text-ink font-medium">{d.name}</td>
+                    <td className="px-5 py-3 text-ink-3 text-xs capitalize">{d.donation_purpose || '—'}</td>
+                    <td className="px-5 py-3 text-gold font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
                     <td className="px-5 py-3 text-ink-3 text-xs">
-                      {new Date(d.CreatedAt).toLocaleDateString('es-ES')}
+                      {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
                     </td>
                   </tr>
                 ))}
