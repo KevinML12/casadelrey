@@ -2,22 +2,35 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle, ArrowRight, XCircle, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
+import apiClient from '../../lib/apiClient';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 export default function PaymentSuccess() {
-  const [searchParams]  = useSearchParams();
-  const [status,  setStatus]  = useState('loading'); // 'loading' | 'success' | 'failed'
+  const [searchParams] = useSearchParams();
+  const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'failed'
   const [intentId, setIntentId] = useState('');
 
   useEffect(() => {
+    const paymentMethod = searchParams.get('payment_method');
+    const token = searchParams.get('token'); // PayPal order ID
     const paymentIntentSecret = searchParams.get('payment_intent_client_secret');
-    const paymentIntentId     = searchParams.get('payment_intent');
-    const redirectStatus      = searchParams.get('redirect_status');
+    const paymentIntentId = searchParams.get('payment_intent');
+    const redirectStatus = searchParams.get('redirect_status');
 
-    setIntentId(paymentIntentId ?? '');
+    setIntentId(paymentIntentId ?? token ?? '');
 
-    // Stripe incluye redirect_status=succeeded en la URL si todo fue bien.
+    // PayPal: capturar orden al regresar
+    if (paymentMethod === 'paypal' && token) {
+      apiClient.post('/donations/capture-paypal-order', { order_id: token })
+        .then(() => setStatus('success'))
+        .catch(() => setStatus('failed'));
+      return;
+    }
+
+    // Stripe: redirect_status=succeeded
     if (redirectStatus === 'succeeded') {
       setStatus('success');
       return;
@@ -28,17 +41,16 @@ export default function PaymentSuccess() {
       return;
     }
 
-    // Si hay client_secret, verificamos el estado real contra Stripe.
-    if (paymentIntentSecret) {
+    // Stripe: verificar con client_secret
+    if (paymentIntentSecret && stripePromise) {
       stripePromise.then(stripe => {
         if (!stripe) { setStatus('failed'); return; }
         stripe.retrievePaymentIntent(paymentIntentSecret).then(({ paymentIntent }) => {
           if (paymentIntent?.status === 'succeeded') setStatus('success');
           else setStatus('failed');
-        });
+        }).catch(() => setStatus('failed'));
       });
     } else {
-      // Sin parámetros de Stripe (acceso directo a la URL).
       setStatus('success');
     }
   }, [searchParams]);
@@ -63,7 +75,7 @@ export default function PaymentSuccess() {
             El pago no pudo ser procesado. Por favor, verifica los datos de tu tarjeta e inténtalo de nuevo.
           </p>
           <Link
-            to="/donar"
+            to="/donate"
             className="inline-flex items-center gap-2 px-6 py-3 bg-navy text-white font-semibold rounded-md hover:bg-navy-d transition-colors"
           >
             Intentar de nuevo
@@ -101,7 +113,7 @@ export default function PaymentSuccess() {
             <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <Link
-            to="/donar"
+            to="/donate"
             className="inline-flex items-center gap-2 px-6 py-3 border border-line text-ink font-medium rounded-md hover:bg-card-2 transition-colors text-sm"
           >
             Donar de nuevo

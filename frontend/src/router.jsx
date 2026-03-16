@@ -13,6 +13,7 @@ import ResetPassword    from './pages/public/ResetPassword';
 import BlogPage         from './pages/public/BlogPage';
 import EventsPage       from './pages/public/EventsPage';
 import PrayerPage       from './pages/public/PrayerPage';
+import CellReportPage   from './pages/public/CellReportPage';
 import VolunteeringPage from './pages/public/VolunteeringPage';
 import AboutPage        from './pages/public/AboutPage';
 import NotFound         from './pages/NotFound';
@@ -34,6 +35,7 @@ import Dashboard        from './pages/admin/Dashboard';
 import AdminBlog        from './pages/admin/AdminBlog';
 import AdminEvents      from './pages/admin/AdminEvents';
 import AdminPetitions   from './pages/admin/AdminPetitions';
+import AdminCellReports from './pages/admin/AdminCellReports';
 import Profile          from './pages/admin/Profile';
 
 export const router = createBrowserRouter([
@@ -52,8 +54,9 @@ export const router = createBrowserRouter([
       { index: true,       element: <Dashboard /> },
       { path: 'blog',      element: <AdminBlog /> },
       { path: 'events',    element: <AdminEvents /> },
-      { path: 'petitions', element: <AdminPetitions /> },
-      { path: 'profile',   element: <Profile /> },
+      { path: 'petitions',     element: <AdminPetitions /> },
+      { path: 'cell-reports', element: <AdminCellReports /> },
+      { path: 'profile',      element: <Profile /> },
     ],
   },
 
@@ -69,6 +72,7 @@ export const router = createBrowserRouter([
       { path: 'blog/:slug',            element: <BlogPage /> },
       { path: 'events',                element: <EventsPage /> },
       { path: 'prayer',                element: <PrayerPage /> },
+      { path: 'cells',                 element: <CellReportPage /> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },

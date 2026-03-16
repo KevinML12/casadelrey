@@ -27,7 +27,7 @@ export default function PrayerForm({ compact = false }) {
 
   const onSubmit = async (data) => {
     try {
-      await apiClient.post('/v1/contact/petition', data);
+      await apiClient.post('/contact/petition', data);
       setSubmitted(true);
       reset();
     } catch (err) {

@@ -8,13 +8,12 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { CheckCircle, Loader2, Shield, Zap, ArrowLeft, Lock } from 'lucide-react';
+import { Loader2, Shield, Zap, ArrowLeft, Lock, CreditCard } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../ui/Button';
 
 // ── Stripe init ──────────────────────────────────────────────────────────────
-// Carga Stripe solo si la clave está definida (evita crash en entornos sin Stripe)
 const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
   : null;
@@ -33,7 +32,7 @@ const inputCls =
   'w-full px-4 py-2.5 rounded-md border border-line dark:border-white/10 bg-transparent text-ink placeholder:text-ink-3 text-sm focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/15 transition-all';
 
 // ── Step 1: Formulario de donación ───────────────────────────────────────────
-function DonationForm({ onNext, loading }) {
+function DonationForm({ onNext, onPayPal, loading }) {
   const [amount,  setAmount]  = useState(100);
   const [custom,  setCustom]  = useState('');
   const [purpose, setPurpose] = useState('general');
@@ -41,16 +40,24 @@ function DonationForm({ onNext, loading }) {
   const [email,   setEmail]   = useState('');
 
   const finalAmount = custom ? parseFloat(custom) : amount;
+  const data = { name, email, amount: finalAmount, currency: 'GTQ', donation_purpose: purpose };
 
-  const handleSubmit = async (e) => {
+  const handleStripe = async (e) => {
     e.preventDefault();
     if (!finalAmount || finalAmount < 10) { toast.error('El monto mínimo es Q10'); return; }
     if (!name.trim())                      { toast.error('Por favor ingresa tu nombre'); return; }
-    onNext({ name, email, amount: finalAmount, currency: 'GTQ', donation_purpose: purpose });
+    onNext(data);
+  };
+
+  const handlePayPal = async (e) => {
+    e.preventDefault();
+    if (!finalAmount || finalAmount < 10) { toast.error('El monto mínimo es Q10'); return; }
+    if (!name.trim())                      { toast.error('Por favor ingresa tu nombre'); return; }
+    onPayPal(data);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={e => e.preventDefault()} className="space-y-5">
       {/* Montos */}
       <div>
         <label className="block text-sm font-medium text-ink mb-2">Monto (Q)</label>
@@ -122,20 +129,28 @@ function DonationForm({ onNext, loading }) {
         </div>
       )}
 
-      <Button
-        type="submit" variant="gold" size="lg" className="w-full"
-        disabled={loading || !finalAmount || finalAmount < 10}
-      >
-        {loading
-          ? <><Loader2 size={16} className="animate-spin" /> Preparando pago...</>
-          : `Proceder al pago — Q${finalAmount || '—'}`
-        }
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button
+          type="button" variant="gold" size="lg" className="flex-1"
+          disabled={loading || !finalAmount || finalAmount < 10}
+          onClick={handleStripe}
+        >
+          {loading ? <><Loader2 size={16} className="animate-spin" /> Preparando...</> : <><CreditCard size={16} /> Tarjeta — Q{finalAmount || '—'}</>}
+        </Button>
+        <Button
+          type="button" variant="outline" size="lg" className="flex-1 border-blue text-blue hover:bg-blue/5"
+          disabled={loading || !finalAmount || finalAmount < 10}
+          onClick={handlePayPal}
+        >
+          {loading ? <><Loader2 size={16} className="animate-spin" /> Preparando...</> : <>PayPal — Q{finalAmount || '—'}</>}
+        </Button>
+      </div>
 
-      <div className="flex items-center justify-center gap-5 text-xs text-ink-3">
+      <div className="flex items-center justify-center gap-4 text-xs text-ink-3 flex-wrap">
         <span className="flex items-center gap-1"><Shield size={11} /> Cifrado SSL</span>
-        <span className="flex items-center gap-1"><Lock size={11} /> Stripe Secured</span>
-        <span className="flex items-center gap-1"><Zap size={11} /> Instantáneo</span>
+        <span className="flex items-center gap-1"><Lock size={11} /> Stripe</span>
+        <span className="flex items-center gap-1">PayPal</span>
+        <span className="flex items-center gap-1"><Zap size={11} /> Seguro</span>
       </div>
     </form>
   );
@@ -228,7 +243,7 @@ export default function DonationCard() {
   const [donationData, setDonationData] = useState(null);
   const [loading,      setLoading]      = useState(false);
 
-  const handleDonationDetails = async (data) => {
+  const handleStripe = async (data) => {
     setLoading(true);
     try {
       const res = await apiClient.post('/donations/create-payment-intent', data);
@@ -239,6 +254,18 @@ export default function DonationCard() {
       const msg = err.response?.data?.error || 'Error al conectar con el servidor de pagos.';
       toast.error(msg);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePayPal = async (data) => {
+    setLoading(true);
+    try {
+      const res = await apiClient.post('/donations/create-paypal-order', data);
+      window.location.href = res.data.approval_url;
+    } catch (err) {
+      const msg = err.response?.data?.error || 'Error al conectar con PayPal.';
+      toast.error(msg);
       setLoading(false);
     }
   };
@@ -270,5 +297,5 @@ export default function DonationCard() {
     );
   }
 
-  return <DonationForm onNext={handleDonationDetails} loading={loading} />;
+  return <DonationForm onNext={handleStripe} onPayPal={handlePayPal} loading={loading} />;
 }

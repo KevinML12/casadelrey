@@ -62,11 +62,13 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		// Es idempotente: seguro de ejecutar en cada arranque del servidor.
 		log.Println("[DB] Ejecutando AutoMigrate...")
 		if err := db.AutoMigrate(
-			&models.User{},     // Tabla: users
-			&models.Post{},     // Tabla: posts
-			&models.Petition{}, // Tabla: petitions (peticiones de oración)
-			&models.Donation{}, // Tabla: donations (donaciones registradas)
-			&models.Event{},    // Tabla: events (eventos de la iglesia)
+			&models.User{},       // Tabla: users
+			&models.Post{},       // Tabla: posts
+			&models.Petition{},   // Tabla: petitions (peticiones de oración)
+			&models.Donation{},   // Tabla: donations (donaciones registradas)
+			&models.PayPalOrder{}, // Tabla: paypal_orders (órdenes pendientes)
+			&models.Event{},       // Tabla: events (eventos de la iglesia)
+			&models.CellReport{},  // Tabla: cell_reports (reportes de células)
 		); err != nil {
 			connectErr = err
 			return

@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Calendar, MessageSquare, User, LogOut, Menu, X, Globe } from 'lucide-react';
+import { LayoutDashboard, FileText, Calendar, MessageSquare, Users, User, LogOut, Menu, X, Globe } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const NAV = [
-  { to: '/admin',           icon: LayoutDashboard, label: 'Dashboard',  exact: true },
-  { to: '/admin/blog',      icon: FileText,         label: 'Blog' },
-  { to: '/admin/events',    icon: Calendar,          label: 'Eventos' },
-  { to: '/admin/petitions', icon: MessageSquare,     label: 'Peticiones' },
-  { to: '/admin/profile',   icon: User,              label: 'Perfil' },
+  { to: '/admin',             icon: LayoutDashboard, label: 'Dashboard',  exact: true },
+  { to: '/admin/blog',        icon: FileText,       label: 'Blog' },
+  { to: '/admin/events',      icon: Calendar,       label: 'Eventos' },
+  { to: '/admin/petitions',   icon: MessageSquare,   label: 'Peticiones' },
+  { to: '/admin/cell-reports', icon: Users,          label: 'Células' },
+  { to: '/admin/profile',    icon: User,             label: 'Perfil' },
 ];
 
 const SITE_LINK = { to: '/', icon: null, label: '← Ver sitio web' };

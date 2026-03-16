@@ -74,6 +74,7 @@ export default function Dashboard() {
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Nombre</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Destino</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Monto</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Método</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-ink-3 uppercase tracking-widest">Fecha</th>
                 </tr>
               </thead>
@@ -84,6 +85,11 @@ export default function Dashboard() {
                     <td className="px-5 py-3 text-ink font-medium">{d.name}</td>
                     <td className="px-5 py-3 text-ink-3 text-xs capitalize">{d.donation_purpose || '—'}</td>
                     <td className="px-5 py-3 text-gold font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
+                    <td className="px-5 py-3 text-ink-3 text-xs">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${d.payment_method === 'paypal' ? 'bg-blue/10 text-blue' : 'bg-ink/10 text-ink-2'}`}>
+                        {d.payment_method === 'paypal' ? 'PayPal' : d.payment_method === 'stripe' ? 'Tarjeta' : d.payment_method || '—'}
+                      </span>
+                    </td>
                     <td className="px-5 py-3 text-ink-3 text-xs">
                       {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
                     </td>

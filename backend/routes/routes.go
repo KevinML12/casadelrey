@@ -20,6 +20,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	petitionHandler := handlers.NewPetitionHandler(db)
 	donationHandler := handlers.NewDonationHandler(db)
 	eventHandler    := handlers.NewEventHandler(db)
+	cellReportHandler := handlers.NewCellReportHandler(db)
 	adminHandler    := handlers.NewAdminHandler(db)
 	uploadHandler   := handlers.NewUploadHandler()
 
@@ -61,12 +62,18 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Donaciones (público: crear payment intent y webhook)
 	donationsGroup := api.Group("/donations")
 	donationsGroup.POST("/create-payment-intent", donationHandler.CreatePaymentIntent)
+	donationsGroup.POST("/create-paypal-order",   donationHandler.CreatePayPalOrder)
+	donationsGroup.POST("/capture-paypal-order",  donationHandler.CapturePayPalOrder)
 	donationsGroup.POST("/webhook",               donationHandler.HandleWebhook) // firmado por Stripe, sin authMW
 	donationsGroup.POST("/simulate",              donationHandler.SimulateDonation)
 
 	// Eventos (público: solo lectura)
 	eventsGroup := api.Group("/events")
 	eventsGroup.GET("/", eventHandler.GetEvents)
+
+	// Reportes de células (público: solo escritura)
+	cellsGroup := api.Group("/cells")
+	cellsGroup.POST("/report", cellReportHandler.CreateCellReport)
 
 	// Upload (requiere login)
 	uploadGroup := api.Group("/upload", authMW)
@@ -89,6 +96,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Peticiones admin
 	adminGroup.GET("/petitions",           petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read",  petitionHandler.MarkAsRead)
+
+	// Reportes de células admin
+	adminGroup.GET("/cell-reports", cellReportHandler.GetAllCellReports)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")
