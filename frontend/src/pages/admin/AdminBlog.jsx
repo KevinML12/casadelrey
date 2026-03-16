@@ -68,10 +68,8 @@ export default function AdminBlog() {
   const [showForm, setShowForm] = useState(false);
   const [editing,  setEditing]  = useState(null);
 
-  // Backend retorna array desde GET /blog/ (con status = 'published')
-  // Para admin, necesitamos todos los posts — usamos el mismo endpoint por ahora
   const load = () =>
-    apiClient.get('/blog/')
+    apiClient.get('/admin/blog/')
       .then(r => setPosts(r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
