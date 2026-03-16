@@ -9,10 +9,12 @@ import (
 // User represents the user model
 type User struct {
 	gorm.Model
-	Name     string `json:"name" gorm:"not null"`
-	Email    string `json:"email" gorm:"unique;not null"`
-	Password string `json:"-" gorm:"not null"`
-	Role     string `json:"role" gorm:"default:member"`
+	Name             string     `json:"name" gorm:"not null"`
+	Email            string     `json:"email" gorm:"unique;not null"`
+	Password         string     `json:"-" gorm:"not null"`
+	Role             string     `json:"role" gorm:"default:member"`
+	ResetToken       *string    `json:"-" gorm:"index"`
+	ResetTokenExpiry *time.Time `json:"-"`
 }
 
 // Post represents the blog post model
