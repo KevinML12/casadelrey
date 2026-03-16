@@ -1,160 +1,110 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import apiClient from '../lib/apiClient';
 
 /**
- * useTTS — Text-To-Speech en español.
+ * useTTS — Texto a voz usando Google Cloud TTS vía nuestro backend.
+ * El audio llega como base64 MP3 y se reproduce con la Web Audio API.
  *
- * Estrategia de motores (en orden de preferencia):
- *  1. ResponsiveVoice (Google TTS, cargado desde CDN en index.html) — mejor calidad
- *  2. Web Speech API nativa — fallback para navegadores sin ResponsiveVoice
+ * @param {string} text — Texto limpio (sin HTML)
  */
 export default function useTTS(text) {
   const [status,   setStatus]   = useState('idle'); // idle | loading | playing | paused | done | error
   const [progress, setProgress] = useState(0);
+  const audioRef    = useRef(null);
   const intervalRef = useRef(null);
-  const startTime   = useRef(null);
-  const estimatedMs = useRef(0);
 
-  const hasRV = () => typeof window !== 'undefined' && typeof window.responsiveVoice !== 'undefined';
-  const hasWS = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const clearTimer = () => clearInterval(intervalRef.current);
 
-  useEffect(() => {
-    return () => {
-      clearInterval(intervalRef.current);
-      if (hasRV()) window.responsiveVoice.cancel();
-      else if (hasWS()) window.speechSynthesis.cancel();
-    };
-  }, []);
+  const play = useCallback(async () => {
+    if (!text) return;
 
-  // Simula progreso por tiempo (ResponsiveVoice no tiene onboundary)
-  const startProgressTimer = useCallback((durationMs) => {
-    estimatedMs.current = durationMs;
-    startTime.current   = Date.now();
-    clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTime.current;
-      const pct = Math.min(Math.round((elapsed / durationMs) * 100), 99);
-      setProgress(pct);
-    }, 400);
-  }, []);
+    // Si hay audio cargado y pausado → reanudar
+    if (audioRef.current && status === 'paused') {
+      audioRef.current.play();
+      setStatus('playing');
+      return;
+    }
 
-  const stopProgressTimer = useCallback(() => {
-    clearInterval(intervalRef.current);
-  }, []);
-
-  // ── ResponsiveVoice ────────────────────────────────────────────────────────
-  const playWithRV = useCallback(() => {
     setStatus('loading');
-    // ~150 palabras por minuto en español
-    const words = text.split(/\s+/).length;
-    const msEst = (words / 130) * 60_000;
+    setProgress(0);
+    clearTimer();
 
-    window.responsiveVoice.speak(text, 'Spanish Latin American Female', {
-      rate:    0.9,
-      pitch:   1,
-      volume:  1,
-      onstart: () => {
+    try {
+      const res = await apiClient.post('/tts', { text });
+      const b64 = res.data.audio;
+
+      // Decodificar base64 → Blob → URL de objeto
+      const binary = atob(b64);
+      const bytes  = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: 'audio/mpeg' });
+      const url  = URL.createObjectURL(blob);
+
+      // Liberar URL anterior
+      if (audioRef.current) {
+        URL.revokeObjectURL(audioRef.current.src);
+        audioRef.current.pause();
+      }
+
+      const audio = new Audio(url);
+      audioRef.current = audio;
+
+      audio.onplay = () => {
         setStatus('playing');
-        setProgress(0);
-        startProgressTimer(msEst);
-      },
-      onend: () => {
-        stopProgressTimer();
-        setStatus('done');
-        setProgress(100);
-      },
-      onerror: () => {
-        stopProgressTimer();
-        setStatus('error');
-      },
-    });
-  }, [text, startProgressTimer, stopProgressTimer]);
-
-  // ── Web Speech API (fallback) ──────────────────────────────────────────────
-  const playWithWS = useCallback(() => {
-    setStatus('loading');
-    window.speechSynthesis.cancel();
-
-    const speak = (voices) => {
-      const utt = new SpeechSynthesisUtterance(text);
-
-      const esVoice =
-        voices.find(v => v.lang === 'es-US') ||
-        voices.find(v => v.lang === 'es-MX') ||
-        voices.find(v => v.lang === 'es-ES') ||
-        voices.find(v => v.lang.startsWith('es'));
-
-      if (esVoice) { utt.voice = esVoice; utt.lang = esVoice.lang; }
-      else           { utt.lang = 'es-ES'; }
-
-      utt.rate  = 0.88;
-      utt.pitch = 1.0;
-
-      utt.onstart  = () => { setStatus('playing'); setProgress(0); };
-      utt.onend    = () => { setStatus('done');    setProgress(100); };
-      utt.onerror  = () => setStatus('error');
-      utt.onpause  = () => setStatus('paused');
-      utt.onresume = () => setStatus('playing');
-
-      let words = 0;
-      const total = text.split(/\s+/).length;
-      utt.onboundary = (e) => {
-        if (e.name === 'word') setProgress(Math.round((++words / total) * 100));
+        // Barra de progreso sincronizada con la duración real del audio
+        clearTimer();
+        intervalRef.current = setInterval(() => {
+          if (audio.duration) {
+            setProgress(Math.round((audio.currentTime / audio.duration) * 100));
+          }
+        }, 300);
       };
 
-      window.speechSynthesis.speak(utt);
-    };
+      audio.onpause = () => {
+        clearTimer();
+        if (!audio.ended) setStatus('paused');
+      };
 
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      speak(voices);
-    } else {
-      window.speechSynthesis.addEventListener(
-        'voiceschanged',
-        () => speak(window.speechSynthesis.getVoices()),
-        { once: true }
-      );
+      audio.onended = () => {
+        clearTimer();
+        setStatus('done');
+        setProgress(100);
+        URL.revokeObjectURL(url);
+      };
+
+      audio.onerror = () => {
+        clearTimer();
+        setStatus('error');
+      };
+
+      audio.play();
+
+    } catch (err) {
+      console.error('[TTS]', err);
+      setStatus('error');
     }
-  }, [text]);
-
-  // ── API pública ────────────────────────────────────────────────────────────
-  const play = useCallback(() => {
-    if (!text) return;
-    if (hasRV()) playWithRV();
-    else if (hasWS()) playWithWS();
-  }, [text, playWithRV, playWithWS]);
+  }, [text, status]);
 
   const pause = useCallback(() => {
-    if (hasRV()) {
-      window.responsiveVoice.pause();
-      stopProgressTimer();
-      setStatus('paused');
-    } else if (hasWS()) {
-      window.speechSynthesis.pause();
-      setStatus('paused');
-    }
-  }, [stopProgressTimer]);
+    audioRef.current?.pause();
+    setStatus('paused');
+    clearTimer();
+  }, []);
 
   const resume = useCallback(() => {
-    if (hasRV()) {
-      window.responsiveVoice.resume();
-      const remaining = estimatedMs.current - (Date.now() - startTime.current);
-      startProgressTimer(Math.max(remaining, 1000));
-      setStatus('playing');
-    } else if (hasWS()) {
-      window.speechSynthesis.resume();
-      setStatus('playing');
-    }
-  }, [startProgressTimer]);
+    audioRef.current?.play();
+    setStatus('playing');
+  }, []);
 
   const stop = useCallback(() => {
-    stopProgressTimer();
-    if (hasRV()) window.responsiveVoice.cancel();
-    else if (hasWS()) window.speechSynthesis.cancel();
+    clearTimer();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     setStatus('idle');
     setProgress(0);
-  }, [stopProgressTimer]);
+  }, []);
 
-  const supported = hasRV() || hasWS();
-
-  return { status, progress, play, pause, resume, stop, supported };
+  return { status, progress, play, pause, resume, stop, supported: true };
 }
