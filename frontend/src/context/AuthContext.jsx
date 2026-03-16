@@ -27,11 +27,11 @@ export function AuthProvider({ children }) {
 
   const register = async (email, password, name) => {
     try {
-      const res = await apiClient.post('/auth/register', { email, password, name });
-      if (res.data?.token) saveToken(res.data.token);
+      await apiClient.post('/auth/register', { email, password, name });
       return { success: true };
     } catch (err) {
-      return { success: false, error: err.response?.data?.message || 'Error al registrarse' };
+      const msg = err.response?.data?.error || err.response?.data?.message || 'Error al registrarse';
+      return { success: false, error: msg };
     }
   };
 
