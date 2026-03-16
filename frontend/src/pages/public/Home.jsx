@@ -54,7 +54,7 @@ function Hero() {
             </div>
             <div className="flex items-center gap-2 text-white/50 text-sm">
               <MapPin size={14} className="text-gold" />
-              <span>7a. Calle 12-66, Huehuetenango</span>
+              <span>7a. calle 12-66 zona 4, Carretera a Zaculeu, Huehuetenango</span>
             </div>
           </div>
         </div>

@@ -283,8 +283,8 @@ Integra automáticamente estilos de error con `react-hook-form` (acepta objeto `
 - Fondo `bg-navy` siempre oscuro
 - 4 columnas: Brand, Navegación, Contacto, Redes Sociales
 - Datos reales: Facebook `casadelreyhuehue`, Instagram `ig.casadelrey`
-- Tel: `+502 5426-0369`, Email: `info@casadelreyhuehue.com`
-- Dirección: 7a. Calle 12-66, Huehuetenango, Guatemala
+- Tel: `4760 0636` / WhatsApp: `+502 4760 0636`, Email: `casadelreyhuehue@gmail.com`
+- Dirección: 7a. calle 12-66 zona 4, Carretera a las Ruinas de Zaculeu, Huehuetenango, Guatemala
 
 ---
 

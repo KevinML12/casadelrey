@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Send } from 'lucide-react';
 import PageHero from '../../components/layout/PageHero';
 import Input from '../../components/ui/Input';
-import { Textarea } from '../../components/ui/Input';
+import { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
@@ -55,17 +55,13 @@ function VolunteerForm() {
       <Input label="Nombre completo" value={form.name} onChange={set('name')} required />
       <Input label="Correo electrónico" type="email" value={form.email} onChange={set('email')} required />
       <Input label="Teléfono" type="tel" value={form.phone} onChange={set('phone')} placeholder="Opcional" />
-      <div>
-        <label className="block text-sm font-medium text-ink mb-1.5">Área de interés</label>
-        <select
-          className="w-full rounded-md border border-line bg-transparent px-4 py-2.5 text-sm text-ink"
-          value={form.area}
-          onChange={(e) => setForm(p => ({ ...p, area: e.target.value }))}
-        >
-          <option value="">Selecciona un área</option>
-          {AREAS.map(a => <option key={a.title} value={a.title}>{a.title}</option>)}
-        </select>
-      </div>
+      <Select
+        label="Área de interés"
+        placeholder="Selecciona un área"
+        value={form.area}
+        onChange={(e) => setForm(p => ({ ...p, area: e.target.value }))}
+        options={AREAS.map(a => ({ value: a.title, label: a.title }))}
+      />
       <Textarea label="Mensaje" rows={3} value={form.message} onChange={set('message')} placeholder="Cuéntanos por qué quieres servir..." />
       <Button type="submit" variant="navy" size="lg" className="w-full" disabled={submitting}>
         {submitting ? 'Enviando...' : <>Enviar inscripción <Send size={14} /></>}

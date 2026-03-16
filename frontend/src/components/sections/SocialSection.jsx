@@ -4,6 +4,8 @@ import apiClient from '../../lib/apiClient';
 
 const FB_URL = 'https://www.facebook.com/casadelreyhuehue';
 const IG_URL = 'https://www.instagram.com/ig.casadelrey/';
+const X_URL = 'https://x.com/pastorleoneli';
+const TIKTOK_URL = 'https://www.tiktok.com/@leoneldeleongt';
 
 function getEmbedUrl(url, platform) {
   if (platform === 'instagram') {
@@ -33,7 +35,7 @@ export default function SocialSection({ title = 'Multimedia', showDirectAccess =
         </div>
 
         {showDirectAccess && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
             <a
               href={FB_URL}
               target="_blank"
@@ -64,6 +66,40 @@ export default function SocialSection({ title = 'Multimedia', showDirectAccess =
               </div>
               <ExternalLink size={18} className="text-ink-3 group-hover:text-purple-500 shrink-0" />
             </a>
+            <a
+              href={X_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-5 rounded-xl bg-black/10 border border-black/20 hover:bg-black/20 transition-colors group dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10"
+            >
+              <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center shrink-0 dark:bg-white">
+                <svg viewBox="0 0 24 24" className="w-6 h-6 text-white dark:text-black" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-ink">X</p>
+                <p className="text-sm text-ink-3">Síguenos en X</p>
+              </div>
+              <ExternalLink size={18} className="text-ink-3 group-hover:text-ink shrink-0" />
+            </a>
+            <a
+              href={TIKTOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-5 rounded-xl bg-black/10 border border-black/20 hover:bg-black/20 transition-colors group dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10"
+            >
+              <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-ink">TikTok</p>
+                <p className="text-sm text-ink-3">Videos y contenido</p>
+              </div>
+              <ExternalLink size={18} className="text-ink-3 group-hover:text-ink shrink-0" />
+            </a>
           </div>
         )}
 
@@ -77,7 +113,7 @@ export default function SocialSection({ title = 'Multimedia', showDirectAccess =
           <div className="text-center py-16 rounded-2xl bg-card border border-line">
             <p className="text-ink-3 text-sm">Aún no hay publicaciones. Síguenos en redes para ver el contenido.</p>
             {showDirectAccess && (
-              <div className="flex justify-center gap-4 mt-6">
+              <div className="flex flex-wrap justify-center gap-3 mt-6">
                 <a href={FB_URL} target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1877F2] text-white text-sm font-medium hover:opacity-90">
                   <Facebook size={18} /> Facebook
@@ -85,6 +121,20 @@ export default function SocialSection({ title = 'Multimedia', showDirectAccess =
                 <a href={IG_URL} target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium hover:opacity-90">
                   <Instagram size={18} /> Instagram
+                </a>
+                <a href={X_URL} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white text-sm font-medium hover:opacity-90 dark:bg-white dark:text-black">
+                  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  X
+                </a>
+                <a href={TIKTOK_URL} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white text-sm font-medium hover:opacity-90">
+                  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                  </svg>
+                  TikTok
                 </a>
               </div>
             )}
