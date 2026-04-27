@@ -14,6 +14,28 @@ import (
 	"gorm.io/gorm"
 )
 
+// Departamentos válidos de voluntariado.
+var Departments = []string{
+	"alabanza",
+	"danza",
+	"servidores",
+	"protocolo",
+	"pancartas",
+	"maestros_ninos",
+	"tecnicos_audiovisuales",
+	"multimedia",
+	"oracion",
+	"logistica",
+}
+
+var validDepartments = func() map[string]bool {
+	m := make(map[string]bool)
+	for _, d := range Departments {
+		m[d] = true
+	}
+	return m
+}()
+
 // VolunteerHandler maneja inscripciones de voluntariado.
 type VolunteerHandler struct {
 	DB *gorm.DB
@@ -26,11 +48,11 @@ func NewVolunteerHandler(db *gorm.DB) *VolunteerHandler {
 // Register POST /api/v1/volunteer/register — público, inscripción de interés.
 func (h *VolunteerHandler) Register(c echo.Context) error {
 	var req struct {
-		Name    string `json:"name"`
-		Email   string `json:"email"`
-		Phone   string `json:"phone"`
-		Area    string `json:"area"`
-		Message string `json:"message"`
+		Name       string `json:"name"`
+		Email      string `json:"email"`
+		Phone      string `json:"phone"`
+		Department string `json:"department"`
+		Message    string `json:"message"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -38,24 +60,34 @@ func (h *VolunteerHandler) Register(c echo.Context) error {
 	if req.Name == "" || req.Email == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nombre y email son requeridos."})
 	}
+	if req.Department != "" && !validDepartments[req.Department] {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Departamento no válido."})
+	}
 
 	v := models.Volunteer{
-		Name:    req.Name,
-		Email:   req.Email,
-		Phone:   req.Phone,
-		Area:    req.Area,
-		Message: req.Message,
-		Status:  "pendiente",
+		Name:       req.Name,
+		Email:      req.Email,
+		Phone:      req.Phone,
+		Department: req.Department,
+		Message:    req.Message,
+		Status:     "pendiente",
 	}
 	if err := h.DB.Create(&v).Error; err != nil {
 		log.Printf("[Volunteer] Error al guardar: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo registrar. Intenta de nuevo."})
 	}
 
-	log.Printf("[Volunteer] Inscripción: %s (%s)", v.Name, v.Email)
+	log.Printf("[Volunteer] Inscripción: %s (%s) → %s", v.Name, v.Email, v.Department)
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "¡Gracias por tu interés! El equipo se comunicará contigo pronto.",
 		"id":      v.ID,
+	})
+}
+
+// GetDepartments GET /api/v1/volunteer/departments — público, lista de departamentos.
+func (h *VolunteerHandler) GetDepartments(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"departments": Departments,
 	})
 }
 
@@ -66,6 +98,13 @@ func (h *VolunteerHandler) GetAll(c echo.Context) error {
 	if role, _ := c.Get("user_role").(string); role == "leader" {
 		uid, _ := c.Get("user_id").(uint)
 		q = q.Where("assigned_leader_id = ?", uid)
+	}
+
+	if dept := c.QueryParam("department"); dept != "" {
+		q = q.Where("department = ?", dept)
+	}
+	if status := c.QueryParam("status"); status != "" {
+		q = q.Where("status = ?", status)
 	}
 
 	var list []models.Volunteer
@@ -102,7 +141,7 @@ func (h *VolunteerHandler) Assign(c echo.Context) error {
 	return c.JSON(http.StatusOK, v)
 }
 
-// CreateUserFromVolunteer POST /api/v1/admin/volunteers/:id/create-user — admin o líder crea usuario desde voluntario.
+// CreateUserFromVolunteer POST /api/v1/admin/volunteers/:id/create-user
 func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 	id := c.Param("id")
 	var req struct {
@@ -120,7 +159,6 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Voluntario no encontrado."})
 	}
 
-	// Si es líder, solo puede crear usuario de voluntarios asignados a él
 	if role, _ := c.Get("user_role").(string); role == "leader" {
 		uid, _ := c.Get("user_id").(uint)
 		if v.AssignedLeaderID == nil || *v.AssignedLeaderID != uid {
@@ -135,7 +173,6 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 
 	hashedPassword, err := auth.HashPassword(req.Password)
 	if err != nil {
-		log.Printf("[Volunteer] Error al hashear contraseña: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al procesar la contraseña."})
 	}
 
@@ -146,12 +183,11 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 		Name:                    v.Name,
 		Email:                   v.Email,
 		Password:                hashedPassword,
-		Role:                    "member",
+		Role:                    "volunteer",
 		VerificationToken:       &verificationToken,
 		VerificationTokenExpiry: &verificationExpiry,
 	}
 	if err := h.DB.Create(&user).Error; err != nil {
-		log.Printf("[Volunteer] Error al crear usuario: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear el usuario."})
 	}
 
@@ -165,7 +201,7 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 	h.DB.Save(&v)
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"message": "Usuario creado. Se envió correo de verificación al voluntario.",
+		"message": "Usuario creado. Se envió correo de verificación.",
 		"user": map[string]interface{}{
 			"id":    user.ID,
 			"name":  user.Name,

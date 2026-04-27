@@ -97,12 +97,13 @@ func (h *BlogHandler) GetAllPosts(c echo.Context) error {
 // Crea un nuevo post de blog. El author_id se toma del JWT, no del body.
 func (h *BlogHandler) CreatePost(c echo.Context) error {
 	type CreatePostRequest struct {
-		Title      string `json:"title"`
-		Slug       string `json:"slug"`
-		Content    string `json:"content"`
-		CoverImage string `json:"cover_image"`
-		Excerpt    string `json:"excerpt"`
-		Status     string `json:"status"` // "draft" | "published"
+		Title       string `json:"title"`
+		Slug        string `json:"slug"`
+		Content     string `json:"content"`
+		CoverImage  string `json:"cover_image"`
+		Excerpt     string `json:"excerpt"`
+		RedirectURL string `json:"redirect_url"`
+		Status      string `json:"status"` // "draft" | "published"
 	}
 
 	req := new(CreatePostRequest)
@@ -112,9 +113,9 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 		})
 	}
 
-	if req.Title == "" || req.Slug == "" || req.Content == "" {
+	if req.Title == "" || req.Slug == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Título, slug y contenido son requeridos.",
+			"error": "Título y slug son requeridos.",
 		})
 	}
 
@@ -137,13 +138,14 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 	}
 
 	post := models.Post{
-		Title:      req.Title,
-		Slug:       req.Slug,
-		Content:    req.Content,
-		CoverImage: req.CoverImage,
-		Excerpt:    req.Excerpt,
-		AuthorID:   userID,
-		Status:     req.Status,
+		Title:       req.Title,
+		Slug:        req.Slug,
+		Content:     req.Content,
+		CoverImage:  req.CoverImage,
+		Excerpt:     req.Excerpt,
+		RedirectURL: req.RedirectURL,
+		AuthorID:    userID,
+		Status:      req.Status,
 	}
 
 	if result := h.DB.Create(&post); result.Error != nil {
@@ -166,12 +168,13 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 // Actualiza los campos de un post existente. Solo actualiza los campos enviados.
 func (h *BlogHandler) UpdatePost(c echo.Context) error {
 	type UpdatePostRequest struct {
-		Title      string `json:"title"`
-		Slug       string `json:"slug"`
-		Content    string `json:"content"`
-		CoverImage string `json:"cover_image"`
-		Excerpt    string `json:"excerpt"`
-		Status     string `json:"status"`
+		Title       string `json:"title"`
+		Slug        string `json:"slug"`
+		Content     string `json:"content"`
+		CoverImage  string `json:"cover_image"`
+		Excerpt     string `json:"excerpt"`
+		RedirectURL string `json:"redirect_url"`
+		Status      string `json:"status"`
 	}
 
 	// Parsear el ID del post desde la URL
@@ -210,9 +213,10 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 	if req.Status == "draft" || req.Status == "published" {
 		post.Status = req.Status
 	}
-	// Siempre actualizar cover_image y excerpt (pueden ser cadena vacía para borrar)
-	post.CoverImage = req.CoverImage
-	post.Excerpt    = req.Excerpt
+	// Siempre actualizar estos campos (pueden ser cadena vacía para borrar)
+	post.CoverImage  = req.CoverImage
+	post.Excerpt     = req.Excerpt
+	post.RedirectURL = req.RedirectURL
 
 	if req.Slug != "" && req.Slug != post.Slug {
 		var other models.Post

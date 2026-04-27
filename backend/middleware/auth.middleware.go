@@ -88,7 +88,7 @@ func AdminMiddleware() echo.MiddlewareFunc {
 	}
 }
 
-// AdminOrLeaderMiddleware permite admin o leader (células, reportes).
+// AdminOrLeaderMiddleware permite admin o leader (células, reportes, boletas).
 func AdminOrLeaderMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -96,6 +96,21 @@ func AdminOrLeaderMiddleware() echo.MiddlewareFunc {
 			if role != "admin" && role != "leader" {
 				return c.JSON(http.StatusForbidden, map[string]string{
 					"error": "Acceso denegado. Se requiere rol de administrador o líder.",
+				})
+			}
+			return next(c)
+		}
+	}
+}
+
+// VolunteerMiddleware permite admin, leader o volunteer.
+func VolunteerMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			role, _ := c.Get("user_role").(string)
+			if role != "admin" && role != "leader" && role != "volunteer" {
+				return c.JSON(http.StatusForbidden, map[string]string{
+					"error": "Acceso denegado.",
 				})
 			}
 			return next(c)

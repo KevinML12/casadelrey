@@ -102,8 +102,9 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 	if err := c.Bind(&req); err != nil || req.Role == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Se requiere el campo 'role'."})
 	}
-	if req.Role != "member" && req.Role != "leader" && req.Role != "admin" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader o admin."})
+	validRoles := map[string]bool{"member": true, "leader": true, "volunteer": true, "admin": true}
+	if !validRoles[req.Role] {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader, volunteer o admin."})
 	}
 	if result := h.DB.Model(&models.User{}).Where("id = ?", id).Update("role", req.Role); result.Error != nil || result.RowsAffected == 0 {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
@@ -145,13 +146,14 @@ func (h *AdminHandler) CreateUser(c echo.Context) error {
 	if role == "" {
 		role = "member"
 	}
-	if role != "member" && role != "leader" && role != "admin" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader o admin."})
+	validRoles2 := map[string]bool{"member": true, "leader": true, "volunteer": true, "admin": true}
+	if !validRoles2[role] {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader, volunteer o admin."})
 	}
-	// Solo admin puede crear líderes o admins
+	// Solo admin puede crear líderes, voluntarios o admins
 	if role != "member" {
 		if r, _ := c.Get("user_role").(string); r != "admin" {
-			return c.JSON(http.StatusForbidden, map[string]string{"error": "Solo un administrador puede crear líderes o admins."})
+			return c.JSON(http.StatusForbidden, map[string]string{"error": "Solo un administrador puede asignar este rol."})
 		}
 	}
 

@@ -62,16 +62,16 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		// Es idempotente: seguro de ejecutar en cada arranque del servidor.
 		log.Println("[DB] Ejecutando AutoMigrate...")
 		if err := db.AutoMigrate(
-			&models.User{},       // Tabla: users
-			&models.Post{},       // Tabla: posts
-			&models.Petition{},   // Tabla: petitions (peticiones de oración)
-			&models.Donation{},   // Tabla: donations (donaciones registradas)
-			&models.PayPalOrder{}, // Tabla: paypal_orders (órdenes pendientes)
-			&models.Event{},       // Tabla: events (eventos de la iglesia)
-			&models.CellReport{},  // Tabla: cell_reports (reportes de células)
-			&models.UserGoal{},    // Tabla: user_goals (metas personales)
-			&models.Volunteer{},   // Tabla: volunteers (inscripciones voluntariado)
-			&models.SocialPost{},  // Tabla: social_posts (FB/IG para feed)
+			&models.User{},         // users
+			&models.Post{},         // posts (blog + enlaces a redes)
+			&models.Petition{},     // petitions (peticiones de oración)
+			&models.Donation{},     // donations (pagos locales)
+			&models.Event{},        // events
+			&models.CellReport{},   // cell_reports (reportes expandidos de células)
+			&models.UserGoal{},     // user_goals (metas personales)
+			&models.Volunteer{},    // volunteers (departamentos)
+			&models.SocialPost{},   // social_posts (FB/IG feed)
+			&models.MemberBoleta{}, // member_boletas (fichas de nuevos)
 		); err != nil {
 			connectErr = err
 			return
