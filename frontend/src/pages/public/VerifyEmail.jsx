@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { MailCheck } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const [status, setStatus] = useState('loading'); // loading | success | error
+  const [status,  setStatus]  = useState('loading');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -15,51 +14,46 @@ export default function VerifyEmail() {
       setMessage('Falta el token de verificación.');
       return;
     }
-
-    apiClient
-      .get('/auth/verify-email', { params: { token } })
-      .then((res) => {
+    apiClient.get('/auth/verify-email', { params: { token } })
+      .then(res => {
         setStatus('success');
         setMessage(res.data?.message || 'Correo verificado correctamente.');
       })
-      .catch((err) => {
+      .catch(err => {
         setStatus('error');
         setMessage(err.response?.data?.error || 'Token inválido o expirado.');
       });
   }, [token]);
 
+  const iconMap = {
+    loading: { icon: 'hourglass_empty', cls: 'bg-surf-high text-on-surf-var' },
+    success: { icon: 'mark_email_read',  cls: 'bg-ter-con text-on-ter-con' },
+    error:   { icon: 'error',            cls: 'bg-err-con text-on-err-con' },
+  };
+  const { icon, cls } = iconMap[status];
+
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-6">
-      <div className="w-full max-w-sm text-center">
+    <div className="min-h-screen bg-surf flex items-center justify-center p-6">
+      <div className="w-full max-w-sm text-center animate-fade-in">
         <div className="mb-8">
-          <div
-            className={`w-16 h-16 rounded-xl border flex items-center justify-center mx-auto mb-5 ${
-              status === 'success'
-                ? 'bg-green-500/10 border-green-500/30 text-green-600'
-                : status === 'error'
-                  ? 'bg-red-500/10 border-red-500/30 text-red-600'
-                  : 'bg-card-2 border-line text-ink-2'
-            }`}
-          >
-            <MailCheck size={32} />
+          <div className={`w-16 h-16 rounded-xl border border-outline-var flex items-center justify-center mx-auto mb-5 ${cls}`}>
+            <span className={`ms ${status === 'loading' ? 'animate-spin' : ''}`} style={{ fontSize: 32 }}>{icon}</span>
           </div>
-          <h1 className="text-2xl font-black text-ink mb-2">
+          <h1 className="text-headline-s text-on-surf font-black mb-2">
             {status === 'loading' && 'Verificando...'}
             {status === 'success' && '¡Correo verificado!'}
-            {status === 'error' && 'Error'}
+            {status === 'error'   && 'Error de verificación'}
           </h1>
-          <p className="text-ink-3 text-sm">
+          <p className="text-body-m text-on-surf-var">
             {status === 'loading' && 'Un momento, por favor.'}
-            {status === 'success' && message}
-            {status === 'error' && message}
+            {(status === 'success' || status === 'error') && message}
           </p>
         </div>
 
         {(status === 'success' || status === 'error') && (
-          <Link
-            to="/login"
-            className="inline-block px-6 py-3 rounded-lg bg-navy text-white font-semibold hover:opacity-90 transition"
-          >
+          <Link to="/login"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
+            <span className="ms" style={{ fontSize: 18 }}>login</span>
             Ir a iniciar sesión
           </Link>
         )}

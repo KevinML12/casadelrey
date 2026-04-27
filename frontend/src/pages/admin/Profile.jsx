@@ -1,61 +1,64 @@
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { User, Mail, Shield } from 'lucide-react';
 import Button from '../../components/ui/Button';
 
 export default function Profile() {
   const { user } = useAuth();
-
   const soon = () => toast('Próximamente disponible');
+
+  const initial = (user?.name || user?.email || '?')[0].toUpperCase();
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-black text-ink mb-8">Mi Perfil</h1>
+      <h1 className="text-headline-s text-on-surf font-black mb-8">Mi Perfil</h1>
 
-      {/* Avatar */}
+      {/* Avatar + info */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-14 h-14 rounded-xl bg-blue/10 flex items-center justify-center">
-          <span className="text-blue font-black text-xl">
-            {(user?.name || user?.email || '?')[0].toUpperCase()}
-          </span>
+        <div className="w-14 h-14 rounded-full bg-pri-con flex items-center justify-center shrink-0">
+          <span className="text-on-pri-con text-headline-s font-black">{initial}</span>
         </div>
         <div>
-          <p className="font-bold text-ink">{user?.name || 'Sin nombre'}</p>
-          <p className="text-sm text-ink-3">{user?.email}</p>
-          <p className="text-xs text-ink-3 capitalize mt-0.5">{user?.role || 'usuario'}</p>
+          <p className="text-title-l text-on-surf font-bold">{user?.name || 'Sin nombre'}</p>
+          <p className="text-body-s text-on-surf-var">{user?.email}</p>
+          <p className="text-label-s text-on-surf-var capitalize mt-0.5">{user?.role || 'usuario'}</p>
         </div>
       </div>
 
-      {/* Info */}
-      <div className="bg-card border border-line rounded-xl overflow-hidden mb-6">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-line">
-          <Mail size={15} className="text-ink-3" />
-          <div>
-            <p className="text-xs text-ink-3 font-medium">Correo electrónico</p>
-            <p className="text-sm text-ink font-medium mt-0.5">{user?.email || '—'}</p>
+      {/* Info list */}
+      <div className="bg-surf-low border border-outline-var rounded-xl overflow-hidden mb-6">
+        {[
+          { icon: 'mail',   label: 'Correo electrónico', value: user?.email || '—' },
+          { icon: 'shield', label: 'Rol',                value: user?.role || 'usuario', capitalize: true },
+        ].map(({ icon, label, value, capitalize }) => (
+          <div key={label} className="flex items-center gap-3 px-5 py-4 border-b border-outline-var last:border-0">
+            <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>{icon}</span>
+            <div>
+              <p className="text-label-s text-on-surf-var font-medium">{label}</p>
+              <p className={`text-body-s text-on-surf font-medium mt-0.5 ${capitalize ? 'capitalize' : ''}`}>{value}</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-line">
-          <Shield size={15} className="text-ink-3" />
-          <div>
-            <p className="text-xs text-ink-3 font-medium">Rol</p>
-            <p className="text-sm text-ink font-medium mt-0.5 capitalize">{user?.role || 'usuario'}</p>
-          </div>
-        </div>
+        ))}
         <div className="flex items-center gap-3 px-5 py-4">
-          <User size={15} className="text-ink-3" />
+          <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>person</span>
           <div>
-            <p className="text-xs text-ink-3 font-medium">Estado de cuenta</p>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-ok/10 text-ok mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-ok" /> Activa
+            <p className="text-label-s text-on-surf-var font-medium">Estado de cuenta</p>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-label-s font-medium bg-ter-con text-on-ter-con mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-ter" />
+              Activa
             </span>
           </div>
         </div>
       </div>
 
       <div className="flex gap-3">
-        <Button variant="secondary" onClick={soon}>Editar perfil</Button>
-        <Button variant="ghost" onClick={soon}>Cambiar contraseña</Button>
+        <Button variant="tonal" onClick={soon}>
+          <span className="ms" style={{ fontSize: 16 }}>edit</span>
+          Editar perfil
+        </Button>
+        <Button variant="outlined" onClick={soon}>
+          <span className="ms" style={{ fontSize: 16 }}>lock</span>
+          Cambiar contraseña
+        </Button>
       </div>
     </div>
   );

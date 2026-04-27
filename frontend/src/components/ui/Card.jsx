@@ -1,7 +1,27 @@
-export default function Card({ children, className = '', ...props }) {
+/**
+ * M3 Card — https://m3.material.io/components/cards
+ *
+ * variant: 'elevated' | 'filled' | 'outlined'
+ */
+
+const variants = {
+  elevated:
+    'surf-1 shadow-elev-1 hover:shadow-elev-2 hover:-translate-y-0.5 ' +
+    'transition-[box-shadow,transform] duration-200 ' +
+    'relative overflow-hidden ' +
+    'before:content-[""] before:absolute before:inset-0 before:bg-on-surf ' +
+    'before:opacity-0 before:transition-opacity before:duration-150 ' +
+    'hover:before:opacity-[.08]',
+  filled:
+    'bg-surf-high',
+  outlined:
+    'bg-surf border border-outline-var',
+};
+
+export default function Card({ variant = 'elevated', className = '', children, ...props }) {
   return (
     <div
-      className={`bg-card border border-line rounded-xl shadow-card p-6 ${className}`}
+      className={`rounded-md overflow-hidden ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -9,21 +29,33 @@ export default function Card({ children, className = '', ...props }) {
   );
 }
 
-export function CardHeader({ children, className = '', ...props }) {
+export function CardMedia({ src, alt = '', height = 160, children, className = '' }) {
+  if (src) {
+    return (
+      <img
+        src={src} alt={alt}
+        className={`w-full object-cover ${className}`}
+        style={{ height }}
+      />
+    );
+  }
   return (
-    <div className={`pb-4 mb-4 border-b border-line ${className}`} {...props}>
+    <div
+      className={`w-full flex items-center justify-center ${className}`}
+      style={{ height }}
+    >
       {children}
     </div>
   );
 }
 
-export function CardContent({ children, className = '', ...props }) {
-  return <div className={className} {...props}>{children}</div>;
+export function CardContent({ children, className = '' }) {
+  return <div className={`p-4 ${className}`}>{children}</div>;
 }
 
-export function CardFooter({ children, className = '', ...props }) {
+export function CardActions({ children, className = '' }) {
   return (
-    <div className={`pt-4 mt-4 border-t border-line flex items-center gap-3 ${className}`} {...props}>
+    <div className={`flex items-center gap-2 px-3 pb-3 pt-0 ${className}`}>
       {children}
     </div>
   );

@@ -1,122 +1,195 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MessageSquare, Heart, BookOpen, Calendar, Clock, MapPin, ChevronRight, HandHelping } from 'lucide-react';
-import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+import Chip from '../../components/ui/Chip';
+import Card, { CardMedia, CardContent, CardActions } from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 import apiClient from '../../lib/apiClient';
-import SocialSection from '../../components/sections/SocialSection';
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
+// ─── Hero ────────────────────────────────────────────────────────────────────
 
 function Hero() {
   return (
-    <section className="relative min-h-[90vh] bg-navy flex items-center overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.06]"
-        style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-navy-d via-navy to-navy-l opacity-80" />
+    <section className="hero-surf relative min-h-[92vh] flex items-center overflow-hidden">
+      <div className="hero-grid" />
 
-      <div className="relative z-10 container mx-auto px-6 py-24 md:py-32">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-white/5 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-            <span className="text-white/70 text-xs font-medium tracking-widest uppercase">Huehuetenango, Guatemala</span>
-          </div>
+      {/* Glow izquierdo */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          left: -200, bottom: -200,
+          width: 700, height: 700,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(21,101,192,.2) 0%, transparent 65%)',
+        }}
+      />
 
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-none tracking-tight mb-6">
-            Casa<br />
-            <span className="text-gold">del Rey</span>
-          </h1>
+      {/* Logo decorativo fondo */}
+      <img
+        src="/logo.png"
+        aria-hidden="true"
+        className="absolute pointer-events-none select-none"
+        style={{
+          right: -40, top: '50%',
+          transform: 'translateY(-50%)',
+          width: 'clamp(280px, 38vw, 500px)',
+          opacity: .06,
+          filter: 'brightness(0) invert(1)',
+        }}
+      />
 
-          <p className="text-white/60 text-lg md:text-xl max-w-lg leading-relaxed mb-10">
-            Una familia que camina junta en la fe. Aquí encontrarás comunidad, propósito y el amor de Dios.
-          </p>
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-20 w-full">
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/register"
-              className="group inline-flex items-center gap-2 px-7 py-3.5 bg-gold text-white font-bold rounded-md hover:bg-gold-d transition-colors shadow-gold-glow">
-              Únete a la comunidad
-              <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link to="/events"
-              className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/20 text-white font-medium rounded-md hover:bg-white/5 transition-colors">
-              Ver próximos eventos
-            </Link>
-          </div>
+        {/* Chip de ubicación */}
+        <Chip
+          color="default"
+          icon="location_on"
+          className="mb-6 border-white/10 text-white/60"
+          style={{ background: 'rgba(255,255,255,.06)' }}
+        >
+          Huehuetenango, Guatemala
+        </Chip>
 
-          {/* Horario destacado */}
-          <div className="flex flex-wrap gap-x-8 gap-y-3 mt-12 pt-10 border-t border-white/10">
-            <div className="flex items-center gap-2 text-white/50 text-sm">
-              <Clock size={14} className="text-gold" />
-              <span>Domingos 10:00 AM</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/50 text-sm">
-              <Clock size={14} className="text-gold" />
-              <span>Miércoles 7:00 PM</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/50 text-sm">
-              <MapPin size={14} className="text-gold" />
-              <span>7a. calle 12-66 zona 4, Carretera a Zaculeu, Huehuetenango</span>
-            </div>
-          </div>
+        {/* Display Large */}
+        <h1 className="text-display-l text-white mb-2">
+          Casa<br />
+          <span style={{ color: '#A4C8FF' }}>del Rey</span>
+        </h1>
+
+        <p className="text-body-l italic mb-4" style={{ color: 'rgba(255,255,255,.45)' }}>
+          "Luz para las Naciones"
+        </p>
+
+        <p className="text-body-l max-w-[460px] mb-10" style={{ color: 'rgba(255,255,255,.55)', lineHeight: 1.75 }}>
+          Iglesia cristiana de restauración familiar. Una comunidad que camina junta en la fe, haciendo discípulos a las naciones.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-wrap gap-3 mb-12">
+          <Button
+            as="link" to="/register" size="lg"
+            className="font-bold"
+            style={{ background: '#A4C8FF', color: '#003063' }}
+          >
+            <span className="ms" style={{ fontSize: 20 }}>group_add</span>
+            Únete a la comunidad
+          </Button>
+          <Button
+            as="link" to="/events" size="lg" variant="outlined"
+            style={{ background: 'rgba(255,255,255,.06)', color: '#fff', borderColor: 'rgba(255,255,255,.2)' }}
+          >
+            <span className="ms" style={{ fontSize: 20 }}>calendar_month</span>
+            Próximos eventos
+          </Button>
         </div>
+
+        {/* Horarios */}
+        <div
+          className="flex flex-wrap gap-5 pt-6 mb-10 border-t"
+          style={{ borderColor: 'rgba(255,255,255,.08)' }}
+        >
+          {[
+            { icon: 'schedule', label: 'Domingos 10:00 AM' },
+            { icon: 'schedule', label: 'Miércoles 7:00 PM' },
+            { icon: 'location_on', label: '7a. calle 12-66 zona 4, Huehuetenango' },
+          ].map(({ icon, label }) => (
+            <div key={label} className="flex items-center gap-2 text-body-s" style={{ color: 'rgba(255,255,255,.45)' }}>
+              <span className="ms" style={{ fontSize: 18, color: '#A4C8FF' }}>{icon}</span>
+              {label}
+            </div>
+          ))}
+        </div>
+
+        {/* Stats */}
+        <div className="flex flex-wrap gap-2.5">
+          {[
+            { value: '200+', label: 'Familias' },
+            { value: '20+',  label: 'Células activas' },
+            { value: '90+',  label: 'Voluntarios' },
+            { value: '10 años', label: 'Sirviendo' },
+          ].map(({ value, label }) => (
+            <div
+              key={label}
+              className="rounded-xl px-5 py-4"
+              style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)' }}
+            >
+              <div className="text-display-s text-white" style={{ fontSize: '1.875rem' }}>{value}</div>
+              <div className="text-label-m mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>{label}</div>
+            </div>
+          ))}
+        </div>
+
       </div>
     </section>
   );
 }
 
-// ─── Ministerios ──────────────────────────────────────────────────────────────
+// ─── Ministerios ─────────────────────────────────────────────────────────────
 
 const AREAS = [
-  { icon: BookOpen,      label: 'Enseñanzas',   desc: 'Mensajes y reflexiones que nutren tu fe cada semana.',      to: '/blog' },
-  { icon: Calendar,      label: 'Eventos',       desc: 'Sunday Service, Primicias, retiros y más. Vive con nosotros.', to: '/events' },
-  { icon: MessageSquare, label: 'Oración',       desc: 'Comparte tu carga. Una comunidad entera intercede contigo.', to: '/prayer' },
-  { icon: HandHelping,   label: 'Voluntariado',  desc: 'Sirve con tus talentos y haz la diferencia en la comunidad.', to: '/volunteering' },
-  { icon: Heart,         label: 'Donaciones',     desc: 'Tu generosidad equipa ministerios y transforma familias.',  to: '/donate' },
+  { icon: 'menu_book',         label: 'Enseñanzas',   desc: 'Mensajes y reflexiones que nutren tu fe cada semana.',        to: '/blog' },
+  { icon: 'calendar_month',    label: 'Eventos',       desc: 'Sunday Service, Primicias, retiros y más. Vive con nosotros.', to: '/events' },
+  { icon: 'volunteer_activism',label: 'Oración',       desc: 'Comparte tu carga. Una comunidad entera intercede contigo.',   to: '/prayer' },
+  { icon: 'handshake',         label: 'Voluntariado',  desc: 'Sirve con tus talentos y haz la diferencia.',                 to: '/volunteering' },
+  { icon: 'favorite',          label: 'Donaciones',    desc: 'Tu generosidad equipa ministerios y transforma familias.',    to: '/donate' },
 ];
 
 function Ministerios() {
   return (
-    <section className="py-24 bg-bg">
-      <div className="container mx-auto px-6">
-        <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+    <section className="py-[72px] bg-surf">
+      <div className="max-w-[1200px] mx-auto px-6">
+
+        <div className="flex justify-between items-end mb-9">
           <div>
-            <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-2">¿Qué hacemos?</p>
-            <h2 className="text-4xl font-black text-ink leading-tight">
+            <Chip color="secondary" icon="star" className="mb-3">¿Qué hacemos?</Chip>
+            <h2 className="text-headline-l text-on-surf">
               Todo lo que necesitas,<br />en un solo lugar
             </h2>
           </div>
-          <Link to="/about" className="text-sm font-medium text-ink-2 hover:text-ink flex items-center gap-1.5 shrink-0">
-            Conócenos <ArrowRight size={14} />
-          </Link>
-        </Reveal>
+          <Button as="link" to="/about" variant="text">
+            Conócenos
+            <span className="ms" style={{ fontSize: 18 }}>arrow_forward</span>
+          </Button>
+        </div>
 
-        <RevealList className="divide-y divide-line">
-          {AREAS.map(({ icon: Icon, label, desc, to }) => (
-            <RevealItem key={to}>
-              <Link to={to}
-                className="group flex items-center justify-between py-6 hover:pl-2 transition-all duration-200">
-                <div className="flex items-center gap-5">
-                  <div className="w-10 h-10 rounded-lg bg-card-2 border border-line flex items-center justify-center shrink-0 group-hover:border-blue/30 group-hover:bg-blue/5 transition-colors">
-                    <Icon size={18} className="text-ink-3 group-hover:text-blue transition-colors" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-ink group-hover:text-blue transition-colors">{label}</h3>
-                    <p className="text-sm text-ink-3 leading-snug mt-0.5">{desc}</p>
-                  </div>
-                </div>
-                <ArrowRight size={16} className="text-ink-3 group-hover:text-blue group-hover:translate-x-0.5 transition-all shrink-0 ml-4" />
-              </Link>
-            </RevealItem>
+        {/* M3 List en Card outlined */}
+        <div className="rounded-xl border border-outline-var overflow-hidden bg-surf">
+          {AREAS.map(({ icon, label, desc, to }, i) => (
+            <Link
+              key={to}
+              to={to}
+              className={
+                'flex items-center gap-4 px-4 py-3 ' +
+                'relative overflow-hidden cursor-pointer ' +
+                'before:content-[""] before:absolute before:inset-0 before:bg-on-surf ' +
+                'before:opacity-0 before:transition-opacity before:duration-150 ' +
+                'hover:before:opacity-[.08] transition-colors ' +
+                (i > 0 ? 'border-t border-outline-var' : '')
+              }
+            >
+              {/* Leading icon container */}
+              <div className="leading-icon shrink-0">
+                <span className="ms">{icon}</span>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-title-m text-on-surf">{label}</p>
+                <p className="text-body-s text-on-surf-var mt-0.5">{desc}</p>
+              </div>
+
+              <span className="ms text-outline shrink-0" style={{ fontSize: 20 }}>chevron_right</span>
+            </Link>
           ))}
-        </RevealList>
+        </div>
+
       </div>
     </section>
   );
 }
 
-// ─── Últimas enseñanzas (datos reales) ───────────────────────────────────────
+// ─── Últimas enseñanzas ───────────────────────────────────────────────────────
 
-function UltimasEnseñanzas() {
-  const [posts,   setPosts]   = useState([]);
+function UltimasEnsenanzas() {
+  const [posts, setPosts]     = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -127,69 +200,76 @@ function UltimasEnseñanzas() {
   }, []);
 
   if (loading) return (
-    <section className="py-20 bg-bg-2">
-      <div className="container mx-auto px-6">
-        <div className="h-8 bg-card-2 rounded w-48 mb-4 animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {[0,1,2].map(i => (
-            <div key={i} className="bg-card rounded-xl h-60 animate-pulse" />
+    <section className="py-[72px]" style={{ background: 'var(--surf-low)' }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="h-8 bg-surf-high rounded w-48 mb-4 animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="bg-surf-high rounded-md h-64 animate-pulse" />
           ))}
         </div>
       </div>
     </section>
   );
 
-  if (posts.length === 0) return null;
+  if (!posts.length) return null;
+
+  const gradients = [
+    'linear-gradient(160deg,#060E30 0%,#1565C0 100%)',
+    'linear-gradient(160deg,#0D1B5E 0%,#1A2E7A 100%)',
+    'linear-gradient(160deg,#1565C0 0%,#006399 100%)',
+  ];
 
   return (
-    <section className="py-24 bg-bg-2">
-      <div className="container mx-auto px-6">
-        <Reveal className="flex items-end justify-between mb-10">
-          <div>
-            <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-2">Palabra de Dios</p>
-            <h2 className="text-3xl font-black text-ink">Últimas enseñanzas</h2>
-          </div>
-          <Link to="/blog" className="text-sm font-medium text-ink-2 hover:text-ink flex items-center gap-1.5">
-            Ver todo <ChevronRight size={14} />
-          </Link>
-        </Reveal>
+    <section className="py-[72px]" style={{ background: 'var(--surf-low)' }}>
+      <div className="max-w-[1200px] mx-auto px-6">
 
-        <RevealList className="grid grid-cols-1 md:grid-cols-3 gap-5" stagger={0.06}>
-          {posts.map(post => (
-            <RevealItem key={post.ID}>
-              <Link to={`/blog/${post.slug}`}
-                className="group block bg-card border border-line rounded-xl overflow-hidden hover:-translate-y-0.5 hover:shadow-card-hover transition-all duration-200">
-                {post.cover_image ? (
-                  <img src={post.cover_image} alt={post.title} className="w-full h-40 object-cover" />
-                ) : (
-                  <div className="w-full h-40 bg-navy-gradient flex items-center justify-center">
-                    <BookOpen size={28} className="text-gold/40" />
-                  </div>
-                )}
-                <div className="p-5">
-                  <h3 className="font-bold text-ink text-sm mb-2 leading-snug group-hover:text-blue transition-colors line-clamp-2">
+        <div className="flex justify-between items-end mb-9">
+          <div>
+            <Chip color="primary" icon="auto_stories" className="mb-3">Palabra de Dios</Chip>
+            <h2 className="text-headline-m text-on-surf">Últimas enseñanzas</h2>
+          </div>
+          <Button as="link" to="/blog" variant="text">
+            Ver todo <span className="ms" style={{ fontSize: 18 }}>arrow_forward</span>
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {posts.map((post, i) => (
+            <Link key={post.ID} to={`/blog/${post.slug}`}>
+              <Card variant="elevated" className="rounded-md h-full">
+                <CardMedia height={160} style={{ background: gradients[i % 3] }}>
+                  <span className="ms" style={{ fontSize: 48, color: 'rgba(255,255,255,.15)' }}>menu_book</span>
+                </CardMedia>
+                <CardContent>
+                  <p className="text-label-s text-pri mb-2">
+                    {post.category || 'Enseñanza'}
+                  </p>
+                  <p className="text-title-m text-on-surf mb-2 line-clamp-2 leading-snug">
                     {post.title}
-                  </h3>
-                  <p className="text-xs text-ink-3 leading-relaxed line-clamp-2">
+                  </p>
+                  <p className="text-body-s text-on-surf-var line-clamp-2">
                     {post.excerpt || post.content?.replace(/<[^>]+>/g, '').substring(0, 100)}
                   </p>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-medium text-blue">
-                    Leer <ArrowRight size={11} />
-                  </div>
-                </div>
-              </Link>
-            </RevealItem>
+                </CardContent>
+                <CardActions>
+                  <Button variant="text" size="sm" as="span">
+                    Leer <span className="ms" style={{ fontSize: 16 }}>arrow_forward</span>
+                  </Button>
+                </CardActions>
+              </Card>
+            </Link>
           ))}
-        </RevealList>
+        </div>
       </div>
     </section>
   );
 }
 
-// ─── Próximos eventos (datos reales) ─────────────────────────────────────────
+// ─── Próximos eventos ─────────────────────────────────────────────────────────
 
 function ProximosEventos() {
-  const [events,  setEvents]  = useState([]);
+  const [events, setEvents]   = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -199,79 +279,79 @@ function ProximosEventos() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading || events.length === 0) return null;
+  if (loading || !events.length) return null;
 
   return (
-    <section className="py-24 bg-bg">
-      <div className="container mx-auto px-6">
-        <Reveal className="flex items-end justify-between mb-10">
-          <div>
-            <p className="text-gold font-semibold text-sm uppercase tracking-widest mb-2">Agenda</p>
-            <h2 className="text-3xl font-black text-ink">Próximos eventos</h2>
-          </div>
-          <Link to="/events" className="text-sm font-medium text-ink-2 hover:text-ink flex items-center gap-1.5">
-            Ver todos <ChevronRight size={14} />
-          </Link>
-        </Reveal>
+    <section className="py-[72px] bg-surf">
+      <div className="max-w-[1200px] mx-auto px-6">
 
-        <RevealList className="space-y-3" stagger={0.07}>
-          {events.map(ev => (
-            <RevealItem key={ev.ID}>
-              <div className="bg-card border border-line rounded-xl px-5 py-4 flex items-center gap-5 hover:border-blue/20 transition-colors">
-                {/* Fecha */}
-                {ev.date && (
-                  <div className="shrink-0 w-14 h-14 rounded-xl bg-navy flex flex-col items-center justify-center text-white">
-                    <span className="text-xs font-bold text-gold uppercase">
-                      {new Date(ev.date + 'T12:00:00').toLocaleDateString('es-ES', { month: 'short' })}
+        <div className="flex justify-between items-end mb-9">
+          <div>
+            <Chip color="secondary" icon="event" className="mb-3">Agenda</Chip>
+            <h2 className="text-headline-m text-on-surf">Próximos eventos</h2>
+          </div>
+          <Button as="link" to="/events" variant="text">
+            Ver todos <span className="ms" style={{ fontSize: 18 }}>arrow_forward</span>
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          {events.map(ev => {
+            const d = ev.date ? new Date(ev.date + 'T12:00:00') : null;
+            return (
+              <Card key={ev.ID} variant="elevated" className="rounded-xl p-4 flex items-center gap-4">
+                {/* Avatar de fecha */}
+                {d && (
+                  <div className="w-[52px] h-[52px] rounded-md bg-sec-con flex flex-col items-center justify-center shrink-0">
+                    <span className="text-label-s text-pri" style={{ fontSize: '.625rem' }}>
+                      {d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()}
                     </span>
-                    <span className="text-xl font-black leading-none">
-                      {new Date(ev.date + 'T12:00:00').getDate()}
+                    <span className="text-headline-s text-on-sec-con font-black" style={{ fontSize: '1.25rem', lineHeight: 1 }}>
+                      {d.getDate()}
                     </span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-ink">{ev.title}</p>
+                  <p className="text-title-m text-on-surf">{ev.title}</p>
                   {ev.location && (
-                    <p className="text-sm text-ink-3 flex items-center gap-1.5 mt-0.5">
-                      <MapPin size={12} className="shrink-0" /> {ev.location}
+                    <p className="text-body-s text-on-surf-var flex items-center gap-1 mt-1">
+                      <span className="ms" style={{ fontSize: 14 }}>location_on</span>
+                      {ev.location}
                     </p>
                   )}
-                  {ev.description && (
-                    <p className="text-xs text-ink-3 mt-1 line-clamp-1">{ev.description}</p>
-                  )}
                 </div>
-                <Link to="/events" className="shrink-0 text-xs font-medium text-blue hover:underline">
-                  Ver más
-                </Link>
-              </div>
-            </RevealItem>
-          ))}
-        </RevealList>
+                <Button as="link" to="/events" variant="tonal" size="sm">Ver más</Button>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
 }
 
-// ─── Oración CTA ──────────────────────────────────────────────────────────────
+// ─── CTA Oración ─────────────────────────────────────────────────────────────
 
 function OracionCTA() {
   return (
-    <section className="py-24 bg-bg-2">
-      <div className="container mx-auto px-6">
-        <Reveal className="max-w-2xl">
-          <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-3">Estamos aquí</p>
-          <h2 className="text-4xl md:text-5xl font-black text-ink mb-5 leading-tight">
+    <section className="py-[72px]" style={{ background: 'var(--sec-con)' }}>
+      <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-10">
+
+        <div className="flex-1 min-w-[280px]">
+          <Chip color="primary" icon="volunteer_activism" className="mb-4">Estamos aquí</Chip>
+          <h2 className="text-display-s text-on-sec-con mb-4 leading-[1.2]">
             ¿Tienes una petición<br />de oración?
           </h2>
-          <p className="text-ink-2 text-lg leading-relaxed mb-8">
-            No estás solo. Nuestra comunidad ora por cada necesidad con amor y fe. Comparte tu petición y cientos de personas intercederán por ti esta semana.
+          <p className="text-body-l text-on-sec-con max-w-[460px]" style={{ opacity: .7, lineHeight: 1.75 }}>
+            No estás solo. Cientos de personas intercederán por ti esta semana con amor y fe genuina.
           </p>
-          <Link to="/prayer"
-            className="group inline-flex items-center gap-2 px-7 py-3.5 bg-navy text-white font-semibold rounded-md hover:bg-navy-d transition-colors">
-            Enviar petición de oración
-            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </Reveal>
+        </div>
+
+        <Button as="link" to="/prayer" variant="filled" size="lg" className="shrink-0">
+          <span className="ms" style={{ fontSize: 22 }}>send</span>
+          Enviar petición
+        </Button>
+
       </div>
     </section>
   );
@@ -281,31 +361,49 @@ function OracionCTA() {
 
 function Donaciones() {
   return (
-    <section className="py-24 bg-bg">
-      <div className="container mx-auto px-6">
-        <Reveal className="bg-navy rounded-2xl p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center gap-10">
-          <div className="flex-1">
-            <p className="text-gold font-bold text-xs uppercase tracking-widest mb-3">Siembra y Ofrenda</p>
-            <h2 className="text-4xl font-black text-white leading-tight mb-4">
+    <section className="py-[72px] bg-surf">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="hero-surf rounded-[28px] p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center gap-10 relative overflow-hidden">
+          <div className="hero-grid" />
+
+          <div className="relative z-10 flex-1 min-w-[280px]">
+            <Chip
+              icon="volunteer_activism"
+              className="mb-4 border-white/10 text-white/60"
+              style={{ background: 'rgba(255,255,255,.06)' }}
+            >
+              Siembra y Ofrenda
+            </Chip>
+            <h2 className="text-headline-l text-white mb-3 leading-[1.2]">
               Tu generosidad<br />transforma vidas
             </h2>
-            <p className="text-white/50 leading-relaxed text-sm max-w-sm">
-              Cada donación alimenta células, equipa ministerios y lleva la luz a comunidades que más lo necesitan.
+            <p className="text-body-m max-w-[360px]" style={{ color: 'rgba(255,255,255,.5)', lineHeight: 1.75 }}>
+              Cada donación alimenta células, equipa ministerios y lleva la luz a quienes más lo necesitan.
             </p>
           </div>
-          <div className="flex flex-col gap-3 w-full md:w-auto">
+
+          <div className="relative z-10 flex flex-col gap-2.5 min-w-[200px] w-full md:w-auto">
             {['Q50', 'Q100', 'Q250'].map(a => (
-              <Link key={a} to="/donate"
-                className="px-8 py-3 rounded-md border border-white/15 bg-white/5 text-white text-center font-bold hover:bg-white/10 hover:border-gold/40 transition-all">
+              <Button
+                key={a} as="link" to="/donate"
+                className="justify-center"
+                style={{ background: 'rgba(255,255,255,.07)', color: '#fff', borderColor: 'rgba(255,255,255,.12)' }}
+                variant="outlined"
+              >
                 {a}
-              </Link>
+              </Button>
             ))}
-            <Link to="/donate"
-              className="px-8 py-3 rounded-md bg-gold text-white font-bold text-center hover:bg-gold-d transition-colors shadow-gold-glow">
-              Donar ahora →
-            </Link>
+            <Button
+              as="link" to="/donate"
+              className="justify-center font-bold"
+              style={{ background: '#A4C8FF', color: '#003063' }}
+            >
+              <span className="ms" style={{ fontSize: 18 }}>favorite</span>
+              Donar ahora
+            </Button>
           </div>
-        </Reveal>
+
+        </div>
       </div>
     </section>
   );
@@ -318,10 +416,9 @@ export default function Home() {
     <>
       <Hero />
       <Ministerios />
-      <UltimasEnseñanzas />
+      <UltimasEnsenanzas />
       <ProximosEventos />
       <OracionCTA />
-      <SocialSection title="Lo último en redes" showDirectAccess />
       <Donaciones />
     </>
   );

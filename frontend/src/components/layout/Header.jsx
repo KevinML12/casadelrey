@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Menu, X, ChevronDown, LayoutDashboard, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import useDarkMode from '../../hooks/useDarkMode';
+import Button, { IconButton } from '../ui/Button';
 
 const NAV_LINKS = [
   { label: 'Conócenos',   to: '/about' },
@@ -10,32 +9,28 @@ const NAV_LINKS = [
   { label: 'Eventos',     to: '/events' },
   { label: 'Oración',     to: '/prayer' },
   { label: 'Voluntariado', to: '/volunteering' },
-  { label: 'Donaciones',  to: '/donate' },
 ];
-
-const activeCls = 'text-blue font-semibold';
-const navLinkCls = ({ isActive }) =>
-  `text-sm font-medium transition-colors hover:text-blue ${isActive ? activeCls : 'text-ink-2'}`;
 
 export default function Header() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
-  const { isDark, toggle } = useDarkMode();
-  const navigate = useNavigate();
-  const [menuOpen, setMenuOpen]       = useState(false);
-  const [dropOpen, setDropOpen]       = useState(false);
-  const [scrolled, setScrolled]       = useState(false);
+  const navigate   = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
+  const [theme, setTheme]       = useState(() => document.documentElement.dataset.theme || 'light');
   const dropRef = useRef(null);
 
-  // Detectar scroll para efecto de sombra
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  // Sync tema con el atributo del HTML
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    setTheme(next);
+  };
 
-  // Cerrar dropdown al hacer click fuera
+  // Cerrar dropdown al click fuera
   useEffect(() => {
-    const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
+    const handler = (e) => {
+      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
@@ -47,148 +42,192 @@ export default function Header() {
   };
 
   return (
-    <header
-      style={{ backgroundColor: 'var(--bg)', borderBottomColor: 'var(--line)' }}
-      className={`sticky top-0 z-40 border-b transition-all duration-200 ${scrolled ? 'shadow-sm' : ''}`}
-    >
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
+    // M3 Top App Bar — Surface level 2 (tinted)
+    <header className="surf-1 sticky top-0 z-40 border-b border-outline-var transition-colors duration-300">
+      <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between gap-4">
 
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0" onClick={() => setMenuOpen(false)}>
-          <div className="w-8 h-8 rounded-lg bg-navy flex items-center justify-center">
-            <span className="text-gold font-black text-sm leading-none">CR</span>
+        {/* ── Leading: Logo ─────────────────────────────────────── */}
+        <Link to="/" className="flex items-center shrink-0" onClick={() => setMenuOpen(false)}>
+          {/* Contenedor navy fijo — logo siempre blanco en ambos temas */}
+          <div className="rounded-lg px-2.5 py-1.5" style={{ background: '#0D1B5E' }}>
+            <img
+              src="/logo.png"
+              alt="Casa del Rey"
+              className="h-9 w-auto object-contain"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
           </div>
-          <span className="font-black text-ink tracking-tight text-base">Casa del Rey</span>
         </Link>
 
-        {/* Nav desktop */}
-        <nav className="hidden md:flex items-center gap-6">
-          {NAV_LINKS.map(l => (
-            <NavLink key={l.to} to={l.to} className={navLinkCls}>{l.label}</NavLink>
+        {/* ── Center: Nav links (desktop) ───────────────────────── */}
+        <nav className="hidden md:flex items-center gap-1">
+          {NAV_LINKS.map(({ label, to }) => (
+            <NavLink key={to} to={to}>
+              {({ isActive }) => (
+                <span
+                  className={
+                    'flex flex-col items-center gap-0.5 px-4 py-2 rounded-full ' +
+                    'text-label-l cursor-pointer relative overflow-hidden ' +
+                    'before:content-[""] before:absolute before:inset-0 before:bg-pri ' +
+                    'before:opacity-0 before:transition-opacity before:duration-150 ' +
+                    'hover:before:opacity-[.08] transition-colors duration-150 ' +
+                    (isActive ? 'text-on-surf font-semibold' : 'text-on-surf-var')
+                  }
+                >
+                  {label}
+                  {/* M3 active indicator */}
+                  {isActive && (
+                    <span className="w-6 h-0.5 rounded-full bg-pri" />
+                  )}
+                </span>
+              )}
+            </NavLink>
           ))}
         </nav>
 
-        {/* Acciones desktop */}
+        {/* ── Trailing: Actions (desktop) ───────────────────────── */}
         <div className="hidden md:flex items-center gap-2">
-          {/* Dark toggle */}
-          <button
-            onClick={toggle}
-            aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-2 hover:bg-card-2 hover:text-ink transition-colors"
-          >
-            {isDark
-              ? <Sun size={16} strokeWidth={2} />
-              : <Moon size={16} strokeWidth={2} />
-            }
-          </button>
+
+          {/* Dark/Light toggle — M3 Icon Button */}
+          <IconButton onClick={toggleTheme} aria-label="Cambiar tema">
+            <span className="ms" style={{ fontSize: 20 }}>
+              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+          </IconButton>
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              {/* Botón visible de panel admin */}
               {(isAdmin || user?.role === 'leader') && (
-                <Link to={isAdmin ? "/admin" : "/leader"}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy text-gold hover:bg-navy-d transition-colors">
-                  <LayoutDashboard size={13} /> {isAdmin ? 'Admin' : 'Panel líder'}
-                </Link>
+                <Button
+                  as="link"
+                  to={isAdmin ? '/admin' : '/leader'}
+                  variant="tonal"
+                  size="sm"
+                >
+                  <span className="ms" style={{ fontSize: 16 }}>dashboard</span>
+                  {isAdmin ? 'Admin' : 'Líderes'}
+                </Button>
               )}
 
-              {/* Avatar + dropdown */}
+              {/* Avatar dropdown */}
               <div className="relative" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
-                  className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-lg text-sm font-medium text-ink-2 hover:bg-card-2 hover:text-ink transition-all"
+                  className={
+                    'flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full ' +
+                    'text-label-l text-on-surf-var cursor-pointer ' +
+                    'relative overflow-hidden ' +
+                    'before:content-[""] before:absolute before:inset-0 before:bg-on-surf ' +
+                    'before:opacity-0 before:transition-opacity ' +
+                    'hover:before:opacity-[.08] transition-colors'
+                  }
                 >
-                  <div className="w-6 h-6 rounded-full bg-blue/10 flex items-center justify-center">
-                    <span className="text-blue text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-pri-con flex items-center justify-center shrink-0">
+                    <span className="text-on-pri-con text-label-m font-bold">
                       {(user?.name || user?.email || '?')[0].toUpperCase()}
                     </span>
                   </div>
-                  <ChevronDown size={14} className={`transition-transform ${dropOpen ? 'rotate-180' : ''}`} />
+                  <span className="ms" style={{ fontSize: 16, transition: 'transform .2s', transform: dropOpen ? 'rotate(180deg)' : '' }}>
+                    expand_more
+                  </span>
                 </button>
 
                 {dropOpen && (
-                  <div style={{ backgroundColor: 'var(--card)', borderColor: 'var(--line)' }}
-                    className="absolute right-0 top-full mt-2 w-48 border rounded-xl shadow-lg py-1 animate-fade-in z-50">
-                    <div className="px-4 py-2 border-b border-line">
-                      <p className="text-xs font-semibold text-ink truncate">{user?.name || 'Usuario'}</p>
-                      <p className="text-xs text-ink-3 truncate">{user?.email}</p>
+                  <div className="absolute right-0 top-full mt-2 w-48 surf-2 border border-outline-var rounded-xl shadow-elev-3 py-1 animate-fade-in z-50">
+                    <div className="px-4 py-2 border-b border-outline-var">
+                      <p className="text-title-s text-on-surf truncate">{user?.name || 'Usuario'}</p>
+                      <p className="text-body-s text-on-surf-var truncate">{user?.email}</p>
                     </div>
-                    {(isAdmin || user?.role === 'leader') && (
-                      <Link to={isAdmin ? "/admin" : "/leader"} onClick={() => setDropOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
-                        <LayoutDashboard size={14} /> {isAdmin ? 'Panel Admin' : 'Panel líder'}
-                      </Link>
-                    )}
-                    <Link to="/profile" onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-2 hover:bg-card-2 hover:text-ink transition-colors">
-                      <User size={14} /> Mi perfil
+                    <Link
+                      to="/profile"
+                      onClick={() => setDropOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-body-s text-on-surf-var hover:bg-on-surf/[.08] transition-colors"
+                    >
+                      <span className="ms" style={{ fontSize: 18 }}>person</span>
+                      Mi perfil
                     </Link>
-                    <div className="my-1 border-t border-line" />
-                    <button onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/5 transition-colors">
-                      <LogOut size={14} /> Cerrar sesión
+                    <div className="my-1 border-t border-outline-var" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-body-s text-err hover:bg-err/[.08] transition-colors"
+                    >
+                      <span className="ms" style={{ fontSize: 18 }}>logout</span>
+                      Cerrar sesión
                     </button>
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            <Link to="/login">
-              <button className="px-4 py-2 rounded-lg text-sm font-semibold bg-navy text-white hover:bg-navy-d transition-colors">
+            <div className="flex items-center gap-2">
+              <Button as="link" to="/login" variant="tonal" size="sm">
+                Donaciones
+              </Button>
+              <Button as="link" to="/login" variant="filled" size="sm">
+                <span className="ms" style={{ fontSize: 16 }}>login</span>
                 Ingresar
-              </button>
-            </Link>
+              </Button>
+            </div>
           )}
         </div>
 
-        {/* Mobile: toggle + hamburguesa */}
+        {/* ── Mobile: theme toggle + hamburger ──────────────────── */}
         <div className="flex md:hidden items-center gap-1">
-          <button
-            onClick={toggle}
-            aria-label={isDark ? 'Modo claro' : 'Modo oscuro'}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-2 hover:bg-card-2 transition-colors"
-          >
-            {isDark ? <Sun size={16} strokeWidth={2} /> : <Moon size={16} strokeWidth={2} />}
-          </button>
-          <button
-            onClick={() => setMenuOpen(p => !p)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-2 hover:bg-card-2 transition-all"
-          >
-            {menuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          <IconButton onClick={toggleTheme}>
+            <span className="ms" style={{ fontSize: 20 }}>
+              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+          </IconButton>
+          <IconButton onClick={() => setMenuOpen(p => !p)} aria-label="Menú">
+            <span className="ms" style={{ fontSize: 22 }}>
+              {menuOpen ? 'close' : 'menu'}
+            </span>
+          </IconButton>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* ── Mobile menu ─────────────────────────────────────────── */}
       {menuOpen && (
-        <div style={{ backgroundColor: 'var(--card)', borderTopColor: 'var(--line)' }} className="md:hidden border-t px-4 py-4 space-y-1 animate-slide-up">
-          {NAV_LINKS.map(l => (
-            <NavLink key={l.to} to={l.to} className={navLinkCls}
-              onClick={() => setMenuOpen(false)}>
-              <span className="block px-3 py-2.5">{l.label}</span>
+        <div className="md:hidden surf-2 border-t border-outline-var px-4 py-3 space-y-1 animate-slide-up">
+          {NAV_LINKS.map(({ label, to }) => (
+            <NavLink key={to} to={to} onClick={() => setMenuOpen(false)}>
+              {({ isActive }) => (
+                <span className={
+                  'flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l ' +
+                  (isActive ? 'bg-pri-con text-on-pri-con' : 'text-on-surf-var')
+                }>
+                  {label}
+                </span>
+              )}
             </NavLink>
           ))}
-          <div className="pt-2 border-t border-line mt-2">
+          <div className="pt-2 border-t border-outline-var mt-2 space-y-1">
             {isAuthenticated ? (
               <>
                 {(isAdmin || user?.role === 'leader') && (
-                  <Link to={isAdmin ? "/admin" : "/leader"} onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-ink-2 hover:text-ink">
-                    <LayoutDashboard size={15} /> {isAdmin ? 'Admin' : 'Panel líder'}
+                  <Link
+                    to={isAdmin ? '/admin' : '/leader'}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l text-on-surf-var"
+                  >
+                    <span className="ms" style={{ fontSize: 18 }}>dashboard</span>
+                    {isAdmin ? 'Admin' : 'Panel líder'}
                   </Link>
                 )}
-                <Link to="/profile" onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-ink-2 hover:text-ink">
-                  <User size={15} /> Mi perfil
-                </Link>
-                <button onClick={() => { handleLogout(); setMenuOpen(false); }}
-                  className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-err w-full text-left">
-                  <LogOut size={15} /> Cerrar sesión
+                <button
+                  onClick={() => { handleLogout(); setMenuOpen(false); }}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l text-err w-full text-left"
+                >
+                  <span className="ms" style={{ fontSize: 18 }}>logout</span>
+                  Cerrar sesión
                 </button>
               </>
             ) : (
-              <Link to="/login" onClick={() => setMenuOpen(false)}
-                className="block px-3 py-2.5 text-sm font-semibold text-blue">
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l text-pri font-semibold"
+              >
                 Ingresar
               </Link>
             )}

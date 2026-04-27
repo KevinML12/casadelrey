@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, Play, Pause, Square, Volume2, Loader2 } from 'lucide-react';
-import Card from '../../components/ui/Card';
 import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
 import useTTS from '../../hooks/useTTS';
 
 function Loader() {
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-blue animate-spin" />
+    <div className="min-h-screen bg-surf flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
     </div>
   );
 }
@@ -19,57 +17,76 @@ function TTSPlayer({ content }) {
   const { status, progress, play, pause, resume, stop, engine } = useTTS(plainText);
 
   const isPlaying = status === 'playing';
-  const isPaused = status === 'paused';
+  const isPaused  = status === 'paused';
   const isLoading = status === 'loading';
-  const isActive = isPlaying || isPaused || isLoading;
-  const isDone = status === 'done';
+  const isActive  = isPlaying || isPaused || isLoading;
+  const isDone    = status === 'done';
 
   return (
     <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-      isActive ? 'bg-navy border-navy-l shadow-lg' : 'bg-card-2 border-line'
-    }`}>
+      isActive ? 'border-outline-var' : 'border-outline-var bg-surf-low'
+    }`}
+    style={isActive ? { background: '#0D1B5E', borderColor: 'rgba(255,255,255,.1)' } : {}}>
       <div className="flex items-center gap-4 px-5 py-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-          isActive ? 'bg-white/10' : 'bg-blue/10'
-        }`}>
-          {isLoading ? <Loader2 size={22} className="text-gold animate-spin" /> : <Volume2 size={22} className={isActive ? 'text-gold' : 'text-blue'} />}
+          isActive ? '' : 'bg-pri-con'
+        }`}
+        style={isActive ? { background: 'rgba(255,255,255,.1)' } : {}}>
+          {isLoading
+            ? <span className="ms animate-spin" style={{ fontSize: 22, color: '#A4C8FF' }}>hourglass_empty</span>
+            : <span className="ms" style={{ fontSize: 22, color: isActive ? '#A4C8FF' : 'var(--on-pri-con)' }}>volume_up</span>
+          }
         </div>
+
         <div className="flex-1 min-w-0">
-          <p className={`font-semibold text-sm ${isActive ? 'text-white' : 'text-ink'}`}>
+          <p className={`text-title-s font-semibold ${isActive ? 'text-white' : 'text-on-surf'}`}>
             {isLoading ? 'Preparando…' : isPlaying ? 'Leyendo…' : isPaused ? 'Pausado' : isDone ? '✓ Completado' : 'Escuchar este post'}
           </p>
-          <p className={`text-xs mt-0.5 ${isActive ? 'text-white/50' : 'text-ink-3'}`}>
+          <p className={`text-label-s mt-0.5 ${isActive ? '' : 'text-on-surf-var'}`}
+            style={isActive ? { color: 'rgba(255,255,255,.5)' } : {}}>
             {isActive
               ? `Voz en español${engine ? ` · ${engine === 'elevenlabs' ? 'ElevenLabs' : engine === 'google-cloud' ? 'Google Cloud' : 'Google Translate'}` : ''}`
-              : engine ? `Motor: ${engine === 'elevenlabs' ? 'ElevenLabs (IA)' : engine === 'google-cloud' ? 'Google Cloud' : 'Google Translate'}` : 'El post se leerá en voz alta'}
+              : engine ? `Motor: ${engine === 'elevenlabs' ? 'ElevenLabs (IA)' : engine === 'google-cloud' ? 'Google Cloud' : 'Google Translate'}` : 'El post se leerá en voz alta'
+            }
           </p>
         </div>
+
         <div className="flex items-center gap-2 shrink-0">
           {(!isActive || isDone) && (
-            <button onClick={play} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue text-white text-sm font-semibold hover:bg-blue-d transition-colors">
-              <Play size={15} /> {isDone ? 'Repetir' : 'Escuchar'}
+            <button onClick={play}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
+              <span className="ms" style={{ fontSize: 16 }}>play_arrow</span>
+              {isDone ? 'Repetir' : 'Escuchar'}
             </button>
           )}
           {isPlaying && (
-            <button onClick={pause} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors">
-              <Pause size={14} /> Pausar
+            <button onClick={pause}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-label-m font-medium"
+              style={{ background: 'rgba(255,255,255,.1)', color: 'white' }}>
+              <span className="ms" style={{ fontSize: 16 }}>pause</span>
+              Pausar
             </button>
           )}
           {isPaused && (
-            <button onClick={resume} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-d transition-colors">
-              <Play size={14} /> Continuar
+            <button onClick={resume}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
+              <span className="ms" style={{ fontSize: 16 }}>play_arrow</span>
+              Continuar
             </button>
           )}
           {isActive && (
-            <button onClick={stop} title="Detener" className="w-9 h-9 rounded-lg bg-white/10 text-white/70 flex items-center justify-center hover:bg-white/20 transition-colors">
-              <Square size={13} />
+            <button onClick={stop} title="Detener"
+              className="w-9 h-9 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,.1)', color: 'rgba(255,255,255,.7)' }}>
+              <span className="ms" style={{ fontSize: 15 }}>stop</span>
             </button>
           )}
         </div>
       </div>
+
       {isActive && (
-        <div className="h-1 bg-white/10">
-          <div className="h-full bg-gold transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="h-1" style={{ background: 'rgba(255,255,255,.1)' }}>
+          <div className="h-full bg-pri transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
       )}
     </div>
@@ -79,30 +96,28 @@ function TTSPlayer({ content }) {
 function PostDetail({ post }) {
   return (
     <div className="max-w-2xl mx-auto">
-      <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink mb-8 transition-colors">
-        <ArrowLeft size={14} /> Volver al Blog
+      <Link to="/blog"
+        className="inline-flex items-center gap-1.5 text-label-m text-on-surf-var hover:text-on-surf mb-8 transition-colors">
+        <span className="ms" style={{ fontSize: 16 }}>arrow_back</span>
+        Volver al Blog
       </Link>
 
-      {/* Imagen de portada */}
       {post.cover_image && (
-        <img
-          src={post.cover_image}
-          alt={post.title}
-          className="w-full max-h-80 object-cover rounded-xl mb-8 border border-line"
-        />
+        <img src={post.cover_image} alt={post.title}
+          className="w-full max-h-80 object-cover rounded-xl mb-8 border border-outline-var" />
       )}
 
-      <p className="text-ink-3 text-xs flex items-center gap-1.5 mb-4">
-        <Calendar size={12} />
+      <p className="text-label-s text-on-surf-var flex items-center gap-1.5 mb-4">
+        <span className="ms" style={{ fontSize: 14 }}>calendar_today</span>
         {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
       </p>
-      <h1 className="text-4xl font-black text-ink leading-tight mb-6">{post.title}</h1>
+      <h1 className="text-headline-l text-on-surf font-black leading-tight mb-6">{post.title}</h1>
 
       <div className="mb-8">
         <TTSPlayer content={post.content} />
       </div>
 
-      <div className="prose max-w-full text-ink-2 leading-relaxed"
+      <div className="prose max-w-full leading-relaxed"
         dangerouslySetInnerHTML={{ __html: post.content }} />
     </div>
   );
@@ -111,40 +126,46 @@ function PostDetail({ post }) {
 function PostList({ posts }) {
   if (posts.length === 0) {
     return (
-      <Card className="text-center py-16">
-        <p className="text-ink-2">No hay publicaciones disponibles aún.</p>
-      </Card>
+      <div className="text-center py-24">
+        <div className="leading-icon mx-auto mb-4" style={{ width: 56, height: 56 }}>
+          <span className="ms" style={{ fontSize: 32 }}>article</span>
+        </div>
+        <p className="text-body-m text-on-surf-var">No hay publicaciones disponibles aún.</p>
+      </div>
     );
   }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {posts.map(p => (
         <Link key={p.ID} to={`/blog/${p.slug}`}>
-          <Card className="h-full flex flex-col hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden p-0">
-            {/* Imagen de portada de la tarjeta */}
+          <div className="h-full flex flex-col rounded-xl border border-outline-var bg-surf-low hover:shadow-elev-2 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             {p.cover_image ? (
               <img src={p.cover_image} alt={p.title} className="w-full h-44 object-cover" />
             ) : (
-              <div className="w-full h-44 bg-navy-gradient flex items-center justify-center">
-                <span className="text-gold font-black text-3xl opacity-30">CR</span>
+              <div className="w-full h-44 hero-surf flex items-center justify-center">
+                <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(255,255,255,.08)' }}>
+                  <img src="/logo.png" alt="Casa del Rey" className="h-12 w-auto object-contain"
+                    style={{ filter: 'brightness(0) invert(1)', opacity: 0.4 }} />
+                </div>
               </div>
             )}
             <div className="flex-1 flex flex-col p-5">
-              <h3 className="font-bold text-ink mb-2 hover:text-blue transition-colors leading-snug">
+              <h3 className="text-title-s text-on-surf font-semibold mb-2 leading-snug hover:text-pri transition-colors">
                 {p.title}
               </h3>
-              <p className="text-ink-3 text-sm leading-relaxed line-clamp-3 flex-1">
+              <p className="text-body-s text-on-surf-var leading-relaxed line-clamp-3 flex-1">
                 {p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 140)}
               </p>
-              <div className="pt-4 mt-4 border-t border-line flex items-center justify-between">
-                <span className="text-xs text-ink-3 flex items-center gap-1">
-                  <Calendar size={11} />
+              <div className="pt-4 mt-4 border-t border-outline-var flex items-center justify-between">
+                <span className="text-label-s text-on-surf-var flex items-center gap-1">
+                  <span className="ms" style={{ fontSize: 12 }}>calendar_today</span>
                   {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES') : ''}
                 </span>
-                <span className="text-xs font-medium text-blue">Leer →</span>
+                <span className="text-label-s text-pri font-medium">Leer →</span>
               </div>
             </div>
-          </Card>
+          </div>
         </Link>
       ))}
     </div>
@@ -182,26 +203,26 @@ export default function BlogPage() {
   if (loading) return <Loader />;
 
   if (error) return (
-    <main className="min-h-screen bg-bg">
-      <PageHero title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
-      <div className="container mx-auto px-6 py-24 text-center">
-        <p className="text-ink-3 text-sm">No se pudo conectar con el servidor. Asegúrate de que el backend está corriendo.</p>
+    <main className="min-h-screen bg-surf">
+      <PageHero icon="article" title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
+      <div className="max-w-[1200px] mx-auto px-6 py-24 text-center">
+        <p className="text-body-m text-on-surf-var">No se pudo conectar con el servidor. Asegúrate de que el backend está corriendo.</p>
       </div>
     </main>
   );
 
   if (slug && post) {
     return (
-      <main className="min-h-screen bg-bg py-16">
-        <div className="container mx-auto px-6"><PostDetail post={post} /></div>
+      <main className="min-h-screen bg-surf py-16">
+        <div className="max-w-[1200px] mx-auto px-6"><PostDetail post={post} /></div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-bg">
-      <PageHero title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
-      <div className="container mx-auto px-6 py-16"><PostList posts={posts} /></div>
+    <main className="min-h-screen bg-surf">
+      <PageHero icon="article" title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
+      <div className="max-w-[1200px] mx-auto px-6 py-16"><PostList posts={posts} /></div>
     </main>
   );
 }

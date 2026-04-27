@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, UserPlus, User, LogOut, Menu, X, Globe } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const NAV = [
-  { to: '/leader', icon: LayoutDashboard, label: 'Inicio', exact: true },
-  { to: '/leader/reports', icon: Users, label: 'Células' },
-  { to: '/leader/volunteers', icon: UserPlus, label: 'Voluntarios' },
-  { to: '/leader/profile', icon: User, label: 'Perfil' },
+  { to: '/leader',             icon: 'home',    label: 'Inicio',      exact: true },
+  { to: '/leader/reports',     icon: 'groups',  label: 'Células' },
+  { to: '/leader/volunteers',  icon: 'group_add', label: 'Voluntarios' },
+  { to: '/leader/profile',     icon: 'person',  label: 'Perfil' },
 ];
 
-function SidebarNav({ onClose }) {
+function SidebarContent({ onClose }) {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -23,53 +22,66 @@ function SidebarNav({ onClose }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-6 py-5 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-            <span className="text-gold font-black text-xs">CR</span>
+    <div className="flex flex-col h-full" style={{ background: '#0D1B5E' }}>
+      {/* Logo */}
+      <div className="px-5 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,.1)' }}>
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg px-2 py-1.5" style={{ background: 'rgba(255,255,255,.08)' }}>
+            <img src="/logo.png" alt="Casa del Rey" className="h-7 w-auto object-contain"
+              style={{ filter: 'brightness(0) invert(1)' }} />
           </div>
-          <span className="font-black text-white text-sm">Casa del Rey</span>
+          <div>
+            <p className="text-title-s text-white font-bold leading-tight">Casa del Rey</p>
+            <p className="text-label-s" style={{ color: 'rgba(255,255,255,.45)' }}>Panel Líder</p>
+          </div>
         </div>
-        <p className="text-white/40 text-xs mt-1">Panel líder</p>
       </div>
 
+      {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {NAV.map(({ to, icon: Icon, label, exact }) => (
+        {NAV.map(({ to, icon, label, exact }) => (
           <NavLink
             key={to}
             to={to}
             end={exact}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white'
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium transition-all duration-150 ${
+                isActive ? 'text-white' : 'hover:text-white'
               }`
             }
+            style={({ isActive }) => ({
+              background: isActive ? 'rgba(255,255,255,.12)' : 'transparent',
+              color: isActive ? '#FFFFFF' : 'rgba(255,255,255,.55)',
+            })}
           >
-            <Icon size={16} />
+            <span className="ms shrink-0" style={{ fontSize: 18 }}>{icon}</span>
             {label}
           </NavLink>
         ))}
       </nav>
 
-      <div className="px-3 pb-4 border-t border-white/10 pt-3 space-y-0.5">
+      {/* Footer */}
+      <div className="px-3 pb-4 pt-3 border-t space-y-0.5" style={{ borderColor: 'rgba(255,255,255,.1)' }}>
         <div className="px-3 py-2">
-          <p className="text-xs font-medium text-white/70 truncate">{user?.name || user?.email}</p>
-          <p className="text-xs text-white/30 truncate">{user?.email}</p>
+          <p className="text-label-l font-medium text-white truncate">{user?.name || user?.email}</p>
+          <p className="text-label-s truncate" style={{ color: 'rgba(255,255,255,.4)' }}>{user?.email}</p>
         </div>
         <Link
           to="/"
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white transition-colors"
           onClick={onClose}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium"
+          style={{ color: 'rgba(255,255,255,.55)' }}
         >
-          <Globe size={16} /> Ver sitio web
+          <span className="ms shrink-0" style={{ fontSize: 18 }}>public</span>
+          Ver sitio web
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium text-err transition-colors hover:bg-err/10"
         >
-          <LogOut size={16} /> Cerrar sesión
+          <span className="ms shrink-0" style={{ fontSize: 18 }}>logout</span>
+          Cerrar sesión
         </button>
       </div>
     </div>
@@ -80,20 +92,23 @@ export default function LeaderLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-bg overflow-hidden">
-      <aside className="hidden md:flex w-56 shrink-0 bg-navy flex-col">
-        <SidebarNav />
+    <div className="flex h-screen bg-surf overflow-hidden">
+      <aside className="hidden md:flex w-60 shrink-0 flex-col">
+        <SidebarContent />
       </aside>
 
       <div className="flex flex-col flex-1 min-w-0">
-        <div className="md:hidden h-14 bg-navy border-b border-white/10 flex items-center px-4 gap-3 shrink-0">
-          <button onClick={() => setDrawerOpen(true)} className="text-white/70 hover:text-white transition-colors">
-            <Menu size={20} />
+        <div className="md:hidden h-14 border-b border-outline-var flex items-center px-4 gap-3 shrink-0 surf-1">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="text-on-surf-var hover:text-on-surf transition-colors"
+          >
+            <span className="ms" style={{ fontSize: 22 }}>menu</span>
           </button>
-          <span className="font-bold text-white text-sm">Panel líder</span>
+          <span className="text-title-s text-on-surf font-semibold">Panel Líder</span>
         </div>
 
-        <main className="flex-1 overflow-y-auto bg-bg">
+        <main className="flex-1 overflow-y-auto bg-surf">
           <Outlet />
         </main>
       </div>
@@ -101,13 +116,17 @@ export default function LeaderLayout() {
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setDrawerOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-56 bg-navy z-50 md:hidden animate-slide-up">
-            <div className="flex justify-end p-3">
-              <button onClick={() => setDrawerOpen(false)} className="text-white/60 hover:text-white">
-                <X size={18} />
+          <div className="fixed inset-y-0 left-0 w-60 z-50 md:hidden animate-slide-up">
+            <div className="absolute top-3 right-3 z-10">
+              <button
+                onClick={() => setDrawerOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,.1)', color: 'rgba(255,255,255,.7)' }}
+              >
+                <span className="ms" style={{ fontSize: 16 }}>close</span>
               </button>
             </div>
-            <SidebarNav onClose={() => setDrawerOpen(false)} />
+            <SidebarContent onClose={() => setDrawerOpen(false)} />
           </div>
         </>
       )}

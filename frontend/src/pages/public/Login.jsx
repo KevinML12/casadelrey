@@ -7,9 +7,9 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
 export default function Login() {
-  const [email, setEmail]     = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading]  = useState(false);
+  const [loading, setLoading]   = useState(false);
   const { login } = useAuth();
   const navigate  = useNavigate();
 
@@ -29,31 +29,69 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex">
-      {/* Panel izquierdo — decorativo, solo desktop */}
-      <div className="hidden lg:flex w-1/2 bg-navy items-center justify-center p-16 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.06]"
-          style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
-        <div className="relative text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-6">
-            <span className="text-gold font-black text-2xl">CR</span>
+    <div className="min-h-screen bg-surf flex">
+
+      {/* ── Panel izquierdo — decorativo, solo desktop ──────────── */}
+      <div className="hidden lg:flex w-1/2 hero-surf items-center justify-center p-16 relative overflow-hidden">
+        <div className="hero-grid" />
+
+        {/* Glow */}
+        <div className="absolute pointer-events-none" style={{
+          left: -100, bottom: -100, width: 500, height: 500,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(21,101,192,.25) 0%, transparent 65%)',
+        }} />
+
+        <div className="relative z-10 text-center">
+          {/* Logo sobre contenedor navy */}
+          <div className="inline-block rounded-xl px-6 py-4 mb-8" style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)' }}>
+            <img
+              src="/logo.png"
+              alt="Casa del Rey"
+              className="h-24 w-auto object-contain mx-auto"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
           </div>
-          <h2 className="text-4xl font-black text-white leading-tight mb-4">
+
+          <h2 className="text-display-s text-white mb-4 leading-tight">
             Casa del<br />
-            <span className="text-gold">Rey</span>
+            <span style={{ color: '#A4C8FF' }}>Rey</span>
           </h2>
-          <p className="text-white/50 text-sm leading-relaxed max-w-xs">
+          <p className="text-body-m" style={{ color: 'rgba(255,255,255,.5)' }}>
             Luz para las naciones.<br />Amor para cada vida.
           </p>
+
+          {/* Stats pequeños */}
+          <div className="flex gap-4 justify-center mt-10">
+            {[['200+', 'Familias'], ['20+', 'Células'], ['90+', 'Voluntarios']].map(([v, l]) => (
+              <div key={l} className="text-center">
+                <div className="text-headline-s text-white font-black">{v}</div>
+                <div className="text-label-m mt-0.5" style={{ color: 'rgba(255,255,255,.4)' }}>{l}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Panel derecho — formulario */}
+      {/* ── Panel derecho — formulario ───────────────────────────── */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-sm animate-fade-in">
+
+          {/* Logo mobile */}
+          <div className="flex justify-center mb-8 lg:hidden">
+            <div className="rounded-lg px-3 py-2" style={{ background: '#0D1B5E' }}>
+              <img
+                src="/logo.png"
+                alt="Casa del Rey"
+                className="h-10 w-auto object-contain"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
+            </div>
+          </div>
+
           <div className="mb-8">
-            <h1 className="text-2xl font-black text-ink mb-1">Inicia sesión</h1>
-            <p className="text-ink-3 text-sm">Ingresa a tu cuenta de Casa del Rey</p>
+            <h1 className="text-headline-s text-on-surf font-black mb-1">Inicia sesión</h1>
+            <p className="text-body-m text-on-surf-var">Ingresa a tu cuenta de Casa del Rey</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,34 +100,49 @@ export default function Login() {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
+              placeholder="tu@correo.com"
               required
             />
+
             <div>
               <Input
                 label="Contraseña"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
                 required
               />
-              <div className="mt-1.5 text-right">
-                <Link to="/forgot-password" className="text-xs text-ink-3 hover:text-blue transition-colors">
+              <div className="mt-2 text-right">
+                <Link to="/forgot-password" className="text-label-m text-pri hover:underline">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
             </div>
 
-            <Button type="submit" variant="navy" size="lg" className="w-full" disabled={loading}>
-              {loading ? 'Ingresando...' : 'Ingresar'}
+            <Button
+              type="submit"
+              variant="filled"
+              size="lg"
+              className="w-full justify-center mt-2"
+              disabled={loading}
+            >
+              {loading
+                ? <><span className="ms" style={{ fontSize: 18 }}>hourglass_empty</span>Ingresando...</>
+                : <><span className="ms" style={{ fontSize: 18 }}>login</span>Ingresar</>
+              }
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-ink-3">
+          <p className="mt-6 text-center text-body-s text-on-surf-var">
             ¿No tienes cuenta?{' '}
-            <Link to="/register" className="text-blue font-medium hover:underline">Regístrate</Link>
+            <Link to="/register" className="text-pri font-semibold hover:underline">
+              Regístrate
+            </Link>
           </p>
         </div>
       </div>
+
     </div>
   );
 }

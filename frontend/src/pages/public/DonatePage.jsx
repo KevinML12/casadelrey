@@ -1,50 +1,57 @@
 import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
-import { Heart, Shield, Globe, BookOpen } from 'lucide-react';
 
 const IMPACT = [
-  { icon: Heart,    title: 'Células',   desc: 'Equipando líderes de casa en cada barrio' },
-  { icon: Globe,    title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
-  { icon: BookOpen, title: 'Educación', desc: 'Materiales y estudios bíblicos gratuitos' },
-  { icon: Shield,   title: 'Familias',  desc: 'Apoyo integral a familias en necesidad' },
+  { icon: 'groups',     title: 'Células',   desc: 'Equipando líderes de casa en cada barrio' },
+  { icon: 'public',     title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
+  { icon: 'menu_book',  title: 'Educación', desc: 'Materiales y estudios bíblicos gratuitos' },
+  { icon: 'family_restroom', title: 'Familias', desc: 'Apoyo integral a familias en necesidad' },
 ];
 
 export default function DonatePage() {
   return (
-    <main className="min-h-screen bg-bg">
-      <PageHero icon={Heart} title="Tu Generosidad Transforma" subtitle="Cada quetzal sembrado con fe produce fruto eterno." />
+    <main className="min-h-screen bg-surf">
+      <PageHero icon="volunteer_activism" title="Tu Generosidad Transforma"
+        subtitle="Cada quetzal sembrado con fe produce fruto eterno." />
 
-      <div className="container mx-auto px-6 py-16">
+      <div className="max-w-[1200px] mx-auto px-6 py-16">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
           {/* Destinos */}
           <div>
-            <h2 className="text-2xl font-black text-ink mb-6">¿A dónde va tu donación?</h2>
+            <h2 className="text-headline-s text-on-surf font-black mb-6">¿A dónde va tu donación?</h2>
             <div className="space-y-3 mb-8">
-              {IMPACT.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="flex items-start gap-4 p-4 rounded-lg bg-card border border-line dark:border-transparent hover:border-blue/20 dark:hover:bg-card-2 transition-colors">
-                  <div className="w-10 h-10 rounded-lg bg-blue/5 flex items-center justify-center shrink-0">
-                    <Icon size={18} className="text-blue" />
+              {IMPACT.map(({ icon, title, desc }) => (
+                <div key={title}
+                  className="flex items-start gap-4 p-4 rounded-xl bg-surf-low border border-outline-var hover:shadow-elev-1 transition-all">
+                  <div className="leading-icon shrink-0">
+                    <span className="ms" style={{ fontSize: 20 }}>{icon}</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink text-sm">{title}</h3>
-                    <p className="text-xs text-ink-3 mt-0.5">{desc}</p>
+                    <h3 className="text-title-s text-on-surf font-semibold">{title}</h3>
+                    <p className="text-body-s text-on-surf-var mt-0.5">{desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <blockquote className="p-5 rounded-xl bg-navy border border-white/10">
-              <p className="text-white/70 text-sm italic leading-relaxed mb-2">
-                "El que siembra escasamente, también segará escasamente; y el que siembra generosamente, generosamente también segará."
-              </p>
-              <cite className="text-gold text-xs font-semibold not-italic">— 2 Corintios 9:6</cite>
-            </blockquote>
+            {/* Versículo */}
+            <div className="hero-surf rounded-2xl p-6 relative overflow-hidden">
+              <div className="hero-grid" />
+              <blockquote className="relative z-10">
+                <p className="text-body-m italic leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,.75)' }}>
+                  "El que siembra escasamente, también segará escasamente; y el que siembra generosamente, generosamente también segará."
+                </p>
+                <cite className="text-label-m font-semibold not-italic" style={{ color: '#A4C8FF' }}>
+                  — 2 Corintios 9:6
+                </cite>
+              </blockquote>
+            </div>
           </div>
 
           {/* Formulario */}
-          <div className="bg-card border border-line dark:border-transparent rounded-2xl shadow-card p-7">
-            <h2 className="text-xl font-black text-ink mb-5">Haz tu donación</h2>
+          <div className="bg-surf-low border border-outline-var rounded-2xl shadow-elev-1 p-7">
+            <h2 className="text-title-l text-on-surf font-black mb-5">Registra tu donación</h2>
             <DonationCard />
           </div>
         </div>

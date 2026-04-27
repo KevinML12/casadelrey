@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ArrowRight, Send } from 'lucide-react';
 import PageHero from '../../components/layout/PageHero';
 import Input from '../../components/ui/Input';
 import { Textarea, Select } from '../../components/ui/Input';
@@ -8,18 +7,18 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 
 const AREAS = [
-  { title: 'Equipo de Bienvenida',    desc: 'Recibe a cada persona con calidez y haz que se sienta en casa desde el primer momento.' },
-  { title: 'Ministerio de Niños',     desc: 'Enseña e inspira a los más pequeños con creatividad y amor.' },
-  { title: 'Equipo de Producción',    desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.' },
-  { title: 'Grupos de Conexión',      desc: 'Facilita espacios donde las personas construyen comunidad y amistad real.' },
-  { title: 'Equipo de Alcance',       desc: 'Lleva el amor de Dios a la comunidad a través de servicio práctico y evangelismo.' },
-  { title: 'Ministerio de Oración',   desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
+  { icon: 'waving_hand',     title: 'Equipo de Bienvenida',   desc: 'Recibe a cada persona con calidez y haz que se sienta en casa desde el primer momento.' },
+  { icon: 'child_care',      title: 'Ministerio de Niños',    desc: 'Enseña e inspira a los más pequeños con creatividad y amor.' },
+  { icon: 'spatial_audio',   title: 'Equipo de Producción',   desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.' },
+  { icon: 'group',           title: 'Grupos de Conexión',     desc: 'Facilita espacios donde las personas construyen comunidad y amistad real.' },
+  { icon: 'volunteer_activism', title: 'Equipo de Alcance',   desc: 'Lleva el amor de Dios a la comunidad a través de servicio práctico y evangelismo.' },
+  { icon: 'self_improvement', title: 'Ministerio de Oración', desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
 ];
 
 function VolunteerForm() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', area: '', message: '' });
+  const [form,       setForm]       = useState({ name: '', email: '', phone: '', area: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sent,       setSent]       = useState(false);
 
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -36,35 +35,38 @@ function VolunteerForm() {
       toast.success('¡Gracias! Nos comunicaremos contigo pronto.');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al enviar. Intenta de nuevo.');
-    } finally {
-      setSubmitting(false);
-    }
+    } finally { setSubmitting(false); }
   };
 
   if (sent) {
     return (
-      <div className="text-center py-6 bg-green-500/10 border border-green-500/20 rounded-xl">
-        <p className="text-green-700 dark:text-green-400 font-medium">¡Inscripción recibida!</p>
-        <p className="text-ink-3 text-sm mt-1">Nuestro equipo se pondrá en contacto contigo.</p>
+      <div className="text-center py-8 bg-ter-con border border-outline-var rounded-xl animate-fade-in">
+        <span className="ms text-on-ter-con mb-3 block" style={{ fontSize: 40 }}>check_circle</span>
+        <p className="text-title-s text-on-ter-con font-semibold">¡Inscripción recibida!</p>
+        <p className="text-body-s text-on-ter-con/80 mt-1">Nuestro equipo se pondrá en contacto contigo.</p>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Input label="Nombre completo" value={form.name} onChange={set('name')} required />
+      <Input label="Nombre completo" value={form.name}  onChange={set('name')}  required />
       <Input label="Correo electrónico" type="email" value={form.email} onChange={set('email')} required />
       <Input label="Teléfono" type="tel" value={form.phone} onChange={set('phone')} placeholder="Opcional" />
       <Select
         label="Área de interés"
         placeholder="Selecciona un área"
         value={form.area}
-        onChange={(e) => setForm(p => ({ ...p, area: e.target.value }))}
+        onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
         options={AREAS.map(a => ({ value: a.title, label: a.title }))}
       />
-      <Textarea label="Mensaje" rows={3} value={form.message} onChange={set('message')} placeholder="Cuéntanos por qué quieres servir..." />
-      <Button type="submit" variant="navy" size="lg" className="w-full" disabled={submitting}>
-        {submitting ? 'Enviando...' : <>Enviar inscripción <Send size={14} /></>}
+      <Textarea label="Mensaje" rows={3} value={form.message} onChange={set('message')}
+        placeholder="Cuéntanos por qué quieres servir..." />
+      <Button type="submit" variant="filled" size="lg" className="w-full justify-center" disabled={submitting}>
+        {submitting
+          ? <><span className="ms" style={{ fontSize: 18 }}>hourglass_empty</span>Enviando...</>
+          : <><span className="ms" style={{ fontSize: 18 }}>send</span>Enviar inscripción</>
+        }
       </Button>
     </form>
   );
@@ -72,30 +74,38 @@ function VolunteerForm() {
 
 export default function VolunteeringPage() {
   return (
-    <main className="min-h-screen bg-bg">
-      <PageHero title="Voluntariado" subtitle="Sirve con tus talentos y haz la diferencia en la comunidad." />
+    <main className="min-h-screen bg-surf">
+      <PageHero icon="handshake" title="Voluntariado" subtitle="Sirve con tus talentos y haz la diferencia en la comunidad." />
 
-      <div className="container mx-auto px-6 py-16">
+      <div className="max-w-[1200px] mx-auto px-6 py-16">
         <div className="max-w-3xl mx-auto">
-          <p className="text-blue font-semibold text-sm uppercase tracking-widest mb-3">Áreas de Servicio</p>
-          <h2 className="text-3xl font-black text-ink mb-10">¿Dónde quieres servir?</h2>
 
-          <div className="divide-y divide-line border border-line rounded-xl overflow-hidden mb-12">
-            {AREAS.map(({ title, desc }) => (
-              <div key={title} className="flex items-start justify-between gap-4 p-5 bg-card hover:bg-card-2 transition-colors">
-                <div>
-                  <h3 className="font-bold text-ink mb-1 text-sm">{title}</h3>
-                  <p className="text-ink-3 text-sm leading-relaxed">{desc}</p>
+          <div className="mb-3">
+            <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-2">Áreas de Servicio</p>
+            <h2 className="text-headline-s text-on-surf font-black">¿Dónde quieres servir?</h2>
+          </div>
+
+          {/* Areas list */}
+          <div className="divide-y divide-outline-var border border-outline-var rounded-xl overflow-hidden mb-12 mt-6">
+            {AREAS.map(({ icon, title, desc }) => (
+              <div key={title}
+                className="flex items-start gap-4 p-5 bg-surf-low hover:bg-surf-high transition-colors">
+                <div className="leading-icon shrink-0">
+                  <span className="ms" style={{ fontSize: 20 }}>{icon}</span>
                 </div>
-                <ArrowRight size={14} className="text-ink-3 mt-0.5 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-title-s text-on-surf font-semibold mb-0.5">{title}</h3>
+                  <p className="text-body-s text-on-surf-var leading-relaxed">{desc}</p>
+                </div>
+                <span className="ms text-on-surf-var mt-1 shrink-0" style={{ fontSize: 18 }}>chevron_right</span>
               </div>
             ))}
           </div>
 
-          {/* Formulario de inscripción */}
-          <div className="p-8 rounded-2xl bg-bg-2 border border-line">
-            <h3 className="text-2xl font-black text-ink mb-2">¿Listo para servir?</h3>
-            <p className="text-ink-2 text-sm mb-6 leading-relaxed">
+          {/* Formulario */}
+          <div className="p-8 rounded-2xl bg-surf-low border border-outline-var">
+            <h3 className="text-headline-s text-on-surf font-black mb-2">¿Listo para servir?</h3>
+            <p className="text-body-m text-on-surf-var mb-6 leading-relaxed">
               Completa el formulario y nuestro equipo se comunicará contigo para orientarte.
             </p>
             <VolunteerForm />

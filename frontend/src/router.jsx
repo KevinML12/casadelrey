@@ -18,14 +18,14 @@ import VolunteeringPage from './pages/public/VolunteeringPage';
 import AboutPage        from './pages/public/AboutPage';
 import NotFound         from './pages/NotFound';
 
-// Páginas con Stripe — lazy para que el SDK no contamine el bundle principal
+// Lazy — evita inflar el bundle principal con páginas de uso infrecuente
 const DonatePage     = lazy(() => import('./pages/public/DonatePage'));
 const PaymentSuccess = lazy(() => import('./pages/public/PaymentSuccess'));
 
 function PageFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg">
-      <div className="w-7 h-7 rounded-full border-2 border-line border-t-blue animate-spin" />
+    <div className="min-h-screen flex items-center justify-center bg-surf">
+      <div className="w-7 h-7 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
     </div>
   );
 }

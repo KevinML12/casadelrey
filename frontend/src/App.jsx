@@ -6,7 +6,7 @@ import Footer from './components/layout/Footer';
 // Solo se usa para rutas públicas. El panel admin tiene su propio layout.
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-bg text-ink">
+    <div className="min-h-screen flex flex-col bg-surf text-on-surf">
       <Header />
       <main className="flex-1 w-full">
         <Outlet />

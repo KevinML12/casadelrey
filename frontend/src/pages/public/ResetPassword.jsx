@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { KeyRound } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
 export default function ResetPassword() {
-  const [password, setPassword]   = useState('');
-  const [confirm,  setConfirm]    = useState('');
-  const [loading,  setLoading]    = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirm,  setConfirm]  = useState('');
+  const [loading,  setLoading]  = useState(false);
   const { resetPassword } = useAuth();
   const { token }  = useParams();
   const navigate   = useNavigate();
@@ -26,14 +25,15 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-6">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen bg-surf flex items-center justify-center p-6">
+      <div className="w-full max-w-sm animate-fade-in">
+
         <div className="mb-8">
-          <div className="w-12 h-12 rounded-xl bg-card-2 border border-line flex items-center justify-center mb-5">
-            <KeyRound size={22} className="text-ink-2" />
+          <div className="w-12 h-12 rounded-xl bg-surf-high border border-outline-var flex items-center justify-center mb-5">
+            <span className="ms text-on-surf-var" style={{ fontSize: 22 }}>lock_reset</span>
           </div>
-          <h1 className="text-2xl font-black text-ink mb-1">Nueva contraseña</h1>
-          <p className="text-ink-3 text-sm">Elige una contraseña segura para tu cuenta.</p>
+          <h1 className="text-headline-s text-on-surf font-black mb-1">Nueva contraseña</h1>
+          <p className="text-body-m text-on-surf-var">Elige una contraseña segura para tu cuenta.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,6 +42,7 @@ export default function ResetPassword() {
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
             helperText="Mínimo 6 caracteres"
             required
           />
@@ -50,10 +51,14 @@ export default function ResetPassword() {
             type="password"
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
+            placeholder="••••••••"
             required
           />
-          <Button type="submit" variant="navy" size="lg" className="w-full" disabled={loading}>
-            {loading ? 'Guardando...' : 'Guardar contraseña'}
+          <Button type="submit" variant="filled" size="lg" className="w-full justify-center mt-2" disabled={loading}>
+            {loading
+              ? <><span className="ms" style={{ fontSize: 18 }}>hourglass_empty</span>Guardando...</>
+              : <><span className="ms" style={{ fontSize: 18 }}>check_circle</span>Guardar contraseña</>
+            }
           </Button>
         </form>
       </div>
