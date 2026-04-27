@@ -10,6 +10,7 @@ const NAV = [
   { to: '/admin/petitions',    icon: 'volunteer_activism', label: 'Peticiones' },
   { to: '/admin/volunteers',   icon: 'group_add',      label: 'Voluntarios' },
   { to: '/admin/cell-reports', icon: 'groups',         label: 'Células' },
+  { to: '/admin/boletas',      icon: 'person_add',     label: 'Nuevos' },
   { to: '/admin/social',       icon: 'share',          label: 'Redes' },
   { to: '/admin/profile',      icon: 'person',         label: 'Perfil' },
 ];

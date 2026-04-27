@@ -7,16 +7,20 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 
 const AREAS = [
-  { icon: 'waving_hand',     title: 'Equipo de Bienvenida',   desc: 'Recibe a cada persona con calidez y haz que se sienta en casa desde el primer momento.' },
-  { icon: 'child_care',      title: 'Ministerio de Niños',    desc: 'Enseña e inspira a los más pequeños con creatividad y amor.' },
-  { icon: 'spatial_audio',   title: 'Equipo de Producción',   desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.' },
-  { icon: 'group',           title: 'Grupos de Conexión',     desc: 'Facilita espacios donde las personas construyen comunidad y amistad real.' },
-  { icon: 'volunteer_activism', title: 'Equipo de Alcance',   desc: 'Lleva el amor de Dios a la comunidad a través de servicio práctico y evangelismo.' },
-  { icon: 'self_improvement', title: 'Ministerio de Oración', desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
+  { value: 'alabanza',               icon: 'mic',              title: 'Alabanza',                desc: 'Lidera la adoración y la música en los servicios y células.' },
+  { value: 'danza',                  icon: 'directions_run',   title: 'Danza',                   desc: 'Expresa la adoración a través del movimiento en los servicios.' },
+  { value: 'servidores',             icon: 'waving_hand',      title: 'Servidores',              desc: 'Recibe a cada persona, cuida la recepción y la limpieza de la Iglesia.' },
+  { value: 'protocolo',              icon: 'star',             title: 'Protocolo',               desc: 'Atención VIP a políticos, pastores invitados y personas de alto nivel.' },
+  { value: 'pancartas',              icon: 'flag',             title: 'Pancartas',               desc: 'Porta y coordina las pancartas durante los días de culto.' },
+  { value: 'maestros_ninos',         icon: 'child_care',       title: 'Maestros de Niños',       desc: 'Enseña e inspira a los más pequeños con creatividad y amor.' },
+  { value: 'tecnicos_audiovisuales', icon: 'spatial_audio',    title: 'Técnicos Audiovisuales',  desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.' },
+  { value: 'multimedia',             icon: 'video_camera_front', title: 'Multimedia',            desc: 'Diseño gráfico, video y redes sociales para la comunicación de la Iglesia.' },
+  { value: 'oracion',                icon: 'self_improvement', title: 'Oración',                 desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
+  { value: 'logistica',              icon: 'local_shipping',   title: 'Logística',               desc: 'Coordina recursos, transporte y organización de eventos y servicios.' },
 ];
 
 function VolunteerForm() {
-  const [form,       setForm]       = useState({ name: '', email: '', phone: '', area: '', message: '' });
+  const [form,       setForm]       = useState({ name: '', email: '', phone: '', department: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [sent,       setSent]       = useState(false);
 
@@ -54,11 +58,11 @@ function VolunteerForm() {
       <Input label="Correo electrónico" type="email" value={form.email} onChange={set('email')} required />
       <Input label="Teléfono" type="tel" value={form.phone} onChange={set('phone')} placeholder="Opcional" />
       <Select
-        label="Área de interés"
-        placeholder="Selecciona un área"
-        value={form.area}
-        onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
-        options={AREAS.map(a => ({ value: a.title, label: a.title }))}
+        label="Departamento de interés"
+        placeholder="Selecciona un departamento"
+        value={form.department}
+        onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
+        options={AREAS.map(a => ({ value: a.value, label: a.title }))}
       />
       <Textarea label="Mensaje" rows={3} value={form.message} onChange={set('message')}
         placeholder="Cuéntanos por qué quieres servir..." />
@@ -87,8 +91,8 @@ export default function VolunteeringPage() {
 
           {/* Areas list */}
           <div className="divide-y divide-outline-var border border-outline-var rounded-xl overflow-hidden mb-12 mt-6">
-            {AREAS.map(({ icon, title, desc }) => (
-              <div key={title}
+            {AREAS.map(({ value, icon, title, desc }) => (
+              <div key={value}
                 className="flex items-start gap-4 p-5 bg-surf-low hover:bg-surf-high transition-colors">
                 <div className="leading-icon shrink-0">
                   <span className="ms" style={{ fontSize: 20 }}>{icon}</span>

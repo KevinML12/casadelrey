@@ -149,6 +149,19 @@ type SocialPost struct {
 	SortOrder int    `json:"sort_order" gorm:"default:0"`
 }
 
+// PayPalOrder almacena los datos de una orden PayPal pendiente hasta que se capture.
+type PayPalOrder struct {
+	OrderID   string    `json:"order_id" gorm:"primaryKey;type:varchar(255)"`
+	Name      string    `json:"name" gorm:"type:varchar(100);not null"`
+	Email     string    `json:"email" gorm:"type:varchar(100)"`
+	Amount    float64   `json:"amount" gorm:"type:decimal(10,2);not null"`
+	Currency  string    `json:"currency" gorm:"type:varchar(3);default:'GTQ'"`
+	Purpose   string    `json:"purpose" gorm:"type:varchar(255)"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (PayPalOrder) TableName() string { return "paypal_orders" }
+
 // MemberBoleta representa la ficha de registro de un nuevo miembro / visitante.
 type MemberBoleta struct {
 	gorm.Model

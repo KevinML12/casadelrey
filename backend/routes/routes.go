@@ -68,9 +68,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	contactGroup := api.Group("/contact")
 	contactGroup.POST("/petition", petitionHandler.CreatePetition)
 
-	// Donaciones (sistema de pago local)
+	// Donaciones (registro local + PayPal)
 	donationsGroup := api.Group("/donations")
-	donationsGroup.POST("/register", donationHandler.RegisterDonation)
+	donationsGroup.POST("/register",             donationHandler.RegisterDonation)
+	donationsGroup.POST("/create-paypal-order",  donationHandler.CreatePayPalOrder)
+	donationsGroup.POST("/capture-paypal-order", donationHandler.CapturePayPalOrder)
 
 	// Eventos (público: solo lectura)
 	eventsGroup := api.Group("/events")

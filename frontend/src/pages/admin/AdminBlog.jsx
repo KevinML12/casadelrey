@@ -55,7 +55,7 @@ function EditorToolbar({ editor }) {
   );
 }
 
-const EMPTY = { title: '', slug: '', excerpt: '', cover_image: '', status: 'draft' };
+const EMPTY = { title: '', slug: '', excerpt: '', cover_image: '', redirect_url: '', status: 'draft' };
 
 function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
   const [form,      setForm]      = useState({ ...EMPTY, ...initial });
@@ -153,6 +153,14 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
         <div>
           <label className="block text-label-l text-on-surf-var mb-1.5">
+            Enlace a red social <span className="font-normal text-on-surf-var/60">(opcional — redirige al hacer clic)</span>
+          </label>
+          <input type="url" placeholder="https://facebook.com/..." value={form.redirect_url} onChange={set('redirect_url')}
+            className={fieldCls} />
+        </div>
+
+        <div>
+          <label className="block text-label-l text-on-surf-var mb-1.5">
             Extracto <span className="font-normal">(resumen visible en la lista)</span>
           </label>
           <textarea rows={2} value={form.excerpt} onChange={set('excerpt')}
@@ -162,7 +170,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-label-l text-on-surf-var">Contenido *</label>
+            <label className="text-label-l text-on-surf-var">Contenido <span className="font-normal text-on-surf-var/60">(opcional si hay enlace)</span></label>
             <div className="flex items-center gap-3">
               <button type="button" onClick={insertContentImage}
                 className="flex items-center gap-1 text-label-s text-on-surf-var hover:text-pri transition-colors">

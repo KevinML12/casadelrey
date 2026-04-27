@@ -65,7 +65,8 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.User{},         // users
 			&models.Post{},         // posts (blog + enlaces a redes)
 			&models.Petition{},     // petitions (peticiones de oración)
-			&models.Donation{},     // donations (pagos locales)
+			&models.Donation{},     // donations (pagos locales + PayPal)
+			&models.PayPalOrder{},  // paypal_orders (órdenes pendientes)
 			&models.Event{},        // events
 			&models.CellReport{},   // cell_reports (reportes expandidos de células)
 			&models.UserGoal{},     // user_goals (metas personales)
