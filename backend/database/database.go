@@ -62,17 +62,21 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		// Es idempotente: seguro de ejecutar en cada arranque del servidor.
 		log.Println("[DB] Ejecutando AutoMigrate...")
 		if err := db.AutoMigrate(
-			&models.User{},         // users
-			&models.Post{},         // posts (blog + enlaces a redes)
-			&models.Petition{},     // petitions (peticiones de oración)
-			&models.Donation{},     // donations (pagos locales + PayPal)
-			&models.PayPalOrder{},  // paypal_orders (órdenes pendientes)
-			&models.Event{},        // events
-			&models.CellReport{},   // cell_reports (reportes expandidos de células)
-			&models.UserGoal{},     // user_goals (metas personales)
-			&models.Volunteer{},    // volunteers (departamentos)
-			&models.SocialPost{},   // social_posts (FB/IG feed)
-			&models.MemberBoleta{}, // member_boletas (fichas de nuevos)
+			&models.User{},              // users
+			&models.Post{},              // posts (blog + enlaces a redes)
+			&models.Petition{},          // petitions (peticiones de oración)
+			&models.Donation{},          // donations (pagos locales + PayPal)
+			&models.PayPalOrder{},       // paypal_orders (órdenes pendientes)
+			&models.Event{},             // events
+			&models.CellReport{},        // cell_reports (reportes expandidos de células)
+			&models.UserGoal{},          // user_goals (metas personales)
+			&models.Volunteer{},         // volunteers (departamentos)
+			&models.SocialPost{},        // social_posts (FB/IG feed)
+			&models.MemberBoleta{},      // member_boleta (fichas de nuevos)
+			&models.Announcement{},      // announcements (anuncios)
+			&models.EventRegistration{}, // event_registrations (RSVP)
+			&models.GalleryPhoto{},      // gallery_photos (galería)
+			&models.ActivityLog{},       // activity_logs (auditoría)
 		); err != nil {
 			connectErr = err
 			return

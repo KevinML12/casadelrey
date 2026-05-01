@@ -36,7 +36,7 @@ const EMPTY = {
   host_name: '', host_phone: '', address: '',
   topic: '',
   total_attendees: 0, converts: 0, reconciled: 0, offering: 0,
-  notes: '',
+  notes: '', photo_url: '',
 };
 
 export default function CellReportForm({ onSuccess }) {
@@ -45,11 +45,26 @@ export default function CellReportForm({ onSuccess }) {
     ...EMPTY,
     leader_name: user?.role === 'leader' ? (user?.name || '') : '',
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitted,  setSubmitted]  = useState(false);
+  const [loading,    setLoading]    = useState(false);
+  const [uploading,  setUploading]  = useState(false);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
   const onInput = k => e => set(k, e.target.value);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    setUploading(true);
+    try {
+      const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      set('photo_url', res.data.url);
+      toast.success('Foto subida');
+    } catch { toast.error('No se pudo subir la foto'); }
+    finally { setUploading(false); }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -163,11 +178,23 @@ export default function CellReportForm({ onSuccess }) {
         </div>
       </div>
 
-      {/* Notas */}
-      <div>
+      {/* Notas y Foto */}
+      <div className="space-y-4">
         <Field label="Notas">
           <textarea rows={3} value={form.notes} onChange={onInput('notes')}
             placeholder="Algo que destacar de la reunión…" className={`${fieldCls} resize-none`} />
+        </Field>
+        <Field label="Foto de la reunión">
+          <div className="flex items-center gap-3">
+            <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-outline-var text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-on-surf-var`}>
+              <span className="ms" style={{ fontSize: 16 }}>{uploading ? 'hourglass_empty' : 'add_photo_alternate'}</span>
+              {uploading ? 'Subiendo…' : form.photo_url ? 'Cambiar foto' : 'Subir foto'}
+              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
+            </label>
+            {form.photo_url && (
+              <img src={form.photo_url} alt="preview" className="h-12 w-12 rounded-xl object-cover border border-outline-var" />
+            )}
+          </div>
         </Field>
       </div>
 

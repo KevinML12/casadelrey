@@ -162,6 +162,56 @@ type PayPalOrder struct {
 
 func (PayPalOrder) TableName() string { return "paypal_orders" }
 
+// Announcement representa un anuncio de la iglesia visible en el sitio.
+type Announcement struct {
+	gorm.Model
+	Title       string     `json:"title" gorm:"type:varchar(255);not null"`
+	Content     string     `json:"content" gorm:"type:text;not null"`
+	RoleTarget  string     `json:"role_target" gorm:"type:varchar(20);default:all"` // all | member | leader | admin
+	IsActive    bool       `json:"is_active" gorm:"default:true"`
+	PublishedAt *time.Time `json:"published_at"`
+	CreatedByID uint       `json:"created_by_id" gorm:"index"`
+	Author      User       `json:"author" gorm:"foreignKey:CreatedByID"`
+}
+
+// EventRegistration almacena el RSVP de un usuario a un evento.
+type EventRegistration struct {
+	gorm.Model
+	EventID       uint   `json:"event_id" gorm:"not null;index"`
+	Event         Event  `json:"event" gorm:"foreignKey:EventID"`
+	UserID        *uint  `json:"user_id" gorm:"index"`               // nil si no está autenticado
+	Name          string `json:"name" gorm:"type:varchar(100);not null"`
+	Email         string `json:"email" gorm:"type:varchar(100);not null"`
+	Phone         string `json:"phone" gorm:"type:varchar(30)"`
+	AttendeeCount int    `json:"attendee_count" gorm:"default:1"`
+	Notes         string `json:"notes" gorm:"type:text"`
+}
+
+// GalleryPhoto representa una foto en la galería de la iglesia.
+type GalleryPhoto struct {
+	gorm.Model
+	Title        string `json:"title" gorm:"type:varchar(255)"`
+	Description  string `json:"description" gorm:"type:text"`
+	URL          string `json:"url" gorm:"type:varchar(500);not null"`
+	ThumbnailURL string `json:"thumbnail_url" gorm:"type:varchar(500)"`
+	EventID      *uint  `json:"event_id" gorm:"index"` // evento al que pertenece (opcional)
+	UploadedByID uint   `json:"uploaded_by_id" gorm:"index"`
+	IsActive     bool   `json:"is_active" gorm:"default:true"`
+	SortOrder    int    `json:"sort_order" gorm:"default:0"`
+}
+
+// ActivityLog registra acciones administrativas para auditoría.
+type ActivityLog struct {
+	gorm.Model
+	UserID     uint   `json:"user_id" gorm:"index"`
+	UserName   string `json:"user_name" gorm:"type:varchar(100)"`
+	Action     string `json:"action" gorm:"type:varchar(50);not null"`    // create | update | delete | approve
+	Resource   string `json:"resource" gorm:"type:varchar(50);not null"`  // user | post | event | boleta…
+	ResourceID uint   `json:"resource_id"`
+	Details    string `json:"details" gorm:"type:text"`
+	IPAddress  string `json:"ip_address" gorm:"type:varchar(45)"`
+}
+
 // MemberBoleta representa la ficha de registro de un nuevo miembro / visitante.
 type MemberBoleta struct {
 	gorm.Model

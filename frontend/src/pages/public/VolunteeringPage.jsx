@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import PageHero from '../../components/layout/PageHero';
 import Input from '../../components/ui/Input';
 import { Textarea, Select } from '../../components/ui/Input';
@@ -19,8 +19,15 @@ const AREAS = [
   { value: 'logistica',              icon: 'local_shipping',   title: 'Logística',               desc: 'Coordina recursos, transporte y organización de eventos y servicios.' },
 ];
 
-function VolunteerForm() {
-  const [form,       setForm]       = useState({ name: '', email: '', phone: '', department: '', message: '' });
+function VolunteerForm({ preselected, onClearPreselected }) {
+  const [form,       setForm]       = useState({ name: '', email: '', phone: '', department: preselected || '', message: '' });
+
+  useEffect(() => {
+    if (preselected) {
+      setForm(p => ({ ...p, department: preselected }));
+      onClearPreselected?.();
+    }
+  }, [preselected]);
   const [submitting, setSubmitting] = useState(false);
   const [sent,       setSent]       = useState(false);
 
@@ -77,6 +84,14 @@ function VolunteerForm() {
 }
 
 export default function VolunteeringPage() {
+  const [selected, setSelected] = useState('');
+  const formRef = useRef(null);
+
+  const handleAreaClick = (value) => {
+    setSelected(value);
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
+
   return (
     <main className="min-h-screen bg-surf">
       <PageHero icon="handshake" title="Voluntariado" subtitle="Sirve con tus talentos y haz la diferencia en la comunidad." />
@@ -87,32 +102,37 @@ export default function VolunteeringPage() {
           <div className="mb-3">
             <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-2">Áreas de Servicio</p>
             <h2 className="text-headline-s text-on-surf font-black">¿Dónde quieres servir?</h2>
+            <p className="text-body-s text-on-surf-var mt-2">Toca un área para seleccionarla en el formulario.</p>
           </div>
 
           {/* Areas list */}
-          <div className="divide-y divide-outline-var border border-outline-var rounded-xl overflow-hidden mb-12 mt-6">
+          <div className="divide-y divide-outline-var border border-outline-var rounded-2xl overflow-hidden mb-12 mt-6">
             {AREAS.map(({ value, icon, title, desc }) => (
-              <div key={value}
-                className="flex items-start gap-4 p-5 bg-surf-low hover:bg-surf-high transition-colors">
-                <div className="leading-icon shrink-0">
+              <button key={value} type="button" onClick={() => handleAreaClick(value)}
+                className={`w-full flex items-start gap-4 p-5 text-left transition-colors ${
+                  selected === value ? 'bg-pri-con' : 'bg-surf-low hover:bg-surf-high'
+                }`}>
+                <div className={`leading-icon shrink-0 ${selected === value ? 'text-on-pri-con' : ''}`}>
                   <span className="ms" style={{ fontSize: 20 }}>{icon}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-title-s text-on-surf font-semibold mb-0.5">{title}</h3>
-                  <p className="text-body-s text-on-surf-var leading-relaxed">{desc}</p>
+                  <h3 className={`text-title-s font-semibold mb-0.5 ${selected === value ? 'text-on-pri-con' : 'text-on-surf'}`}>{title}</h3>
+                  <p className={`text-body-s leading-relaxed ${selected === value ? 'text-on-pri-con/80' : 'text-on-surf-var'}`}>{desc}</p>
                 </div>
-                <span className="ms text-on-surf-var mt-1 shrink-0" style={{ fontSize: 18 }}>chevron_right</span>
-              </div>
+                <span className={`ms mt-1 shrink-0 ${selected === value ? 'text-on-pri-con' : 'text-on-surf-var'}`} style={{ fontSize: 18 }}>
+                  {selected === value ? 'check_circle' : 'chevron_right'}
+                </span>
+              </button>
             ))}
           </div>
 
           {/* Formulario */}
-          <div className="p-8 rounded-2xl bg-surf-low border border-outline-var">
+          <div ref={formRef} className="p-8 rounded-2xl bg-surf-low border border-outline-var scroll-mt-6">
             <h3 className="text-headline-s text-on-surf font-black mb-2">¿Listo para servir?</h3>
             <p className="text-body-m text-on-surf-var mb-6 leading-relaxed">
               Completa el formulario y nuestro equipo se comunicará contigo para orientarte.
             </p>
-            <VolunteerForm />
+            <VolunteerForm preselected={selected} onClearPreselected={() => setSelected('')} />
           </div>
         </div>
       </div>

@@ -1,23 +1,29 @@
 import { useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import toast from 'react-hot-toast';
 
 const NAV = [
-  { to: '/admin',              icon: 'dashboard',      label: 'Dashboard',   exact: true },
-  { to: '/admin/blog',         icon: 'article',        label: 'Blog' },
-  { to: '/admin/events',       icon: 'calendar_month', label: 'Eventos' },
-  { to: '/admin/petitions',    icon: 'volunteer_activism', label: 'Peticiones' },
-  { to: '/admin/volunteers',   icon: 'group_add',      label: 'Voluntarios' },
-  { to: '/admin/cell-reports', icon: 'groups',         label: 'Células' },
-  { to: '/admin/boletas',      icon: 'person_add',     label: 'Nuevos' },
-  { to: '/admin/social',       icon: 'share',          label: 'Redes' },
-  { to: '/admin/profile',      icon: 'person',         label: 'Perfil' },
+  { to: '/admin',                  icon: 'dashboard',          label: 'Dashboard',     exact: true },
+  { to: '/admin/users',            icon: 'manage_accounts',    label: 'Usuarios' },
+  { to: '/admin/blog',             icon: 'article',            label: 'Blog' },
+  { to: '/admin/events',           icon: 'calendar_month',     label: 'Eventos' },
+  { to: '/admin/announcements',    icon: 'campaign',           label: 'Anuncios' },
+  { to: '/admin/petitions',        icon: 'volunteer_activism', label: 'Peticiones',    badge: 'unread_petitions' },
+  { to: '/admin/volunteers',       icon: 'group_add',          label: 'Voluntarios',   badge: 'pending_volunteers' },
+  { to: '/admin/cell-reports',     icon: 'groups',             label: 'Células',       badge: 'pending_reports' },
+  { to: '/admin/boletas',          icon: 'person_add',         label: 'Nuevos' },
+  { to: '/admin/gallery',          icon: 'photo_library',      label: 'Galería' },
+  { to: '/admin/social',           icon: 'share',              label: 'Redes' },
+  { to: '/admin/activity-log',     icon: 'history',            label: 'Actividad' },
+  { to: '/admin/profile',          icon: 'person',             label: 'Perfil' },
 ];
 
 function SidebarContent({ onClose }) {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const notifCounts = useNotificationCounts();
 
   const handleLogout = () => {
     logout();
@@ -44,28 +50,34 @@ function SidebarContent({ onClose }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {NAV.map(({ to, icon, label, exact }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={exact}
-            onClick={onClose}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium transition-all duration-150 ${
-                isActive
-                  ? 'text-white'
-                  : 'hover:text-white'
-              }`
-            }
-            style={({ isActive }) => ({
-              background: isActive ? 'rgba(255,255,255,.12)' : 'transparent',
-              color: isActive ? '#FFFFFF' : 'rgba(255,255,255,.55)',
-            })}
-          >
-            <span className="ms shrink-0" style={{ fontSize: 18 }}>{icon}</span>
-            {label}
-          </NavLink>
-        ))}
+        {NAV.map(({ to, icon, label, exact, badge }) => {
+          const count = badge ? (notifCounts[badge] || 0) : 0;
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              end={exact}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium transition-all duration-150 ${
+                  isActive ? 'text-white' : 'hover:text-white'
+                }`
+              }
+              style={({ isActive }) => ({
+                background: isActive ? 'rgba(255,255,255,.12)' : 'transparent',
+                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,.55)',
+              })}
+            >
+              <span className="ms shrink-0" style={{ fontSize: 18 }}>{icon}</span>
+              <span className="flex-1">{label}</span>
+              {count > 0 && (
+                <span className="min-w-[20px] h-5 rounded-full bg-err text-white text-xs font-bold flex items-center justify-center px-1.5">
+                  {count > 99 ? '99+' : count}
+                </span>
+              )}
+            </NavLink>
+          );
+        })}
       </nav>
 
       {/* Footer */}

@@ -54,15 +54,30 @@ func (h *PetitionHandler) CreatePetition(c echo.Context) error {
 
 // GetAllPetitions godoc
 // GET /api/v1/admin/petitions  [Requiere auth + rol admin]
-// Lista todas las peticiones, ordenadas por más recientes primero.
+// Lista todas las peticiones con búsqueda y paginación.
 func (h *PetitionHandler) GetAllPetitions(c echo.Context) error {
+	page, limit := parsePage(c)
+
+	q := h.DB.Model(&models.Petition{})
+	if search := c.QueryParam("q"); search != "" {
+		like := "%" + search + "%"
+		q = q.Where("name ILIKE ? OR subject ILIKE ? OR message ILIKE ?", like, like, like)
+	}
+	if isRead := c.QueryParam("is_read"); isRead != "" {
+		q = q.Where("is_read = ?", isRead == "true")
+	}
+
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
 	var petitions []models.Petition
-	if result := h.DB.Order("created_at DESC").Find(&petitions); result.Error != nil {
+	if err := q.Order("created_at DESC").Offset(offset).Limit(limit).Find(&petitions).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error al obtener las peticiones.",
 		})
 	}
-	return c.JSON(http.StatusOK, petitions)
+	return c.JSON(http.StatusOK, PagedResponse{Data: petitions, Meta: newMeta(total, page, limit)})
 }
 
 // MarkAsRead godoc

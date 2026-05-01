@@ -2,16 +2,39 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
-import Button from '../../components/ui/Button';
+import Button, { IconButton } from '../../components/ui/Button';
+import Chip, { FilterChip } from '../../components/ui/Chip';
+import { downloadCsv } from '../../lib/exportCsv';
 
 const CATEGORIES = [
-  { value: 'convertido',   label: 'Convertido',   cls: 'bg-ter-con text-on-ter-con' },
-  { value: 'reconciliado', label: 'Reconciliado',  cls: 'bg-pri-con text-on-pri-con' },
-  { value: 'nuevo',        label: 'Nuevo',         cls: 'bg-sec-con text-on-sec-con' },
+  { value: 'convertido',   label: 'Convertido',   color: 'tertiary',  icon: 'church' },
+  { value: 'reconciliado', label: 'Reconciliado',  color: 'primary',   icon: 'favorite' },
+  { value: 'nuevo',        label: 'Nuevo',         color: 'secondary', icon: 'person_add' },
 ];
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.value, c]));
+
+const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 const EMPTY = { date: '', inviter_name: '', inviter_phone: '', guest_name: '', guest_phone: '', address: '', category: 'nuevo', notes: '' };
+
+function FieldLabel({ children, required }) {
+  return (
+    <label className="block text-label-l text-on-surf-var mb-1.5">
+      {children}{required && <span className="text-err ml-0.5">*</span>}
+    </label>
+  );
+}
+
+function SectionHeader({ icon, children }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-7 h-7 rounded-lg bg-pri-con flex items-center justify-center">
+        <span className="ms text-on-pri-con" style={{ fontSize: 14 }}>{icon}</span>
+      </div>
+      <p className="text-label-l text-on-surf font-semibold">{children}</p>
+    </div>
+  );
+}
 
 function BoletaForm({ onSave, onCancel }) {
   const [form, setForm] = useState({ ...EMPTY, date: new Date().toISOString().slice(0, 10) });
@@ -37,63 +60,74 @@ function BoletaForm({ onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
+
+      {/* Fecha + Categoría */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Fecha *</label>
+          <FieldLabel required>Fecha</FieldLabel>
           <input type="date" value={form.date} onChange={set('date')} className={fieldCls} required />
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Categoría *</label>
-          <select value={form.category} onChange={set('category')} className={fieldCls} required>
-            {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </select>
+          <FieldLabel required>Categoría</FieldLabel>
+          <div className="flex gap-2 flex-wrap pt-1">
+            {CATEGORIES.map(c => (
+              <FilterChip key={c.value} selected={form.category === c.value}
+                icon={c.icon} onClick={() => setForm(p => ({ ...p, category: c.value }))}>
+                {c.label}
+              </FilterChip>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="p-4 rounded-xl bg-surf border border-outline-var space-y-3">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Quien invitó</p>
+      {/* Quien invitó */}
+      <div className="space-y-3">
+        <SectionHeader icon="person">Quien invitó</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Nombre</label>
+            <FieldLabel>Nombre</FieldLabel>
             <input value={form.inviter_name} onChange={set('inviter_name')} className={fieldCls} placeholder="Nombre del invitador" />
           </div>
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Teléfono</label>
+            <FieldLabel>Teléfono</FieldLabel>
             <input value={form.inviter_phone} onChange={set('inviter_phone')} className={fieldCls} placeholder="+502 5555 0000" />
           </div>
         </div>
       </div>
 
-      <div className="p-4 rounded-xl bg-surf border border-outline-var space-y-3">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Invitado *</p>
+      {/* Invitado */}
+      <div className="space-y-3">
+        <SectionHeader icon="person_add">Invitado</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Nombre *</label>
+            <FieldLabel required>Nombre</FieldLabel>
             <input value={form.guest_name} onChange={set('guest_name')} className={fieldCls} placeholder="Nombre del invitado" required />
           </div>
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Teléfono</label>
+            <FieldLabel>Teléfono</FieldLabel>
             <input value={form.guest_phone} onChange={set('guest_phone')} className={fieldCls} placeholder="+502 5555 0000" />
           </div>
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Dirección</label>
+          <FieldLabel>Dirección</FieldLabel>
           <input value={form.address} onChange={set('address')} className={fieldCls} placeholder="Zona, colonia, municipio…" />
         </div>
       </div>
 
+      {/* Notas */}
       <div>
-        <label className="block text-label-l text-on-surf-var mb-1.5">Notas</label>
-        <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${fieldCls} resize-none`} placeholder="Observaciones adicionales…" />
+        <FieldLabel>Notas</FieldLabel>
+        <textarea rows={2} value={form.notes} onChange={set('notes')}
+          className={`${fieldCls} resize-none`} placeholder="Observaciones adicionales…" />
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 pt-2 border-t border-outline-var">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
           <span className="ms" style={{ fontSize: 16 }}>save</span>
           {loading ? 'Guardando…' : 'Guardar boleta'}
         </Button>
-        <Button type="button" variant="outlined" onClick={onCancel}>Cancelar</Button>
+        <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>
   );
@@ -125,113 +159,141 @@ export default function AdminBoletas() {
       await apiClient.delete(`/admin/boletas/${id}`);
       toast.success('Boleta eliminada');
       refresh();
-    } catch {
-      toast.error('Error al eliminar');
-    }
+    } catch { toast.error('Error al eliminar'); }
   };
 
   const counts = CATEGORIES.reduce((acc, c) => {
     acc[c.value] = boletas.filter(b => b.category === c.value).length;
     return acc;
   }, {});
+  const total = boletas.length;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
-        <div>
-          <h1 className="text-headline-s text-on-surf font-black">Boletas de Nuevos</h1>
-          <p className="text-body-s text-on-surf-var mt-1">
-            {boletas.length} registros · {counts.convertido || 0} convertidos · {counts.reconciliado || 0} reconciliados · {counts.nuevo || 0} nuevos
-          </p>
+    <div className="p-6 max-w-4xl mx-auto">
+
+      {/* Page header */}
+      <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
+            <span className="ms text-on-sec-con" style={{ fontSize: 22 }}>person_add</span>
+          </div>
+          <div>
+            <h1 className="text-headline-s text-on-surf font-black leading-tight">Boletas de Nuevos</h1>
+            <p className="text-body-s text-on-surf-var mt-0.5">
+              {total} registros · {counts.convertido || 0} conv. · {counts.reconciliado || 0} rec. · {counts.nuevo || 0} nuevos
+            </p>
+          </div>
         </div>
-        <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-          <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
-          {showForm ? 'Cancelar' : 'Nueva boleta'}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="tonal" onClick={() => downloadCsv(`/admin/export/boletas${catFilter ? `?category=${catFilter}` : ''}`, 'boletas.csv')}>
+            <span className="ms" style={{ fontSize: 16 }}>download</span>
+            Exportar CSV
+          </Button>
+          <Button variant="filled" onClick={() => setShowForm(s => !s)}>
+            <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
+            {showForm ? 'Cancelar' : 'Nueva boleta'}
+          </Button>
+        </div>
       </div>
 
+      {/* Formulario inline */}
       {showForm && (
         <div className="mb-8 p-6 rounded-2xl bg-surf-low border border-outline-var">
-          <h2 className="text-title-l text-on-surf font-bold mb-5">Registrar nuevo miembro</h2>
+          <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-5">Registrar nuevo miembro</p>
           <BoletaForm onSave={() => { setShowForm(false); refresh(); }} onCancel={() => setShowForm(false)} />
         </div>
       )}
 
-      {/* Filtro por categoría */}
+      {/* Filter chips */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        {[['', 'Todas'], ...CATEGORIES.map(c => [c.value, c.label])].map(([val, lbl]) => (
-          <button key={val} onClick={() => setCatFilter(val)}
-            className={`px-4 py-2 rounded-full text-label-m font-medium border transition-all ${
-              catFilter === val
-                ? 'border-pri bg-pri-con text-on-pri-con'
-                : 'border-outline-var text-on-surf-var hover:border-pri/40 hover:text-pri'
-            }`}>
-            {lbl}
-            {val && <span className="ml-1.5 text-label-s opacity-70">{counts[val] || 0}</span>}
-          </button>
+        <FilterChip selected={catFilter === ''} onClick={() => setCatFilter('')} icon="apps">
+          Todas
+        </FilterChip>
+        {CATEGORIES.map(c => (
+          <FilterChip key={c.value} selected={catFilter === c.value} icon={c.icon}
+            count={counts[c.value] || 0}
+            onClick={() => setCatFilter(c.value)}>
+            {c.label}
+          </FilterChip>
         ))}
       </div>
 
+      {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
         </div>
       ) : boletas.length === 0 ? (
-        <div className="text-center py-20 bg-surf-low border border-outline-var rounded-2xl">
-          <span className="ms text-on-surf-var block mb-3" style={{ fontSize: 40 }}>person_add</span>
-          <p className="text-body-s text-on-surf-var">No hay boletas registradas aún.</p>
+        <div className="bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4 text-on-surf-var">
+          <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
+            <span className="ms" style={{ fontSize: 32 }}>person_add</span>
+          </div>
+          <div className="text-center">
+            <p className="text-body-l text-on-surf font-medium">Sin boletas</p>
+            <p className="text-body-s text-on-surf-var mt-1">
+              {catFilter ? `No hay registros con categoría "${catFilter}".` : 'Crea la primera boleta con el botón de arriba.'}
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden divide-y divide-outline-var">
           {boletas.map(b => {
-            const cat = CATEGORIES.find(c => c.value === b.category);
+            const cat = CAT_MAP[b.category];
             return (
-              <div key={b.ID} className="bg-surf-low border border-outline-var rounded-2xl p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <span className={`text-label-s px-2.5 py-1 rounded-full font-medium ${cat?.cls || 'bg-surf-high text-on-surf-var'}`}>
-                        {cat?.label || b.category}
+              <div key={b.ID} className="flex items-start gap-4 p-5 hover:bg-surf-high transition-colors">
+
+                {/* Leading icon */}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5
+                  ${cat ? `bg-${cat.color === 'tertiary' ? 'ter' : cat.color === 'secondary' ? 'sec' : 'pri'}-con` : 'bg-surf-high'}`}
+                  style={cat ? {} : {}}>
+                  <span className="ms text-on-pri-con" style={{ fontSize: 18 }}>
+                    {cat?.icon || 'person'}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-body-l text-on-surf font-medium">{b.guest_name}</span>
+                    {cat && <Chip color={cat.color}>{cat.label}</Chip>}
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-on-surf-var">
+                    {b.guest_phone && (
+                      <span className="flex items-center gap-1.5">
+                        <span className="ms" style={{ fontSize: 14 }}>phone</span>{b.guest_phone}
                       </span>
-                      <span className="text-title-s text-on-surf font-semibold">{b.guest_name}</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-body-s">
-                      {b.guest_phone && (
-                        <span className="flex items-center gap-1.5 text-on-surf-var">
-                          <span className="ms" style={{ fontSize: 14 }}>phone</span>{b.guest_phone}
-                        </span>
-                      )}
-                      {b.address && (
-                        <span className="flex items-center gap-1.5 text-on-surf-var">
-                          <span className="ms" style={{ fontSize: 14 }}>location_on</span>{b.address}
-                        </span>
-                      )}
-                      {b.inviter_name && (
-                        <span className="flex items-center gap-1.5 text-on-surf-var">
-                          <span className="ms" style={{ fontSize: 14 }}>person</span>Invitado por: <strong className="text-on-surf ml-1">{b.inviter_name}</strong>
-                        </span>
-                      )}
-                      {b.inviter_phone && (
-                        <span className="flex items-center gap-1.5 text-on-surf-var">
-                          <span className="ms" style={{ fontSize: 14 }}>call</span>{b.inviter_phone}
-                        </span>
-                      )}
-                    </div>
-                    {b.notes && (
-                      <p className="text-body-s text-on-surf-var mt-2 bg-surf border border-outline-var rounded-lg px-3 py-2">{b.notes}</p>
+                    )}
+                    {b.address && (
+                      <span className="flex items-center gap-1.5">
+                        <span className="ms" style={{ fontSize: 14 }}>location_on</span>{b.address}
+                      </span>
+                    )}
+                    {b.inviter_name && (
+                      <span className="flex items-center gap-1.5">
+                        <span className="ms" style={{ fontSize: 14 }}>person</span>
+                        Invitado por <strong className="text-on-surf ml-1">{b.inviter_name}</strong>
+                        {b.inviter_phone && ` · ${b.inviter_phone}`}
+                      </span>
                     )}
                   </div>
-                  <div className="flex items-start gap-2 shrink-0">
-                    <span className="text-label-s text-on-surf-var">
-                      {b.date ? new Date(b.date + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
-                    </span>
-                    {isAdmin && (
-                      <button onClick={() => deleteBoleta(b.ID)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-err hover:bg-err-con transition-all">
-                        <span className="ms" style={{ fontSize: 16 }}>delete</span>
-                      </button>
-                    )}
-                  </div>
+                  {b.notes && (
+                    <p className="text-body-s text-on-surf-var mt-2 bg-surf border border-outline-var rounded-xl px-3 py-2 leading-relaxed">
+                      {b.notes}
+                    </p>
+                  )}
+                </div>
+
+                {/* Trailing */}
+                <div className="flex items-start gap-2 shrink-0">
+                  <p className="text-label-s text-on-surf-var whitespace-nowrap">
+                    {b.date ? new Date(b.date + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
+                  </p>
+                  {isAdmin && (
+                    <IconButton onClick={() => deleteBoleta(b.ID)} title="Eliminar"
+                      className="text-on-surf-var hover:text-err hover:bg-err-con transition-all">
+                      <span className="ms" style={{ fontSize: 16 }}>delete</span>
+                    </IconButton>
+                  )}
                 </div>
               </div>
             );

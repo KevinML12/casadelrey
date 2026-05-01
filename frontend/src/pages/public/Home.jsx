@@ -409,6 +409,52 @@ function Donaciones() {
   );
 }
 
+// ─── Anuncios públicos ────────────────────────────────────────────────────────
+
+function Anuncios() {
+  const [items, setItems]     = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiClient.get('/announcements')
+      .then(r => setItems((r.data?.data || r.data || []).slice(0, 4)))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading || !items.length) return null;
+
+  return (
+    <section className="py-[72px]" style={{ background: 'var(--surf-low)' }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+
+        <div className="flex justify-between items-end mb-9">
+          <div>
+            <Chip color="tertiary" icon="campaign" className="mb-3">Anuncios</Chip>
+            <h2 className="text-headline-m text-on-surf">Novedades de la iglesia</h2>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {items.map(a => (
+            <div key={a.ID}
+              className="bg-surf border border-outline-var rounded-2xl p-5 flex gap-4 items-start">
+              <div className="w-10 h-10 rounded-xl bg-ter-con flex items-center justify-center shrink-0">
+                <span className="ms text-on-ter-con" style={{ fontSize: 20 }}>campaign</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-title-m text-on-surf mb-1">{a.title}</p>
+                <p className="text-body-s text-on-surf-var leading-relaxed line-clamp-3">{a.content}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -416,6 +462,7 @@ export default function Home() {
     <>
       <Hero />
       <Ministerios />
+      <Anuncios />
       <UltimasEnsenanzas />
       <ProximosEventos />
       <OracionCTA />

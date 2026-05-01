@@ -16,6 +16,7 @@ import EventsPage       from './pages/public/EventsPage';
 import PrayerPage       from './pages/public/PrayerPage';
 import VolunteeringPage from './pages/public/VolunteeringPage';
 import AboutPage        from './pages/public/AboutPage';
+import GalleryPage      from './pages/public/GalleryPage';
 import NotFound         from './pages/NotFound';
 
 // Lazy — evita inflar el bundle principal con páginas de uso infrecuente
@@ -30,23 +31,28 @@ function PageFallback() {
   );
 }
 
-// Páginas admin
-import AdminIndex      from './pages/admin/AdminIndex';
-import AdminBlog        from './pages/admin/AdminBlog';
-import AdminEvents      from './pages/admin/AdminEvents';
-import AdminPetitions   from './pages/admin/AdminPetitions';
-import AdminVolunteers  from './pages/admin/AdminVolunteers';
-import AdminCellReports from './pages/admin/AdminCellReports';
-import AdminBoletas     from './pages/admin/AdminBoletas';
-import AdminSocial      from './pages/admin/AdminSocial';
-import ProfilePage      from './pages/public/ProfilePage';
+// Páginas admin — lazy para reducir bundle inicial
+const AdminIndex         = lazy(() => import('./pages/admin/AdminIndex'));
+const AdminUsers         = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminBlog          = lazy(() => import('./pages/admin/AdminBlog'));
+const AdminEvents        = lazy(() => import('./pages/admin/AdminEvents'));
+const AdminPetitions     = lazy(() => import('./pages/admin/AdminPetitions'));
+const AdminVolunteers    = lazy(() => import('./pages/admin/AdminVolunteers'));
+const AdminCellReports   = lazy(() => import('./pages/admin/AdminCellReports'));
+const AdminBoletas       = lazy(() => import('./pages/admin/AdminBoletas'));
+const AdminSocial        = lazy(() => import('./pages/admin/AdminSocial'));
+const AdminAnnouncements = lazy(() => import('./pages/admin/AdminAnnouncements'));
+const AdminGallery       = lazy(() => import('./pages/admin/AdminGallery'));
+const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
+const ProfilePage        = lazy(() => import('./pages/public/ProfilePage'));
 
-// Páginas líder
-import LeaderLayout    from './components/layout/LeaderLayout';
-import LeaderIndex     from './pages/leader/LeaderIndex';
-import LeaderReports   from './pages/leader/LeaderReports';
-import LeaderBoletas   from './pages/leader/LeaderBoletas';
-import LeaderVolunteers from './pages/leader/LeaderVolunteers';
+// Páginas líder — lazy
+import LeaderLayout        from './components/layout/LeaderLayout';
+const LeaderIndex         = lazy(() => import('./pages/leader/LeaderIndex'));
+const LeaderReports       = lazy(() => import('./pages/leader/LeaderReports'));
+const LeaderBoletas       = lazy(() => import('./pages/leader/LeaderBoletas'));
+const LeaderVolunteers    = lazy(() => import('./pages/leader/LeaderVolunteers'));
+const LeaderCellDirectory = lazy(() => import('./pages/leader/LeaderCellDirectory'));
 
 export const router = createBrowserRouter([
 
@@ -59,15 +65,19 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true,       element: <AdminIndex /> },
-      { path: 'blog',      element: <AdminBlog /> },
-      { path: 'events',    element: <AdminEvents /> },
-      { path: 'petitions',     element: <AdminPetitions /> },
-      { path: 'volunteers',    element: <AdminVolunteers /> },
-      { path: 'cell-reports', element: <AdminCellReports /> },
-      { path: 'boletas',      element: <AdminBoletas /> },
-      { path: 'social',       element: <AdminSocial /> },
-      { path: 'profile',      element: <ProfilePage /> },
+      { index: true,             element: <Suspense fallback={<PageFallback />}><AdminIndex /></Suspense> },
+      { path: 'users',           element: <Suspense fallback={<PageFallback />}><AdminUsers /></Suspense> },
+      { path: 'blog',            element: <Suspense fallback={<PageFallback />}><AdminBlog /></Suspense> },
+      { path: 'events',          element: <Suspense fallback={<PageFallback />}><AdminEvents /></Suspense> },
+      { path: 'petitions',       element: <Suspense fallback={<PageFallback />}><AdminPetitions /></Suspense> },
+      { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><AdminVolunteers /></Suspense> },
+      { path: 'cell-reports',    element: <Suspense fallback={<PageFallback />}><AdminCellReports /></Suspense> },
+      { path: 'boletas',         element: <Suspense fallback={<PageFallback />}><AdminBoletas /></Suspense> },
+      { path: 'social',          element: <Suspense fallback={<PageFallback />}><AdminSocial /></Suspense> },
+      { path: 'announcements',   element: <Suspense fallback={<PageFallback />}><AdminAnnouncements /></Suspense> },
+      { path: 'gallery',         element: <Suspense fallback={<PageFallback />}><AdminGallery /></Suspense> },
+      { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
+      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],
   },
 
@@ -80,16 +90,16 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <LeaderIndex /> },
-      { path: 'reports', element: <LeaderReports /> },
-      { path: 'boletas', element: <LeaderBoletas /> },
-      { path: 'volunteers', element: <LeaderVolunteers /> },
-      { path: 'profile', element: <ProfilePage /> },
+      { index: true,             element: <Suspense fallback={<PageFallback />}><LeaderIndex /></Suspense> },
+      { path: 'reports',         element: <Suspense fallback={<PageFallback />}><LeaderReports /></Suspense> },
+      { path: 'boletas',         element: <Suspense fallback={<PageFallback />}><LeaderBoletas /></Suspense> },
+      { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><LeaderVolunteers /></Suspense> },
+      { path: 'cell-directory',  element: <Suspense fallback={<PageFallback />}><LeaderCellDirectory /></Suspense> },
+      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],
   },
 
   // ── Sitio Público ──────────────────────────────────────────────────────────
-  // App shell: Header + animación de página + Footer.
   {
     path: '/',
     element: <App />,
@@ -99,6 +109,7 @@ export const router = createBrowserRouter([
       { path: 'blog',                  element: <BlogPage /> },
       { path: 'blog/:slug',            element: <BlogPage /> },
       { path: 'events',                element: <EventsPage /> },
+      { path: 'gallery',               element: <GalleryPage /> },
       { path: 'prayer',                element: <PrayerPage /> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },

@@ -74,22 +74,32 @@ func (h *BlogHandler) GetPostBySlug(c echo.Context) error {
 
 // GetAllPosts godoc
 // GET /api/v1/admin/blog/  [Requiere auth + rol admin]
-// Retorna TODOS los posts (borradores y publicados), para el panel de administración.
+// Retorna TODOS los posts (borradores y publicados) con búsqueda y paginación.
 func (h *BlogHandler) GetAllPosts(c echo.Context) error {
-	var posts []models.Post
-	result := h.DB.
-		Preload("Author").
-		Order("created_at DESC").
-		Find(&posts)
+	page, limit := parsePage(c)
 
-	if result.Error != nil {
-		log.Printf("[Blog] Error al obtener posts (admin): %v", result.Error)
+	q := h.DB.Model(&models.Post{})
+	if search := c.QueryParam("q"); search != "" {
+		like := "%" + search + "%"
+		q = q.Where("title ILIKE ? OR content ILIKE ?", like, like)
+	}
+	if status := c.QueryParam("status"); status != "" {
+		q = q.Where("status = ?", status)
+	}
+
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
+	var posts []models.Post
+	if err := q.Preload("Author").Order("created_at DESC").Offset(offset).Limit(limit).Find(&posts).Error; err != nil {
+		log.Printf("[Blog] Error al obtener posts (admin): %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error al obtener los posts.",
 		})
 	}
 
-	return c.JSON(http.StatusOK, posts)
+	return c.JSON(http.StatusOK, PagedResponse{Data: posts, Meta: newMeta(total, page, limit)})
 }
 
 // CreatePost godoc

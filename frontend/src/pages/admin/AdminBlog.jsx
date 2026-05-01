@@ -112,12 +112,12 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     onSave({ ...form, content: editor.getHTML() });
   };
 
-  const fieldCls = 'w-full px-3 py-2.5 rounded-lg border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+  const fieldCls = 'w-full px-3 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
   return (
-    <div className="bg-surf-low border border-outline-var rounded-xl p-5 mb-6 animate-fade-in">
+    <div className="bg-surf-low border border-outline-var rounded-2xl p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-title-s text-on-surf font-semibold">{initial.ID ? 'Editar Post' : 'Nuevo Post'}</h3>
+        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
         <button onClick={onCancel} className="text-on-surf-var hover:text-on-surf transition-colors">
           <span className="ms" style={{ fontSize: 20 }}>close</span>
         </button>
@@ -268,11 +268,19 @@ export default function AdminBlog() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-headline-s text-on-surf font-black">Blog</h1>
+      <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
+            <span className="ms text-on-pri-con" style={{ fontSize: 22 }}>article</span>
+          </div>
+          <div>
+            <h1 className="text-headline-s text-on-surf font-black leading-tight">Blog</h1>
+            <p className="text-body-s text-on-surf-var mt-0.5">{posts.length} publicaciones</p>
+          </div>
+        </div>
         {!showForm && !editing && (
-          <Button size="sm" variant="filled" onClick={() => setShowForm(true)}>
-            <span className="ms" style={{ fontSize: 14 }}>add</span>
+          <Button variant="filled" onClick={() => setShowForm(true)}>
+            <span className="ms" style={{ fontSize: 18 }}>add</span>
             Nuevo post
           </Button>
         )}
@@ -283,49 +291,61 @@ export default function AdminBlog() {
       )}
 
       {loading ? <Spinner /> : (
-        <div className="bg-surf-low border border-outline-var rounded-xl overflow-hidden">
+        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
           {posts.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-body-s text-on-surf-var">No hay posts. Crea el primero con el botón de arriba.</p>
+            <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
+              <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
+                <span className="ms" style={{ fontSize: 32 }}>article</span>
+              </div>
+              <div className="text-center">
+                <p className="text-body-l text-on-surf font-medium">Sin posts</p>
+                <p className="text-body-s text-on-surf-var mt-1">Crea el primero con el botón de arriba.</p>
+              </div>
             </div>
           ) : posts.map(post => (
-            <div key={post.ID}>
+            <div key={post.ID} className="divide-y divide-outline-var">
               {editing?.ID === post.ID ? (
-                <div className="p-4">
+                <div className="p-5">
                   <PostForm initial={{ ...post }} onSave={handleSave}
                     onCancel={() => setEditing(null)} loading={saving} />
                 </div>
               ) : (
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-outline-var last:border-0 hover:bg-surf-high transition-colors group">
+                <div className="flex items-center gap-4 px-5 py-4 border-b border-outline-var last:border-0 hover:bg-surf-high transition-colors group">
                   {post.cover_image ? (
-                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-md object-cover shrink-0 border border-outline-var" />
+                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-outline-var" />
                   ) : (
-                    <div className="w-12 h-10 rounded-md bg-surf-high border border-outline-var flex items-center justify-center shrink-0">
-                      <span className="ms text-on-surf-var" style={{ fontSize: 16 }}>image</span>
+                    <div className="w-12 h-10 rounded-lg bg-surf-high border border-outline-var flex items-center justify-center shrink-0">
+                      <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>article</span>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-body-s text-on-surf font-medium truncate">{post.title}</p>
-                    <p className="text-label-s text-on-surf-var mt-0.5 truncate">{post.slug}</p>
+                    <p className="text-body-m text-on-surf font-medium truncate">{post.title}</p>
+                    <p className="text-label-s text-on-surf-var mt-0.5 truncate font-mono">{post.slug}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-label-s text-on-surf-var">{post.view_count ?? 0} vistas</span>
-                    <span className={`px-2 py-0.5 rounded-full text-label-s font-medium ${
+                    <span className="text-label-s text-on-surf-var hidden sm:block">{post.view_count ?? 0} vistas</span>
+                    <span className={`inline-flex items-center h-7 px-3 rounded-lg text-label-m font-medium ${
                       post.status === 'published'
                         ? 'bg-ter-con text-on-ter-con'
                         : 'bg-surf-high text-on-surf-var'
                     }`}>
                       {post.status === 'published' ? 'Publicado' : 'Borrador'}
                     </span>
+                    {post.redirect_url && (
+                      <span className="inline-flex items-center h-7 px-3 rounded-lg bg-sec-con text-on-sec-con text-label-m font-medium gap-1">
+                        <span className="ms" style={{ fontSize: 12 }}>open_in_new</span>
+                        Externo
+                      </span>
+                    )}
                     <button
                       onClick={() => { setEditing(post); setShowForm(false); }}
-                      className="opacity-0 group-hover:opacity-100 text-on-surf-var hover:text-pri transition-all p-1"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-pri hover:bg-pri-con transition-all"
                     >
                       <span className="ms" style={{ fontSize: 16 }}>edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(post.ID)}
-                      className="opacity-0 group-hover:opacity-100 text-on-surf-var hover:text-err transition-all p-1"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-err hover:bg-err-con transition-all"
                     >
                       <span className="ms" style={{ fontSize: 16 }}>delete</span>
                     </button>

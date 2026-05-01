@@ -4,6 +4,7 @@ import { IconButton } from '../ui/Button';
 const MINISTERIOS = [
   { label: 'Blog & Enseñanzas', to: '/blog' },
   { label: 'Eventos',           to: '/events' },
+  { label: 'Galería',           to: '/gallery' },
   { label: 'Oración',          to: '/prayer' },
   { label: 'Voluntariado',     to: '/volunteering' },
   { label: 'Células',          to: '/cells' },

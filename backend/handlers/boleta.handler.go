@@ -75,22 +75,30 @@ func (h *BoletaHandler) CreateBoleta(c echo.Context) error {
 
 // GetBoletas GET /api/v1/admin/boletas — admin ve todas, leader las suyas.
 func (h *BoletaHandler) GetBoletas(c echo.Context) error {
-	q := h.DB.Order("created_at DESC")
+	page, limit := parsePage(c)
 
+	q := h.DB.Model(&models.MemberBoleta{})
 	if role, _ := c.Get("user_role").(string); role == "leader" {
 		uid, _ := c.Get("user_id").(uint)
 		q = q.Where("leader_id = ?", uid)
 	}
-
 	if cat := c.QueryParam("category"); cat != "" {
 		q = q.Where("category = ?", cat)
 	}
+	if search := c.QueryParam("q"); search != "" {
+		like := "%" + search + "%"
+		q = q.Where("guest_name ILIKE ? OR inviter_name ILIKE ?", like, like)
+	}
 
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
 	var list []models.MemberBoleta
-	if err := q.Find(&list).Error; err != nil {
+	if err := q.Order("created_at DESC").Offset(offset).Limit(limit).Find(&list).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener las boletas."})
 	}
-	return c.JSON(http.StatusOK, list)
+	return c.JSON(http.StatusOK, PagedResponse{Data: list, Meta: newMeta(total, page, limit)})
 }
 
 // UpdateBoleta PUT /api/v1/admin/boletas/:id — admin o el líder que la creó.

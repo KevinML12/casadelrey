@@ -4,11 +4,13 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import CellReportForm from './CellReportForm';
 import Button from '../ui/Button';
+import Chip, { FilterChip } from '../ui/Chip';
+import { downloadCsv } from '../../lib/exportCsv';
 
-const STATUS = {
-  pendiente: { label: 'Pendiente',  cls: 'bg-surf-high text-on-surf-var' },
-  aprobado:  { label: 'Aprobado',   cls: 'bg-ter-con text-on-ter-con' },
-  rechazado: { label: 'Rechazado',  cls: 'bg-err-con text-on-err-con' },
+const STATUS_CONFIG = {
+  pendiente: { label: 'Pendiente', color: 'default',   icon: 'schedule' },
+  aprobado:  { label: 'Aprobado',  color: 'tertiary',  icon: 'check_circle' },
+  rechazado: { label: 'Rechazado', color: 'error',     icon: 'cancel' },
 };
 
 const Spinner = () => (
@@ -17,15 +19,21 @@ const Spinner = () => (
   </div>
 );
 
-function StatCard({ icon, label, value, sub }) {
+function MiniStat({ icon, label, value, tint = 'pri' }) {
+  const tintMap = {
+    pri: 'bg-pri-con text-on-pri-con',
+    sec: 'bg-sec-con text-on-sec-con',
+    ter: 'bg-ter-con text-on-ter-con',
+  };
   return (
-    <div className="bg-surf-low border border-outline-var rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="ms text-pri" style={{ fontSize: 18 }}>{icon}</span>
-        <span className="text-label-s text-on-surf-var uppercase tracking-widest">{label}</span>
+    <div className="bg-surf-low border border-outline-var rounded-2xl p-4 flex flex-col gap-2">
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tintMap[tint]}`}>
+        <span className="ms" style={{ fontSize: 16 }}>{icon}</span>
       </div>
-      <p className="text-headline-s text-on-surf font-black">{value}</p>
-      {sub && <p className="text-label-s text-on-surf-var mt-0.5">{sub}</p>}
+      <div>
+        <p className="text-label-s text-on-surf-var uppercase tracking-widest">{label}</p>
+        <p className="text-headline-s text-on-surf font-black">{value}</p>
+      </div>
     </div>
   );
 }
@@ -38,8 +46,8 @@ export default function CellReportsPage() {
   const [stats,     setStats]     = useState(null);
   const [loading,   setLoading]   = useState(true);
   const [showForm,  setShowForm]  = useState(false);
-  const [filter,    setFilter]    = useState('');   // status filter
-  const [expanded,  setExpanded]  = useState(null); // expanded report ID
+  const [filter,    setFilter]    = useState('');
+  const [expanded,  setExpanded]  = useState(null);
   const [approving, setApproving] = useState(null);
 
   const refresh = () => {
@@ -64,30 +72,52 @@ export default function CellReportsPage() {
       refresh();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al actualizar');
-    } finally {
-      setApproving(null);
-    }
+    } finally { setApproving(null); }
   };
 
   const pendingCount = reports.filter(r => r.status === 'pendiente').length;
 
+  const filterCounts = {
+    '':          reports.length,
+    pendiente:   reports.filter(r => r.status === 'pendiente').length,
+    aprobado:    reports.filter(r => r.status === 'aprobado').length,
+    rechazado:   reports.filter(r => r.status === 'rechazado').length,
+  };
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
-        <div>
-          <h1 className="text-headline-s text-on-surf font-black">Reportes de Células</h1>
-          {isAdmin && pendingCount > 0 && (
-            <p className="text-body-s text-on-surf-var mt-1">
-              <span className="text-pri font-semibold">{pendingCount}</span> reporte{pendingCount !== 1 ? 's' : ''} pendiente{pendingCount !== 1 ? 's' : ''} de aprobación
+
+      {/* Page header */}
+      <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
+            <span className="ms text-on-sec-con" style={{ fontSize: 22 }}>groups</span>
+          </div>
+          <div>
+            <h1 className="text-headline-s text-on-surf font-black leading-tight">Reportes de Células</h1>
+            <p className="text-body-s text-on-surf-var mt-0.5">
+              {isAdmin && pendingCount > 0
+                ? <><span className="text-pri font-semibold">{pendingCount}</span> pendiente{pendingCount !== 1 ? 's' : ''} de aprobación</>
+                : `${reports.length} reporte${reports.length !== 1 ? 's' : ''}`
+              }
             </p>
-          )}
+          </div>
         </div>
-        <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-          <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
-          {showForm ? 'Cancelar' : 'Nuevo reporte'}
-        </Button>
+        <div className="flex gap-2">
+          {isAdmin && (
+            <Button variant="tonal" onClick={() => downloadCsv(`/admin/export/cell-reports${filter ? `?status=${filter}` : ''}`, 'reportes-celulas.csv')}>
+              <span className="ms" style={{ fontSize: 16 }}>download</span>
+              Exportar CSV
+            </Button>
+          )}
+          <Button variant="filled" onClick={() => setShowForm(s => !s)}>
+            <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
+            {showForm ? 'Cancelar' : 'Nuevo reporte'}
+          </Button>
+        </div>
       </div>
 
+      {/* Formulario */}
       {showForm && (
         <div className="mb-8 p-6 rounded-2xl bg-surf-low border border-outline-var">
           <CellReportForm onSuccess={() => { setShowForm(false); refresh(); }} />
@@ -97,60 +127,59 @@ export default function CellReportsPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <StatCard icon="article"       label="Reportes"     value={stats.total_reports ?? 0} />
-          <StatCard icon="groups"        label="Asistentes"   value={stats.total_attendees ?? 0} />
-          <StatCard icon="favorite"      label="Convertidos"  value={stats.total_converts ?? 0} />
-          <StatCard icon="replay"        label="Reconciliados" value={stats.total_reconciled ?? 0} />
-          <StatCard icon="savings"       label="Ofrenda total" value={`Q${(stats.total_offering ?? 0).toFixed(2)}`} />
+          <MiniStat icon="article"   label="Reportes"      value={stats.total_reports ?? 0}    tint="pri" />
+          <MiniStat icon="groups"    label="Asistentes"    value={stats.total_attendees ?? 0}   tint="sec" />
+          <MiniStat icon="church"    label="Convertidos"   value={stats.total_converts ?? 0}    tint="ter" />
+          <MiniStat icon="favorite"  label="Reconciliados" value={stats.total_reconciled ?? 0}  tint="pri" />
+          <MiniStat icon="savings"   label="Ofrenda"       value={`Q${(stats.total_offering ?? 0).toFixed(0)}`} tint="sec" />
         </div>
       )}
 
-      {/* Filtro de status (admin) */}
+      {/* Filter chips */}
       {isAdmin && (
         <div className="flex gap-2 mb-6 flex-wrap">
-          {[['', 'Todos'], ['pendiente', 'Pendientes'], ['aprobado', 'Aprobados'], ['rechazado', 'Rechazados']].map(([val, lbl]) => (
-            <button key={val} onClick={() => setFilter(val)}
-              className={`px-4 py-2 rounded-full text-label-m font-medium border transition-all ${
-                filter === val
-                  ? 'border-pri bg-pri-con text-on-pri-con'
-                  : 'border-outline-var text-on-surf-var hover:border-pri/40 hover:text-pri'
-              }`}>
+          {[
+            { val: '',          lbl: 'Todos',      icon: 'apps' },
+            { val: 'pendiente', lbl: 'Pendientes', icon: 'schedule' },
+            { val: 'aprobado',  lbl: 'Aprobados',  icon: 'check_circle' },
+            { val: 'rechazado', lbl: 'Rechazados', icon: 'cancel' },
+          ].map(({ val, lbl, icon }) => (
+            <FilterChip key={val} selected={filter === val} icon={icon}
+              count={val ? filterCounts[val] : undefined}
+              onClick={() => setFilter(val)}>
               {lbl}
-            </button>
+            </FilterChip>
           ))}
         </div>
       )}
 
-      {/* Por célula */}
+      {/* Resumen por célula */}
       {stats?.by_cell?.length > 0 && (
-        <div className="mb-8 p-5 rounded-2xl bg-surf-low border border-outline-var">
-          <h3 className="text-title-s text-on-surf font-semibold mb-4 flex items-center gap-2">
+        <div className="mb-8 bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-outline-var flex items-center gap-2">
             <span className="ms text-pri" style={{ fontSize: 18 }}>bar_chart</span>
-            Resumen por célula
-          </h3>
+            <h3 className="text-title-s text-on-surf font-semibold">Resumen por célula</h3>
+          </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-body-s">
+            <table className="w-full">
               <thead>
-                <tr className="border-b border-outline-var text-label-s text-on-surf-var uppercase">
-                  <th className="text-left pb-2 pr-4">Célula</th>
-                  <th className="text-right pb-2 pr-4">Reportes</th>
-                  <th className="text-right pb-2 pr-4">Asistentes</th>
-                  <th className="text-right pb-2 pr-4">Conv.</th>
-                  <th className="text-right pb-2 pr-4">Rec.</th>
-                  <th className="text-right pb-2">Ofrenda</th>
+                <tr className="border-b border-outline-var bg-surf">
+                  {['Célula', 'Reportes', 'Asistentes', 'Conv.', 'Rec.', 'Ofrenda'].map(h => (
+                    <th key={h} className="text-left px-5 py-3 text-label-s text-on-surf-var uppercase tracking-widest">{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-outline-var">
                 {stats.by_cell.map((c, i) => (
-                  <tr key={i} className="border-b border-outline-var last:border-0">
-                    <td className="py-2 pr-4 font-medium text-on-surf">
-                      {c.cell_code && <span className="text-pri mr-1">[{c.cell_code}]</span>}{c.cell_name}
+                  <tr key={i} className="hover:bg-surf-high transition-colors">
+                    <td className="px-5 py-3 text-body-s text-on-surf font-medium">
+                      {c.cell_code && <span className="text-pri mr-1.5 font-mono">[{c.cell_code}]</span>}{c.cell_name}
                     </td>
-                    <td className="py-2 pr-4 text-right text-on-surf-var">{c.reports}</td>
-                    <td className="py-2 pr-4 text-right text-on-surf-var">{c.total_attendees}</td>
-                    <td className="py-2 pr-4 text-right text-on-surf-var">{c.converts}</td>
-                    <td className="py-2 pr-4 text-right text-on-surf-var">{c.reconciled}</td>
-                    <td className="py-2 text-right text-ter font-semibold">Q{Number(c.total_offering ?? 0).toFixed(0)}</td>
+                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.reports}</td>
+                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.total_attendees}</td>
+                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.converts}</td>
+                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.reconciled}</td>
+                    <td className="px-5 py-3 text-body-s text-ter font-semibold">Q{Number(c.total_offering ?? 0).toFixed(0)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -161,104 +190,131 @@ export default function CellReportsPage() {
 
       {/* Lista de reportes */}
       {loading ? <Spinner /> : reports.length === 0 ? (
-        <div className="text-center py-16 bg-surf-low border border-outline-var rounded-2xl">
-          <span className="ms text-on-surf-var block mb-3" style={{ fontSize: 32 }}>inbox</span>
-          <p className="text-body-s text-on-surf-var">No hay reportes{filter ? ` con estado "${filter}"` : ''}.</p>
+        <div className="bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
+            <span className="ms text-on-surf-var" style={{ fontSize: 32 }}>inbox</span>
+          </div>
+          <div className="text-center">
+            <p className="text-body-l text-on-surf font-medium">Sin reportes</p>
+            <p className="text-body-s text-on-surf-var mt-1">
+              {filter ? `No hay reportes con estado "${filter}".` : 'Crea el primero con el botón de arriba.'}
+            </p>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
           {reports.map(r => {
-            const st = STATUS[r.status] || STATUS.pendiente;
+            const st = STATUS_CONFIG[r.status] || STATUS_CONFIG.pendiente;
             const open = expanded === r.ID;
             return (
               <div key={r.ID} className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
-                {/* Header */}
+
+                {/* Accordion trigger */}
                 <button onClick={() => setExpanded(open ? null : r.ID)}
-                  className="w-full text-left p-5 flex items-start gap-4 hover:bg-surf-high transition-colors">
+                  className="w-full text-left flex items-start gap-4 p-5 hover:bg-surf-high transition-colors">
+
+                  {/* Leading: cell type indicator */}
+                  <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="ms text-on-sec-con" style={{ fontSize: 18 }}>groups</span>
+                  </div>
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       {r.cell_code && (
-                        <span className="text-label-s font-mono px-2 py-0.5 rounded-full bg-pri-con text-on-pri-con">{r.cell_code}</span>
+                        <span className="text-label-s font-mono px-2 h-7 flex items-center rounded-lg bg-pri-con text-on-pri-con">{r.cell_code}</span>
                       )}
-                      <span className="text-title-s text-on-surf font-semibold">{r.cell_name}</span>
-                      <span className={`text-label-s px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
+                      <span className="text-body-l text-on-surf font-medium">{r.cell_name}</span>
+                      <Chip color={st.color} icon={st.icon}>{st.label}</Chip>
                     </div>
-                    <div className="flex gap-4 text-label-s text-on-surf-var flex-wrap">
-                      {isAdmin && r.leader_name && <span className="flex items-center gap-1"><span className="ms" style={{fontSize:12}}>person</span>{r.leader_name}</span>}
-                      <span className="flex items-center gap-1"><span className="ms" style={{fontSize:12}}>calendar_today</span>
-                        {r.meeting_date ? new Date(r.meeting_date + 'T12:00').toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'}) : '—'}
+                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-on-surf-var">
+                      {isAdmin && r.leader_name && (
+                        <span className="flex items-center gap-1">
+                          <span className="ms" style={{ fontSize: 13 }}>person</span>{r.leader_name}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <span className="ms" style={{ fontSize: 13 }}>calendar_today</span>
+                        {r.meeting_date ? new Date(r.meeting_date + 'T12:00').toLocaleDateString('es-ES', {
+                          day: '2-digit', month: 'short', year: 'numeric'
+                        }) : '—'}
                       </span>
-                      <span className="flex items-center gap-1"><span className="ms" style={{fontSize:12}}>groups</span>{r.total_attendees ?? 0} asist.</span>
-                      {(r.converts > 0 || r.reconciled > 0) && (
-                        <span className="flex items-center gap-1 text-pri font-medium">
-                          <span className="ms" style={{fontSize:12}}>person_add</span>
+                      <span className="flex items-center gap-1">
+                        <span className="ms" style={{ fontSize: 13 }}>groups</span>
+                        {r.total_attendees ?? 0} asist.
+                      </span>
+                      {((r.converts ?? 0) + (r.reconciled ?? 0)) > 0 && (
+                        <span className="flex items-center gap-1 text-ter font-medium">
+                          <span className="ms" style={{ fontSize: 13 }}>person_add</span>
                           {(r.converts || 0) + (r.reconciled || 0)} nuevos
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className="ms text-on-surf-var shrink-0" style={{ fontSize: 20 }}>
+
+                  <span className="ms text-on-surf-var shrink-0 mt-1" style={{ fontSize: 20 }}>
                     {open ? 'expand_less' : 'expand_more'}
                   </span>
                 </button>
 
-                {/* Detalle */}
+                {/* Detalle expandido */}
                 {open && (
-                  <div className="border-t border-outline-var p-5 space-y-5">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="border-t border-outline-var p-5 space-y-5 bg-surf">
+
+                    {/* Números */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { icon: 'groups',       label: 'Total asistentes', value: r.total_attendees ?? 0 },
-                        { icon: 'favorite',     label: 'Convertidos',      value: r.converts ?? 0 },
-                        { icon: 'replay',       label: 'Reconciliados',    value: r.reconciled ?? 0 },
-                        { icon: 'savings',      label: 'Ofrenda',          value: `Q${Number(r.offering ?? 0).toFixed(2)}` },
-                      ].map(({ icon, label, value }) => (
-                        <div key={label} className="text-center p-3 rounded-xl bg-surf border border-outline-var">
-                          <span className="ms text-pri block mb-1" style={{ fontSize: 20 }}>{icon}</span>
-                          <p className="text-title-m text-on-surf font-bold">{value}</p>
-                          <p className="text-label-s text-on-surf-var">{label}</p>
+                        { icon: 'groups',      label: 'Asistentes',   value: r.total_attendees ?? 0, tint: 'bg-sec-con text-on-sec-con' },
+                        { icon: 'church',      label: 'Convertidos',  value: r.converts ?? 0,        tint: 'bg-ter-con text-on-ter-con' },
+                        { icon: 'favorite',    label: 'Reconciliados', value: r.reconciled ?? 0,     tint: 'bg-pri-con text-on-pri-con' },
+                        { icon: 'savings',     label: 'Ofrenda',      value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'bg-sec-con text-on-sec-con' },
+                      ].map(({ icon, label, value, tint }) => (
+                        <div key={label} className="rounded-2xl border border-outline-var bg-surf-low p-4 flex flex-col gap-2">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tint}`}>
+                            <span className="ms" style={{ fontSize: 16 }}>{icon}</span>
+                          </div>
+                          <div>
+                            <p className="text-label-s text-on-surf-var uppercase tracking-widest">{label}</p>
+                            <p className="text-headline-s text-on-surf font-black">{value}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-body-s">
-                      {r.pastor_name && (
-                        <div><span className="text-on-surf-var">Pastor: </span><span className="text-on-surf font-medium">{r.pastor_name}</span></div>
-                      )}
-                      {r.topic && (
-                        <div><span className="text-on-surf-var">Tema: </span><span className="text-on-surf font-medium">{r.topic}</span></div>
-                      )}
-                      {r.host_name && (
-                        <div><span className="text-on-surf-var">Anfitrión: </span><span className="text-on-surf font-medium">{r.host_name}</span>
-                          {r.host_phone && <span className="text-on-surf-var ml-2">· {r.host_phone}</span>}
+                    {/* Info adicional */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-s">
+                      {[
+                        r.pastor_name && { label: 'Pastor', value: r.pastor_name },
+                        r.topic       && { label: 'Tema',   value: r.topic },
+                        r.host_name   && { label: 'Anfitrión', value: `${r.host_name}${r.host_phone ? ` · ${r.host_phone}` : ''}` },
+                        r.address     && { label: 'Dirección', value: r.address },
+                      ].filter(Boolean).map(({ label, value }) => (
+                        <div key={label} className="flex gap-1.5">
+                          <span className="text-on-surf-var shrink-0">{label}:</span>
+                          <span className="text-on-surf font-medium">{value}</span>
                         </div>
-                      )}
-                      {r.address && (
-                        <div><span className="text-on-surf-var">Dirección: </span><span className="text-on-surf font-medium">{r.address}</span></div>
-                      )}
+                      ))}
                     </div>
 
                     {r.photo_url && (
                       <img src={r.photo_url} alt="Foto de la reunión"
-                        className="w-full max-h-60 object-cover rounded-xl border border-outline-var" />
+                        className="w-full max-h-60 object-cover rounded-2xl border border-outline-var" />
                     )}
 
                     {r.notes && (
-                      <div className="p-4 rounded-xl bg-surf border border-outline-var">
+                      <div className="px-4 py-3 rounded-xl border border-outline-var bg-surf-low">
                         <p className="text-body-s text-on-surf-var leading-relaxed">{r.notes}</p>
                       </div>
                     )}
 
-                    {/* Botones de aprobación (solo admin, solo si pendiente) */}
+                    {/* Botones aprobación */}
                     {isAdmin && r.status === 'pendiente' && (
                       <div className="flex gap-3 pt-2">
-                        <Button variant="filled" onClick={() => approve(r.ID, 'aprobado')}
-                          disabled={!!approving}>
+                        <Button variant="filled" onClick={() => approve(r.ID, 'aprobado')} disabled={!!approving}>
                           <span className="ms" style={{ fontSize: 16 }}>check_circle</span>
                           {approving === r.ID + 'aprobado' ? 'Aprobando…' : 'Aprobar'}
                         </Button>
-                        <Button variant="outlined" onClick={() => approve(r.ID, 'rechazado')}
-                          disabled={!!approving}
-                          className="border-err text-err hover:bg-err-con">
+                        <Button variant="outlined" onClick={() => approve(r.ID, 'rechazado')} disabled={!!approving}
+                          className="border-err text-err before:bg-err hover:before:opacity-[.08]">
                           <span className="ms" style={{ fontSize: 16 }}>cancel</span>
                           {approving === r.ID + 'rechazado' ? 'Rechazando…' : 'Rechazar'}
                         </Button>

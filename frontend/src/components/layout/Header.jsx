@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { label: 'Conócenos',   to: '/about' },
   { label: 'Blog',        to: '/blog' },
   { label: 'Eventos',     to: '/events' },
+  { label: 'Galería',     to: '/gallery' },
   { label: 'Oración',     to: '/prayer' },
   { label: 'Voluntariado', to: '/volunteering' },
 ];

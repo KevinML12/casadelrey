@@ -4,8 +4,9 @@
  */
 
 const fieldBase = [
-  'w-full rounded-sm border border-outline bg-transparent text-on-surf',
+  'w-full rounded border border-outline-var bg-transparent text-on-surf',
   'placeholder:text-on-surf-var',
+  'hover:border-on-surf-var',
   'focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15',
   'transition-all duration-150 text-body-m',
   'disabled:opacity-[.38] disabled:cursor-not-allowed',

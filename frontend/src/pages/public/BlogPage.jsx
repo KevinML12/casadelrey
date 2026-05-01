@@ -137,9 +137,10 @@ function PostList({ posts }) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {posts.map(p => (
-        <Link key={p.ID} to={`/blog/${p.slug}`}>
-          <div className="h-full flex flex-col rounded-xl border border-outline-var bg-surf-low hover:shadow-elev-2 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+      {posts.map(p => {
+        const isExternal = !!p.redirect_url;
+        const cardBody = (
+          <div className="h-full flex flex-col rounded-2xl border border-outline-var bg-surf-low hover:shadow-elev-2 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             {p.cover_image ? (
               <img src={p.cover_image} alt={p.title} className="w-full h-44 object-cover" />
             ) : (
@@ -162,12 +163,17 @@ function PostList({ posts }) {
                   <span className="ms" style={{ fontSize: 12 }}>calendar_today</span>
                   {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES') : ''}
                 </span>
-                <span className="text-label-s text-pri font-medium">Leer →</span>
+                <span className="text-label-s text-pri font-medium flex items-center gap-1">
+                  {isExternal ? <><span className="ms" style={{ fontSize: 12 }}>open_in_new</span>Ver</> : 'Leer →'}
+                </span>
               </div>
             </div>
           </div>
-        </Link>
-      ))}
+        );
+        return isExternal
+          ? <a key={p.ID} href={p.redirect_url} target="_blank" rel="noopener noreferrer" className="block">{cardBody}</a>
+          : <Link key={p.ID} to={`/blog/${p.slug}`} className="block">{cardBody}</Link>;
+      })}
     </div>
   );
 }

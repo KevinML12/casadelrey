@@ -92,26 +92,33 @@ func (h *CellReportHandler) CreateCellReport(c echo.Context) error {
 
 // GetAllCellReports GET /api/v1/admin/cell-reports — admin ve todo, leader solo los suyos.
 func (h *CellReportHandler) GetAllCellReports(c echo.Context) error {
-	q := h.DB.Order("created_at DESC")
+	page, limit := parsePage(c)
 
+	q := h.DB.Model(&models.CellReport{})
 	if role, _ := c.Get("user_role").(string); role == "leader" {
 		uid, _ := c.Get("user_id").(uint)
 		q = q.Where("leader_id = ?", uid)
 	}
-
-	// Filtros opcionales por query param
 	if status := c.QueryParam("status"); status != "" {
 		q = q.Where("status = ?", status)
 	}
 	if cellType := c.QueryParam("cell_type"); cellType != "" {
 		q = q.Where("cell_type = ?", cellType)
 	}
+	if search := c.QueryParam("q"); search != "" {
+		like := "%" + search + "%"
+		q = q.Where("cell_name ILIKE ? OR leader_name ILIKE ?", like, like)
+	}
 
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
 	var reports []models.CellReport
-	if err := q.Find(&reports).Error; err != nil {
+	if err := q.Order("created_at DESC").Offset(offset).Limit(limit).Find(&reports).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener los reportes."})
 	}
-	return c.JSON(http.StatusOK, reports)
+	return c.JSON(http.StatusOK, PagedResponse{Data: reports, Meta: newMeta(total, page, limit)})
 }
 
 // ApproveReport PUT /api/v1/admin/cell-reports/:id/approve — solo admin.

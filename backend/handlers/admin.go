@@ -74,23 +74,32 @@ func (h *AdminHandler) GetKPIs(c echo.Context) error {
 
 // GetDonations godoc
 // GET /api/v1/admin/donations  [Requiere auth + rol admin]
-// Lista las últimas 50 donaciones exitosas, ordenadas por más recientes.
+// Lista donaciones exitosas con búsqueda y paginación.
 func (h *AdminHandler) GetDonations(c echo.Context) error {
-	var donations []models.Donation
-	result := h.DB.
-		Where("is_successful = ?", true).
-		Order("created_at DESC").
-		Limit(50).
-		Find(&donations)
+	page, limit := parsePage(c)
 
-	if result.Error != nil {
-		log.Printf("[Admin] Error al obtener donaciones: %v", result.Error)
+	q := h.DB.Model(&models.Donation{}).Where("is_successful = ?", true)
+	if search := c.QueryParam("q"); search != "" {
+		like := "%" + search + "%"
+		q = q.Where("name ILIKE ? OR email ILIKE ?", like, like)
+	}
+	if purpose := c.QueryParam("purpose"); purpose != "" {
+		q = q.Where("donation_purpose = ?", purpose)
+	}
+
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
+	var donations []models.Donation
+	if err := q.Order("created_at DESC").Offset(offset).Limit(limit).Find(&donations).Error; err != nil {
+		log.Printf("[Admin] Error al obtener donaciones: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error al obtener las donaciones.",
 		})
 	}
 
-	return c.JSON(http.StatusOK, donations)
+	return c.JSON(http.StatusOK, PagedResponse{Data: donations, Meta: newMeta(total, page, limit)})
 }
 
 // UpdateUserRole PUT /api/v1/admin/users/:id/role — admin, actualizar rol (member, leader, admin).
@@ -110,6 +119,34 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Rol actualizado."})
+}
+
+// GetUsers GET /api/v1/admin/users — admin obtiene todos los usuarios (con búsqueda y paginación).
+func (h *AdminHandler) GetUsers(c echo.Context) error {
+	page, limit := parsePage(c)
+
+	q := h.DB.Model(&models.User{})
+	if search := c.QueryParam("q"); search != "" {
+		like := "%" + search + "%"
+		q = q.Where("name ILIKE ? OR email ILIKE ?", like, like)
+	}
+	if role := c.QueryParam("role"); role != "" {
+		q = q.Where("role = ?", role)
+	}
+
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
+	var users []models.User
+	if err := q.Order("created_at DESC").Offset(offset).Limit(limit).Find(&users).Error; err != nil {
+		log.Printf("[Admin] Error al obtener usuarios: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener usuarios."})
+	}
+	for i := range users {
+		users[i].Password = ""
+	}
+	return c.JSON(http.StatusOK, PagedResponse{Data: users, Meta: newMeta(total, page, limit)})
 }
 
 // GetLeaders GET /api/v1/admin/leaders — admin obtiene lista de líderes para asignar voluntarios.
