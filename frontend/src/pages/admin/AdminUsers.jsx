@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip, { FilterChip } from '../../components/ui/Chip';
+import CellCodePicker from '../../components/ui/CellCodePicker';
 
 const ROLES = ['member', 'leader', 'volunteer', 'admin'];
 
@@ -11,6 +12,62 @@ const ROLE_CONFIG = {
   volunteer: { label: 'Voluntario', color: 'secondary', icon: 'favorite' },
   member:    { label: 'Miembro',    color: 'default',   icon: 'person' },
 };
+
+// Modal para editar el código de célula de un líder
+function CellModal({ user, onClose, onSaved }) {
+  const [cellCode, setCellCode] = useState(user.cell_code || '');
+  const [cellType, setCellType] = useState(user.cell_type || '');
+  const [saving,   setSaving]   = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.put(`/admin/users/${user.ID}/cell`, { cell_code: cellCode, cell_type: cellType });
+      toast.success('Código de célula actualizado');
+      onSaved(user.ID, cellCode, cellType);
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al actualizar');
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-surf rounded-2xl border border-outline-var shadow-elev-3 w-full max-w-md p-6 animate-fade-in">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="text-title-l text-on-surf font-bold">Código de célula</h3>
+            <p className="text-body-s text-on-surf-var mt-0.5">{user.name}</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surf-dim text-on-surf-var transition-colors">
+            <span className="ms" style={{ fontSize: 18 }}>close</span>
+          </button>
+        </div>
+
+        <CellCodePicker
+          cellCode={cellCode}
+          cellType={cellType}
+          onChange={({ cell_code, cell_type }) => { setCellCode(cell_code); setCellType(cell_type); }}
+        />
+
+        <div className="flex gap-3 mt-6 pt-4 border-t border-outline-var">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            <span className="ms" style={{ fontSize: 16 }}>save</span>
+            {saving ? 'Guardando…' : 'Guardar'}
+          </button>
+          <button onClick={onClose} className="px-4 h-10 rounded-xl text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RoleSelect({ userId, currentRole, onUpdated }) {
   const [saving, setSaving] = useState(false);
@@ -51,10 +108,11 @@ const Spinner = () => (
 );
 
 export default function AdminUsers() {
-  const [users,   setUsers]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search,  setSearch]  = useState('');
-  const [filter,  setFilter]  = useState('');
+  const [users,      setUsers]      = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [search,     setSearch]     = useState('');
+  const [filter,     setFilter]     = useState('');
+  const [cellModal,  setCellModal]  = useState(null); // user object o null
 
   useEffect(() => {
     apiClient.get('/admin/users')
@@ -65,6 +123,9 @@ export default function AdminUsers() {
 
   const updateRole = (id, role) =>
     setUsers(prev => prev.map(u => u.ID === id ? { ...u, role } : u));
+
+  const updateCell = (id, cell_code, cell_type) =>
+    setUsers(prev => prev.map(u => u.ID === id ? { ...u, cell_code, cell_type } : u));
 
   const filtered = users.filter(u => {
     const q = search.toLowerCase();
@@ -80,6 +141,13 @@ export default function AdminUsers() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+      {cellModal && (
+        <CellModal
+          user={cellModal}
+          onClose={() => setCellModal(null)}
+          onSaved={updateCell}
+        />
+      )}
 
       {/* Page header */}
       <div className="flex items-center gap-4 mb-8">
@@ -156,6 +224,18 @@ export default function AdminUsers() {
                       <p className="text-label-s text-on-surf-var capitalize mt-0.5">{u.cell_type}</p>
                     )}
                   </div>
+
+                  {/* Botón código célula — solo visible para líderes */}
+                  {u.role === 'leader' && (
+                    <button
+                      onClick={() => setCellModal(u)}
+                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-outline-var text-label-m text-on-surf-var hover:border-pri hover:text-pri transition-colors font-mono"
+                      title="Editar código de célula"
+                    >
+                      <span className="ms" style={{ fontSize: 14 }}>tag</span>
+                      {u.cell_code || 'Sin código'}
+                    </button>
+                  )}
 
                   {/* Role selector */}
                   <div className="shrink-0">

@@ -1,8 +1,15 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-export default function ProtectedRoute({ children, adminOnly = false, leaderOnly = false, panel = false }) {
-  const { isAuthenticated, isAdmin, isLeader, canAccessPanel, loading } = useAuth();
+export default function ProtectedRoute({
+  children,
+  adminOnly    = false,
+  leaderOnly   = false,
+  leaderOrAdmin = false,
+  volunteerOnly = false,
+  panel        = false,
+}) {
+  const { isAuthenticated, isAdmin, isLeader, isVolunteer, canAccessPanel, loading } = useAuth();
 
   if (loading) {
     return (
@@ -13,9 +20,11 @@ export default function ProtectedRoute({ children, adminOnly = false, leaderOnly
   }
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (adminOnly && !isAdmin) return <Navigate to="/" replace />;
-  if (leaderOnly && !isLeader) return <Navigate to={isAdmin ? '/admin' : '/'} replace />;
-  if (panel && !canAccessPanel) return <Navigate to="/" replace />;
+  if (adminOnly    && !isAdmin)                  return <Navigate to="/"      replace />;
+  if (leaderOnly   && !isLeader)                 return <Navigate to={isAdmin ? '/admin' : '/'} replace />;
+  if (leaderOrAdmin && !isAdmin && !isLeader)    return <Navigate to="/"      replace />;
+  if (volunteerOnly && !isVolunteer)             return <Navigate to={isAdmin ? '/admin' : isLeader ? '/leader' : '/'} replace />;
+  if (panel        && !canAccessPanel)           return <Navigate to="/"      replace />;
 
   return children;
 }

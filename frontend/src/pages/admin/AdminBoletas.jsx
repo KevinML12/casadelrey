@@ -4,7 +4,6 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip, { FilterChip } from '../../components/ui/Chip';
-import { downloadCsv } from '../../lib/exportCsv';
 
 const CATEGORIES = [
   { value: 'convertido',   label: 'Convertido',   color: 'tertiary',  icon: 'church' },
@@ -185,10 +184,6 @@ export default function AdminBoletas() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="tonal" onClick={() => downloadCsv(`/admin/export/boletas${catFilter ? `?category=${catFilter}` : ''}`, 'boletas.csv')}>
-            <span className="ms" style={{ fontSize: 16 }}>download</span>
-            Exportar CSV
-          </Button>
           <Button variant="filled" onClick={() => setShowForm(s => !s)}>
             <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
             {showForm ? 'Cancelar' : 'Nueva boleta'}

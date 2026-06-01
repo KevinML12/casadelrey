@@ -93,7 +93,19 @@ function TTSPlayer({ content }) {
   );
 }
 
+// Detecta la plataforma desde la URL para mostrar el ícono y nombre correcto
+function getSocialPlatform(url = '') {
+  if (!url) return null;
+  if (url.includes('instagram.com'))  return { label: 'Instagram',  icon: 'photo_camera' };
+  if (url.includes('facebook.com'))   return { label: 'Facebook',   icon: 'thumb_up' };
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return { label: 'YouTube', icon: 'play_circle' };
+  if (url.includes('tiktok.com'))     return { label: 'TikTok',     icon: 'music_video' };
+  return { label: 'Ver publicación', icon: 'open_in_new' };
+}
+
 function PostDetail({ post }) {
+  const social = getSocialPlatform(post.redirect_url);
+
   return (
     <div className="max-w-2xl mx-auto">
       <Link to="/blog"
@@ -112,6 +124,25 @@ function PostDetail({ post }) {
         {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
       </p>
       <h1 className="text-headline-l text-on-surf font-black leading-tight mb-6">{post.title}</h1>
+
+      {/* Banner de red social */}
+      {post.redirect_url && social && (
+        <a
+          href={post.redirect_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-outline-var bg-surf-low hover:bg-surf-high transition-colors mb-8 group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pri-con flex items-center justify-center shrink-0">
+            <span className="ms text-on-pri-con" style={{ fontSize: 20 }}>{social.icon}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-label-l text-on-surf font-semibold">Ver en {social.label}</p>
+            <p className="text-label-s text-on-surf-var truncate">{post.redirect_url}</p>
+          </div>
+          <span className="ms text-on-surf-var group-hover:text-on-surf transition-colors shrink-0" style={{ fontSize: 18 }}>open_in_new</span>
+        </a>
+      )}
 
       <div className="mb-8">
         <TTSPlayer content={post.content} />

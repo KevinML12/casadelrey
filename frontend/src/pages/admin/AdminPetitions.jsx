@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip from '../../components/ui/Chip';
-import { IconButton } from '../../components/ui/Button';
+import Button, { IconButton } from '../../components/ui/Button';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
@@ -24,13 +24,69 @@ function EmptyState() {
   );
 }
 
+function printWeeklyPetitions(data) {
+  const { petitions, week_start, week_end } = data;
+  if (!petitions?.length) { toast('No hay peticiones esta semana'); return; }
+
+  const fmtDate = (d) => d ? new Date(d + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+
+  const pages = petitions.map((p, i) => `
+    <div class="page">
+      <div class="header">
+        <h1>Casa del Rey</h1>
+        <p class="sub">Petición de oración — Semana ${fmtDate(week_start)} al ${fmtDate(week_end)}</p>
+        <p class="num">${i + 1} / ${petitions.length}</p>
+      </div>
+      <div class="body">
+        <div class="field"><span class="lbl">Nombre</span><span class="val">${p.name || '—'}</span></div>
+        ${p.email    ? `<div class="field"><span class="lbl">Correo</span><span class="val">${p.email}</span></div>` : ''}
+        ${p.phone    ? `<div class="field"><span class="lbl">Teléfono</span><span class="val">${p.phone}</span></div>` : ''}
+        ${p.category ? `<div class="field"><span class="lbl">Categoría</span><span class="val">${p.category}</span></div>` : ''}
+        ${p.subject  ? `<div class="field"><span class="lbl">Asunto</span><span class="val">${p.subject}</span></div>` : ''}
+        <div class="msg-label">Mensaje de oración</div>
+        <div class="msg">${p.message || '—'}</div>
+        <div class="date">Recibida el ${p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '—'}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Peticiones Semana ${week_start}</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: Georgia, serif; color: #0a0a0a; background: white; }
+      .page { page-break-after: always; min-height: 100vh; padding: 48px; display: flex; flex-direction: column; gap: 32px; }
+      .page:last-child { page-break-after: auto; }
+      .header { border-bottom: 2px solid #0D1B4B; padding-bottom: 16px; }
+      .header h1 { font-size: 24px; color: #0D1B4B; font-weight: 900; letter-spacing: -0.5px; }
+      .header .sub { font-size: 13px; color: #555; margin-top: 4px; }
+      .header .num { font-size: 12px; color: #999; margin-top: 2px; }
+      .body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+      .field { display: flex; gap: 8px; align-items: baseline; }
+      .lbl { font-size: 12px; font-weight: 700; color: #0D1B4B; text-transform: uppercase; letter-spacing: 0.05em; width: 90px; flex-shrink: 0; }
+      .val { font-size: 15px; color: #0a0a0a; }
+      .msg-label { font-size: 12px; font-weight: 700; color: #0D1B4B; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px; }
+      .msg { font-size: 16px; line-height: 1.7; color: #0a0a0a; background: #f4f6fb; border-left: 3px solid #0D1B4B; padding: 16px 20px; border-radius: 4px; margin-top: 8px; white-space: pre-wrap; }
+      .date { font-size: 12px; color: #999; margin-top: auto; padding-top: 24px; }
+      @media print { .page { padding: 32px; } }
+    </style>
+  </head><body>${pages}</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 500);
+}
+
 export default function AdminPetitions() {
-  const [petitions, setPetitions] = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [petitions,   setPetitions]   = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [pdfLoading,  setPdfLoading]  = useState(false);
 
   const load = () =>
     apiClient.get('/admin/petitions')
-      .then(r => setPetitions(r.data || []))
+      .then(r => setPetitions(r.data?.data || r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
 
@@ -42,6 +98,15 @@ export default function AdminPetitions() {
       setPetitions(prev => prev.map(p => p.ID === id ? { ...p, is_answered: true } : p));
       toast.success('Marcada como respondida');
     } catch { toast.error('Error al actualizar'); }
+  };
+
+  const handleWeeklyPdf = async () => {
+    setPdfLoading(true);
+    try {
+      const r = await apiClient.get('/admin/petitions/weekly');
+      printWeeklyPetitions(r.data);
+    } catch { toast.error('Error al obtener peticiones de la semana'); }
+    finally { setPdfLoading(false); }
   };
 
   const unread = petitions.filter(p => !p.is_answered).length;
@@ -64,9 +129,13 @@ export default function AdminPetitions() {
             </p>
           </div>
         </div>
-        {unread > 0 && (
-          <Chip color="primary">{unread} nueva{unread > 1 ? 's' : ''}</Chip>
-        )}
+        <div className="flex items-center gap-3">
+          {unread > 0 && <Chip color="primary">{unread} nueva{unread > 1 ? 's' : ''}</Chip>}
+          <Button variant="outlined" onClick={handleWeeklyPdf} disabled={pdfLoading}>
+            <span className="ms" style={{ fontSize: 16 }}>print</span>
+            {pdfLoading ? 'Cargando…' : 'PDF semanal'}
+          </Button>
+        </div>
       </div>
 
       {loading ? <Spinner /> : petitions.length === 0 ? (

@@ -121,6 +121,30 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Rol actualizado."})
 }
 
+// UpdateUserCell PUT /api/v1/admin/users/:id/cell — admin, asignar código y tipo de célula a un líder.
+func (h *AdminHandler) UpdateUserCell(c echo.Context) error {
+	id := c.Param("id")
+	var req struct {
+		CellCode string `json:"cell_code"`
+		CellType string `json:"cell_type"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+	}
+	validTypes := map[string]bool{"hombres": true, "mujeres": true, "jovenes": true, "prejus": true, "ninos": true, "": true}
+	if !validTypes[req.CellType] {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Tipo de célula no válido."})
+	}
+	result := h.DB.Model(&models.User{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"cell_code": req.CellCode,
+		"cell_type": req.CellType,
+	})
+	if result.Error != nil || result.RowsAffected == 0 {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "Código de célula actualizado."})
+}
+
 // GetUsers GET /api/v1/admin/users — admin obtiene todos los usuarios (con búsqueda y paginación).
 func (h *AdminHandler) GetUsers(c echo.Context) error {
 	page, limit := parsePage(c)

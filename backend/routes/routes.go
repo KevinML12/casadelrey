@@ -33,7 +33,6 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	rsvpHandler          := handlers.NewRSVPHandler(db)
 	leaderDashHandler    := handlers.NewLeaderDashboardHandler(db)
 	activityLogHandler   := handlers.NewActivityLogHandler(db)
-	pdfHandler           := handlers.NewPDFHandler(db)
 
 	// ── Middlewares ───────────────────────────────────────────────────────────────
 	authMW          := middleware.NewAuthMiddleware(cfg.JWTSecret)
@@ -57,6 +56,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Voluntariado
 	api.POST("/volunteer/register",   volunteerHandler.Register)
 	api.GET("/volunteer/departments", volunteerHandler.GetDepartments)
+	api.GET("/volunteer/me",          volunteerHandler.GetMyInfo, authMW)
 
 	// Auth
 	authGroup := api.Group("/auth")
@@ -115,6 +115,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	adminGroup.GET("/donations",          adminHandler.GetDonations)
 	adminGroup.GET("/users",              adminHandler.GetUsers)
 	adminGroup.PUT("/users/:id/role",     adminHandler.UpdateUserRole)
+	adminGroup.PUT("/users/:id/cell",     adminHandler.UpdateUserCell)
 	adminGroup.GET("/leaders",            adminHandler.GetLeaders)
 	adminGroup.PUT("/volunteers/:id/assign", volunteerHandler.Assign)
 
@@ -126,12 +127,6 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 
 	// Historial de actividad
 	adminGroup.GET("/activity-log", activityLogHandler.GetActivityLog)
-
-	// Exportaciones CSV
-	exportGroup := adminGroup.Group("/export")
-	exportGroup.GET("/cell-reports", pdfHandler.ExportCellReports)
-	exportGroup.GET("/donations",    pdfHandler.ExportDonations)
-	exportGroup.GET("/boletas",      pdfHandler.ExportBoletas)
 
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)
@@ -146,6 +141,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Peticiones admin
 	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
+	adminGroup.GET("/petitions/weekly",   petitionHandler.GetWeeklyPetitions)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")

@@ -54,6 +54,10 @@ const LeaderBoletas       = lazy(() => import('./pages/leader/LeaderBoletas'));
 const LeaderVolunteers    = lazy(() => import('./pages/leader/LeaderVolunteers'));
 const LeaderCellDirectory = lazy(() => import('./pages/leader/LeaderCellDirectory'));
 
+// Panel Voluntario — lazy
+import VolunteerLayout      from './components/layout/VolunteerLayout';
+const VolunteerDashboard  = lazy(() => import('./pages/volunteer/VolunteerDashboard'));
+
 export const router = createBrowserRouter([
 
   // ── Panel Admin ────────────────────────────────────────────────────────────
@@ -78,6 +82,19 @@ export const router = createBrowserRouter([
       { path: 'gallery',         element: <Suspense fallback={<PageFallback />}><AdminGallery /></Suspense> },
       { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
+    ],
+  },
+
+  // ── Panel Voluntario ───────────────────────────────────────────────────────
+  {
+    path: '/volunteer',
+    element: (
+      <ProtectedRoute volunteerOnly>
+        <VolunteerLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: 'dashboard', element: <Suspense fallback={<PageFallback />}><VolunteerDashboard /></Suspense> },
     ],
   },
 
@@ -110,7 +127,7 @@ export const router = createBrowserRouter([
       { path: 'blog/:slug',            element: <BlogPage /> },
       { path: 'events',                element: <EventsPage /> },
       { path: 'gallery',               element: <GalleryPage /> },
-      { path: 'prayer',                element: <PrayerPage /> },
+      { path: 'prayer',                element: <ProtectedRoute leaderOrAdmin><PrayerPage /></ProtectedRoute> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },

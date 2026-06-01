@@ -5,7 +5,6 @@ import { useAuth } from '../../context/AuthContext';
 import CellReportForm from './CellReportForm';
 import Button from '../ui/Button';
 import Chip, { FilterChip } from '../ui/Chip';
-import { downloadCsv } from '../../lib/exportCsv';
 
 const STATUS_CONFIG = {
   pendiente: { label: 'Pendiente', color: 'default',   icon: 'schedule' },
@@ -104,12 +103,6 @@ export default function CellReportsPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          {isAdmin && (
-            <Button variant="tonal" onClick={() => downloadCsv(`/admin/export/cell-reports${filter ? `?status=${filter}` : ''}`, 'reportes-celulas.csv')}>
-              <span className="ms" style={{ fontSize: 16 }}>download</span>
-              Exportar CSV
-            </Button>
-          )}
           <Button variant="filled" onClick={() => setShowForm(s => !s)}>
             <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
             {showForm ? 'Cancelar' : 'Nuevo reporte'}

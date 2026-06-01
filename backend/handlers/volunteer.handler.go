@@ -141,6 +141,23 @@ func (h *VolunteerHandler) Assign(c echo.Context) error {
 	return c.JSON(http.StatusOK, v)
 }
 
+// GetMyInfo GET /api/v1/volunteer/me — retorna el registro de voluntario del usuario autenticado.
+func (h *VolunteerHandler) GetMyInfo(c echo.Context) error {
+	uid, _ := c.Get("user_id").(uint)
+
+	// Obtener email del usuario desde la DB
+	var user models.User
+	if err := h.DB.First(&user, uid).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
+	}
+
+	var v models.Volunteer
+	if err := h.DB.Where("email = ?", user.Email).First(&v).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Sin registro de voluntario aún."})
+	}
+	return c.JSON(http.StatusOK, v)
+}
+
 // CreateUserFromVolunteer POST /api/v1/admin/volunteers/:id/create-user
 func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 	id := c.Param("id")

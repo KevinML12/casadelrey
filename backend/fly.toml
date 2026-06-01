@@ -1,5 +1,5 @@
 app = "casa-del-rey-mvp"
-primary_region = "scl"
+primary_region = "dfw"
 
 [http_service]
   internal_port = 8080

@@ -3,14 +3,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
-
-const CELL_TYPES = [
-  { value: 'hombres',  label: 'Hombres (HX)' },
-  { value: 'mujeres',  label: 'Mujeres (MX)' },
-  { value: 'jovenes',  label: 'Jóvenes (JX)' },
-  { value: 'prejus',   label: 'Prejus (PX)' },
-  { value: 'ninos',    label: 'Niños (NX)' },
-];
+import CellCodePicker, { parseCode } from '../ui/CellCodePicker';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -41,9 +34,13 @@ const EMPTY = {
 
 export default function CellReportForm({ onSuccess }) {
   const { user } = useAuth();
+  // Pre-cargar código y tipo desde el perfil del líder si está disponible
+  const leaderParsed = parseCode(user?.cell_code || '');
   const [form, setForm] = useState({
     ...EMPTY,
     leader_name: user?.role === 'leader' ? (user?.name || '') : '',
+    cell_code:   user?.cell_code || '',
+    cell_type:   user?.cell_type || leaderParsed.type || '',
   });
   const [submitted,  setSubmitted]  = useState(false);
   const [loading,    setLoading]    = useState(false);
@@ -112,14 +109,19 @@ export default function CellReportForm({ onSuccess }) {
       {/* Identificación */}
       <div className="p-5 rounded-2xl bg-surf border border-outline-var space-y-4">
         <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Identificación</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Field label="Código" ><input value={form.cell_code} onChange={onInput('cell_code')} className={fieldCls} placeholder="H1, M2, J3…" /></Field>
-          <Field label="Nombre de la célula" required><input value={form.cell_name} onChange={onInput('cell_name')} className={fieldCls} placeholder="Ej. Célula Centro" /></Field>
-          <Field label="Tipo de célula">
-            <select value={form.cell_type} onChange={onInput('cell_type')} className={fieldCls}>
-              <option value="">Seleccionar…</option>
-              {CELL_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
+            <Field label="Tipo y código de célula">
+              <CellCodePicker
+                cellCode={form.cell_code}
+                cellType={form.cell_type}
+                onChange={({ cell_code, cell_type }) => setForm(p => ({ ...p, cell_code, cell_type }))}
+                disabled={user?.role === 'leader'} // el líder no cambia su propio código
+              />
+            </Field>
+          </div>
+          <Field label="Nombre de la célula" required>
+            <input value={form.cell_name} onChange={onInput('cell_name')} className={fieldCls} placeholder="Ej. Célula Centro" />
           </Field>
         </div>
         <Field label="Fecha de la reunión" required>

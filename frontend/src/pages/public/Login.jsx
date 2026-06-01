@@ -20,7 +20,11 @@ export default function Login() {
       const res = await apiClient.post('/auth/login', { email, password });
       login(res.data.token);
       toast.success('¡Bienvenido!');
-      navigate('/admin');
+      const role = res.data.user?.role || '';
+      if (role === 'admin')          navigate('/admin');
+      else if (role === 'leader')    navigate('/leader');
+      else if (role === 'volunteer') navigate('/volunteer/dashboard');
+      else                           navigate('/profile');
     } catch (err) {
       toast.error(err.response?.data?.error || err.response?.data?.message || 'Credenciales incorrectas');
     } finally {

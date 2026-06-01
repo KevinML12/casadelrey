@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"casadelrey/backend/models"
 
@@ -111,4 +112,37 @@ func (h *PetitionHandler) MarkAsRead(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, petition)
+}
+
+// GetWeeklyPetitions godoc
+// GET /api/v1/admin/petitions/weekly  [Requiere auth + rol admin o leader]
+// Retorna todas las peticiones de la semana en curso (lunes–domingo)
+// para ser impresas y distribuidas a los intercesores.
+func (h *PetitionHandler) GetWeeklyPetitions(c echo.Context) error {
+	now := time.Now()
+
+	// Calcular lunes de la semana actual
+	weekday := int(now.Weekday())
+	if weekday == 0 {
+		weekday = 7 // domingo = 7
+	}
+	startOfWeek := time.Date(now.Year(), now.Month(), now.Day()-(weekday-1), 0, 0, 0, 0, now.Location())
+	endOfWeek := startOfWeek.AddDate(0, 0, 7)
+
+	var petitions []models.Petition
+	if err := h.DB.
+		Where("created_at >= ? AND created_at < ?", startOfWeek, endOfWeek).
+		Order("created_at ASC").
+		Find(&petitions).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Error al obtener las peticiones de la semana.",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"petitions":  petitions,
+		"week_start": startOfWeek.Format("2006-01-02"),
+		"week_end":   startOfWeek.AddDate(0, 0, 6).Format("2006-01-02"),
+		"count":      len(petitions),
+	})
 }
