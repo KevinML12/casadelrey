@@ -255,14 +255,305 @@ Patrón C — Split:
 
 ---
 
-## Output esperado
+## Componentes faltantes (completar también)
 
-Genera:
-1. **Sistema de colores** completo en variables CSS
-2. **Tokens de tipografía** para Tailwind
-3. **Mockup del hero** del sitio público
-4. **Mockup de card** de evento (con y sin precio)
-5. **Mockup del sidebar** admin con el nuevo estilo
-6. **Paleta visual** con todos los colores y sus usos
+### 8. Header público (sticky)
+```
+Estado inicial (sobre hero oscuro):
+  Fondo: transparente
+  Logo: blanco
+  Nav links: blanco 80% opacity
+  Botón "Ingresar": outlined blanco
 
-El resultado debe verse como si lo hubiera diseñado el equipo de Elevation Church con la pulcritud de Apple, usando los colores de marca de la iglesia.
+Estado al hacer scroll (sobre contenido claro):
+  Fondo: blanco con backdrop-blur
+  Logo: navy
+  Nav links: navy
+  Botón "Ingresar": filled celeste
+  Transición: 200ms ease
+
+Mobile:
+  Solo logo + hamburger
+  Drawer lateral desde la derecha (no izquierda)
+  Fondo: navy profundo
+  Links: grandes, touch-friendly (min 48px)
+```
+
+### 9. Footer
+```
+Fondo: #060D24 (negro profundo)
+3 columnas desktop / 1 columna mobile:
+  Col 1: Logo + "Luz para las Naciones" + redes sociales (iconos)
+  Col 2: Links rápidos (Inicio, Blog, Eventos, Galería, Voluntarios)
+  Col 3: Datos de contacto (dirección, teléfono, horarios de culto)
+Línea divisoria: blanco al 10%
+Copyright: blanco al 30%
+```
+
+### 10. Sistema de navegación admin (breadcrumbs)
+```
+No breadcrumbs — el sidebar es suficiente contexto
+Título de página siempre visible en el área de contenido
+Subtítulo con conteo o estado ("5 reportes · 2 pendientes")
+```
+
+### 11. Estados de carga
+```
+Spinner: círculo de 24px, borde 2px, arco superior en celeste
+         Velocidad: 0.6s linear infinite
+Skeleton loader: rectángulos con shimmer animation (de left a right)
+                 Color: outline-var al 60%
+                 Para: listas de cards, tablas, imágenes
+Página completa: spinner centrado sobre fondo surf, sin texto
+```
+
+### 12. Empty states
+```
+Estructura:
+  Ícono Material grande (48px) — color outline-var
+  Título (body-l, font-medium): "Sin [recurso] aún"
+  Subtítulo (body-s, on-surf-var): instrucción o contexto
+  Botón de acción (si aplica)
+
+Estilo: no ilustraciones — minimalista Apple
+        No centrado verticalmente en toda la pantalla — solo en el contenedor
+```
+
+### 13. Toasts / notificaciones
+```
+Posición: bottom-center en mobile, bottom-right en desktop
+Ancho: auto, max 380px
+Border-radius: 12px
+Sombra: elev-3
+Variantes:
+  Success: borde izquierdo 3px verde + ícono check_circle
+  Error:   borde izquierdo 3px rojo + ícono error
+  Info:    borde izquierdo 3px celeste + ícono info
+  Loading: spinner inline + mensaje
+Sin fondo de color — fondo blanco/navy + solo el borde de color
+Auto-dismiss: 3.5s con barra de progreso sutil en la base
+```
+
+### 14. Modales / Dialogs
+```
+Overlay: negro al 50% con backdrop-blur(4px)
+Contenedor:
+  Fondo: surf (#FFFFFF)
+  Border-radius: 20px
+  Sombra: elev-4
+  Max-width: 480px (sm), 640px (md)
+  Padding: 24px
+  Max-height: 90vh, overflow-y: auto en el contenido
+
+Estructura fija:
+  [Ícono contextual + Título] + [X cerrar] — header
+  Línea divisoria
+  [Contenido — formulario o información]
+  Línea divisoria
+  [Botón secundario] [Botón primario] — siempre alineados a la derecha
+
+Animación entrada: translateY(8px) opacity(0) → translateY(0) opacity(1), 200ms
+```
+
+### 15. Chips / Badges de estado
+```
+Estructura: ícono 14px + texto label-s + padding 4px 10px + border-radius full
+
+Colores por estado:
+  Pendiente:   fondo #FEF3C7, texto #92400E, ícono schedule
+  Aprobado:    fondo #D1FAE5, texto #065F46, ícono check_circle
+  Rechazado:   fondo #FEE2E2, texto #991B1B, ícono cancel
+  Verificado:  fondo #D1FAE5, texto #065F46, ícono verified
+  Nuevo:       fondo celeste/10%, texto celeste, ícono fiber_new
+  Publicado:   fondo verde/10%, texto verde oscuro
+  Borrador:    fondo gris/10%, texto gris oscuro
+  Convertido:  fondo violeta/10%, texto violeta
+  Reconciliado:fondo navy/10%, texto navy
+
+Nota: fondos suaves, textos oscuros — nunca fondo saturado con texto blanco
+```
+
+### 16. Paginador
+```
+Estilo Apple: números simples, sin bordes en cada número
+  ← Anterior  · 1 · 2 · [3] · 4 · 5 · Siguiente →
+El número activo: fondo celeste #4A90D9, texto blanco, border-radius 8px
+Hover: fondo surf-dim
+Separador "..." si hay muchas páginas
+Texto auxiliar: "Mostrando 41-60 de 127" — alineado a la izquierda, gris
+```
+
+### 17. Formularios — detalle completo
+```
+Input text:
+  Height: 48px
+  Border: 1px #D1D5E0
+  Border-focus: 2px celeste #4A90D9
+  Border-error: 2px rojo #DC2626
+  Border-radius: 12px
+  Padding: 0 16px
+  Label: encima del input (no flotante) — label-m, on-surf-var
+  Error: texto rojo debajo, label-s, sin ícono
+  Placeholder: on-surf-var opacity 60%
+
+Textarea:
+  Igual que input pero resize: vertical only
+  Min-height: 80px
+
+Select:
+  Igual que input + chevron_down icon a la derecha
+
+Checkbox/Radio:
+  Custom — no usar el nativo del browser
+  Checkbox: 20x20, border-radius 6px, check en celeste
+  Radio: 20x20, círculo, dot en celeste
+
+Upload zone (fotos comprobantes/células):
+  Border: 2px dashed outline-var
+  Border-radius: 16px
+  Padding: 32px
+  Centro: ícono grande + texto + texto auxiliar
+  Hover: border celeste + fondo celeste/5%
+  Con archivo: preview de imagen + botón "cambiar"
+```
+
+### 18. Gráficas del dashboard (Recharts)
+```
+Colores de series:
+  Serie 1 (principal): celeste #4A90D9
+  Serie 2: violeta #7C3AED
+  Serie 3: verde #10B981
+  Serie 4: naranja #F59E0B
+
+Estilo de gráfica:
+  Sin bordes en el contenedor
+  Eje Y: líneas horizontales muy sutiles (outline-var al 40%)
+  Eje X: texto label-s, on-surf-var
+  Tooltip: fondo surf, sombra elev-2, border outline-var, border-radius 8px
+  No usar fondos de color en el área de la gráfica
+  Dots: solo en hover
+  Animación: ease-out 400ms
+```
+
+### 19. Página de login
+```
+Layout desktop: dos paneles 50/50
+  Panel izquierdo: fondo navy profundo #060D24
+    - Logo grande centrado (blanco)
+    - Nombre de la iglesia bold 32px
+    - Cita o frase inspiracional
+    - Overlay de foto del culto con blend mode multiply
+  Panel derecho: fondo blanco
+    - "Bienvenido de vuelta" como título
+    - Formulario centrado, max-width 380px
+
+Layout mobile: solo el formulario, logo arriba pequeño
+
+Formulario:
+  Email + Password con toggle show/hide
+  Link "¿Olvidaste tu contraseña?" — alineado a la derecha del campo
+  Botón "Ingresar" — full width, filled celeste
+```
+
+### 20. Página de blog — detalle del post
+```
+Layout: max-width 720px centrado (como Medium)
+Imagen de portada: full-width, max-height 400px, object-cover, border-radius 0
+Fecha: label-s, uppercase, celeste, debajo de la imagen
+Título: display-s (2.25rem), peso 800, margin-bottom 24px
+Banner de red social (si tiene redirect):
+  Card con ícono de la plataforma + "Ver en Instagram" + URL
+  Fondo: surf-low, border: outline-var, radius: 12px
+TTS player: antes del contenido
+Contenido: max-width 65ch, body-l, line-height 1.8
+  h2: 1.5rem, bold
+  blockquote: border-left 3px celeste, italic, padding-left 16px
+  Imágenes: border-radius 8px
+```
+
+### 21. Galería — lightbox
+```
+Overlay: negro al 90%
+Imagen: centrada, max-height 85vh, max-width 90vw, object-contain
+Controles:
+  ← → para navegar (teclas y botones)
+  X para cerrar
+  Contador: "3 / 24" en la esquina superior derecha
+Metadata: título en la parte inferior sobre fondo gradient
+```
+
+### 22. Sistema de motion / animaciones
+```
+Duración base: 200ms
+Duración media: 300ms
+Duración larga: 400ms (solo para page transitions)
+Easing: ease-out para entradas, ease-in para salidas
+
+Hover en cards: translateY(-2px), 150ms ease-out
+Aparición de elementos: opacity 0→1 + translateY(8px→0), 200ms
+Modales: opacity 0→1 + scale 0.96→1, 200ms
+Sidebar drawer: translateX(-100%→0), 250ms ease-out
+Spinner: rotate 360deg, 0.6s linear infinite
+
+NO usar: bounce, elastic, flip, 3D transforms innecesarios
+```
+
+### 23. Página 404 / Error
+```
+Fondo: navy #0D1B4B
+Número de error: 6rem, peso 900, blanco al 20% (enorme, decorativo)
+Mensaje: "Página no encontrada" — blanco, título-l
+Subtítulo: blanco al 60%, body-m
+Botón: "Volver al inicio" — outlined blanco
+Sin ilustraciones — solo tipografía
+```
+
+### 24. Tarjeta de conexión pública (/comprobante y futuro /conectarme)
+```
+Diseño: card centrada, max-width 560px, fondo blanco
+Header: navy con logo e ícono contextual
+Datos bancarios: table-like, clean
+Upload zone: prominente, el elemento más importante
+Botón submit: full-width, celeste, altura 52px
+```
+
+### 25. Perfil de usuario (/profile)
+```
+Header del perfil:
+  Avatar: iniciales en círculo navy, 64px
+  Nombre + rol (chip)
+  Email
+
+Sección de metas:
+  Lista vertical de GoalCards
+  GoalCard: checkbox custom + título + fecha + botón eliminar
+  Completadas: tachadas, opacidad 60%, al final de la lista
+  Nueva meta: botón + inline form (no modal)
+```
+
+---
+
+## Output esperado (completo)
+
+Genera todo esto como un sistema coherente:
+
+1. **Variables CSS completas** — todos los tokens de color para `index.css`
+2. **Tokens Tailwind** — colores, radios, sombras para `tailwind.config.js`
+3. **Mockups de pantallas públicas:**
+   - Hero del home
+   - Card de evento (gratis y con precio)
+   - Card de blog (con y sin redirect a red social)
+   - Página de login (desktop)
+4. **Mockups de paneles internos:**
+   - Sidebar admin con nuevo estilo
+   - Dashboard con KPIs y gráficas
+   - Tabla de reportes de célula
+5. **Sistema de componentes:**
+   - Todos los estados de chips/badges
+   - Botones (todas las variantes)
+   - Formulario completo
+   - Toast/notificación
+   - Modal
+6. **Guía de motion** — tabla de duraciones y easings
+
+El resultado debe verse como si lo hubiera diseñado el equipo de Elevation Church con la pulcritud de Apple, usando los colores de marca de Casa del Rey.
