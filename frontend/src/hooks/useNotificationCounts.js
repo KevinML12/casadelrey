@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 export function useNotificationCounts(intervalMs = 60000) {
   const { user } = useAuth();
-  const [counts, setCounts] = useState({ unread_petitions: 0, pending_reports: 0, pending_volunteers: 0, total: 0 });
+  const [counts, setCounts] = useState({ unread_petitions: 0, pending_reports: 0, pending_volunteers: 0, pending_receipts: 0, total: 0 });
 
   const fetchCounts = () => {
     if (!user) return;

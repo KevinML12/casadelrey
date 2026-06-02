@@ -152,7 +152,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Peticiones admin
 	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
-	adminGroup.GET("/petitions/weekly",   petitionHandler.GetWeeklyPetitions)
+
+	// PDF semanal: accesible por admin Y líder (ambos lo distribuyen a intercessores)
+	adminOrLeader.GET("/petitions/weekly", petitionHandler.GetWeeklyPetitions)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")
