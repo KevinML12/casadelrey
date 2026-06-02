@@ -145,7 +145,7 @@ export default function AdminBoletas() {
     setLoading(true);
     const params = catFilter ? `?category=${catFilter}` : '';
     apiClient.get(`/admin/boletas${params}`)
-      .then(r => setBoletas(r.data || []))
+      .then(r => setBoletas(r.data?.data || r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
   };

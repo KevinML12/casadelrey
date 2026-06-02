@@ -116,7 +116,7 @@ export default function AdminUsers() {
 
   useEffect(() => {
     apiClient.get('/admin/users')
-      .then(r => setUsers(r.data || []))
+      .then(r => setUsers(r.data?.data || r.data || []))
       .catch(() => toast.error('No se pudieron cargar usuarios'))
       .finally(() => setLoading(false));
   }, []);

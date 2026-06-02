@@ -58,7 +58,7 @@ export default function Dashboard() {
   useEffect(() => {
     Promise.all([
       apiClient.get('/admin/kpis').then(r => setKpis(r.data)),
-      apiClient.get('/admin/donations').then(r => setDonations(r.data || [])),
+      apiClient.get('/admin/donations').then(r => setDonations(r.data?.data || r.data || [])),
       apiClient.get('/admin/cell-reports/stats').then(r => setCellStats(r.data)).catch(() => {}),
       apiClient.get('/admin/notifications/counts').then(r => setNotifs(r.data)).catch(() => {}),
     ]).catch(console.error).finally(() => setLoading(false));

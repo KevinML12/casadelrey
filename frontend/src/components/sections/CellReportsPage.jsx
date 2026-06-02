@@ -53,7 +53,7 @@ export default function CellReportsPage() {
     setLoading(true);
     const params = filter ? `?status=${filter}` : '';
     Promise.all([
-      apiClient.get(`/admin/cell-reports${params}`).then(r => r.data || []),
+      apiClient.get(`/admin/cell-reports${params}`).then(r => r.data?.data || r.data || []),
       apiClient.get('/admin/cell-reports/stats').then(r => r.data).catch(() => null),
     ])
       .then(([reps, st]) => { setReports(reps); setStats(st); })

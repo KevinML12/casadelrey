@@ -231,7 +231,7 @@ export default function AdminBlog() {
 
   const load = () =>
     apiClient.get('/admin/blog/')
-      .then(r => setPosts(r.data || []))
+      .then(r => setPosts(r.data?.data || r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
 

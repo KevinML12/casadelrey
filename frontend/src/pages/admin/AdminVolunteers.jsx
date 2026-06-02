@@ -62,13 +62,13 @@ export default function AdminVolunteers() {
 
   const load = () =>
     apiClient.get('/admin/volunteers')
-      .then(r => setVolunteers(r.data || []))
+      .then(r => setVolunteers(r.data?.data || r.data || []))
       .catch(() => toast.error('Error al cargar voluntarios'))
       .finally(() => setLoading(false));
 
   useEffect(() => { load(); }, []);
   useEffect(() => {
-    if (isAdmin) apiClient.get('/admin/leaders').then(r => setLeaders(r.data || [])).catch(() => {});
+    if (isAdmin) apiClient.get('/admin/leaders').then(r => setLeaders(r.data?.data || r.data || [])).catch(() => {});
   }, [isAdmin]);
 
   const handleAssign = async (id, leaderId) => {

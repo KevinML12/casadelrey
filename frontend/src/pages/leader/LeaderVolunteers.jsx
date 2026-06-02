@@ -25,7 +25,7 @@ export default function LeaderVolunteers() {
 
   const load = () =>
     apiClient.get('/admin/volunteers')
-      .then(r => setVolunteers(r.data || []))
+      .then(r => setVolunteers(r.data?.data || r.data || []))
       .catch(() => toast.error('Error al cargar voluntarios'))
       .finally(() => setLoading(false));
 
