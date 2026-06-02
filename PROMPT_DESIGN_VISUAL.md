@@ -482,20 +482,225 @@ Controles:
 Metadata: título en la parte inferior sobre fondo gradient
 ```
 
-### 22. Sistema de motion / animaciones
+### 22. Sistema de motion / animaciones — Apple-first, Elevation-bold
+
+La filosofía es: **las transiciones no se ven, se sienten.**
+Apple no anima para impresionar — anima para orientar. Elevation usa el movimiento para crear momentum y energía. Juntos: fluidez que da peso y propósito.
+
+#### Curvas de easing (las mismas que usa Apple)
+```css
+--ease-standard:  cubic-bezier(0.4, 0.0, 0.2, 1);   /* entradas y salidas normales */
+--ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);  /* elementos que entran a escena */
+--ease-accelerate: cubic-bezier(0.4, 0.0, 1.0, 1);  /* elementos que salen de escena */
+--ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1); /* botones, checkboxes — tiny bounce */
+--ease-sharp:     cubic-bezier(0.4, 0.0, 0.6, 1);   /* drawers, sidebars */
 ```
-Duración base: 200ms
-Duración media: 300ms
-Duración larga: 400ms (solo para page transitions)
-Easing: ease-out para entradas, ease-in para salidas
 
-Hover en cards: translateY(-2px), 150ms ease-out
-Aparición de elementos: opacity 0→1 + translateY(8px→0), 200ms
-Modales: opacity 0→1 + scale 0.96→1, 200ms
-Sidebar drawer: translateX(-100%→0), 250ms ease-out
-Spinner: rotate 360deg, 0.6s linear infinite
+#### Escala de duraciones
+```
+50ms  — micro: cambios de color, opacity de íconos
+100ms — rápido: hover de botones, focus rings
+150ms — normal: hover de cards, chips, links
+200ms — medio: modales entrando, tooltips
+300ms — suave: page sections, sidebars
+400ms — dramático: hero reveals, grandes transiciones de página
+600ms — cinematográfico: SOLO para el hero del home (Elevation-style)
+```
 
-NO usar: bounce, elastic, flip, 3D transforms innecesarios
+#### Regla de oro
+```
+Si el usuario lo inició (click, hover) → más rápido (100–150ms)
+Si el sistema lo inició (carga, auto) → más lento (300–400ms)
+Si es decorativo (hero) → puede ser dramático (500–600ms)
+```
+
+#### Por componente
+
+**Botones (Apple spring feel):**
+```css
+/* Reposo → Hover */
+transform: scale(1) → scale(1.02);
+background-color: celeste → celeste oscurecido 8%;
+transition: transform 100ms var(--ease-spring),
+            background-color 100ms var(--ease-standard);
+
+/* Hover → Active (press) */
+transform: scale(1.02) → scale(0.98);
+transition: transform 80ms var(--ease-accelerate);
+
+/* Active → Release */
+transform: scale(0.98) → scale(1);
+transition: transform 200ms var(--ease-spring);
+```
+
+**Cards (flotación sutil):**
+```css
+/* Reposo → Hover */
+transform: translateY(0) → translateY(-3px);
+box-shadow: elev-1 → elev-2;
+transition: transform 180ms var(--ease-decelerate),
+            box-shadow 180ms var(--ease-standard);
+/* NUNCA más de -4px — Apple nunca exagera */
+```
+
+**Focus rings (accesibilidad Apple):**
+```css
+/* Aparecen con keyboard, no con mouse */
+outline: 3px solid rgba(74, 144, 217, 0.5);
+outline-offset: 2px;
+transition: outline-offset 100ms var(--ease-spring);
+/* Al obtener focus: outline-offset 2px → 0px en 80ms → 2px en 150ms */
+/* Ese micro-bounce es exactamente lo que hace Apple */
+```
+
+**Modales (peso y presencia):**
+```css
+/* Entrada */
+opacity: 0 → 1;
+transform: scale(0.95) translateY(8px) → scale(1) translateY(0);
+transition: opacity 200ms var(--ease-decelerate),
+            transform 250ms var(--ease-decelerate);
+
+/* Salida */
+opacity: 1 → 0;
+transform: scale(1) → scale(0.97);
+transition: opacity 150ms var(--ease-accelerate),
+            transform 150ms var(--ease-accelerate);
+/* Salida SIEMPRE más rápida que entrada — ley de Apple */
+```
+
+**Sidebar / Drawer:**
+```css
+/* Entrada */
+transform: translateX(-100%) → translateX(0);
+transition: transform 280ms var(--ease-sharp);
+
+/* Overlay */
+opacity: 0 → 0.5;
+transition: opacity 280ms var(--ease-standard);
+```
+
+**Aparición de listas (stagger — Elevation-style):**
+```css
+/* Cada ítem de una lista aparece con 40ms de delay entre ellos */
+/* Efecto: ola de arriba hacia abajo */
+.list-item:nth-child(1) { animation-delay: 0ms }
+.list-item:nth-child(2) { animation-delay: 40ms }
+.list-item:nth-child(3) { animation-delay: 80ms }
+/* máximo 5 ítems con stagger — el resto aparece sin delay */
+
+/* La animación de cada ítem */
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+animation: slideInUp 300ms var(--ease-decelerate) both;
+```
+
+**Hero del home (Elevation dramático):**
+```css
+/* El título aparece en dos partes con 120ms entre ellas */
+/* Línea 1: */
+animation: heroReveal 600ms var(--ease-decelerate) 100ms both;
+
+/* Línea 2: */
+animation: heroReveal 600ms var(--ease-decelerate) 220ms both;
+
+/* Subtítulo: */
+animation: heroReveal 400ms var(--ease-decelerate) 380ms both;
+
+/* Botones: */
+animation: heroReveal 400ms var(--ease-decelerate) 480ms both;
+
+@keyframes heroReveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Resultado: el hero se construye visualmente de arriba hacia abajo
+   como si cada elemento "cayera" suavemente al lugar — signature Elevation */
+```
+
+**Inputs (micro-feedback Apple):**
+```css
+/* Focus */
+border-color: outline-var → celeste;
+box-shadow: 0 0 0 0px rgba(74,144,217,0.3) → 0 0 0 3px rgba(74,144,217,0.3);
+transition: border-color 100ms var(--ease-standard),
+            box-shadow 150ms var(--ease-spring);
+/* El ring "crece" desde el borde hacia afuera — exactamente iOS */
+
+/* Error */
+border-color: celeste → rojo;
+/* Además: pequeña vibración horizontal */
+animation: shake 300ms var(--ease-standard);
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  40%       { transform: translateX(4px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
+```
+
+**Tabs / Filter chips:**
+```css
+/* El indicador activo se desliza entre tabs — no aparece/desaparece */
+/* Usar motion layout o transition de left/width */
+transition: left 200ms var(--ease-spring),
+            width 200ms var(--ease-spring);
+/* El chip "salta" de posición — signature Apple tabs */
+```
+
+**Toasts:**
+```css
+/* Entrada desde abajo */
+transform: translateY(100%) → translateY(0);
+opacity: 0 → 1;
+transition: transform 300ms var(--ease-spring),
+            opacity 200ms var(--ease-standard);
+
+/* Salida hacia arriba (no hacia abajo) — Apple siempre sale hacia donde vino */
+transform: translateY(0) → translateY(-8px);
+opacity: 1 → 0;
+transition: transform 200ms var(--ease-accelerate),
+            opacity 150ms var(--ease-accelerate);
+```
+
+**Skeletons (loading):**
+```css
+/* Shimmer de izquierda a derecha — velocidad Apple */
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+background: linear-gradient(90deg,
+  var(--surf-dim) 0%,
+  var(--surf-high) 50%,
+  var(--surf-dim) 100%
+);
+background-size: 200% 100%;
+animation: shimmer 1.5s ease-in-out infinite;
+/* 1.5s es el ritmo exacto que usa Apple en iOS skeleton loaders */
+```
+
+#### Lo que NUNCA hacer
+```
+❌ bounce exagerado (spring > 1.6 en amplitud)
+❌ transiciones > 500ms en elementos de UI (solo hero)
+❌ animate-bounce de Tailwind — demasiado agresivo
+❌ animaciones en loop que no sean loading states
+❌ fade + scale + translateY + rotate todo junto
+❌ diferentes duraciones para el mismo tipo de elemento
+❌ transitions en propiedades que no sean transform/opacity/color/shadow
+   (animar width, height, padding causa reflow = laggy)
+```
+
+#### La diferencia Apple vs Elevation en motion
+```
+Apple:  invisible, funcional, consistente — el usuario no lo nota conscientemente
+Elevation: usarlo en los MOMENTOS DE IMPACTO — hero reveal, página nueva, logro
+Juntos: UI suave como Apple, momentos dramáticos como Elevation en los heroes
+        y en transiciones de sección importantes
 ```
 
 ### 23. Página 404 / Error
