@@ -11,6 +11,7 @@ import (
 	"casadelrey/backend/database"
 	"casadelrey/backend/handlers"
 	"casadelrey/backend/routes"
+	"casadelrey/backend/storage"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -67,8 +68,13 @@ func main() {
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
 	}))
 
+	// 5b. Inicializar storage (R2 si hay vars configuradas, local como fallback).
+	//     Cambia de cuenta tuya ↔ cliente solo cambiando las vars CF_R2_*.
+	store := storage.New()
+	log.Printf("[Storage] Backend activo: %s", store.ActiveBackend())
+
 	// 6. Registrar todas las rutas (públicas y protegidas).
-	routes.Register(e, db, cfg)
+	routes.Register(e, db, cfg, store)
 
 	// 6b. TTS — registrado aquí explícitamente para asegurar que esté en el deploy
 	tts := handlers.NewTTSHandler()

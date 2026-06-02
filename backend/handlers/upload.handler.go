@@ -1,49 +1,29 @@
 package handlers
 
 import (
-	"fmt"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
+
+	"casadelrey/backend/storage"
 
 	"github.com/labstack/echo/v4"
 )
 
-// UploadHandler maneja la subida de archivos al servidor.
-// Por ahora guarda en el sistema de archivos local (/uploads).
-// TODO: conectar a S3 o Dokploy Volumes en producción.
+// UploadHandler maneja la subida de archivos.
+// Delega al Store (R2 o local) — intercambiable sin tocar este código.
 type UploadHandler struct {
-	// UploadDir es la ruta absoluta del directorio donde se almacenan los archivos.
-	UploadDir string
+	store storage.Store
 }
 
-// NewUploadHandler crea una nueva instancia del handler de uploads.
-// Crea el directorio /uploads si no existe al arrancar el servidor.
-func NewUploadHandler() *UploadHandler {
-	uploadDir := "./uploads"
-
-	// Crear directorio de uploads con permisos 0755 si no existe
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
-		// Error al crear el directorio es fatal; el servidor no puede recibir archivos
-		panic(fmt.Sprintf("[Upload] No se pudo crear el directorio '%s': %v", uploadDir, err))
-	}
-
-	return &UploadHandler{UploadDir: uploadDir}
+// NewUploadHandler crea el handler con el Store ya inicializado.
+func NewUploadHandler(store storage.Store) *UploadHandler {
+	return &UploadHandler{store: store}
 }
 
-// UploadFile godoc
-// POST /api/upload
-// Acepta un archivo via multipart/form-data (campo: "file").
-// Guarda el archivo en ./uploads/ con un nombre único basado en timestamp.
-// Retorna la URL relativa del archivo para usarla en el frontend.
-//
-// Límite de tamaño: controlado por echo.New() con e.Server.MaxHeaderBytes.
-// Recomendación: agregar e.Use(middleware.BodyLimit("10M")) en main.go si es necesario.
+// UploadFile POST /api/v1/upload
+// Acepta multipart/form-data con campo "file".
+// Query param opcional: ?folder=celulas|galeria|comprobantes|blog
+// Retorna la URL pública del archivo.
 func (h *UploadHandler) UploadFile(c echo.Context) error {
-	// 1. Obtener el archivo del campo "file" del form-data
 	file, err := c.FormFile("file")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -51,66 +31,66 @@ func (h *UploadHandler) UploadFile(c echo.Context) error {
 		})
 	}
 
-	// 2. Abrir el stream del archivo subido
+	// Validar tamaño máximo: 10 MB
+	const maxSize = 10 << 20
+	if file.Size > maxSize {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "El archivo supera el límite de 10 MB.",
+		})
+	}
+
+	// Validar tipo de archivo
+	if !isAllowedType(file.Filename) {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Tipo de archivo no permitido. Solo imágenes (jpg, png, webp, gif) y PDF.",
+		})
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "No se pudo leer el archivo subido.",
+			"error": "No se pudo leer el archivo.",
 		})
 	}
 	defer src.Close()
 
-	// 3. Generar un nombre único para evitar colisiones entre archivos
-	ext := filepath.Ext(file.Filename)
-	baseName := strings.TrimSuffix(file.Filename, ext)
-	uniqueName := fmt.Sprintf("%d_%s%s",
-		time.Now().UnixNano(),
-		sanitizeFilename(baseName),
-		strings.ToLower(ext),
-	)
-	destPath := filepath.Join(h.UploadDir, uniqueName)
+	// Carpeta según el contexto (query param ?folder=celulas)
+	folder := c.QueryParam("folder")
+	if folder == "" {
+		folder = "general"
+	}
 
-	// 4. Crear el archivo de destino en el servidor
-	dst, err := os.Create(destPath)
+	uniqueName := storage.UniqueFilename(file.Filename)
+	contentType := storage.DetectContentType(file.Filename, nil)
+
+	url, err := h.store.Upload(c.Request().Context(), folder, uniqueName, src, file.Size, contentType)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "No se pudo crear el archivo en el servidor.",
-		})
-	}
-	defer dst.Close()
-
-	// 5. Copiar los bytes del archivo subido al destino
-	if _, err := io.Copy(dst, src); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Error al escribir el archivo en el servidor.",
+			"error": "Error al guardar el archivo.",
 		})
 	}
 
-	// 6. Responder con los metadatos del archivo guardado
 	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"message":  "Archivo subido exitosamente.",
+		"url":      url,
 		"filename": uniqueName,
-		"url":      fmt.Sprintf("/uploads/%s", uniqueName), // URL relativa al servidor
-		"size":     file.Size,                               // Tamaño en bytes
-		"original": file.Filename,                           // Nombre original del archivo
+		"folder":   folder,
+		"size":     file.Size,
+		"backend":  string(h.store.ActiveBackend()),
 	})
 }
 
-// sanitizeFilename elimina caracteres peligrosos de un nombre de archivo
-// para prevenir path traversal y otros ataques relacionados con el filesystem.
-func sanitizeFilename(name string) string {
-	replacer := strings.NewReplacer(
-		" ", "_",
-		"/", "",
-		"\\", "",
-		"..", "",
-		"<", "",
-		">", "",
-		":", "",
-		"\"", "",
-		"|", "",
-		"?", "",
-		"*", "",
-	)
-	return replacer.Replace(name)
+// isAllowedType valida que el archivo sea imagen o PDF.
+func isAllowedType(filename string) bool {
+	allowed := map[string]bool{
+		".jpg": true, ".jpeg": true, ".png": true,
+		".webp": true, ".gif": true, ".pdf": true,
+	}
+	ext := ""
+	for i := len(filename) - 1; i >= 0; i-- {
+		if filename[i] == '.' {
+			ext = filename[i:]
+			break
+		}
+	}
+	return allowed[ext]
 }

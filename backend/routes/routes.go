@@ -7,12 +7,13 @@ import (
 	"casadelrey/backend/config"
 	"casadelrey/backend/handlers"
 	"casadelrey/backend/middleware"
+	"casadelrey/backend/storage"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
-func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
+func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store) {
 
 	// ── Handlers ─────────────────────────────────────────────────────────────────
 	authHandler          := auth.NewHandler(db)
@@ -26,7 +27,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	profileHandler       := handlers.NewProfileHandler(db)
 	volunteerHandler     := handlers.NewVolunteerHandler(db)
 	boletaHandler        := handlers.NewBoletaHandler(db)
-	uploadHandler        := handlers.NewUploadHandler()
+	uploadHandler        := handlers.NewUploadHandler(store)
 	announcementHandler  := handlers.NewAnnouncementHandler(db)
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
