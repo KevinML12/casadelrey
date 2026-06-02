@@ -62,21 +62,29 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		// Es idempotente: seguro de ejecutar en cada arranque del servidor.
 		log.Println("[DB] Ejecutando AutoMigrate...")
 		if err := db.AutoMigrate(
-			&models.User{},              // users
-			&models.Post{},              // posts (blog + enlaces a redes)
-			&models.Petition{},          // petitions (peticiones de oración)
-			&models.Donation{},          // donations (pagos locales + PayPal)
-			&models.PayPalOrder{},       // paypal_orders (órdenes pendientes)
-			&models.Event{},             // events
-			&models.CellReport{},        // cell_reports (reportes expandidos de células)
-			&models.UserGoal{},          // user_goals (metas personales)
-			&models.Volunteer{},         // volunteers (departamentos)
-			&models.SocialPost{},        // social_posts (FB/IG feed)
-			&models.MemberBoleta{},      // member_boleta (fichas de nuevos)
-			&models.Announcement{},      // announcements (anuncios)
-			&models.EventRegistration{}, // event_registrations (RSVP)
-			&models.GalleryPhoto{},      // gallery_photos (galería)
-			&models.ActivityLog{},       // activity_logs (auditoría)
+			// Core
+			&models.User{},
+			&models.Cell{},             // NUEVA — normaliza células
+			// Contenido
+			&models.Post{},
+			&models.Announcement{},
+			&models.GalleryPhoto{},
+			&models.SocialPost{},
+			// Células
+			&models.CellReport{},
+			&models.MemberBoleta{},
+			// Eventos
+			&models.Event{},
+			&models.EventRegistration{},
+			// Pagos
+			&models.PaymentReceipt{},   // NUEVA — verifica comprobantes bancarios
+			&models.Donation{},
+			// Personas
+			&models.Volunteer{},
+			&models.Petition{},
+			// Sistema
+			&models.UserGoal{},
+			&models.ActivityLog{},
 		); err != nil {
 			connectErr = err
 			return
