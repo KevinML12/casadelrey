@@ -28,6 +28,7 @@ func (h *NotificationHandler) GetCounts(c echo.Context) error {
 	var unreadPetitions int64
 	var pendingReports int64
 	var pendingVolunteers int64
+	var pendingReceipts int64
 
 	if err := h.DB.Model(&models.Petition{}).Where("is_answered = ?", false).Count(&unreadPetitions).Error; err != nil {
 		log.Printf("[Notifications] Error petitions: %v", err)
@@ -49,10 +50,17 @@ func (h *NotificationHandler) GetCounts(c echo.Context) error {
 		log.Printf("[Notifications] Error volunteers: %v", err)
 	}
 
+	if role == "admin" {
+		if err := h.DB.Model(&models.PaymentReceipt{}).Where("status = ?", "pendiente").Count(&pendingReceipts).Error; err != nil {
+			log.Printf("[Notifications] Error receipts: %v", err)
+		}
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"unread_petitions":  unreadPetitions,
-		"pending_reports":   pendingReports,
+		"unread_petitions":   unreadPetitions,
+		"pending_reports":    pendingReports,
 		"pending_volunteers": pendingVolunteers,
-		"total":             unreadPetitions + pendingReports + pendingVolunteers,
+		"pending_receipts":   pendingReceipts,
+		"total":              unreadPetitions + pendingReports + pendingVolunteers + pendingReceipts,
 	})
 }

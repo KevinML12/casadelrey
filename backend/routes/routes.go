@@ -28,6 +28,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	volunteerHandler     := handlers.NewVolunteerHandler(db)
 	boletaHandler        := handlers.NewBoletaHandler(db)
 	uploadHandler        := handlers.NewUploadHandler(store)
+	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
 	announcementHandler  := handlers.NewAnnouncementHandler(db)
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
@@ -53,6 +54,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// ── API v1 ────────────────────────────────────────────────────────────────────
 	api := e.Group("/api/v1")
+
+	// Comprobantes bancarios — público: enviar
+	api.POST("/receipts", receiptHandler.Submit)
 
 	// Voluntariado
 	api.POST("/volunteer/register",   volunteerHandler.Register)
@@ -128,6 +132,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Historial de actividad
 	adminGroup.GET("/activity-log", activityLogHandler.GetActivityLog)
+
+	// Comprobantes bancarios — admin
+	adminGroup.GET("/receipts",              receiptHandler.GetAll)
+	adminGroup.PUT("/receipts/:id/verify",   receiptHandler.Verify)
+	adminGroup.GET("/receipts/count",        receiptHandler.GetPendingCount)
 
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)

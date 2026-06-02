@@ -44,6 +44,8 @@ const AdminSocial        = lazy(() => import('./pages/admin/AdminSocial'));
 const AdminAnnouncements = lazy(() => import('./pages/admin/AdminAnnouncements'));
 const AdminGallery       = lazy(() => import('./pages/admin/AdminGallery'));
 const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
+const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
+const ReceiptPage        = lazy(() => import('./pages/public/ReceiptPage'));
 const ProfilePage        = lazy(() => import('./pages/public/ProfilePage'));
 
 // Páginas líder — lazy
@@ -81,6 +83,7 @@ export const router = createBrowserRouter([
       { path: 'announcements',   element: <Suspense fallback={<PageFallback />}><AdminAnnouncements /></Suspense> },
       { path: 'gallery',         element: <Suspense fallback={<PageFallback />}><AdminGallery /></Suspense> },
       { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
+      { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],
   },
@@ -131,6 +134,7 @@ export const router = createBrowserRouter([
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },
+      { path: 'comprobante',           element: <Suspense fallback={<PageFallback />}><ReceiptPage /></Suspense> },
       { path: 'profile',               element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
       { path: 'login',                 element: <Login /> },
       { path: 'register',              element: <Register /> },

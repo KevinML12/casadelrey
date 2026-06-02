@@ -14,6 +14,7 @@ const NAV = [
   { to: '/admin/volunteers',       icon: 'group_add',          label: 'Voluntarios',   badge: 'pending_volunteers' },
   { to: '/admin/cell-reports',     icon: 'groups',             label: 'Células',       badge: 'pending_reports' },
   { to: '/admin/boletas',          icon: 'person_add',         label: 'Nuevos' },
+  { to: '/admin/receipts',         icon: 'receipt_long',       label: 'Comprobantes', badge: 'pending_receipts' },
   { to: '/admin/gallery',          icon: 'photo_library',      label: 'Galería' },
   { to: '/admin/social',           icon: 'share',              label: 'Redes' },
   { to: '/admin/activity-log',     icon: 'history',            label: 'Actividad' },
