@@ -152,3 +152,38 @@ func (h *PaymentReceiptHandler) GetPendingCount(c echo.Context) error {
 	h.DB.Model(&models.PaymentReceipt{}).Where("status = ?", "pendiente").Count(&count)
 	return c.JSON(http.StatusOK, map[string]int64{"pending": count})
 }
+
+// Revert PUT /api/v1/admin/receipts/:id/revert — revierte a pendiente.
+// Útil si el admin cometió un error al verificar o rechazar.
+func (h *PaymentReceiptHandler) Revert(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ID inválido."})
+	}
+
+	var receipt models.PaymentReceipt
+	if err := h.DB.First(&receipt, id).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Comprobante no encontrado."})
+	}
+	if receipt.Status == "pendiente" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El comprobante ya está en estado pendiente."})
+	}
+
+	prevStatus := receipt.Status
+	receipt.Status = "pendiente"
+	receipt.VerifiedByID = nil
+	receipt.VerifiedAt = nil
+	receipt.RejectionReason = ""
+	h.DB.Save(&receipt)
+
+	// Si estaba ligado a una inscripción de evento, revertir también su payment_status
+	if receipt.Purpose == "evento" && receipt.EventID != nil {
+		h.DB.Model(&models.EventRegistration{}).
+			Where("receipt_id = ?", receipt.ID).
+			Update("payment_status", "pendiente")
+	}
+
+	adminID, _ := c.Get("user_id").(uint)
+	log.Printf("[Receipt] Revertido de '%s' a 'pendiente' por admin %d — ID:%d", prevStatus, adminID, receipt.ID)
+	return c.JSON(http.StatusOK, receipt)
+}

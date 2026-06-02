@@ -136,6 +136,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Comprobantes bancarios — admin
 	adminGroup.GET("/receipts",              receiptHandler.GetAll)
 	adminGroup.PUT("/receipts/:id/verify",   receiptHandler.Verify)
+	adminGroup.PUT("/receipts/:id/revert",   receiptHandler.Revert)
 	adminGroup.GET("/receipts/count",        receiptHandler.GetPendingCount)
 
 	// Aprobación de reportes de células (solo admin)

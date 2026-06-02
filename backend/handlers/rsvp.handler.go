@@ -54,6 +54,31 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 		return c.JSON(http.StatusConflict, map[string]string{"error": "Ya existe un registro con este correo para este evento."})
 	}
 
+	// Si el evento requiere pago, validar que exista un comprobante verificado o pendiente
+	paymentStatus := "no_requerido"
+	if event.RequiresPayment {
+		var receipt models.PaymentReceipt
+		err := h.DB.Where("payer_email = ? AND event_id = ? AND status IN ('pendiente','verificado')", req.Email, event.ID).
+			First(&receipt).Error
+
+		if err != nil {
+			// No hay boleta → bloquear el registro
+			return c.JSON(http.StatusPaymentRequired, map[string]interface{}{
+				"error":         "Este evento requiere pago. Sube tu comprobante bancario antes de registrarte.",
+				"requires_payment": true,
+				"price_gtq":     event.PriceGTQ,
+				"upload_url":    "/comprobante",
+			})
+		}
+
+		// Hay boleta: si está verificada → confirmado, si está pendiente → en espera
+		if receipt.Status == "verificado" {
+			paymentStatus = "verificado"
+		} else {
+			paymentStatus = "pendiente"
+		}
+	}
+
 	userID, _ := c.Get("user_id").(uint)
 	reg := models.EventRegistration{
 		EventID:       event.ID,
@@ -62,6 +87,7 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 		Phone:         req.Phone,
 		AttendeeCount: req.AttendeeCount,
 		Notes:         req.Notes,
+		PaymentStatus: paymentStatus,
 	}
 	if userID != 0 {
 		reg.UserID = &userID
@@ -72,8 +98,13 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al registrar asistencia."})
 	}
 
+	msg := "Registro confirmado."
+	if paymentStatus == "pendiente" {
+		msg = "Registro recibido. Tu pago está pendiente de verificación."
+	}
+
 	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"message":      "Registro confirmado.",
+		"message":      msg,
 		"registration": reg,
 	})
 }

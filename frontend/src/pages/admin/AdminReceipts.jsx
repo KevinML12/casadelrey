@@ -15,10 +15,67 @@ const BANKS_ICONS = {
   'G&T Continental': 'account_balance', 'Industrial': 'account_balance',
 };
 
-function VerifyModal({ receipt, onClose, onDone }) {
-  const [status, setStatus]   = useState('verificado');
-  const [reason, setReason]   = useState('');
+function RevertSection({ receipt, onDone, onClose }) {
+  const [confirm, setConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const revert = async () => {
+    setLoading(true);
+    try {
+      await apiClient.put(`/admin/receipts/${receipt.ID}/revert`);
+      toast.success('Comprobante revertido a pendiente');
+      onDone();
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al revertir');
+    } finally { setLoading(false); }
+  };
+
+  if (!confirm) return (
+    <button onClick={() => setConfirm(true)}
+      className="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-outline-var text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+      <span className="ms" style={{ fontSize: 16 }}>undo</span>
+      Revertir a pendiente
+    </button>
+  );
+
+  return (
+    <div className="rounded-2xl border border-outline-var bg-surf-low p-4 space-y-3 animate-fade-in">
+      <p className="text-body-s text-on-surf font-semibold flex items-center gap-2">
+        <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>undo</span>
+        ¿Revertir este comprobante a pendiente?
+      </p>
+      <p className="text-body-s text-on-surf-var">Volverá a aparecer en la cola de verificación y deberás revisarlo nuevamente.</p>
+      <div className="flex gap-2">
+        <button onClick={revert} disabled={loading}
+          className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
+          <span className="ms" style={{ fontSize: 16 }}>undo</span>
+          {loading ? 'Revirtiendo…' : 'Sí, revertir'}
+        </button>
+        <button onClick={() => setConfirm(false)}
+          className="flex-1 h-10 rounded-xl border border-outline-var text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function VerifyModal({ receipt, onClose, onDone }) {
+  const [status,   setStatus]   = useState('verificado');
+  const [reason,   setReason]   = useState('');
+  const [loading,  setLoading]  = useState(false);
+  // Doble confirmación: solo se activa al intentar rechazar
+  const [confirmStep, setConfirmStep] = useState(false);
+
+  const handleAction = () => {
+    // Si va a rechazar → pedir doble confirmación
+    if (status === 'rechazado' && !confirmStep) {
+      setConfirmStep(true);
+      return;
+    }
+    submit();
+  };
 
   const submit = async () => {
     setLoading(true);
@@ -27,7 +84,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
         status,
         rejection_reason: reason,
       });
-      toast.success(status === 'verificado' ? 'Comprobante verificado' : 'Comprobante rechazado');
+      toast.success(status === 'verificado' ? '✅ Comprobante verificado' : '❌ Comprobante rechazado');
       onDone();
       onClose();
     } catch { toast.error('Error al verificar'); }
@@ -77,31 +134,68 @@ function VerifyModal({ receipt, onClose, onDone }) {
 
         {/* Decisión */}
         <div className="px-6 pb-6 space-y-3 border-t border-outline-var pt-4">
-          <div className="flex gap-3">
-            {['verificado', 'rechazado'].map(s => (
-              <button key={s} onClick={() => setStatus(s)}
-                className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-xl text-label-l font-semibold transition-colors ${
-                  status === s
-                    ? s === 'verificado' ? 'bg-ter-con text-on-ter-con' : 'bg-err-con text-err'
-                    : 'border border-outline-var text-on-surf-var hover:bg-surf-dim'
+
+          {/* Solo mostrar selección si el comprobante está pendiente */}
+          {receipt.status === 'pendiente' && !confirmStep && (
+            <>
+              <div className="flex gap-3">
+                {['verificado', 'rechazado'].map(s => (
+                  <button key={s} onClick={() => { setStatus(s); setConfirmStep(false); }}
+                    className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-xl text-label-l font-semibold transition-colors ${
+                      status === s
+                        ? s === 'verificado' ? 'bg-ter-con text-on-ter-con' : 'bg-err-con text-err'
+                        : 'border border-outline-var text-on-surf-var hover:bg-surf-dim'
+                    }`}>
+                    <span className="ms" style={{ fontSize: 16 }}>{s === 'verificado' ? 'check_circle' : 'cancel'}</span>
+                    {s === 'verificado' ? 'Aprobar' : 'Rechazar'}
+                  </button>
+                ))}
+              </div>
+              {status === 'rechazado' && (
+                <textarea rows={2} value={reason} onChange={e => setReason(e.target.value)}
+                  placeholder="Razón del rechazo (opcional)…"
+                  className="w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri resize-none" />
+              )}
+              <button onClick={handleAction} disabled={loading}
+                className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl text-label-l font-semibold transition-opacity disabled:opacity-50 ${
+                  status === 'rechazado' ? 'bg-err text-white hover:opacity-90' : 'bg-pri text-on-pri hover:opacity-90'
                 }`}>
-                <span className="ms" style={{ fontSize: 16 }}>
-                  {s === 'verificado' ? 'check_circle' : 'cancel'}
-                </span>
-                {s === 'verificado' ? 'Aprobar' : 'Rechazar'}
+                <span className="ms" style={{ fontSize: 16 }}>save</span>
+                {loading ? 'Guardando…' : status === 'rechazado' ? 'Rechazar comprobante' : 'Aprobar comprobante'}
               </button>
-            ))}
-          </div>
-          {status === 'rechazado' && (
-            <textarea rows={2} value={reason} onChange={e => setReason(e.target.value)}
-              placeholder="Razón del rechazo (opcional)…"
-              className="w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri resize-none" />
+            </>
           )}
-          <button onClick={submit} disabled={loading}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-            <span className="ms" style={{ fontSize: 16 }}>save</span>
-            {loading ? 'Guardando…' : 'Confirmar decisión'}
-          </button>
+
+          {/* Doble confirmación de rechazo */}
+          {confirmStep && (
+            <div className="rounded-2xl border-2 border-err bg-err-con/20 p-4 space-y-3 animate-fade-in">
+              <div className="flex items-center gap-2">
+                <span className="ms text-err" style={{ fontSize: 22 }}>warning</span>
+                <p className="text-body-s text-on-surf font-semibold">¿Confirmas el rechazo?</p>
+              </div>
+              <p className="text-body-s text-on-surf-var">
+                Esta acción notifica al pagador que su comprobante fue rechazado.
+                Puedes revertirla después si cometiste un error.
+              </p>
+              {reason && <p className="text-label-s text-err">Razón: {reason}</p>}
+              <div className="flex gap-2">
+                <button onClick={submit} disabled={loading}
+                  className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-err text-white text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
+                  <span className="ms" style={{ fontSize: 16 }}>cancel</span>
+                  {loading ? 'Rechazando…' : 'Sí, rechazar'}
+                </button>
+                <button onClick={() => setConfirmStep(false)}
+                  className="flex-1 h-10 rounded-xl border border-outline-var text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+                  Volver
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Revertir — visible si ya fue procesado */}
+          {receipt.status !== 'pendiente' && !confirmStep && (
+            <RevertSection receipt={receipt} onDone={onDone} onClose={onClose} />
+          )}
         </div>
       </div>
     </div>
