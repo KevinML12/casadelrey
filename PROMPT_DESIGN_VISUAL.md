@@ -762,3 +762,37 @@ Genera todo esto como un sistema coherente:
 6. **Guía de motion** — tabla de duraciones y easings
 
 El resultado debe verse como si lo hubiera diseñado el equipo de Elevation Church con la pulcritud de Apple, usando los colores de marca de Casa del Rey.
+
+---
+
+## Orientación a jóvenes — instrucción crítica
+
+**Audiencia primaria real:** jóvenes de 16-28 años en Guatemala. El pastor tiene visión explícita de alcanzar esta generación.
+
+**Ajustes de diseño para que lo sientan suyo:**
+
+1. **El violeta `#7C3AED` es el color protagonista en el sitio público** — no el navy. El navy es para los paneles internos (admin/líder). En el hero del home, secciones de impacto y CTAs del sitio público, el violeta debe dominar. Es el color real de su escenario y es el color que la generación Z asocia con energía, espiritualidad y creatividad.
+
+2. **Tipografía con actitud** — no solo bold, sino con contraste intencional dentro de la misma línea:
+   - "TU" en peso 400 italic → "GENERACIÓN" en peso 900
+   - Mixing de serif (para citas bíblicas) con sans-serif bold (para titulares de sección)
+   - Esto es signature Elevation y signature youth culture
+
+3. **Lenguaje del copy en los mockups:**
+   - NO: "Bienvenidos a nuestra congregación"
+   - SÍ: "Empieza tu propósito aquí", "Tu generación. Tu momento.", "Únete al movimiento"
+   - Las citas bíblicas en tipografía serif elegante sobre fondo oscuro — exactamente como su Instagram
+
+4. **Las células de jóvenes (JX y PX) tienen identidad visual propia:**
+   - En la página de voluntarios y directorio, las células JX/PX tienen un accent violeta
+   - Las células de hombres y mujeres tienen el navy
+   - Las de niños tienen celeste
+   - Esto hace que los jóvenes vean "hay algo específico para mí"
+
+5. **Energía en el hero — no corporativo:**
+   - El hero NO debe verse como una landing page de SaaS ni como una iglesia de señoras
+   - Debe verse como: si Elevation Church y un artista guatemalteco de 25 años diseñaran juntos
+   - Oscuro, violeta, bold, con un subtítulo que dice el horario del culto en formato humano:
+     "Domingos · 10am · Zona 1, Huehuetenango"
+
+**Nota sobre fotografía:** El diseño debe funcionar con cualquier fotografía que provea la iglesia — no depende de fotos específicas. Los overlays, gradientes y la tipografía son lo que comunica juventud, no la foto en sí.
