@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 
 const NAV = [
   { to: '/admin',                  icon: 'dashboard',          label: 'Dashboard',     exact: true },
+  { to: '/admin/hero',             icon: 'view_carousel',      label: 'Hero' },
   { to: '/admin/users',            icon: 'manage_accounts',    label: 'Usuarios' },
   { to: '/admin/blog',             icon: 'article',            label: 'Blog' },
   { to: '/admin/events',           icon: 'calendar_month',     label: 'Eventos' },

@@ -29,6 +29,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	boletaHandler        := handlers.NewBoletaHandler(db)
 	uploadHandler        := handlers.NewUploadHandler(store)
 	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
+	heroHandler          := handlers.NewHeroHandler(db)
 	announcementHandler  := handlers.NewAnnouncementHandler(db)
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
@@ -57,6 +58,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Comprobantes bancarios — público: enviar
 	api.POST("/receipts", receiptHandler.Submit)
+
+	// Hero del home — público: obtener el activo
+	api.GET("/hero/active", heroHandler.GetActive)
 
 	// Voluntariado
 	api.POST("/volunteer/register",   volunteerHandler.Register)
@@ -138,6 +142,13 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.PUT("/receipts/:id/verify",   receiptHandler.Verify)
 	adminGroup.PUT("/receipts/:id/revert",   receiptHandler.Revert)
 	adminGroup.GET("/receipts/count",        receiptHandler.GetPendingCount)
+
+	// Hero CMS — admin
+	adminGroup.GET("/hero",               heroHandler.GetAll)
+	adminGroup.POST("/hero",              heroHandler.Create)
+	adminGroup.PUT("/hero/:id",           heroHandler.Update)
+	adminGroup.PUT("/hero/:id/activate",  heroHandler.Activate)
+	adminGroup.DELETE("/hero/:id",        heroHandler.Delete)
 
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)

@@ -82,6 +82,8 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			// Personas
 			&models.Volunteer{},
 			&models.Petition{},
+			// CMS
+			&models.HeroSetting{},
 			// Sistema
 			&models.UserGoal{},
 			&models.ActivityLog{},

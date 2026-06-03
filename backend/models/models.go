@@ -230,6 +230,33 @@ type ActivityLog struct {
 	IPAddress  string `json:"ip_address" gorm:"type:varchar(45)"`
 }
 
+// HeroSetting configura el contenido del hero de la home pública.
+// Solo hay un registro activo a la vez. Editado desde /admin/hero.
+type HeroSetting struct {
+	gorm.Model
+	// Textos
+	LabelTop         string `json:"label_top" gorm:"type:varchar(120)"`     // "● IGLESIA CRISTIANA · HUEHUETENANGO"
+	TitleLine1       string `json:"title_line_1" gorm:"type:varchar(80)"`   // "LUZ PARA"
+	TitleLine2       string `json:"title_line_2" gorm:"type:varchar(80)"`   // "LAS NACIONES" (outline)
+	VerseReference   string `json:"verse_reference" gorm:"type:varchar(40)"` // "MATEO 5:14"
+	Subtitle         string `json:"subtitle" gorm:"type:varchar(200)"`      // "Empieza tu propósito aquí."
+	ScheduleText     string `json:"schedule_text" gorm:"type:varchar(200)"` // "Domingos · 10am · Zona 1, Huehuetenango"
+
+	// CTAs
+	CTAPrimaryText   string `json:"cta_primary_text" gorm:"type:varchar(60)"`
+	CTAPrimaryURL    string `json:"cta_primary_url" gorm:"type:varchar(255)"`
+	CTASecondaryText string `json:"cta_secondary_text" gorm:"type:varchar(60)"`
+	CTASecondaryURL  string `json:"cta_secondary_url" gorm:"type:varchar(255)"`
+
+	// Visual
+	BackgroundImageURL string `json:"background_image_url" gorm:"type:varchar(500)"`
+	OverlayColor       string `json:"overlay_color" gorm:"type:varchar(20);default:'#060D24'"`
+	OverlayOpacity     int    `json:"overlay_opacity" gorm:"default:50"` // 0-100
+
+	// Estado
+	IsActive bool `json:"is_active" gorm:"default:false"`
+}
+
 type MemberBoleta struct {
 	gorm.Model
 	Date           string `json:"date" gorm:"type:varchar(20);not null"`
