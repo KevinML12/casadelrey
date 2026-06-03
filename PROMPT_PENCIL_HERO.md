@@ -234,3 +234,117 @@ El resultado debe verse como **el hero de elevation.church/messages pero con ide
 - Revista Apartamento → tipografía con kerning negativo
 
 **NO referencias:** Vercel, Linear, Resend, PostHog, Stripe, Notion (todos SaaS oscuros genéricos).
+
+---
+
+# Sección 2 — Galería desde redes sociales (debajo del hero)
+
+Diseña **una sección que muestre las últimas fotos** que el admin ha vinculado desde Instagram, Facebook, YouTube o TikTok. Las imágenes están subidas localmente (no son embeds), cada una linkea al post original.
+
+## Estructura
+
+### Label de sección (estilo Elevation)
+```
+── DESDE NUESTRAS REDES
+```
+- Línea horizontal corta + texto uppercase
+- Inter 600, 12px, color violeta `#7C3AED`
+- Letter-spacing 0.15em
+- Padding-top de la sección: 128px
+
+### Título de sección
+```
+LO QUE ESTAMOS VIVIENDO
+```
+- Inter 900, `clamp(2.5rem, 5vw, 4rem)`
+- Color: `#050505` si fondo claro, blanco si fondo oscuro
+- Letter-spacing: -0.04em
+- Margin-bottom: 64px
+
+### Grid editorial asimétrico — **NO es masonry uniforme**
+
+El admin asigna **3 tamaños** a cada post: `small`, `medium`, `large`.
+Usa CSS Grid con `auto-rows: 200px` y `grid-template-columns: repeat(4, 1fr)`.
+
+```
+small  = col-span-1 row-span-1   (200×200)
+medium = col-span-2 row-span-1   (400×200)
+large  = col-span-2 row-span-2   (400×400)
+```
+
+**Ejemplo de layout (mezcla intencional):**
+
+```
+┌──────────┬──────────────┬──────────┐
+│  small   │              │  small   │
+│          │   LARGE      │          │
+├──────────┤              ├──────────┤
+│  small   │              │  medium  │
+│          │              │          │
+├──────────┴──────────┬───┴──────────┤
+│      medium         │     small    │
+│                     │              │
+└─────────────────────┴──────────────┘
+```
+
+Esto es lo que crea el ritmo editorial — NUNCA un grid uniforme tipo Instagram.
+
+### Cada card de post
+
+**Imagen:** `object-fit: cover`, llena toda la card sin padding.
+
+**Badge de plataforma — esquina superior izquierda:**
+```
+[📷 INSTAGRAM]    o    [👍 FACEBOOK]    o    [▶ YOUTUBE]
+```
+- Background: `rgba(0,0,0,0.6)` con `backdrop-filter: blur(8px)`
+- Padding: 6px 10px
+- Border-radius: 6px
+- Ícono 12px + texto 10px uppercase, tracking 0.15em, blanco
+
+**Hover overlay (Apple feel):**
+- Aparece un overlay `rgba(0,0,0,0.7)` con transición 200ms ease-out
+- Al centro: el caption (si existe) en blanco, max 2 líneas
+- Debajo del caption: botón circular "Ver en [plataforma] →" con ícono `open_in_new`
+- Click en la card entera → abre el post original en nueva pestaña
+- Cursor: pointer
+
+**Animación de carga (stagger):**
+- Cada card aparece con `opacity 0 → 1 + translateY(20px → 0)`
+- Stagger de 60ms entre cards (las primeras 8, luego sin delay)
+- Easing: `cubic-bezier(0.0, 0.0, 0.2, 1)` (decelerate)
+
+### CTA al final de la sección
+
+Centrado, padding-top 64px:
+```
+Síguenos en redes →
+```
+- Texto en `#7C3AED` violeta
+- Inter 600, 1rem
+- El "→" se desplaza 6px a la derecha en hover (200ms)
+- Sin fondo, sin borde — solo el texto
+
+### Responsive
+
+**Mobile (<768px):**
+- Grid de 2 columnas
+- `auto-rows: 160px`
+- `large` se convierte en `col-span-2 row-span-2` (sigue siendo grande)
+- `medium` se convierte en `col-span-2 row-span-1` (ocupa ancho completo)
+- `small` mantiene `col-span-1 row-span-1`
+
+**Tablet (768-1023px):**
+- Grid de 3 columnas
+- Recalcular spans proporcionalmente
+
+---
+
+## Output esperado (sección 2)
+
+1. **Mockup desktop 1440px** con 8-10 cards de ejemplo mezcladas en tamaños
+2. **Mockup mobile** con el mismo contenido adaptado
+3. **Estado hover** mostrando el overlay con caption + botón
+4. **CSS de implementación**
+
+El resultado debe verse como **el feed de fotografía editorial de A24 Films** combinado con la calidez de un Instagram bien curado — NO como un grid uniforme de Instagram puro.

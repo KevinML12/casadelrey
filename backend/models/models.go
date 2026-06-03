@@ -173,12 +173,13 @@ type Volunteer struct {
 
 type SocialPost struct {
 	gorm.Model
-	Platform  string `json:"platform" gorm:"type:varchar(20);not null"` // facebook|instagram
-	PostURL   string `json:"post_url" gorm:"type:varchar(500);not null"`
-	Caption   string `json:"caption" gorm:"type:varchar(500)"`
-	ImageURL  string `json:"image_url" gorm:"type:varchar(500)"`
-	IsActive  bool   `json:"is_active" gorm:"default:true"`
-	SortOrder int    `json:"sort_order" gorm:"default:0"`
+	Platform     string `json:"platform" gorm:"type:varchar(20);not null"` // facebook|instagram|youtube|tiktok
+	PostURL      string `json:"post_url" gorm:"type:varchar(500);not null"`
+	Caption      string `json:"caption" gorm:"type:varchar(500)"`
+	ImageURL     string `json:"image_url" gorm:"type:varchar(500)"`        // foto subida a R2
+	FeaturedSize string `json:"featured_size" gorm:"type:varchar(20);default:'medium'"` // small|medium|large — grid editorial
+	IsActive     bool   `json:"is_active" gorm:"default:true"`
+	SortOrder    int    `json:"sort_order" gorm:"default:0"`
 }
 
 type Announcement struct {
