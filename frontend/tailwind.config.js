@@ -60,7 +60,8 @@ export default {
         'navy':       '#0D1B4B',
         'navy-deep':  '#060D24',
         'navy-press': '#091237',
-        'celeste':    '#4A90D9',
+        'celeste':    '#4AD0CE',
+        'turquoise':  '#4AD0CE',
         'violet':     '#7C3AED',
         'cream':      '#FAFAF8',
       },
@@ -94,7 +95,7 @@ export default {
         'elev-4': '0 20px 25px rgba(0,0,0,0.10), 0 10px 10px rgba(0,0,0,0.04)',
         'elev-5': '0 25px 50px rgba(0,0,0,0.15)',
         'ring-pri':    '0 0 0 3px rgba(13, 27, 75, 0.20)',
-        'ring-sec':    '0 0 0 3px rgba(74, 144, 217, 0.30)',
+        'ring-sec':    '0 0 0 3px rgba(74, 208, 206, 0.30)',
         'ring-err':    '0 0 0 3px rgba(220, 38, 38, 0.20)',
       },
 

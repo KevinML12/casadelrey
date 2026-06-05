@@ -22,11 +22,11 @@
   --pri-con:     #E0E7FF;   /* Navy tinte — backgrounds suaves */
   --on-pri-con:  #050505;
 
-  /* Acento celeste */
-  --sec:         #4A90D9;
-  --on-sec:      #FFFFFF;
-  --sec-con:     #DBEAFE;
-  --on-sec-con:  #050505;
+  /* Acento celeste/turquesa */
+  --sec:         #4AD0CE;
+  --on-sec:      #050505;
+  --sec-con:     #D6F5F4;
+  --on-sec-con:  #0F4D4C;
 
   /* Violeta opcional — solo eventos juveniles */
   --ter:         #7C3AED;
@@ -46,23 +46,23 @@
   --outline-var: #E5E7EB;   /* Borde 1px */
 
   /* ── ESTADOS ──────────────────────────────────────────────── */
-  --err:         #DC2626;
+  --err:         #EF4444;
   --on-err:      #FFFFFF;
   --err-con:     #FEE2E2;
   --on-err-con:  #991B1B;
 
-  --warn:        #D97706;
+  --warn:        #F59E0B;
   --warn-con:    #FEF3C7;
   --on-warn-con: #92400E;
 
-  --ok:          #16A34A;
+  --ok:          #10B981;
   --ok-con:      #D1FAE5;
   --on-ok-con:   #065F46;
 
   /* ── INVERSE (hero / footer siempre dark) ─────────────────── */
   --inv-surf:    #060D24;
   --inv-on-surf: #FFFFFF;
-  --inv-pri:     #4A90D9;
+  --inv-pri:     #4AD0CE;
 
   /* ── RADIOS ───────────────────────────────────────────────── */
   --r-xs:   4px;
@@ -85,10 +85,10 @@
   color-scheme: dark;
 
   /* ── MARCA en dark ───────────────────────────────────────── */
-  --pri:         #4A90D9;   /* Acento celeste pasa a primario en dark */
-  --pri-press:   #2563EB;
-  --on-pri:      #FFFFFF;
-  --pri-con:     rgba(74, 144, 217, 0.15);
+  --pri:         #4AD0CE;   /* Turquesa como primario en dark */
+  --pri-press:   #2BBAB7;
+  --on-pri:      #050505;
+  --pri-con:     rgba(74, 208, 206, 0.15);
   --on-pri-con:  #FFFFFF;
 
   --sec:         #7C3AED;
@@ -96,9 +96,9 @@
   --sec-con:     rgba(124, 58, 237, 0.15);
   --on-sec-con:  #FFFFFF;
 
-  --ter:         #4A90D9;
-  --on-ter:      #FFFFFF;
-  --ter-con:     rgba(74, 144, 217, 0.15);
+  --ter:         #4AD0CE;
+  --on-ter:      #050505;
+  --ter-con:     rgba(74, 208, 206, 0.15);
   --on-ter-con:  #FFFFFF;
 
   /* ── NEUTRALES dark ──────────────────────────────────────── */
@@ -153,7 +153,7 @@
   }
 
   ::selection {
-    background: rgba(13, 27, 75, .15);
+    background: rgba(74, 208, 206, .25);
   }
 
   a { text-decoration: none; color: inherit; }
