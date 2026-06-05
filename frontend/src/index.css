@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,1,0&display=block');
 
 @tailwind base;
@@ -6,91 +8,127 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════
-   M3 COLOR ROLES — Casa del Rey
-   https://m3.material.io/styles/color/roles
+   CASA DEL REY — BRAND SYSTEM v1.0
+   Navy + Celeste + Cream  ·  Apple HIG + Elevation Church
 ═══════════════════════════════════════════════════════════════════ */
 
 :root {
   color-scheme: light;
 
-  /* Primary — Royal Blue */
-  --pri:        #1565C0;
-  --on-pri:     #FFFFFF;
-  --pri-con:    #D3E4FF;
-  --on-pri-con: #001C38;
+  /* ── MARCA ────────────────────────────────────────────────── */
+  --pri:         #0D1B4B;   /* Navy marca — botón primario, sidebar */
+  --pri-press:   #091237;   /* Navy press (active) */
+  --on-pri:      #FFFFFF;
+  --pri-con:     #E0E7FF;   /* Navy tinte — backgrounds suaves */
+  --on-pri-con:  #050505;
 
-  /* Secondary — Navy */
-  --sec:        #4A5680;
-  --on-sec:     #FFFFFF;
-  --sec-con:    #DCE1FF;
-  --on-sec-con: #050E3A;
+  /* Acento celeste */
+  --sec:         #4A90D9;
+  --on-sec:      #FFFFFF;
+  --sec-con:     #DBEAFE;
+  --on-sec-con:  #050505;
 
-  /* Tertiary */
-  --ter:        #006399;
-  --on-ter:     #FFFFFF;
-  --ter-con:    #CCE5FF;
-  --on-ter-con: #001E30;
+  /* Violeta opcional — solo eventos juveniles */
+  --ter:         #7C3AED;
+  --on-ter:      #FFFFFF;
+  --ter-con:     #EDE9FE;
+  --on-ter-con:  #050505;
 
-  /* Error */
-  --err:        #BA1A1A;
-  --on-err:     #FFFFFF;
-  --err-con:    #FFDAD6;
-  --on-err-con: #410002;
+  /* ── NEUTRALES ────────────────────────────────────────────── */
+  --surf:        #FAFAF8;   /* Fondo del sitio */
+  --surf-low:    #F4F6FB;   /* Inset / inputs / barras */
+  --surf-high:   #FFFFFF;   /* Superficie elevada / cards */
+  --surf-dim:    #E5E7EB;   /* Borders / dividers */
 
-  /* Surface scale */
-  --surf:       #F8F9FF;
-  --surf-dim:   #D8D9E5;
-  --surf-low:   #ECEDF9;
-  --surf-high:  #E6E8F3;
-  --on-surf:    #191B22;
-  --on-surf-var:#44464F;
+  --on-surf:     #050505;   /* Tinta texto */
+  --on-surf-var: #525B7A;   /* Texto secundario */
+  --outline:     #9CA3B8;   /* Texto tenue / placeholders */
+  --outline-var: #E5E7EB;   /* Borde 1px */
 
-  /* Outline */
-  --outline:     #757780;
-  --outline-var: #C5C6D0;
+  /* ── ESTADOS ──────────────────────────────────────────────── */
+  --err:         #DC2626;
+  --on-err:      #FFFFFF;
+  --err-con:     #FEE2E2;
+  --on-err-con:  #991B1B;
 
-  /* Inverse */
-  --inv-surf:    #2E3038;
-  --inv-on-surf: #E0E1EC;
-  --inv-pri:     #A4C8FF;
+  --warn:        #D97706;
+  --warn-con:    #FEF3C7;
+  --on-warn-con: #92400E;
+
+  --ok:          #16A34A;
+  --ok-con:      #D1FAE5;
+  --on-ok-con:   #065F46;
+
+  /* ── INVERSE (hero / footer siempre dark) ─────────────────── */
+  --inv-surf:    #060D24;
+  --inv-on-surf: #FFFFFF;
+  --inv-pri:     #4A90D9;
+
+  /* ── RADIOS ───────────────────────────────────────────────── */
+  --r-xs:   4px;
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   24px;
+  --r-2xl:  28px;
+  --r-full: 9999px;
+
+  /* ── EASINGS (Apple) ──────────────────────────────────────── */
+  --ease-standard:   cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0.0, 1.0, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-sharp:      cubic-bezier(0.4, 0.0, 0.6, 1);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --pri:        #A4C8FF;
-  --on-pri:     #003063;
-  --pri-con:    #004A98;
-  --on-pri-con: #D3E4FF;
+  /* ── MARCA en dark ───────────────────────────────────────── */
+  --pri:         #4A90D9;   /* Acento celeste pasa a primario en dark */
+  --pri-press:   #2563EB;
+  --on-pri:      #FFFFFF;
+  --pri-con:     rgba(74, 144, 217, 0.15);
+  --on-pri-con:  #FFFFFF;
 
-  --sec:        #BBC3FF;
-  --on-sec:     #1E2578;
-  --sec-con:    #363D90;
-  --on-sec-con: #DCE1FF;
+  --sec:         #7C3AED;
+  --on-sec:      #FFFFFF;
+  --sec-con:     rgba(124, 58, 237, 0.15);
+  --on-sec-con:  #FFFFFF;
 
-  --ter:        #8ECDFF;
-  --on-ter:     #003350;
-  --ter-con:    #004B72;
-  --on-ter-con: #CCE5FF;
+  --ter:         #4A90D9;
+  --on-ter:      #FFFFFF;
+  --ter-con:     rgba(74, 144, 217, 0.15);
+  --on-ter-con:  #FFFFFF;
 
-  --err:        #FFB4AB;
-  --on-err:     #690005;
-  --err-con:    #93000A;
-  --on-err-con: #FFDAD6;
+  /* ── NEUTRALES dark ──────────────────────────────────────── */
+  --surf:        #060D24;
+  --surf-low:    rgba(255, 255, 255, 0.04);
+  --surf-high:   #0D1B4B;
+  --surf-dim:    rgba(255, 255, 255, 0.10);
 
-  --surf:       #111318;
-  --surf-dim:   #111318;
-  --surf-low:   #191B22;
-  --surf-high:  #222429;
-  --on-surf:    #E2E2E9;
-  --on-surf-var:#C5C6D0;
+  --on-surf:     #FFFFFF;
+  --on-surf-var: rgba(255, 255, 255, 0.60);
+  --outline:     rgba(255, 255, 255, 0.35);
+  --outline-var: rgba(255, 255, 255, 0.10);
 
-  --outline:     #8F9099;
-  --outline-var: #44464F;
+  /* ── ESTADOS dark ────────────────────────────────────────── */
+  --err:         #EF4444;
+  --on-err:      #FFFFFF;
+  --err-con:     rgba(239, 68, 68, 0.15);
+  --on-err-con:  #FCA5A5;
 
-  --inv-surf:    #E2E2E9;
-  --inv-on-surf: #2E3038;
-  --inv-pri:     #1565C0;
+  --warn:        #F59E0B;
+  --warn-con:    rgba(245, 158, 11, 0.15);
+  --on-warn-con: #FCD34D;
+
+  --ok:          #22C55E;
+  --ok-con:      rgba(34, 197, 94, 0.15);
+  --on-ok-con:   #86EFAC;
+
+  --inv-surf:    #FAFAF8;
+  --inv-on-surf: #050505;
+  --inv-pri:     #0D1B4B;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -99,8 +137,9 @@
 
 @layer base {
   html {
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -109,54 +148,40 @@
     font-family: Inter, system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color .3s, color .3s;
+    transition: background-color .3s var(--ease-standard),
+                color .3s var(--ease-standard);
   }
 
   ::selection {
-    background: rgba(21, 101, 192, .2);
+    background: rgba(13, 27, 75, .15);
   }
 
   a { text-decoration: none; color: inherit; }
+
+  /* Tipografía editorial — clase utility */
+  .font-display {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.95;
+  }
+  .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.15em;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   M3 STATE LAYER
-   https://m3.material.io/foundations/interaction/states
+   COMPONENTES
 ═══════════════════════════════════════════════════════════════════ */
 
 @layer components {
-  .state-layer {
-    position: relative;
-    overflow: hidden;
-  }
-  .state-layer::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--on-surf);
-    opacity: 0;
-    transition: opacity .15s;
-    pointer-events: none;
-  }
-  .state-layer:hover::before   { opacity: .08; }
-  .state-layer:active::before  { opacity: .12; }
-  .state-layer:focus-visible::before { opacity: .12; }
 
-  .state-pri::before  { background: var(--pri); }
-  .state-err::before  { background: var(--err); }
-
-  /* ── M3 Elevation surfaces ────────────────────────────────────── */
-  .surf-1 {
-    background: color-mix(in srgb, var(--surf) 95%, var(--pri) 5%);
-  }
-  .surf-2 {
-    background: color-mix(in srgb, var(--surf) 92%, var(--pri) 8%);
-  }
-  .surf-3 {
-    background: color-mix(in srgb, var(--surf) 89%, var(--pri) 11%);
-  }
-
-  /* ── Material Symbols ────────────────────────────────────────── */
+  /* ── Material Symbols ────────────────────────────────────── */
   .ms {
     font-family: 'Material Symbols Rounded', sans-serif;
     font-size: 24px;
@@ -168,11 +193,45 @@
     user-select: none;
     flex-shrink: 0;
     vertical-align: middle;
-    /* display=block en la URL del font previene texto fallback */
     speak: never;
   }
 
-  /* ── Logo adaptive — light: blend, dark: invert ──────────────── */
+  /* ── State layer (Apple-style hover) ─────────────────────── */
+  .state-layer {
+    position: relative;
+    overflow: hidden;
+    transition: transform 100ms var(--ease-spring);
+  }
+  .state-layer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--on-surf);
+    opacity: 0;
+    transition: opacity 150ms var(--ease-standard);
+    pointer-events: none;
+  }
+  .state-layer:hover::before   { opacity: .04; }
+  .state-layer:active::before  { opacity: .08; }
+  .state-layer:focus-visible::before { opacity: .08; }
+  .state-pri::before  { background: var(--pri); }
+  .state-err::before  { background: var(--err); }
+
+  /* ── Surface elevations Apple-style (sutiles) ────────────── */
+  .surf-1 {
+    background: var(--surf-high);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .surf-2 {
+    background: var(--surf-high);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
+  }
+  .surf-3 {
+    background: var(--surf-high);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  /* ── Logo adaptive ───────────────────────────────────────── */
   .logo-adaptive {
     mix-blend-mode: multiply;
   }
@@ -181,7 +240,7 @@
     filter: brightness(0) invert(1);
   }
 
-  /* ── Leading icon container (M3 List) ────────────────────────── */
+  /* ── Leading icon Apple-style ────────────────────────────── */
   .leading-icon {
     width: 40px;
     height: 40px;
@@ -194,16 +253,92 @@
     justify-content: center;
   }
 
-  /* ── Hero (superficie siempre dark — independiente del tema) ─── */
+  /* ── Hero superficie (siempre dark) ──────────────────────── */
   .hero-surf {
-    background: #0A1145;
+    background: #060D24;
   }
   .hero-grid {
-    background-image: radial-gradient(circle, rgba(164,200,255,.07) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(255,255,255,.04) 1px, transparent 1px);
     background-size: 32px 32px;
     position: absolute;
     inset: 0;
     pointer-events: none;
+  }
+
+  /* ── Botón pill Apple ────────────────────────────────────── */
+  .btn-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.4;
+    transition: transform 100ms var(--ease-spring),
+                background-color 100ms var(--ease-standard),
+                opacity 100ms var(--ease-standard);
+    cursor: pointer;
+  }
+  .btn-pill:hover    { transform: scale(1.02); }
+  .btn-pill:active   { transform: scale(0.97); }
+  .btn-pill:disabled { opacity: 0.4; cursor: not-allowed; transform: scale(1); }
+
+  /* ── Nav sticky Apple ────────────────────────────────────── */
+  .nav-sticky {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.72);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .nav-sticky-dark {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(13, 27, 75, 0.72);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ── Animaciones signature ───────────────────────────────── */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes heroReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(3px); }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% center; }
+    to   { background-position: 200% center; }
+  }
+  .animate-fade-in   { animation: fadeIn 200ms var(--ease-decelerate) both; }
+  .animate-slide-up  { animation: slideUp 300ms var(--ease-decelerate) both; }
+  .animate-hero-1    { animation: heroReveal 600ms var(--ease-decelerate) 100ms both; }
+  .animate-hero-2    { animation: heroReveal 600ms var(--ease-decelerate) 220ms both; }
+  .animate-hero-3    { animation: heroReveal 600ms var(--ease-decelerate) 340ms both; }
+  .animate-hero-4    { animation: heroReveal 400ms var(--ease-decelerate) 460ms both; }
+  .animate-hero-5    { animation: heroReveal 400ms var(--ease-decelerate) 580ms both; }
+  .animate-shake     { animation: shake 300ms var(--ease-standard); }
+  .animate-shimmer {
+    background: linear-gradient(90deg,
+      var(--surf-low) 0%,
+      var(--surf-dim) 50%,
+      var(--surf-low) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
   }
 }
 
@@ -219,28 +354,35 @@
   height: 0;
 }
 
-.prose h2       { font-size: 1.5rem;   font-weight: 900; color: var(--on-surf);     margin: 1.5rem 0 .75rem; }
-.prose h3       { font-size: 1.25rem;  font-weight: 700; color: var(--on-surf);     margin: 1.25rem 0 .5rem; }
-.prose p        { margin-bottom: 1rem; color: var(--on-surf); }
-.prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+.prose h2       { font-size: 1.75rem; font-weight: 700; color: var(--on-surf); margin: 1.75rem 0 .75rem; letter-spacing: -0.02em; }
+.prose h3       { font-size: 1.375rem; font-weight: 700; color: var(--on-surf); margin: 1.25rem 0 .5rem; letter-spacing: -0.01em; }
+.prose p        { margin-bottom: 1.25rem; color: var(--on-surf); line-height: 1.7; }
+.prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
 .prose ul       { list-style-type: disc; }
 .prose ol       { list-style-type: decimal; }
-.prose li       { margin-bottom: .25rem; color: var(--on-surf); }
+.prose li       { margin-bottom: .375rem; color: var(--on-surf); }
 .prose blockquote {
   border-left: 3px solid var(--pri);
-  padding-left: 1rem;
+  padding-left: 1.25rem;
   color: var(--on-surf-var);
   font-style: italic;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
 }
-.prose a        { color: var(--pri); text-decoration: underline; }
-.prose img      { max-width: 100%; border-radius: 12px; margin: 1.5rem 0; }
+.prose a        { color: var(--sec); text-decoration: underline; text-underline-offset: 2px; }
+.prose img      { max-width: 100%; border-radius: var(--r-lg); margin: 2rem 0; }
 .prose strong   { font-weight: 700; color: var(--on-surf); }
 
 /* ═══════════════════════════════════════════════════════════════════
    SCROLLBAR
 ═══════════════════════════════════════════════════════════════════ */
 
-::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: var(--outline-var); border-radius: 3px; }
+::-webkit-scrollbar-thumb  {
+  background: var(--outline-var);
+  border-radius: 3px;
+  transition: background 150ms var(--ease-standard);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--outline); }
