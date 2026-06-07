@@ -247,119 +247,140 @@ export default function EventsPage() {
     <main className="min-h-screen bg-surf">
       <PageHero icon="calendar_month" title="Eventos y Cultos" subtitle="Conéctate con nuestra comunidad en persona." />
 
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
-        {error ? (
-          <div className="text-center py-24">
-            <p className="text-body-m text-on-surf-var">No se pudo conectar con el servidor.</p>
-          </div>
-        ) : events.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="leading-icon mx-auto mb-4" style={{ width: 56, height: 56 }}>
-              <span className="ms" style={{ fontSize: 32 }}>calendar_month</span>
-            </div>
-            <h3 className="text-title-l text-on-surf font-bold mb-2">Sin eventos próximos</h3>
-            <p className="text-body-m text-on-surf-var">Pronto publicaremos nuevos eventos. ¡Vuelve pronto!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map(ev => {
-              const dayNum   = ev.date ? new Date(ev.date + 'T12:00').getDate() : '';
-              const monthStr = ev.date
-                ? new Date(ev.date + 'T12:00').toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()
-                : '';
-              const weekday  = ev.date
-                ? new Date(ev.date + 'T12:00').toLocaleDateString('es-ES', { weekday: 'long' })
-                : '';
+      <div className="max-w-[1200px] mx-auto px-6 py-20 md:py-28">
 
-              return (
-                <div
-                  key={ev.ID}
-                  className="flex flex-col overflow-hidden transition-shadow duration-200"
-                  style={{ borderRadius: 28, background: '#FFFFFF', boxShadow: '0 2px 8px rgba(13,27,75,0.06)' }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 25px rgba(13,27,75,0.12)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(13,27,75,0.06)'; }}
-                >
-                  {/* Área superior: fecha destacada */}
-                  <div
-                    className="flex flex-col items-center justify-center relative"
-                    style={{ height: 220, background: '#0D1B4B', borderRadius: '28px 28px 0 0' }}
-                  >
-                    {dayNum && (
-                      <>
-                        <span
-                          className="text-white font-black leading-none"
-                          style={{ fontSize: 72 }}
-                        >
-                          {dayNum}
-                        </span>
-                        <span
-                          className="text-white font-semibold"
-                          style={{ fontSize: 13, letterSpacing: 2, opacity: 0.65, marginTop: 6 }}
-                        >
-                          {monthStr}
-                        </span>
-                        {weekday && (
-                          <span
-                            className="text-white"
-                            style={{ fontSize: 12, opacity: 0.45, marginTop: 4 }}
-                          >
+        {error ? (
+          /* ── Error state ── */
+          <div className="py-32 flex flex-col items-center gap-5">
+            <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>
+              SIN CONEXIÓN
+            </p>
+            <p className="font-bold text-[28px] tracking-[-0.02em]" style={{ color: 'var(--on-surf)' }}>
+              No pudimos conectar.
+            </p>
+            <p style={{ color: 'var(--on-surf-var)', fontSize: 16 }}>
+              Verifica tu conexión e intenta de nuevo.
+            </p>
+          </div>
+
+        ) : events.length === 0 ? (
+          /* ── Empty state ── */
+          <div className="py-32 flex flex-col items-center gap-5">
+            <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>
+              PRÓXIMOS EVENTOS
+            </p>
+            <p className="font-bold leading-[1.05] tracking-[-0.02em] text-center whitespace-pre-line"
+              style={{ color: 'var(--on-surf)', fontSize: 'clamp(28px, 4vw, 40px)' }}>
+              {'Sin eventos\npublicados aún.'}
+            </p>
+            <p style={{ color: 'var(--on-surf-var)', fontSize: 16 }}>
+              Vuelve pronto — publicamos nuevos eventos cada semana.
+            </p>
+          </div>
+
+        ) : (
+          /* ── Lista editorial ── */
+          <>
+            <p className="font-mono text-[11px] tracking-[2px] mb-12" style={{ color: 'var(--outline)' }}>
+              {events.length} EVENTO{events.length !== 1 ? 'S' : ''} PRÓXIMO{events.length !== 1 ? 'S' : ''}
+            </p>
+
+            <div className="flex flex-col">
+              {events.map((ev, i) => {
+                const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
+                const dayNum   = d ? d.getDate() : null;
+                const monthStr = d ? d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase() : null;
+                const weekday  = d ? d.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase() : 'EVENTO';
+                const details  = [ev.time, ev.location]
+                  .filter(Boolean)
+                  .map(s => s[0].toUpperCase() + s.slice(1))
+                  .join(' · ');
+
+                return (
+                  <div key={ev.ID}>
+                    <div className="flex items-center justify-between py-8 gap-6">
+
+                      {/* Fecha */}
+                      <div className="flex items-center gap-6 md:gap-8 min-w-0 flex-1">
+                        {dayNum ? (
+                          <div className="text-center shrink-0" style={{ width: 72 }}>
+                            <div className="font-black leading-none" style={{ color: '#060D24', fontSize: 52, letterSpacing: '-1px' }}>
+                              {dayNum}
+                            </div>
+                            <div className="font-semibold tracking-[1.5px] mt-1" style={{ color: 'var(--on-surf-var)', fontSize: 11 }}>
+                              {monthStr}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-[72px] shrink-0" />
+                        )}
+
+                        <div className="w-px h-16 shrink-0" style={{ background: 'var(--outline-var)' }} />
+
+                        {/* Info */}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-mono text-[11px] tracking-[1.2px] mb-1.5" style={{ color: 'var(--outline)' }}>
                             {weekday}
+                          </p>
+                          <p className="font-bold truncate tracking-[-0.3px]"
+                            style={{ color: 'var(--on-surf)', fontSize: 'clamp(18px, 2.5vw, 24px)' }}>
+                            {ev.title}
+                          </p>
+                          {details && (
+                            <p className="text-[14px] mt-1 truncate" style={{ color: 'var(--on-surf-var)' }}>
+                              {details}
+                            </p>
+                          )}
+                          {ev.description && (
+                            <p className="text-[13px] mt-1.5 line-clamp-1 hidden md:block" style={{ color: 'var(--outline)' }}>
+                              {ev.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* CTA */}
+                      <div className="shrink-0 flex flex-col items-end gap-2">
+                        {ev.requires_payment && (
+                          <span className="font-bold text-[13px] font-mono" style={{ color: '#7C3AED' }}>
+                            Q{Number(ev.price_gtq).toFixed(0)}
                           </span>
                         )}
-                      </>
-                    )}
-                    {ev.requires_payment && (
-                      <div
-                        className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full text-white font-bold"
-                        style={{ background: '#7C3AED', fontSize: 13 }}
-                      >
-                        Q{Number(ev.price_gtq).toFixed(0)}
+                        {ev.requires_payment ? (
+                          <button
+                            onClick={() => setRsvpEvent(ev)}
+                            className="px-6 py-2.5 rounded-full font-semibold text-[15px] transition-opacity hover:opacity-90"
+                            style={{ background: '#060D24', color: '#FFFFFF' }}
+                          >
+                            Registrarme →
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setRsvpEvent(ev)}
+                            className="px-6 py-2.5 rounded-full font-semibold text-[15px] transition-opacity hover:opacity-90 hidden sm:block"
+                            style={{ background: 'var(--pri-con)', color: '#060D24' }}
+                          >
+                            Confirmar →
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setRsvpEvent(ev)}
+                          className="px-5 py-2 rounded-full font-semibold text-[14px] transition-opacity hover:opacity-90 sm:hidden"
+                          style={{ background: '#060D24', color: '#FFFFFF' }}
+                        >
+                          Registrarme →
+                        </button>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Contenido */}
-                  <div className="flex flex-col flex-1 gap-2" style={{ padding: '20px 24px' }}>
-                    <h3 className="font-bold leading-snug" style={{ fontSize: 16, color: '#050505' }}>
-                      {ev.title}
-                    </h3>
-                    {ev.location && (
-                      <div className="flex items-center gap-2" style={{ color: '#525B7A', fontSize: 13 }}>
-                        <span className="ms shrink-0" style={{ fontSize: 15 }}>location_on</span>
-                        {ev.location}
-                      </div>
-                    )}
-                    {ev.time && (
-                      <div className="flex items-center gap-2" style={{ color: '#525B7A', fontSize: 13 }}>
-                        <span className="ms shrink-0" style={{ fontSize: 15 }}>schedule</span>
-                        {ev.time}
-                      </div>
-                    )}
-                    {ev.description && (
-                      <p className="line-clamp-2" style={{ color: '#525B7A', fontSize: 13, lineHeight: 1.5 }}>
-                        {ev.description}
-                      </p>
+                    </div>
+                    {i < events.length - 1 && (
+                      <div className="h-px w-full" style={{ background: 'var(--outline-var)' }} />
                     )}
                   </div>
-
-                  {/* CTA */}
-                  <div style={{ padding: '0 24px 20px' }}>
-                    {ev.requires_payment ? (
-                      <Button variant="filled" onClick={() => setRsvpEvent(ev)} className="w-full justify-center">
-                        <span className="ms" style={{ fontSize: 16 }}>payments</span>
-                        Registrarme — Q{Number(ev.price_gtq).toFixed(0)}
-                      </Button>
-                    ) : (
-                      <Button variant="tonal" onClick={() => setRsvpEvent(ev)} className="w-full justify-center">
-                        <span className="ms" style={{ fontSize: 16 }}>check_circle</span>
-                        Confirmar asistencia
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
 

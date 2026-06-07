@@ -157,81 +157,80 @@ function PostDetail({ post }) {
 function PostList({ posts }) {
   if (posts.length === 0) {
     return (
-      <div className="text-center py-24">
-        <div className="leading-icon mx-auto mb-4" style={{ width: 56, height: 56 }}>
-          <span className="ms" style={{ fontSize: 32 }}>article</span>
-        </div>
-        <p className="text-body-m text-on-surf-var">No hay publicaciones disponibles aún.</p>
+      <div className="py-32 flex flex-col items-center gap-5">
+        <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>BLOG</p>
+        <p className="font-bold leading-[1.05] tracking-[-0.02em]"
+          style={{ color: 'var(--on-surf)', fontSize: 'clamp(28px, 4vw, 40px)' }}>
+          Pronto, primeras palabras.
+        </p>
+        <p style={{ color: 'var(--on-surf-var)', fontSize: 16 }}>
+          Estamos preparando contenido para ti.
+        </p>
       </div>
     );
   }
 
+  const GRADIENTS = [
+    'linear-gradient(160deg,#0D1B4B 0%,#060D24 100%)',
+    'linear-gradient(160deg,#1E3A6E 0%,#0D1B4B 100%)',
+    'linear-gradient(160deg,#10254E 0%,#060D24 100%)',
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {posts.map(p => {
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {posts.map((p, i) => {
         const isExternal = !!p.redirect_url;
-        const dateLabel  = p.CreatedAt
-          ? new Date(p.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
-          : '';
+        const featured   = i === 0;
+        const excerpt    = p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 110);
+        const category   = (p.category || (isExternal ? 'RED SOCIAL' : 'ENSEÑANZA')).toUpperCase();
+
         const cardBody = (
           <div
-            className="relative overflow-hidden group cursor-pointer transition-transform duration-300 hover:-translate-y-1"
-            style={{ borderRadius: 24, height: 460 }}
-          >
-            {/* BG: imagen o navy sólido */}
-            {p.cover_image
-              ? <img
-                  src={p.cover_image}
-                  alt={p.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              : <div className="absolute inset-0" style={{ background: '#0D1B4B' }} />
+            className="rounded-3xl overflow-hidden flex flex-col transition-transform duration-200 hover:-translate-y-1"
+            style={
+              featured
+                ? { background: '#060D24', boxShadow: '0 12px 32px rgba(6,13,36,0.22)' }
+                : { background: 'var(--surf-high)', border: '1px solid var(--outline-var)' }
             }
-
-            {/* Overlay gradiente bottom-up */}
+          >
+            {/* Media */}
             <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to top, #060D24F0 0%, #060D2466 50%, #060D2400 100%)',
-              }}
+              className="h-48 w-full shrink-0 bg-cover bg-center"
+              style={
+                p.cover_image
+                  ? { backgroundImage: `url('${p.cover_image}')` }
+                  : { background: GRADIENTS[i % GRADIENTS.length] }
+              }
             />
-
-            {/* Chip de red social */}
-            {isExternal && (
-              <div
-                className="absolute top-5 left-5 flex items-center gap-1.5 px-3 py-1 rounded-full"
-                style={{ background: 'rgba(255,255,255,.15)', backdropFilter: 'blur(8px)' }}
-              >
-                <span className="ms text-white" style={{ fontSize: 13 }}>open_in_new</span>
-                <span className="text-white font-medium" style={{ fontSize: 12 }}>Red social</span>
-              </div>
-            )}
-
-            {/* Contenido inferior */}
-            <div
-              className="absolute inset-x-0 bottom-0 flex flex-col gap-2"
-              style={{ padding: '0 28px 28px' }}
-            >
-              <p style={{ color: 'rgba(255,255,255,.55)', fontSize: 12, fontWeight: 500 }}>
-                {dateLabel}
+            {/* Body */}
+            <div className="p-6 flex flex-col gap-2.5 flex-1">
+              <p className="text-[11px] font-bold tracking-[1.5px]"
+                style={{ color: featured ? 'rgba(255,255,255,0.6)' : 'var(--outline)' }}>
+                {category}
+                {isExternal && (
+                  <span className="ml-2 inline-flex items-center gap-1">
+                    <span className="ms" style={{ fontSize: 11 }}>open_in_new</span>
+                  </span>
+                )}
               </p>
-              <h3
-                className="text-white font-semibold leading-snug"
-                style={{ fontSize: 18, lineHeight: 1.4 }}
-              >
+              <p className="text-[20px] font-bold leading-snug line-clamp-2"
+                style={{ color: featured ? '#FFFFFF' : 'var(--on-surf)' }}>
                 {p.title}
-              </h3>
-              {!isExternal && (p.excerpt || p.content) && (
-                <p
-                  className="line-clamp-2"
-                  style={{ color: 'rgba(255,255,255,.6)', fontSize: 13, lineHeight: 1.5 }}
-                >
-                  {p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 120)}
+              </p>
+              {excerpt && (
+                <p className="text-[14px] leading-relaxed line-clamp-2"
+                  style={{ color: featured ? 'rgba(255,255,255,0.65)' : 'var(--on-surf-var)' }}>
+                  {excerpt}
                 </p>
               )}
+              <span className="text-[14px] font-bold mt-1"
+                style={{ color: featured ? '#FFFFFF' : 'var(--on-surf)' }}>
+                {isExternal ? 'Ver →' : 'Leer →'}
+              </span>
             </div>
           </div>
         );
+
         return isExternal
           ? <a key={p.ID} href={p.redirect_url} target="_blank" rel="noopener noreferrer" className="block">{cardBody}</a>
           : <Link key={p.ID} to={`/blog/${p.slug}`} className="block">{cardBody}</Link>;
@@ -273,8 +272,13 @@ export default function BlogPage() {
   if (error) return (
     <main className="min-h-screen bg-surf">
       <PageHero icon="article" title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
-      <div className="max-w-[1200px] mx-auto px-6 py-24 text-center">
-        <p className="text-body-m text-on-surf-var">No se pudo conectar con el servidor. Asegúrate de que el backend está corriendo.</p>
+      <div className="max-w-[1200px] mx-auto px-6 py-32 flex flex-col items-center gap-5">
+        <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>SIN CONEXIÓN</p>
+        <p className="font-bold leading-[1.05] tracking-[-0.02em]"
+          style={{ color: 'var(--on-surf)', fontSize: 'clamp(28px, 4vw, 40px)' }}>
+          No pudimos conectar.
+        </p>
+        <p style={{ color: 'var(--on-surf-var)', fontSize: 16 }}>Verifica tu conexión e intenta de nuevo.</p>
       </div>
     </main>
   );
