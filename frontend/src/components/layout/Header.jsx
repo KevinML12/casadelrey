@@ -17,21 +17,10 @@ export default function Header() {
   const location  = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [theme,    setTheme]    = useState(
+  const [theme, setTheme] = useState(
     () => document.documentElement.dataset.theme || 'light'
   );
   const dropRef = useRef(null);
-
-  // Páginas con hero oscuro — antes de scroll muestra nav navy translúcida
-  const darkHeroPages = ['/', '/events', '/about'];
-  const isHeroDark = darkHeroPages.includes(location.pathname) && !scrolled && theme === 'light';
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -51,15 +40,10 @@ export default function Header() {
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-  // Clases dinámicas según contexto
-  const navBg = isHeroDark
-    ? 'bg-[#0D1B4B]/70 backdrop-blur-xl border-white/10'
-    : 'bg-[var(--surf-high)]/80 backdrop-blur-xl border-[var(--outline-var)] shadow-sm';
-
-  const linkColor   = isHeroDark ? 'text-white/70 hover:text-white'           : 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)]';
-  const linkActiveCl= isHeroDark ? 'text-white font-semibold'                 : 'text-[var(--on-surf)] font-semibold';
-  const iconColor   = isHeroDark ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)] hover:bg-[var(--surf-low)]';
-  const logoFilter  = isHeroDark ? 'brightness(0) invert(1)'                  : undefined;
+  const navBg      = 'bg-[var(--surf-high)]/80 backdrop-blur-xl border-[var(--outline-var)] shadow-sm';
+  const linkColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)]';
+  const linkActiveCl = 'text-[var(--on-surf)] font-semibold';
+  const iconColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)] hover:bg-[var(--surf-low)]';
 
   return (
     <header className={`sticky top-0 z-40 border-b transition-all duration-300 ${navBg}`}>
@@ -70,8 +54,7 @@ export default function Header() {
           <img
             src="/logo.png"
             alt="Casa del Rey"
-            className="h-8 md:h-9 w-auto object-contain transition-[filter] duration-300"
-            style={{ filter: logoFilter }}
+            className="h-8 md:h-9 w-auto object-contain"
           />
         </Link>
 
@@ -108,10 +91,7 @@ export default function Header() {
               {(isAdmin || user?.role === 'leader') && (
                 <Link
                   to={isAdmin ? '/admin' : '/leader'}
-                  className={`px-4 py-1.5 rounded-full text-[13px] font-medium border transition-colors
-                    ${isHeroDark
-                      ? 'border-white/25 text-white/80 hover:bg-white/10'
-                      : 'border-[var(--outline-var)] text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}
+                  className="px-4 py-1.5 rounded-full text-[13px] font-medium border border-[var(--outline-var)] text-[var(--on-surf-var)] hover:bg-[var(--surf-low)] transition-colors"
                 >
                   {isAdmin ? 'Admin' : 'Líderes'}
                 </Link>
@@ -120,8 +100,7 @@ export default function Header() {
               <div className="relative" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
-                  className={`flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full text-[13px] transition-colors
-                    ${isHeroDark ? 'text-white/80 hover:bg-white/10' : 'text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}
+                  className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full text-[13px] text-[var(--on-surf-var)] hover:bg-[var(--surf-low)] transition-colors"
                 >
                   <div className="w-7 h-7 rounded-full bg-[var(--pri)] flex items-center justify-center shrink-0">
                     <span className="text-[var(--on-pri)] text-[11px] font-bold">
@@ -157,8 +136,7 @@ export default function Header() {
           ) : (
             <div className="flex items-center gap-2 ml-1">
               <Link to="/login"
-                className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors
-                  ${isHeroDark ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}>
+                className="px-4 py-1.5 rounded-full text-[13px] font-medium text-[var(--on-surf-var)] hover:bg-[var(--surf-low)] transition-colors">
                 Ingresar
               </Link>
               <Link to="/donate"
