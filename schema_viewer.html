@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ERD — Casa del Rey</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, system-ui, sans-serif; background: #0D1B4B; color: white; min-height: 100vh; }
+  header { padding: 24px 32px; border-bottom: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 20px; font-weight: 800; }
+  header p  { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 2px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 16px 32px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .chip { display: inline-flex; align-items: center; gap-6px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; gap: 6px; }
+  .diagram { background: #f8f9ff; border-radius: 16px; margin: 24px 32px; padding: 24px; overflow-x: auto; }
+  .mermaid { min-width: 900px; }
+  .note { padding: 12px 32px 24px; font-size: 13px; color: rgba(255,255,255,.45); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Casa del Rey — Esquema de Base de Datos</h1>
+    <p>16 tablas · 26 relaciones · Supabase PostgreSQL</p>
+  </div>
+</header>
+
+<div class="legend">
+  <span class="chip" style="background:#DAE8FC;color:#1e3a5f">🔵 Auth / Usuarios</span>
+  <span class="chip" style="background:#D5E8D4;color:#1e5f2a">🟢 Células</span>
+  <span class="chip" style="background:#FFE6CC;color:#5f3a1e">🟠 Eventos y Pagos</span>
+  <span class="chip" style="background:#E1D5E7;color:#3a1e5f">🟣 Contenido y Personas</span>
+  <span class="chip" style="background:#F5F5F5;color:#333">⚫ Sistema</span>
+  <span class="chip" style="background:#FFF2CC;color:#5f4a1e">🆕 Campo nuevo</span>
+  <span class="chip" style="background:#F8CECC;color:#5f1e1e">⚠️ A deprecar</span>
+</div>
+
+<div class="diagram">
+<div class="mermaid">
+erDiagram
+
+    users {
+        serial id PK
+        varchar name
+        varchar email
+        varchar role
+        varchar address
+        varchar phone
+        int cell_id FK
+        varchar cell_code
+        varchar cell_type
+        bool email_verified
+    }
+
+    cells {
+        serial id PK
+        varchar code
+        varchar name
+        varchar type
+        int leader_id FK
+        int pastor_id FK
+        bool is_active
+    }
+
+    cell_reports {
+        serial id PK
+        int cell_id FK
+        varchar cell_code
+        varchar cell_name
+        varchar meeting_date
+        int leader_id FK
+        varchar leader_name
+        int pastor_id FK
+        varchar pastor_name
+        varchar host_name
+        varchar host_phone
+        varchar address
+        varchar topic
+        int total_attendees
+        int converts
+        int reconciled
+        decimal offering
+        varchar photo_url
+        varchar status
+        int approved_by_id FK
+    }
+
+    member_boletas {
+        serial id PK
+        varchar date
+        varchar category
+        varchar inviter_name
+        int inviter_user_id FK
+        varchar guest_name
+        varchar guest_phone
+        varchar address
+        int leader_id FK
+        int cell_report_id FK
+    }
+
+    events {
+        serial id PK
+        varchar title
+        varchar date
+        varchar time
+        varchar location
+        text description
+        bool is_active
+        bool requires_payment
+        decimal price_gtq
+    }
+
+    event_registrations {
+        serial id PK
+        int event_id FK
+        int user_id FK
+        varchar name
+        varchar email
+        int attendee_count
+        varchar payment_status
+        int receipt_id FK
+    }
+
+    payment_receipts {
+        serial id PK
+        varchar payer_name
+        decimal amount
+        varchar bank_name
+        varchar reference_number
+        varchar receipt_image_url
+        varchar purpose
+        int event_id FK
+        int donation_id FK
+        varchar status
+        int verified_by_id FK
+    }
+
+    donations {
+        serial id PK
+        varchar name
+        int user_id FK
+        decimal amount
+        varchar payment_method
+        varchar payment_reference
+        int receipt_id FK
+        bool is_successful
+        varchar donation_purpose
+    }
+
+    volunteers {
+        serial id PK
+        varchar name
+        varchar email
+        varchar department
+        int assigned_leader_id FK
+        int user_id FK
+        varchar status
+    }
+
+    petitions {
+        serial id PK
+        varchar name
+        varchar category
+        varchar subject
+        text message
+        bool is_answered
+        int user_id FK
+    }
+
+    posts {
+        serial id PK
+        varchar title
+        varchar slug
+        text content
+        varchar redirect_url
+        varchar social_platform
+        int author_id FK
+        varchar status
+    }
+
+    announcements {
+        serial id PK
+        varchar title
+        text content
+        varchar role_target
+        bool is_active
+        timestamptz expires_at
+        int created_by_id FK
+    }
+
+    gallery_photos {
+        serial id PK
+        varchar title
+        varchar url
+        int event_id FK
+        int uploaded_by_id FK
+        bool is_active
+    }
+
+    social_posts {
+        serial id PK
+        varchar platform
+        varchar post_url
+        varchar caption
+        bool is_active
+    }
+
+    user_goals {
+        serial id PK
+        int user_id FK
+        varchar title
+        bool completed
+        timestamptz completed_at
+    }
+
+    activity_logs {
+        serial id PK
+        int user_id FK
+        varchar action
+        varchar resource
+        text details
+        timestamptz created_at
+    }
+
+    users           ||--o{ cells                : "lidera"
+    users           ||--o{ cell_reports         : "reporta"
+    users           ||--o{ member_boletas       : "registra"
+    users           ||--o{ volunteers           : "es voluntario"
+    users           ||--o{ user_goals           : "metas"
+    users           ||--o{ posts                : "autor"
+    users           ||--o{ announcements        : "crea"
+    users           ||--o{ petitions            : "envia"
+    users           ||--o{ activity_logs        : "genera"
+    users           }o--o| cells                : "pertenece"
+    cells           ||--o{ cell_reports         : "reportes"
+    cell_reports    ||--o{ member_boletas       : "boletas"
+    events          ||--o{ event_registrations  : "registros"
+    events          ||--o{ gallery_photos       : "fotos"
+    events          ||--o{ payment_receipts     : "pagos"
+    event_registrations }o--o| payment_receipts : "comprobante"
+    payment_receipts    }o--o| donations        : "aplica"
+    donations           }o--o| users            : "donante"
+</div>
+</div>
+
+<p class="note">Abre este archivo en cualquier navegador · Generado el 1 junio 2026</p>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default', er: { diagramPadding: 20, layoutDirection: 'TB', minEntityWidth: 100, minEntityHeight: 75, entityPadding: 15 } });
+</script>
+</body>
+</html>

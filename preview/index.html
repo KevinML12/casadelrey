@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Casa del Rey — M3 Design Spec</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+  <style>
+
+/* ═══════════════════════════════════════════════════════════
+   M3 COLOR SYSTEM — Casa del Rey
+   Fuente: https://m3.material.io/styles/color/roles
+═══════════════════════════════════════════════════════════ */
+:root {
+  color-scheme: light;
+
+  /* Primary — Royal Blue */
+  --pri:        #1565C0;
+  --on-pri:     #FFFFFF;
+  --pri-con:    #D3E4FF;
+  --on-pri-con: #001C38;
+
+  /* Secondary — Navy */
+  --sec:        #4A5680;
+  --on-sec:     #FFFFFF;
+  --sec-con:    #DCE1FF;
+  --on-sec-con: #050E3A;
+
+  /* Tertiary — Accent blue */
+  --ter:        #006399;
+  --on-ter:     #FFFFFF;
+  --ter-con:    #CCE5FF;
+  --on-ter-con: #001E30;
+
+  /* Error */
+  --err:        #BA1A1A;
+  --on-err:     #FFFFFF;
+  --err-con:    #FFDAD6;
+  --on-err-con: #410002;
+
+  /* Surface */
+  --surf:       #F8F9FF;
+  --surf-dim:   #D8D9E5;
+  --surf-bright:#F8F9FF;
+  --surf-low:   #ECEDF9;
+  --surf-high:  #E6E8F3;
+  --on-surf:    #191B22;
+  --on-surf-var:#44464F;
+
+  /* Outline */
+  --outline:    #757780;
+  --outline-var:#C5C6D0;
+
+  /* Inverse */
+  --inv-surf:   #2E3038;
+  --inv-on-surf:#E0E1EC;
+  --inv-pri:    #A4C8FF;
+
+  /* Shadow & Scrim */
+  --shadow:     rgba(0,0,0,1);
+  --scrim:      rgba(0,0,0,1);
+
+  /* Elevation tints (primary over surface) */
+  --elev-1: rgba(21,101,192,.05);
+  --elev-2: rgba(21,101,192,.08);
+  --elev-3: rgba(21,101,192,.11);
+  --elev-4: rgba(21,101,192,.12);
+  --elev-5: rgba(21,101,192,.14);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --pri:        #A4C8FF;
+  --on-pri:     #003063;
+  --pri-con:    #004A98;
+  --on-pri-con: #D3E4FF;
+
+  --sec:        #BBC3FF;
+  --on-sec:     #1E2578;
+  --sec-con:    #363D90;
+  --on-sec-con: #DCE1FF;
+
+  --ter:        #8ECDFF;
+  --on-ter:     #003350;
+  --ter-con:    #004B72;
+  --on-ter-con: #CCE5FF;
+
+  --err:        #FFB4AB;
+  --on-err:     #690005;
+  --err-con:    #93000A;
+  --on-err-con: #FFDAD6;
+
+  --surf:       #111318;
+  --surf-dim:   #111318;
+  --surf-bright:#37393F;
+  --surf-low:   #191B22;
+  --surf-high:  #222429;
+  --on-surf:    #E2E2E9;
+  --on-surf-var:#C5C6D0;
+
+  --outline:    #8F9099;
+  --outline-var:#44464F;
+
+  --inv-surf:   #E2E2E9;
+  --inv-on-surf:#2E3038;
+  --inv-pri:    #1565C0;
+
+  --elev-1: rgba(164,200,255,.05);
+  --elev-2: rgba(164,200,255,.08);
+  --elev-3: rgba(164,200,255,.11);
+  --elev-4: rgba(164,200,255,.12);
+  --elev-5: rgba(164,200,255,.14);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--surf);
+  color: var(--on-surf);
+  -webkit-font-smoothing: antialiased;
+  transition: background .3s, color .3s;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 TYPOGRAPHY SCALE
+   https://m3.material.io/styles/typography/type-scale-tokens
+═══════════════════════════════════════════════════════════ */
+.t-display-l  { font-size: clamp(3rem,6vw,5.5rem);  font-weight: 900; line-height: 1.05; letter-spacing: -.03em; }
+.t-display-m  { font-size: clamp(2.25rem,4vw,3.75rem); font-weight: 800; line-height: 1.1;  letter-spacing: -.02em; }
+.t-display-s  { font-size: 2.25rem;  font-weight: 800; line-height: 1.15; letter-spacing: -.01em; }
+.t-headline-l { font-size: 2rem;     font-weight: 700; line-height: 1.25; }
+.t-headline-m { font-size: 1.75rem;  font-weight: 700; line-height: 1.3; }
+.t-headline-s { font-size: 1.5rem;   font-weight: 600; line-height: 1.35; }
+.t-title-l    { font-size: 1.375rem; font-weight: 600; line-height: 1.4; letter-spacing: .0125em; }
+.t-title-m    { font-size: 1rem;     font-weight: 600; line-height: 1.5; letter-spacing: .009em; }
+.t-title-s    { font-size: .875rem;  font-weight: 600; line-height: 1.5; letter-spacing: .007em; }
+.t-body-l     { font-size: 1rem;     font-weight: 400; line-height: 1.65; letter-spacing: .031em; }
+.t-body-m     { font-size: .9375rem; font-weight: 400; line-height: 1.6;  letter-spacing: .016em; }
+.t-body-s     { font-size: .875rem;  font-weight: 400; line-height: 1.6;  letter-spacing: .025em; }
+.t-label-l    { font-size: .875rem;  font-weight: 600; letter-spacing: .006em; }
+.t-label-m    { font-size: .75rem;   font-weight: 600; letter-spacing: .031em; text-transform: uppercase; }
+.t-label-s    { font-size: .6875rem; font-weight: 600; letter-spacing: .062em; text-transform: uppercase; }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 SHAPE SCALE
+   https://m3.material.io/styles/shape/shape-scale-tokens
+═══════════════════════════════════════════════════════════ */
+.r-none   { border-radius: 0; }
+.r-xs     { border-radius: 4px; }
+.r-sm     { border-radius: 8px; }
+.r-md     { border-radius: 12px; }
+.r-lg     { border-radius: 16px; }
+.r-xl     { border-radius: 28px; }
+.r-full   { border-radius: 9999px; }
+/* Top-only variants for nav indicators */
+.r-b-full { border-radius: 0 0 9999px 9999px; }
+.r-t-full { border-radius: 9999px 9999px 0 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 ELEVATION (surface tint + shadow)
+   Level 0-5: https://m3.material.io/styles/elevation/tokens
+═══════════════════════════════════════════════════════════ */
+.elev-0 { background: var(--surf); }
+.elev-1 { background: color-mix(in srgb, var(--surf) 95%, var(--pri) 5%); box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15); }
+.elev-2 { background: color-mix(in srgb, var(--surf) 92%, var(--pri) 8%); box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15); }
+.elev-3 { background: color-mix(in srgb, var(--surf) 89%, var(--pri) 11%); box-shadow: 0 4px 8px 3px rgba(0,0,0,.15), 0 1px 3px rgba(0,0,0,.3); }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 STATE LAYER
+═══════════════════════════════════════════════════════════ */
+.state { position: relative; overflow: hidden; cursor: pointer; }
+.state::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--on-surf); opacity: 0;
+  transition: opacity .2s; pointer-events: none;
+}
+.state:hover::before  { opacity: .08; }
+.state:active::before { opacity: .12; }
+.state-pri::before    { background: var(--pri); }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 BUTTONS
+   https://m3.material.io/components/buttons
+═══════════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 24px; border-radius: 9999px; border: none;
+  font-family: inherit; font-size: .875rem; font-weight: 600;
+  letter-spacing: .006em; line-height: 1.25;
+  cursor: pointer; text-decoration: none;
+  transition: box-shadow .2s;
+  position: relative; overflow: hidden; white-space: nowrap;
+}
+.btn::before {
+  content: ''; position: absolute; inset: 0;
+  opacity: 0; transition: opacity .15s;
+}
+.btn:hover::before  { opacity: .08; }
+.btn:active::before { opacity: .12; }
+
+/* Filled */
+.btn-filled            { background: var(--pri);     color: var(--on-pri);     box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15); }
+.btn-filled:hover      { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15); }
+.btn-filled::before    { background: var(--on-pri); }
+
+/* Filled Tonal */
+.btn-tonal             { background: var(--sec-con); color: var(--on-sec-con); }
+.btn-tonal::before     { background: var(--on-sec-con); }
+.btn-tonal:hover       { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15); }
+
+/* Outlined */
+.btn-outlined          { background: transparent; color: var(--pri); border: 1px solid var(--outline); }
+.btn-outlined::before  { background: var(--pri); }
+.btn-outlined:hover    { border-color: var(--pri); }
+
+/* Elevated */
+.btn-elevated          { background: var(--surf-low); color: var(--pri); }
+.btn-elevated          { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15); }
+.btn-elevated::before  { background: var(--pri); }
+.btn-elevated:hover    { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15); }
+
+/* Text */
+.btn-text              { background: transparent; color: var(--pri); padding: 10px 12px; }
+.btn-text::before      { background: var(--pri); }
+
+/* Icon button */
+.btn-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 9999px; border: none;
+  background: transparent; color: var(--on-surf-var);
+  cursor: pointer; position: relative; overflow: hidden; transition: background .15s;
+}
+.btn-icon::before      { content: ''; position: absolute; inset: 0; background: var(--on-surf); opacity: 0; transition: opacity .15s; }
+.btn-icon:hover::before { opacity: .08; }
+
+/* FAB */
+.fab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px; border-radius: 16px; border: none;
+  background: var(--pri-con); color: var(--on-pri-con);
+  cursor: pointer; position: relative; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15);
+  transition: box-shadow .2s;
+}
+.fab:hover { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 8px 3px rgba(0,0,0,.15); }
+.fab::before { content: ''; position: absolute; inset: 0; background: var(--on-pri-con); opacity: 0; transition: opacity .15s; }
+.fab:hover::before { opacity: .08; }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 CARDS
+   https://m3.material.io/components/cards
+═══════════════════════════════════════════════════════════ */
+.card            { border-radius: 12px; overflow: hidden; }
+.card-elevated   { background: color-mix(in srgb, var(--surf) 95%, var(--pri) 5%); box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15); transition: box-shadow .2s, transform .2s; }
+.card-elevated:hover { box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15); transform: translateY(-2px); }
+.card-filled     { background: var(--surf-high); }
+.card-outlined   { background: var(--surf); border: 1px solid var(--outline-var); }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 CHIPS
+   https://m3.material.io/components/chips
+═══════════════════════════════════════════════════════════ */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 8px; border: 1px solid var(--outline-var);
+  background: transparent; color: var(--on-surf-var);
+  font-size: .75rem; font-weight: 600; letter-spacing: .031em;
+  text-transform: uppercase; white-space: nowrap;
+}
+.chip-pri { background: var(--pri-con); color: var(--on-pri-con); border-color: transparent; }
+.chip-sec { background: var(--sec-con); color: var(--on-sec-con); border-color: transparent; }
+
+/* ═══════════════════════════════════════════════════════════
+   M3 LIST
+   https://m3.material.io/components/lists
+═══════════════════════════════════════════════════════════ */
+.list-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 16px; position: relative; overflow: hidden;
+  cursor: pointer;
+}
+.list-item::before { content: ''; position: absolute; inset: 0; background: var(--on-surf); opacity: 0; transition: opacity .15s; }
+.list-item:hover::before { opacity: .08; }
+.list-item + .list-item { border-top: 1px solid var(--outline-var); }
+
+.leading-icon {
+  width: 40px; height: 40px; border-radius: 9999px; flex-shrink: 0;
+  background: var(--pri-con); color: var(--on-pri-con);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   M3 NAVIGATION BAR (Top App Bar)
+   https://m3.material.io/components/top-app-bar
+═══════════════════════════════════════════════════════════ */
+.top-app-bar {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--surf) 95%, var(--pri) 5%);
+  border-bottom: 1px solid var(--outline-var);
+  transition: background .3s, border-color .3s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MATERIAL SYMBOLS
+═══════════════════════════════════════════════════════════ */
+.ms {
+  font-family: 'Material Symbols Rounded';
+  font-size: 24px; line-height: 1;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block; user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════ */
+.wrap    { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 72px 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   HERO — sin foto, solo sistema M3
+   Usa --inv-surf (surface inversa) como fondo absoluto
+═══════════════════════════════════════════════════════════ */
+.hero {
+  background: #0A1145;
+  position: relative; overflow: hidden;
+  min-height: 92vh; display: flex; align-items: center;
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(164,200,255,.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.hero-glow-l {
+  position: absolute; left: -200px; bottom: -200px;
+  width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(21,101,192,.2) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-glow-r {
+  position: absolute; right: -100px; top: -100px;
+  width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(13,27,94,.6) 0%, transparent 65%);
+  pointer-events: none;
+}
+/* Logo decorativo grande en el fondo del hero */
+.hero-globe {
+  position: absolute; right: -40px; top: 50%;
+  transform: translateY(-50%);
+  width: clamp(320px, 40vw, 520px);
+  opacity: .06;
+  pointer-events: none;
+  filter: brightness(0) invert(1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════════════════════ */
+.divider { border: none; height: 1px; background: var(--outline-var); }
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--outline-var); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════════════════
+   THEME TOGGLE FAB — fixed
+═══════════════════════════════════════════════════════════ */
+#theme-toggle {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+}
+
+  </style>
+</head>
+<body>
+
+<!-- ─── THEME TOGGLE FAB ─────────────────────────────────────────── -->
+<div id="theme-toggle">
+  <button class="fab" onclick="
+    const h = document.documentElement;
+    const dark = h.dataset.theme === 'dark';
+    h.dataset.theme = dark ? 'light' : 'dark';
+    this.querySelector('.ms').textContent = dark ? 'dark_mode' : 'light_mode';
+  ">
+    <span class="ms">dark_mode</span>
+  </button>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <TopAppBar />
+  Props: transparent (sobre hero)
+  M3 ref: Top App Bar — Center-aligned
+══════════════════════════════════════════════════════════════════ -->
+<header class="top-app-bar">
+  <div class="wrap" style="height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+
+    <!-- Leading: Logo -->
+    <a href="/" style="display:flex; align-items:center; flex-shrink:0;">
+      <img src="../frontend/public/logo.png" alt="Casa del Rey"
+        style="height:44px; width:auto; mix-blend-mode:multiply; object-fit:contain;" />
+    </a>
+
+    <!-- Center: Navigation (Desktop) -->
+    <nav style="display:flex; gap:2px; align-items:center;">
+      <!-- M3 active indicator: pill bajo el label -->
+      <a href="/" class="state state-pri" style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:9999px; color:var(--on-surf);">
+        <span class="t-label-l">Inicio</span>
+        <span style="width:24px; height:3px; border-radius:2px; background:var(--pri);"></span>
+      </a>
+      <a href="#" class="state state-pri" style="padding:8px 16px; border-radius:9999px; color:var(--on-surf-var);" class="t-label-l">
+        <span class="t-label-l">Blog</span>
+      </a>
+      <a href="#" class="state state-pri" style="padding:8px 16px; border-radius:9999px; color:var(--on-surf-var);">
+        <span class="t-label-l">Eventos</span>
+      </a>
+      <a href="#" class="state state-pri" style="padding:8px 16px; border-radius:9999px; color:var(--on-surf-var);">
+        <span class="t-label-l">Oración</span>
+      </a>
+      <a href="#" class="state state-pri" style="padding:8px 16px; border-radius:9999px; color:var(--on-surf-var);">
+        <span class="t-label-l">Voluntariado</span>
+      </a>
+    </nav>
+
+    <!-- Trailing: Actions -->
+    <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+      <a href="#" class="btn btn-tonal r-full">
+        <span class="ms" style="font-size:18px;">favorite</span>
+        Donaciones
+      </a>
+      <a href="#" class="btn btn-filled r-full">
+        <span class="ms" style="font-size:18px;">login</span>
+        Ingresar
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <HeroSection />
+  Sin foto — usa globo del logo como elemento decorativo
+  M3 ref: expressive hero con surface inversa
+══════════════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow-l"></div>
+  <div class="hero-glow-r"></div>
+
+  <!-- Logo grande decorativo (fondo) -->
+  <img src="../frontend/public/logo.png" alt="" class="hero-globe" aria-hidden="true" />
+
+  <div class="wrap" style="position:relative; z-index:10; padding-top:72px; padding-bottom:72px; width:100%;">
+
+    <!-- Chip M3 — Surface variant inversa -->
+    <div class="chip" style="border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:rgba(255,255,255,.65); margin-bottom:24px;">
+      <span class="ms" style="font-size:14px; color:#A4C8FF;">location_on</span>
+      Huehuetenango, Guatemala
+    </div>
+
+    <!-- Display Large -->
+    <h1 class="t-display-l" style="color:#FFFFFF; margin-bottom:8px;">
+      Casa<br>
+      <span style="color:#A4C8FF;">del Rey</span>
+    </h1>
+
+    <!-- Subtitle — italic brand tagline -->
+    <p style="font-size:1.125rem; font-style:italic; color:rgba(255,255,255,.45); margin-bottom:16px;">
+      "Luz para las Naciones"
+    </p>
+
+    <!-- Body Large -->
+    <p class="t-body-l" style="color:rgba(255,255,255,.55); max-width:460px; margin-bottom:40px;">
+      Iglesia cristiana de restauración familiar. Una comunidad que camina junta en la fe, haciendo discípulos a las naciones.
+    </p>
+
+    <!-- M3 Button row: Filled + Outlined (hero variant) -->
+    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:48px;">
+      <!-- Filled — usa primary del dark scheme: #A4C8FF sobre #003063 -->
+      <a href="#" class="btn r-full" style="background:#A4C8FF; color:#003063; font-size:.9375rem; padding:14px 28px; font-weight:700; box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15);">
+        <span class="ms" style="font-size:20px;">group_add</span>
+        Únete a la comunidad
+      </a>
+      <!-- Outlined (hero variant: borde semi-transparente) -->
+      <a href="#" class="btn r-full" style="background:rgba(255,255,255,.06); color:#fff; border:1px solid rgba(255,255,255,.2); font-size:.9375rem; padding:14px 28px;">
+        <span class="ms" style="font-size:20px;">calendar_month</span>
+        Próximos eventos
+      </a>
+    </div>
+
+    <!-- Horarios — M3 Support text con icon -->
+    <div style="display:flex; flex-wrap:wrap; gap:20px; padding-top:24px; border-top:1px solid rgba(255,255,255,.08); margin-bottom:40px;">
+      <div style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.45);">
+        <span class="ms" style="font-size:18px; color:#A4C8FF;">schedule</span>
+        <span class="t-body-s">Domingos 10:00 AM</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.45);">
+        <span class="ms" style="font-size:18px; color:#A4C8FF;">schedule</span>
+        <span class="t-body-s">Miércoles 7:00 PM</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.45);">
+        <span class="ms" style="font-size:18px; color:#A4C8FF;">location_on</span>
+        <span class="t-body-s">7a. calle 12-66 zona 4, Huehuetenango</span>
+      </div>
+    </div>
+
+    <!-- M3 Stats — surface-variant inversa (tonal containers) -->
+    <div style="display:flex; flex-wrap:wrap; gap:10px;">
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px 24px;">
+        <div class="t-display-s" style="color:#fff; font-size:1.875rem;">200+</div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.4); margin-top:4px;">Familias</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px 24px;">
+        <div class="t-display-s" style="color:#fff; font-size:1.875rem;">20+</div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.4); margin-top:4px;">Células activas</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px 24px;">
+        <div class="t-display-s" style="color:#fff; font-size:1.875rem;">90+</div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.4); margin-top:4px;">Voluntarios</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px 24px;">
+        <div class="t-display-s" style="color:#fff; font-size:1.875rem;">10 años</div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.4); margin-top:4px;">Sirviendo</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <MinistryList />
+  M3 ref: List — Three-line, with leading icon container
+══════════════════════════════════════════════════════════════════ -->
+<section class="section elev-0">
+  <div class="wrap">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:36px;">
+      <div>
+        <div class="chip chip-sec" style="margin-bottom:12px;">
+          <span class="ms" style="font-size:14px;">star</span>
+          ¿Qué hacemos?
+        </div>
+        <h2 class="t-headline-l" style="color:var(--on-surf);">
+          Todo lo que necesitas,<br>en un solo lugar
+        </h2>
+      </div>
+      <a href="#" class="btn btn-text r-full">
+        Conócenos
+        <span class="ms" style="font-size:18px;">arrow_forward</span>
+      </a>
+    </div>
+
+    <!-- M3 List en Card outlined -->
+    <div class="card card-outlined r-xl" style="overflow:hidden;">
+      <div class="list-item">
+        <div class="leading-icon"><span class="ms">menu_book</span></div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Enseñanzas</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); margin-top:2px;">Mensajes y reflexiones que nutren tu fe cada semana.</div>
+        </div>
+        <span class="ms" style="color:var(--outline); font-size:20px;">chevron_right</span>
+      </div>
+      <div class="list-item">
+        <div class="leading-icon"><span class="ms">calendar_month</span></div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Eventos</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); margin-top:2px;">Sunday Service, Primicias, retiros y más. Vive con nosotros.</div>
+        </div>
+        <span class="ms" style="color:var(--outline); font-size:20px;">chevron_right</span>
+      </div>
+      <div class="list-item">
+        <div class="leading-icon"><span class="ms">volunteer_activism</span></div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Oración</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); margin-top:2px;">Comparte tu carga. Una comunidad entera intercede contigo.</div>
+        </div>
+        <span class="ms" style="color:var(--outline); font-size:20px;">chevron_right</span>
+      </div>
+      <div class="list-item">
+        <div class="leading-icon"><span class="ms">handshake</span></div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Voluntariado</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); margin-top:2px;">Sirve con tus talentos y haz la diferencia en la comunidad.</div>
+        </div>
+        <span class="ms" style="color:var(--outline); font-size:20px;">chevron_right</span>
+      </div>
+      <div class="list-item">
+        <div class="leading-icon"><span class="ms">favorite</span></div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Donaciones</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); margin-top:2px;">Tu generosidad equipa ministerios y transforma familias.</div>
+        </div>
+        <span class="ms" style="color:var(--outline); font-size:20px;">chevron_right</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <TeachingCards />
+  M3 ref: Cards — Elevated, grid layout
+══════════════════════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--surf-low);">
+  <div class="wrap">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:36px;">
+      <div>
+        <div class="chip chip-pri" style="margin-bottom:12px;">
+          <span class="ms" style="font-size:14px;">auto_stories</span>
+          Palabra de Dios
+        </div>
+        <h2 class="t-headline-m" style="color:var(--on-surf);">Últimas enseñanzas</h2>
+      </div>
+      <a href="#" class="btn btn-text r-full">
+        Ver todo <span class="ms" style="font-size:18px;">arrow_forward</span>
+      </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+
+      <div class="card card-elevated state" style="border-radius:16px;">
+        <!-- Media — M3 usa 16:9 o square -->
+        <div style="height:160px; background:linear-gradient(160deg,#060E30 0%,#1565C0 100%); display:flex; align-items:center; justify-content:center;">
+          <span class="ms" style="font-size:48px; color:rgba(255,255,255,.15);">menu_book</span>
+        </div>
+        <div style="padding:16px 20px 20px;">
+          <div class="t-label-s" style="color:var(--pri); margin-bottom:8px;">Serie · Fe</div>
+          <div class="t-title-m" style="color:var(--on-surf); margin-bottom:8px; line-height:1.4;">Caminando en fe cuando todo parece oscuro</div>
+          <div class="t-body-s" style="color:var(--on-surf-var);">Una reflexión sobre confiar en Dios en los momentos difíciles...</div>
+          <div style="margin-top:16px;">
+            <a href="#" class="btn btn-text" style="padding:6px 0; font-size:.8125rem;">
+              Leer <span class="ms" style="font-size:16px;">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-elevated state" style="border-radius:16px;">
+        <div style="height:160px; background:linear-gradient(160deg,#0D1B5E 0%,#1A2E7A 100%); display:flex; align-items:center; justify-content:center;">
+          <span class="ms" style="font-size:48px; color:rgba(255,255,255,.15);">home</span>
+        </div>
+        <div style="padding:16px 20px 20px;">
+          <div class="t-label-s" style="color:var(--pri); margin-bottom:8px;">Serie · Familia</div>
+          <div class="t-title-m" style="color:var(--on-surf); margin-bottom:8px; line-height:1.4;">Restauración familiar: el corazón de nuestra visión</div>
+          <div class="t-body-s" style="color:var(--on-surf-var);">Cómo la Iglesia puede ser centro de restauración para cada hogar...</div>
+          <div style="margin-top:16px;">
+            <a href="#" class="btn btn-text" style="padding:6px 0; font-size:.8125rem;">
+              Leer <span class="ms" style="font-size:16px;">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-elevated state" style="border-radius:16px;">
+        <div style="height:160px; background:linear-gradient(160deg,#1565C0 0%,#006399 100%); display:flex; align-items:center; justify-content:center;">
+          <span class="ms" style="font-size:48px; color:rgba(255,255,255,.15);">groups</span>
+        </div>
+        <div style="padding:16px 20px 20px;">
+          <div class="t-label-s" style="color:var(--pri); margin-bottom:8px;">Serie · Discipulado</div>
+          <div class="t-title-m" style="color:var(--on-surf); margin-bottom:8px; line-height:1.4;">Ser discípulo: más que asistir a la Iglesia</div>
+          <div class="t-body-s" style="color:var(--on-surf-var);">El llamado a reproducir la obra de Dios en cada área de tu vida...</div>
+          <div style="margin-top:16px;">
+            <a href="#" class="btn btn-text" style="padding:6px 0; font-size:.8125rem;">
+              Leer <span class="ms" style="font-size:16px;">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <EventList />
+  M3 ref: List — Two-line con avatar de fecha
+══════════════════════════════════════════════════════════════════ -->
+<section class="section elev-0">
+  <div class="wrap">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:36px;">
+      <div>
+        <div class="chip chip-sec" style="margin-bottom:12px;">
+          <span class="ms" style="font-size:14px;">event</span>
+          Agenda
+        </div>
+        <h2 class="t-headline-m" style="color:var(--on-surf);">Próximos eventos</h2>
+      </div>
+      <a href="#" class="btn btn-text r-full">
+        Ver todos <span class="ms" style="font-size:18px;">arrow_forward</span>
+      </a>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px;">
+
+      <div class="card card-elevated state r-xl" style="padding:16px 20px; display:flex; align-items:center; gap:16px;">
+        <!-- Avatar de fecha = M3 "Avatar leading element" -->
+        <div style="width:52px; height:52px; border-radius:12px; background:var(--sec-con); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0;">
+          <span class="t-label-s" style="color:var(--pri); font-size:.625rem;">MAY</span>
+          <span class="t-headline-s" style="color:var(--on-sec-con); font-size:1.25rem;">4</span>
+        </div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Sunday Service</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span class="ms" style="font-size:14px;">location_on</span>
+            7a. calle 12-66 zona 4 · 10:00 AM
+          </div>
+        </div>
+        <a href="#" class="btn btn-tonal r-full" style="padding:8px 20px; font-size:.8125rem;">Ver más</a>
+      </div>
+
+      <div class="card card-elevated state r-xl" style="padding:16px 20px; display:flex; align-items:center; gap:16px;">
+        <div style="width:52px; height:52px; border-radius:12px; background:var(--sec-con); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0;">
+          <span class="t-label-s" style="color:var(--pri); font-size:.625rem;">MAY</span>
+          <span class="t-headline-s" style="color:var(--on-sec-con); font-size:1.25rem;">11</span>
+        </div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Noche de Alabanza</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span class="ms" style="font-size:14px;">location_on</span>
+            Templo Central · 7:00 PM
+          </div>
+        </div>
+        <a href="#" class="btn btn-tonal r-full" style="padding:8px 20px; font-size:.8125rem;">Ver más</a>
+      </div>
+
+      <div class="card card-elevated state r-xl" style="padding:16px 20px; display:flex; align-items:center; gap:16px;">
+        <div style="width:52px; height:52px; border-radius:12px; background:var(--sec-con); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0;">
+          <span class="t-label-s" style="color:var(--pri); font-size:.625rem;">MAY</span>
+          <span class="t-headline-s" style="color:var(--on-sec-con); font-size:1.25rem;">18</span>
+        </div>
+        <div style="flex:1;">
+          <div class="t-title-m" style="color:var(--on-surf);">Retiro de Líderes 2026</div>
+          <div class="t-body-s" style="color:var(--on-surf-var); display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span class="ms" style="font-size:14px;">location_on</span>
+            Por confirmar
+          </div>
+        </div>
+        <a href="#" class="btn btn-tonal r-full" style="padding:8px 20px; font-size:.8125rem;">Ver más</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <PrayerCTA />
+  M3 ref: Banner — secondary container como surface
+══════════════════════════════════════════════════════════════════ -->
+<section style="padding:72px 0; background:var(--sec-con);">
+  <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; gap:40px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:280px;">
+      <div class="chip chip-pri" style="margin-bottom:16px;">
+        <span class="ms" style="font-size:14px;">volunteer_activism</span>
+        Estamos aquí
+      </div>
+      <h2 class="t-display-s" style="color:var(--on-sec-con); margin-bottom:16px; line-height:1.2;">
+        ¿Tienes una petición<br>de oración?
+      </h2>
+      <p class="t-body-l" style="color:var(--on-sec-con); opacity:.7; max-width:460px;">
+        No estás solo. Cientos de personas intercederán por ti esta semana con amor y fe genuina.
+      </p>
+    </div>
+    <div>
+      <a href="#" class="btn btn-filled r-full" style="padding:16px 36px; font-size:1rem; font-weight:700;">
+        <span class="ms" style="font-size:22px;">send</span>
+        Enviar petición
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <DonationBanner />
+  M3 ref: Card filled con hero navy — surface inversa
+══════════════════════════════════════════════════════════════════ -->
+<section class="section elev-0">
+  <div class="wrap">
+    <div style="background:#0A1145; border-radius:28px; padding:56px; display:flex; align-items:center; justify-content:space-between; gap:40px; flex-wrap:wrap; position:relative; overflow:hidden;">
+      <div class="hero-grid"></div>
+      <div style="position:relative; z-index:1; flex:1; min-width:280px;">
+        <div class="chip" style="background:rgba(164,200,255,.1); color:#A4C8FF; border-color:rgba(164,200,255,.2); margin-bottom:16px;">
+          <span class="ms" style="font-size:14px;">volunteer_activism</span>
+          Siembra y Ofrenda
+        </div>
+        <h2 class="t-headline-l" style="color:#fff; margin-bottom:12px;">Tu generosidad<br>transforma vidas</h2>
+        <p class="t-body-m" style="color:rgba(255,255,255,.5); max-width:360px;">
+          Cada donación alimenta células, equipa ministerios y lleva la luz a quienes más lo necesitan.
+        </p>
+      </div>
+      <!-- M3 Buttons en hero: filled tonal inverso -->
+      <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:10px; min-width:200px;">
+        <a href="#" class="btn r-full" style="background:rgba(255,255,255,.07); color:#fff; border:1px solid rgba(255,255,255,.12); padding:12px 32px; justify-content:center;">Q50</a>
+        <a href="#" class="btn r-full" style="background:rgba(255,255,255,.07); color:#fff; border:1px solid rgba(255,255,255,.12); padding:12px 32px; justify-content:center;">Q100</a>
+        <a href="#" class="btn r-full" style="background:rgba(255,255,255,.07); color:#fff; border:1px solid rgba(255,255,255,.12); padding:12px 32px; justify-content:center;">Q250</a>
+        <a href="#" class="btn r-full" style="background:#A4C8FF; color:#003063; padding:12px 32px; justify-content:center; font-weight:700; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);">
+          <span class="ms" style="font-size:18px;">favorite</span>
+          Donar ahora
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+  COMPONENTE: <Footer />
+  M3 ref: surface inverse (#0A1145)
+══════════════════════════════════════════════════════════════════ -->
+<footer style="background:#0A1145; padding:56px 0 32px;">
+  <div class="wrap">
+    <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:48px;">
+
+      <div>
+        <img src="../frontend/public/logo.png" alt="Casa del Rey"
+          style="height:56px; width:auto; object-fit:contain; filter:brightness(0) invert(1); margin-bottom:16px;" />
+        <p class="t-body-s" style="color:rgba(255,255,255,.38); line-height:1.75; max-width:280px;">
+          Iglesia cristiana de restauración familiar en Huehuetenango, Guatemala.
+        </p>
+        <!-- M3 Icon buttons para redes -->
+        <div style="display:flex; gap:8px; margin-top:20px;">
+          <button class="btn-icon" style="background:rgba(255,255,255,.06); color:rgba(255,255,255,.5);">
+            <span class="ms">photo_camera</span>
+          </button>
+          <button class="btn-icon" style="background:rgba(255,255,255,.06); color:rgba(255,255,255,.5);">
+            <span class="ms">play_circle</span>
+          </button>
+          <button class="btn-icon" style="background:rgba(255,255,255,.06); color:rgba(255,255,255,.5);">
+            <span class="ms">thumb_up</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.3); margin-bottom:16px;">Ministerios</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Blog & Enseñanzas</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Eventos</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Oración</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Voluntariado</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Células</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.3); margin-bottom:16px;">Iglesia</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Conócenos</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Nuestros pastores</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Visión & Misión</a>
+          <a href="#" class="t-body-s" style="color:rgba(255,255,255,.55);">Donaciones</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="t-label-m" style="color:rgba(255,255,255,.3); margin-bottom:16px;">Contacto</div>
+        <div style="display:flex; flex-direction:column; gap:12px; color:rgba(255,255,255,.55);">
+          <span class="t-body-s">7a. calle 12-66 zona 4</span>
+          <span class="t-body-s">Huehuetenango, Guatemala</span>
+          <span class="t-body-s" style="margin-top:4px;">Dom · 10:00 AM</span>
+          <span class="t-body-s">Mié · 7:00 PM</span>
+        </div>
+      </div>
+
+    </div>
+
+    <hr style="border:none; height:1px; background:rgba(255,255,255,.07); margin-bottom:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="t-body-s" style="color:rgba(255,255,255,.18);">© 2026 Casa del Rey — Luz para las Naciones</span>
+      <span class="t-body-s" style="color:rgba(255,255,255,.12);">Huehuetenango, Guatemala</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
