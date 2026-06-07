@@ -47,11 +47,11 @@ export default function Header() {
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-  // Sin scroll → opaco (no sangra el contenido oscuro del hero a través del blur)
-  // Con scroll → glass con blur (ya hay contenido claro debajo)
+  // Siempre blanco sólido — sin transparencia para evitar sangrado de colores
+  // Al scroll se agrega shadow sutil para dar elevación
   const navBg = scrolled
-    ? 'bg-[var(--surf-high)]/80 backdrop-blur-xl border-[var(--outline-var)] shadow-sm'
-    : 'bg-[var(--surf-high)] border-[var(--outline-var)]';
+    ? 'bg-[var(--surf-high)] border-[var(--outline-var)] shadow-sm'
+    : 'bg-[var(--surf-high)] border-transparent';
   const linkColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)]';
   const linkActiveCl = 'text-[var(--on-surf)] font-semibold';
   const iconColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)] hover:bg-[var(--surf-low)]';
