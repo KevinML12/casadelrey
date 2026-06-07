@@ -1,147 +1,95 @@
 import { Link } from 'react-router-dom';
-import { IconButton } from '../ui/Button';
 
-const MINISTERIOS = [
-  { label: 'Blog & Enseñanzas', to: '/blog' },
-  { label: 'Eventos',           to: '/events' },
-  { label: 'Galería',           to: '/gallery' },
-  { label: 'Oración',          to: '/prayer' },
-  { label: 'Voluntariado',     to: '/volunteering' },
-  { label: 'Células',          to: '/cells' },
-];
-
-const IGLESIA = [
-  { label: 'Conócenos',       to: '/about' },
-  { label: 'Nuestros pastores', to: '/about' },
-  { label: 'Visión & Misión', to: '/about' },
-  { label: 'Donaciones',      to: '/donate' },
+const COLS = [
+  {
+    title: 'MINISTERIOS',
+    links: [
+      { label: 'Blog & Enseñanzas', to: '/blog' },
+      { label: 'Eventos',           to: '/events' },
+      { label: 'Galería',           to: '/gallery' },
+      { label: 'Oración',           to: '/prayer' },
+      { label: 'Voluntariado',      to: '/volunteering' },
+    ],
+  },
+  {
+    title: 'IGLESIA',
+    links: [
+      { label: 'Conócenos',         to: '/about' },
+      { label: 'Donaciones',        to: '/donate' },
+      { label: 'Ingresar',          to: '/login' },
+    ],
+  },
+  {
+    title: 'CONTACTO',
+    links: [
+      { label: '7a. calle 12-66, zona 4', to: '/about' },
+      { label: 'Huehuetenango, Guatemala', to: '/about' },
+      { label: 'Domingos · 10:00 AM',     to: '/about' },
+      { label: 'Miércoles · 7:00 PM',     to: '/about' },
+    ],
+  },
 ];
 
 export default function Footer() {
   return (
-    // Footer siempre usa hero-surf (navy fijo — no cambia con el tema)
-    <footer className="hero-surf">
-      <div className="max-w-[1200px] mx-auto px-6 pt-14 pb-8">
+    <footer className="bg-[var(--surf-low)] border-t border-[var(--outline-var)]">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-16 pt-12 pb-8">
 
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-12">
+        {/* Brand + columns grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-10">
 
           {/* Brand */}
           <div>
             <img
               src="/logo.png"
               alt="Casa del Rey"
-              className="h-14 w-auto object-contain mb-4"
-              style={{ filter: 'brightness(0) invert(1)' }}
+              className="h-10 w-auto object-contain mb-4 opacity-90"
             />
-            <p className="text-body-s leading-relaxed max-w-[280px]" style={{ color: 'rgba(255,255,255,.38)' }}>
+            <p className="text-[13px] text-[var(--on-surf-var)] leading-relaxed max-w-[260px]">
               Iglesia cristiana de restauración familiar en Huehuetenango, Guatemala.
             </p>
-
-            {/* Redes — M3 Icon Buttons */}
             <div className="flex gap-2 mt-5">
-              <a href="https://instagram.com/ig.casadelrey" target="_blank" rel="noreferrer">
-                <IconButton
-                  className="text-white/50"
-                  style={{ background: 'rgba(255,255,255,.06)' }}
-                  aria-label="Instagram"
-                >
-                  <span className="ms" style={{ fontSize: 20 }}>photo_camera</span>
-                </IconButton>
+              <a href="https://instagram.com/ig.casadelrey" target="_blank" rel="noreferrer"
+                className="w-9 h-9 rounded-full bg-[var(--surf-dim)] flex items-center justify-center text-[var(--on-surf-var)] hover:bg-[var(--pri)] hover:text-[var(--on-pri)] transition-colors">
+                <span className="ms" style={{ fontSize: 18 }}>photo_camera</span>
               </a>
-              <a href="#" target="_blank" rel="noreferrer">
-                <IconButton
-                  className="text-white/50"
-                  style={{ background: 'rgba(255,255,255,.06)' }}
-                  aria-label="YouTube"
-                >
-                  <span className="ms" style={{ fontSize: 20 }}>play_circle</span>
-                </IconButton>
+              <a href="#" target="_blank" rel="noreferrer"
+                className="w-9 h-9 rounded-full bg-[var(--surf-dim)] flex items-center justify-center text-[var(--on-surf-var)] hover:bg-[var(--pri)] hover:text-[var(--on-pri)] transition-colors">
+                <span className="ms" style={{ fontSize: 18 }}>play_circle</span>
               </a>
-              <a href="#" target="_blank" rel="noreferrer">
-                <IconButton
-                  className="text-white/50"
-                  style={{ background: 'rgba(255,255,255,.06)' }}
-                  aria-label="Facebook"
-                >
-                  <span className="ms" style={{ fontSize: 20 }}>thumb_up</span>
-                </IconButton>
+              <a href="#" target="_blank" rel="noreferrer"
+                className="w-9 h-9 rounded-full bg-[var(--surf-dim)] flex items-center justify-center text-[var(--on-surf-var)] hover:bg-[var(--pri)] hover:text-[var(--on-pri)] transition-colors">
+                <span className="ms" style={{ fontSize: 18 }}>thumb_up</span>
               </a>
             </div>
           </div>
 
-          {/* Ministerios */}
-          <div>
-            <p className="text-label-m mb-4" style={{ color: 'rgba(255,255,255,.3)' }}>
-              Ministerios
-            </p>
-            <ul className="space-y-3">
-              {MINISTERIOS.map(({ label, to }) => (
-                <li key={to}>
-                  <Link
-                    to={to}
-                    className="text-body-s transition-colors duration-150"
-                    style={{ color: 'rgba(255,255,255,.55)' }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,.85)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,.55)'}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Iglesia */}
-          <div>
-            <p className="text-label-m mb-4" style={{ color: 'rgba(255,255,255,.3)' }}>
-              Iglesia
-            </p>
-            <ul className="space-y-3">
-              {IGLESIA.map(({ label, to }) => (
-                <li key={label}>
-                  <Link
-                    to={to}
-                    className="text-body-s transition-colors duration-150"
-                    style={{ color: 'rgba(255,255,255,.55)' }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,.85)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,.55)'}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contacto */}
-          <div>
-            <p className="text-label-m mb-4" style={{ color: 'rgba(255,255,255,.3)' }}>
-              Contacto
-            </p>
-            <ul className="space-y-3 text-body-s" style={{ color: 'rgba(255,255,255,.55)' }}>
-              <li className="flex items-start gap-2">
-                <span className="ms mt-0.5" style={{ fontSize: 16, color: 'rgba(255,255,255,.3)' }}>location_on</span>
-                7a. calle 12-66 zona 4, Huehuetenango
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="ms" style={{ fontSize: 16, color: 'rgba(255,255,255,.3)' }}>schedule</span>
-                Domingos · 10:00 AM
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="ms" style={{ fontSize: 16, color: 'rgba(255,255,255,.3)' }}>schedule</span>
-                Miércoles · 7:00 PM
-              </li>
-            </ul>
-          </div>
+          {/* Columns */}
+          {COLS.map(col => (
+            <div key={col.title}>
+              <p className="text-[11px] font-semibold text-[var(--outline)] mb-4 tracking-[1.2px]">
+                {col.title}
+              </p>
+              <ul className="space-y-3">
+                {col.links.map(link => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-[13px] text-[var(--on-surf-var)] hover:text-[var(--on-surf)] transition-colors duration-150"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
         {/* Bottom bar */}
-        <div
-          className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-6 border-t text-body-s"
-          style={{ borderColor: 'rgba(255,255,255,.07)', color: 'rgba(255,255,255,.2)' }}
-        >
-          <span>© 2026 Casa del Rey — Luz para las Naciones</span>
-          <span>Huehuetenango, Guatemala</span>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-6 border-t border-[var(--outline-var)]">
+          <span className="text-[12px] text-[var(--outline)]">© 2026 Casa del Rey — Luz para las Naciones</span>
+          <span className="text-[12px] text-[var(--outline)]">Huehuetenango, Guatemala</span>
         </div>
       </div>
     </footer>

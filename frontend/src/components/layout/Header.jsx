@@ -1,33 +1,38 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import Button, { IconButton } from '../ui/Button';
 
 const NAV_LINKS = [
-  { label: 'Conócenos',   to: '/about' },
-  { label: 'Blog',        to: '/blog' },
-  { label: 'Eventos',     to: '/events' },
-  { label: 'Galería',     to: '/gallery' },
-  { label: 'Oración',     to: '/prayer' },
+  { label: 'Inicio',       to: '/' },
+  { label: 'Nosotros',     to: '/about' },
+  { label: 'Eventos',      to: '/events' },
+  { label: 'Blog',         to: '/blog' },
   { label: 'Voluntariado', to: '/volunteering' },
+  { label: 'Donar',        to: '/donate' },
 ];
 
 export default function Header() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
-  const navigate   = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
-  const [theme, setTheme]       = useState(() => document.documentElement.dataset.theme || 'light');
+  const [scrolled, setScrolled] = useState(false);
+  const [theme,    setTheme]    = useState(
+    () => document.documentElement.dataset.theme || 'light'
+  );
   const dropRef = useRef(null);
 
-  // Sync tema con el atributo del HTML
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
-  };
+  // Páginas con hero oscuro — antes de scroll muestra nav navy translúcida
+  const darkHeroPages = ['/', '/events', '/about'];
+  const isHeroDark = darkHeroPages.includes(location.pathname) && !scrolled && theme === 'light';
 
-  // Cerrar dropdown al click fuera
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   useEffect(() => {
     const handler = (e) => {
       if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false);
@@ -36,95 +41,90 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    setDropOpen(false);
-    navigate('/');
+  useEffect(() => { setMenuOpen(false); }, [location]);
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    setTheme(next);
   };
 
-  return (
-    // M3 Top App Bar — Surface level 2 (tinted)
-    <header className="surf-1 sticky top-0 z-40 border-b border-outline-var transition-colors duration-300">
-      <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between gap-4">
+  const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-        {/* ── Leading: Logo ─────────────────────────────────────── */}
-        <Link to="/" className="flex items-center shrink-0" onClick={() => setMenuOpen(false)}>
-          {/* Contenedor navy fijo — logo siempre blanco en ambos temas */}
-          <div className="rounded-lg px-2.5 py-1.5" style={{ background: '#0D1B5E' }}>
-            <img
-              src="/logo.png"
-              alt="Casa del Rey"
-              className="h-9 w-auto object-contain"
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
-          </div>
+  // Clases dinámicas según contexto
+  const navBg = isHeroDark
+    ? 'bg-[#0D1B4B]/70 backdrop-blur-xl border-white/10'
+    : 'bg-[var(--surf-high)]/80 backdrop-blur-xl border-[var(--outline-var)] shadow-sm';
+
+  const linkColor   = isHeroDark ? 'text-white/70 hover:text-white'           : 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)]';
+  const linkActiveCl= isHeroDark ? 'text-white font-semibold'                 : 'text-[var(--on-surf)] font-semibold';
+  const iconColor   = isHeroDark ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)] hover:bg-[var(--surf-low)]';
+  const logoFilter  = isHeroDark ? 'brightness(0) invert(1)'                  : undefined;
+
+  return (
+    <header className={`sticky top-0 z-40 border-b transition-all duration-300 ${navBg}`}>
+      <div className="max-w-[1440px] mx-auto px-6 md:px-16 h-[72px] md:h-[88px] flex items-center justify-between gap-4">
+
+        {/* Logo */}
+        <Link to="/" className="shrink-0">
+          <img
+            src="/logo.png"
+            alt="Casa del Rey"
+            className="h-8 md:h-9 w-auto object-contain transition-[filter] duration-300"
+            style={{ filter: logoFilter }}
+          />
         </Link>
 
-        {/* ── Center: Nav links (desktop) ───────────────────────── */}
-        <nav className="hidden md:flex items-center gap-1">
+        {/* Nav links — desktop */}
+        <nav className="hidden lg:flex items-center gap-0.5">
           {NAV_LINKS.map(({ label, to }) => (
-            <NavLink key={to} to={to}>
+            <NavLink key={to} to={to} end={to === '/'}>
               {({ isActive }) => (
-                <span
-                  className={
-                    'flex flex-col items-center gap-0.5 px-4 py-2 rounded-full ' +
-                    'text-label-l cursor-pointer relative overflow-hidden ' +
-                    'before:content-[""] before:absolute before:inset-0 before:bg-pri ' +
-                    'before:opacity-0 before:transition-opacity before:duration-150 ' +
-                    'hover:before:opacity-[.08] transition-colors duration-150 ' +
-                    (isActive ? 'text-on-surf font-semibold' : 'text-on-surf-var')
-                  }
-                >
+                <span className={`px-4 py-2 rounded-full text-[14px] cursor-pointer transition-colors duration-150 block
+                  ${isActive ? linkActiveCl : linkColor}`}>
                   {label}
-                  {/* M3 active indicator */}
-                  {isActive && (
-                    <span className="w-6 h-0.5 rounded-full bg-pri" />
-                  )}
                 </span>
               )}
             </NavLink>
           ))}
         </nav>
 
-        {/* ── Trailing: Actions (desktop) ───────────────────────── */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Right actions — desktop */}
+        <div className="hidden lg:flex items-center gap-1">
 
-          {/* Dark/Light toggle — M3 Icon Button */}
-          <IconButton onClick={toggleTheme} aria-label="Cambiar tema">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full transition-colors ${iconColor}`}
+            aria-label="Cambiar tema"
+          >
             <span className="ms" style={{ fontSize: 20 }}>
               {theme === 'dark' ? 'light_mode' : 'dark_mode'}
             </span>
-          </IconButton>
+          </button>
 
           {isAuthenticated ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-1">
               {(isAdmin || user?.role === 'leader') && (
-                <Button
-                  as="link"
+                <Link
                   to={isAdmin ? '/admin' : '/leader'}
-                  variant="tonal"
-                  size="sm"
+                  className={`px-4 py-1.5 rounded-full text-[13px] font-medium border transition-colors
+                    ${isHeroDark
+                      ? 'border-white/25 text-white/80 hover:bg-white/10'
+                      : 'border-[var(--outline-var)] text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}
                 >
-                  <span className="ms" style={{ fontSize: 16 }}>dashboard</span>
                   {isAdmin ? 'Admin' : 'Líderes'}
-                </Button>
+                </Link>
               )}
 
-              {/* Avatar dropdown */}
               <div className="relative" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
-                  className={
-                    'flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full ' +
-                    'text-label-l text-on-surf-var cursor-pointer ' +
-                    'relative overflow-hidden ' +
-                    'before:content-[""] before:absolute before:inset-0 before:bg-on-surf ' +
-                    'before:opacity-0 before:transition-opacity ' +
-                    'hover:before:opacity-[.08] transition-colors'
-                  }
+                  className={`flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full text-[13px] transition-colors
+                    ${isHeroDark ? 'text-white/80 hover:bg-white/10' : 'text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-pri-con flex items-center justify-center shrink-0">
-                    <span className="text-on-pri-con text-label-m font-bold">
+                  <div className="w-7 h-7 rounded-full bg-[var(--pri)] flex items-center justify-center shrink-0">
+                    <span className="text-[var(--on-pri)] text-[11px] font-bold">
                       {(user?.name || user?.email || '?')[0].toUpperCase()}
                     </span>
                   </div>
@@ -134,25 +134,20 @@ export default function Header() {
                 </button>
 
                 {dropOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 surf-2 border border-outline-var rounded-xl shadow-elev-3 py-1 animate-fade-in z-50">
-                    <div className="px-4 py-2 border-b border-outline-var">
-                      <p className="text-title-s text-on-surf truncate">{user?.name || 'Usuario'}</p>
-                      <p className="text-body-s text-on-surf-var truncate">{user?.email}</p>
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-[var(--surf-high)] border border-[var(--outline-var)] rounded-2xl shadow-xl py-2 z-50">
+                    <div className="px-4 py-2.5 border-b border-[var(--outline-var)]">
+                      <p className="text-[13px] font-semibold text-[var(--on-surf)] truncate">{user?.name || 'Usuario'}</p>
+                      <p className="text-[12px] text-[var(--on-surf-var)] truncate">{user?.email}</p>
                     </div>
-                    <Link
-                      to="/profile"
-                      onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-body-s text-on-surf-var hover:bg-on-surf/[.08] transition-colors"
-                    >
-                      <span className="ms" style={{ fontSize: 18 }}>person</span>
+                    <Link to="/profile" onClick={() => setDropOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[var(--on-surf)] hover:bg-[var(--surf-low)] transition-colors">
+                      <span className="ms" style={{ fontSize: 16 }}>person</span>
                       Mi perfil
                     </Link>
-                    <div className="my-1 border-t border-outline-var" />
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-body-s text-err hover:bg-err/[.08] transition-colors"
-                    >
-                      <span className="ms" style={{ fontSize: 18 }}>logout</span>
+                    <div className="my-1 border-t border-[var(--outline-var)]" />
+                    <button onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[var(--err)] hover:bg-[var(--err-con)] transition-colors">
+                      <span className="ms" style={{ fontSize: 16 }}>logout</span>
                       Cerrar sesión
                     </button>
                   </div>
@@ -160,75 +155,65 @@ export default function Header() {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button as="link" to="/login" variant="tonal" size="sm">
-                Donaciones
-              </Button>
-              <Button as="link" to="/login" variant="filled" size="sm">
-                <span className="ms" style={{ fontSize: 16 }}>login</span>
+            <div className="flex items-center gap-2 ml-1">
+              <Link to="/login"
+                className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors
+                  ${isHeroDark ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}>
                 Ingresar
-              </Button>
+              </Link>
+              <Link to="/donate"
+                className="px-5 py-1.5 rounded-full text-[13px] font-semibold bg-[var(--pri)] text-[var(--on-pri)] hover:bg-[var(--pri-press)] transition-colors">
+                Donar
+              </Link>
             </div>
           )}
         </div>
 
-        {/* ── Mobile: theme toggle + hamburger ──────────────────── */}
-        <div className="flex md:hidden items-center gap-1">
-          <IconButton onClick={toggleTheme}>
-            <span className="ms" style={{ fontSize: 20 }}>
-              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-            </span>
-          </IconButton>
-          <IconButton onClick={() => setMenuOpen(p => !p)} aria-label="Menú">
-            <span className="ms" style={{ fontSize: 22 }}>
-              {menuOpen ? 'close' : 'menu'}
-            </span>
-          </IconButton>
+        {/* Mobile: theme toggle + hamburger */}
+        <div className="flex lg:hidden items-center gap-1">
+          <button onClick={toggleTheme} className={`p-2 rounded-full transition-colors ${iconColor}`} aria-label="Tema">
+            <span className="ms" style={{ fontSize: 20 }}>{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+          </button>
+          <button onClick={() => setMenuOpen(p => !p)} className={`p-2 rounded-full transition-colors ${iconColor}`} aria-label="Menú">
+            <span className="ms" style={{ fontSize: 22 }}>{menuOpen ? 'close' : 'menu'}</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Mobile menu ─────────────────────────────────────────── */}
+      {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden surf-2 border-t border-outline-var px-4 py-3 space-y-1 animate-slide-up">
+        <div className="lg:hidden bg-[var(--surf-high)] border-t border-[var(--outline-var)] px-4 py-3 space-y-1">
           {NAV_LINKS.map(({ label, to }) => (
-            <NavLink key={to} to={to} onClick={() => setMenuOpen(false)}>
+            <NavLink key={to} to={to} end={to === '/'} onClick={() => setMenuOpen(false)}>
               {({ isActive }) => (
-                <span className={
-                  'flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l ' +
-                  (isActive ? 'bg-pri-con text-on-pri-con' : 'text-on-surf-var')
-                }>
+                <span className={`flex items-center px-4 py-2.5 rounded-xl text-[14px] transition-colors
+                  ${isActive
+                    ? 'bg-[var(--pri-con)] text-[var(--on-pri-con)] font-semibold'
+                    : 'text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}>
                   {label}
                 </span>
               )}
             </NavLink>
           ))}
-          <div className="pt-2 border-t border-outline-var mt-2 space-y-1">
+          <div className="pt-2 mt-1 border-t border-[var(--outline-var)] space-y-1">
             {isAuthenticated ? (
               <>
                 {(isAdmin || user?.role === 'leader') && (
-                  <Link
-                    to={isAdmin ? '/admin' : '/leader'}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l text-on-surf-var"
-                  >
+                  <Link to={isAdmin ? '/admin' : '/leader'} onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] text-[var(--on-surf-var)]">
                     <span className="ms" style={{ fontSize: 18 }}>dashboard</span>
-                    {isAdmin ? 'Admin' : 'Panel líder'}
+                    {isAdmin ? 'Panel Admin' : 'Panel Líder'}
                   </Link>
                 )}
-                <button
-                  onClick={() => { handleLogout(); setMenuOpen(false); }}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l text-err w-full text-left"
-                >
+                <button onClick={() => { handleLogout(); setMenuOpen(false); }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] text-[var(--err)] w-full">
                   <span className="ms" style={{ fontSize: 18 }}>logout</span>
                   Cerrar sesión
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-label-l text-pri font-semibold"
-              >
+              <Link to="/login" onClick={() => setMenuOpen(false)}
+                className="flex items-center px-4 py-2.5 rounded-xl text-[14px] font-semibold text-[var(--pri)]">
                 Ingresar
               </Link>
             )}
