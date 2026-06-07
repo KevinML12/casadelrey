@@ -35,17 +35,22 @@ function SidebarContent({ onClose }) {
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#0D1B5E' }}>
+    <div className="flex flex-col h-full" style={{ background: '#060D24' }}>
       {/* Logo */}
-      <div className="px-5 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,.1)' }}>
-        <div className="flex items-center gap-3">
+      <div className="px-4 py-6 border-b" style={{ borderColor: 'rgba(255,255,255,.1)' }}>
+        <div className="flex items-center gap-2.5">
           <div className="rounded-lg px-2 py-1.5" style={{ background: 'rgba(255,255,255,.08)' }}>
             <img src="/logo.png" alt="Casa del Rey" className="h-7 w-auto object-contain"
               style={{ filter: 'brightness(0) invert(1)' }} />
           </div>
-          <div>
-            <p className="text-title-s text-white font-bold leading-tight">Casa del Rey</p>
-            <p className="text-label-s" style={{ color: 'rgba(255,255,255,.45)' }}>Panel Admin</p>
+          <div style={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
+            <p className="text-white font-bold leading-tight" style={{ fontSize: 14 }}>Casa del Rey</p>
+            <p style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10,
+              letterSpacing: '1.65px',
+              color: 'rgba(255,255,255,.4)',
+            }}>PANEL ADMIN</p>
           </div>
         </div>
       </div>
@@ -66,7 +71,7 @@ function SidebarContent({ onClose }) {
                 }`
               }
               style={({ isActive }) => ({
-                background: isActive ? 'rgba(255,255,255,.12)' : 'transparent',
+                background: isActive ? 'rgba(255,255,255,.15)' : 'transparent',
                 color: isActive ? '#FFFFFF' : 'rgba(255,255,255,.55)',
               })}
             >

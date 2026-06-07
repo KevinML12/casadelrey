@@ -170,34 +170,65 @@ function PostList({ posts }) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {posts.map(p => {
         const isExternal = !!p.redirect_url;
+        const dateLabel  = p.CreatedAt
+          ? new Date(p.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+          : '';
         const cardBody = (
-          <div className="h-full flex flex-col rounded-2xl border border-outline-var bg-surf-low hover:shadow-elev-2 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
-            {p.cover_image ? (
-              <img src={p.cover_image} alt={p.title} className="w-full h-44 object-cover" />
-            ) : (
-              <div className="w-full h-44 hero-surf flex items-center justify-center">
-                <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(255,255,255,.08)' }}>
-                  <img src="/logo.png" alt="Casa del Rey" className="h-12 w-auto object-contain"
-                    style={{ filter: 'brightness(0) invert(1)', opacity: 0.4 }} />
-                </div>
+          <div
+            className="relative overflow-hidden group cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+            style={{ borderRadius: 24, height: 460 }}
+          >
+            {/* BG: imagen o navy sólido */}
+            {p.cover_image
+              ? <img
+                  src={p.cover_image}
+                  alt={p.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              : <div className="absolute inset-0" style={{ background: '#0D1B4B' }} />
+            }
+
+            {/* Overlay gradiente bottom-up */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(to top, #060D24F0 0%, #060D2466 50%, #060D2400 100%)',
+              }}
+            />
+
+            {/* Chip de red social */}
+            {isExternal && (
+              <div
+                className="absolute top-5 left-5 flex items-center gap-1.5 px-3 py-1 rounded-full"
+                style={{ background: 'rgba(255,255,255,.15)', backdropFilter: 'blur(8px)' }}
+              >
+                <span className="ms text-white" style={{ fontSize: 13 }}>open_in_new</span>
+                <span className="text-white font-medium" style={{ fontSize: 12 }}>Red social</span>
               </div>
             )}
-            <div className="flex-1 flex flex-col p-5">
-              <h3 className="text-title-s text-on-surf font-semibold mb-2 leading-snug hover:text-pri transition-colors">
+
+            {/* Contenido inferior */}
+            <div
+              className="absolute inset-x-0 bottom-0 flex flex-col gap-2"
+              style={{ padding: '0 28px 28px' }}
+            >
+              <p style={{ color: 'rgba(255,255,255,.55)', fontSize: 12, fontWeight: 500 }}>
+                {dateLabel}
+              </p>
+              <h3
+                className="text-white font-semibold leading-snug"
+                style={{ fontSize: 18, lineHeight: 1.4 }}
+              >
                 {p.title}
               </h3>
-              <p className="text-body-s text-on-surf-var leading-relaxed line-clamp-3 flex-1">
-                {p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 140)}
-              </p>
-              <div className="pt-4 mt-4 border-t border-outline-var flex items-center justify-between">
-                <span className="text-label-s text-on-surf-var flex items-center gap-1">
-                  <span className="ms" style={{ fontSize: 12 }}>calendar_today</span>
-                  {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES') : ''}
-                </span>
-                <span className="text-label-s text-pri font-medium flex items-center gap-1">
-                  {isExternal ? <><span className="ms" style={{ fontSize: 12 }}>open_in_new</span>Ver</> : 'Leer →'}
-                </span>
-              </div>
+              {!isExternal && (p.excerpt || p.content) && (
+                <p
+                  className="line-clamp-2"
+                  style={{ color: 'rgba(255,255,255,.6)', fontSize: 13, lineHeight: 1.5 }}
+                >
+                  {p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 120)}
+                </p>
+              )}
             </div>
           </div>
         );

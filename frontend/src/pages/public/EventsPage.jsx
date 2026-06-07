@@ -213,7 +213,11 @@ function RSVPModal({ event, onClose }) {
 function ModalWrapper({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-surf rounded-[28px] w-full max-w-md p-6 shadow-elev-3 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div
+        className="bg-white w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+        style={{ borderRadius: 20, boxShadow: '0 20px 60px rgba(0,0,0,0.094)' }}
+        onClick={e => e.stopPropagation()}
+      >
         {children}
       </div>
     </div>
@@ -257,58 +261,89 @@ export default function EventsPage() {
             <p className="text-body-m text-on-surf-var">Pronto publicaremos nuevos eventos. ¡Vuelve pronto!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map(ev => {
-              const dayNum  = ev.date ? new Date(ev.date + 'T12:00').getDate() : '';
+              const dayNum   = ev.date ? new Date(ev.date + 'T12:00').getDate() : '';
               const monthStr = ev.date
                 ? new Date(ev.date + 'T12:00').toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()
                 : '';
-              const dateStr = ev.date
-                ? new Date(ev.date + 'T12:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+              const weekday  = ev.date
+                ? new Date(ev.date + 'T12:00').toLocaleDateString('es-ES', { weekday: 'long' })
                 : '';
 
               return (
-                <div key={ev.ID} className="rounded-xl border border-outline-var bg-surf-low hover:shadow-elev-1 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col">
-
-                  {/* Header: fecha + título */}
-                  <div className="flex items-center gap-4 p-5 border-b border-outline-var">
-                    <div className="w-14 h-14 rounded-xl bg-pri-con flex flex-col items-center justify-center shrink-0">
-                      <span className="text-headline-s text-on-pri-con font-black leading-none">{dayNum}</span>
-                      <span className="text-label-s text-on-pri-con font-semibold">{monthStr}</span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-title-s text-on-surf font-bold leading-snug truncate">{ev.title}</h3>
-                      <p className="text-label-s text-on-surf-var mt-0.5">{dateStr}</p>
-                    </div>
-                    {/* Badge de precio */}
+                <div
+                  key={ev.ID}
+                  className="flex flex-col overflow-hidden transition-shadow duration-200"
+                  style={{ borderRadius: 28, background: '#FFFFFF', boxShadow: '0 2px 8px rgba(13,27,75,0.06)' }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 25px rgba(13,27,75,0.12)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(13,27,75,0.06)'; }}
+                >
+                  {/* Área superior: fecha destacada */}
+                  <div
+                    className="flex flex-col items-center justify-center relative"
+                    style={{ height: 220, background: '#0D1B4B', borderRadius: '28px 28px 0 0' }}
+                  >
+                    {dayNum && (
+                      <>
+                        <span
+                          className="text-white font-black leading-none"
+                          style={{ fontSize: 72 }}
+                        >
+                          {dayNum}
+                        </span>
+                        <span
+                          className="text-white font-semibold"
+                          style={{ fontSize: 13, letterSpacing: 2, opacity: 0.65, marginTop: 6 }}
+                        >
+                          {monthStr}
+                        </span>
+                        {weekday && (
+                          <span
+                            className="text-white"
+                            style={{ fontSize: 12, opacity: 0.45, marginTop: 4 }}
+                          >
+                            {weekday}
+                          </span>
+                        )}
+                      </>
+                    )}
                     {ev.requires_payment && (
-                      <div className="shrink-0 px-2.5 py-1 rounded-full bg-pri text-on-pri text-label-s font-bold">
+                      <div
+                        className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full text-white font-bold"
+                        style={{ background: '#7C3AED', fontSize: 13 }}
+                      >
                         Q{Number(ev.price_gtq).toFixed(0)}
                       </div>
                     )}
                   </div>
 
-                  {/* Cuerpo */}
-                  <div className="p-5 flex-1 space-y-2">
+                  {/* Contenido */}
+                  <div className="flex flex-col flex-1 gap-2" style={{ padding: '20px 24px' }}>
+                    <h3 className="font-bold leading-snug" style={{ fontSize: 16, color: '#050505' }}>
+                      {ev.title}
+                    </h3>
                     {ev.location && (
-                      <div className="flex items-center gap-2 text-on-surf-var">
-                        <span className="ms shrink-0" style={{ fontSize: 16 }}>location_on</span>
-                        <span className="text-body-s">{ev.location}</span>
+                      <div className="flex items-center gap-2" style={{ color: '#525B7A', fontSize: 13 }}>
+                        <span className="ms shrink-0" style={{ fontSize: 15 }}>location_on</span>
+                        {ev.location}
                       </div>
                     )}
                     {ev.time && (
-                      <div className="flex items-center gap-2 text-on-surf-var">
-                        <span className="ms shrink-0" style={{ fontSize: 16 }}>schedule</span>
-                        <span className="text-body-s">{ev.time}</span>
+                      <div className="flex items-center gap-2" style={{ color: '#525B7A', fontSize: 13 }}>
+                        <span className="ms shrink-0" style={{ fontSize: 15 }}>schedule</span>
+                        {ev.time}
                       </div>
                     )}
                     {ev.description && (
-                      <p className="text-body-s text-on-surf-var line-clamp-2 leading-relaxed">{ev.description}</p>
+                      <p className="line-clamp-2" style={{ color: '#525B7A', fontSize: 13, lineHeight: 1.5 }}>
+                        {ev.description}
+                      </p>
                     )}
                   </div>
 
                   {/* CTA */}
-                  <div className="px-5 pb-5">
+                  <div style={{ padding: '0 24px 20px' }}>
                     {ev.requires_payment ? (
                       <Button variant="filled" onClick={() => setRsvpEvent(ev)} className="w-full justify-center">
                         <span className="ms" style={{ fontSize: 16 }}>payments</span>
