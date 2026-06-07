@@ -386,3 +386,25 @@
   transition: background 150ms var(--ease-standard);
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--outline); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   HOME — utilidades sin inline styles
+═══════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  /* Outlined text para la segunda línea del Hero */
+  .text-outlined {
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85);
+  }
+
+  /* Gradients para cards de enseñanzas sin cover image */
+  .ens-grad-0 { background: linear-gradient(160deg, #0D1B4B 0%, #060D24 100%); }
+  .ens-grad-1 { background: linear-gradient(160deg, #1E3A6E 0%, #0D1B4B 100%); }
+  .ens-grad-2 { background: linear-gradient(160deg, #10254E 0%, #060D24 100%); }
+
+  /* OracionCTA: fade de navy hacia la foto de la derecha */
+  .oracion-overlay {
+    background: linear-gradient(90deg, #060D24 42%, rgba(6, 13, 36, 0.55) 68%, rgba(6, 13, 36, 0.85) 100%);
+  }
+}

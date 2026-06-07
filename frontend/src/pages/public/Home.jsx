@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../../lib/apiClient';
 
-// ─── Hero ────────────────────────────────────────────────────────────────────
+// Gradient class map — static strings so Tailwind JIT keeps them
+const ENS_GRAD = ['ens-grad-0', 'ens-grad-1', 'ens-grad-2'];
 
-const STATS = [
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+const HERO_STATS = [
   { value: '200+', label: 'FAMILIAS' },
   { value: '20+',  label: 'CÉLULAS ACTIVAS' },
   { value: '10',   label: 'AÑOS SIRVIENDO' },
@@ -13,117 +16,86 @@ const STATS = [
 function Hero() {
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden">
-
-      {/* Foto de fondo */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1920&q=80')`,
-        }}
+      {/* Background photo — avoids inline backgroundImage */}
+      <img
+        src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1920&q=80"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      {/* Overlay oscuro */}
-      <div className="absolute inset-0" style={{ background: '#060D24CC' }} />
+      {/* Navy overlay */}
+      <div className="absolute inset-0 bg-navy/80" />
+      {/* Dot-grid texture */}
+      <div className="hero-grid" />
 
-      {/* Contenido */}
       <div className="relative z-10 flex-1 flex flex-col justify-between max-w-[1440px] w-full mx-auto px-6 md:px-24 pt-8 pb-10">
 
-        {/* Badge + scripture — top bar */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#7FA8D9]" />
-            <span className="text-[#7FA8D9] text-[12px] font-semibold tracking-[1.8px] hidden sm:block">
+        {/* Badge row — animate-hero-1 */}
+        <div className="flex items-center justify-between animate-hero-1">
+          <div className="flex items-center gap-2 backdrop-blur-apple backdrop-saturate-apple bg-white/10 border border-white/10 rounded-pill px-4 py-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-celeste shrink-0" />
+            <span className="text-mono text-celeste hidden sm:block">
               IGLESIA CRISTIANA · HUEHUETENANGO · DESDE 2016
             </span>
-            <span className="text-[#7FA8D9] text-[11px] font-semibold tracking-[1.5px] sm:hidden">
-              IGLESIA CRISTIANA · HUEHUETENANGO
-            </span>
+            <span className="text-mono text-celeste sm:hidden">CDR · HUEHUETENANGO</span>
           </div>
-          <span className="text-[#7FA8D9] text-[11px] font-medium tracking-[2.2px] font-mono hidden sm:block">
+          <span className="text-mono text-celeste hidden sm:block backdrop-blur-apple backdrop-saturate-apple bg-white/10 border border-white/10 rounded-pill px-3 py-1.5">
             MATEO 5:14
           </span>
         </div>
 
-        {/* Título principal */}
+        {/* Main content */}
         <div className="mt-auto pt-16 md:pt-0">
-          <h1
-            className="font-black leading-[0.9] tracking-[-0.05em] mb-6"
-            style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}
-          >
-            <span className="block text-white">LUZ PARA</span>
-            {/* Segunda línea: texto outlined (sin fill) */}
-            <span
-              className="block"
-              style={{
-                color: 'transparent',
-                WebkitTextStroke: '2px rgba(255,255,255,0.85)',
-                paddingLeft: 'clamp(16px, 2vw, 24px)',
-              }}
-            >
-              LAS NACIONES
-            </span>
+
+          {/* Title — animate-hero-2 */}
+          <h1 className="mb-6 animate-hero-2">
+            <span className="block text-display-l text-white">LUZ PARA</span>
+            <span className="block text-display-l text-outlined pl-4 md:pl-6">LAS NACIONES</span>
           </h1>
 
-          <p
-            className="mb-2 font-normal"
-            style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'clamp(16px, 2vw, 24px)', maxWidth: 480 }}
-          >
-            Empieza tu propósito aquí.
-          </p>
-          <p
-            className="mb-8 font-medium tracking-[1.5px] uppercase"
-            style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(11px, 1.2vw, 14px)' }}
-          >
-            Domingos · 10AM · Zona 1, Huehuetenango
-          </p>
+          {/* Subtitle — animate-hero-3 */}
+          <div className="animate-hero-3">
+            <p className="text-body-l text-white/85 mb-2 max-w-[480px]">Empieza tu propósito aquí.</p>
+            <p className="text-mono text-white/60 mb-8 uppercase">
+              Domingos · 10AM · Zona 1, Huehuetenango
+            </p>
+          </div>
 
-          {/* Botones */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-12 sm:mb-16">
-            <Link
-              to="/events"
-              className="px-7 py-3.5 rounded-full font-semibold text-[17px] transition-opacity hover:opacity-90 text-center"
-              style={{ background: '#FFFFFF', color: '#060D24' }}
-            >
+          {/* CTAs — animate-hero-4 */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-12 sm:mb-16 animate-hero-4">
+            <Link to="/events" className="btn-pill bg-white text-navy font-semibold">
               Ver próximos eventos
             </Link>
             <Link
               to="/about"
-              className="px-2 py-3.5 text-white font-normal text-[17px] hover:text-white/70 transition-colors flex items-center gap-1.5"
+              className="px-2 py-3.5 text-white text-body-l font-normal hover:text-white/70 transition-colors flex items-center gap-1.5"
             >
               Conócenos <span>→</span>
             </Link>
           </div>
 
-          {/* Stats con divisores */}
-          <div className="flex items-end gap-10 md:gap-12">
-            {STATS.map((stat, i) => (
-              <div key={stat.label} className="flex items-end gap-10 md:gap-12">
-                <div className="flex flex-col gap-1">
-                  <span
-                    className="font-black text-white leading-[0.9]"
-                    style={{ fontSize: i === 0 ? 'clamp(48px, 6vw, 96px)' : 'clamp(28px, 4vw, 48px)', fontWeight: i === 0 ? 900 : 800 }}
-                  >
-                    {stat.value}
-                  </span>
-                  <span
-                    className="font-medium tracking-[2px]"
-                    style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}
-                  >
-                    {stat.label}
-                  </span>
+          {/* Stats glass container — animate-hero-5 */}
+          <div className="animate-hero-5 inline-flex">
+            <div className="backdrop-blur-apple backdrop-saturate-apple bg-navy/50 border border-white/10 rounded-xl px-6 py-5 flex items-end gap-10 md:gap-12">
+              {HERO_STATS.map((stat, i) => (
+                <div key={stat.label} className="flex items-end gap-10 md:gap-12">
+                  <div>
+                    <div className={`font-black text-white leading-none tracking-tight ${i === 0 ? 'text-headline-l' : 'text-headline-m'}`}>
+                      {stat.value}
+                    </div>
+                    <div className="text-mono text-white/50 mt-1">{stat.label}</div>
+                  </div>
+                  {i < HERO_STATS.length - 1 && (
+                    <div className="self-center h-10 md:h-14 w-px bg-white/25 mb-2" />
+                  )}
                 </div>
-                {i < STATS.length - 1 && (
-                  <div className="self-center h-10 md:h-14 w-px mb-2" style={{ background: 'rgba(255,255,255,0.25)' }} />
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Scroll hint — centrado abajo */}
-        <p
-          className="text-center mt-8 font-semibold tracking-[3.5px] hidden md:block"
-          style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}
-        >
+        {/* Scroll hint */}
+        <p className="text-center mt-8 text-mono text-white/50 hidden md:block">
           ↓&nbsp;&nbsp;EXPLORAR
         </p>
       </div>
@@ -131,27 +103,19 @@ function Hero() {
   );
 }
 
-// ─── Section header reutilizable ──────────────────────────────────────────────
+// ─── Section header ───────────────────────────────────────────────────────────
 
 function SectionHeader({ label, title, linkText, linkTo }) {
   return (
     <div className="flex justify-between items-end mb-10 md:mb-12">
       <div>
-        <p className="text-[12px] font-semibold tracking-[2px] mb-3" style={{ color: 'var(--outline)' }}>
-          {label}
-        </p>
-        <h2
-          className="font-bold leading-[1.05] tracking-[-0.02em] whitespace-pre-line"
-          style={{ color: 'var(--on-surf)', fontSize: 'clamp(30px, 4.5vw, 44px)' }}
-        >
-          {title}
-        </h2>
+        <p className="text-mono text-outline mb-3">{label}</p>
+        <h2 className="text-headline-l whitespace-pre-line text-on-surf">{title}</h2>
       </div>
       {linkText && (
         <Link
           to={linkTo}
-          className="text-[15px] font-semibold shrink-0 hidden sm:block hover:opacity-70 transition-opacity"
-          style={{ color: 'var(--on-surf)' }}
+          className="text-body-s font-semibold text-on-surf shrink-0 hidden sm:block hover:opacity-70 transition-opacity"
         >
           {linkText}
         </Link>
@@ -160,19 +124,19 @@ function SectionHeader({ label, title, linkText, linkTo }) {
   );
 }
 
-// ─── Ministerios ─────────────────────────────────────────────────────────────
+// ─── Ministerios (Bento Grid) ─────────────────────────────────────────────────
 
 const AREAS = [
-  { icon: 'menu_book',          label: 'Enseñanzas',   desc: 'Mensajes y series para crecer en la fe.',            to: '/blog' },
-  { icon: 'calendar_month',     label: 'Eventos',       desc: 'Cultos, conferencias y noches especiales.',          to: '/events' },
-  { icon: 'volunteer_activism', label: 'Oración',       desc: 'Envía tu petición y oramos contigo.',                to: '/prayer' },
-  { icon: 'handshake',          label: 'Voluntariado',  desc: 'Sirve con tus dones en Casa del Rey.',               to: '/volunteering' },
-  { icon: 'favorite',           label: 'Donaciones',    desc: 'Tu generosidad transforma comunidades.',             to: '/donate' },
+  { icon: 'menu_book',          label: 'Enseñanzas',   desc: 'Mensajes y series para crecer en la fe.',   to: '/blog' },
+  { icon: 'calendar_month',     label: 'Eventos',       desc: 'Cultos, conferencias y noches especiales.', to: '/events' },
+  { icon: 'volunteer_activism', label: 'Oración',       desc: 'Envía tu petición y oramos contigo.',       to: '/prayer' },
+  { icon: 'handshake',          label: 'Voluntariado',  desc: 'Sirve con tus dones en Casa del Rey.',       to: '/volunteering' },
+  { icon: 'favorite',           label: 'Donaciones',    desc: 'Tu generosidad transforma comunidades.',     to: '/donate' },
 ];
 
 function Ministerios() {
   return (
-    <section className="py-20 md:py-28" style={{ background: 'var(--surf-low)' }}>
+    <section className="py-20 md:py-28 bg-surf-low">
       <div className="max-w-[1200px] mx-auto px-6">
         <SectionHeader
           label="MINISTERIOS"
@@ -180,34 +144,34 @@ function Ministerios() {
           linkText="Ver todo →"
           linkTo="/about"
         />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Bento: featured spans 2/3 cols on desktop, full-width on tablet */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {AREAS.map(({ icon, label, desc, to }, i) => {
             const featured = i === 0;
             return (
               <Link
                 key={to}
                 to={to}
-                className="rounded-3xl p-7 flex flex-col gap-5 transition-transform duration-200 hover:-translate-y-1"
-                style={
+                className={[
+                  'rounded-3xl p-7 flex flex-col gap-5 transition-transform duration-200 hover:-translate-y-1',
                   featured
-                    ? { background: '#060D24', boxShadow: '0 12px 32px rgba(6,13,36,0.22)' }
-                    : { background: 'var(--surf-high)', border: '1px solid var(--outline-var)' }
-                }
+                    ? 'sm:col-span-2 lg:col-span-2 bg-navy shadow-elev-5'
+                    : 'bg-surf-high border border-outline-var shadow-elev-1 state-layer',
+                ].join(' ')}
               >
-                <span className="ms" style={{ fontSize: 32, color: featured ? '#FFFFFF' : '#060D24' }}>
+                <span className={`ms text-[32px] leading-none ${featured ? 'text-white' : 'text-pri'}`}>
                   {icon}
                 </span>
-                <div className="h-px w-full" style={{ background: featured ? 'rgba(255,255,255,0.14)' : 'var(--outline-var)' }} />
+                <div className={`h-px w-full ${featured ? 'bg-white/10' : 'bg-outline-var'}`} />
                 <div className="flex-1">
-                  <p className="text-[18px] font-bold mb-2" style={{ color: featured ? '#FFFFFF' : 'var(--on-surf)' }}>
+                  <p className={`text-title-m font-bold mb-2 ${featured ? 'text-white' : 'text-on-surf'}`}>
                     {label}
                   </p>
-                  <p className="text-[13px] leading-relaxed" style={{ color: featured ? 'rgba(255,255,255,0.65)' : 'var(--on-surf-var)' }}>
+                  <p className={`text-body-s leading-relaxed ${featured ? 'text-white/65' : 'text-on-surf-var'}`}>
                     {desc}
                   </p>
                 </div>
-                <span className="text-[14px] font-semibold" style={{ color: featured ? '#FFFFFF' : 'var(--on-surf)' }}>
+                <span className={`text-label-l font-bold ${featured ? 'text-white' : 'text-on-surf'}`}>
                   → Ver más
                 </span>
               </Link>
@@ -219,7 +183,7 @@ function Ministerios() {
   );
 }
 
-// ─── Anuncios públicos ────────────────────────────────────────────────────────
+// ─── Anuncios ─────────────────────────────────────────────────────────────────
 
 function Anuncios() {
   const [items, setItems]     = useState([]);
@@ -235,23 +199,21 @@ function Anuncios() {
   if (loading || !items.length) return null;
 
   return (
-    <section className="py-20 md:py-28" style={{ background: 'var(--surf)' }}>
+    <section className="py-20 md:py-28 bg-surf">
       <div className="max-w-[1200px] mx-auto px-6">
         <SectionHeader label="ANUNCIOS" title="Novedades de la iglesia" />
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {items.map(a => (
             <div
               key={a.ID}
-              className="rounded-3xl p-6 flex gap-4 items-start"
-              style={{ background: 'var(--surf-high)', border: '1px solid var(--outline-var)' }}
+              className="rounded-3xl p-6 flex gap-4 items-start bg-surf-high border border-outline-var"
             >
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'var(--pri-con)' }}>
-                <span className="ms" style={{ fontSize: 20, color: '#060D24' }}>campaign</span>
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-pri-con">
+                <span className="ms text-[20px] text-on-pri-con">campaign</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[16px] font-bold mb-1" style={{ color: 'var(--on-surf)' }}>{a.title}</p>
-                <p className="text-[13px] leading-relaxed line-clamp-3" style={{ color: 'var(--on-surf-var)' }}>{a.content}</p>
+                <p className="text-title-s font-bold mb-1 text-on-surf">{a.title}</p>
+                <p className="text-body-s leading-relaxed line-clamp-3 text-on-surf-var">{a.content}</p>
               </div>
             </div>
           ))}
@@ -261,13 +223,7 @@ function Anuncios() {
   );
 }
 
-// ─── Últimas enseñanzas ───────────────────────────────────────────────────────
-
-const ENS_GRADIENTS = [
-  'linear-gradient(160deg,#0D1B4B 0%,#060D24 100%)',
-  'linear-gradient(160deg,#1E3A6E 0%,#0D1B4B 100%)',
-  'linear-gradient(160deg,#10254E 0%,#060D24 100%)',
-];
+// ─── Últimas enseñanzas (Bento Grid) ─────────────────────────────────────────
 
 function UltimasEnsenanzas() {
   const [posts, setPosts]     = useState([]);
@@ -281,12 +237,12 @@ function UltimasEnsenanzas() {
   }, []);
 
   if (loading) return (
-    <section className="py-20 md:py-28" style={{ background: 'var(--surf-low)' }}>
+    <section className="py-20 md:py-28 bg-surf-low">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="h-8 rounded w-48 mb-10 animate-pulse" style={{ background: 'var(--surf-high)' }} />
+        <div className="h-8 rounded-xl w-48 mb-10 animate-shimmer" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {[0, 1, 2].map(i => (
-            <div key={i} className="rounded-3xl h-[420px] animate-pulse" style={{ background: 'var(--surf-high)' }} />
+            <div key={i} className={`rounded-3xl h-[380px] animate-shimmer ${i === 0 ? 'md:col-span-2' : ''}`} />
           ))}
         </div>
       </div>
@@ -296,7 +252,7 @@ function UltimasEnsenanzas() {
   if (!posts.length) return null;
 
   return (
-    <section className="py-20 md:py-28" style={{ background: 'var(--surf-low)' }}>
+    <section className="py-20 md:py-28 bg-surf-low">
       <div className="max-w-[1200px] mx-auto px-6">
         <SectionHeader
           label="ENSEÑANZAS"
@@ -304,43 +260,50 @@ function UltimasEnsenanzas() {
           linkText="Ver blog →"
           linkTo="/blog"
         />
-
+        {/* Bento: post 0 → 2 cols, post 2 → full-width horizontal */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {posts.map((post, i) => {
             const featured = i === 0;
+            const wide = posts.length >= 3 && i === 2;
             const excerpt = post.excerpt || post.content?.replace(/<[^>]+>/g, '').substring(0, 110);
+
             return (
               <Link
                 key={post.ID}
                 to={`/blog/${post.slug}`}
-                className="rounded-3xl overflow-hidden flex flex-col transition-transform duration-200 hover:-translate-y-1"
-                style={
-                  featured
-                    ? { background: '#060D24', boxShadow: '0 12px 32px rgba(6,13,36,0.22)' }
-                    : { background: 'var(--surf-high)', border: '1px solid var(--outline-var)' }
-                }
+                className={[
+                  'rounded-3xl overflow-hidden transition-transform duration-200 hover:-translate-y-1',
+                  featured && 'md:col-span-2 flex flex-col bg-navy shadow-elev-5',
+                  wide    && 'md:col-span-3 flex flex-col md:flex-row bg-surf-high border border-outline-var shadow-elev-1',
+                  !featured && !wide && 'flex flex-col bg-surf-high border border-outline-var shadow-elev-1',
+                ].filter(Boolean).join(' ')}
               >
                 {/* Media */}
                 <div
-                  className="h-48 w-full bg-cover bg-center shrink-0"
-                  style={
-                    post.cover_image
-                      ? { backgroundImage: `url('${post.cover_image}')` }
-                      : { background: ENS_GRADIENTS[i % 3] }
-                  }
-                />
+                  className={[
+                    'shrink-0',
+                    wide ? 'w-full md:w-2/5 h-48 md:h-auto' : 'w-full h-48',
+                    post.cover_image ? 'overflow-hidden' : ENS_GRAD[i % ENS_GRAD.length],
+                  ].join(' ')}
+                >
+                  {post.cover_image && (
+                    <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover" />
+                  )}
+                </div>
                 {/* Body */}
                 <div className="p-6 flex flex-col gap-2.5 flex-1">
-                  <p className="text-[11px] font-bold tracking-[1.5px]" style={{ color: featured ? 'rgba(255,255,255,0.6)' : 'var(--outline)' }}>
+                  <p className={`text-mono ${featured ? 'text-white/60' : 'text-outline'}`}>
                     {(post.category || 'ENSEÑANZA').toUpperCase()}
                   </p>
-                  <p className="text-[20px] font-bold leading-snug line-clamp-2" style={{ color: featured ? '#FFFFFF' : 'var(--on-surf)' }}>
+                  <p className={`text-title-l font-bold leading-snug line-clamp-2 ${featured ? 'text-white' : 'text-on-surf'}`}>
                     {post.title}
                   </p>
-                  <p className="text-[14px] leading-relaxed line-clamp-2" style={{ color: featured ? 'rgba(255,255,255,0.65)' : 'var(--on-surf-var)' }}>
-                    {excerpt}
-                  </p>
-                  <span className="text-[14px] font-bold mt-1" style={{ color: featured ? '#FFFFFF' : 'var(--on-surf)' }}>
+                  {excerpt && (
+                    <p className={`text-body-s leading-relaxed line-clamp-2 ${featured ? 'text-white/65' : 'text-on-surf-var'}`}>
+                      {excerpt}
+                    </p>
+                  )}
+                  <span className={`text-label-l font-bold mt-1 ${featured ? 'text-white' : 'text-on-surf'}`}>
                     Leer →
                   </span>
                 </div>
@@ -369,7 +332,7 @@ function ProximosEventos() {
   if (loading || !events.length) return null;
 
   return (
-    <section className="py-20 md:py-28" style={{ background: 'var(--surf)' }}>
+    <section className="py-20 md:py-28 bg-surf">
       <div className="max-w-[1200px] mx-auto px-6">
         <SectionHeader
           label="PRÓXIMOS EVENTOS"
@@ -377,11 +340,12 @@ function ProximosEventos() {
           linkText="Ver todos →"
           linkTo="/events"
         />
-
         <div className="flex flex-col">
           {events.map((ev, i) => {
             const d = ev.date ? new Date(ev.date + 'T12:00:00') : null;
-            const weekday = d ? d.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase() : 'EVENTO';
+            const weekday = d
+              ? d.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase()
+              : 'EVENTO';
             const details = [
               d ? d.toLocaleDateString('es-ES', { weekday: 'long' }) : null,
               ev.time,
@@ -392,48 +356,39 @@ function ProximosEventos() {
               <div key={ev.ID}>
                 <div className="flex items-center justify-between py-7 gap-4">
                   <div className="flex items-center gap-6 md:gap-8 min-w-0">
-                    {/* Date block */}
                     {d && (
-                      <div className="text-center shrink-0" style={{ width: 72 }}>
-                        <div className="font-black leading-none" style={{ color: '#060D24', fontSize: 52, letterSpacing: '-1px' }}>
+                      <div className="text-center shrink-0 w-[72px]">
+                        <div className="text-display-s font-black leading-none text-navy">
                           {d.getDate()}
                         </div>
-                        <div className="font-semibold tracking-[1.5px] mt-1" style={{ color: 'var(--on-surf-var)', fontSize: 12 }}>
+                        <div className="text-mono text-on-surf-var mt-1">
                           {d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()}
                         </div>
                       </div>
                     )}
-                    <div className="w-px h-16 shrink-0" style={{ background: 'var(--outline-var)' }} />
-                    {/* Info */}
+                    <div className="w-px h-16 shrink-0 bg-outline-var" />
                     <div className="min-w-0">
-                      <p className="text-[11px] font-semibold tracking-[1.2px] mb-1" style={{ color: 'var(--outline)' }}>
-                        {weekday}
-                      </p>
-                      <p className="font-bold tracking-[-0.3px] truncate" style={{ color: 'var(--on-surf)', fontSize: 24 }}>
+                      <p className="text-mono text-outline mb-1.5">{weekday}</p>
+                      <p className="text-headline-s font-bold tracking-tight truncate text-on-surf">
                         {ev.title}
                       </p>
-                      <p className="text-[14px] mt-1 truncate" style={{ color: 'var(--on-surf-var)' }}>
-                        {details}
-                      </p>
+                      <p className="text-body-s mt-1 truncate text-on-surf-var">{details}</p>
                     </div>
                   </div>
-                  <Link to="/events" className="text-[15px] font-semibold shrink-0 hidden sm:block hover:opacity-70 transition-opacity" style={{ color: '#060D24' }}>
+                  <Link
+                    to="/events"
+                    className="text-body-s font-semibold text-navy shrink-0 hidden sm:block hover:opacity-70 transition-opacity"
+                  >
                     Ver detalles →
                   </Link>
                 </div>
-                {i < events.length - 1 && <div className="h-px w-full" style={{ background: 'var(--outline-var)' }} />}
+                {i < events.length - 1 && <div className="h-px w-full bg-outline-var" />}
               </div>
             );
           })}
         </div>
-
-        {/* CTA */}
         <div className="flex justify-center mt-12">
-          <Link
-            to="/events"
-            className="px-8 py-3.5 rounded-full text-[17px] font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: '#060D24' }}
-          >
+          <Link to="/events" className="btn-pill bg-navy text-white font-semibold">
             Ver todos los eventos
           </Link>
         </div>
@@ -442,46 +397,43 @@ function ProximosEventos() {
   );
 }
 
-// ─── CTA Oración ─────────────────────────────────────────────────────────────
+// ─── CTA Oración — sin violeta, botón celeste ─────────────────────────────────
 
 function OracionCTA() {
   return (
-    <section className="relative overflow-hidden" style={{ background: '#060D24' }}>
-      {/* Foto atmosférica derecha */}
-      <div
-        className="absolute inset-y-0 right-0 w-1/2 hidden md:block bg-cover bg-center"
-        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1200&q=80')` }}
-      />
-      {/* Fade hacia navy */}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'linear-gradient(90deg, #060D24 42%, rgba(6,13,36,0.55) 68%, rgba(6,13,36,0.85) 100%)' }}
-      />
+    <section className="relative overflow-hidden bg-navy">
+      {/* Atmospheric photo — right half */}
+      <div className="absolute inset-y-0 right-0 w-1/2 hidden md:block overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1200&q=80"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      {/* Gradient fade — defined in index.css to avoid inline style */}
+      <div className="absolute inset-0 oracion-overlay" />
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-24 md:py-32">
         <div className="max-w-[600px]">
-          <p className="font-serif italic mb-6" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 17 }}>
+          <p className="font-serif italic text-body-l text-white/50 mb-6">
             «No se inquieten por nada.»
           </p>
-          <h2 className="font-bold leading-[1.05] tracking-[-0.02em] mb-5 whitespace-pre-line" style={{ color: '#FFFFFF', fontSize: 'clamp(34px, 5vw, 48px)' }}>
+          <h2 className="text-display-s text-white mb-5 whitespace-pre-line">
             {'¿Tienes una\npetición de oración?'}
           </h2>
-          <p className="mb-4 max-w-[520px]" style={{ color: 'rgba(255,255,255,0.6)', fontSize: 17, lineHeight: 1.65 }}>
-            No tienes que enfrentarlo solo. Nuestro equipo ora cada semana por las peticiones de nuestra comunidad. Comparte lo que hay en tu corazón.
+          <p className="text-body-l text-white/60 mb-4 max-w-[520px] leading-[1.65]">
+            No tienes que enfrentarlo solo. Nuestro equipo ora cada semana por las peticiones de nuestra comunidad.
           </p>
-          <p className="font-mono mb-8" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '2px' }}>
-            FILIPENSES 4:6
-          </p>
-
+          <p className="text-mono text-white/40 mb-8">FILIPENSES 4:6</p>
           <div className="flex items-center gap-5">
-            <Link
-              to="/prayer"
-              className="px-8 py-3.5 rounded-full text-[17px] font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: '#7C3AED' }}
-            >
+            <Link to="/prayer" className="btn-pill bg-celeste text-white font-semibold">
               Enviar petición →
             </Link>
-            <Link to="/about" className="text-[15px] font-medium hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <Link
+              to="/about"
+              className="text-body-s font-medium text-white/50 hover:text-white transition-colors"
+            >
               Saber más
             </Link>
           </div>
@@ -496,75 +448,63 @@ function OracionCTA() {
 const DON_AMOUNTS = ['Q50', 'Q100', 'Q250'];
 
 function Donaciones() {
+  const [active, setActive] = useState('Q100');
+
   return (
-    <section className="py-20 md:py-28" style={{ background: 'var(--surf)' }}>
+    <section className="py-20 md:py-28 bg-surf">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div
-          className="rounded-[28px] p-10 md:p-16 flex flex-col lg:flex-row gap-12 lg:items-center"
-          style={{ background: '#060D24' }}
-        >
-          {/* Izquierda */}
+        <div className="rounded-2xl p-10 md:p-16 flex flex-col lg:flex-row gap-12 lg:items-center bg-navy">
+
+          {/* Left */}
           <div className="flex-1">
-            <p className="font-mono mb-5" style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, letterSpacing: '2px' }}>
-              SIEMBRA Y OFRENDA
-            </p>
-            <h2 className="font-extrabold leading-[1.0] tracking-[-0.02em] mb-5 whitespace-pre-line" style={{ color: '#FFFFFF', fontSize: 'clamp(34px, 5vw, 52px)' }}>
+            <p className="text-mono text-white/30 mb-5">SIEMBRA Y OFRENDA</p>
+            <h2 className="text-display-s text-white mb-5 whitespace-pre-line">
               {'Tu generosidad\ntransforma vidas.'}
             </h2>
-            <p className="max-w-[460px] mb-9" style={{ color: 'rgba(255,255,255,0.6)', fontSize: 17, lineHeight: 1.7 }}>
+            <p className="text-body-l text-white/60 max-w-[460px] mb-9 leading-[1.7]">
               Cada semilla impacta familias, financia misiones y sostiene el ministerio de Casa del Rey en Huehuetenango y más allá.
             </p>
-
-            {/* Stats */}
             <div className="flex gap-12 md:gap-16">
               {[
                 { v: 'Q48,000', l: 'recaudados este año' },
                 { v: '1,284',   l: 'donadores activos' },
               ].map(s => (
                 <div key={s.l}>
-                  <div className="font-extrabold leading-none" style={{ color: '#FFFFFF', fontSize: 'clamp(40px, 5vw, 64px)', letterSpacing: '-2px' }}>
+                  <div className="text-headline-l font-extrabold text-white leading-none tracking-tight">
                     {s.v}
                   </div>
-                  <div className="font-medium mt-2" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
-                    {s.l}
-                  </div>
+                  <div className="text-body-s text-white/50 mt-2">{s.l}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Derecha — montos + donar */}
-          <div className="flex flex-col gap-4 w-full lg:w-auto lg:min-w-[320px] justify-center">
-            <div className="flex gap-2.5">
-              {DON_AMOUNTS.map((a, i) => {
-                const active = i === 1;
-                return (
-                  <Link
-                    key={a}
-                    to="/donate"
-                    className="flex-1 text-center py-3 rounded-full text-[16px] font-medium transition-colors"
-                    style={
-                      active
-                        ? { background: '#FFFFFF', color: '#060D24', fontWeight: 700 }
-                        : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.2)' }
-                    }
-                  >
-                    {a}
-                  </Link>
-                );
-              })}
+          {/* Right — amounts + donate */}
+          <div className="flex flex-col gap-4 w-full lg:w-auto lg:min-w-[320px]">
+            <p className="text-mono text-white/40">ELIGE UN MONTO</p>
+            <div className="flex gap-3">
+              {DON_AMOUNTS.map(amt => (
+                <button
+                  key={amt}
+                  onClick={() => setActive(amt)}
+                  className={[
+                    'flex-1 h-14 rounded-xl font-bold transition-all duration-150 text-title-s',
+                    active === amt
+                      ? 'bg-white text-navy shadow-elev-3'
+                      : 'backdrop-blur-apple backdrop-saturate-apple bg-white/10 border border-white/10 text-white hover:bg-white/15',
+                  ].join(' ')}
+                >
+                  {amt}
+                </button>
+              ))}
             </div>
             <Link
               to="/donate"
-              className="flex items-center justify-center gap-2 py-4 rounded-full text-[17px] font-bold transition-opacity hover:opacity-90"
-              style={{ background: '#FFFFFF', color: '#060D24' }}
+              className="btn-pill bg-celeste text-white font-semibold mt-2"
             >
-              <span className="ms" style={{ fontSize: 18 }}>favorite</span>
-              Donar ahora
+              Donar {active}
             </Link>
-            <p className="text-center" style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
-              Pago seguro · 100% al ministerio
-            </p>
+            <p className="text-mono text-white/30 text-center">PAGO SEGURO · BANRURAL / TIGO MONEY</p>
           </div>
         </div>
       </div>
