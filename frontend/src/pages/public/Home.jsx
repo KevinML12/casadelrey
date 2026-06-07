@@ -7,117 +7,128 @@ import apiClient from '../../lib/apiClient';
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 
+const STATS = [
+  { value: '200+', label: 'FAMILIAS' },
+  { value: '20+',  label: 'CÉLULAS ACTIVAS' },
+  { value: '10',   label: 'AÑOS SIRVIENDO' },
+];
+
 function Hero() {
   return (
-    <section className="hero-surf relative min-h-[92vh] flex items-center overflow-hidden">
-      <div className="hero-grid" />
+    <section className="relative min-h-screen flex flex-col overflow-hidden">
 
-      {/* Glow izquierdo */}
+      {/* Foto de fondo */}
       <div
-        className="absolute pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
-          left: -200, bottom: -200,
-          width: 700, height: 700,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(21,101,192,.2) 0%, transparent 65%)',
+          backgroundImage: `url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1920&q=80')`,
         }}
       />
+      {/* Overlay oscuro */}
+      <div className="absolute inset-0" style={{ background: '#060D24CC' }} />
 
-      {/* Logo decorativo fondo */}
-      <img
-        src="/logo.png"
-        aria-hidden="true"
-        className="absolute pointer-events-none select-none"
-        style={{
-          right: -40, top: '50%',
-          transform: 'translateY(-50%)',
-          width: 'clamp(280px, 38vw, 500px)',
-          opacity: .06,
-          filter: 'brightness(0) invert(1)',
-        }}
-      />
+      {/* Contenido */}
+      <div className="relative z-10 flex-1 flex flex-col justify-between max-w-[1440px] w-full mx-auto px-6 md:px-24 pt-8 pb-10">
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-20 w-full">
-
-        {/* Chip de ubicación */}
-        <Chip
-          color="default"
-          icon="location_on"
-          className="mb-6 border-white/10 text-white/60"
-          style={{ background: 'rgba(255,255,255,.06)' }}
-        >
-          Huehuetenango, Guatemala
-        </Chip>
-
-        {/* Display Large */}
-        <h1 className="text-display-l text-white mb-2">
-          Casa<br />
-          <span style={{ color: '#A4C8FF' }}>del Rey</span>
-        </h1>
-
-        <p className="text-body-l italic mb-4" style={{ color: 'rgba(255,255,255,.45)' }}>
-          "Luz para las Naciones"
-        </p>
-
-        <p className="text-body-l max-w-[460px] mb-10" style={{ color: 'rgba(255,255,255,.55)', lineHeight: 1.75 }}>
-          Iglesia cristiana de restauración familiar. Una comunidad que camina junta en la fe, haciendo discípulos a las naciones.
-        </p>
-
-        {/* Buttons */}
-        <div className="flex flex-wrap gap-3 mb-12">
-          <Button
-            as="link" to="/register" size="lg"
-            className="font-bold"
-            style={{ background: '#A4C8FF', color: '#003063' }}
-          >
-            <span className="ms" style={{ fontSize: 20 }}>group_add</span>
-            Únete a la comunidad
-          </Button>
-          <Button
-            as="link" to="/events" size="lg" variant="outlined"
-            style={{ background: 'rgba(255,255,255,.06)', color: '#fff', borderColor: 'rgba(255,255,255,.2)' }}
-          >
-            <span className="ms" style={{ fontSize: 20 }}>calendar_month</span>
-            Próximos eventos
-          </Button>
+        {/* Badge + scripture — top bar */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4AD0CE]" />
+            <span className="text-[#4AD0CE] text-[12px] font-semibold tracking-[1.8px] hidden sm:block">
+              IGLESIA CRISTIANA · HUEHUETENANGO · DESDE 2016
+            </span>
+            <span className="text-[#4AD0CE] text-[11px] font-semibold tracking-[1.5px] sm:hidden">
+              IGLESIA CRISTIANA · HUEHUETENANGO
+            </span>
+          </div>
+          <span className="text-[#4AD0CE] text-[11px] font-medium tracking-[2.2px] font-mono hidden sm:block">
+            MATEO 5:14
+          </span>
         </div>
 
-        {/* Horarios */}
-        <div
-          className="flex flex-wrap gap-5 pt-6 mb-10 border-t"
-          style={{ borderColor: 'rgba(255,255,255,.08)' }}
-        >
-          {[
-            { icon: 'schedule', label: 'Domingos 10:00 AM' },
-            { icon: 'schedule', label: 'Miércoles 7:00 PM' },
-            { icon: 'location_on', label: '7a. calle 12-66 zona 4, Huehuetenango' },
-          ].map(({ icon, label }) => (
-            <div key={label} className="flex items-center gap-2 text-body-s" style={{ color: 'rgba(255,255,255,.45)' }}>
-              <span className="ms" style={{ fontSize: 18, color: '#A4C8FF' }}>{icon}</span>
-              {label}
-            </div>
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div className="flex flex-wrap gap-2.5">
-          {[
-            { value: '200+', label: 'Familias' },
-            { value: '20+',  label: 'Células activas' },
-            { value: '90+',  label: 'Voluntarios' },
-            { value: '10 años', label: 'Sirviendo' },
-          ].map(({ value, label }) => (
-            <div
-              key={label}
-              className="rounded-xl px-5 py-4"
-              style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)' }}
+        {/* Título principal */}
+        <div className="mt-auto pt-16 md:pt-0">
+          <h1
+            className="font-black leading-[0.9] tracking-[-0.05em] mb-6"
+            style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}
+          >
+            <span className="block text-white">LUZ PARA</span>
+            {/* Segunda línea: texto outlined (sin fill) */}
+            <span
+              className="block"
+              style={{
+                color: 'transparent',
+                WebkitTextStroke: '2px rgba(255,255,255,0.85)',
+                paddingLeft: 'clamp(16px, 2vw, 24px)',
+              }}
             >
-              <div className="text-display-s text-white" style={{ fontSize: '1.875rem' }}>{value}</div>
-              <div className="text-label-m mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>{label}</div>
-            </div>
-          ))}
+              LAS NACIONES
+            </span>
+          </h1>
+
+          <p
+            className="mb-2 font-normal"
+            style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'clamp(16px, 2vw, 24px)', maxWidth: 480 }}
+          >
+            Empieza tu propósito aquí.
+          </p>
+          <p
+            className="mb-8 font-medium tracking-[1.5px] uppercase"
+            style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(11px, 1.2vw, 14px)' }}
+          >
+            Domingos · 10AM · Zona 1, Huehuetenango
+          </p>
+
+          {/* Botones */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-12 sm:mb-16">
+            <Link
+              to="/events"
+              className="px-7 py-3.5 rounded-full text-white font-normal text-[17px] transition-opacity hover:opacity-90 text-center"
+              style={{ background: '#7C3AED' }}
+            >
+              Ver próximos eventos
+            </Link>
+            <Link
+              to="/about"
+              className="px-2 py-3.5 text-white font-normal text-[17px] hover:text-white/70 transition-colors flex items-center gap-1.5"
+            >
+              Conócenos <span>→</span>
+            </Link>
+          </div>
+
+          {/* Stats con divisores turquesa */}
+          <div className="flex items-end gap-10 md:gap-12">
+            {STATS.map((stat, i) => (
+              <div key={stat.label} className="flex items-end gap-10 md:gap-12">
+                <div className="flex flex-col gap-1">
+                  <span
+                    className="font-black text-white leading-[0.9]"
+                    style={{ fontSize: i === 0 ? 'clamp(48px, 6vw, 96px)' : 'clamp(28px, 4vw, 48px)', fontWeight: i === 0 ? 900 : 800 }}
+                  >
+                    {stat.value}
+                  </span>
+                  <span
+                    className="font-medium tracking-[2px]"
+                    style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}
+                  >
+                    {stat.label}
+                  </span>
+                </div>
+                {i < STATS.length - 1 && (
+                  <div className="self-center h-10 md:h-14 w-px mb-2" style={{ background: 'rgba(74,208,206,0.4)' }} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
+        {/* Scroll hint — centrado abajo */}
+        <p
+          className="text-center mt-8 font-semibold tracking-[3.5px] hidden md:block"
+          style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}
+        >
+          ↓&nbsp;&nbsp;EXPLORAR
+        </p>
       </div>
     </section>
   );
