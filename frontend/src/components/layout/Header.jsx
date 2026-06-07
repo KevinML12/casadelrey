@@ -52,9 +52,10 @@ export default function Header() {
   const navBg = scrolled
     ? 'bg-[var(--surf-high)] border-[var(--outline-var)] shadow-sm'
     : 'bg-[var(--surf-high)] border-transparent';
-  const linkColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)]';
-  const linkActiveCl = 'text-[var(--on-surf)] font-semibold';
-  const iconColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)] hover:bg-[var(--surf-low)]';
+  // Links: navy profundo como acento de marca
+  const linkColor  = 'text-[#5B6478] hover:text-[#060D24]';
+  const linkActiveCl = 'text-[#060D24] font-semibold bg-[var(--pri-con)]';
+  const iconColor  = 'text-[#5B6478] hover:text-[#060D24] hover:bg-[var(--surf-low)]';
 
   return (
     <header className={`sticky top-0 z-40 border-b transition-all duration-300 ${navBg}`}>
@@ -102,7 +103,7 @@ export default function Header() {
               {(isAdmin || user?.role === 'leader') && (
                 <Link
                   to={isAdmin ? '/admin' : '/leader'}
-                  className="px-4 py-1.5 rounded-full text-[13px] font-medium border border-[var(--outline-var)] text-[var(--on-surf-var)] hover:bg-[var(--surf-low)] transition-colors"
+                  className="px-4 py-1.5 rounded-full text-[13px] font-medium border border-[var(--outline-var)] text-[#060D24] hover:bg-[var(--surf-low)] transition-colors"
                 >
                   {isAdmin ? 'Admin' : 'Líderes'}
                 </Link>
@@ -147,7 +148,7 @@ export default function Header() {
           ) : (
             <div className="flex items-center gap-2 ml-1">
               <Link to="/login"
-                className="px-4 py-1.5 rounded-full text-[13px] font-medium text-[var(--on-surf-var)] hover:bg-[var(--surf-low)] transition-colors">
+                className="px-4 py-1.5 rounded-full text-[13px] font-medium text-[#060D24] hover:bg-[var(--surf-low)] transition-colors">
                 Ingresar
               </Link>
               <Link to="/donate"

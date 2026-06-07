@@ -166,7 +166,7 @@ export default function VolunteerDashboard() {
 
       {/* Bienvenida */}
       <div className="rounded-2xl overflow-hidden border border-outline-var">
-        <div className="px-6 py-5" style={{ background: '#0D1B4B' }}>
+        <div className="px-6 py-5" style={{ background: '#060D24' }}>
           <p className="text-label-m mb-1" style={{ color: 'rgba(255,255,255,.5)' }}>Bienvenido,</p>
           <h1 className="text-headline-s text-white font-black leading-tight">{user?.name}</h1>
           {dept && (

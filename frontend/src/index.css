@@ -16,17 +16,17 @@
   color-scheme: light;
 
   /* ── MARCA ────────────────────────────────────────────────── */
-  --pri:         #0D1B4B;   /* Navy marca — botón primario, sidebar */
-  --pri-press:   #091237;   /* Navy press (active) */
+  --pri:         #060D24;   /* Navy profundo (TINTA) — botón primario, sidebar */
+  --pri-press:   #0D1B4B;   /* Navy más claro en hover/press */
   --on-pri:      #FFFFFF;
-  --pri-con:     #E0E7FF;   /* Navy tinte — backgrounds suaves */
-  --on-pri-con:  #050505;
+  --pri-con:     #E8F0FF;   /* Navy tinte suave — backgrounds */
+  --on-pri-con:  #060D24;
 
-  /* Acento celeste/turquesa */
-  --sec:         #4AD0CE;
-  --on-sec:      #050505;
-  --sec-con:     #D6F5F4;
-  --on-sec-con:  #0F4D4C;
+  /* Acento secundario — navy (sin turquesa) */
+  --sec:         #0D1B4B;
+  --on-sec:      #FFFFFF;
+  --sec-con:     #E8F0FF;
+  --on-sec-con:  #0D1B4B;
 
   /* Violeta opcional — solo eventos juveniles */
   --ter:         #7C3AED;
@@ -62,7 +62,7 @@
   /* ── INVERSE (hero / footer siempre dark) ─────────────────── */
   --inv-surf:    #060D24;
   --inv-on-surf: #FFFFFF;
-  --inv-pri:     #4AD0CE;
+  --inv-pri:     #4A90D9;   /* Celeste CDR — acento sobre superficies oscuras */
 
   /* ── RADIOS ───────────────────────────────────────────────── */
   --r-xs:   4px;
@@ -85,10 +85,10 @@
   color-scheme: dark;
 
   /* ── MARCA en dark ───────────────────────────────────────── */
-  --pri:         #4AD0CE;   /* Turquesa como primario en dark */
-  --pri-press:   #2BBAB7;
-  --on-pri:      #050505;
-  --pri-con:     rgba(74, 208, 206, 0.15);
+  --pri:         #4A90D9;   /* Celeste CDR como primario en dark */
+  --pri-press:   #3A7BC0;
+  --on-pri:      #FFFFFF;
+  --pri-con:     rgba(74, 144, 217, 0.15);
   --on-pri-con:  #FFFFFF;
 
   --sec:         #7C3AED;
@@ -96,9 +96,9 @@
   --sec-con:     rgba(124, 58, 237, 0.15);
   --on-sec-con:  #FFFFFF;
 
-  --ter:         #4AD0CE;
-  --on-ter:      #050505;
-  --ter-con:     rgba(74, 208, 206, 0.15);
+  --ter:         #7C3AED;
+  --on-ter:      #FFFFFF;
+  --ter-con:     rgba(124, 58, 237, 0.15);
   --on-ter-con:  #FFFFFF;
 
   /* ── NEUTRALES dark ──────────────────────────────────────── */
@@ -153,7 +153,7 @@
   }
 
   ::selection {
-    background: rgba(74, 208, 206, .25);
+    background: rgba(13, 27, 75, .18);
   }
 
   a { text-decoration: none; color: inherit; }
@@ -295,7 +295,7 @@
   .nav-sticky-dark {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(13, 27, 75, 0.72);
+    background: rgba(6, 13, 36, 0.85);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 

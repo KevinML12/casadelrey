@@ -57,11 +57,11 @@ export default {
         'inv-pri':     'var(--inv-pri)',
 
         // Brand estático (independiente de tema)
-        'navy':       '#0D1B4B',
+        'navy':       '#060D24',   // navy profundo = marca principal
         'navy-deep':  '#060D24',
-        'navy-press': '#091237',
-        'celeste':    '#4AD0CE',
-        'turquoise':  '#4AD0CE',
+        'navy-mid':   '#0D1B4B',
+        'navy-press': '#0D1B4B',
+        'celeste':    '#4A90D9',   // azul CDR (sin turquesa)
         'violet':     '#7C3AED',
         'cream':      '#FAFAF8',
       },

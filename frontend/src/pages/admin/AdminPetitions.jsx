@@ -57,16 +57,16 @@ function printWeeklyPetitions(data) {
       body { font-family: Georgia, serif; color: #0a0a0a; background: white; }
       .page { page-break-after: always; min-height: 100vh; padding: 48px; display: flex; flex-direction: column; gap: 32px; }
       .page:last-child { page-break-after: auto; }
-      .header { border-bottom: 2px solid #0D1B4B; padding-bottom: 16px; }
-      .header h1 { font-size: 24px; color: #0D1B4B; font-weight: 900; letter-spacing: -0.5px; }
+      .header { border-bottom: 2px solid #060D24; padding-bottom: 16px; }
+      .header h1 { font-size: 24px; color: #060D24; font-weight: 900; letter-spacing: -0.5px; }
       .header .sub { font-size: 13px; color: #555; margin-top: 4px; }
       .header .num { font-size: 12px; color: #999; margin-top: 2px; }
       .body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
       .field { display: flex; gap: 8px; align-items: baseline; }
-      .lbl { font-size: 12px; font-weight: 700; color: #0D1B4B; text-transform: uppercase; letter-spacing: 0.05em; width: 90px; flex-shrink: 0; }
+      .lbl { font-size: 12px; font-weight: 700; color: #060D24; text-transform: uppercase; letter-spacing: 0.05em; width: 90px; flex-shrink: 0; }
       .val { font-size: 15px; color: #0a0a0a; }
-      .msg-label { font-size: 12px; font-weight: 700; color: #0D1B4B; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px; }
-      .msg { font-size: 16px; line-height: 1.7; color: #0a0a0a; background: #f4f6fb; border-left: 3px solid #0D1B4B; padding: 16px 20px; border-radius: 4px; margin-top: 8px; white-space: pre-wrap; }
+      .msg-label { font-size: 12px; font-weight: 700; color: #060D24; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px; }
+      .msg { font-size: 16px; line-height: 1.7; color: #0a0a0a; background: #f4f6fb; border-left: 3px solid #060D24; padding: 16px 20px; border-radius: 4px; margin-top: 8px; white-space: pre-wrap; }
       .date { font-size: 12px; color: #999; margin-top: auto; padding-top: 24px; }
       @media print { .page { padding: 32px; } }
     </style>

@@ -33,15 +33,15 @@ function Hero() {
         {/* Badge + scripture — top bar */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4AD0CE]" />
-            <span className="text-[#4AD0CE] text-[12px] font-semibold tracking-[1.8px] hidden sm:block">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#7FA8D9]" />
+            <span className="text-[#7FA8D9] text-[12px] font-semibold tracking-[1.8px] hidden sm:block">
               IGLESIA CRISTIANA · HUEHUETENANGO · DESDE 2016
             </span>
-            <span className="text-[#4AD0CE] text-[11px] font-semibold tracking-[1.5px] sm:hidden">
+            <span className="text-[#7FA8D9] text-[11px] font-semibold tracking-[1.5px] sm:hidden">
               IGLESIA CRISTIANA · HUEHUETENANGO
             </span>
           </div>
-          <span className="text-[#4AD0CE] text-[11px] font-medium tracking-[2.2px] font-mono hidden sm:block">
+          <span className="text-[#7FA8D9] text-[11px] font-medium tracking-[2.2px] font-mono hidden sm:block">
             MATEO 5:14
           </span>
         </div>
@@ -83,8 +83,8 @@ function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 mb-12 sm:mb-16">
             <Link
               to="/events"
-              className="px-7 py-3.5 rounded-full text-white font-normal text-[17px] transition-opacity hover:opacity-90 text-center"
-              style={{ background: '#7C3AED' }}
+              className="px-7 py-3.5 rounded-full font-semibold text-[17px] transition-opacity hover:opacity-90 text-center"
+              style={{ background: '#FFFFFF', color: '#060D24' }}
             >
               Ver próximos eventos
             </Link>
@@ -115,7 +115,7 @@ function Hero() {
                   </span>
                 </div>
                 {i < STATS.length - 1 && (
-                  <div className="self-center h-10 md:h-14 w-px mb-2" style={{ background: 'rgba(74,208,206,0.4)' }} />
+                  <div className="self-center h-10 md:h-14 w-px mb-2" style={{ background: 'rgba(255,255,255,0.25)' }} />
                 )}
               </div>
             ))}
