@@ -17,10 +17,17 @@ export default function Header() {
   const location  = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState(
     () => document.documentElement.dataset.theme || 'light'
   );
   const dropRef = useRef(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -40,7 +47,11 @@ export default function Header() {
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-  const navBg      = 'bg-[var(--surf-high)]/80 backdrop-blur-xl border-[var(--outline-var)] shadow-sm';
+  // Sin scroll → opaco (no sangra el contenido oscuro del hero a través del blur)
+  // Con scroll → glass con blur (ya hay contenido claro debajo)
+  const navBg = scrolled
+    ? 'bg-[var(--surf-high)]/80 backdrop-blur-xl border-[var(--outline-var)] shadow-sm'
+    : 'bg-[var(--surf-high)] border-[var(--outline-var)]';
   const linkColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)]';
   const linkActiveCl = 'text-[var(--on-surf)] font-semibold';
   const iconColor  = 'text-[var(--on-surf-var)] hover:text-[var(--on-surf)] hover:bg-[var(--surf-low)]';
