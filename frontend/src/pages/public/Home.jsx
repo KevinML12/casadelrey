@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../../lib/apiClient';
 
-// Gradient class map — static strings so Tailwind JIT keeps them
 const ENS_GRAD = ['ens-grad-0', 'ens-grad-1', 'ens-grad-2'];
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -16,19 +15,19 @@ const HERO_STATS = [
 function Hero() {
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Background photo — avoids inline backgroundImage */}
+      {/* Full-bleed photo */}
       <img
         src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1920&q=80"
         alt=""
         aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover"
       />
-      {/* Navy overlay */}
-      <div className="absolute inset-0 bg-navy/80" />
+      {/* Radial vignette: edges dark, center clear */}
+      <div className="absolute inset-0 hero-vignette" />
       {/* Dot-grid texture */}
       <div className="hero-grid" />
 
-      <div className="relative z-10 flex-1 flex flex-col justify-between max-w-[1440px] w-full mx-auto px-6 md:px-24 pt-8 pb-10">
+      <div className="relative z-10 flex-1 flex flex-col justify-between max-w-[1440px] w-full mx-auto px-6 md:px-24 pt-8 pb-0">
 
         {/* Badge row — animate-hero-1 */}
         <div className="flex items-center justify-between animate-hero-1">
@@ -46,23 +45,19 @@ function Hero() {
 
         {/* Main content */}
         <div className="mt-auto pt-16 md:pt-0">
-
-          {/* Title — animate-hero-2 */}
-          <h1 className="mb-6 animate-hero-2">
+          {/* Title: solid, enorme — sin outline — animate-hero-2 */}
+          <h1 className="mb-4 animate-hero-2">
             <span className="block text-display-l text-white">LUZ PARA</span>
-            <span className="block text-display-l text-outlined pl-4 md:pl-6">LAS NACIONES</span>
+            <span className="block text-display-l text-white">LAS NACIONES</span>
           </h1>
 
           {/* Subtitle — animate-hero-3 */}
-          <div className="animate-hero-3">
-            <p className="text-body-l text-white/85 mb-2 max-w-[480px]">Empieza tu propósito aquí.</p>
-            <p className="text-mono text-white/60 mb-8 uppercase">
-              Domingos · 10AM · Zona 1, Huehuetenango
-            </p>
+          <div className="animate-hero-3 mb-8">
+            <p className="text-body-l text-white/75 max-w-[480px]">Empieza tu propósito aquí.</p>
           </div>
 
           {/* CTAs — animate-hero-4 */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-12 sm:mb-16 animate-hero-4">
+          <div className="flex flex-col sm:flex-row gap-4 animate-hero-4">
             <Link to="/events" className="btn-pill bg-white text-navy font-semibold">
               Ver próximos eventos
             </Link>
@@ -73,31 +68,30 @@ function Hero() {
               Conócenos <span>→</span>
             </Link>
           </div>
+        </div>
 
-          {/* Stats glass container — animate-hero-5 */}
-          <div className="animate-hero-5 inline-flex">
-            <div className="backdrop-blur-apple backdrop-saturate-apple bg-navy/50 border border-white/10 rounded-xl px-6 py-5 flex items-end gap-10 md:gap-12">
-              {HERO_STATS.map((stat, i) => (
-                <div key={stat.label} className="flex items-end gap-10 md:gap-12">
-                  <div>
-                    <div className={`font-black text-white leading-none tracking-tight ${i === 0 ? 'text-headline-l' : 'text-headline-m'}`}>
-                      {stat.value}
-                    </div>
-                    <div className="text-mono text-white/50 mt-1">{stat.label}</div>
+        {/* Stats glass panel pinned at bottom — animate-hero-5 */}
+        <div className="animate-hero-5 mt-10">
+          <div className="backdrop-blur-3xl bg-black/30 border-t border-white/10 py-6 flex items-center gap-10 md:gap-14">
+            {HERO_STATS.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-10 md:gap-14">
+                <div>
+                  <div className={`font-black text-white leading-none tracking-tight ${i === 0 ? 'text-headline-l' : 'text-headline-m'}`}>
+                    {stat.value}
                   </div>
-                  {i < HERO_STATS.length - 1 && (
-                    <div className="self-center h-10 md:h-14 w-px bg-white/25 mb-2" />
-                  )}
+                  <div className="text-mono text-white/50 mt-1">{stat.label}</div>
                 </div>
-              ))}
-            </div>
+                {i < HERO_STATS.length - 1 && (
+                  <div className="h-10 w-px bg-white/20" />
+                )}
+              </div>
+            ))}
+            <span className="ml-auto text-mono text-white/35 hidden md:block">
+              ↓&nbsp;&nbsp;EXPLORAR
+            </span>
           </div>
         </div>
 
-        {/* Scroll hint */}
-        <p className="text-center mt-8 text-mono text-white/50 hidden md:block">
-          ↓&nbsp;&nbsp;EXPLORAR
-        </p>
       </div>
     </section>
   );
@@ -124,7 +118,7 @@ function SectionHeader({ label, title, linkText, linkTo }) {
   );
 }
 
-// ─── Ministerios (Bento Grid) ─────────────────────────────────────────────────
+// ─── Ministerios — mesh bg + glass cards ─────────────────────────────────────
 
 const AREAS = [
   { icon: 'menu_book',          label: 'Enseñanzas',   desc: 'Mensajes y series para crecer en la fe.',   to: '/blog' },
@@ -136,7 +130,7 @@ const AREAS = [
 
 function Ministerios() {
   return (
-    <section className="py-20 md:py-28 bg-surf-low">
+    <section className="py-20 md:py-28 min-mesh">
       <div className="max-w-[1200px] mx-auto px-6">
         <SectionHeader
           label="MINISTERIOS"
@@ -144,7 +138,6 @@ function Ministerios() {
           linkText="Ver todo →"
           linkTo="/about"
         />
-        {/* Bento: featured spans 2/3 cols on desktop, full-width on tablet */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {AREAS.map(({ icon, label, desc, to }, i) => {
             const featured = i === 0;
@@ -153,16 +146,16 @@ function Ministerios() {
                 key={to}
                 to={to}
                 className={[
-                  'rounded-3xl p-7 flex flex-col gap-5 transition-transform duration-200 hover:-translate-y-1',
+                  'rounded-3xl p-7 flex flex-col gap-5 transition-transform duration-200 hover:-translate-y-1 backdrop-blur-2xl',
                   featured
-                    ? 'sm:col-span-2 lg:col-span-2 bg-navy shadow-elev-5'
-                    : 'bg-surf-high border border-outline-var shadow-elev-1 state-layer',
+                    ? 'sm:col-span-2 lg:col-span-2 bg-navy/90 border border-white/15 shadow-elev-5'
+                    : 'bg-white/60 border border-white/50 shadow-elev-2',
                 ].join(' ')}
               >
                 <span className={`ms text-[32px] leading-none ${featured ? 'text-white' : 'text-pri'}`}>
                   {icon}
                 </span>
-                <div className={`h-px w-full ${featured ? 'bg-white/10' : 'bg-outline-var'}`} />
+                <div className={`h-px w-full ${featured ? 'bg-white/10' : 'bg-outline-var/60'}`} />
                 <div className="flex-1">
                   <p className={`text-title-m font-bold mb-2 ${featured ? 'text-white' : 'text-on-surf'}`}>
                     {label}
@@ -223,7 +216,7 @@ function Anuncios() {
   );
 }
 
-// ─── Últimas enseñanzas (Bento Grid) ─────────────────────────────────────────
+// ─── Últimas enseñanzas — true asymmetric bento 2cols×2rows ──────────────────
 
 function UltimasEnsenanzas() {
   const [posts, setPosts]     = useState([]);
@@ -241,9 +234,9 @@ function UltimasEnsenanzas() {
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="h-8 rounded-xl w-48 mb-10 animate-shimmer" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {[0, 1, 2].map(i => (
-            <div key={i} className={`rounded-3xl h-[380px] animate-shimmer ${i === 0 ? 'md:col-span-2' : ''}`} />
-          ))}
+          <div className="rounded-3xl animate-shimmer min-h-[400px] md:col-span-2 md:row-span-2" />
+          <div className="rounded-3xl animate-shimmer min-h-[190px]" />
+          <div className="rounded-3xl animate-shimmer min-h-[190px]" />
         </div>
       </div>
     </section>
@@ -260,52 +253,64 @@ function UltimasEnsenanzas() {
           linkText="Ver blog →"
           linkTo="/blog"
         />
-        {/* Bento: post 0 → 2 cols, post 2 → full-width horizontal */}
+        {/* Asymmetric bento: featured = 2cols × 2rows */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {posts.map((post, i) => {
             const featured = i === 0;
-            const wide = posts.length >= 3 && i === 2;
-            const excerpt = post.excerpt || post.content?.replace(/<[^>]+>/g, '').substring(0, 110);
+            const excerpt = post.excerpt || post.content?.replace(/<[^>]+>/g, '').substring(0, 120);
+
+            if (featured) {
+              return (
+                <Link
+                  key={post.ID}
+                  to={`/blog/${post.slug}`}
+                  className="relative rounded-3xl overflow-hidden transition-transform duration-200 hover:-translate-y-1 min-h-[360px] md:col-span-2 md:row-span-2"
+                >
+                  {/* Full-bleed background */}
+                  {post.cover_image
+                    ? <img src={post.cover_image} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
+                    : <div className={`absolute inset-0 ${ENS_GRAD[0]}`} />
+                  }
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy/95 via-navy/50 to-transparent" />
+                  {/* Glass pill at bottom */}
+                  <div className="absolute bottom-0 inset-x-0 p-5">
+                    <div className="backdrop-blur-xl bg-black/40 border border-white/15 rounded-2xl p-5">
+                      <p className="text-mono text-white/60 mb-2">
+                        {(post.category || 'ENSEÑANZA').toUpperCase()}
+                      </p>
+                      <p className="text-title-l font-bold text-white leading-snug line-clamp-2 mb-2">
+                        {post.title}
+                      </p>
+                      {excerpt && (
+                        <p className="text-body-s text-white/65 line-clamp-2 mb-3">{excerpt}</p>
+                      )}
+                      <span className="text-label-l font-bold text-white/80">Leer →</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            }
 
             return (
               <Link
                 key={post.ID}
                 to={`/blog/${post.slug}`}
-                className={[
-                  'rounded-3xl overflow-hidden transition-transform duration-200 hover:-translate-y-1',
-                  featured && 'md:col-span-2 flex flex-col bg-navy shadow-elev-5',
-                  wide    && 'md:col-span-3 flex flex-col md:flex-row bg-surf-high border border-outline-var shadow-elev-1',
-                  !featured && !wide && 'flex flex-col bg-surf-high border border-outline-var shadow-elev-1',
-                ].filter(Boolean).join(' ')}
+                className="relative rounded-3xl overflow-hidden transition-transform duration-200 hover:-translate-y-1 min-h-[190px]"
               >
-                {/* Media */}
-                <div
-                  className={[
-                    'shrink-0',
-                    wide ? 'w-full md:w-2/5 h-48 md:h-auto' : 'w-full h-48',
-                    post.cover_image ? 'overflow-hidden' : ENS_GRAD[i % ENS_GRAD.length],
-                  ].join(' ')}
-                >
-                  {post.cover_image && (
-                    <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover" />
-                  )}
-                </div>
-                {/* Body */}
-                <div className="p-6 flex flex-col gap-2.5 flex-1">
-                  <p className={`text-mono ${featured ? 'text-white/60' : 'text-outline'}`}>
+                {post.cover_image
+                  ? <img src={post.cover_image} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
+                  : <div className={`absolute inset-0 ${ENS_GRAD[i % ENS_GRAD.length]}`} />
+                }
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent" />
+                <div className="absolute bottom-0 inset-x-0 p-4">
+                  <p className="text-mono text-white/60 mb-1">
                     {(post.category || 'ENSEÑANZA').toUpperCase()}
                   </p>
-                  <p className={`text-title-l font-bold leading-snug line-clamp-2 ${featured ? 'text-white' : 'text-on-surf'}`}>
+                  <p className="text-title-s font-bold text-white leading-snug line-clamp-2">
                     {post.title}
                   </p>
-                  {excerpt && (
-                    <p className={`text-body-s leading-relaxed line-clamp-2 ${featured ? 'text-white/65' : 'text-on-surf-var'}`}>
-                      {excerpt}
-                    </p>
-                  )}
-                  <span className={`text-label-l font-bold mt-1 ${featured ? 'text-white' : 'text-on-surf'}`}>
-                    Leer →
-                  </span>
+                  <span className="text-label-m text-white/70 mt-1 block">Leer →</span>
                 </div>
               </Link>
             );
@@ -397,46 +402,43 @@ function ProximosEventos() {
   );
 }
 
-// ─── CTA Oración — sin violeta, botón celeste ─────────────────────────────────
+// ─── CTA Oración — full-bleed inmersiva, sin corte 50/50 ─────────────────────
 
 function OracionCTA() {
   return (
-    <section className="relative overflow-hidden bg-navy">
-      {/* Atmospheric photo — right half */}
-      <div className="absolute inset-y-0 right-0 w-1/2 hidden md:block overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1200&q=80"
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      {/* Gradient fade — defined in index.css to avoid inline style */}
-      <div className="absolute inset-0 oracion-overlay" />
+    <section className="relative overflow-hidden min-h-[640px] flex items-end">
+      {/* Full-bleed photo: 100% width & height */}
+      <img
+        src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1920&q=80"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* Gradient from bottom: navy → transparent */}
+      <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/80 to-transparent" />
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-24 md:py-32">
-        <div className="max-w-[600px]">
-          <p className="font-serif italic text-body-l text-white/50 mb-6">
-            «No se inquieten por nada.»
-          </p>
-          <h2 className="text-display-s text-white mb-5 whitespace-pre-line">
-            {'¿Tienes una\npetición de oración?'}
-          </h2>
-          <p className="text-body-l text-white/60 mb-4 max-w-[520px] leading-[1.65]">
-            No tienes que enfrentarlo solo. Nuestro equipo ora cada semana por las peticiones de nuestra comunidad.
-          </p>
-          <p className="text-mono text-white/40 mb-8">FILIPENSES 4:6</p>
-          <div className="flex items-center gap-5">
-            <Link to="/prayer" className="btn-pill bg-celeste text-white font-semibold">
-              Enviar petición →
-            </Link>
-            <Link
-              to="/about"
-              className="text-body-s font-medium text-white/50 hover:text-white transition-colors"
-            >
-              Saber más
-            </Link>
-          </div>
+      {/* Content floats dramatically at bottom */}
+      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 py-16 md:py-24">
+        <p className="font-serif italic text-body-l text-white/50 mb-5">
+          «No se inquieten por nada.»
+        </p>
+        <h2 className="text-display-s text-white mb-5 max-w-[560px] whitespace-pre-line">
+          {'¿Tienes una\npetición de oración?'}
+        </h2>
+        <p className="text-body-l text-white/65 mb-4 max-w-[480px] leading-[1.65]">
+          No tienes que enfrentarlo solo. Nuestro equipo ora cada semana por las peticiones de nuestra comunidad.
+        </p>
+        <p className="text-mono text-white/40 mb-8">FILIPENSES 4:6</p>
+        <div className="flex items-center gap-5">
+          <Link to="/prayer" className="btn-pill bg-celeste text-white font-semibold">
+            Enviar petición →
+          </Link>
+          <Link
+            to="/about"
+            className="text-body-s font-medium text-white/50 hover:text-white transition-colors"
+          >
+            Saber más
+          </Link>
         </div>
       </div>
     </section>
@@ -454,8 +456,6 @@ function Donaciones() {
     <section className="py-20 md:py-28 bg-surf">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="rounded-2xl p-10 md:p-16 flex flex-col lg:flex-row gap-12 lg:items-center bg-navy">
-
-          {/* Left */}
           <div className="flex-1">
             <p className="text-mono text-white/30 mb-5">SIEMBRA Y OFRENDA</p>
             <h2 className="text-display-s text-white mb-5 whitespace-pre-line">
@@ -478,8 +478,6 @@ function Donaciones() {
               ))}
             </div>
           </div>
-
-          {/* Right — amounts + donate */}
           <div className="flex flex-col gap-4 w-full lg:w-auto lg:min-w-[320px]">
             <p className="text-mono text-white/40">ELIGE UN MONTO</p>
             <div className="flex gap-3">
@@ -498,10 +496,7 @@ function Donaciones() {
                 </button>
               ))}
             </div>
-            <Link
-              to="/donate"
-              className="btn-pill bg-celeste text-white font-semibold mt-2"
-            >
+            <Link to="/donate" className="btn-pill bg-celeste text-white font-semibold mt-2">
               Donar {active}
             </Link>
             <p className="text-mono text-white/30 text-center">PAGO SEGURO · BANRURAL / TIGO MONEY</p>
