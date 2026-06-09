@@ -93,6 +93,7 @@ func (h *VolunteerHandler) GetDepartments(c echo.Context) error {
 
 // GetAll GET /api/v1/admin/volunteers — admin ve todos, leader solo los asignados.
 func (h *VolunteerHandler) GetAll(c echo.Context) error {
+	page, limit := parsePage(c)
 	q := h.DB.Model(&models.Volunteer{}).Order("created_at DESC")
 
 	if role, _ := c.Get("user_role").(string); role == "leader" {
@@ -107,11 +108,15 @@ func (h *VolunteerHandler) GetAll(c echo.Context) error {
 		q = q.Where("status = ?", status)
 	}
 
+	var total int64
+	q.Count(&total)
+
+	offset := (page - 1) * limit
 	var list []models.Volunteer
-	if err := q.Find(&list).Error; err != nil {
+	if err := q.Offset(offset).Limit(limit).Find(&list).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener voluntarios."})
 	}
-	return c.JSON(http.StatusOK, list)
+	return c.JSON(http.StatusOK, PagedResponse{Data: list, Meta: newMeta(total, page, limit)})
 }
 
 // Assign PUT /api/v1/admin/volunteers/:id/assign — admin asigna a un líder.

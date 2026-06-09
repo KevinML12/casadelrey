@@ -41,6 +41,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	authMW          := middleware.NewAuthMiddleware(cfg.JWTSecret)
 	adminMW         := middleware.AdminMiddleware()
 	adminOrLeaderMW := middleware.AdminOrLeaderMiddleware()
+	globalRateLimit := middleware.GlobalRateLimit()
+	authRateLimit   := middleware.AuthRateLimit()
+
+	// Aplicar Rate Limiter Global a todo el servidor
+	e.Use(globalRateLimit)
 
 	// ── Health check ──────────────────────────────────────────────────────────────
 	e.GET("/health", func(c echo.Context) error {
@@ -68,7 +73,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.GET("/volunteer/me",          volunteerHandler.GetMyInfo, authMW)
 
 	// Auth
-	authGroup := api.Group("/auth")
+	authGroup := api.Group("/auth", authRateLimit)
 	authGroup.POST("/register",        authHandler.RegisterDisabled)
 	authGroup.POST("/login",           authHandler.Login)
 	authGroup.GET("/verify-email",     authHandler.VerifyEmail)
