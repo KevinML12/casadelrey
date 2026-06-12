@@ -1,11 +1,11 @@
-﻿import DonationCard from '../../components/sections/DonationCard';
+import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
 import { Icon, Halos } from '../../components/ui/Glass';
 
 const IMPACT = [
-  { icon: 'users',  title: 'CÃ©lulas',   desc: 'Equipando lÃ­deres de casa en cada barrio' },
+  { icon: 'users',  title: 'Células',   desc: 'Equipando líderes de casa en cada barrio' },
   { icon: 'spark',  title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
-  { icon: 'book',   title: 'EducaciÃ³n', desc: 'Materiales y estudios bÃ­blicos gratuitos' },
+  { icon: 'book',   title: 'Educación', desc: 'Materiales y estudios bíblicos gratuitos' },
   { icon: 'heart',  title: 'Familias',  desc: 'Apoyo integral a familias en necesidad' },
 ];
 
@@ -22,17 +22,17 @@ export default function DonatePage() {
         <Halos variant="soft" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-            {/* Destinos + versÃ­culo */}
+            {/* Destinos + versículo */}
             <div>
               <div className="flex items-center gap-3 mb-5">
                 <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
                 <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">
-                  Â¿A dÃ³nde va tu donaciÃ³n?
+                  ¿A dónde va tu donación?
                 </span>
               </div>
               <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
                 Siembra con<br />
-                <span className="text-grad-celeste">alegrÃ­a</span>
+                <span className="text-grad-celeste">alegría</span>
                 .
               </h2>
 
@@ -50,7 +50,7 @@ export default function DonatePage() {
                 ))}
               </div>
 
-              {/* VersÃ­culo */}
+              {/* Versículo */}
               <div className="mt-8 bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 relative overflow-hidden">
                 <div className="absolute inset-0 -z-10 pointer-events-none">
                   <div className="halo" style={{ width: 280, height: 280, top: -80, right: -60, background: 'rgba(124,212,255,0.18)' }} />
@@ -60,7 +60,7 @@ export default function DonatePage() {
                     className="italic text-ink leading-snug mb-4"
                     style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(1.2rem, 2.4vw, 1.6rem)' }}
                   >
-                    â€œEl que siembra escasamente, tambiÃ©n segarÃ¡ escasamente; y el que siembra generosamente, generosamente tambiÃ©n segarÃ¡.â€
+                    “El que siembra escasamente, también segará escasamente; y el que siembra generosamente, generosamente también segará.”
                   </p>
                   <cite className="not-italic text-celeste text-[11px] font-extrabold uppercase tracking-widest">
                     2 Corintios 9:6
@@ -74,7 +74,7 @@ export default function DonatePage() {
               <div className="flex items-center gap-3 mb-5">
                 <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
                 <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">
-                  Registra tu donaciÃ³n
+                  Registra tu donación
                 </span>
               </div>
               <h2 className="display-mega text-ink mb-7" style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)' }}>

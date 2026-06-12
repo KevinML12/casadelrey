@@ -1,4 +1,4 @@
-﻿import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import PageHero from '../../components/layout/PageHero';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
 import { Icon, Halos } from '../../components/ui/Glass';
@@ -20,7 +20,7 @@ export default function ReceiptPage() {
       <PageHero
         icon="receipt_long"
         eyebrow="Comprobante"
-        title="Sube tu depÃ³sito."
+        title="Sube tu depósito."
         subtitle="Lo verificamos y confirmamos tu pago lo antes posible."
       />
 
@@ -47,7 +47,7 @@ export default function ReceiptPage() {
             </div>
             <div className="flex items-center gap-3 mb-5">
               <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Datos para depÃ³sito</span>
+              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Datos para depósito</span>
             </div>
 
             <div className="space-y-2.5">

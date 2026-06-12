@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Icon, Halos, GlassButton } from '../../components/ui/Glass';
 
 export default function Register() {
@@ -9,7 +9,7 @@ export default function Register() {
         <div className="inline-flex items-center gap-2 mb-7">
           <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
           <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">
-            Ãšnete a la familia
+            Únete a la familia
           </span>
         </div>
 
@@ -31,25 +31,25 @@ export default function Register() {
             </span>
             <p className="text-[15.5px] leading-relaxed text-ink">
               Las cuentas las crea un{' '}
-              <span className="font-bold text-ink">lÃ­der o administrador</span>. Si quieres
-              unirte, contacta a tu lÃ­der de cÃ©lula o al equipo para que te den acceso.
+              <span className="font-bold text-ink">líder o administrador</span>. Si quieres
+              unirte, contacta a tu líder de célula o al equipo para que te den acceso.
             </p>
           </div>
 
           <div className="my-7 h-px bg-white/10" />
 
           <p className="text-[14px] text-ink-2 leading-relaxed">
-            Â¿Te interesa servir?{' '}
+            ¿Te interesa servir?{' '}
             <Link to="/volunteering" className="text-celeste font-bold hover:text-electric transition-colors">
-              InscrÃ­bete como voluntario
+              Inscríbete como voluntario
             </Link>{' '}
-            y el equipo se comunicarÃ¡ contigo.
+            y el equipo se comunicará contigo.
           </p>
         </div>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <GlassButton as={Link} to="/login" variant="primary" icon="arrow">
-            Ya tengo cuenta Â· Ingresar
+            Ya tengo cuenta · Ingresar
           </GlassButton>
           <GlassButton as={Link} to="/" variant="glass">
             Volver al inicio

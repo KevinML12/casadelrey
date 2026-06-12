@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import PageHero from '../../components/layout/PageHero';
 import Paginator from '../../components/ui/Paginator';
@@ -25,9 +25,9 @@ export default function GalleryPage() {
     <main className="min-h-screen bg-bg text-ink">
       <PageHero
         icon="photo_library"
-        eyebrow="GalerÃ­a"
+        eyebrow="Galería"
         title="Momentos vivos."
-        subtitle="Lo que pasa cuando una generaciÃ³n se reÃºne con luces encendidas."
+        subtitle="Lo que pasa cuando una generación se reúne con luces encendidas."
       />
 
       <section className="relative py-16 md:py-24 overflow-hidden">
@@ -39,9 +39,9 @@ export default function GalleryPage() {
             </div>
           ) : photos.length === 0 ? (
             <div className="flex flex-col items-center py-24 gap-5 text-center">
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">GalerÃ­a</span>
+              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Galería</span>
               <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)' }}>
-                No hay fotos aÃºn.
+                No hay fotos aún.
               </h2>
               <p className="text-[15.5px] text-ink-2">Pronto subiremos los mejores momentos.</p>
             </div>

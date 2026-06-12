@@ -1,4 +1,4 @@
-﻿import PrayerForm from '../../components/sections/PrayerForm';
+import PrayerForm from '../../components/sections/PrayerForm';
 import PageHero from '../../components/layout/PageHero';
 import { Icon, Halos } from '../../components/ui/Glass';
 
@@ -13,9 +13,9 @@ export default function PrayerPage() {
     <main className="min-h-screen bg-bg text-ink">
       <PageHero
         icon="volunteer_activism"
-        eyebrow="Peticiones de oraciÃ³n"
-        title="Clama y Ã‰l responde."
-        subtitle='"Clama a mÃ­, y yo te responderÃ©." â€” JeremÃ­as 33:3'
+        eyebrow="Peticiones de oración"
+        title="Clama y Él responde."
+        subtitle='"Clama a mí, y yo te responderé." — Jeremías 33:3'
       >
         <div className="flex flex-wrap justify-center gap-3 mt-8">
           {TRUST.map(({ icon, text }) => (

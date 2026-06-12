@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import { Icon } from '../ui/Glass';
 
@@ -8,9 +8,9 @@ const X_URL      = 'https://x.com/pastorleoneli';
 const TIKTOK_URL = 'https://www.tiktok.com/@leoneldeleongt';
 
 const NETWORKS = [
-  { href: FB_URL,     label: 'Facebook',   sub: 'SÃ­guenos y mantente al dÃ­a', icon: 'heart' },
-  { href: IG_URL,     label: 'Instagram',  sub: 'Fotos, videos y mÃ¡s',         icon: 'instagram' },
-  { href: X_URL,      label: 'X / Twitter',sub: 'SÃ­guenos en X',               icon: 'spark' },
+  { href: FB_URL,     label: 'Facebook',   sub: 'Síguenos y mantente al día', icon: 'heart' },
+  { href: IG_URL,     label: 'Instagram',  sub: 'Fotos, videos y más',         icon: 'instagram' },
+  { href: X_URL,      label: 'X / Twitter',sub: 'Síguenos en X',               icon: 'spark' },
   { href: TIKTOK_URL, label: 'TikTok',     sub: 'Videos y contenido',          icon: 'music' },
 ];
 
@@ -78,7 +78,7 @@ export default function SocialSection({ title = 'Multimedia', showDirectAccess =
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16 bg-bg border border-ink-soft shadow-card rounded-card">
-            <p className="text-[14.5px] text-ink-2">AÃºn no hay publicaciones vinculadas. SÃ­guenos en redes para ver el contenido.</p>
+            <p className="text-[14.5px] text-ink-2">Aún no hay publicaciones vinculadas. Síguenos en redes para ver el contenido.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -105,7 +105,7 @@ export default function SocialSection({ title = 'Multimedia', showDirectAccess =
                   <div className="p-4">
                     <p className="text-[13.5px] text-ink-2 line-clamp-2">{p.caption}</p>
                     <p className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-extrabold uppercase tracking-[0.24em] text-celeste">
-                      Ver publicaciÃ³n
+                      Ver publicación
                       <Icon name="arrow" className="w-3 h-3" />
                     </p>
                   </div>
