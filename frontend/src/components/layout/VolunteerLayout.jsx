@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import { Icon } from '../ui/Glass';
 
 export default function VolunteerLayout() {
   const { user, logout } = useAuth();
@@ -12,27 +13,33 @@ export default function VolunteerLayout() {
     navigate('/');
   };
 
-  return (
-    <div className="min-h-screen bg-surf flex flex-col">
+  const initial = (user?.name || user?.email || '?')[0].toUpperCase();
 
-      {/* Topbar */}
-      <header className="h-16 border-b border-outline-var bg-surf flex items-center px-6 gap-4 shrink-0 sticky top-0 z-30">
-        <Link to="/" className="flex items-center gap-2.5 mr-auto">
-          <img src="/logo.png" alt="Casa del Rey" className="h-8 w-auto object-contain" />
-          <span className="text-title-s text-on-surf font-bold hidden sm:block">Casa del Rey</span>
+  return (
+    <div className="min-h-screen bg-bg-tint text-ink flex flex-col">
+      {/* Topbar — glass squircle bar */}
+      <header className="h-16 border-b border-ink-soft bg-bg flex items-center px-6 gap-4 shrink-0 sticky top-0 z-30 shadow-whisper">
+        <Link to="/" className="flex items-center gap-2.5 mr-auto group">
+          <span className="grid place-items-center w-10 h-10 rounded-md bg-celeste text-white shadow-pri">
+            <Icon name="crown" className="w-5 h-5" stroke={2} />
+          </span>
+          <div className="hidden sm:block">
+            <p className="text-[14.5px] font-extrabold tracking-tightish text-ink leading-tight">Casa del Rey</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-widest text-celeste mt-0.5">Voluntario</p>
+          </div>
         </Link>
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-label-l text-on-surf font-semibold leading-tight">{user?.name}</p>
-            <p className="text-label-s text-on-surf-var">Voluntario</p>
+            <p className="text-[13.5px] text-ink font-bold leading-tight">{user?.name}</p>
+            <p className="text-[11.5px] text-ink-2">{user?.email}</p>
           </div>
-          <div className="w-9 h-9 rounded-full bg-pri-con flex items-center justify-center">
-            <span className="ms text-on-pri-con" style={{ fontSize: 18 }}>person</span>
-          </div>
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-celeste text-white text-[13px] font-extrabold shadow-pri">
+            {initial}
+          </span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-label-m text-on-surf-var hover:text-on-surf hover:bg-surf-dim transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-md text-[13px] font-semibold text-ink-2 hover:text-rose hover:bg-rose-soft transition-colors"
             title="Cerrar sesión"
           >
             <span className="ms" style={{ fontSize: 18 }}>logout</span>
@@ -41,8 +48,7 @@ export default function VolunteerLayout() {
         </div>
       </header>
 
-      {/* Contenido */}
-      <main className="flex-1">
+      <main className="flex-1 bg-bg-tint">
         <Outlet />
       </main>
     </div>

@@ -155,7 +155,7 @@ export default function AdminGallery() {
                 onError={e => { e.target.src = 'https://placehold.co/200x200?text=Foto'; }}
               />
               {!p.is_active && (
-                <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+                <div className="absolute top-2 left-2 bg-black/60 text-ink text-xs px-2 py-0.5 rounded-full">
                   Oculta
                 </div>
               )}
@@ -165,13 +165,13 @@ export default function AdminGallery() {
                   <span className="ms" style={{ fontSize: 16 }}>{p.is_active ? 'visibility_off' : 'visibility'}</span>
                 </IconButton>
                 <IconButton onClick={() => handleDelete(p.ID)} title="Eliminar"
-                  className="bg-err/90 text-white hover:bg-err w-8 h-8">
+                  className="bg-err/90 text-ink hover:bg-err w-8 h-8">
                   <span className="ms" style={{ fontSize: 16 }}>delete</span>
                 </IconButton>
               </div>
               {p.title && (
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                  <p className="text-xs text-white font-medium line-clamp-1">{p.title}</p>
+                  <p className="text-xs text-ink font-medium line-clamp-1">{p.title}</p>
                 </div>
               )}
             </div>

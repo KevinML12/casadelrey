@@ -1,32 +1,43 @@
-import PrayerForm from '../../components/sections/PrayerForm';
+﻿import PrayerForm from '../../components/sections/PrayerForm';
 import PageHero from '../../components/layout/PageHero';
+import { Icon, Halos } from '../../components/ui/Glass';
 
 const TRUST = [
-  { icon: 'groups',     text: 'Comunidad que ora contigo' },
-  { icon: 'favorite',   text: 'Respondidas con amor' },
-  { icon: 'lock',       text: 'Absoluta confidencialidad' },
+  { icon: 'users', text: 'Comunidad que ora contigo' },
+  { icon: 'heart', text: 'Respondidas con amor' },
+  { icon: 'spark', text: 'Absoluta confidencialidad' },
 ];
 
 export default function PrayerPage() {
   return (
-    <main className="min-h-screen bg-surf">
-      <PageHero icon="volunteer_activism" title="Peticiones de Oración" subtitle='"Clama a mí, y yo te responderé." — Jeremías 33:3'>
-        <div className="flex flex-wrap justify-center gap-3 mt-6">
+    <main className="min-h-screen bg-bg text-ink">
+      <PageHero
+        icon="volunteer_activism"
+        eyebrow="Peticiones de oraciÃ³n"
+        title="Clama y Ã‰l responde."
+        subtitle='"Clama a mÃ­, y yo te responderÃ©." â€” JeremÃ­as 33:3'
+      >
+        <div className="flex flex-wrap justify-center gap-3 mt-8">
           {TRUST.map(({ icon, text }) => (
-            <span key={text} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-label-m font-medium"
-              style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: 'rgba(255,255,255,.7)' }}>
-              <span className="ms" style={{ fontSize: 14, color: '#A4C8FF' }}>{icon}</span>
+            <span
+              key={text}
+              className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-[12.5px] font-semibold text-ink"
+            >
+              <Icon name={icon} className="w-3.5 h-3.5 text-celeste" />
               {text}
             </span>
           ))}
         </div>
       </PageHero>
 
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
-        <div className="max-w-2xl mx-auto bg-surf-low border border-outline-var rounded-2xl shadow-elev-1 p-8 md:p-10">
-          <PrayerForm />
+      <section className="relative py-16 md:py-24 overflow-hidden">
+        <Halos variant="soft" />
+        <div className="relative z-10 max-w-3xl mx-auto px-6">
+          <div className="bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 md:p-10">
+            <PrayerForm />
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

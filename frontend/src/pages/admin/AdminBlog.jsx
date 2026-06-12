@@ -144,7 +144,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <div className="mt-2 relative">
               <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-outline-var" />
               <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-ink flex items-center justify-center hover:bg-black/70">
                 <span className="ms" style={{ fontSize: 14 }}>close</span>
               </button>
             </div>

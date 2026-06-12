@@ -147,9 +147,9 @@ export default function DonationCard() {
 
       {/* Resumen */}
       {finalAmount >= 10 && (
-        <div className="px-4 py-3 rounded-xl hero-surf flex justify-between items-center animate-fade-in">
-          <span className="text-body-s" style={{ color: 'rgba(255,255,255,.6)' }}>Total a registrar</span>
-          <span className="text-headline-s font-black" style={{ color: '#A4C8FF' }}>Q{finalAmount}</span>
+        <div className="px-5 py-4 rounded-xl flex justify-between items-center animate-fade-in bg-celeste-soft border border-celeste/15">
+          <span className="text-[12.5px] font-bold uppercase tracking-widest text-celeste-hov">Total a registrar</span>
+          <span className="text-[28px] font-extrabold tracking-tightish text-celeste">Q{finalAmount}</span>
         </div>
       )}
 

@@ -132,7 +132,7 @@ export default function ProfilePage() {
                   <button
                     onClick={() => toggleGoal(g)}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                      g.completed ? 'bg-ter border-ter text-white' : 'border-outline hover:border-pri'
+                      g.completed ? 'bg-ter border-ter text-ink' : 'border-outline hover:border-pri'
                     }`}
                   >
                     {g.completed && <span className="ms" style={{ fontSize: 14 }}>check</span>}

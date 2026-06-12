@@ -3,6 +3,7 @@ import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import toast from 'react-hot-toast';
+import { Icon } from '../ui/Glass';
 
 const NAV = [
   { to: '/leader',                   icon: 'home',       label: 'Inicio',       exact: true },
@@ -26,28 +27,20 @@ function SidebarContent({ onClose }) {
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#060D24' }}>
-      {/* Logo */}
-      <div className="px-4 py-6 border-b" style={{ borderColor: 'rgba(255,255,255,.1)' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="rounded-lg px-2 py-1.5" style={{ background: 'rgba(255,255,255,.08)' }}>
-            <img src="/logo.png" alt="Casa del Rey" className="h-7 w-auto object-contain"
-              style={{ filter: 'brightness(0) invert(1)' }} />
+    <div className="flex flex-col h-full bg-bg border-r border-ink-soft">
+      <div className="px-5 py-6 border-b border-ink-soft">
+        <Link to="/leader" onClick={onClose} className="flex items-center gap-2.5 group">
+          <span className="grid place-items-center w-10 h-10 rounded-md bg-celeste text-white shadow-pri">
+            <Icon name="crown" className="w-5 h-5" stroke={2} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[14.5px] font-extrabold tracking-tightish text-ink leading-tight">Casa del Rey</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-widest text-celeste mt-0.5">Panel Líder</p>
           </div>
-          <div style={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
-            <p className="text-white font-bold leading-tight" style={{ fontSize: 14 }}>Casa del Rey</p>
-            <p style={{
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 10,
-              letterSpacing: '1.65px',
-              color: 'rgba(255,255,255,.4)',
-            }}>PANEL LÍDER</p>
-          </div>
-        </div>
+        </Link>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {NAV.map(({ to, icon, label, exact, badge }) => {
           const count = badge ? (notifCounts[badge] || 0) : 0;
           return (
@@ -57,19 +50,17 @@ function SidebarContent({ onClose }) {
               end={exact}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium transition-all duration-150 ${
-                  isActive ? 'text-white' : 'hover:text-white'
+                `flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px] font-semibold tracking-tightish transition-all duration-300 ${
+                  isActive
+                    ? 'bg-ink text-white shadow-whisper'
+                    : 'text-ink-2 hover:text-ink hover:bg-bg-soft'
                 }`
               }
-              style={({ isActive }) => ({
-                background: isActive ? 'rgba(255,255,255,.15)' : 'transparent',
-                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,.55)',
-              })}
             >
               <span className="ms shrink-0" style={{ fontSize: 18 }}>{icon}</span>
               <span className="flex-1">{label}</span>
               {count > 0 && (
-                <span className="min-w-[20px] h-5 rounded-full bg-err text-white text-xs font-bold flex items-center justify-center px-1.5">
+                <span className="min-w-[20px] h-5 rounded-full bg-celeste text-white text-[10.5px] font-bold flex items-center justify-center px-1.5 shadow-pri">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
@@ -78,24 +69,27 @@ function SidebarContent({ onClose }) {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 pb-4 pt-3 border-t space-y-0.5" style={{ borderColor: 'rgba(255,255,255,.1)' }}>
-        <div className="px-3 py-2">
-          <p className="text-label-l font-medium text-white truncate">{user?.name || user?.email}</p>
-          <p className="text-label-s truncate" style={{ color: 'rgba(255,255,255,.4)' }}>{user?.email}</p>
+      <div className="px-3 pb-4 pt-3 border-t border-ink-soft space-y-0.5">
+        <div className="px-3 py-2.5 flex items-center gap-3">
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-celeste text-white text-[13px] font-extrabold shadow-pri shrink-0">
+            {(user?.name || user?.email || '?')[0].toUpperCase()}
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold text-ink truncate">{user?.name || 'Usuario'}</p>
+            <p className="text-[11.5px] text-ink-2 truncate">{user?.email}</p>
+          </div>
         </div>
         <Link
           to="/"
           onClick={onClose}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium"
-          style={{ color: 'rgba(255,255,255,.55)' }}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px] font-semibold text-ink-2 hover:text-ink hover:bg-bg-soft transition-colors"
         >
           <span className="ms shrink-0" style={{ fontSize: 18 }}>public</span>
           Ver sitio web
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-l font-medium text-err transition-colors hover:bg-err/10"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px] font-semibold text-ink-2 hover:text-rose hover:bg-rose-soft transition-colors"
         >
           <span className="ms shrink-0" style={{ fontSize: 18 }}>logout</span>
           Cerrar sesión
@@ -109,36 +103,37 @@ export default function LeaderLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-surf overflow-hidden">
-      <aside className="hidden md:flex w-60 shrink-0 flex-col">
+    <div className="flex h-screen bg-bg-tint overflow-hidden text-ink">
+      <aside className="hidden md:flex w-64 shrink-0 flex-col">
         <SidebarContent />
       </aside>
 
       <div className="flex flex-col flex-1 min-w-0">
-        <div className="md:hidden h-14 border-b border-outline-var flex items-center px-4 gap-3 shrink-0 surf-1">
+        <div className="md:hidden h-14 border-b border-ink-soft flex items-center px-4 gap-3 shrink-0 bg-bg">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="text-on-surf-var hover:text-on-surf transition-colors"
+            className="text-ink-2 hover:text-ink transition-colors"
+            aria-label="Abrir menú"
           >
             <span className="ms" style={{ fontSize: 22 }}>menu</span>
           </button>
-          <span className="text-title-s text-on-surf font-semibold">Panel Líder</span>
+          <span className="text-[14.5px] text-ink font-extrabold tracking-tightish">Panel Líder</span>
         </div>
 
-        <main className="flex-1 overflow-y-auto bg-surf">
+        <main className="flex-1 overflow-y-auto bg-bg-tint">
           <Outlet />
         </main>
       </div>
 
       {drawerOpen && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setDrawerOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-60 z-50 md:hidden animate-slide-up">
+          <div className="fixed inset-0 bg-ink/40 backdrop-blur-md z-40 md:hidden animate-fade-in" onClick={() => setDrawerOpen(false)} />
+          <div className="fixed inset-y-0 left-0 w-64 z-50 md:hidden animate-slide-up">
             <div className="absolute top-3 right-3 z-10">
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ background: 'rgba(255,255,255,.1)', color: 'rgba(255,255,255,.7)' }}
+                className="w-8 h-8 rounded-full bg-bg-soft text-ink-2 hover:text-ink flex items-center justify-center transition-colors"
+                aria-label="Cerrar menú"
               >
                 <span className="ms" style={{ fontSize: 16 }}>close</span>
               </button>

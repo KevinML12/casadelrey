@@ -1,61 +1,90 @@
-import DonationCard from '../../components/sections/DonationCard';
+﻿import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
+import { Icon, Halos } from '../../components/ui/Glass';
 
 const IMPACT = [
-  { icon: 'groups',     title: 'Células',   desc: 'Equipando líderes de casa en cada barrio' },
-  { icon: 'public',     title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
-  { icon: 'menu_book',  title: 'Educación', desc: 'Materiales y estudios bíblicos gratuitos' },
-  { icon: 'family_restroom', title: 'Familias', desc: 'Apoyo integral a familias en necesidad' },
+  { icon: 'users',  title: 'CÃ©lulas',   desc: 'Equipando lÃ­deres de casa en cada barrio' },
+  { icon: 'spark',  title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
+  { icon: 'book',   title: 'EducaciÃ³n', desc: 'Materiales y estudios bÃ­blicos gratuitos' },
+  { icon: 'heart',  title: 'Familias',  desc: 'Apoyo integral a familias en necesidad' },
 ];
 
 export default function DonatePage() {
   return (
-    <main className="min-h-screen bg-surf">
-      <PageHero icon="volunteer_activism" title="Tu Generosidad Transforma"
-        subtitle="Cada quetzal sembrado con fe produce fruto eterno." />
+    <main className="min-h-screen bg-bg text-ink">
+      <PageHero
+        icon="volunteer_activism"
+        title="Tu generosidad transforma."
+        subtitle="Cada quetzal sembrado con fe produce fruto eterno."
+      />
 
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <section className="relative py-16 md:py-24 overflow-hidden">
+        <Halos variant="soft" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+            {/* Destinos + versÃ­culo */}
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
+                <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">
+                  Â¿A dÃ³nde va tu donaciÃ³n?
+                </span>
+              </div>
+              <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
+                Siembra con<br />
+                <span className="text-grad-celeste">alegrÃ­a</span>
+                .
+              </h2>
 
-          {/* Destinos */}
-          <div>
-            <h2 className="text-headline-s text-on-surf font-black mb-6">¿A dónde va tu donación?</h2>
-            <div className="space-y-3 mb-8">
-              {IMPACT.map(({ icon, title, desc }) => (
-                <div key={title}
-                  className="flex items-start gap-4 p-4 rounded-xl bg-surf-low border border-outline-var hover:shadow-elev-1 transition-all">
-                  <div className="leading-icon shrink-0">
-                    <span className="ms" style={{ fontSize: 20 }}>{icon}</span>
+              <div className="mt-8 space-y-3">
+                {IMPACT.map(({ icon, title, desc }) => (
+                  <div key={title} className="flex items-start gap-4 bg-bg border border-ink-soft shadow-whisper rounded-md p-4">
+                    <span className="grid place-items-center w-11 h-11 rounded-sm bg-bg-soft text-celeste shrink-0">
+                      <Icon name={icon} className="w-5 h-5" />
+                    </span>
+                    <div>
+                      <h3 className="text-[15px] font-extrabold tracking-tightish text-ink">{title}</h3>
+                      <p className="text-[13.5px] text-ink-2 mt-0.5">{desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-title-s text-on-surf font-semibold">{title}</h3>
-                    <p className="text-body-s text-on-surf-var mt-0.5">{desc}</p>
-                  </div>
+                ))}
+              </div>
+
+              {/* VersÃ­culo */}
+              <div className="mt-8 bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 relative overflow-hidden">
+                <div className="absolute inset-0 -z-10 pointer-events-none">
+                  <div className="halo" style={{ width: 280, height: 280, top: -80, right: -60, background: 'rgba(124,212,255,0.18)' }} />
                 </div>
-              ))}
+                <blockquote className="relative">
+                  <p
+                    className="italic text-ink leading-snug mb-4"
+                    style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(1.2rem, 2.4vw, 1.6rem)' }}
+                  >
+                    â€œEl que siembra escasamente, tambiÃ©n segarÃ¡ escasamente; y el que siembra generosamente, generosamente tambiÃ©n segarÃ¡.â€
+                  </p>
+                  <cite className="not-italic text-celeste text-[11px] font-extrabold uppercase tracking-widest">
+                    2 Corintios 9:6
+                  </cite>
+                </blockquote>
+              </div>
             </div>
 
-            {/* Versículo */}
-            <div className="hero-surf rounded-2xl p-6 relative overflow-hidden">
-              <div className="hero-grid" />
-              <blockquote className="relative z-10">
-                <p className="text-body-m italic leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,.75)' }}>
-                  "El que siembra escasamente, también segará escasamente; y el que siembra generosamente, generosamente también segará."
-                </p>
-                <cite className="text-label-m font-semibold not-italic" style={{ color: '#A4C8FF' }}>
-                  — 2 Corintios 9:6
-                </cite>
-              </blockquote>
+            {/* Formulario glass */}
+            <div className="bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 md:p-9">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
+                <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">
+                  Registra tu donaciÃ³n
+                </span>
+              </div>
+              <h2 className="display-mega text-ink mb-7" style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)' }}>
+                Sembrar es<br />sumar.
+              </h2>
+              <DonationCard />
             </div>
-          </div>
-
-          {/* Formulario */}
-          <div className="bg-surf-low border border-outline-var rounded-2xl shadow-elev-1 p-7">
-            <h2 className="text-title-l text-on-surf font-black mb-5">Registra tu donación</h2>
-            <DonationCard />
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

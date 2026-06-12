@@ -51,7 +51,7 @@ function HeroPreview({ data }) {
             {data.verse_reference}
           </p>
         )}
-        <h1 className="text-white font-black leading-[0.95]" style={{
+        <h1 className="text-ink font-black leading-[0.95]" style={{
           fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
           letterSpacing: '-0.04em',
         }}>
@@ -66,19 +66,19 @@ function HeroPreview({ data }) {
           {data.title_line_2 || 'LAS NACIONES'}
         </h1>
         {data.subtitle && (
-          <p className="text-white/80 text-xs mt-3">{data.subtitle}</p>
+          <p className="text-ink/80 text-xs mt-3">{data.subtitle}</p>
         )}
         {data.schedule_text && (
-          <p className="text-white/60 text-[10px] uppercase tracking-widest mt-1">{data.schedule_text}</p>
+          <p className="text-ink/60 text-[10px] uppercase tracking-widest mt-1">{data.schedule_text}</p>
         )}
         <div className="flex gap-2 mt-3">
           {data.cta_primary_text && (
-            <span className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white" style={{ background: '#7C3AED' }}>
+            <span className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-ink" style={{ background: '#7C3AED' }}>
               {data.cta_primary_text}
             </span>
           )}
           {data.cta_secondary_text && (
-            <span className="px-3 py-1.5 text-[10px] font-semibold text-white/80">
+            <span className="px-3 py-1.5 text-[10px] font-semibold text-ink/80">
               {data.cta_secondary_text} →
             </span>
           )}

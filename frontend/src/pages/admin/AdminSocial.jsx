@@ -235,24 +235,24 @@ export default function AdminSocial() {
                 )}
                 {/* Badge plataforma */}
                 <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm flex items-center gap-1">
-                  <span className="ms text-white" style={{ fontSize: 12 }}>{plat?.icon}</span>
-                  <span className="text-[10px] text-white font-semibold uppercase tracking-wider">{plat?.label}</span>
+                  <span className="ms text-ink" style={{ fontSize: 12 }}>{plat?.icon}</span>
+                  <span className="text-[10px] text-ink font-semibold uppercase tracking-wider">{plat?.label}</span>
                 </div>
                 {/* Hover overlay con acciones */}
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
-                  {p.caption && <p className="text-label-s text-white text-center line-clamp-2">{p.caption}</p>}
+                  {p.caption && <p className="text-label-s text-ink text-center line-clamp-2">{p.caption}</p>}
                   <div className="flex gap-2">
                     <button onClick={() => setEditing(p)}
                       className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                      <span className="ms text-white" style={{ fontSize: 16 }}>edit</span>
+                      <span className="ms text-ink" style={{ fontSize: 16 }}>edit</span>
                     </button>
                     <a href={p.post_url} target="_blank" rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                      <span className="ms text-white" style={{ fontSize: 16 }}>open_in_new</span>
+                      <span className="ms text-ink" style={{ fontSize: 16 }}>open_in_new</span>
                     </a>
                     <button onClick={() => remove(p.ID)}
                       className="w-9 h-9 rounded-full bg-err/80 hover:bg-err flex items-center justify-center transition-colors">
-                      <span className="ms text-white" style={{ fontSize: 16 }}>delete</span>
+                      <span className="ms text-ink" style={{ fontSize: 16 }}>delete</span>
                     </button>
                   </div>
                 </div>

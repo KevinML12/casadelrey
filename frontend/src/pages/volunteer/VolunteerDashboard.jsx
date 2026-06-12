@@ -168,13 +168,13 @@ export default function VolunteerDashboard() {
       <div className="rounded-2xl overflow-hidden border border-outline-var">
         <div className="px-6 py-5" style={{ background: '#060D24' }}>
           <p className="text-label-m mb-1" style={{ color: 'rgba(255,255,255,.5)' }}>Bienvenido,</p>
-          <h1 className="text-headline-s text-white font-black leading-tight">{user?.name}</h1>
+          <h1 className="text-headline-s text-ink font-black leading-tight">{user?.name}</h1>
           {dept && (
             <div className="flex items-center gap-2 mt-3">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,.12)' }}>
-                <span className="ms text-white" style={{ fontSize: 16 }}>{dept.icon}</span>
+                <span className="ms text-ink" style={{ fontSize: 16 }}>{dept.icon}</span>
               </div>
-              <span className="text-label-l text-white font-medium">{dept.label}</span>
+              <span className="text-label-l text-ink font-medium">{dept.label}</span>
             </div>
           )}
         </div>

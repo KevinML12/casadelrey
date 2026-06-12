@@ -158,7 +158,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
               )}
               <button onClick={handleAction} disabled={loading}
                 className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl text-label-l font-semibold transition-opacity disabled:opacity-50 ${
-                  status === 'rechazado' ? 'bg-err text-white hover:opacity-90' : 'bg-pri text-on-pri hover:opacity-90'
+                  status === 'rechazado' ? 'bg-err text-ink hover:opacity-90' : 'bg-pri text-on-pri hover:opacity-90'
                 }`}>
                 <span className="ms" style={{ fontSize: 16 }}>save</span>
                 {loading ? 'Guardando…' : status === 'rechazado' ? 'Rechazar comprobante' : 'Aprobar comprobante'}
@@ -180,7 +180,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
               {reason && <p className="text-label-s text-err">Razón: {reason}</p>}
               <div className="flex gap-2">
                 <button onClick={submit} disabled={loading}
-                  className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-err text-white text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
+                  className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-err text-ink text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
                   <span className="ms" style={{ fontSize: 16 }}>cancel</span>
                   {loading ? 'Rechazando…' : 'Sí, rechazar'}
                 </button>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { Icon } from '../ui/Glass';
 
 const NAV_LINKS = [
   { label: 'Inicio',       to: '/' },
@@ -13,18 +14,15 @@ const NAV_LINKS = [
 
 export default function Header() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [theme, setTheme] = useState(
-    () => document.documentElement.dataset.theme || 'light'
-  );
   const dropRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -39,177 +37,192 @@ export default function Header() {
 
   useEffect(() => { setMenuOpen(false); }, [location]);
 
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
-  };
-
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-  // Siempre blanco sólido — sin transparencia para evitar sangrado de colores
-  // Al scroll se agrega shadow sutil para dar elevación
-  const navBg = scrolled
-    ? 'bg-[var(--surf-high)] border-[var(--outline-var)] shadow-sm'
-    : 'bg-[var(--surf-high)] border-transparent';
-  // Links: navy profundo como acento de marca
-  const linkColor  = 'text-[#5B6478] hover:text-[#060D24]';
-  const linkActiveCl = 'text-[#060D24] font-semibold bg-[var(--pri-con)]';
-  const iconColor  = 'text-[#5B6478] hover:text-[#060D24] hover:bg-[var(--surf-low)]';
-
   return (
-    <header className={`sticky top-0 z-40 border-b transition-all duration-300 ${navBg}`}>
-      <div className="max-w-[1440px] mx-auto px-6 md:px-16 h-[72px] md:h-[88px] flex items-center justify-between gap-4">
-
-        {/* Logo */}
-        <Link to="/" className="shrink-0">
-          <img
-            src="/logo.png"
-            alt="Casa del Rey"
-            className="h-8 md:h-9 w-auto object-contain"
-          />
-        </Link>
-
-        {/* Nav links — desktop */}
-        <nav className="hidden lg:flex items-center gap-0.5">
-          {NAV_LINKS.map(({ label, to }) => (
-            <NavLink key={to} to={to} end={to === '/'}>
-              {({ isActive }) => (
-                <span className={`px-4 py-2 rounded-full text-[14px] cursor-pointer transition-colors duration-150 block
-                  ${isActive ? linkActiveCl : linkColor}`}>
-                  {label}
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* Right actions — desktop */}
-        <div className="hidden lg:flex items-center gap-1">
-
-          {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full transition-colors ${iconColor}`}
-            aria-label="Cambiar tema"
-          >
-            <span className="ms" style={{ fontSize: 20 }}>
-              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+    <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-4 pointer-events-none">
+      <nav
+        className={`pointer-events-auto w-full max-w-6xl rounded-pill glass-nav glass-sheen transition-all duration-500 ease-spring ${
+          scrolled ? 'shadow-card-lg' : 'shadow-whisper'
+        }`}
+        style={{ transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
+      >
+        <div className="flex items-center justify-between pl-4 pr-2 py-2">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 group rounded-pill pl-1.5 pr-3 py-1">
+            <span
+              className="grid place-items-center w-10 h-10 rounded-md bg-celeste text-white shadow-pri transition-transform duration-400"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
+            >
+              <Icon name="crown" className="w-5 h-5" stroke={2} />
             </span>
-          </button>
+            <span className="text-[15px] font-extrabold tracking-tightish text-ink">Casa del Rey</span>
+          </Link>
 
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2 ml-1">
-              {(isAdmin || user?.role === 'leader') && (
-                <Link
-                  to={isAdmin ? '/admin' : '/leader'}
-                  className="px-4 py-1.5 rounded-full text-[13px] font-medium border border-[var(--outline-var)] text-[#060D24] hover:bg-[var(--surf-low)] transition-colors"
-                >
-                  {isAdmin ? 'Admin' : 'Líderes'}
-                </Link>
-              )}
+          {/* Desktop nav links */}
+          <div className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map(n => (
+              <NavLink key={n.to} to={n.to} end={n.to === '/'}>
+                {({ isActive }) => (
+                  <span
+                    className={`px-4 py-2 rounded-pill text-[14px] font-semibold cursor-pointer transition-all duration-300 ${
+                      isActive
+                        ? 'bg-ink text-white shadow-whisper'
+                        : 'text-ink-2 hover:text-ink hover:bg-bg-soft'
+                    }`}
+                  >
+                    {n.label}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </div>
 
-              <div className="relative" ref={dropRef}>
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <div className="relative hidden sm:block" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
-                  className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full text-[13px] text-[var(--on-surf-var)] hover:bg-[var(--surf-low)] transition-colors"
+                  className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-[13px] text-ink hover:bg-bg-soft transition-all duration-300 focus-ring"
                 >
-                  <div className="w-7 h-7 rounded-full bg-[var(--pri)] flex items-center justify-center shrink-0">
-                    <span className="text-[var(--on-pri)] text-[11px] font-bold">
-                      {(user?.name || user?.email || '?')[0].toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="ms" style={{ fontSize: 16, transition: 'transform .2s', transform: dropOpen ? 'rotate(180deg)' : '' }}>
-                    expand_more
+                  <span className="grid place-items-center w-7 h-7 rounded-full bg-celeste text-white text-[12px] font-extrabold shadow-pri">
+                    {(user?.name || user?.email || '?')[0].toUpperCase()}
                   </span>
+                  <span className="font-semibold">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>
                 </button>
 
                 {dropOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-[var(--surf-high)] border border-[var(--outline-var)] rounded-2xl shadow-xl py-2 z-50">
-                    <div className="px-4 py-2.5 border-b border-[var(--outline-var)]">
-                      <p className="text-[13px] font-semibold text-[var(--on-surf)] truncate">{user?.name || 'Usuario'}</p>
-                      <p className="text-[12px] text-[var(--on-surf-var)] truncate">{user?.email}</p>
+                  <div
+                    className="absolute right-0 top-full mt-3 w-60 glass-strong glass-sheen rounded-2xl p-2 z-50 animate-rise"
+                    style={{ animationDuration: '300ms' }}
+                  >
+                    <div className="px-3 py-2.5 border-b border-ink-soft mb-1">
+                      <p className="text-[13px] font-bold text-ink truncate">{user?.name || 'Usuario'}</p>
+                      <p className="text-[12px] text-ink-2 truncate">{user?.email}</p>
                     </div>
-                    <Link to="/profile" onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[var(--on-surf)] hover:bg-[var(--surf-low)] transition-colors">
-                      <span className="ms" style={{ fontSize: 16 }}>person</span>
+                    {(isAdmin || user?.role === 'leader') && (
+                      <Link
+                        to={isAdmin ? '/admin' : '/leader'}
+                        onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-[13.5px] font-medium text-ink hover:bg-bg-soft transition-colors"
+                      >
+                        <Icon name="spark" className="w-4 h-4 text-celeste" />
+                        {isAdmin ? 'Panel Admin' : 'Panel Líder'}
+                      </Link>
+                    )}
+                    <Link
+                      to="/profile"
+                      onClick={() => setDropOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-[13.5px] font-medium text-ink hover:bg-bg-soft transition-colors"
+                    >
+                      <Icon name="user" className="w-4 h-4 text-celeste" />
                       Mi perfil
                     </Link>
-                    <div className="my-1 border-t border-[var(--outline-var)]" />
-                    <button onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[var(--err)] hover:bg-[var(--err-con)] transition-colors">
-                      <span className="ms" style={{ fontSize: 16 }}>logout</span>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md text-[13.5px] font-medium text-rose hover:bg-rose-soft transition-colors"
+                    >
+                      <Icon name="close" className="w-4 h-4" />
                       Cerrar sesión
                     </button>
                   </div>
                 )}
               </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 ml-1">
-              <Link to="/login"
-                className="px-4 py-1.5 rounded-full text-[13px] font-medium text-[#060D24] hover:bg-[var(--surf-low)] transition-colors">
-                Ingresar
-              </Link>
-              <Link to="/donate"
-                className="px-5 py-1.5 rounded-full text-[13px] font-semibold bg-[var(--pri)] text-[var(--on-pri)] hover:bg-[var(--pri-press)] transition-colors">
-                Donar
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Mobile: theme toggle + hamburger */}
-        <div className="flex lg:hidden items-center gap-1">
-          <button onClick={toggleTheme} className={`p-2 rounded-full transition-colors ${iconColor}`} aria-label="Tema">
-            <span className="ms" style={{ fontSize: 20 }}>{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
-          </button>
-          <button onClick={() => setMenuOpen(p => !p)} className={`p-2 rounded-full transition-colors ${iconColor}`} aria-label="Menú">
-            <span className="ms" style={{ fontSize: 22 }}>{menuOpen ? 'close' : 'menu'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="lg:hidden bg-[var(--surf-high)] border-t border-[var(--outline-var)] px-4 py-3 space-y-1">
-          {NAV_LINKS.map(({ label, to }) => (
-            <NavLink key={to} to={to} end={to === '/'} onClick={() => setMenuOpen(false)}>
-              {({ isActive }) => (
-                <span className={`flex items-center px-4 py-2.5 rounded-xl text-[14px] transition-colors
-                  ${isActive
-                    ? 'bg-[var(--pri-con)] text-[var(--on-pri-con)] font-semibold'
-                    : 'text-[var(--on-surf-var)] hover:bg-[var(--surf-low)]'}`}>
-                  {label}
-                </span>
-              )}
-            </NavLink>
-          ))}
-          <div className="pt-2 mt-1 border-t border-[var(--outline-var)] space-y-1">
-            {isAuthenticated ? (
-              <>
-                {(isAdmin || user?.role === 'leader') && (
-                  <Link to={isAdmin ? '/admin' : '/leader'} onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] text-[var(--on-surf-var)]">
-                    <span className="ms" style={{ fontSize: 18 }}>dashboard</span>
-                    {isAdmin ? 'Panel Admin' : 'Panel Líder'}
-                  </Link>
-                )}
-                <button onClick={() => { handleLogout(); setMenuOpen(false); }}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] text-[var(--err)] w-full">
-                  <span className="ms" style={{ fontSize: 18 }}>logout</span>
-                  Cerrar sesión
-                </button>
-              </>
             ) : (
-              <Link to="/login" onClick={() => setMenuOpen(false)}
-                className="flex items-center px-4 py-2.5 rounded-xl text-[14px] font-semibold text-[var(--pri)]">
+              <Link
+                to="/login"
+                className="hidden sm:inline-flex px-4 py-2 rounded-pill text-[14px] font-semibold text-ink-2 hover:text-ink hover:bg-bg-soft transition-all duration-300"
+              >
                 Ingresar
               </Link>
             )}
+
+            <Link
+              to="/donate"
+              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-pill bg-celeste text-white text-[14px] font-bold shadow-pri btn-spring hover:bg-celeste-hov hover:shadow-pri-lg focus-ring"
+            >
+              {isAuthenticated ? 'Donar' : 'Planifica tu visita'}
+              <Icon name="arrow" className="w-4 h-4" stroke={2} />
+            </Link>
+
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              className="md:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg-soft text-ink hover:bg-celeste-soft hover:text-celeste transition-colors focus-ring"
+              aria-label="Menú"
+            >
+              <Icon name={menuOpen ? 'close' : 'menu'} />
+            </button>
           </div>
         </div>
-      )}
+
+        {/* Mobile sheet */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-500 ease-spring ${
+            menuOpen ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
+          style={{ transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
+        >
+          <div className="px-2 pb-2 pt-1 flex flex-col gap-1">
+            {NAV_LINKS.map(n => (
+              <NavLink key={n.to} to={n.to} end={n.to === '/'} onClick={() => setMenuOpen(false)}>
+                {({ isActive }) => (
+                  <span className={`block px-4 py-3 rounded-md text-[15px] font-semibold transition-colors ${
+                    isActive ? 'bg-ink text-white' : 'text-ink hover:bg-bg-soft'
+                  }`}>
+                    {n.label}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+
+            <div className="pt-2 mt-1 border-t border-ink-soft flex flex-col gap-1">
+              {isAuthenticated ? (
+                <>
+                  {(isAdmin || user?.role === 'leader') && (
+                    <Link
+                      to={isAdmin ? '/admin' : '/leader'}
+                      onClick={() => setMenuOpen(false)}
+                      className="px-4 py-2.5 rounded-md text-[14px] font-medium text-ink-2 hover:bg-bg-soft transition-colors"
+                    >
+                      {isAdmin ? 'Panel Admin' : 'Panel Líder'}
+                    </Link>
+                  )}
+                  <Link
+                    to="/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-2.5 rounded-md text-[14px] font-medium text-ink-2 hover:bg-bg-soft transition-colors"
+                  >
+                    Mi perfil
+                  </Link>
+                  <button
+                    onClick={() => { handleLogout(); setMenuOpen(false); }}
+                    className="text-left px-4 py-2.5 rounded-md text-[14px] font-medium text-rose hover:bg-rose-soft transition-colors"
+                  >
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="px-4 py-2.5 rounded-md text-[14px] font-semibold text-ink hover:bg-bg-soft transition-colors"
+                >
+                  Ingresar
+                </Link>
+              )}
+              <Link
+                to="/donate"
+                onClick={() => setMenuOpen(false)}
+                className="mt-1 flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-celeste text-white text-[14.5px] font-bold shadow-pri btn-spring hover:bg-celeste-hov"
+              >
+                {isAuthenticated ? 'Donar' : 'Planifica tu visita'}
+                <Icon name="arrow" className="w-4 h-4" stroke={2} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
     </header>
   );
 }
