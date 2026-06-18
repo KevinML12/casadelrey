@@ -47,7 +47,7 @@ function HeroCarousel({ onPlan }) {
         />
       ) : (
         <img
-          src={hero.image || hero.image_url || '/images/bg-hero.jpg'}
+          src={hero.image || hero.image_url || 'https://images.unsplash.com/photo-1438283173091-5dbf5c5a3206?auto=format&fit=crop&q=80'}
           alt={hero.title}
           className="absolute inset-0 w-full h-full object-cover animate-hero-1"
         />
@@ -94,7 +94,6 @@ function Agenda() {
     apiClient.get('/events')
       .then(res => {
         if (res.data && res.data.length > 0) {
-          // Format the dates
           const formatted = res.data.map(ev => {
             const date = new Date(ev.date + 'T12:00:00');
             return {
@@ -113,10 +112,10 @@ function Agenda() {
         }
       })
       .catch(err => {
-        // Fallback elegante
         setEvents([
           { id: 1, day: '15', month: 'AGO', title: 'Noche de Jóvenes', time: 'Viernes · 7:30 PM', loc: 'Auditorio Central', isFeatured: true },
-          { id: 2, day: '18', month: 'AGO', title: 'Encuentro de Líderes', time: 'Jueves · 6:00 PM', loc: 'Salón 2', isFeatured: false }
+          { id: 2, day: '18', month: 'AGO', title: 'Encuentro de Líderes', time: 'Jueves · 6:00 PM', loc: 'Salón 2', isFeatured: false },
+          { id: 3, day: '23', month: 'AGO', title: 'Retiro "Reinicio"', time: 'Sábado · Todo el día', loc: 'Casa de campo', isFeatured: false }
         ]);
       });
   }, []);
@@ -128,12 +127,13 @@ function Agenda() {
 
   return (
     <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
-      {/* Fallback gradients if image fails to load */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-rose/10 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob" style={{ animationDelay: '2s' }} />
+      {/* Liquid glowing orbs */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-rose/20 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob" style={{ animationDelay: '2s' }} />
       
-      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" onError={(e) => e.target.style.display='none'} />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-bg/40" />
+      {/* Background image - Unsplash para asegurar que cargue siempre */}
+      <img src="https://images.unsplash.com/photo-1540039155732-d674d4040a46?auto=format&fit=crop&q=80" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-gradient-to-r from-bg/90 via-bg/70 to-bg/30" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
         <div className="flex flex-col justify-center">
@@ -199,20 +199,16 @@ function CelulasSection() {
   useEffect(() => {
     apiClient.get('/cell-categories')
       .then(res => {
-        if (res.data && res.data.length > 0) {
-          setCategories(res.data);
-        } else {
-          throw new Error("No categories");
-        }
+        if (res.data && res.data.length > 0) setCategories(res.data);
+        else throw new Error("No categories");
       })
       .catch(err => {
-        // Fallback con la nueva información de Mujeres
         setCategories([
-          { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: '/images/celulas/adolescentes.jpg' },
-          { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: '/images/celulas/jovenes.jpg' },
-          { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: '/images/celulas/prejuveniles.jpg' },
-          { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: '/images/celulas/varones.jpg' },
-          { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: '/images/celulas/mujeres.jpg' }
+          { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: 'https://images.unsplash.com/photo-1529156069898-49953eb1f5bc?auto=format&fit=crop&q=80' },
+          { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80' },
+          { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80' },
+          { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb046ebf?auto=format&fit=crop&q=80' },
+          { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80' }
         ]);
       });
   }, []);
@@ -221,12 +217,11 @@ function CelulasSection() {
 
   return (
     <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
-      {/* Liquid glowing orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob" style={{ animationDelay: '4s' }} />
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob" style={{ animationDelay: '4s' }} />
 
-      <img src="/images/bg-celulas.jpg" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" onError={(e) => e.target.style.display='none'} />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent" />
+      <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/30" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="mb-16 text-center">
@@ -242,22 +237,23 @@ function CelulasSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
           {categories.map((cat, i) => {
             let gridSpan = 'md:col-span-1';
-            // Patrón asimétrico para los primeros elementos (Adolescentes y Mujeres en el diseño original)
             if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2'; 
             else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2'; 
 
             return (
-            <div key={i} className={`relative rounded-[32px] flex flex-col card-spring ${gridSpan}`}>
-              <div className="absolute inset-0 rounded-[32px] overflow-hidden">
+            <div key={i} className={`group relative rounded-[32px] flex flex-col card-spring liquid-glass ${gridSpan}`}>
+              <div className="absolute inset-0 rounded-[32px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
                 <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-bg/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
               </div>
-              <div className="relative z-10 w-full h-full liquid-glass rounded-[32px] p-8 text-center flex flex-col items-center justify-center">
-                <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest mb-4">
-                  {cat.age_group}
-                </span>
-                <h3 className={`font-bold text-white mb-2 ${i === 0 ? 'text-[32px]' : 'text-[20px]'}`}>{cat.name}</h3>
-                <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px]'}`}>{cat.description}</p>
+              <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
+                <div>
+                  <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest mb-4 inline-block backdrop-blur-md">
+                    {cat.age_group}
+                  </span>
+                  <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
+                  <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
+                </div>
               </div>
             </div>
             );
@@ -275,11 +271,10 @@ function MensajesCarousel() {
   const [sermons, setSermons] = useState([]);
 
   useEffect(() => {
-    // Simulando que viene de /api/v1/blog o algo similar, pero por ahora mostramos contenido real genérico
     setSermons([
-      { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026' },
-      { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026' },
-      { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026' },
+      { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026', image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&q=80' },
+      { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026', image: 'https://images.unsplash.com/photo-1510563800743-aed236490d08?auto=format&fit=crop&q=80' },
+      { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026', image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80' },
     ]);
   }, []);
 
@@ -287,7 +282,10 @@ function MensajesCarousel() {
 
   return (
     <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-[#0F192B] to-bg/40" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber/10 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '1s' }} />
+      
+      <img src="https://images.unsplash.com/photo-1445384763658-0400939829cd?auto=format&fit=crop&q=80" alt="Mensajes Background" className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-[#0F192B]/90 to-bg/50" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12">
         <Eyebrow>Últimas Prédicas</Eyebrow>
@@ -301,20 +299,17 @@ function MensajesCarousel() {
         <div className="w-[1px] shrink-0 md:w-[calc((100vw-72rem)/2)] hidden md:block" />
         
         {sermons.map((s) => (
-          <a href="#" key={s.id} className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[32px] liquid-glass hover:border-white/30 snap-start card-spring">
-              <div className="relative aspect-video rounded-t-[24px] overflow-hidden bg-white/5 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent" />
-                <Icon name="play" className="w-12 h-12 text-white/20 group-hover:text-white transition-colors duration-500" stroke={1} />
-              </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent rounded-[32px]" />
+          <a href="#" key={s.id} className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[32px] liquid-glass hover:border-white/30 snap-start card-spring overflow-hidden">
+            <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
             
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100">
-              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full liquid-glass flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform duration-500 shadow-xl">
                 <Icon name="play" className="w-6 h-6 text-white ml-1" />
               </div>
             </div>
 
-            <div className="absolute bottom-0 left-0 p-8 w-full">
+            <div className="absolute bottom-0 left-0 p-8 w-full z-10">
               <div className="text-[11px] font-extrabold uppercase tracking-widest text-white/80 mb-2">{s.date}</div>
               <h3 className="text-[20px] md:text-[24px] font-bold text-white leading-tight">{s.title}</h3>
             </div>
@@ -331,15 +326,18 @@ function MensajesCarousel() {
 // ════════════════════════════════════════════════════════════════════
 function Ubicacion({ onPlan }) {
   return (
-    <section id="ubicacion" className="relative py-20 md:py-32 bg-bg border-t border-white/5">
-      <img src="/images/bg-ensenanzas.jpg" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/10" />
+    <section id="ubicacion" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '3s' }} />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob" />
+
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/30" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-8">
           
           <div className="rounded-[32px] liquid-glass p-10 md:p-14 flex flex-col justify-center card-spring">
-            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center border border-white/20 mb-8">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center border border-white/20 mb-8 backdrop-blur-md">
               <Icon name="pin" className="w-6 h-6 text-white" />
             </div>
             <h3 className="display-mega text-white mb-4" style={{ fontSize: '2.5rem' }}>Visítanos</h3>
@@ -348,7 +346,7 @@ function Ubicacion({ onPlan }) {
               carretera a las Ruinas de Zaculeu,<br />
               Huehuetenango
             </p>
-            <a href="#" className="inline-flex items-center justify-between px-6 py-4 rounded-full bg-white/10 border border-white/20 text-white text-[14px] font-bold hover:bg-white/20 transition-all btn-spring w-full md:w-max">
+            <a href="#" className="inline-flex items-center justify-between px-6 py-4 rounded-full bg-transparent border border-white/20 text-white text-[14px] font-bold hover:bg-white/10 transition-all btn-spring w-full md:w-max backdrop-blur-md">
               Ver en Google Maps
               <Icon name="arrow" className="w-4 h-4 ml-4" />
             </a>
@@ -359,7 +357,7 @@ function Ubicacion({ onPlan }) {
             <p className="text-[16px] text-white/70 font-medium mb-8 max-w-sm">
               Queremos conocerte. Planifica tu visita y nos aseguraremos de que te sientas en casa desde el primer minuto.
             </p>
-            <button onClick={onPlan} className="inline-flex items-center justify-between px-6 py-4 rounded-full bg-white text-bg text-[14px] font-bold hover:bg-white/90 transition-all btn-spring w-full md:w-max liquid-glass">
+            <button onClick={onPlan} className="inline-flex items-center justify-between px-6 py-4 rounded-full liquid-glass text-white text-[14px] font-bold hover:border-white/40 transition-all btn-spring w-full md:w-max">
               Planificar Visita
               <Icon name="arrow" className="w-4 h-4 ml-4" />
             </button>
