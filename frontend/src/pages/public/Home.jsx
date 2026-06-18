@@ -128,8 +128,12 @@ function Agenda() {
 
   return (
     <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
-      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/60 to-bg/20" />
+      {/* Fallback gradients if image fails to load */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-rose/10 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob" style={{ animationDelay: '2s' }} />
+      
+      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" onError={(e) => e.target.style.display='none'} />
+      <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-bg/40" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
         <div className="flex flex-col justify-center">
@@ -216,9 +220,13 @@ function CelulasSection() {
   if (categories.length === 0) return null;
 
   return (
-    <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5">
-      <img src="/images/bg-celulas.jpg" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
+    <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
+      {/* Liquid glowing orbs */}
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob" style={{ animationDelay: '4s' }} />
+
+      <img src="/images/bg-celulas.jpg" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" onError={(e) => e.target.style.display='none'} />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="mb-16 text-center">
