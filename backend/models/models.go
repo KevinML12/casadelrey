@@ -38,6 +38,16 @@ type Cell struct {
 	Leader   User   `json:"leader" gorm:"foreignKey:LeaderID"`
 }
 
+// CellCategory agrupa células por tipos (Adolescentes, Jóvenes, Varones, Mujeres, etc.)
+type CellCategory struct {
+	gorm.Model
+	Name        string `json:"name" gorm:"type:varchar(100);not null;unique"` // e.g. "Adolescentes"
+	AgeGroup    string `json:"age_group" gorm:"type:varchar(50)"`             // e.g. "15 a 24 años"
+	Description string `json:"description" gorm:"type:text"`
+	ImageURL    string `json:"image_url" gorm:"type:varchar(500)"`
+	IsActive    bool   `json:"is_active" gorm:"default:true"`
+}
+
 type Post struct {
 	gorm.Model
 	Title          string `json:"title" gorm:"not null"`

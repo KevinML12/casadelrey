@@ -1,61 +1,57 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
-
-// ════════════════════════════════════════════════════════════════════
-// MOCK DATA (Simulando respuesta del Backend/Admin Panel)
-// ════════════════════════════════════════════════════════════════════
-
-const MOCK_HEROES = [
-  { 
-    id: 1, 
-    title: 'LUZ PARA\nLAS NACIONES', 
-    subtitle: 'Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.', 
-    image: '/images/bg-hero.jpg', 
-    buttonText: 'Planifica tu visita',
-    highlightTitle: 'Próximo servicio',
-    highlightTime: '7:30',
-    highlightPeriod: 'PM',
-    highlightDesc: 'Viernes · Noche de Jóvenes'
-  }
-];
-
-const MOCK_EVENTS = [
-  { id: 1, day: '15', month: 'AGO', title: 'Noche de Jóvenes', time: 'Viernes · 7:30 PM', loc: 'Auditorio Central', isFeatured: true },
-  { id: 2, day: '18', month: 'AGO', title: 'Encuentro de Líderes', time: 'Jueves · 6:00 PM', loc: 'Salón 2', isFeatured: false },
-  { id: 3, day: '23', month: 'AGO', title: 'Retiro "Reinicio"', time: 'Sábado · Todo el día', loc: 'Casa de campo', isFeatured: false },
-  { id: 4, day: '24', month: 'AGO', title: 'Servicio General', time: 'Domingo · 10:00 AM', loc: 'Auditorio Central', isFeatured: false }
-];
-
-const MOCK_CELLS = [
-  { category: 'Adolescentes', age: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image: '/images/celulas/adolescentes.jpg' },
-  { category: 'Jóvenes Adultos', age: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image: '/images/celulas/jovenes.jpg' },
-  { category: 'Prejuveniles', age: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image: '/images/celulas/prejuveniles.jpg' },
-  { category: 'Varones', age: 'Casados', description: 'Hombres compartiendo la palabra y construyendo familia.', image: '/images/celulas/varones.jpg' },
-  { category: 'Mujeres', age: 'Mujeres de Palabra', description: 'Formación y hermandad para mujeres de fe.', image: '/images/celulas/mujeres.jpg' }
-];
-
-const MOCK_SERMONS = [
-  { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026' },
-  { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026' },
-  { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026' },
-];
-
+import apiClient from '../../lib/apiClient';
 
 // ════════════════════════════════════════════════════════════════════
 // 1 · HERO CAROUSEL
 // ════════════════════════════════════════════════════════════════════
 function HeroCarousel({ onPlan }) {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const hero = MOCK_HEROES[currentIdx];
+  const [hero, setHero] = useState(null);
+
+  useEffect(() => {
+    apiClient.get('/hero/active')
+      .then(res => {
+        if (res.data) setHero({
+          title: `${res.data.title_line_1 || ''}\n${res.data.title_line_2 || ''}`,
+          subtitle: res.data.subtitle,
+          image: res.data.fallback_image_url || res.data.desktop_video_url,
+          buttonText: res.data.cta_primary_text || 'Planifica tu visita',
+          url: res.data.cta_primary_url
+        });
+        else throw new Error("No data");
+      })
+      .catch(err => {
+        // Fallback elegante (inyectado para prueba R2/Video)
+        setHero({
+          title: 'LUZ PARA\nLAS NACIONES', 
+          subtitle: 'Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.', 
+          image: 'https://pub-6dab501bcd5c4b8b9cfdd7aa6ee88595.r2.dev/sample-hero.mp4', 
+          buttonText: 'Planifica tu visita',
+        });
+      });
+  }, []);
+
+  if (!hero) return <div className="min-h-[100svh] bg-bg" />;
 
   return (
     <section id="inicio" className="relative min-h-[100svh] overflow-hidden bg-bg">
-      <img
-        src={hero.image}
-        alt={hero.title}
-        className="absolute inset-0 w-full h-full object-cover animate-hero-1"
-      />
+      {hero.image && hero.image.endsWith('.mp4') ? (
+        <video 
+          src={hero.image} 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="absolute inset-0 w-full h-full object-cover animate-hero-1"
+        />
+      ) : (
+        <img
+          src={hero.image || hero.image_url || '/images/bg-hero.jpg'}
+          alt={hero.title}
+          className="absolute inset-0 w-full h-full object-cover animate-hero-1"
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/30 to-transparent" />
 
@@ -79,7 +75,7 @@ function HeroCarousel({ onPlan }) {
             onClick={onPlan}
             className="inline-flex items-center justify-center gap-4 rounded-full liquid-glass text-white px-8 py-5 text-[16px] font-bold tracking-tightish btn-spring focus-ring"
           >
-            {hero.buttonText}
+            {hero.buttonText || 'Planifica tu visita'}
             <Icon name="arrow" className="w-5 h-5" stroke={2} />
           </button>
         </div>
@@ -92,8 +88,43 @@ function HeroCarousel({ onPlan }) {
 // 2 · AGENDA (Eventos)
 // ════════════════════════════════════════════════════════════════════
 function Agenda() {
-  const featured = MOCK_EVENTS.find(e => e.isFeatured) || MOCK_EVENTS[0];
-  const others = MOCK_EVENTS.filter(e => !e.isFeatured);
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    apiClient.get('/events')
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          // Format the dates
+          const formatted = res.data.map(ev => {
+            const date = new Date(ev.date + 'T12:00:00');
+            return {
+              id: ev.ID,
+              day: date.getDate().toString(),
+              month: date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase(),
+              title: ev.title,
+              time: ev.time || 'Por definir',
+              loc: ev.location,
+              isFeatured: ev.is_featured
+            };
+          });
+          setEvents(formatted);
+        } else {
+          throw new Error("Empty events");
+        }
+      })
+      .catch(err => {
+        // Fallback elegante
+        setEvents([
+          { id: 1, day: '15', month: 'AGO', title: 'Noche de Jóvenes', time: 'Viernes · 7:30 PM', loc: 'Auditorio Central', isFeatured: true },
+          { id: 2, day: '18', month: 'AGO', title: 'Encuentro de Líderes', time: 'Jueves · 6:00 PM', loc: 'Salón 2', isFeatured: false }
+        ]);
+      });
+  }, []);
+
+  if (events.length === 0) return null;
+
+  const featured = events.find(e => e.isFeatured) || events[0];
+  const others = events.filter(e => e.id !== featured.id).slice(0, 3);
 
   return (
     <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
@@ -131,7 +162,7 @@ function Agenda() {
           </div>
           <div className="space-y-4">
             {others.map((ev) => (
-              <div key={ev.id} className="group rounded-[24px] bg-white/5 border border-white/10 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
+              <div key={ev.id} className="group rounded-[24px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
                 <div className="text-center sm:text-left shrink-0">
                   <div className="text-[32px] font-extrabold text-white leading-none">{ev.day}</div>
                   <div className="text-[10px] text-white font-bold tracking-widest mt-1">{ev.month}</div>
@@ -159,6 +190,31 @@ function Agenda() {
 // 3 · CÉLULAS Y COMUNIDAD
 // ════════════════════════════════════════════════════════════════════
 function CelulasSection() {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    apiClient.get('/cell-categories')
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          setCategories(res.data);
+        } else {
+          throw new Error("No categories");
+        }
+      })
+      .catch(err => {
+        // Fallback con la nueva información de Mujeres
+        setCategories([
+          { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: '/images/celulas/adolescentes.jpg' },
+          { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: '/images/celulas/jovenes.jpg' },
+          { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: '/images/celulas/prejuveniles.jpg' },
+          { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: '/images/celulas/varones.jpg' },
+          { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: '/images/celulas/mujeres.jpg' }
+        ]);
+      });
+  }, []);
+
+  if (categories.length === 0) return null;
+
   return (
     <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5">
       <img src="/images/bg-celulas.jpg" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-60" />
@@ -176,22 +232,23 @@ function CelulasSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
-          {MOCK_CELLS.map((cat, i) => {
+          {categories.map((cat, i) => {
             let gridSpan = 'md:col-span-1';
-            if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2'; // Adolescentes
-            else if (i === 4) gridSpan = 'md:col-span-2 lg:col-span-2'; // Mujeres
+            // Patrón asimétrico para los primeros elementos (Adolescentes y Mujeres en el diseño original)
+            if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2'; 
+            else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2'; 
 
             return (
             <div key={i} className={`relative rounded-[32px] flex flex-col card-spring ${gridSpan}`}>
               <div className="absolute inset-0 rounded-[32px] overflow-hidden">
-                <img src={cat.image} alt={cat.category} className="w-full h-full object-cover" />
+                <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-bg/40" />
               </div>
               <div className="relative z-10 w-full h-full liquid-glass rounded-[32px] p-8 text-center flex flex-col items-center justify-center">
                 <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest mb-4">
-                  {cat.age}
+                  {cat.age_group}
                 </span>
-                <h3 className={`font-bold text-white mb-2 ${i === 0 ? 'text-[32px]' : 'text-[20px]'}`}>{cat.category}</h3>
+                <h3 className={`font-bold text-white mb-2 ${i === 0 ? 'text-[32px]' : 'text-[20px]'}`}>{cat.name}</h3>
                 <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px]'}`}>{cat.description}</p>
               </div>
             </div>
@@ -207,6 +264,19 @@ function CelulasSection() {
 // 4 · MENSAJES (Prédicas en Liquid Glass)
 // ════════════════════════════════════════════════════════════════════
 function MensajesCarousel() {
+  const [sermons, setSermons] = useState([]);
+
+  useEffect(() => {
+    // Simulando que viene de /api/v1/blog o algo similar, pero por ahora mostramos contenido real genérico
+    setSermons([
+      { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026' },
+      { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026' },
+      { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026' },
+    ]);
+  }, []);
+
+  if (sermons.length === 0) return null;
+
   return (
     <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-[#0F192B] to-bg/40" />
@@ -222,7 +292,7 @@ function MensajesCarousel() {
         <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
         <div className="w-[1px] shrink-0 md:w-[calc((100vw-72rem)/2)] hidden md:block" />
         
-        {MOCK_SERMONS.map((s) => (
+        {sermons.map((s) => (
           <a href="#" key={s.id} className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[32px] liquid-glass hover:border-white/30 snap-start card-spring">
               <div className="relative aspect-video rounded-t-[24px] overflow-hidden bg-white/5 flex items-center justify-center">
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent" />

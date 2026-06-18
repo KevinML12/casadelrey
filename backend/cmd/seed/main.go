@@ -34,7 +34,7 @@ func main() {
 		&models.MemberBoleta{}, &models.Volunteer{}, &models.Announcement{},
 		&models.GalleryPhoto{}, &models.Donation{}, &models.Petition{},
 		&models.EventRegistration{}, &models.SocialPost{}, &models.UserGoal{},
-		&models.ActivityLog{},
+		&models.ActivityLog{}, &models.CellCategory{}, &models.HeroSetting{},
 	)
 	fmt.Println("Tablas migradas")
 
@@ -97,6 +97,28 @@ func main() {
 		}
 		db.Create(&events[i])
 		fmt.Printf("  + evento: %s\n", events[i].Title)
+	}
+
+	cellCats := []models.CellCategory{
+		{Name: "Adolescentes", AgeGroup: "15 a 24 años", Description: "Reuniones dinámicas para adolescentes.", ImageURL: "/images/celulas/adolescentes.jpg"},
+		{Name: "Jóvenes Adultos", AgeGroup: "Solteros", Description: "Comunidad para jóvenes profesionales y universitarios.", ImageURL: "/images/celulas/jovenes.jpg"},
+		{Name: "Prejuveniles", AgeGroup: "12 a 15 años", Description: "Un espacio seguro y divertido para crecer.", ImageURL: "/images/celulas/prejuveniles.jpg"},
+		{Name: "Varones", AgeGroup: "Hombres", Description: "Hombres compartiendo la palabra y construyendo familia.", ImageURL: "/images/celulas/varones.jpg"},
+		{Name: "Mujeres", AgeGroup: "Mujeres", Description: "Un espacio de formación espiritual, apoyo mutuo y hermandad.", ImageURL: "/images/celulas/mujeres.jpg"},
+	}
+	for i := range cellCats {
+		var ex models.CellCategory
+		if db.Where("name = ?", cellCats[i].Name).First(&ex).Error == nil {
+			// Update if exists to reflect new image paths
+			ex.AgeGroup = cellCats[i].AgeGroup
+			ex.Description = cellCats[i].Description
+			ex.ImageURL = cellCats[i].ImageURL
+			db.Save(&ex)
+			fmt.Printf("  ~ updated cell category: %s\n", cellCats[i].Name)
+			continue
+		}
+		db.Create(&cellCats[i])
+		fmt.Printf("  + cell category: %s\n", cellCats[i].Name)
 	}
 
 	d1 := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
@@ -211,6 +233,21 @@ func main() {
 		db.Create(&donations[i])
 		fmt.Printf("  + donacion: Q%.0f - %s\n", donations[i].Amount, donations[i].DonationPurpose)
 	}
+
+	db.Where("1 = 1").Delete(&models.HeroSetting{})
+	hero := models.HeroSetting{
+		LabelTop:         "● IGLESIA CRISTIANA · HUEHUETENANGO",
+		TitleLine1:       "LUZ PARA",
+		TitleLine2:       "LAS NACIONES",
+		Subtitle:         "Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.",
+		CTAPrimaryText:   "Planifica tu visita",
+		CTAPrimaryURL:    "/visita",
+		FallbackImageURL: "/images/bg-hero.jpg",
+		DesktopVideoURL:  "https://pub-6dab501bcd5c4b8b9cfdd7aa6ee88595.r2.dev/sample-hero.mp4",
+		IsActive:         true,
+	}
+	db.Create(&hero)
+	log.Println("Hero setting planted.")
 
 	fmt.Println("\nSeed completado!")
 	fmt.Println("\nCredenciales:")

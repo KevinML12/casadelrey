@@ -21,6 +21,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	petitionHandler      := handlers.NewPetitionHandler(db)
 	donationHandler      := handlers.NewDonationHandler(db)
 	eventHandler         := handlers.NewEventHandler(db)
+	cellCategoryHandler  := handlers.NewCellCategoryHandler(db)
 	cellReportHandler    := handlers.NewCellReportHandler(db)
 	socialHandler        := handlers.NewSocialHandler(db)
 	adminHandler         := handlers.NewAdminHandler(db)
@@ -98,7 +99,13 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Eventos (público: lectura + RSVP)
 	eventsGroup := api.Group("/events")
 	eventsGroup.GET("/",              eventHandler.GetEvents)
+	eventsGroup.GET("/:id",           eventHandler.GetEventByID)
+	eventsGroup.POST("/:id/register", eventHandler.RegisterForEvent)
 	eventsGroup.POST("/:id/rsvp",    rsvpHandler.RegisterRSVP)
+
+	// Células (público: lectura de categorías)
+	cellsGroup := api.Group("/cell-categories")
+	cellsGroup.GET("/", cellCategoryHandler.GetCellCategories)
 
 	// Feed social
 	api.GET("/social/feed", socialHandler.GetSocialFeed)
