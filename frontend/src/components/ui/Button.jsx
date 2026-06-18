@@ -34,6 +34,9 @@ const variants = {
   text:
     'bg-transparent text-pri px-3 ' +
     'before:bg-pri hover:before:opacity-[.08] active:before:opacity-[.12] focus-visible:before:opacity-[.12]',
+  glass:
+    'liquid-glass text-white border-none ' +
+    'hover:bg-white/10 active:bg-white/15',
 };
 
 const sizes = {

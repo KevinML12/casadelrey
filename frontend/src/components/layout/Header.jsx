@@ -5,11 +5,9 @@ import { Icon } from '../ui/Glass';
 
 const NAV_LINKS = [
   { label: 'Inicio',       to: '/' },
-  { label: 'Nosotros',     to: '/about' },
+  { label: 'Ministerios',  to: '/about' },
   { label: 'Eventos',      to: '/events' },
-  { label: 'Blog',         to: '/blog' },
-  { label: 'Voluntariado', to: '/volunteering' },
-  { label: 'Donar',        to: '/donate' },
+  { label: 'Dar',          to: '/donate' },
 ];
 
 export default function Header() {
@@ -51,12 +49,12 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group rounded-pill pl-1.5 pr-3 py-1">
             <span
-              className="grid place-items-center w-10 h-10 rounded-md bg-celeste text-white shadow-pri transition-transform duration-400"
+              className="grid place-items-center w-10 h-10 rounded-md bg-white text-bg transition-transform duration-400"
               style={{ transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
             >
               <Icon name="crown" className="w-5 h-5" stroke={2} />
             </span>
-            <span className="text-[15px] font-extrabold tracking-tightish text-ink">Casa del Rey</span>
+            <span className="text-[15px] font-extrabold tracking-tightish text-white">Casa del Rey</span>
           </Link>
 
           {/* Desktop nav links */}
@@ -67,8 +65,8 @@ export default function Header() {
                   <span
                     className={`px-4 py-2 rounded-pill text-[14px] font-semibold cursor-pointer transition-all duration-300 ${
                       isActive
-                        ? 'bg-ink text-white shadow-whisper'
-                        : 'text-ink-2 hover:text-ink hover:bg-bg-soft'
+                        ? 'bg-white text-bg shadow-whisper'
+                        : 'text-white/80 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {n.label}
@@ -80,48 +78,48 @@ export default function Header() {
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <div className="relative hidden sm:block" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
                   className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-[13px] text-ink hover:bg-bg-soft transition-all duration-300 focus-ring"
                 >
-                  <span className="grid place-items-center w-7 h-7 rounded-full bg-celeste text-white text-[12px] font-extrabold shadow-pri">
+                  <span className="grid place-items-center w-7 h-7 rounded-full bg-white/20 text-white text-[12px] font-extrabold shadow-pri">
                     {(user?.name || user?.email || '?')[0].toUpperCase()}
                   </span>
-                  <span className="font-semibold">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>
+                  <span className="font-semibold text-white">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>
                 </button>
 
                 {dropOpen && (
                   <div
-                    className="absolute right-0 top-full mt-3 w-60 glass-strong glass-sheen rounded-2xl p-2 z-50 animate-rise"
+                    className="absolute right-0 top-full mt-3 w-60 liquid-glass rounded-[24px] p-2 z-50 animate-rise"
                     style={{ animationDuration: '300ms' }}
                   >
-                    <div className="px-3 py-2.5 border-b border-ink-soft mb-1">
-                      <p className="text-[13px] font-bold text-ink truncate">{user?.name || 'Usuario'}</p>
-                      <p className="text-[12px] text-ink-2 truncate">{user?.email}</p>
+                    <div className="px-3 py-2.5 border-b border-white/10 mb-1">
+                      <p className="text-[13px] font-bold text-white truncate">{user?.name || 'Usuario'}</p>
+                      <p className="text-[12px] text-white/60 truncate">{user?.email}</p>
                     </div>
                     {(isAdmin || user?.role === 'leader') && (
                       <Link
                         to={isAdmin ? '/admin' : '/leader'}
                         onClick={() => setDropOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-[13.5px] font-medium text-ink hover:bg-bg-soft transition-colors"
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[13.5px] font-medium text-white hover:bg-white/10 transition-colors"
                       >
-                        <Icon name="spark" className="w-4 h-4 text-celeste" />
+                        <Icon name="spark" className="w-4 h-4 text-white" />
                         {isAdmin ? 'Panel Admin' : 'Panel Líder'}
                       </Link>
                     )}
                     <Link
                       to="/profile"
                       onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-[13.5px] font-medium text-ink hover:bg-bg-soft transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[13.5px] font-medium text-white hover:bg-white/10 transition-colors"
                     >
-                      <Icon name="user" className="w-4 h-4 text-celeste" />
+                      <Icon name="user" className="w-4 h-4 text-white" />
                       Mi perfil
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md text-[13.5px] font-medium text-rose hover:bg-rose-soft transition-colors"
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[13.5px] font-medium text-rose hover:bg-rose-soft transition-colors"
                     >
                       <Icon name="close" className="w-4 h-4" />
                       Cerrar sesión
@@ -129,26 +127,19 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : (
-              <Link
-                to="/login"
-                className="hidden sm:inline-flex px-4 py-2 rounded-pill text-[14px] font-semibold text-ink-2 hover:text-ink hover:bg-bg-soft transition-all duration-300"
-              >
-                Ingresar
-              </Link>
             )}
 
             <Link
               to="/donate"
-              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-pill bg-celeste text-white text-[14px] font-bold shadow-pri btn-spring hover:bg-celeste-hov hover:shadow-pri-lg focus-ring"
+              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-glass text-white text-[14px] font-bold btn-spring focus-ring"
             >
-              {isAuthenticated ? 'Donar' : 'Planifica tu visita'}
+              {isAuthenticated ? 'Dar' : 'Planifica tu visita'}
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
             </Link>
 
             <button
               onClick={() => setMenuOpen(o => !o)}
-              className="md:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg-soft text-ink hover:bg-celeste-soft hover:text-celeste transition-colors focus-ring"
+              className="md:hidden grid place-items-center w-10 h-10 rounded-pill bg-white/5 text-white hover:bg-white/10 transition-colors focus-ring"
               aria-label="Menú"
             >
               <Icon name={menuOpen ? 'close' : 'menu'} />
@@ -177,13 +168,13 @@ export default function Header() {
             ))}
 
             <div className="pt-2 mt-1 border-t border-ink-soft flex flex-col gap-1">
-              {isAuthenticated ? (
+              {isAuthenticated && (
                 <>
                   {(isAdmin || user?.role === 'leader') && (
                     <Link
                       to={isAdmin ? '/admin' : '/leader'}
                       onClick={() => setMenuOpen(false)}
-                      className="px-4 py-2.5 rounded-md text-[14px] font-medium text-ink-2 hover:bg-bg-soft transition-colors"
+                      className="px-4 py-2.5 rounded-md text-[14px] font-medium text-white hover:bg-white/10 transition-colors"
                     >
                       {isAdmin ? 'Panel Admin' : 'Panel Líder'}
                     </Link>
@@ -191,7 +182,7 @@ export default function Header() {
                   <Link
                     to="/profile"
                     onClick={() => setMenuOpen(false)}
-                    className="px-4 py-2.5 rounded-md text-[14px] font-medium text-ink-2 hover:bg-bg-soft transition-colors"
+                    className="px-4 py-2.5 rounded-md text-[14px] font-medium text-white hover:bg-white/10 transition-colors"
                   >
                     Mi perfil
                   </Link>
@@ -202,23 +193,15 @@ export default function Header() {
                     Cerrar sesión
                   </button>
                 </>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="px-4 py-2.5 rounded-md text-[14px] font-semibold text-ink hover:bg-bg-soft transition-colors"
-                >
-                  Ingresar
-                </Link>
               )}
-              <Link
-                to="/donate"
-                onClick={() => setMenuOpen(false)}
-                className="mt-1 flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-celeste text-white text-[14.5px] font-bold shadow-pri btn-spring hover:bg-celeste-hov"
-              >
-                {isAuthenticated ? 'Donar' : 'Planifica tu visita'}
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
-              </Link>
+                <Link
+                  to="/donate"
+                  onClick={() => setMenuOpen(false)}
+                  className="mt-1 flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-white text-bg text-[14.5px] font-bold shadow-pri btn-spring hover:bg-white/90"
+                >
+                  {isAuthenticated ? 'Donar' : 'Planifica tu visita'}
+                  <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                </Link>
             </div>
           </div>
         </div>

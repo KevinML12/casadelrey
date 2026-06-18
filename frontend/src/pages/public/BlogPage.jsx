@@ -4,6 +4,12 @@ import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
 import useTTS from '../../hooks/useTTS';
 
+const MOCK_POSTS_FALLBACK = [
+  { ID: 1, title: 'El Precio del Propósito', slug: 'precio-proposito', category: 'ENSEÑANZA', excerpt: 'Descubre cómo el propósito moldea nuestra identidad.', content: '<p>Descubre cómo el propósito moldea nuestra identidad.</p>' },
+  { ID: 2, title: 'Identidad Inquebrantable', slug: 'identidad-inquebrantable', category: 'ENSEÑANZA', excerpt: 'Nuestra identidad está firme en la palabra.', content: '<p>Nuestra identidad está firme en la palabra.</p>' },
+  { ID: 3, title: 'Instagram Oficial', redirect_url: 'https://instagram.com/casadelreyhue', category: 'RED SOCIAL' }
+];
+
 function Loader() {
   return (
     <div className="min-h-screen bg-surf flex items-center justify-center">
@@ -93,7 +99,6 @@ function TTSPlayer({ content }) {
   );
 }
 
-// Detecta la plataforma desde la URL para mostrar el ícono y nombre correcto
 function getSocialPlatform(url = '') {
   if (!url) return null;
   if (url.includes('instagram.com'))  return { label: 'Instagram',  icon: 'photo_camera' };
@@ -125,7 +130,6 @@ function PostDetail({ post }) {
       </p>
       <h1 className="text-headline-l text-on-surf font-black leading-tight mb-6">{post.title}</h1>
 
-      {/* Banner de red social */}
       {post.redirect_url && social && (
         <a
           href={post.redirect_url}
@@ -193,7 +197,6 @@ function PostList({ posts }) {
                 : { background: 'var(--surf-high)', border: '1px solid var(--outline-var)' }
             }
           >
-            {/* Media */}
             <div
               className="h-48 w-full shrink-0 bg-cover bg-center"
               style={
@@ -202,7 +205,6 @@ function PostList({ posts }) {
                   : { background: GRADIENTS[i % GRADIENTS.length] }
               }
             />
-            {/* Body */}
             <div className="p-6 flex flex-col gap-2.5 flex-1">
               <p className="text-[11px] font-bold tracking-[1.5px]"
                 style={{ color: featured ? 'rgba(255,255,255,0.6)' : 'var(--outline)' }}>
@@ -243,12 +245,10 @@ export default function BlogPage() {
   const [posts,   setPosts]   = useState([]);
   const [post,    setPost]    = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(false);
   const { slug } = useParams();
 
   useEffect(() => {
     setLoading(true);
-    setError(false);
     (async () => {
       try {
         if (slug) {
@@ -260,7 +260,11 @@ export default function BlogPage() {
         }
       } catch (err) {
         console.error(err);
-        setError(true);
+        if (slug) {
+          setPost(MOCK_POSTS_FALLBACK.find(p => p.slug === slug));
+        } else {
+          setPosts(MOCK_POSTS_FALLBACK);
+        }
       } finally {
         setLoading(false);
       }
@@ -268,20 +272,6 @@ export default function BlogPage() {
   }, [slug]);
 
   if (loading) return <Loader />;
-
-  if (error) return (
-    <main className="min-h-screen bg-surf">
-      <PageHero icon="article" title="Blog" subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual." />
-      <div className="max-w-[1200px] mx-auto px-6 py-32 flex flex-col items-center gap-5">
-        <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>SIN CONEXIÓN</p>
-        <p className="font-bold leading-[1.05] tracking-[-0.02em]"
-          style={{ color: 'var(--on-surf)', fontSize: 'clamp(28px, 4vw, 40px)' }}>
-          No pudimos conectar.
-        </p>
-        <p style={{ color: 'var(--on-surf-var)', fontSize: 16 }}>Verifica tu conexión e intenta de nuevo.</p>
-      </div>
-    </main>
-  );
 
   if (slug && post) {
     return (

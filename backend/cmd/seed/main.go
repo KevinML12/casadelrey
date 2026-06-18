@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"fmt"
@@ -51,7 +51,14 @@ func main() {
 	for i := range users {
 		var ex models.User
 		if db.Where("email = ?", users[i].Email).First(&ex).Error == nil {
-			fmt.Printf("  skip: %s\n", users[i].Email)
+			// Actualizar contraseña, rol y verificación del usuario existente
+			ex.Password = users[i].Password
+			ex.Role = users[i].Role
+			ex.EmailVerified = users[i].EmailVerified
+			ex.CellCode = users[i].CellCode
+			ex.CellType = users[i].CellType
+			db.Save(&ex)
+			fmt.Printf("  ~ updated: %s (%s)\n", users[i].Email, users[i].Role)
 			continue
 		}
 		db.Create(&users[i])

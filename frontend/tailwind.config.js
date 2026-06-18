@@ -4,25 +4,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ── LIQUID GLASS LIGHT — paleta directa ────────────────────
-        'bg':           '#FFFFFF',
-        'bg-tint':      '#FAFBFD',
-        'bg-soft':      '#F4F6FB',
+        // ── LIQUID GLASS NAVY — paleta directa ────────────────────
+        'bg':           '#0A1526',     // Deep Navy Canvas
+        'bg-tint':      '#0F192B',
+        'bg-soft':      '#131F33',
 
-        'ink':          '#0A1526',     // Deep Navy
-        'ink-2':        '#475569',
-        'ink-3':        '#94A3B8',
+        'ink':          '#FFFFFF',     // Pure White Text
+        'ink-2':        '#94A3B8',     // Muted Text
+        'ink-3':        '#475569',
 
         'celeste':      '#3B82F6',     // Sapphire — primary
-        'celeste-hov':  '#2563EB',
-        'celeste-soft': '#EFF5FF',
+        'celeste-hov':  '#60A5FA',
+        'celeste-soft': '#1E3A8A',     // Darker tint for navy bg
 
-        'rose':         '#E11D48',
-        'rose-soft':    '#FFF1F2',
+        'rose':         '#F43F5E',
+        'rose-soft':    '#881337',
         'amber':        '#F59E0B',
-        'amber-soft':   '#FFFBEB',
+        'amber-soft':   '#78350F',
         'emerald':      '#10B981',
-        'emerald-soft': '#ECFDF5',
+        'emerald-soft': '#064E3B',
 
         // ── ALIAS LEGACY (compat con código existente) ──────────────
         'pri':         'var(--celeste)',
@@ -31,10 +31,10 @@ export default {
         'pri-con':     'var(--celeste-soft)',
         'on-pri-con':  'var(--celeste-hov)',
 
-        'sec':         'var(--ink)',
+        'sec':         'var(--bg-soft)',
         'on-sec':      '#FFFFFF',
-        'sec-con':     'var(--bg-soft)',
-        'on-sec-con':  'var(--ink)',
+        'sec-con':     'var(--bg)',
+        'on-sec-con':  '#FFFFFF',
 
         'ter':         'var(--celeste)',
         'on-ter':      '#FFFFFF',
@@ -44,25 +44,25 @@ export default {
         'err':         'var(--rose)',
         'on-err':      '#FFFFFF',
         'err-con':     'var(--rose-soft)',
-        'on-err-con':  'var(--rose)',
+        'on-err-con':  '#FDA4AF',
         'warn':        'var(--amber)',
         'warn-con':    'var(--amber-soft)',
-        'on-warn-con': '#92400E',
+        'on-warn-con': '#FCD34D',
         'ok':          'var(--emerald)',
         'ok-con':      'var(--emerald-soft)',
-        'on-ok-con':   '#065F46',
+        'on-ok-con':   '#6EE7B7',
 
-        'surf':        '#FFFFFF',
-        'surf-dim':    'var(--ink-line)',
-        'surf-low':    'var(--bg-soft)',
-        'surf-high':   '#FFFFFF',
-        'on-surf':     'var(--ink)',
-        'on-surf-var': 'var(--ink-2)',
-        'outline':     'var(--ink-3)',
-        'outline-var': 'var(--ink-soft)',
+        'surf':        '#0A1526',
+        'surf-dim':    '#0F192B',
+        'surf-low':    '#131F33',
+        'surf-high':   '#1E293B',
+        'on-surf':     '#FFFFFF',
+        'on-surf-var': '#94A3B8',
+        'outline':     '#334155',
+        'outline-var': '#1E293B',
 
-        'inv-surf':    'var(--ink)',
-        'inv-on-surf': '#FFFFFF',
+        'inv-surf':    '#FFFFFF',
+        'inv-on-surf': '#0A1526',
         'inv-pri':     'var(--celeste)',
 
         // ── DARK ALIASES preservados (algunas páginas todavía los usan) ─
@@ -76,10 +76,10 @@ export default {
       },
 
       fontFamily: {
-        sans:    ['Inter', 'system-ui', '-apple-system', 'SF Pro Text', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
         serif:   ['Playfair Display', 'Georgia', 'serif'],
-        mono:    ['JetBrains Mono', 'SF Mono', 'Menlo', 'monospace'],
+        mono:    ['SF Mono', 'JetBrains Mono', 'Menlo', 'monospace'],
       },
 
       // ── Squircle radii (Apple HIG) ──────────────────────────────

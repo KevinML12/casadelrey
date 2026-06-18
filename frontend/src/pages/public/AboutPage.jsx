@@ -1,112 +1,118 @@
 import PageHero from '../../components/layout/PageHero';
 import SocialSection from '../../components/sections/SocialSection';
-import { Icon, Halos } from '../../components/ui/Glass';
+import { Icon } from '../../components/ui/Glass';
 
 const INFO_ITEMS = [
   { icon: 'clock', text: 'Domingos 10:00 AM' },
-  { icon: 'clock', text: 'Miércoles 7:00 PM' },
   { icon: 'pin',   text: '7a. Calle 12-66 zona 4, Huehuetenango' },
-  { icon: 'phone', text: '+502 4760 0636',          href: 'tel:+50247600636' },
-  { icon: 'mail',  text: 'casadelreyhuehue@gmail.com', href: 'mailto:casadelreyhuehue@gmail.com' },
-  { icon: 'chat',  text: 'WhatsApp · +502 4760 0636', href: 'https://wa.me/50247600636', external: true },
-];
-
-const PILLARS = [
-  { label: 'Misión',  icon: 'spark', body: 'Próximamente.' },
-  { label: 'Visión',  icon: 'crown', body: 'Próximamente.' },
-  { label: 'Valores', icon: 'heart', body: 'Próximamente.' },
+  { icon: 'phone', text: '+502 4760 0636', href: 'tel:+50247600636' },
+  { icon: 'music', text: 'Radio CDR Inusual (92.9FM) · Vie 15:00' },
 ];
 
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-bg text-ink">
       <PageHero
-        eyebrow="Conócenos"
-        title="Somos una familia."
-        subtitle="Apasionada por Dios, por su Casa y por su gente."
+        eyebrow="Ministerios e Identidad"
+        title="Nuestra Casa."
+        subtitle="Apasionados por Dios, por su Casa y por su gente."
       />
 
-      <section className="relative py-20 md:py-28 overflow-hidden">
-        <Halos variant="soft" />
-        <div className="relative z-10 max-w-5xl mx-auto px-6 space-y-20">
-          {/* Historia */}
+      <section className="relative py-20 md:py-28 overflow-hidden bg-bg">
+        <div className="relative z-10 max-w-5xl mx-auto px-6 space-y-24">
+          
+          {/* Liderazgo */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Nuestra historia</span>
+              <span className="h-px w-10 bg-gradient-to-r from-celeste to-transparent" />
+              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Liderazgo</span>
             </div>
             <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.4rem)' }}>
-              Una casa con luces<br />encendidas desde 2016.
+              Pastores.
             </h2>
-            <div className="mt-7 bg-bg border border-ink-soft shadow-card rounded-card p-7 md:p-9">
-              <p className="text-[16.5px] text-ink-2 leading-relaxed">Próximamente.</p>
+            
+            <div className="mt-10 grid md:grid-cols-2 gap-6">
+              {/* Fundadores */}
+              <div className="bg-white/5 border border-white/10 rounded-[24px] p-8 card-spring">
+                <span className="grid place-items-center w-12 h-12 rounded-full bg-celeste/10 text-celeste mb-6">
+                  <Icon name="crown" className="w-6 h-6" />
+                </span>
+                <div className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-2">Pastores Fundadores</div>
+                <h3 className="text-[24px] font-bold text-white tracking-tight">José De León (+) <br/> y Desideria López</h3>
+                <p className="mt-4 text-[14px] text-white/60 leading-relaxed">
+                  Quienes sembraron la visión original y levantaron los cimientos de fe sobre los cuales Casa del Rey sigue edificando hoy.
+                </p>
+              </div>
+
+              {/* Actuales */}
+              <div className="bg-white/5 border border-white/10 rounded-[24px] p-8 card-spring">
+                <span className="grid place-items-center w-12 h-12 rounded-full bg-celeste/10 text-celeste mb-6">
+                  <Icon name="users" className="w-6 h-6" />
+                </span>
+                <div className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-2">Pastores Generales</div>
+                <h3 className="text-[24px] font-bold text-white tracking-tight">Leonel e Ismeina <br/> De León</h3>
+                <p className="mt-4 text-[14px] text-white/60 leading-relaxed">
+                  Liderando a la iglesia con pasión y propósito, llevando el mensaje de restauración familiar a cada rincón de Huehuetenango.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Misión, Visión, Valores */}
+          {/* Misión y Visión */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Pilares</span>
+              <span className="h-px w-10 bg-gradient-to-r from-celeste to-transparent" />
+              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Identidad</span>
             </div>
             <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.4rem)' }}>
-              Misión, visión y valores.
+              Propósito.
             </h2>
 
-            <div className="mt-8 grid md:grid-cols-3 gap-4">
-              {PILLARS.map(({ label, icon, body }) => (
-                <div key={label} className="bg-bg border border-ink-soft shadow-card rounded-card p-6">
-                  <span className="grid place-items-center w-12 h-12 rounded-sm bg-bg-soft text-celeste mb-5">
-                    <Icon name={icon} className="w-6 h-6" />
-                  </span>
-                  <h3 className="text-[20px] font-extrabold tracking-tightish text-ink">{label}</h3>
-                  <p className="mt-2 text-[14.5px] text-ink-2 leading-relaxed">{body}</p>
-                </div>
-              ))}
+            <div className="mt-10 space-y-6">
+              <div className="bg-white/5 border border-white/10 rounded-[24px] p-8 md:p-12 card-spring">
+                <h3 className="text-[28px] font-bold tracking-tight text-white mb-4">Nuestra Misión</h3>
+                <p className="text-[18px] md:text-[22px] text-white/70 leading-relaxed font-serif">
+                  "Somos una Iglesia Cristiana familiar, enfocada a cumplir la gran comisión de Jesucristo de id y haced discípulos a las naciones, haciendo de cada miembro un líder capacitado para reproducir la obra de Dios."
+                </p>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 rounded-[24px] p-8 md:p-12 card-spring">
+                <h3 className="text-[28px] font-bold tracking-tight text-white mb-4">Nuestra Visión</h3>
+                <p className="text-[18px] md:text-[22px] text-white/70 leading-relaxed font-serif">
+                  "Ser una Iglesia Cristiana de restauración familiar, punta de lanza, que proclame la verdad de la Palabra de Dios, bajo el poder del Espíritu Santo."
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Declaración de Fe */}
-          <div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Lo que creemos</span>
-            </div>
-            <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.4rem)' }}>
-              Declaración de fe.
-            </h2>
-            <div className="mt-7 bg-bg border border-ink-soft shadow-card rounded-card p-7 md:p-9">
-              <p className="text-[16.5px] text-ink-2 leading-relaxed">Próximamente.</p>
-            </div>
-          </div>
+          {/* Horario + ubicación */}
+          <div className="relative rounded-[32px] overflow-hidden bg-[#0A1526] border border-white/10 p-7 md:p-12 shadow-card-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-celeste/10 to-transparent pointer-events-none" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="h-px w-10 bg-gradient-to-r from-celeste to-transparent" />
+                <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Contacto</span>
+              </div>
+              <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2rem, 4.5vw, 3.4rem)' }}>
+                Ubicación.
+              </h2>
 
-          {/* Horario + ubicación — glass-strong sobre halos */}
-          <div className="relative rounded-card overflow-hidden bg-bg border border-ink-soft shadow-card-lg p-7 md:p-10">
-            <div className="absolute inset-0 -z-10 pointer-events-none">
-              <div className="halo" style={{ width: 420, height: 420, top: -120, right: -80, background: 'rgba(63,169,255,0.20)' }} />
-            </div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Visítanos</span>
-            </div>
-            <h2 className="display-mega text-ink" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 2.6rem)' }}>
-              Horario y ubicación.
-            </h2>
-
-            <div className="mt-7 grid sm:grid-cols-2 gap-3">
-              {INFO_ITEMS.map(({ icon, text, href, external }) => {
-                const body = (
-                  <div className="flex items-start gap-3 rounded-md bg-bg-soft border border-ink-soft p-4 hover:bg-bg-soft transition-colors">
-                    <span className="grid place-items-center w-10 h-10 rounded-sm bg-bg-soft text-celeste shrink-0">
-                      <Icon name={icon} className="w-5 h-5" />
-                    </span>
-                    <span className="text-[14.5px] text-ink leading-snug">{text}</span>
-                  </div>
-                );
-                return href
-                  ? <a key={text} href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})} className="block focus-ring rounded-md">{body}</a>
-                  : <div key={text}>{body}</div>;
-              })}
+              <div className="mt-10 grid sm:grid-cols-2 gap-4">
+                {INFO_ITEMS.map(({ icon, text, href, external }) => {
+                  const body = (
+                    <div className="flex items-center gap-4 rounded-[16px] bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition-colors">
+                      <span className="grid place-items-center w-12 h-12 rounded-full bg-white/5 text-celeste shrink-0">
+                        <Icon name={icon} className="w-5 h-5" />
+                      </span>
+                      <span className="text-[15px] font-bold text-white/90 leading-snug">{text}</span>
+                    </div>
+                  );
+                  return href
+                    ? <a key={text} href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})} className="block focus-ring rounded-md">{body}</a>
+                    : <div key={text}>{body}</div>;
+                })}
+              </div>
             </div>
           </div>
         </div>

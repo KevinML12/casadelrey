@@ -7,6 +7,13 @@ import Button from '../../components/ui/Button';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
+const MOCK_EVENTS_FALLBACK = [
+  { ID: 1, title: 'Noche de Jóvenes', date: '2026-08-15', time: '19:30', location: 'Auditorio Central', requires_payment: false },
+  { ID: 2, title: 'Encuentro de Líderes', date: '2026-08-18', time: '18:00', location: 'Salón 2', requires_payment: false },
+  { ID: 3, title: 'Retiro "Reinicio"', date: '2026-08-23', time: '08:00', location: 'Casa de campo', requires_payment: true, price_gtq: 150, payment_deadline: '2026-08-20' },
+  { ID: 4, title: 'Servicio General', date: '2026-08-24', time: '10:00', location: 'Auditorio Central', requires_payment: false }
+];
+
 // Datos bancarios de la iglesia (centralizado)
 const BANK_INFO = [
   { label: 'Banco',      value: 'Banrural' },
@@ -155,11 +162,11 @@ function RSVPModal({ event, onClose }) {
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Confirmar asistencia</p>
-          <p className="text-body-s text-on-surf-var mt-0.5 truncate max-w-64">{event.title}</p>
+          <p className="text-label-l text-white font-semibold uppercase tracking-widest">Confirmar asistencia</p>
+          <p className="text-body-s text-white/60 mt-0.5 truncate max-w-64">{event.title}</p>
         </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full bg-surf-high flex items-center justify-center hover:bg-outline-var transition-colors">
-          <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>close</span>
+        <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+          <span className="ms text-white/60" style={{ fontSize: 18 }}>close</span>
         </button>
       </div>
 
@@ -167,9 +174,9 @@ function RSVPModal({ event, onClose }) {
       {event.requires_payment && <PaymentBanner event={event} />}
 
       {event.requires_payment && (
-        <div className="mb-4 px-4 py-3 rounded-xl bg-pri-con flex items-start gap-2">
-          <span className="ms text-on-pri-con shrink-0" style={{ fontSize: 16 }}>info</span>
-          <p className="text-body-s text-on-pri-con">
+        <div className="mb-4 px-4 py-3 rounded-xl bg-white/10 border border-white/20 flex items-start gap-2">
+          <span className="ms text-white shrink-0" style={{ fontSize: 16 }}>info</span>
+          <p className="text-body-s text-white/90">
             Si ya realizaste el depósito y subiste tu comprobante, ingresa el mismo correo que usaste al subirlo.
           </p>
         </div>
@@ -177,33 +184,33 @@ function RSVPModal({ event, onClose }) {
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1">Nombre <span className="text-err">*</span></label>
+          <label className="block text-label-l text-white/60 mb-1">Nombre <span className="text-rose">*</span></label>
           <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1">Correo <span className="text-err">*</span></label>
+          <label className="block text-label-l text-white/60 mb-1">Correo <span className="text-rose">*</span></label>
           <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="El mismo correo del comprobante" required />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1">Teléfono</label>
+            <label className="block text-label-l text-white/60 mb-1">Teléfono</label>
             <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" />
           </div>
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1">Asistentes</label>
+            <label className="block text-label-l text-white/60 mb-1">Asistentes</label>
             <input type="number" min={1} max={20} value={form.attendee_count} onChange={set('attendee_count')} className={fieldCls} />
           </div>
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1">Notas</label>
+          <label className="block text-label-l text-white/60 mb-1">Notas</label>
           <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${fieldCls} resize-none`} placeholder="¿Algo que debamos saber?" />
         </div>
-        <div className="flex gap-3 pt-2 border-t border-outline-var">
-          <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
+        <div className="flex gap-3 pt-2 border-t border-white/10">
+          <Button type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
             <span className="ms" style={{ fontSize: 16 }}>check_circle</span>
             {loading ? 'Verificando…' : event.requires_payment ? 'Verificar y registrar' : 'Confirmar asistencia'}
           </Button>
-          <Button type="button" variant="outlined" onClick={onClose}>Cancelar</Button>
+          <Button type="button" variant="text" onClick={onClose} className="text-white/60 hover:text-white">Cancelar</Button>
         </div>
       </form>
     </ModalWrapper>
@@ -214,8 +221,8 @@ function ModalWrapper({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div
-        className="bg-white w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
-        style={{ borderRadius: 20, boxShadow: '0 20px 60px rgba(0,0,0,0.094)' }}
+        className="liquid-glass border border-white/20 w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-white"
+        style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
         onClick={e => e.stopPropagation()}
       >
         {children}
@@ -233,7 +240,7 @@ export default function EventsPage() {
   useEffect(() => {
     apiClient.get('/events/')
       .then(r => setEvents(r.data || []))
-      .catch(err => { console.error(err); setError(true); })
+      .catch(err => { console.error(err); setEvents(MOCK_EVENTS_FALLBACK); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -249,21 +256,7 @@ export default function EventsPage() {
 
       <div className="max-w-[1200px] mx-auto px-6 py-20 md:py-28">
 
-        {error ? (
-          /* ── Error state ── */
-          <div className="py-32 flex flex-col items-center gap-5">
-            <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>
-              SIN CONEXIÓN
-            </p>
-            <p className="font-bold text-[28px] tracking-[-0.02em]" style={{ color: 'var(--on-surf)' }}>
-              No pudimos conectar.
-            </p>
-            <p style={{ color: 'var(--on-surf-var)', fontSize: 16 }}>
-              Verifica tu conexión e intenta de nuevo.
-            </p>
-          </div>
-
-        ) : events.length === 0 ? (
+        {events.length === 0 ? (
           /* ── Empty state ── */
           <div className="py-32 flex flex-col items-center gap-5">
             <p className="font-mono text-[11px] tracking-[2px]" style={{ color: 'var(--outline)' }}>

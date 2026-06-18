@@ -38,3 +38,10 @@ npm-debug.log*
 # Coverage
 coverage/
 *.out
+
+# Media & Samples (do not commit)
+frontend/DOMINGOS\ 2026/
+frontend/WILD\ YOUTH\ FOTOGRAFR*
+frontend/liquid\ glass/
+apple_sample/
+frontend/ComposingCustomLayoutsWithSwiftUI/

@@ -1,7 +1,9 @@
 email,name,role,password
-admin@casadelrey.org,Administrador,admin,Admin123!
-lider1@casadelrey.org,María Líder,leader,Lider123!
-lider2@casadelrey.org,Juan Coordinador,leader,Lider123!
-usuario@casadelrey.org,Pedro Miembro,member,Usuario123!
-ana@casadelrey.org,Ana García,member,Usuario123!
-carlos@casadelrey.org,Carlos López,member,Usuario123!
+pastor@casadelrey.org,Pastor Roberto Mendez,admin,Admin2026!
+carlos@casadelrey.org,Carlos Mendez,admin,Admin2026!
+leonel@casadelrey.org,Leonel Garcia,leader,Lider2026!
+ana@casadelrey.org,Ana Perez,leader,Lider2026!
+diego@casadelrey.org,Diego Rodriguez,leader,Lider2026!
+josue@casadelrey.org,Josue Ramirez,leader,Lider2026!
+sofia@casadelrey.org,Sofia Castillo,leader,Lider2026!
+juan.v@casadelrey.org,Juan Voluntario,volunteer,Vol2026!

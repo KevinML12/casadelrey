@@ -16,35 +16,35 @@
   color-scheme: light;
 
   /* ── PALETTE ──────────────────────────────────────────────────── */
-  --bg:           #FFFFFF;      /* canvas blanco puro */
-  --bg-tint:      #FAFBFD;      /* tint apenas perceptible para zonas alternas */
-  --bg-soft:      #F4F6FB;      /* superficie de descanso (inputs, inset) */
+  --bg:           #0A1526;      /* Deep Navy Canvas */
+  --bg-tint:      #0F192B;      
+  --bg-soft:      #131F33;      
 
-  --ink:          #0A1526;      /* Deep Navy — texto primario, marca */
-  --ink-2:        #475569;      /* texto secundario */
-  --ink-3:        #94A3B8;      /* texto terciario, placeholders */
-  --ink-soft:     rgba(10, 21, 38, 0.05);   /* hairline borders */
-  --ink-line:     rgba(10, 21, 38, 0.10);   /* dividers visibles */
+  --ink:          #FFFFFF;      /* Pure white text */
+  --ink-2:        #94A3B8;      /* muted text */
+  --ink-3:        #475569;      
+  --ink-soft:     rgba(255, 255, 255, 0.05);   
+  --ink-line:     rgba(255, 255, 255, 0.10);   
 
   --celeste:      #3B82F6;      /* Sapphire — primary action */
-  --celeste-hov:  #2563EB;      /* pressed/hover */
-  --celeste-soft: #EFF5FF;      /* tint container, badge bg */
+  --celeste-hov:  #60A5FA;      
+  --celeste-soft: #1E3A8A;      
   --on-celeste:   #FFFFFF;
 
-  --rose:         #E11D48;
-  --rose-soft:    #FFF1F2;
+  --rose:         #F43F5E;
+  --rose-soft:    #881337;
   --amber:        #F59E0B;
-  --amber-soft:   #FFFBEB;
+  --amber-soft:   #78350F;
   --emerald:      #10B981;
-  --emerald-soft: #ECFDF5;
+  --emerald-soft: #064E3B;
 
   /* ── GEOMETRY (Squircles) ────────────────────────────────────── */
   --r-xs:   8px;
-  --r-sm:   12px;     /* botones, inputs, chips */
-  --r-md:   16px;     /* tarjetas pequeñas, pills grandes */
+  --r-sm:   12px;     
+  --r-md:   16px;     
   --r-lg:   20px;
-  --r-xl:   24px;     /* tarjetas grandes */
-  --r-2xl:  32px;     /* modales, hero glass */
+  --r-xl:   24px;     
+  --r-2xl:  32px;     
   --r-pill: 9999px;
 
   /* ── ELEVATION (whisper-soft) ────────────────────────────────── */
@@ -157,29 +157,29 @@
 
   /* Cristal estándar — la base para cards translúcidas y navbars */
   .glass {
-    background: rgba(255, 255, 255, 0.70);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-            backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(10, 21, 38, 0.05);
-    box-shadow: 0 8px 32px rgba(10, 21, 38, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+            backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
 
   /* Cristal flotante (cards elevadas, modales) — más opaco, sombra mayor */
   .glass-strong {
-    background: rgba(255, 255, 255, 0.84);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-            backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(10, 21, 38, 0.05);
-    box-shadow: var(--sh-card-lg);
+    background: rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+            backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   /* Glass para el Navbar flotante — translucido pero legible al scroll */
   .glass-nav {
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(10, 21, 38, 0.6);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
             backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(10, 21, 38, 0.06);
-    box-shadow: 0 8px 32px rgba(10, 21, 38, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 
   /* Highlight interno tipo Liquid (top edge bright) */
@@ -191,6 +191,52 @@
     border-radius: inherit;
     pointer-events: none;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  /* ── AUTHENTIC LIQUID GLASS (Figma / Apple HIG) ── */
+  
+  /* ── LIQUID GLASS (Ultra-Transparent & Symmetrical) ── */
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.03); /* Super transparent background */
+    backdrop-filter: blur(24px); /* Clean blur */
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Thin, crisp white border */
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.1); /* Very subtle shadow */
+    transition: all 0.4s ease-out;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .liquid-glass:hover {
+    background: rgba(255, 255, 255, 0.08); /* Slightly more visible on hover */
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+
+  /* .liquid-btn: Botones secundarios estilo cristal. */
+  .liquid-btn {
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .liquid-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Brillo diagonal para liquid-glass */
+  .liquid-glass::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%; width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+    transform: skewX(-20deg);
+    animation: glassShine 8s infinite;
+    pointer-events: none;
   }
 
   /* Surface sólida elevada (no translúcida) */
@@ -301,6 +347,10 @@
   @keyframes haloPulse {
     0%, 100% { transform: scale(1); opacity: 0.45; }
     50%      { transform: scale(1.08); opacity: 0.6; }
+  }
+  @keyframes glassShine {
+    0%, 20% { left: -100%; }
+    100% { left: 200%; }
   }
   .animate-fade-in  { animation: fadeIn 240ms var(--ease-out) both; }
   .animate-slide-up { animation: slideUp 360ms var(--ease-out) both; }
