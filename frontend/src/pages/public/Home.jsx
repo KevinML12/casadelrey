@@ -132,8 +132,8 @@ function Agenda() {
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-rose/20 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob" style={{ animationDelay: '2s' }} />
       
       {/* Background image - Unsplash para asegurar que cargue siempre */}
-      <img src="https://images.unsplash.com/photo-1540039155732-d674d4040a46?auto=format&fit=crop&q=80" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay" />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg/90 via-bg/70 to-bg/30" />
+      <img src="https://images.unsplash.com/photo-1540039155732-d674d4040a46?auto=format&fit=crop&q=80" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-bg/10" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
         <div className="flex flex-col justify-center">
@@ -220,8 +220,8 @@ function CelulasSection() {
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob" style={{ animationDelay: '4s' }} />
 
-      <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/30" />
+      <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="mb-16 text-center">
@@ -284,8 +284,8 @@ function MensajesCarousel() {
     <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber/10 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '1s' }} />
       
-      <img src="https://images.unsplash.com/photo-1445384763658-0400939829cd?auto=format&fit=crop&q=80" alt="Mensajes Background" className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-[#0F192B]/90 to-bg/50" />
+      <img src="https://images.unsplash.com/photo-1445384763658-0400939829cd?auto=format&fit=crop&q=80" alt="Mensajes Background" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/20" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12">
         <Eyebrow>Últimas Prédicas</Eyebrow>
@@ -330,8 +330,8 @@ function Ubicacion({ onPlan }) {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '3s' }} />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob" />
 
-      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/30" />
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/10" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-8">
