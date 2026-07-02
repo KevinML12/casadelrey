@@ -8,10 +8,10 @@ import Button from '../../components/ui/Button';
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const MOCK_EVENTS_FALLBACK = [
-  { ID: 1, title: 'Noche de Jóvenes', date: '2026-08-15', time: '19:30', location: 'Auditorio Central', requires_payment: false },
-  { ID: 2, title: 'Encuentro de Líderes', date: '2026-08-18', time: '18:00', location: 'Salón 2', requires_payment: false },
-  { ID: 3, title: 'Retiro "Reinicio"', date: '2026-08-23', time: '08:00', location: 'Casa de campo', requires_payment: true, price_gtq: 150, payment_deadline: '2026-08-20' },
-  { ID: 4, title: 'Servicio General', date: '2026-08-24', time: '10:00', location: 'Auditorio Central', requires_payment: false }
+  { ID: 1, title: 'Noche de Jóvenes', date: '2026-08-15', time: '19:30', location: 'Auditorio Central', requires_payment: false, cover_image: '/images/bg-hero.jpg' },
+  { ID: 2, title: 'Encuentro de Líderes', date: '2026-08-18', time: '18:00', location: 'Salón 2', requires_payment: false, cover_image: '/images/bg-eventos.jpg' },
+  { ID: 3, title: 'Retiro "Reinicio"', date: '2026-08-23', time: '08:00', location: 'Casa de campo', requires_payment: true, price_gtq: 150, payment_deadline: '2026-08-20', cover_image: '/images/bg-hero.jpg' },
+  { ID: 4, title: 'Servicio General', date: '2026-08-24', time: '10:00', location: 'Auditorio Central', requires_payment: false, cover_image: '/images/bg-eventos.jpg' }
 ];
 
 // Datos bancarios de la iglesia (centralizado)
@@ -280,8 +280,8 @@ export default function EventsPage() {
             <p className="text-white/40 text-[16px]">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
           </div>
         ) : (
-          /* ── Lista de Eventos (Distribución Inmersiva) ── */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          /* ── Carrusel Inmersivo de Eventos ── */
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 hide-scrollbar" style={{ scrollPadding: '1.5rem', scrollbarWidth: 'none' }}>
             {events.map((ev, i) => {
               const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
               const dayNum   = d ? d.getDate() : null;
@@ -292,74 +292,85 @@ export default function EventsPage() {
                 .map(s => s[0].toUpperCase() + s.slice(1))
                 .join(' · ');
 
-              const isFeatured = i === 0;
+              // Imagen de fallback por si no hay flyer
+              const bgImage = ev.cover_image || '/images/bg-eventos.jpg';
 
               return (
                 <div 
                   key={ev.ID} 
-                  className={`group relative overflow-hidden liquid-glass rounded-[32px] p-8 md:p-10 flex flex-col justify-between gap-8 hover:bg-white/5 transition-all duration-500 card-spring border border-white/10 hover:border-white/20 ${isFeatured ? 'md:col-span-2 md:flex-row md:items-center' : ''}`}
+                  className="snap-center relative overflow-hidden rounded-[32px] shrink-0 w-full md:w-[800px] h-[550px] md:h-[650px] group border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-transform duration-700 hover:scale-[1.02]"
                 >
                   
-                  {/* Info Principal */}
-                  <div className="relative z-10 flex flex-col sm:flex-row items-start gap-6 md:gap-8 min-w-0 flex-1">
-                    
-                    {/* Fecha */}
-                    {dayNum && (
-                      <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 ${isFeatured ? 'w-[100px] h-[100px]' : 'w-[80px] h-[80px]'}`}>
-                        <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: isFeatured ? 48 : 36 }}>
-                          {dayNum}
-                        </div>
-                        <div className={`font-bold tracking-[2px] mt-1 text-white/60 ${isFeatured ? 'text-[12px]' : 'text-[10px]'}`}>
-                          {monthStr}
+                  {/* Flyer de fondo */}
+                  <img src={bgImage} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                  
+                  {/* Gradiente para oscurecer la parte inferior y leer el texto */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-transparent opacity-90" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent opacity-60" />
+
+                  {/* Etiqueta de próximo evento si es el primero */}
+                  {i === 0 && (
+                    <div className="absolute top-6 left-6 z-20">
+                      <span className="liquid-glass px-4 py-1.5 rounded-full bg-white/10 text-white text-[11px] font-bold uppercase tracking-widest border border-white/20 shadow-pri flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-celeste animate-pulse" />
+                        Próximo Evento
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Contenido (Liquid Glass Panel) */}
+                  <div className="absolute bottom-6 left-6 right-6 z-20">
+                    <div className="liquid-glass rounded-[24px] p-6 md:p-8 bg-white/5 border border-white/10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 backdrop-blur-3xl">
+                      
+                      <div className="flex items-start gap-6 w-full md:w-auto flex-1 min-w-0">
+                        {/* Fecha */}
+                        {dayNum && (
+                          <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/10 border border-white/10 w-[70px] h-[70px] md:w-[90px] md:h-[90px] shadow-inner">
+                            <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
+                              {dayNum}
+                            </div>
+                            <div className="font-bold tracking-[2px] mt-1 text-celeste text-[9px] md:text-[11px]">
+                              {monthStr}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Detalles */}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-mono text-[10px] tracking-[1.5px] text-white/50 uppercase mb-1">
+                            {weekday}
+                          </p>
+                          <h3 className="font-bold tracking-tight text-white line-clamp-2"
+                            style={{ fontSize: 'clamp(22px, 3vw, 32px)', lineHeight: 1.1 }}>
+                            {ev.title}
+                          </h3>
+                          {details && (
+                            <p className="text-[14px] md:text-[16px] mt-2 truncate text-white/70 flex items-center gap-1.5">
+                              <span className="material-symbols-rounded text-[16px] text-celeste">location_on</span>
+                              {details}
+                            </p>
+                          )}
                         </div>
                       </div>
-                    )}
 
-                    {/* Detalles */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        {isFeatured && (
-                          <span className="px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20">
-                            Próximo Evento
+                      {/* Botón CTA */}
+                      <div className="shrink-0 flex flex-col items-start md:items-end gap-3 w-full md:w-auto pt-4 md:pt-0 border-t border-white/10 md:border-t-0">
+                        {ev.requires_payment && (
+                          <span className="font-bold text-[14px] font-mono text-emerald tracking-wider flex items-center gap-1.5 px-3 py-1 bg-black/40 rounded-full border border-emerald/20">
+                            <span className="material-symbols-rounded text-[16px]">payments</span>
+                            Q{Number(ev.price_gtq).toFixed(0)}
                           </span>
                         )}
-                        <p className="font-mono text-[11px] tracking-[1.2px] text-white/60 uppercase">
-                          {weekday}
-                        </p>
+                        <button
+                          onClick={() => setRsvpEvent(ev)}
+                          className="px-8 py-3.5 rounded-full bg-celeste text-bg text-[14px] font-black hover:bg-white transition-colors duration-300 btn-spring w-full md:w-auto inline-flex items-center justify-center gap-3 shadow-pri group/btn"
+                        >
+                          {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
+                          <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+                        </button>
                       </div>
-                      <p className="font-bold tracking-tight text-white"
-                        style={{ fontSize: isFeatured ? 'clamp(28px, 4vw, 40px)' : 'clamp(20px, 2.5vw, 26px)', lineHeight: 1.1 }}>
-                        {ev.title}
-                      </p>
-                      {details && (
-                        <p className="text-[15px] mt-3 truncate text-white/70 flex items-center gap-1.5">
-                          <span className="material-symbols-rounded text-[18px] text-white/40">location_on</span>
-                          {details}
-                        </p>
-                      )}
-                      {ev.description && (
-                        <p className={`mt-4 line-clamp-3 text-white/50 leading-relaxed ${isFeatured ? 'text-[16px] max-w-2xl' : 'text-[14px]'}`}>
-                          {ev.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Botón CTA */}
-                  <div className={`relative z-10 shrink-0 flex flex-col items-start gap-3 ${isFeatured ? 'md:items-end md:min-w-[200px]' : 'w-full pt-6 border-t border-white/10'}`}>
-                    {ev.requires_payment && (
-                      <span className="font-bold text-[14px] font-mono text-white tracking-wider flex items-center gap-1.5">
-                        <span className="material-symbols-rounded text-[16px] text-white/60">payments</span>
-                        Q{Number(ev.price_gtq).toFixed(0)}
-                      </span>
-                    )}
-                    <button
-                      onClick={() => setRsvpEvent(ev)}
-                      className="px-6 py-3.5 rounded-full liquid-glass bg-white/5 text-white text-[14px] font-bold hover:bg-white/10 hover:border-white/30 transition-all duration-300 btn-spring w-full inline-flex items-center justify-center gap-4 group/btn border border-white/10"
-                    >
-                      {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-                      <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
-                    </button>
+                    </div>
                   </div>
 
                 </div>
