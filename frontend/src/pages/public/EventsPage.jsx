@@ -139,11 +139,9 @@ function RSVPModal({ event, onClose }) {
         </div>
 
         <PaymentBanner event={event} />
-
         <p className="text-body-s text-on-surf-var">
           Después de depositar, sube la foto de tu comprobante. Una vez verificado, vuelve aquí para completar tu registro.
         </p>
-
         <button onClick={goToReceipt}
           className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
           <span className="ms" style={{ fontSize: 16 }}>upload</span>
@@ -157,7 +155,6 @@ function RSVPModal({ event, onClose }) {
     </ModalWrapper>
   );
 
-  // ── Formulario principal
   return (
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
@@ -169,19 +166,7 @@ function RSVPModal({ event, onClose }) {
           <span className="ms text-white/60" style={{ fontSize: 18 }}>close</span>
         </button>
       </div>
-
-      {/* Banner de pago si aplica */}
       {event.requires_payment && <PaymentBanner event={event} />}
-
-      {event.requires_payment && (
-        <div className="mb-4 px-4 py-3 rounded-xl bg-white/10 border border-white/20 flex items-start gap-2">
-          <span className="ms text-white shrink-0" style={{ fontSize: 16 }}>info</span>
-          <p className="text-body-s text-white/90">
-            Si ya realizaste el depósito y subiste tu comprobante, ingresa el mismo correo que usaste al subirlo.
-          </p>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className="block text-label-l text-white/60 mb-1">Nombre <span className="text-rose">*</span></label>
@@ -234,9 +219,8 @@ function ModalWrapper({ children, onClose }) {
 export default function EventsPage() {
   const [events,    setEvents]    = useState([]);
   const [loading,   setLoading]   = useState(true);
-  const [error,     setError]     = useState(false);
   const [rsvpEvent, setRsvpEvent] = useState(null);
-  const [viewMode,  setViewMode]  = useState('carousel'); // 'carousel' | 'grid'
+  const [viewMode,  setViewMode]  = useState('carousel');
 
   useEffect(() => {
     apiClient.get('/events/')
@@ -253,47 +237,31 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      {/* Background & Blobs */}
       <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" />
       <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" style={{ animationDelay: '2s' }} />
-      
       <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/40" />
 
-      {/* Hero Section */}
       <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
         <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
         <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
           Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
         </p>
         
-        {/* Toggle Vista */}
         {events.length > 0 && (
-          <div className="liquid-glass rounded-full p-1.5 flex items-center gap-1 bg-white/5 border border-white/10">
+          <div className="w-full flex justify-end max-w-7xl">
             <button
-              onClick={() => setViewMode('carousel')}
-              className={`px-5 py-2.5 rounded-full text-[13px] font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2 ${
-                viewMode === 'carousel' ? 'bg-white/10 text-white shadow-sm' : 'text-white/50 hover:text-white hover:bg-white/5'
-              }`}
+              onClick={() => setViewMode(v => v === 'carousel' ? 'grid' : 'carousel')}
+              className="liquid-glass px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest transition-colors"
             >
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>view_carousel</span>
-              Carrusel
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-5 py-2.5 rounded-full text-[13px] font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2 ${
-                viewMode === 'grid' ? 'bg-white/10 text-white shadow-sm' : 'text-white/50 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>grid_view</span>
-              Cajón
+              <span className="material-symbols-rounded" style={{ fontSize: 16 }}>{viewMode === 'carousel' ? 'grid_view' : 'view_carousel'}</span>
+              {viewMode === 'carousel' ? 'Vista en cuadrícula' : 'Vista en carrusel'}
             </button>
           </div>
         )}
       </div>
 
-      <div className={`relative z-10 mx-auto pb-32 w-full flex-1 ${viewMode === 'carousel' ? 'max-w-none pl-6 md:pl-12' : 'max-w-7xl px-6'}`}>
-
+      <motion.div layout className={`relative z-10 mx-auto pb-32 w-full flex-1 ${viewMode === 'carousel' ? 'max-w-none pl-6 md:pl-12' : 'max-w-7xl px-6'}`}>
         {events.length === 0 ? (
           /* ── Empty state ── */
           <div className="py-32 flex flex-col items-center gap-5">
@@ -306,12 +274,13 @@ export default function EventsPage() {
           </div>
         ) : (
           /* ── Contenedor de Eventos ── */
-          <div className={viewMode === 'carousel' 
+          <motion.div layout className={viewMode === 'carousel' 
             ? "flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pr-6 md:pr-12 hide-scrollbar" 
             : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
           } 
           style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
             
+            <AnimatePresence>
             {events.map((ev, i) => {
               const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
               const dayNum   = d ? d.getDate() : null;
@@ -327,9 +296,14 @@ export default function EventsPage() {
               const isCarousel = viewMode === 'carousel';
 
               return (
-                <div 
+                <motion.div 
+                  layout="position"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
                   key={ev.ID} 
-                  className={`${isCarousel ? 'snap-center shrink-0 w-[90vw] max-w-[1000px] h-[600px] md:h-[700px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 transition-transform duration-700 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'}`}
+                  className={`${isCarousel ? 'snap-center shrink-0 w-[90vw] max-w-[1000px] h-[600px] md:h-[700px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
                 >
                   
                   {/* Flyer de fondo */}
@@ -340,33 +314,33 @@ export default function EventsPage() {
 
                   {/* Etiqueta de próximo evento si es el primero */}
                   {i === 0 && isCarousel && (
-                    <div className="absolute top-6 left-6 z-20">
+                    <motion.div layout className="absolute top-6 left-6 z-20">
                       <span className="liquid-glass px-4 py-1.5 rounded-full bg-white/5 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20 flex items-center gap-2 backdrop-blur-md">
                         <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
                         Próximo Evento
                       </span>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Contenido (Liquid Glass Panel) */}
-                  <div className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6 md:p-8' : 'p-5 md:p-6'}`}>
+                  <motion.div layout className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6 md:p-8' : 'p-5 md:p-6'}`}>
                     <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col ${isCarousel ? 'md:flex-row p-6 md:p-8 items-start md:items-end justify-between gap-6' : 'p-5 gap-5'}`}>
                       
-                      <div className="flex items-start gap-4 md:gap-6 w-full md:w-auto flex-1 min-w-0">
+                      <motion.div layout className="flex items-start gap-4 md:gap-6 w-full md:w-auto flex-1 min-w-0">
                         {/* Fecha */}
                         {dayNum && (
-                          <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner ${isCarousel ? 'w-[70px] h-[70px] md:w-[90px] md:h-[90px]' : 'w-[60px] h-[60px]'}`}>
+                          <motion.div layout className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner ${isCarousel ? 'w-[70px] h-[70px] md:w-[90px] md:h-[90px]' : 'w-[60px] h-[60px]'}`}>
                             <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: isCarousel ? 'clamp(28px, 4vw, 40px)' : '24px' }}>
                               {dayNum}
                             </div>
                             <div className={`font-bold tracking-[2px] mt-1 text-white/50 ${isCarousel ? 'text-[9px] md:text-[11px]' : 'text-[9px]'}`}>
                               {monthStr}
                             </div>
-                          </div>
+                          </motion.div>
                         )}
 
                         {/* Detalles */}
-                        <div className="min-w-0 flex-1">
+                        <motion.div layout className="min-w-0 flex-1">
                           <p className="font-mono text-[10px] tracking-[1.5px] text-white/40 uppercase mb-1">
                             {weekday}
                           </p>
@@ -380,11 +354,11 @@ export default function EventsPage() {
                               {details}
                             </p>
                           )}
-                        </div>
-                      </div>
+                        </motion.div>
+                      </motion.div>
 
                       {/* Botón CTA */}
-                      <div className={`shrink-0 flex flex-col gap-3 w-full ${isCarousel ? 'md:w-auto items-start md:items-end pt-4 md:pt-0 border-t border-white/10 md:border-t-0' : 'pt-4 border-t border-white/10'}`}>
+                      <motion.div layout className={`shrink-0 flex flex-col gap-3 w-full ${isCarousel ? 'md:w-auto items-start md:items-end pt-4 md:pt-0 border-t border-white/10 md:border-t-0' : 'pt-4 border-t border-white/10'}`}>
                         {ev.requires_payment && (
                           <span className="font-bold text-[13px] font-mono text-white/80 tracking-wider flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10">
                             <span className="material-symbols-rounded text-[14px]">payments</span>
@@ -398,12 +372,12 @@ export default function EventsPage() {
                           {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
                           <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
                         </button>
-                      </div>
+                      </motion.div>
 
                     </div>
-                  </div>
+                  </motion.div>
 
-                </div>
+                </motion.div>
               );
             })}
           </div>
