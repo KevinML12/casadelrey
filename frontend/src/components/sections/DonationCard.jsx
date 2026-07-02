@@ -34,7 +34,7 @@ const BANK_INFO = [
 ];
 
 const inputCls =
-  'w-full rounded-sm bg-bg-soft border border-ink-soft px-4 py-3 text-[15px] text-ink placeholder-ink-3 focus-ring transition-all focus:bg-bg focus:border-celeste';
+  'w-full rounded-sm bg-white/5 border border-white/10 px-4 py-3 text-[15px] text-white placeholder-ink-3 focus-ring transition-all focus:bg-bg focus:border-celeste';
 
 export default function DonationCard() {
   const [amount,  setAmount]  = useState(100);
@@ -138,24 +138,24 @@ export default function DonationCard() {
         <span className="grid place-items-center w-16 h-16 mx-auto mb-5 rounded-full bg-celeste text-white shadow-pri">
           <Icon name="check" className="w-8 h-8" stroke={2.4} />
         </span>
-        <h3 className="display-mega text-ink" style={{ fontSize: '1.7rem' }}>
+        <h3 className="display-mega text-white" style={{ fontSize: '1.7rem' }}>
           ¡Gracias por sembrar!
         </h3>
         {isTransfer ? (
           <>
-            <p className="mt-3 text-[15px] text-ink-2 leading-relaxed">
-              Recibimos tu donación de <strong className="text-ink">Q{finalAmount}</strong> para <strong className="text-ink">{purposeLabel}</strong>.
+            <p className="mt-3 text-[15px] text-white/70 leading-relaxed">
+              Recibimos tu donación de <strong className="text-white">Q{finalAmount}</strong> para <strong className="text-white">{purposeLabel}</strong>.
             </p>
-            <p className="mt-1 text-[13.5px] text-ink-3">
+            <p className="mt-1 text-[13.5px] text-white/50">
               Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.
             </p>
           </>
         ) : (
           <>
-            <p className="mt-3 text-[15px] text-ink-2 leading-relaxed">
-              Anotamos tu intención de <strong className="text-ink">Q{finalAmount}</strong> para <strong className="text-ink">{purposeLabel}</strong>.
+            <p className="mt-3 text-[15px] text-white/70 leading-relaxed">
+              Anotamos tu intención de <strong className="text-white">Q{finalAmount}</strong> para <strong className="text-white">{purposeLabel}</strong>.
             </p>
-            <p className="mt-1 text-[13.5px] text-ink-3">
+            <p className="mt-1 text-[13.5px] text-white/50">
               Te esperamos este domingo. Un coordinador te recibe en la entrada.
             </p>
           </>
@@ -187,7 +187,7 @@ export default function DonationCard() {
                 className={`py-3 rounded-sm text-[14.5px] font-extrabold tracking-tightish btn-spring focus-ring border ${
                   active
                     ? 'bg-celeste text-white border-celeste shadow-pri'
-                    : 'bg-bg-soft border-ink-soft text-ink hover:bg-celeste-soft hover:border-celeste/40'
+                    : 'bg-white/5 border-white/10 text-white hover:bg-celeste-soft hover:border-celeste/40'
                 }`}
               >
                 Q{a}
@@ -220,8 +220,8 @@ export default function DonationCard() {
                 onClick={() => setPurpose(p.value)}
                 className={`text-left rounded-sm px-4 py-3 text-[14px] font-bold tracking-tightish transition-all focus-ring border btn-spring ${
                   active
-                    ? 'bg-celeste-soft border-celeste text-ink'
-                    : 'bg-bg-soft border-ink-soft text-ink-2 hover:bg-celeste-soft hover:border-celeste/40 hover:text-ink'
+                    ? 'bg-celeste-soft border-celeste text-white'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-celeste-soft hover:border-celeste/40 hover:text-white'
                 }`}
               >
                 {p.label}
@@ -247,19 +247,19 @@ export default function DonationCard() {
                 className={`w-full flex items-center gap-4 rounded-sm px-4 py-4 text-left transition-all focus-ring border btn-spring ${
                   active
                     ? 'bg-celeste-soft border-celeste'
-                    : 'bg-bg-soft border-ink-soft hover:bg-celeste-soft hover:border-celeste/40'
+                    : 'bg-white/5 border-white/10 hover:bg-celeste-soft hover:border-celeste/40'
                 }`}
               >
                 <span className={`grid place-items-center w-11 h-11 rounded-sm shrink-0 ${
-                  active ? 'bg-celeste text-white shadow-pri' : 'bg-bg text-celeste border border-ink-soft'
+                  active ? 'bg-celeste text-white shadow-pri' : 'bg-bg text-celeste border border-white/10'
                 }`}>
                   <Icon name={m.icon} className="w-5 h-5" stroke={2} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className={`text-[14.5px] font-extrabold tracking-tightish ${active ? 'text-ink' : 'text-ink'}`}>
+                  <div className={`text-[14.5px] font-extrabold tracking-tightish ${active ? 'text-white' : 'text-white'}`}>
                     {m.label}
                   </div>
-                  <div className="text-[12.5px] text-ink-2 mt-0.5">{m.sub}</div>
+                  <div className="text-[12.5px] text-white/70 mt-0.5">{m.sub}</div>
                 </div>
                 {active && (
                   <Icon name="check" className="w-5 h-5 text-celeste shrink-0" stroke={2.4} />
@@ -295,9 +295,9 @@ export default function DonationCard() {
             </div>
             <div className="space-y-2">
               {BANK_INFO.map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between rounded-sm bg-bg px-4 py-3 border border-ink-soft">
-                  <span className="text-[11.5px] font-bold uppercase tracking-widest text-ink-2">{label}</span>
-                  <span className="text-[14.5px] font-extrabold tracking-tightish text-ink">{value}</span>
+                <div key={label} className="flex items-center justify-between rounded-sm bg-bg px-4 py-3 border border-white/10">
+                  <span className="text-[11.5px] font-bold uppercase tracking-widest text-white/70">{label}</span>
+                  <span className="text-[14.5px] font-extrabold tracking-tightish text-white">{value}</span>
                 </div>
               ))}
             </div>
@@ -322,16 +322,16 @@ export default function DonationCard() {
             </span>
             {receiptUrl ? (
               <div className="flex items-center gap-4 rounded-sm bg-bg border border-celeste/40 p-4">
-                <img src={receiptUrl} alt="comprobante" className="h-20 w-20 object-cover rounded-sm border border-ink-soft" />
+                <img src={receiptUrl} alt="comprobante" className="h-20 w-20 object-cover rounded-sm border border-white/10" />
                 <div className="flex-1 min-w-0">
-                  <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-ink">
+                  <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-white">
                     <Icon name="check" className="w-4 h-4 text-celeste" stroke={2.4} />
                     Comprobante cargado
                   </p>
                   <button
                     type="button"
                     onClick={() => setReceiptUrl('')}
-                    className="block mt-1 text-[12px] font-bold uppercase tracking-widest text-ink-3 hover:text-rose transition-colors"
+                    className="block mt-1 text-[12px] font-bold uppercase tracking-widest text-white/50 hover:text-rose transition-colors"
                   >
                     Cambiar foto
                   </button>
@@ -347,10 +347,10 @@ export default function DonationCard() {
                   )}
                 </span>
                 <div className="text-center">
-                  <p className="text-[14.5px] font-extrabold tracking-tightish text-ink">
+                  <p className="text-[14.5px] font-extrabold tracking-tightish text-white">
                     {uploading ? 'Subiendo…' : 'Toca para subir la foto'}
                   </p>
-                  <p className="mt-0.5 text-[12px] text-ink-2">JPG, PNG o PDF · máx. 10 MB</p>
+                  <p className="mt-0.5 text-[12px] text-white/70">JPG, PNG o PDF · máx. 10 MB</p>
                 </div>
                 <input
                   type="file"
@@ -367,7 +367,7 @@ export default function DonationCard() {
 
       {/* Resumen */}
       {finalAmount >= 10 && (
-        <div className="rounded-sm bg-ink p-5 flex justify-between items-center">
+        <div className="rounded-sm bg-white/10 p-5 flex justify-between items-center">
           <div>
             <div className="text-[10.5px] font-extrabold uppercase tracking-widest text-celeste">Total a registrar</div>
             <div className="text-[12.5px] text-white/70 mt-0.5">{purposeLabel}</div>
@@ -392,7 +392,7 @@ export default function DonationCard() {
             : `Registrar donación`}
       </GlassButton>
 
-      <p className="text-center text-[12px] text-ink-3">
+      <p className="text-center text-[12px] text-white/50">
         {isTransfer
           ? 'Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.'
           : 'Un coordinador te recibirá este domingo en la entrada.'}

@@ -93,33 +93,41 @@ export default function VolunteeringPage() {
   };
 
   return (
-    <main className="min-h-screen bg-surf">
+    <main className="min-h-screen bg-bg text-white relative overflow-hidden flex flex-col">
+      {/* Background & Blobs */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-blob" />
+      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-amber/20 rounded-full mix-blend-screen filter blur-[150px] opacity-50 animate-blob" style={{ animationDelay: '2s' }} />
+      
+      <img src="/images/bg-hero.jpg" alt="Voluntariado" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/10" />
+
       <PageHero icon="handshake" title="Voluntariado" subtitle="Sirve con tus talentos y haz la diferencia en la comunidad." />
 
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-16 w-full">
         <div className="max-w-3xl mx-auto">
 
-          <div className="mb-3">
-            <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-2">Áreas de Servicio</p>
-            <h2 className="text-headline-s text-on-surf font-black">¿Dónde quieres servir?</h2>
-            <p className="text-body-s text-on-surf-var mt-2">Toca un área para seleccionarla en el formulario.</p>
+          <div className="mb-6 text-center">
+            <h2 className="display-mega text-white mb-2" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>¿Dónde quieres servir?</h2>
+            <p className="text-[16px] text-white/70">Toca un área para seleccionarla en el formulario.</p>
           </div>
 
           {/* Areas list */}
-          <div className="divide-y divide-outline-var border border-outline-var rounded-2xl overflow-hidden mb-12 mt-6">
+          <div className="flex flex-col gap-4 mb-16">
             {AREAS.map(({ value, icon, title, desc }) => (
               <button key={value} type="button" onClick={() => handleAreaClick(value)}
-                className={`w-full flex items-start gap-4 p-5 text-left transition-colors ${
-                  selected === value ? 'bg-pri-con' : 'bg-surf-low hover:bg-surf-high'
+                className={`w-full flex items-center justify-between gap-4 p-5 rounded-[24px] text-left transition-all card-spring ${
+                  selected === value ? 'liquid-glass bg-white/10 border-celeste shadow-pri' : 'liquid-glass hover:bg-white/5 border-white/10'
                 }`}>
-                <div className={`leading-icon shrink-0 ${selected === value ? 'text-on-pri-con' : ''}`}>
-                  <span className="ms" style={{ fontSize: 20 }}>{icon}</span>
+                <div className="flex items-center gap-4">
+                  <div className={`grid place-items-center w-12 h-12 rounded-full shrink-0 transition-colors ${selected === value ? 'bg-celeste text-white shadow-pri' : 'bg-white/10 text-white/70'}`}>
+                    <span className="material-symbols-rounded">{icon}</span>
+                  </div>
+                  <div>
+                    <h3 className={`text-[18px] font-bold tracking-tightish mb-0.5 ${selected === value ? 'text-white' : 'text-white/90'}`}>{title}</h3>
+                    <p className={`text-[14px] leading-relaxed ${selected === value ? 'text-white/80' : 'text-white/50'}`}>{desc}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className={`text-title-s font-semibold mb-0.5 ${selected === value ? 'text-on-pri-con' : 'text-on-surf'}`}>{title}</h3>
-                  <p className={`text-body-s leading-relaxed ${selected === value ? 'text-on-pri-con/80' : 'text-on-surf-var'}`}>{desc}</p>
-                </div>
-                <span className={`ms mt-1 shrink-0 ${selected === value ? 'text-on-pri-con' : 'text-on-surf-var'}`} style={{ fontSize: 18 }}>
+                <span className={`material-symbols-rounded shrink-0 transition-transform ${selected === value ? 'text-celeste scale-110' : 'text-white/30'}`} style={{ fontSize: 24 }}>
                   {selected === value ? 'check_circle' : 'chevron_right'}
                 </span>
               </button>
@@ -127,12 +135,23 @@ export default function VolunteeringPage() {
           </div>
 
           {/* Formulario */}
-          <div ref={formRef} className="p-8 rounded-2xl bg-surf-low border border-outline-var scroll-mt-6">
-            <h3 className="text-headline-s text-on-surf font-black mb-2">¿Listo para servir?</h3>
-            <p className="text-body-m text-on-surf-var mb-6 leading-relaxed">
-              Completa el formulario y nuestro equipo se comunicará contigo para orientarte.
-            </p>
-            <VolunteerForm preselected={selected} onClearPreselected={() => setSelected('')} />
+          <div ref={formRef} className="liquid-glass rounded-[32px] p-8 md:p-10 scroll-mt-24 relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-celeste/10 rounded-full mix-blend-screen filter blur-[100px]" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="h-px w-10 bg-gradient-to-r from-celeste to-transparent" />
+                <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">
+                  Aplicación
+                </span>
+              </div>
+              <h3 className="display-mega text-white mb-2" style={{ fontSize: '2rem' }}>¿Listo para servir?</h3>
+              <p className="text-[15px] text-white/70 mb-8 leading-relaxed">
+                Completa el formulario y nuestro equipo se comunicará contigo para orientarte y ayudarte a dar tu primer paso en el voluntariado.
+              </p>
+              <div className="donation-wrapper">
+                <VolunteerForm preselected={selected} onClearPreselected={() => setSelected('')} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
