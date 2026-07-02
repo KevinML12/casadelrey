@@ -7,7 +7,13 @@ import apiClient from '../../lib/apiClient';
 // 1 · HERO CAROUSEL
 // ════════════════════════════════════════════════════════════════════
 function HeroCarousel({ onPlan }) {
-  const [hero, setHero] = useState(null);
+  const [hero, setHero] = useState({
+    title: 'LUZ PARA\nLAS NACIONES', 
+    subtitle: 'Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.', 
+    image: '/images/bg-hero.jpg', 
+    buttonText: 'Planifica tu visita',
+    url: '#'
+  });
 
   useEffect(() => {
     apiClient.get('/hero/active')
