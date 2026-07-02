@@ -292,44 +292,53 @@ export default function EventsPage() {
                 .map(s => s[0].toUpperCase() + s.slice(1))
                 .join(' · ');
 
+              const glowColors = ['bg-celeste', 'bg-emerald', 'bg-amber', 'bg-rose', 'bg-violet'];
+              const orbColor = glowColors[i % glowColors.length];
+
               return (
-                <div key={ev.ID} className="liquid-glass rounded-[32px] p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 hover:bg-white/5 transition-colors card-spring">
+                <div key={ev.ID} className="group relative overflow-hidden liquid-glass rounded-[32px] p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 hover:bg-white/10 transition-all duration-500 card-spring border border-white/10 hover:border-white/30 hover:shadow-[0_0_40px_rgba(255,255,255,0.05)]">
                   
+                  {/* Orbes internos inmersivos */}
+                  <div className={`absolute -top-12 -right-12 w-48 h-48 ${orbColor}/20 rounded-full mix-blend-screen filter blur-[60px] opacity-30 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none`} />
+                  <div className={`absolute -bottom-12 -left-12 w-48 h-48 ${orbColor}/10 rounded-full mix-blend-screen filter blur-[60px] opacity-30 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none`} />
+
                   {/* Info e Ícono */}
-                  <div className="flex items-center gap-6 md:gap-8 min-w-0 flex-1 w-full">
+                  <div className="relative z-10 flex items-center gap-6 md:gap-8 min-w-0 flex-1 w-full">
                     
                     {/* Fecha */}
                     {dayNum ? (
-                      <div className="text-center shrink-0 w-[72px]">
-                        <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: 48 }}>
+                      <div className="text-center shrink-0 w-[80px] h-[80px] bg-white/5 rounded-2xl border border-white/10 flex flex-col items-center justify-center group-hover:bg-white/10 group-hover:scale-105 transition-all duration-500">
+                        <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: 36 }}>
                           {dayNum}
                         </div>
-                        <div className="font-bold tracking-[2px] mt-2 text-white/50 text-[11px]">
+                        <div className="font-bold tracking-[2px] mt-1 text-white/60 text-[10px]">
                           {monthStr}
                         </div>
                       </div>
                     ) : (
-                      <div className="w-[72px] shrink-0" />
+                      <div className="w-[80px] shrink-0" />
                     )}
-
-                    <div className="w-px h-16 shrink-0 bg-white/10 hidden sm:block" />
 
                     {/* Detalles */}
                     <div className="min-w-0 flex-1">
-                      <p className="font-mono text-[11px] tracking-[1.2px] mb-2 text-white/60 uppercase">
-                        {weekday}
-                      </p>
-                      <p className="font-bold truncate tracking-[-0.02em] text-white"
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className={`w-2 h-2 rounded-full ${orbColor} animate-pulse`} />
+                        <p className="font-mono text-[11px] tracking-[1.2px] text-white/60 uppercase">
+                          {weekday}
+                        </p>
+                      </div>
+                      <p className="font-bold truncate tracking-tight text-white group-hover:text-white transition-colors"
                         style={{ fontSize: 'clamp(20px, 2.5vw, 26px)' }}>
                         {ev.title}
                       </p>
                       {details && (
-                        <p className="text-[15px] mt-1.5 truncate text-white/70">
+                        <p className="text-[15px] mt-1.5 truncate text-white/70 flex items-center gap-1.5">
+                          <span className="material-symbols-rounded text-[16px] text-white/40">location_on</span>
                           {details}
                         </p>
                       )}
                       {ev.description && (
-                        <p className="text-[14px] mt-2 line-clamp-2 text-white/50 hidden md:block leading-relaxed">
+                        <p className="text-[14px] mt-3 line-clamp-2 text-white/50 hidden md:block leading-relaxed">
                           {ev.description}
                         </p>
                       )}
@@ -337,18 +346,19 @@ export default function EventsPage() {
                   </div>
 
                   {/* Botón CTA */}
-                  <div className="shrink-0 flex flex-col items-start sm:items-end gap-3 w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t border-white/5 sm:border-t-0">
+                  <div className="relative z-10 shrink-0 flex flex-col items-start sm:items-end gap-3 w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t border-white/5 sm:border-t-0">
                     {ev.requires_payment && (
-                      <span className="font-bold text-[14px] font-mono text-emerald tracking-wider">
+                      <span className="font-bold text-[14px] font-mono text-emerald tracking-wider flex items-center gap-1.5 bg-emerald/10 px-3 py-1 rounded-full border border-emerald/20">
+                        <span className="material-symbols-rounded text-[14px]">payments</span>
                         Q{Number(ev.price_gtq).toFixed(0)}
                       </span>
                     )}
                     <button
                       onClick={() => setRsvpEvent(ev)}
-                      className="px-6 py-3.5 rounded-full liquid-glass text-white text-[14px] font-bold hover:bg-white/10 hover:border-white/40 transition-all btn-spring w-full sm:w-auto inline-flex items-center justify-center sm:justify-between gap-4"
+                      className="px-6 py-3.5 rounded-full liquid-glass text-white text-[14px] font-bold hover:bg-white/20 hover:border-white/50 transition-all duration-300 btn-spring w-full sm:w-auto inline-flex items-center justify-center sm:justify-between gap-4 group/btn"
                     >
                       {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-                      <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
+                      <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
                     </button>
                   </div>
 
