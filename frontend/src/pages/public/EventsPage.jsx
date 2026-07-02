@@ -236,6 +236,7 @@ export default function EventsPage() {
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(false);
   const [rsvpEvent, setRsvpEvent] = useState(null);
+  const [viewMode,  setViewMode]  = useState('carousel'); // 'carousel' | 'grid'
 
   useEffect(() => {
     apiClient.get('/events/')
@@ -246,28 +247,52 @@ export default function EventsPage() {
 
   if (loading) return (
     <div className="min-h-[100svh] bg-bg flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-celeste animate-spin" />
+      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
     </div>
   );
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
       {/* Background & Blobs */}
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-blob" />
-      <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-rose/20 rounded-full mix-blend-screen filter blur-[150px] opacity-50 animate-blob" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" />
+      <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" style={{ animationDelay: '2s' }} />
       
-      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-50" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/10" />
+      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/40" />
 
       {/* Hero Section */}
-      <div className="relative z-10 pt-32 pb-12 px-6 max-w-4xl mx-auto w-full text-center">
-        <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>PRÓXIMOS EVENTOS</h1>
-        <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium">
+      <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
+        <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
+        <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
           Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
         </p>
+        
+        {/* Toggle Vista */}
+        {events.length > 0 && (
+          <div className="liquid-glass rounded-full p-1.5 flex items-center gap-1 bg-white/5 border border-white/10">
+            <button
+              onClick={() => setViewMode('carousel')}
+              className={`px-5 py-2.5 rounded-full text-[13px] font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2 ${
+                viewMode === 'carousel' ? 'bg-white/10 text-white shadow-sm' : 'text-white/50 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>view_carousel</span>
+              Carrusel
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-5 py-2.5 rounded-full text-[13px] font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2 ${
+                viewMode === 'grid' ? 'bg-white/10 text-white shadow-sm' : 'text-white/50 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>grid_view</span>
+              Cajón
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 pb-32 w-full flex-1">
+      <div className={`relative z-10 mx-auto pb-32 w-full flex-1 ${viewMode === 'carousel' ? 'max-w-none pl-6 md:pl-12' : 'max-w-7xl px-6'}`}>
 
         {events.length === 0 ? (
           /* ── Empty state ── */
@@ -280,8 +305,13 @@ export default function EventsPage() {
             <p className="text-white/40 text-[16px]">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
           </div>
         ) : (
-          /* ── Carrusel Inmersivo de Eventos ── */
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 hide-scrollbar" style={{ scrollPadding: '1.5rem', scrollbarWidth: 'none' }}>
+          /* ── Contenedor de Eventos ── */
+          <div className={viewMode === 'carousel' 
+            ? "flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pr-6 md:pr-12 hide-scrollbar" 
+            : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+          } 
+          style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
+            
             {events.map((ev, i) => {
               const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
               const dayNum   = d ? d.getDate() : null;
@@ -292,44 +322,44 @@ export default function EventsPage() {
                 .map(s => s[0].toUpperCase() + s.slice(1))
                 .join(' · ');
 
-              // Imagen de fallback por si no hay flyer
               const bgImage = ev.cover_image || '/images/bg-eventos.jpg';
+              
+              const isCarousel = viewMode === 'carousel';
 
               return (
                 <div 
                   key={ev.ID} 
-                  className="snap-center relative overflow-hidden rounded-[32px] shrink-0 w-full md:w-[800px] h-[550px] md:h-[650px] group border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-transform duration-700 hover:scale-[1.02]"
+                  className={`${isCarousel ? 'snap-center shrink-0 w-[90vw] max-w-[1000px] h-[600px] md:h-[700px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 transition-transform duration-700 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'}`}
                 >
                   
                   {/* Flyer de fondo */}
-                  <img src={bgImage} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                  <img src={bgImage} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
                   
-                  {/* Gradiente para oscurecer la parte inferior y leer el texto */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-transparent opacity-90" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent opacity-60" />
+                  {/* Gradiente para leer el texto */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
 
                   {/* Etiqueta de próximo evento si es el primero */}
-                  {i === 0 && (
+                  {i === 0 && isCarousel && (
                     <div className="absolute top-6 left-6 z-20">
-                      <span className="liquid-glass px-4 py-1.5 rounded-full bg-white/10 text-white text-[11px] font-bold uppercase tracking-widest border border-white/20 shadow-pri flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-celeste animate-pulse" />
+                      <span className="liquid-glass px-4 py-1.5 rounded-full bg-white/5 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20 flex items-center gap-2 backdrop-blur-md">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
                         Próximo Evento
                       </span>
                     </div>
                   )}
 
                   {/* Contenido (Liquid Glass Panel) */}
-                  <div className="absolute bottom-6 left-6 right-6 z-20">
-                    <div className="liquid-glass rounded-[24px] p-6 md:p-8 bg-white/5 border border-white/10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 backdrop-blur-3xl">
+                  <div className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6 md:p-8' : 'p-5 md:p-6'}`}>
+                    <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col ${isCarousel ? 'md:flex-row p-6 md:p-8 items-start md:items-end justify-between gap-6' : 'p-5 gap-5'}`}>
                       
-                      <div className="flex items-start gap-6 w-full md:w-auto flex-1 min-w-0">
+                      <div className="flex items-start gap-4 md:gap-6 w-full md:w-auto flex-1 min-w-0">
                         {/* Fecha */}
                         {dayNum && (
-                          <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/10 border border-white/10 w-[70px] h-[70px] md:w-[90px] md:h-[90px] shadow-inner">
-                            <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
+                          <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner ${isCarousel ? 'w-[70px] h-[70px] md:w-[90px] md:h-[90px]' : 'w-[60px] h-[60px]'}`}>
+                            <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: isCarousel ? 'clamp(28px, 4vw, 40px)' : '24px' }}>
                               {dayNum}
                             </div>
-                            <div className="font-bold tracking-[2px] mt-1 text-celeste text-[9px] md:text-[11px]">
+                            <div className={`font-bold tracking-[2px] mt-1 text-white/50 ${isCarousel ? 'text-[9px] md:text-[11px]' : 'text-[9px]'}`}>
                               {monthStr}
                             </div>
                           </div>
@@ -337,16 +367,16 @@ export default function EventsPage() {
 
                         {/* Detalles */}
                         <div className="min-w-0 flex-1">
-                          <p className="font-mono text-[10px] tracking-[1.5px] text-white/50 uppercase mb-1">
+                          <p className="font-mono text-[10px] tracking-[1.5px] text-white/40 uppercase mb-1">
                             {weekday}
                           </p>
                           <h3 className="font-bold tracking-tight text-white line-clamp-2"
-                            style={{ fontSize: 'clamp(22px, 3vw, 32px)', lineHeight: 1.1 }}>
+                            style={{ fontSize: isCarousel ? 'clamp(22px, 3vw, 32px)' : '20px', lineHeight: 1.1 }}>
                             {ev.title}
                           </h3>
                           {details && (
-                            <p className="text-[14px] md:text-[16px] mt-2 truncate text-white/70 flex items-center gap-1.5">
-                              <span className="material-symbols-rounded text-[16px] text-celeste">location_on</span>
+                            <p className={`mt-2 truncate text-white/60 flex items-center gap-1.5 ${isCarousel ? 'text-[14px] md:text-[16px]' : 'text-[13px]'}`}>
+                              <span className="material-symbols-rounded text-[16px] text-white/40">location_on</span>
                               {details}
                             </p>
                           )}
@@ -354,16 +384,16 @@ export default function EventsPage() {
                       </div>
 
                       {/* Botón CTA */}
-                      <div className="shrink-0 flex flex-col items-start md:items-end gap-3 w-full md:w-auto pt-4 md:pt-0 border-t border-white/10 md:border-t-0">
+                      <div className={`shrink-0 flex flex-col gap-3 w-full ${isCarousel ? 'md:w-auto items-start md:items-end pt-4 md:pt-0 border-t border-white/10 md:border-t-0' : 'pt-4 border-t border-white/10'}`}>
                         {ev.requires_payment && (
-                          <span className="font-bold text-[14px] font-mono text-emerald tracking-wider flex items-center gap-1.5 px-3 py-1 bg-black/40 rounded-full border border-emerald/20">
-                            <span className="material-symbols-rounded text-[16px]">payments</span>
+                          <span className="font-bold text-[13px] font-mono text-white/80 tracking-wider flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                            <span className="material-symbols-rounded text-[14px]">payments</span>
                             Q{Number(ev.price_gtq).toFixed(0)}
                           </span>
                         )}
                         <button
                           onClick={() => setRsvpEvent(ev)}
-                          className="px-8 py-3.5 rounded-full bg-celeste text-bg text-[14px] font-black hover:bg-white transition-colors duration-300 btn-spring w-full md:w-auto inline-flex items-center justify-center gap-3 shadow-pri group/btn"
+                          className={`rounded-full liquid-glass bg-white/5 text-white text-[14px] font-bold hover:bg-white/10 hover:border-white/30 transition-all duration-300 btn-spring inline-flex items-center justify-center gap-3 group/btn border border-white/10 ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'}`}
                         >
                           {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
                           <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
