@@ -131,8 +131,8 @@ function Agenda() {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob" />
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-rose/20 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob" style={{ animationDelay: '2s' }} />
       
-      {/* Background image - Unsplash para asegurar que cargue siempre */}
-      <img src="https://images.unsplash.com/photo-1540039155732-d674d4040a46?auto=format&fit=crop&q=80" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      {/* Background image */}
+      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-60" />
       <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-bg/10" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
@@ -204,11 +204,11 @@ function CelulasSection() {
       })
       .catch(err => {
         setCategories([
-          { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: 'https://images.unsplash.com/photo-1529156069898-49953eb1f5bc?auto=format&fit=crop&q=80' },
-          { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80' },
-          { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80' },
-          { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb046ebf?auto=format&fit=crop&q=80' },
-          { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80' }
+          { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: '/images/celulas/adolescentes.jpg' },
+          { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: '/images/celulas/jovenes.jpg' },
+          { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: '/images/celulas/prejuveniles.jpg' },
+          { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: '/images/celulas/varones.jpg' },
+          { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: '/images/celulas/mujeres.jpg' }
         ]);
       });
   }, []);
@@ -220,7 +220,7 @@ function CelulasSection() {
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob" style={{ animationDelay: '4s' }} />
 
-      <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <img src="/images/bg-hero.jpg" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-50" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
@@ -284,7 +284,7 @@ function MensajesCarousel() {
     <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber/10 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '1s' }} />
       
-      <img src="https://images.unsplash.com/photo-1445384763658-0400939829cd?auto=format&fit=crop&q=80" alt="Mensajes Background" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <img src="/images/bg-ensenanzas.jpg" alt="Mensajes Background" className="absolute inset-0 w-full h-full object-cover opacity-50" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/20" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12">
@@ -330,7 +330,7 @@ function Ubicacion({ onPlan }) {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '3s' }} />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob" />
 
-      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      <img src="/images/bg-ubicacion.jpg" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-60" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/10" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
