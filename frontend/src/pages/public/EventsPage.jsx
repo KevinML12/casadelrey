@@ -280,8 +280,8 @@ export default function EventsPage() {
             <p className="text-white/40 text-[16px]">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
           </div>
         ) : (
-          /* ── Lista de Eventos ── */
-          <div className="flex flex-col gap-6">
+          /* ── Lista de Eventos (Distribución Inmersiva) ── */
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {events.map((ev, i) => {
               const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
               const dayNum   = d ? d.getDate() : null;
@@ -292,53 +292,53 @@ export default function EventsPage() {
                 .map(s => s[0].toUpperCase() + s.slice(1))
                 .join(' · ');
 
-              const glowColors = ['bg-celeste', 'bg-emerald', 'bg-amber', 'bg-rose', 'bg-violet'];
-              const orbColor = glowColors[i % glowColors.length];
+              const isFeatured = i === 0;
 
               return (
-                <div key={ev.ID} className="group relative overflow-hidden liquid-glass rounded-[32px] p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 hover:bg-white/10 transition-all duration-500 card-spring border border-white/10 hover:border-white/30 hover:shadow-[0_0_40px_rgba(255,255,255,0.05)]">
+                <div 
+                  key={ev.ID} 
+                  className={`group relative overflow-hidden liquid-glass rounded-[32px] p-8 md:p-10 flex flex-col justify-between gap-8 hover:bg-white/5 transition-all duration-500 card-spring border border-white/10 hover:border-white/20 ${isFeatured ? 'md:col-span-2 md:flex-row md:items-center' : ''}`}
+                >
                   
-                  {/* Orbes internos inmersivos */}
-                  <div className={`absolute -top-12 -right-12 w-48 h-48 ${orbColor}/20 rounded-full mix-blend-screen filter blur-[60px] opacity-30 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none`} />
-                  <div className={`absolute -bottom-12 -left-12 w-48 h-48 ${orbColor}/10 rounded-full mix-blend-screen filter blur-[60px] opacity-30 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none`} />
-
-                  {/* Info e Ícono */}
-                  <div className="relative z-10 flex items-center gap-6 md:gap-8 min-w-0 flex-1 w-full">
+                  {/* Info Principal */}
+                  <div className="relative z-10 flex flex-col sm:flex-row items-start gap-6 md:gap-8 min-w-0 flex-1">
                     
                     {/* Fecha */}
-                    {dayNum ? (
-                      <div className="text-center shrink-0 w-[80px] h-[80px] bg-white/5 rounded-2xl border border-white/10 flex flex-col items-center justify-center group-hover:bg-white/10 group-hover:scale-105 transition-all duration-500">
-                        <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: 36 }}>
+                    {dayNum && (
+                      <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 ${isFeatured ? 'w-[100px] h-[100px]' : 'w-[80px] h-[80px]'}`}>
+                        <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: isFeatured ? 48 : 36 }}>
                           {dayNum}
                         </div>
-                        <div className="font-bold tracking-[2px] mt-1 text-white/60 text-[10px]">
+                        <div className={`font-bold tracking-[2px] mt-1 text-white/60 ${isFeatured ? 'text-[12px]' : 'text-[10px]'}`}>
                           {monthStr}
                         </div>
                       </div>
-                    ) : (
-                      <div className="w-[80px] shrink-0" />
                     )}
 
                     {/* Detalles */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className={`w-2 h-2 rounded-full ${orbColor} animate-pulse`} />
+                        {isFeatured && (
+                          <span className="px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20">
+                            Próximo Evento
+                          </span>
+                        )}
                         <p className="font-mono text-[11px] tracking-[1.2px] text-white/60 uppercase">
                           {weekday}
                         </p>
                       </div>
-                      <p className="font-bold truncate tracking-tight text-white group-hover:text-white transition-colors"
-                        style={{ fontSize: 'clamp(20px, 2.5vw, 26px)' }}>
+                      <p className="font-bold tracking-tight text-white"
+                        style={{ fontSize: isFeatured ? 'clamp(28px, 4vw, 40px)' : 'clamp(20px, 2.5vw, 26px)', lineHeight: 1.1 }}>
                         {ev.title}
                       </p>
                       {details && (
-                        <p className="text-[15px] mt-1.5 truncate text-white/70 flex items-center gap-1.5">
-                          <span className="material-symbols-rounded text-[16px] text-white/40">location_on</span>
+                        <p className="text-[15px] mt-3 truncate text-white/70 flex items-center gap-1.5">
+                          <span className="material-symbols-rounded text-[18px] text-white/40">location_on</span>
                           {details}
                         </p>
                       )}
                       {ev.description && (
-                        <p className="text-[14px] mt-3 line-clamp-2 text-white/50 hidden md:block leading-relaxed">
+                        <p className={`mt-4 line-clamp-3 text-white/50 leading-relaxed ${isFeatured ? 'text-[16px] max-w-2xl' : 'text-[14px]'}`}>
                           {ev.description}
                         </p>
                       )}
@@ -346,16 +346,16 @@ export default function EventsPage() {
                   </div>
 
                   {/* Botón CTA */}
-                  <div className="relative z-10 shrink-0 flex flex-col items-start sm:items-end gap-3 w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t border-white/5 sm:border-t-0">
+                  <div className={`relative z-10 shrink-0 flex flex-col items-start gap-3 ${isFeatured ? 'md:items-end md:min-w-[200px]' : 'w-full pt-6 border-t border-white/10'}`}>
                     {ev.requires_payment && (
-                      <span className="font-bold text-[14px] font-mono text-emerald tracking-wider flex items-center gap-1.5 bg-emerald/10 px-3 py-1 rounded-full border border-emerald/20">
-                        <span className="material-symbols-rounded text-[14px]">payments</span>
+                      <span className="font-bold text-[14px] font-mono text-white tracking-wider flex items-center gap-1.5">
+                        <span className="material-symbols-rounded text-[16px] text-white/60">payments</span>
                         Q{Number(ev.price_gtq).toFixed(0)}
                       </span>
                     )}
                     <button
                       onClick={() => setRsvpEvent(ev)}
-                      className="px-6 py-3.5 rounded-full liquid-glass text-white text-[14px] font-bold hover:bg-white/20 hover:border-white/50 transition-all duration-300 btn-spring w-full sm:w-auto inline-flex items-center justify-center sm:justify-between gap-4 group/btn"
+                      className="px-6 py-3.5 rounded-full liquid-glass bg-white/5 text-white text-[14px] font-bold hover:bg-white/10 hover:border-white/30 transition-all duration-300 btn-spring w-full inline-flex items-center justify-center gap-4 group/btn border border-white/10"
                     >
                       {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
                       <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
