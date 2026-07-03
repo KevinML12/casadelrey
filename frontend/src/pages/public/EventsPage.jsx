@@ -332,17 +332,17 @@ export default function EventsPage() {
                   )}
 
                   {/* Contenido (Liquid Glass Panel) */}
-                  <motion.div layout className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6 md:p-8' : 'p-5 md:p-6'}`}>
-                    <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col ${isCarousel ? 'md:flex-row p-6 md:p-8 items-start md:items-end justify-between gap-6' : 'p-5 gap-5'}`}>
+                  <motion.div layout className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6' : 'p-5'}`}>
+                    <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col gap-4 ${isCarousel ? 'p-6' : 'p-5'}`}>
                       
-                      <motion.div layout className="flex items-start gap-4 md:gap-6 w-full md:w-auto flex-1 min-w-0">
+                      <motion.div layout className="flex items-center gap-4 w-full min-w-0">
                         {/* Fecha */}
                         {dayNum && (
-                          <motion.div layout className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner ${isCarousel ? 'w-[70px] h-[70px] md:w-[90px] md:h-[90px]' : 'w-[60px] h-[60px]'}`}>
-                            <div className="font-black leading-none text-white tracking-tighter" style={{ fontSize: isCarousel ? 'clamp(28px, 4vw, 40px)' : '24px' }}>
+                          <motion.div layout className="text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner w-[60px] h-[60px]">
+                            <div className="font-black leading-none text-white tracking-tighter text-[24px]">
                               {dayNum}
                             </div>
-                            <div className={`font-bold tracking-[2px] mt-1 text-white/50 ${isCarousel ? 'text-[9px] md:text-[11px]' : 'text-[9px]'}`}>
+                            <div className="font-bold tracking-[2px] mt-1 text-white/50 text-[9px]">
                               {monthStr}
                             </div>
                           </motion.div>
@@ -353,21 +353,20 @@ export default function EventsPage() {
                           <p className="font-mono text-[10px] tracking-[1.5px] text-white/40 uppercase mb-1">
                             {weekday}
                           </p>
-                          <h3 className="font-bold tracking-tight text-white line-clamp-2"
-                            style={{ fontSize: isCarousel ? 'clamp(22px, 3vw, 32px)' : '20px', lineHeight: 1.1 }}>
+                          <h3 className="font-bold tracking-tight text-white line-clamp-1 text-[20px] leading-tight">
                             {ev.title}
                           </h3>
                         </motion.div>
                       </motion.div>
 
                       {details && (
-                        <p className={`truncate text-white/60 flex items-center gap-1.5 text-[12px]`}>
+                        <p className="truncate text-white/60 flex items-center gap-1.5 text-[12px]">
                           <span className="material-symbols-rounded text-[14px] text-white/40">location_on</span>
                           {details}
                         </p>
                       )}
 
-                      <motion.div layout className={`shrink-0 flex flex-col gap-3 w-full pt-2 border-t border-white/10`}>
+                      <motion.div layout className="shrink-0 flex flex-col gap-3 w-full pt-3 border-t border-white/10">
                         {ev.requires_payment && (
                           <span className="font-bold text-[12px] font-mono text-white/80 tracking-wider flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
                             <span className="material-symbols-rounded text-[12px]">payments</span>
