@@ -430,12 +430,22 @@ export default function EventsPage() {
             <h2 className="text-[28px] font-bold text-white mb-2 text-center">Galería de Eventos</h2>
             <p className="text-white/50 mb-10 text-center max-w-2xl mx-auto">Revive los mejores momentos de nuestros eventos pasados.</p>
             
-            <div className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {gallery.map(photo => (
-                <div key={photo.ID} className="shrink-0 w-[280px] h-[350px] snap-center rounded-[32px] overflow-hidden liquid-glass border border-white/10 relative group">
-                  <img src={photo.url} alt={photo.title || 'Foto de evento'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
-                    <p className="text-white font-medium">{photo.title}</p>
+                <div key={photo.ID} className="shrink-0 w-[300px] h-[400px] snap-center rounded-[32px] overflow-hidden relative group shadow-2xl">
+                  {/* Imagen de fondo */}
+                  <img src={photo.url} alt={photo.title || 'Foto de evento'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                  
+                  {/* Gradiente sutil para que siempre se lea bien */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent opacity-60" />
+
+                  {/* Panel flotante Liquid Glass para el título */}
+                  <div className="absolute bottom-5 inset-x-5 flex flex-col justify-end">
+                    <div className="liquid-glass bg-white/10 border border-white/20 backdrop-blur-md p-4 rounded-2xl transform translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+                      <p className="text-white font-semibold text-[15px] leading-tight line-clamp-2">
+                        {photo.title || 'Momento especial'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
