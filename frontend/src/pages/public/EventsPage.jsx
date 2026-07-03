@@ -388,8 +388,45 @@ export default function EventsPage() {
                 </motion.div>
               );
             })}
-          </div>
+            </AnimatePresence>
+          </motion.div>
         )}
+      </motion.div>
+
+      {/* Botones de navegación del carrusel (solo visibles en modo carrusel) */}
+      {viewMode === 'carousel' && events.length > 0 && (
+        <div className="relative z-10 flex justify-center gap-4 pb-20">
+          <button 
+            onClick={() => scrollContainer('left')}
+            className="w-12 h-12 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <span className="material-symbols-rounded">arrow_back</span>
+          </button>
+          <button 
+            onClick={() => scrollContainer('right')}
+            className="w-12 h-12 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <span className="material-symbols-rounded">arrow_forward</span>
+          </button>
+        </div>
+      )}
+
+      {/* Sugerencia de nuevas secciones */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 text-center border-t border-white/10 pt-20 mt-10">
+        <h2 className="text-[24px] font-bold text-white mb-4">¿Buscas algo más?</h2>
+        <p className="text-white/50 mb-8 max-w-2xl mx-auto">Próximamente añadiremos más secciones para que puedas revivir nuestros eventos pasados y encontrar respuestas a tus dudas.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="liquid-glass p-8 rounded-[32px] bg-white/5 border border-white/10 text-left">
+            <span className="material-symbols-rounded text-[32px] text-white/40 mb-4">photo_library</span>
+            <h3 className="text-white font-bold text-[18px] mb-2">Galería de Eventos</h3>
+            <p className="text-white/50 text-[14px]">Fotos y resúmenes de lo que vivimos en nuestros retiros y noches especiales.</p>
+          </div>
+          <div className="liquid-glass p-8 rounded-[32px] bg-white/5 border border-white/10 text-left">
+            <span className="material-symbols-rounded text-[32px] text-white/40 mb-4">help_center</span>
+            <h3 className="text-white font-bold text-[18px] mb-2">Preguntas Frecuentes</h3>
+            <p className="text-white/50 text-[14px]">Información sobre parqueo, cuidado de niños y código de vestimenta para nuestros eventos.</p>
+          </div>
+        </div>
       </div>
 
       {rsvpEvent && <RSVPModal event={rsvpEvent} onClose={() => setRsvpEvent(null)} />}
