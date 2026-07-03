@@ -221,6 +221,14 @@ export default function EventsPage() {
   const [loading,   setLoading]   = useState(true);
   const [rsvpEvent, setRsvpEvent] = useState(null);
   const [viewMode,  setViewMode]  = useState('carousel');
+  const carouselRef = useRef(null);
+
+  const scrollContainer = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = direction === 'left' ? -600 : 600;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     apiClient.get('/events/')
@@ -274,8 +282,8 @@ export default function EventsPage() {
           </div>
         ) : (
           /* ── Contenedor de Eventos ── */
-          <motion.div layout className={viewMode === 'carousel' 
-            ? "flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pr-6 md:pr-12 hide-scrollbar" 
+          <motion.div ref={carouselRef} layout className={viewMode === 'carousel' 
+            ? "flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pr-6 md:pr-12 hide-scrollbar" 
             : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
           } 
           style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
@@ -303,7 +311,7 @@ export default function EventsPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
                   key={ev.ID} 
-                  className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[800px] h-[450px] md:h-[550px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+                  className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
                 >
                   
                   {/* Flyer de fondo */}
@@ -348,20 +356,20 @@ export default function EventsPage() {
                             style={{ fontSize: isCarousel ? 'clamp(22px, 3vw, 32px)' : '20px', lineHeight: 1.1 }}>
                             {ev.title}
                           </h3>
-                          {details && (
-                            <p className={`mt-2 truncate text-white/60 flex items-center gap-1.5 ${isCarousel ? 'text-[14px] md:text-[16px]' : 'text-[13px]'}`}>
-                              <span className="material-symbols-rounded text-[16px] text-white/40">location_on</span>
-                              {details}
-                            </p>
-                          )}
                         </motion.div>
                       </motion.div>
 
-                      {/* Botón CTA */}
-                      <motion.div layout className={`shrink-0 flex flex-col gap-3 w-full ${isCarousel ? 'md:w-auto items-start md:items-end pt-4 md:pt-0 border-t border-white/10 md:border-t-0' : 'pt-4 border-t border-white/10'}`}>
+                      {details && (
+                        <p className={`truncate text-white/60 flex items-center gap-1.5 text-[12px]`}>
+                          <span className="material-symbols-rounded text-[14px] text-white/40">location_on</span>
+                          {details}
+                        </p>
+                      )}
+
+                      <motion.div layout className={`shrink-0 flex flex-col gap-3 w-full pt-2 border-t border-white/10`}>
                         {ev.requires_payment && (
-                          <span className="font-bold text-[13px] font-mono text-white/80 tracking-wider flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10">
-                            <span className="material-symbols-rounded text-[14px]">payments</span>
+                          <span className="font-bold text-[12px] font-mono text-white/80 tracking-wider flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
+                            <span className="material-symbols-rounded text-[12px]">payments</span>
                             Q{Number(ev.price_gtq).toFixed(0)}
                           </span>
                         )}
