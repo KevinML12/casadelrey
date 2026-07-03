@@ -220,15 +220,12 @@ function ModalWrapper({ children, onClose }) {
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [faqs, setFaqs] = useState([]);
-  const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
   const [viewMode, setViewMode] = useState('carousel');
   const [openFaq, setOpenFaq] = useState(null);
-  const [selectedAlbum, setSelectedAlbum] = useState(null);
-  const [visibleCount, setVisibleCount] = useState(12);
 
   // Referencias para el carrusel
   const scrollRef = useRef(null);
@@ -240,30 +237,14 @@ export default function EventsPage() {
     }
   };
 
-  // Agrupar fotos de la galería por álbum (nombre de la carpeta extraído del título)
-  const albums = useMemo(() => {
-    const grouped = {};
-    gallery.forEach(photo => {
-      let albumName = "Otros";
-      if (photo.title && photo.title.includes(" - ")) {
-        albumName = photo.title.split(" - ")[0].trim();
-      }
-      if (!grouped[albumName]) grouped[albumName] = [];
-      grouped[albumName].push(photo);
-    });
-    return grouped;
-  }, [gallery]);
-
   useEffect(() => {
     Promise.all([
       apiClient.get('/events/').catch(() => ({ data: MOCK_EVENTS_FALLBACK })),
-      apiClient.get('/faqs/').catch(() => ({ data: [] })),
-      apiClient.get('/gallery/').catch(() => ({ data: { data: [] } }))
+      apiClient.get('/faqs/').catch(() => ({ data: [] }))
     ])
-      .then(([eventsRes, faqsRes, galleryRes]) => {
+      .then(([eventsRes, faqsRes]) => {
         setEvents(eventsRes.data || []);
         setFaqs(faqsRes.data || []);
-        setGallery(galleryRes.data?.data || galleryRes.data || []);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -441,47 +422,8 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* Secciones dinámicas: Galería y FAQs */}
+      {/* Secciones dinámicas: FAQs */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/10 pt-20 mt-10">
-        
-        {/* Galería (solo si hay fotos) */}
-        {gallery.length > 0 && (
-          <div className="mb-24">
-            <h2 className="text-[28px] font-bold text-white mb-2 text-center">Galería de Eventos</h2>
-            <p className="text-white/50 mb-10 text-center max-w-2xl mx-auto">Revive los mejores momentos de nuestros eventos pasados.</p>
-            
-            <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {Object.entries(albums).map(([albumName, photos]) => (
-                <div 
-                  key={albumName} 
-                  onClick={() => { setSelectedAlbum({ name: albumName, photos }); setVisibleCount(12); }}
-                  className="shrink-0 w-[240px] md:w-[280px] h-[340px] md:h-[380px] snap-center rounded-[32px] overflow-hidden relative group shadow-2xl cursor-pointer"
-                >
-                  {/* Cover image (primera foto del álbum) */}
-                  <img src={photos[0].url} alt={albumName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                  
-                  {/* Gradiente sutil para texto */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/10 to-transparent opacity-80" />
-
-                  {/* Panel flotante Liquid Glass */}
-                  <div className="absolute bottom-5 inset-x-5 flex flex-col justify-end">
-                    <div className="liquid-glass bg-white/10 border border-white/20 backdrop-blur-md p-4 rounded-2xl transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 flex justify-between items-center">
-                      <div>
-                        <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
-                        <p className="text-white/60 text-[13px]">{photos.length} fotos</p>
-                      </div>
-                      <span className="material-symbols-rounded text-white/80 group-hover:text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Ocultar barra de scroll webkit con estilos CSS en línea */}
-            <style>{`
-              .snap-x::-webkit-scrollbar { display: none; }
-            `}</style>
-          </div>
-        )}
 
         {/* FAQs */}
         {faqs.length > 0 && (
@@ -525,70 +467,6 @@ export default function EventsPage() {
       {/* RSVP Modal */}
       <AnimatePresence>
         {rsvpEvent && <RSVPModal event={rsvpEvent} onClose={() => setRsvpEvent(null)} />}
-      </AnimatePresence>
-
-      {/* Album Modal (Ventana emergente de la Galería) */}
-      <AnimatePresence>
-        {selectedAlbum && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-          >
-            {/* Fondo desenfocado */}
-            <div className="absolute inset-0 bg-bg/90 backdrop-blur-xl" onClick={() => setSelectedAlbum(null)} />
-            
-            {/* Contenedor principal del modal */}
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="relative w-full max-w-6xl max-h-[90vh] liquid-glass bg-white/5 border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
-            >
-              {/* Encabezado fijo */}
-              <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5 shrink-0">
-                <div>
-                  <h3 className="text-2xl font-bold text-white">{selectedAlbum.name}</h3>
-                  <p className="text-white/50 text-sm">{selectedAlbum.photos.length} fotografías</p>
-                </div>
-                <button
-                  onClick={() => setSelectedAlbum(null)}
-                  className="w-10 h-10 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <span className="material-symbols-rounded">close</span>
-                </button>
-              </div>
-              
-              {/* Cuadrícula de fotos con scroll */}
-              <div className="p-8 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                  {selectedAlbum.photos.slice(0, visibleCount).map((photo, idx) => (
-                    <div key={photo.ID} className="rounded-2xl overflow-hidden aspect-[4/5] relative group bg-black/20 shadow-lg border border-white/5">
-                      <img src={photo.url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <span className="material-symbols-rounded text-white text-3xl">zoom_in</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Botón Cargar Más */}
-                {visibleCount < selectedAlbum.photos.length && (
-                  <div className="flex justify-center mt-10">
-                    <button 
-                      onClick={() => setVisibleCount(prev => prev + 12)}
-                      className="px-8 py-3 rounded-full liquid-glass bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
-                    >
-                      <span className="material-symbols-rounded text-[18px]">add</span>
-                      Cargar más fotos
-                    </button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
       </AnimatePresence>
     </main>
   );

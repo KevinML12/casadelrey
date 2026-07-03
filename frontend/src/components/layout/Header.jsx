@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { label: 'Inicio',       to: '/' },
   { label: 'Ministerios',  to: '/about' },
   { label: 'Eventos',      to: '/events' },
+  { label: 'Galería',      to: '/gallery' },
   { label: 'Dar',          to: '/donate' },
 ];
 

@@ -375,6 +375,76 @@ function Ubicacion({ onPlan }) {
   );
 }
 
+// ════════════════════════════════════════════════════════════════════
+// 4.5 · GALERÍA (Preview)
+// ════════════════════════════════════════════════════════════════════
+function GalleryPreviewSection() {
+  const [gallery, setGallery] = useState([]);
+  const [albums, setAlbums] = useState({});
+
+  useEffect(() => {
+    apiClient.get('/gallery/')
+      .then(res => {
+        const data = res.data?.data || res.data || [];
+        setGallery(data);
+        
+        const grouped = {};
+        data.forEach(photo => {
+          let albumName = "Otros";
+          if (photo.title && photo.title.includes(" - ")) {
+            albumName = photo.title.split(" - ")[0].trim();
+          }
+          if (!grouped[albumName]) grouped[albumName] = [];
+          grouped[albumName].push(photo);
+        });
+        setAlbums(grouped);
+      })
+      .catch(console.error);
+  }, []);
+
+  if (gallery.length === 0) return null;
+
+  const topAlbums = Object.entries(albums).slice(0, 4); // Tomar solo los primeros 4 para el preview
+
+  return (
+    <section id="galeria-preview" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-rose/10 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" />
+      
+      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <Eyebrow>Galería</Eyebrow>
+          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+            Momentos <span className="text-white">vivos</span>.
+          </h2>
+        </div>
+        <Link to="/gallery" className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-full liquid-glass text-white font-bold hover:bg-white/10 transition-colors btn-spring border border-white/20 shrink-0">
+          Explorar Galería
+          <Icon name="arrow" className="w-4 h-4" />
+        </Link>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {topAlbums.map(([albumName, photos]) => (
+            <Link to="/gallery" key={albumName} className="group relative rounded-[24px] overflow-hidden aspect-[4/5] liquid-glass card-spring block border border-white/5 hover:border-white/20">
+              <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80" loading="lazy" />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
+              <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
+                <div>
+                  <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
+                  <p className="text-white/60 text-[12px] font-medium mt-1">{photos.length} fotos</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0 backdrop-blur-md">
+                  <Icon name="arrow" className="w-3 h-3" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 // ════════════════════════════════════════════════════════════════════
 // COMPONENTE PRINCIPAL
@@ -390,6 +460,7 @@ export default function Home() {
       <Agenda />
       <CelulasSection />
       <MensajesCarousel />
+      <GalleryPreviewSection />
       <Ubicacion onPlan={handlePlan} />
     </main>
   );
