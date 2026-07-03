@@ -225,6 +225,7 @@ export default function EventsPage() {
 
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
+  const [viewMode, setViewMode] = useState('carousel');
   const [openFaq, setOpenFaq] = useState(null);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
 
