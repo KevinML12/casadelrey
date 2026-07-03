@@ -303,7 +303,7 @@ export default function EventsPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
                   key={ev.ID} 
-                  className={`${isCarousel ? 'snap-center shrink-0 w-[90vw] max-w-[1000px] h-[600px] md:h-[700px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+                  className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[800px] h-[450px] md:h-[550px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
                 >
                   
                   {/* Flyer de fondo */}
