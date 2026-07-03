@@ -100,8 +100,6 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Eventos (público: lectura + RSVP)
 	eventsGroup := api.Group("/events")
 	eventsGroup.GET("/",              eventHandler.GetEvents)
-	eventsGroup.GET("/:id",           eventHandler.GetEventByID)
-	eventsGroup.POST("/:id/register", eventHandler.RegisterForEvent)
 	eventsGroup.POST("/:id/rsvp",    rsvpHandler.RegisterRSVP)
 
 	// Células (público: lectura de categorías)
