@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
@@ -218,21 +218,39 @@ function ModalWrapper({ children, onClose }) {
 }
 
 export default function EventsPage() {
-  const [events,    setEvents]    = useState([]);
-  const [faqs,      setFaqs]      = useState([]);
-  const [gallery,   setGallery]   = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [events, setEvents] = useState([]);
+  const [faqs, setFaqs] = useState([]);
+  const [gallery, setGallery] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
-  const [viewMode,  setViewMode]  = useState('carousel');
-  const [openFaq,   setOpenFaq]   = useState(null);
-  const carouselRef = useRef(null);
+  const [openFaq, setOpenFaq] = useState(null);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
+
+  // Referencias para el carrusel
+  const scrollRef = useRef(null);
 
   const scrollContainer = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = direction === 'left' ? -600 : 600;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -350 : 350;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  // Agrupar fotos de la galería por álbum (nombre de la carpeta extraído del título)
+  const albums = useMemo(() => {
+    const grouped = {};
+    gallery.forEach(photo => {
+      let albumName = "Otros";
+      if (photo.title && photo.title.includes(" - ")) {
+        albumName = photo.title.split(" - ")[0].trim();
+      }
+      if (!grouped[albumName]) grouped[albumName] = [];
+      grouped[albumName].push(photo);
+    });
+    return grouped;
+  }, [gallery]);
 
   useEffect(() => {
     Promise.all([
@@ -293,7 +311,7 @@ export default function EventsPage() {
           </div>
         ) : (
           /* ── Contenedor de Eventos ── */
-          <motion.div ref={carouselRef} layout className={viewMode === 'carousel' 
+          <motion.div ref={scrollRef} layout className={viewMode === 'carousel' 
             ? "flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pr-6 md:pr-12 hide-scrollbar" 
             : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
           } 
@@ -431,20 +449,26 @@ export default function EventsPage() {
             <p className="text-white/50 mb-10 text-center max-w-2xl mx-auto">Revive los mejores momentos de nuestros eventos pasados.</p>
             
             <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {gallery.map(photo => (
-                <div key={photo.ID} className="shrink-0 w-[300px] h-[400px] snap-center rounded-[32px] overflow-hidden relative group shadow-2xl">
-                  {/* Imagen de fondo */}
-                  <img src={photo.url} alt={photo.title || 'Foto de evento'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+              {Object.entries(albums).map(([albumName, photos]) => (
+                <div 
+                  key={albumName} 
+                  onClick={() => setSelectedAlbum({ name: albumName, photos })}
+                  className="shrink-0 w-[300px] h-[400px] snap-center rounded-[32px] overflow-hidden relative group shadow-2xl cursor-pointer"
+                >
+                  {/* Cover image (primera foto del álbum) */}
+                  <img src={photos[0].url} alt={albumName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                   
-                  {/* Gradiente sutil para que siempre se lea bien */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent opacity-60" />
+                  {/* Gradiente sutil para texto */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/10 to-transparent opacity-80" />
 
-                  {/* Panel flotante Liquid Glass para el título */}
+                  {/* Panel flotante Liquid Glass */}
                   <div className="absolute bottom-5 inset-x-5 flex flex-col justify-end">
-                    <div className="liquid-glass bg-white/10 border border-white/20 backdrop-blur-md p-4 rounded-2xl transform translate-y-2 group-hover:translate-y-0 transition-all duration-500">
-                      <p className="text-white font-semibold text-[15px] leading-tight line-clamp-2">
-                        {photo.title || 'Momento especial'}
-                      </p>
+                    <div className="liquid-glass bg-white/10 border border-white/20 backdrop-blur-md p-4 rounded-2xl transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 flex justify-between items-center">
+                      <div>
+                        <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
+                        <p className="text-white/60 text-[13px]">{photos.length} fotos</p>
+                      </div>
+                      <span className="material-symbols-rounded text-white/80 group-hover:text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
                     </div>
                   </div>
                 </div>
@@ -496,7 +520,61 @@ export default function EventsPage() {
         )}
       </div>
 
-      {rsvpEvent && <RSVPModal event={rsvpEvent} onClose={() => setRsvpEvent(null)} />}
+      {/* RSVP Modal */}
+      <AnimatePresence>
+        {rsvpEvent && <RSVPModal event={rsvpEvent} onClose={() => setRsvpEvent(null)} />}
+      </AnimatePresence>
+
+      {/* Album Modal (Ventana emergente de la Galería) */}
+      <AnimatePresence>
+        {selectedAlbum && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+          >
+            {/* Fondo desenfocado */}
+            <div className="absolute inset-0 bg-bg/90 backdrop-blur-xl" onClick={() => setSelectedAlbum(null)} />
+            
+            {/* Contenedor principal del modal */}
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="relative w-full max-w-6xl max-h-[90vh] liquid-glass bg-white/5 border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
+            >
+              {/* Encabezado fijo */}
+              <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5 shrink-0">
+                <div>
+                  <h3 className="text-2xl font-bold text-white">{selectedAlbum.name}</h3>
+                  <p className="text-white/50 text-sm">{selectedAlbum.photos.length} fotografías</p>
+                </div>
+                <button
+                  onClick={() => setSelectedAlbum(null)}
+                  className="w-10 h-10 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  <span className="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              
+              {/* Cuadrícula de fotos con scroll */}
+              <div className="p-8 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {selectedAlbum.photos.map((photo, idx) => (
+                    <div key={photo.ID} className="rounded-2xl overflow-hidden aspect-[4/5] relative group bg-black/20 shadow-lg border border-white/5">
+                      <img src={photo.url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <span className="material-symbols-rounded text-white text-3xl">zoom_in</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
