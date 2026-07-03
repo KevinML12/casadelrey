@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
