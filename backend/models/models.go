@@ -282,3 +282,11 @@ type MemberBoleta struct {
 	CellReportID   *uint  `json:"cell_report_id" gorm:"index"`
 	Notes          string `json:"notes" gorm:"type:text"`
 }
+
+type FAQ struct {
+	gorm.Model
+	Question  string `json:"question" gorm:"type:text;not null"`
+	Answer    string `json:"answer" gorm:"type:text;not null"`
+	IsActive  bool   `json:"is_active" gorm:"default:true"`
+	SortOrder int    `json:"sort_order" gorm:"default:0"`
+}

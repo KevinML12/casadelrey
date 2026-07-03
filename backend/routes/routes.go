@@ -34,6 +34,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	announcementHandler  := handlers.NewAnnouncementHandler(db)
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
+	faqHandler           := handlers.NewFAQHandler(db)
 	rsvpHandler          := handlers.NewRSVPHandler(db)
 	leaderDashHandler    := handlers.NewLeaderDashboardHandler(db)
 	activityLogHandler   := handlers.NewActivityLogHandler(db)
@@ -116,6 +117,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Galería pública
 	galleryGroup := api.Group("/gallery")
 	galleryGroup.GET("/", galleryHandler.GetPhotos)
+
+	// FAQs públicas
+	faqGroup := api.Group("/faqs")
+	faqGroup.GET("/", faqHandler.GetFAQs)
 
 	// Perfil y metas (usuario autenticado)
 	profileGroup := api.Group("/profile", authMW)
@@ -206,6 +211,13 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGallery.POST("/",      galleryHandler.CreatePhoto)
 	adminGallery.PUT("/:id",    galleryHandler.UpdatePhoto)
 	adminGallery.DELETE("/:id", galleryHandler.DeletePhoto)
+
+	// FAQs admin
+	adminFAQs := adminGroup.Group("/faqs")
+	adminFAQs.GET("/",       faqHandler.GetAllFAQs)
+	adminFAQs.POST("/",      faqHandler.CreateFAQ)
+	adminFAQs.PUT("/:id",    faqHandler.UpdateFAQ)
+	adminFAQs.DELETE("/:id", faqHandler.DeleteFAQ)
 
 	// Boletas (admin: eliminar)
 	adminGroup.DELETE("/boletas/:id", boletaHandler.DeleteBoleta)

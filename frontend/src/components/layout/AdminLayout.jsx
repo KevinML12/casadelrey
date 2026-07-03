@@ -11,6 +11,7 @@ const NAV = [
   { to: '/admin/users',            icon: 'manage_accounts',    label: 'Usuarios' },
   { to: '/admin/blog',             icon: 'article',            label: 'Blog' },
   { to: '/admin/events',           icon: 'calendar_month',     label: 'Eventos' },
+  { to: '/admin/faqs',             icon: 'help_center',        label: 'FAQs' },
   { to: '/admin/announcements',    icon: 'campaign',           label: 'Anuncios' },
   { to: '/admin/petitions',        icon: 'volunteer_activism', label: 'Peticiones',    badge: 'unread_petitions' },
   { to: '/admin/volunteers',       icon: 'group_add',          label: 'Voluntarios',   badge: 'pending_volunteers' },

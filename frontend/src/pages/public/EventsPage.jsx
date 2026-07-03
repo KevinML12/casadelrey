@@ -219,9 +219,12 @@ function ModalWrapper({ children, onClose }) {
 
 export default function EventsPage() {
   const [events,    setEvents]    = useState([]);
+  const [faqs,      setFaqs]      = useState([]);
+  const [gallery,   setGallery]   = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [rsvpEvent, setRsvpEvent] = useState(null);
   const [viewMode,  setViewMode]  = useState('carousel');
+  const [openFaq,   setOpenFaq]   = useState(null);
   const carouselRef = useRef(null);
 
   const scrollContainer = (direction) => {
@@ -232,9 +235,16 @@ export default function EventsPage() {
   };
 
   useEffect(() => {
-    apiClient.get('/events/')
-      .then(r => setEvents(r.data || []))
-      .catch(err => { console.error(err); setEvents(MOCK_EVENTS_FALLBACK); })
+    Promise.all([
+      apiClient.get('/events/').catch(() => ({ data: MOCK_EVENTS_FALLBACK })),
+      apiClient.get('/faqs/').catch(() => ({ data: [] })),
+      apiClient.get('/gallery/').catch(() => ({ data: { data: [] } }))
+    ])
+      .then(([eventsRes, faqsRes, galleryRes]) => {
+        setEvents(eventsRes.data || []);
+        setFaqs(faqsRes.data || []);
+        setGallery(galleryRes.data?.data || galleryRes.data || []);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -411,22 +421,69 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* Sugerencia de nuevas secciones */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 text-center border-t border-white/10 pt-20 mt-10">
-        <h2 className="text-[24px] font-bold text-white mb-4">¿Buscas algo más?</h2>
-        <p className="text-white/50 mb-8 max-w-2xl mx-auto">Próximamente añadiremos más secciones para que puedas revivir nuestros eventos pasados y encontrar respuestas a tus dudas.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          <div className="liquid-glass p-8 rounded-[32px] bg-white/5 border border-white/10 text-left">
-            <span className="material-symbols-rounded text-[32px] text-white/40 mb-4">photo_library</span>
-            <h3 className="text-white font-bold text-[18px] mb-2">Galería de Eventos</h3>
-            <p className="text-white/50 text-[14px]">Fotos y resúmenes de lo que vivimos en nuestros retiros y noches especiales.</p>
+      {/* Secciones dinámicas: Galería y FAQs */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/10 pt-20 mt-10">
+        
+        {/* Galería (solo si hay fotos) */}
+        {gallery.length > 0 && (
+          <div className="mb-24">
+            <h2 className="text-[28px] font-bold text-white mb-2 text-center">Galería de Eventos</h2>
+            <p className="text-white/50 mb-10 text-center max-w-2xl mx-auto">Revive los mejores momentos de nuestros eventos pasados.</p>
+            
+            <div className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {gallery.map(photo => (
+                <div key={photo.ID} className="shrink-0 w-[280px] h-[350px] snap-center rounded-[32px] overflow-hidden liquid-glass border border-white/10 relative group">
+                  <img src={photo.url} alt={photo.title || 'Foto de evento'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+                    <p className="text-white font-medium">{photo.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Ocultar barra de scroll webkit con estilos CSS en línea */}
+            <style>{`
+              .snap-x::-webkit-scrollbar { display: none; }
+            `}</style>
           </div>
-          <div className="liquid-glass p-8 rounded-[32px] bg-white/5 border border-white/10 text-left">
-            <span className="material-symbols-rounded text-[32px] text-white/40 mb-4">help_center</span>
-            <h3 className="text-white font-bold text-[18px] mb-2">Preguntas Frecuentes</h3>
-            <p className="text-white/50 text-[14px]">Información sobre parqueo, cuidado de niños y código de vestimenta para nuestros eventos.</p>
+        )}
+
+        {/* FAQs */}
+        {faqs.length > 0 && (
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-[28px] font-bold text-white mb-2 text-center">Preguntas Frecuentes</h2>
+            <p className="text-white/50 mb-10 text-center max-w-2xl mx-auto">Todo lo que necesitas saber antes de asistir a nuestros eventos.</p>
+            
+            <div className="space-y-4">
+              {faqs.map(faq => (
+                <div key={faq.ID} className="liquid-glass bg-white/5 border border-white/10 rounded-[24px] overflow-hidden">
+                  <button 
+                    onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
+                    className="w-full px-6 py-5 text-left flex items-center justify-between group cursor-pointer"
+                  >
+                    <span className="text-white font-medium pr-4">{faq.question}</span>
+                    <span className={`material-symbols-rounded text-white/50 transition-transform duration-300 ${openFaq === faq.ID ? 'rotate-180' : ''}`}>
+                      expand_more
+                    </span>
+                  </button>
+                  <AnimatePresence>
+                    {openFaq === faq.ID && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="px-6 pb-5 pt-0 text-white/60 text-[15px] leading-relaxed border-t border-white/5 mt-2">
+                          {faq.answer}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {rsvpEvent && <RSVPModal event={rsvpEvent} onClose={() => setRsvpEvent(null)} />}

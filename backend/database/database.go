@@ -70,6 +70,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.Announcement{},
 			&models.GalleryPhoto{},
 			&models.SocialPost{},
+			&models.FAQ{},
 			// Células
 			&models.CellReport{},
 			&models.MemberBoleta{},
