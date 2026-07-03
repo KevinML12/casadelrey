@@ -228,6 +228,7 @@ export default function EventsPage() {
   const [viewMode, setViewMode] = useState('carousel');
   const [openFaq, setOpenFaq] = useState(null);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   // Referencias para el carrusel
   const scrollRef = useRef(null);
@@ -453,8 +454,8 @@ export default function EventsPage() {
               {Object.entries(albums).map(([albumName, photos]) => (
                 <div 
                   key={albumName} 
-                  onClick={() => setSelectedAlbum({ name: albumName, photos })}
-                  className="shrink-0 w-[300px] h-[400px] snap-center rounded-[32px] overflow-hidden relative group shadow-2xl cursor-pointer"
+                  onClick={() => { setSelectedAlbum({ name: albumName, photos }); setVisibleCount(12); }}
+                  className="shrink-0 w-[240px] md:w-[280px] h-[340px] md:h-[380px] snap-center rounded-[32px] overflow-hidden relative group shadow-2xl cursor-pointer"
                 >
                   {/* Cover image (primera foto del álbum) */}
                   <img src={photos[0].url} alt={albumName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
@@ -561,8 +562,8 @@ export default function EventsPage() {
               
               {/* Cuadrícula de fotos con scroll */}
               <div className="p-8 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {selectedAlbum.photos.map((photo, idx) => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                  {selectedAlbum.photos.slice(0, visibleCount).map((photo, idx) => (
                     <div key={photo.ID} className="rounded-2xl overflow-hidden aspect-[4/5] relative group bg-black/20 shadow-lg border border-white/5">
                       <img src={photo.url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -571,6 +572,19 @@ export default function EventsPage() {
                     </div>
                   ))}
                 </div>
+                
+                {/* Botón Cargar Más */}
+                {visibleCount < selectedAlbum.photos.length && (
+                  <div className="flex justify-center mt-10">
+                    <button 
+                      onClick={() => setVisibleCount(prev => prev + 12)}
+                      className="px-8 py-3 rounded-full liquid-glass bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
+                    >
+                      <span className="material-symbols-rounded text-[18px]">add</span>
+                      Cargar más fotos
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
