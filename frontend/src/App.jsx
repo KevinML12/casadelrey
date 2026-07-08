@@ -4,6 +4,7 @@ import Lenis from 'lenis';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Splash from './components/ui/Splash';
+import StarField from './components/three/StarField';
 
 // Public shell — Liquid Glass sobre canvas navy.
 // Lenis da scroll suave con inercia (se desactiva con prefers-reduced-motion).
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-bg text-ink">
       <Splash />
+      <StarField />
       <Header />
       <main className="flex-1 w-full">
         <Outlet />

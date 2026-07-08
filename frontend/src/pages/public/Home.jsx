@@ -6,11 +6,12 @@ import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
 import { useApi, useBackdrops, groupAlbums, fetchOnce } from '../../lib/feed';
 
-// 3D — chunks aparte, solo se descargan si el dispositivo califica
+// 3D — chunk aparte, solo se descarga si el dispositivo califica
+// (el campo de partículas global vive en App.jsx, vía StarField)
 const GlobeHero = lazy(() => import('../../components/three/GlobeHero'));
-const ParticleField = lazy(() => import('../../components/three/ParticleField'));
 import use3D from '../../components/three/use3D';
 import Tilt from '../../components/ui/Tilt';
+import ParallaxImg from '../../components/ui/ParallaxImg';
 
 const MotionLink = motion.create(Link);
 
@@ -20,26 +21,6 @@ const PRESS = {
   whileTap: { scale: 0.94 },
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
-
-/**
- * ParallaxImg — foto de fondo que se mueve más lento que el contenido.
- * La capa de profundidad que separa un sitio real de una plantilla.
- */
-function ParallaxImg({ src, alt = '', className = '' }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], ['-9%', '9%']);
-  return (
-    <div ref={ref} className="absolute inset-0 overflow-hidden">
-      <motion.img
-        src={src}
-        alt={alt}
-        style={{ y }}
-        className={`absolute inset-0 w-full h-full object-cover scale-[1.18] ${className}`}
-      />
-    </div>
-  );
-}
 
 // ════════════════════════════════════════════════════════════════════
 // 1 · HERO CAROUSEL — slides reales: los heroes que el admin activa en
@@ -969,7 +950,6 @@ function GalleryPreviewSection() {
 // COMPONENTE PRINCIPAL
 // ════════════════════════════════════════════════════════════════════
 export default function Home() {
-  const show3D = use3D();
   // Fondos de sección curados desde la galería del admin (fallback local)
   const backdrops = useBackdrops();
   // "Planifica tu visita" lleva a la sección de ubicación/primera vez
@@ -978,16 +958,8 @@ export default function Home() {
 
   return (
     <main className="bg-bg w-full">
-      {/* Polvo de luz 3D global: vive entre los fondos (z-auto) y el
-          contenido (z-10) — las cards de cristal lo difuminan con su
-          backdrop-blur. Una sola capa fixed para todo el Home. */}
-      {show3D && (
-        <Suspense fallback={null}>
-          <div aria-hidden className="fixed inset-0 z-[4] pointer-events-none mix-blend-screen">
-            <ParticleField />
-          </div>
-        </Suspense>
-      )}
+      {/* El polvo de luz 3D ("estrellitas") ya vive en App.jsx, global
+          para todas las páginas públicas — aquí no hace falta montarlo */}
       <HeroCarousel onPlan={handlePlan} />
       <AnnouncementsBar />
       <Agenda bg={backdrops.agenda} />

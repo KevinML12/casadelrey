@@ -5,6 +5,7 @@ import SocialSection from '../../components/sections/SocialSection';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
+import ParallaxImg from '../../components/ui/ParallaxImg';
 
 const MotionLink = motion.create(Link);
 const PRESS = {
@@ -12,15 +13,6 @@ const PRESS = {
   whileTap: { scale: 0.94 },
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
-
-// Estructura pastoral sobre las células (CONTEXTO_IGLESIA jul-2026):
-// 3 pastores + 1 encargada de niños cubren los 5 tipos de célula.
-const CELL_PASTORS = [
-  { name: 'Leonel de León', covers: 'Varones y Prejuveniles' },
-  { name: 'Ismeina Castillo de De León', covers: 'Red Mujeres de Palabra' },
-  { name: 'Pastor de jóvenes', covers: 'Adolescentes y Jóvenes Adultos' },
-  { name: 'Encargada de niños', covers: 'Niños' },
-];
 
 // Los 10 departamentos reales donde sirven los ~90 voluntarios
 const DEPARTMENTS = [
@@ -44,9 +36,12 @@ export default function AboutPage() {
         subtitle="Una iglesia familiar en Huehuetenango, edificada célula por célula, generación tras generación."
       />
 
-      {/* Fundadores + estructura actual */}
-      <section className="relative py-16 md:py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      {/* Fundadores + estructura actual — fotografía real de la congregación
+          en adoración como ambiente (no atribuida a nadie en particular) */}
+      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
+        <ParallaxImg src="/images/nosotros/pastores.jpg" alt="" className="opacity-55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12">
             <Eyebrow>Identidad</Eyebrow>
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
@@ -89,8 +84,10 @@ export default function AboutPage() {
       </section>
 
       {/* Misión y Visión */}
-      <section className="relative py-16 md:py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
+        <ParallaxImg src="/images/nosotros/servidores.jpg" alt="" className="opacity-45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12">
             <Eyebrow>Propósito</Eyebrow>
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
@@ -123,8 +120,10 @@ export default function AboutPage() {
       </section>
 
       {/* Comunidad en números + departamentos de voluntariado */}
-      <section className="relative py-16 md:py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
+        <ParallaxImg src="/images/nosotros/comunidad.jpg" alt="" className="opacity-55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/45 to-bg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12 text-center">
             <Eyebrow>Comunidad</Eyebrow>
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
@@ -169,8 +168,10 @@ export default function AboutPage() {
       </section>
 
       {/* Células — acceso directo al módulo */}
-      <section className="relative py-16 md:py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
+        <ParallaxImg src="/images/nosotros/lideres.jpg" alt="" className="opacity-45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="liquid-glass rounded-[24px] p-9 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between">
             <div>
               <Eyebrow>Grupos pequeños</Eyebrow>
