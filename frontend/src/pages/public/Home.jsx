@@ -62,6 +62,29 @@ const SLIDE_FALLBACK = {
 const fmtEventDate = (d) =>
   new Date(d + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
+// ── Coreografía del carrusel ──────────────────────────────────────
+// Entrada en cascada (label → título → subtítulo → CTA) con las líneas
+// del título emergiendo desde una máscara; salida rápida hacia arriba.
+const EASE_OUT = [0.16, 1, 0.3, 1];   // expo-out: llega suave
+const EASE_IN  = [0.6, 0, 0.8, 1];    // salida decidida
+
+const SLIDE_ANIM = {
+  hidden: {},
+  show:   { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+  exit:   { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
+};
+const RISE = {
+  hidden: { opacity: 0, y: 30 },
+  show:   { opacity: 1, y: 0,  transition: { duration: 0.6,  ease: EASE_OUT } },
+  exit:   { opacity: 0, y: -24, transition: { duration: 0.28, ease: EASE_IN } },
+};
+// Máscara de línea: el texto sube desde detrás de un overflow-hidden
+const LINE = {
+  hidden: { y: '115%' },
+  show:   { y: '0%',   transition: { duration: 0.9,  ease: EASE_OUT } },
+  exit:   { y: '-115%', transition: { duration: 0.35, ease: EASE_IN } },
+};
+
 // Fallback si /events no responde — mismo shape que el mapeo de la API
 const NEXT_EVENT_DEFAULT = {
   day: '15', month: 'AGO', title: 'Noche de Jóvenes',
@@ -162,40 +185,42 @@ function HeroCarousel({ onPlan }) {
 
   return (
     <section ref={heroRef} id="inicio" className="relative min-h-[100svh] overflow-hidden bg-bg">
-      {/* Fondo por slide con crossfade — key por URL: si dos slides
-          comparten foto no hay parpadeo */}
-      <AnimatePresence initial={false}>
-        {media.endsWith('.mp4') ? (
-          <motion.video
-            key={media}
-            src={media}
-            autoPlay
-            loop
-            muted
-            playsInline
-            onError={markFailed}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            style={{ y: bgY, scale: bgScale }}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <motion.img
-            key={media}
-            src={media}
-            alt=""
-            onError={markFailed}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            style={{ y: bgY, scale: bgScale }}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        )}
-      </AnimatePresence>
+      {/* Fondo por slide: crossfade + Ken Burns (entra a 1.06 y asienta).
+          El wrapper externo lleva el parallax de scroll; el interno la
+          transición — framer no puede animar scale dos veces en el mismo
+          elemento. Key por URL: si dos slides comparten foto, no parpadea */}
+      <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0">
+        <AnimatePresence initial={false}>
+          {media.endsWith('.mp4') ? (
+            <motion.video
+              key={media}
+              src={media}
+              autoPlay
+              loop
+              muted
+              playsInline
+              onError={markFailed}
+              initial={{ opacity: 0, scale: 1.06 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ opacity: { duration: 0.9, ease: 'easeOut' }, scale: { duration: 1.8, ease: EASE_OUT } }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <motion.img
+              key={media}
+              src={media}
+              alt=""
+              onError={markFailed}
+              initial={{ opacity: 0, scale: 1.06 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ opacity: { duration: 0.9, ease: 'easeOut' }, scale: { duration: 1.8, ease: EASE_OUT } }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )}
+        </AnimatePresence>
+      </motion.div>
       {/* Scrims: legibilidad del texto sin apagar la foto */}
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/20 to-transparent" />
@@ -220,33 +245,41 @@ function HeroCarousel({ onPlan }) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 26 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -18 }}
-                transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
+                variants={SLIDE_ANIM}
+                initial="hidden"
+                animate="show"
+                exit="exit"
               >
-                <div className="mb-6 text-white/80 text-[15px] font-semibold">
+                <motion.div variants={RISE} className="mb-6 text-white/80 text-[15px] font-semibold">
                   {slide.label}
-                </div>
+                </motion.div>
                 <h1
                   className="display-mega text-white"
-                  style={{ fontSize: 'clamp(3rem, 8vw, 7.5rem)', lineHeight: '0.92' }}
+                  style={{ fontSize: 'clamp(3rem, 8vw, 7.5rem)', lineHeight: '1' }}
                 >
-                  {slide.l1}
-                  {slide.l2 && <><br />{slide.l2}</>}
+                  {[slide.l1, slide.l2].filter(Boolean).map((line, li) => (
+                    // pb/-mb: deja respirar los descendentes (g, j, p)
+                    // dentro de la máscara sin abrir el interlineado
+                    <span key={li} className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
+                      <motion.span variants={LINE} className="block">
+                        {line}
+                      </motion.span>
+                    </span>
+                  ))}
                 </h1>
                 {slide.subtitle && (
-                  <p className="mt-8 max-w-xl text-[17px] md:text-[20px] leading-relaxed text-white/80 font-medium">
+                  <motion.p variants={RISE} className="mt-8 max-w-xl text-[17px] md:text-[20px] leading-relaxed text-white/80 font-medium">
                     {slide.subtitle}
-                  </p>
+                  </motion.p>
                 )}
                 {slide.schedule && (
-                  <p className="mt-4 text-[14px] font-semibold text-white/60">
+                  <motion.p variants={RISE} className="mt-4 text-[14px] font-semibold text-white/60">
                     {slide.schedule}
-                  </p>
+                  </motion.p>
                 )}
                 {slide.ctaText && (
-                  slide.ctaUrl?.startsWith('http') ? (
+                <motion.div variants={RISE}>
+                  {slide.ctaUrl?.startsWith('http') ? (
                     <motion.a
                       href={slide.ctaUrl}
                       target="_blank"
@@ -275,7 +308,8 @@ function HeroCarousel({ onPlan }) {
                       {slide.ctaText}
                       <Icon name="arrow" className="w-4 h-4" stroke={2} />
                     </motion.button>
-                  )
+                  )}
+                </motion.div>
                 )}
               </motion.div>
             </AnimatePresence>

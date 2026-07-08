@@ -45,6 +45,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminOrLeaderMW := middleware.AdminOrLeaderMiddleware()
 	globalRateLimit := middleware.GlobalRateLimit()
 	authRateLimit   := middleware.AuthRateLimit()
+	// Cache-Control por tipo de contenido: lo que cambia poco (categorías de
+	// células) cachea más tiempo que lo que el admin edita seguido (hero, feed)
+	cacheShort := middleware.PublicCache(20)  // hero, eventos, feed, anuncios
+	cacheMed   := middleware.PublicCache(60)  // blog, galería
+	cacheLong  := middleware.PublicCache(300) // categorías de células (casi estáticas)
 
 	// Aplicar Rate Limiter Global a todo el servidor
 	e.Use(globalRateLimit)
@@ -67,7 +72,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.POST("/receipts", receiptHandler.Submit)
 
 	// Hero del home — público: obtener el activo
-	api.GET("/hero/active", heroHandler.GetActive)
+	api.GET("/hero/active", heroHandler.GetActive, cacheShort)
 
 	// Voluntariado
 	api.POST("/volunteer/register",   volunteerHandler.Register)
@@ -84,8 +89,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Blog (público: lectura)
 	blogGroup := api.Group("/blog")
-	blogGroup.GET("/",      blogHandler.GetPublishedPosts)
-	blogGroup.GET("/:slug", blogHandler.GetPostBySlug)
+	blogGroup.GET("/",      blogHandler.GetPublishedPosts, cacheMed)
+	blogGroup.GET("/:slug", blogHandler.GetPostBySlug, cacheMed)
 
 	// Peticiones de oración
 	contactGroup := api.Group("/contact")
@@ -100,29 +105,29 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Eventos (público: lectura + RSVP) — con y sin slash final:
 	// Echo no redirige entre ambos y el frontend histórico usa /events
 	eventsGroup := api.Group("/events")
-	eventsGroup.GET("",               eventHandler.GetEvents)
-	eventsGroup.GET("/",              eventHandler.GetEvents)
+	eventsGroup.GET("",               eventHandler.GetEvents, cacheShort)
+	eventsGroup.GET("/",              eventHandler.GetEvents, cacheShort)
 	eventsGroup.POST("/:id/rsvp",    rsvpHandler.RegisterRSVP)
 
 	// Células (público: lectura de categorías + listado seguro de células)
 	cellsGroup := api.Group("/cell-categories")
-	cellsGroup.GET("", cellCategoryHandler.GetCellCategories)
-	cellsGroup.GET("/", cellCategoryHandler.GetCellCategories)
-	api.GET("/cells", cellCategoryHandler.GetPublicCells)
+	cellsGroup.GET("", cellCategoryHandler.GetCellCategories, cacheLong)
+	cellsGroup.GET("/", cellCategoryHandler.GetCellCategories, cacheLong)
+	api.GET("/cells", cellCategoryHandler.GetPublicCells, cacheLong)
 
 	// Feed social
-	api.GET("/social/feed", socialHandler.GetSocialFeed)
+	api.GET("/social/feed", socialHandler.GetSocialFeed, cacheShort)
 
 	// Anuncios (público — authMW opcional para filtrar por rol)
-	api.GET("/announcements", announcementHandler.GetAnnouncements)
+	api.GET("/announcements", announcementHandler.GetAnnouncements, cacheShort)
 
 	// Galería pública
 	galleryGroup := api.Group("/gallery")
-	galleryGroup.GET("/", galleryHandler.GetPhotos)
+	galleryGroup.GET("/", galleryHandler.GetPhotos, cacheMed)
 
 	// FAQs públicas
 	faqGroup := api.Group("/faqs")
-	faqGroup.GET("/", faqHandler.GetFAQs)
+	faqGroup.GET("/", faqHandler.GetFAQs, cacheLong)
 
 	// Perfil y metas (usuario autenticado)
 	profileGroup := api.Group("/profile", authMW)

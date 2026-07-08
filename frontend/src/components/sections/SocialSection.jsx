@@ -1,120 +1,102 @@
-import { useEffect, useState } from 'react';
-import apiClient from '../../lib/apiClient';
-import { Icon } from '../ui/Glass';
+// ============================================================
+//  SocialSection — grid editorial del feed social (mismo lenguaje
+//  que FeedSection en Home.jsx): fotos reales de AdminSocial, sin
+//  iframes de embed. featured_size decide el tamaño de cada card.
+// ============================================================
+import { Icon, Eyebrow } from '../ui/Glass';
+import Reveal, { RevealList, RevealItem } from '../ui/Reveal';
+import Tilt from '../ui/Tilt';
+import { useApi } from '../../lib/feed';
 
-const FB_URL     = 'https://www.facebook.com/casadelreyhuehue';
-const IG_URL     = 'https://www.instagram.com/ig.casadelrey/';
-const X_URL      = 'https://x.com/pastorleoneli';
-const TIKTOK_URL = 'https://www.tiktok.com/@leoneldeleongt';
+const PLATFORM_ICON = { instagram: 'instagram', youtube: 'youtube', facebook: 'heart', tiktok: 'music' };
+const FEED_SPAN = {
+  small:  'col-span-1 row-span-1',
+  medium: 'col-span-2 row-span-1',
+  large:  'col-span-2 row-span-2',
+};
 
 const NETWORKS = [
-  { href: FB_URL,     label: 'Facebook',   sub: 'Síguenos y mantente al día', icon: 'heart' },
-  { href: IG_URL,     label: 'Instagram',  sub: 'Fotos, videos y más',         icon: 'instagram' },
-  { href: X_URL,      label: 'X / Twitter',sub: 'Síguenos en X',               icon: 'spark' },
-  { href: TIKTOK_URL, label: 'TikTok',     sub: 'Videos y contenido',          icon: 'music' },
+  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  icon: 'heart' },
+  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', icon: 'instagram' },
+  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    icon: 'music' },
+  { href: 'https://x.com/pastorleoneli',                label: 'X',         icon: 'spark' },
 ];
 
-function getEmbedUrl(url, platform) {
-  if (platform === 'instagram') {
-    const match = url.match(/instagram\.com\/p\/([^/]+)/);
-    return match ? `https://www.instagram.com/p/${match[1]}/embed` : url;
-  }
-  return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&width=500&show_text=true`;
-}
-
-export default function SocialSection({ title = 'Multimedia', showDirectAccess = true }) {
-  const [posts,   setPosts]   = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiClient.get('/social/feed')
-      .then(r => setPosts(r.data || []))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false));
-  }, []);
+export default function SocialSection({ title = 'Nuestro feed', showDirectAccess = true }) {
+  const data = useApi('/social/feed');
+  const posts = (Array.isArray(data) ? data : []).filter(p => p.is_active !== false);
 
   return (
-    <section className="relative py-24 md:py-28 bg-bg overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="halo" style={{ width: 520, height: 520, top: '5%', left: '-12%', background: 'rgba(63,169,255,0.10)' }} />
-      </div>
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="flex items-center gap-3 mb-5">
-          <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-          <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Redes sociales</span>
+    <section className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <Eyebrow>Redes sociales</Eyebrow>
+          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+            {title}
+          </h2>
         </div>
-        <h2 className="display-mega text-ink mb-12" style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)' }}>
-          {title}
-        </h2>
-
         {showDirectAccess && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
-            {NETWORKS.map(({ href, label, sub, icon }) => (
+          <div className="flex gap-3 shrink-0">
+            {NETWORKS.map(n => (
               <a
-                key={label}
-                href={href}
+                key={n.label}
+                href={n.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 bg-bg border border-ink-soft shadow-card rounded-card p-5 hover:bg-bg-soft transition-all group focus-ring"
+                className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white hover:scale-105 transition-transform focus-ring"
+                aria-label={n.label}
               >
-                <span className="grid place-items-center w-12 h-12 rounded-sm bg-bg-soft text-celeste shrink-0">
-                  <Icon name={icon} className="w-6 h-6" />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-extrabold tracking-tightish text-ink">{label}</p>
-                  <p className="text-[12.5px] text-ink-3 truncate">{sub}</p>
-                </div>
-                <Icon name="arrow" className="w-5 h-5 text-ink-3 group-hover:text-ink transition-colors" />
+                <Icon name={n.icon} className="w-5 h-5" />
               </a>
             ))}
           </div>
         )}
+      </Reveal>
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="aspect-square glass rounded-card animate-pulse" />
-            ))}
+      {posts.length === 0 ? (
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="liquid-glass rounded-[24px] p-12 text-center">
+            <p className="text-[15px] text-white/60 font-medium">
+              Aún no hay publicaciones vinculadas. Síguenos en redes para ver el contenido más reciente.
+            </p>
           </div>
-        ) : posts.length === 0 ? (
-          <div className="text-center py-16 bg-bg border border-ink-soft shadow-card rounded-card">
-            <p className="text-[14.5px] text-ink-2">Aún no hay publicaciones vinculadas. Síguenos en redes para ver el contenido.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        </div>
+      ) : (
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <RevealList className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 auto-rows-[170px] md:auto-rows-[200px]">
             {posts.map(p => (
-              <a
-                key={p.ID}
-                href={p.post_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-card overflow-hidden glass glass-sheen hover:bg-bg-soft transition-all group focus-ring"
-              >
-                <div className="aspect-square relative overflow-hidden bg-bg-soft">
-                  <iframe
-                    src={getEmbedUrl(p.post_url, p.platform)}
-                    className="w-full h-full"
-                    style={{ minHeight: 280 }}
-                    title={p.caption || p.platform}
-                  />
-                  <div className="absolute top-3 right-3 glass rounded-full px-3 py-1 text-[10.5px] font-extrabold uppercase tracking-widest text-ink capitalize">
-                    {p.platform}
+              <RevealItem key={p.ID} className={FEED_SPAN[p.featured_size] || FEED_SPAN.small}>
+                <Tilt
+                  as="a"
+                  href={p.post_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  max={6}
+                  className="group relative block h-full rounded-[18px] overflow-hidden liquid-glass border border-white/5 hover:border-white/25"
+                >
+                  {p.image_url && (
+                    <img
+                      src={p.image_url}
+                      alt={p.caption || p.platform}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/85 via-bg/15 to-transparent" />
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-bg/50 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/80">
+                    <Icon name={PLATFORM_ICON[p.platform] || 'spark'} className="w-4 h-4" />
                   </div>
-                </div>
-                {p.caption && (
-                  <div className="p-4">
-                    <p className="text-[13.5px] text-ink-2 line-clamp-2">{p.caption}</p>
-                    <p className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-extrabold uppercase tracking-[0.24em] text-celeste">
-                      Ver publicación
-                      <Icon name="arrow" className="w-3 h-3" />
-                    </p>
-                  </div>
-                )}
-              </a>
+                  {p.caption && (
+                    <div className="absolute bottom-0 inset-x-0 p-4">
+                      <p className="text-[13.5px] font-semibold text-white leading-snug line-clamp-2">{p.caption}</p>
+                    </div>
+                  )}
+                </Tilt>
+              </RevealItem>
             ))}
-          </div>
-        )}
-      </div>
+          </RevealList>
+        </div>
+      )}
     </section>
   );
 }

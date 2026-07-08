@@ -38,14 +38,16 @@ func GlobalRateLimit() echo.MiddlewareFunc {
 }
 
 // AuthRateLimit protege endpoints sensibles (Login, Register).
-// Solo permite 5 peticiones por segundo, con ráfaga de 10.
+// 1 req/s con ráfaga de 5 por IP: un humano nunca lo nota, un ataque
+// de fuerza bruta queda a ~60 intentos/minuto (repo público → asumir
+// que conocen los emails del seed).
 func AuthRateLimit() echo.MiddlewareFunc {
 	config := middleware.RateLimiterConfig{
 		Skipper: middleware.DefaultSkipper,
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
 			middleware.RateLimiterMemoryStoreConfig{
-				Rate:      rate.Limit(5),
-				Burst:     10,
+				Rate:      rate.Limit(1),
+				Burst:     5,
 				ExpiresIn: 3 * 60 * 1000000000,
 			},
 		),

@@ -7,11 +7,12 @@ import { Icon } from '../ui/Glass';
 // Espeja las secciones reales del sitio (mismo orden que el Footer).
 // "Dar" no va aquí: es el CTA de la derecha cuando hay sesión.
 const NAV_LINKS = [
-  { label: 'Inicio',     to: '/' },
-  { label: 'Células',    to: '/celulas' },
-  { label: 'Eventos',    to: '/events' },
-  { label: 'Enseñanzas', to: '/blog' },
-  { label: 'Galería',    to: '/gallery' },
+  { label: 'Inicio',   to: '/' },
+  { label: 'Nosotros', to: '/about' },
+  { label: 'Células',  to: '/celulas' },
+  { label: 'Eventos',  to: '/events' },
+  { label: 'Blog',     to: '/blog' },
+  { label: 'Galería',  to: '/gallery' },
 ];
 
 export default function Header() {

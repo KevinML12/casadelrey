@@ -6,11 +6,11 @@ import { Icon } from '../ui/Glass';
 // correo y horarios se agregan cuando el pastor los entregue.
 const NAV = [
   { id: '/',        label: 'Inicio' },
+  { id: '/about',   label: 'Nosotros' },
   { id: '/celulas', label: 'Células' },
   { id: '/events',  label: 'Eventos' },
-  { id: '/blog',    label: 'Enseñanzas' },
+  { id: '/blog',    label: 'Blog' },
   { id: '/gallery', label: 'Galería' },
-  { id: '/about',   label: 'Nosotros' },
   { id: '/donate',  label: 'Dar' },
 ];
 
