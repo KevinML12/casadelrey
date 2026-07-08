@@ -31,6 +31,12 @@ const PATHS = {
   lock:      <><rect x="5" y="11" width="14" height="9" rx="2.5" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>,
   search:    <><circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" /></>,
   gift:      <><rect x="3.5" y="9" width="17" height="11" rx="2" /><path d="M3.5 13h17M12 9v11" /><path d="M12 9C9 9 7.5 4 12 4M12 9c3 0 4.5-5 0-5" /></>,
+  mic:       <><rect x="9" y="2.5" width="6" height="11" rx="3" /><path d="M6 11a6 6 0 0 0 12 0" /><line x1="12" y1="17" x2="12" y2="21" /><line x1="8.5" y1="21" x2="15.5" y2="21" /></>,
+  flag:      <><line x1="5" y1="3" x2="5" y2="21" /><path d="M5 4h13l-3 4 3 4H5Z" /></>,
+  camera:    <><path d="M4 8h3l1.5-2.5h7L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z" /><circle cx="12" cy="13.5" r="3.6" /></>,
+  headphones: <><path d="M4 15v-3a8 8 0 0 1 16 0v3" /><rect x="2.5" y="14" width="4" height="6" rx="1.6" /><rect x="17.5" y="14" width="4" height="6" rx="1.6" /></>,
+  pray:      <><path d="M12 4v16" /><path d="M12 4c-3 2-4 5-4 8 0 3 1.5 5.5 4 8" /><path d="M12 4c3 2 4 5 4 8 0 3-1.5 5.5-4 8" /></>,
+  box:       <><path d="M3.5 8.5 12 4l8.5 4.5-8.5 4.5-8.5-4.5Z" /><path d="M3.5 8.5v7L12 20l8.5-4.5v-7" /><line x1="12" y1="13" x2="12" y2="20" /></>,
 };
 
 export function Icon({ name, className = 'w-5 h-5', stroke = 1.6 }) {

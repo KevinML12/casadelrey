@@ -46,7 +46,7 @@ function TTSPlayer({ content }) {
 
         <div className="flex-1 min-w-0">
           <p className={`text-title-s font-semibold ${isActive ? 'text-ink' : 'text-on-surf'}`}>
-            {isLoading ? 'Preparando…' : isPlaying ? 'Leyendo…' : isPaused ? 'Pausado' : isDone ? '✓ Completado' : 'Escuchar este post'}
+            {isLoading ? 'Preparando…' : isPlaying ? 'Leyendo…' : isPaused ? 'Pausado' : isDone ? 'Completado' : 'Escuchar este post'}
           </p>
           <p className={`text-label-s mt-0.5 ${isActive ? '' : 'text-on-surf-var'}`}
             style={isActive ? { color: 'rgba(255,255,255,.5)' } : {}}>

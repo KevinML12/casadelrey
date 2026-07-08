@@ -84,7 +84,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
         status,
         rejection_reason: reason,
       });
-      toast.success(status === 'verificado' ? '✅ Comprobante verificado' : '❌ Comprobante rechazado');
+      toast.success(status === 'verificado' ? 'Comprobante verificado' : 'Comprobante rechazado');
       onDone();
       onClose();
     } catch { toast.error('Error al verificar'); }

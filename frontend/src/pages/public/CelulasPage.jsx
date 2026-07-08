@@ -1,10 +1,12 @@
 // ============================================================
-//  CelulasPage — módulo público de células. Cada tipo se
-//  despliega mostrando sus células: nombre · líder · zona.
-//  PRIVACIDAD: nunca direcciones exactas ni teléfonos (el
-//  directorio completo es solo interno, ver CONTEXTO_IGLESIA).
-//  API-first (GET /cells + /cell-categories) con fallback del
-//  directorio real jul-2026 en su versión pública segura.
+//  CelulasPage — módulo público de células, en un layout de
+//  panel maestro-detalle (sidebar de categorías + ventana de
+//  contenido), al estilo de Ajustes del Sistema de macOS: dos
+//  superficies de cristal separadas en vez de un único acordeón.
+//  Cada célula muestra solo nombre · líder · zona (PRIVACIDAD:
+//  nunca direcciones exactas — el directorio completo es interno,
+//  ver CONTEXTO_IGLESIA). API-first (GET /cells + /cell-categories)
+//  con fallback del directorio real jul-2026 en su versión segura.
 // ============================================================
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
@@ -13,6 +15,12 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import { useApi } from '../../lib/feed';
+
+const PRESS = {
+  whileHover: { scale: 1.04 },
+  whileTap: { scale: 0.94 },
+  transition: { type: 'spring', stiffness: 400, damping: 17 },
+};
 
 // Directorio público seguro (jul 2026) — solo célula · líder · zona
 const GROUPS_FALLBACK = [
@@ -73,7 +81,7 @@ const TYPE_TO_KEY = {
 export default function CelulasPage() {
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
-  const [open, setOpen] = useState(null);
+  const [active, setActive] = useState(null);
 
   // Si el backend ya tiene células cargadas, sustituyen al fallback
   // dentro de su grupo; los grupos sin datos de API conservan el suyo.
@@ -87,18 +95,20 @@ export default function CelulasPage() {
     return GROUPS_FALLBACK.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
   }, [apiCells]);
 
-  // ?tipo=Adolescentes (desde las cards del Home) abre ese grupo
+  // ?tipo=Adolescentes (desde las cards del Home) selecciona ese grupo
   useEffect(() => {
     const tipo = params.get('tipo');
-    if (!tipo) { setOpen(groups[0]?.key ?? null); return; }
+    if (!tipo) { setActive(groups[0]?.key ?? null); return; }
     const hit = groups.find(g => g.name.toLowerCase().startsWith(tipo.toLowerCase().slice(0, 5)));
-    setOpen(hit ? hit.key : groups[0]?.key ?? null);
+    setActive(hit ? hit.key : groups[0]?.key ?? null);
   }, [params, groups]);
+
+  const current = groups.find(g => g.key === active) || groups[0];
 
   return (
     <main className="bg-bg w-full min-h-screen">
       {/* Encabezado */}
-      <section className="relative pt-40 pb-16 overflow-hidden">
+      <section className="relative pt-40 pb-14 overflow-hidden">
         <div className="absolute inset-0 opacity-40">
           <img src="/images/bg-ministerios.jpg" alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/30" />
@@ -115,75 +125,96 @@ export default function CelulasPage() {
         </Reveal>
       </section>
 
-      {/* Acordeón por tipo */}
-      <section className="relative max-w-6xl mx-auto px-6 pb-24 flex flex-col gap-5">
-        {groups.map((g, gi) => {
-          const isOpen = open === g.key;
-          return (
-            <Reveal key={g.key} delay={gi * 0.05}>
-              <div className={`liquid-glass rounded-[24px] overflow-hidden transition-colors ${isOpen ? 'border-white/25' : ''}`}>
-                {/* Cabecera del grupo */}
-                <button
-                  onClick={() => setOpen(isOpen ? null : g.key)}
-                  className="w-full flex items-center gap-6 p-6 md:p-8 text-left focus-ring"
-                  aria-expanded={isOpen}
-                >
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-[16px] overflow-hidden shrink-0 border border-white/10">
-                    <img src={g.image} alt={g.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-[24px] md:text-[30px] font-bold text-white tracking-tight">{g.name}</h2>
-                    <p className="text-[14px] text-white/60 font-semibold mt-1">
-                      {g.age} · {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'}
-                    </p>
-                  </div>
-                  <motion.div
-                    animate={{ rotate: isOpen ? 90 : 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                    className="w-11 h-11 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0"
-                  >
-                    <Icon name="arrow" className="w-4 h-4" />
-                  </motion.div>
-                </button>
+      {/* Panel maestro-detalle: dos ventanas de cristal separadas */}
+      <section className="relative max-w-6xl mx-auto px-6 pb-24">
+        {current && (
+          <Reveal className="grid lg:grid-cols-[300px_1fr] gap-5 items-start">
 
-                {/* Células del grupo */}
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <RevealList className="grid sm:grid-cols-2 gap-3 px-6 md:px-8 pb-6 md:pb-8">
-                        {g.cells.map((c, i) => (
-                          <RevealItem key={`${c.name}-${i}`}>
-                            <Tilt max={4} className="rounded-[16px] bg-white/5 border border-white/10 p-5 flex items-center gap-4 h-full">
-                              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
-                                <Icon name="users" className="w-5 h-5" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-[16px] font-bold text-white leading-tight">{c.name}</p>
-                                <p className="text-[13px] text-white/60 font-medium mt-0.5">{c.leader}</p>
-                              </div>
-                              <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-3 py-1 rounded-full text-[12px] font-semibold">
-                                {c.zone}
-                              </span>
-                            </Tilt>
-                          </RevealItem>
-                        ))}
-                      </RevealList>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </Reveal>
-          );
-        })}
+            {/* Ventana izquierda — lista de categorías */}
+            <nav
+              aria-label="Categorías de células"
+              className="liquid-glass rounded-[24px] p-3 lg:sticky lg:top-28 flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible"
+            >
+              {groups.map(g => {
+                const isActive = g.key === current.key;
+                return (
+                  <button
+                    key={g.key}
+                    onClick={() => setActive(g.key)}
+                    className="relative shrink-0 lg:w-full flex items-center gap-3 px-3.5 py-3 rounded-[16px] text-left focus-ring transition-colors"
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="cell-nav-active"
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                        className="absolute inset-0 bg-white/10 border border-white/15 rounded-[16px]"
+                      />
+                    )}
+                    <div className="relative z-10 w-9 h-9 rounded-full overflow-hidden shrink-0 border border-white/10">
+                      <img src={g.image} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="relative z-10 min-w-0">
+                      <p className={`text-[14px] font-bold whitespace-nowrap lg:whitespace-normal leading-tight ${isActive ? 'text-white' : 'text-white/70'}`}>
+                        {g.name}
+                      </p>
+                      <p className="text-[11.5px] text-white/45 font-medium mt-0.5 hidden sm:block">
+                        {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Ventana derecha — detalle del grupo seleccionado */}
+            <div className="liquid-glass rounded-[24px] overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={current.key}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                >
+                  {/* Banner de la categoría */}
+                  <div className="relative h-40 md:h-48">
+                    <img src={current.image} alt={current.name} className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
+                    <div className="absolute bottom-0 left-0 p-6 md:p-8">
+                      <h2 className="text-[26px] md:text-[32px] font-bold text-white tracking-tight">{current.name}</h2>
+                      <p className="text-[13.5px] text-white/70 font-semibold mt-1">
+                        {current.age} · {current.cells.length} {current.cells.length === 1 ? 'célula' : 'células'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Células del grupo */}
+                  <RevealList className="grid sm:grid-cols-2 gap-3 p-6 md:p-8">
+                    {current.cells.map((c, i) => (
+                      <RevealItem key={`${c.name}-${i}`}>
+                        <Tilt max={4} className="rounded-[16px] bg-white/5 border border-white/10 p-5 flex items-center gap-4 h-full">
+                          <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
+                            <Icon name="users" className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[16px] font-bold text-white leading-tight">{c.name}</p>
+                            <p className="text-[13px] text-white/60 font-medium mt-0.5">{c.leader}</p>
+                          </div>
+                          <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-3 py-1 rounded-full text-[12px] font-semibold">
+                            {c.zone}
+                          </span>
+                        </Tilt>
+                      </RevealItem>
+                    ))}
+                  </RevealList>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </Reveal>
+        )}
 
         {/* CTA de contacto — sin exponer direcciones: escríbenos y te conectamos */}
-        <Reveal delay={0.1}>
+        <Reveal delay={0.1} className="mt-5">
           <div className="liquid-glass rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
             <div>
               <h3 className="text-[22px] font-bold text-white">¿No sabes cuál es para ti?</h3>
@@ -196,9 +227,7 @@ export default function CelulasPage() {
                 href="https://www.instagram.com/ig.casadelrey/"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.94 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                {...PRESS}
                 className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-white text-bg text-[14px] font-bold focus-ring"
               >
                 <Icon name="instagram" className="w-4 h-4" />
