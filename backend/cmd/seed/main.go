@@ -240,11 +240,10 @@ func main() {
 		TitleLine1:       "LUZ PARA",
 		TitleLine2:       "LAS NACIONES",
 		Subtitle:         "Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.",
-		CTAPrimaryText:   "Planifica tu visita",
-		CTAPrimaryURL:    "/visita",
-		FallbackImageURL: "/images/bg-hero.jpg",
-		DesktopVideoURL:  "https://pub-6dab501bcd5c4b8b9cfdd7aa6ee88595.r2.dev/sample-hero.mp4",
-		IsActive:         true,
+		CTAPrimaryText:     "Planifica tu visita",
+		CTAPrimaryURL:      "/visita",
+		BackgroundImageURL: "/images/bg-hero.jpg",
+		IsActive:           true,
 	}
 	db.Create(&hero)
 	log.Println("Hero setting planted.")

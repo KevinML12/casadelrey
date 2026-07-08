@@ -34,6 +34,7 @@ type Cell struct {
 	Type     string `json:"type" gorm:"type:varchar(20);not null"` // hombres|mujeres|jovenes|prejus|ninos
 	LeaderID uint   `json:"leader_id" gorm:"index;not null"`
 	PastorID *uint  `json:"pastor_id" gorm:"index"`
+	Zone     string `json:"zone" gorm:"type:varchar(80)"` // zona/sector aproximado — lo ÚNICO de ubicación que va público
 	IsActive bool   `json:"is_active" gorm:"default:true"`
 	Leader   User   `json:"leader" gorm:"foreignKey:LeaderID"`
 }

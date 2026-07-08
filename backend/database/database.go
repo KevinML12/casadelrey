@@ -72,6 +72,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.SocialPost{},
 			&models.FAQ{},
 			// Células
+			&models.CellCategory{},     // categorías públicas (Grupos de Vida)
 			&models.CellReport{},
 			&models.MemberBoleta{},
 			// Eventos

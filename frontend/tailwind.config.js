@@ -76,10 +76,10 @@ export default {
       },
 
       fontFamily: {
-        sans:    ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
-        serif:   ['Playfair Display', 'Georgia', 'serif'],
-        mono:    ['SF Mono', 'JetBrains Mono', 'Menlo', 'monospace'],
+        sans:    ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif:   ['New York', 'Georgia', 'serif'],
+        mono:    ['SF Mono', 'Cascadia Code', 'Consolas', 'Menlo', 'monospace'],
       },
 
       // ── Squircle radii (Apple HIG) ──────────────────────────────
@@ -116,7 +116,9 @@ export default {
         'tightest': '-0.05em',
         'tighter':  '-0.04em',
         'tightish': '-0.02em',
-        'widest':   '0.34em',
+        // Antes 0.34em — el letterspacing exagerado delataba "look IA".
+        // Apple usa labels en caps con tracking moderado.
+        'widest':   '0.08em',
       },
 
       fontSize: {

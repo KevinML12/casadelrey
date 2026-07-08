@@ -1,90 +1,378 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
+import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
+import { useApi, useBackdrops, groupAlbums, fetchOnce } from '../../lib/feed';
+
+// 3D — chunks aparte, solo se descargan si el dispositivo califica
+const GlobeHero = lazy(() => import('../../components/three/GlobeHero'));
+const ParticleField = lazy(() => import('../../components/three/ParticleField'));
+import use3D from '../../components/three/use3D';
+import Tilt from '../../components/ui/Tilt';
+
+const MotionLink = motion.create(Link);
+
+// Física de resorte compartida para botones (hundir al presionar, rebotar al soltar)
+const PRESS = {
+  whileHover: { scale: 1.04 },
+  whileTap: { scale: 0.94 },
+  transition: { type: 'spring', stiffness: 400, damping: 17 },
+};
+
+/**
+ * ParallaxImg — foto de fondo que se mueve más lento que el contenido.
+ * La capa de profundidad que separa un sitio real de una plantilla.
+ */
+function ParallaxImg({ src, alt = '', className = '' }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], ['-9%', '9%']);
+  return (
+    <div ref={ref} className="absolute inset-0 overflow-hidden">
+      <motion.img
+        src={src}
+        alt={alt}
+        style={{ y }}
+        className={`absolute inset-0 w-full h-full object-cover scale-[1.18] ${className}`}
+      />
+    </div>
+  );
+}
 
 // ════════════════════════════════════════════════════════════════════
-// 1 · HERO CAROUSEL
+// 1 · HERO CAROUSEL — slides reales: los heroes que el admin activa en
+// AdminHero + los próximos eventos con su foto. El fallback local solo
+// aparece si la API no responde (el backend ya trae su hero default).
 // ════════════════════════════════════════════════════════════════════
+const LOCAL_MEDIA = '/images/bg-hero.jpg';
+
+// Neutro y solo hechos confirmados: nada de lemas inventados
+const SLIDE_FALLBACK = {
+  type: 'hero',
+  label: 'Iglesia cristiana · Huehuetenango',
+  l1: 'CASA', l2: 'DEL REY',
+  subtitle: '',
+  schedule: '',
+  media: LOCAL_MEDIA,
+  ctaText: 'Planifica tu visita', ctaUrl: '#',
+};
+
+const fmtEventDate = (d) =>
+  new Date(d + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+// Fallback si /events no responde — mismo shape que el mapeo de la API
+const NEXT_EVENT_DEFAULT = {
+  day: '15', month: 'AGO', title: 'Noche de Jóvenes',
+  time: 'Viernes · 7:30 PM', loc: 'Auditorio Central',
+};
+
 function HeroCarousel({ onPlan }) {
-  const [hero, setHero] = useState({
-    title: 'LUZ PARA\nLAS NACIONES', 
-    subtitle: 'Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.', 
-    image: '/images/bg-hero.jpg', 
-    buttonText: 'Planifica tu visita',
-    url: '#'
-  });
+  const [slides, setSlides] = useState([SLIDE_FALLBACK]);
+  const [idx, setIdx] = useState(0);
+  const [nextEvent, setNextEvent] = useState(NEXT_EVENT_DEFAULT);
+  const [eventLabel, setEventLabel] = useState('Próximo evento');
+  const [failed, setFailed] = useState({});
+  // El globo 3D solo en desktop con mouse y sin reduced-motion
+  const show3D = use3D();
 
   useEffect(() => {
-    apiClient.get('/hero/active')
-      .then(res => {
-        if (res.data) setHero({
-          title: `${res.data.title_line_1 || ''}\n${res.data.title_line_2 || ''}`,
-          subtitle: res.data.subtitle,
-          image: res.data.fallback_image_url || res.data.desktop_video_url,
-          buttonText: res.data.cta_primary_text || 'Planifica tu visita',
-          url: res.data.cta_primary_url
-        });
-        else throw new Error("No data");
-      })
-      .catch(err => {
-        // Fallback elegante (inyectado para prueba R2/Video)
-        setHero({
-          title: 'LUZ PARA\nLAS NACIONES', 
-          subtitle: 'Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.', 
-          image: 'https://pub-6dab501bcd5c4b8b9cfdd7aa6ee88595.r2.dev/sample-hero.mp4', 
-          buttonText: 'Planifica tu visita',
+    Promise.all([fetchOnce('/hero/active'), fetchOnce('/events/')]).then(([heroData, events]) => {
+      const s = [];
+
+      // Heroes del panel — el endpoint nuevo devuelve array; el viejo, objeto
+      const heroes = Array.isArray(heroData) ? heroData : heroData ? [heroData] : [];
+      heroes.forEach(h => {
+        if (!h.title_line_1) return;
+        s.push({
+          type: 'hero',
+          label: (h.label_top || '').replace(/^●\s*/, '') || 'Casa del Rey · Huehuetenango',
+          l1: h.title_line_1, l2: h.title_line_2,
+          subtitle: h.subtitle,
+          schedule: [h.schedule_text, h.verse_reference].filter(Boolean).join(' · '),
+          media: h.background_image_url || h.fallback_image_url || LOCAL_MEDIA,
+          ctaText: h.cta_primary_text, ctaUrl: h.cta_primary_url,
         });
       });
+
+      // Eventos como slides: próximos primero; si no hay ninguno por venir,
+      // los más recientes con etiqueta honesta (nunca el carrusel vacío)
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const sorted = (Array.isArray(events) ? events : [])
+        .filter(e => e.is_active !== false)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const upcoming = sorted.filter(e => new Date(e.date + 'T12:00:00') >= today);
+      const pool = upcoming.length > 0 ? upcoming.slice(0, 3) : sorted.slice(-2).reverse();
+      const isUpcoming = upcoming.length > 0;
+
+      pool.forEach(e => {
+        s.push({
+          type: 'event',
+          label: isUpcoming ? 'Próximo evento' : 'Evento reciente',
+          l1: e.title.toUpperCase(), l2: '',
+          subtitle: e.description ? `${e.description.slice(0, 140)}${e.description.length > 140 ? '…' : ''}` : '',
+          schedule: [fmtEventDate(e.date), e.time, e.location].filter(Boolean).join(' · '),
+          media: e.cover_image || LOCAL_MEDIA,
+          ctaText: isUpcoming ? 'Reservar mi lugar' : 'Ver calendario',
+          ctaUrl: '/events',
+        });
+      });
+
+      if (s.length > 0) setSlides(s);
+
+      // La tarjeta de cristal: el evento más próximo, o el último realizado
+      const ev = upcoming[0] || sorted[sorted.length - 1];
+      if (!isUpcoming && ev) setEventLabel('Último evento');
+      if (ev) {
+        const date = new Date(ev.date + 'T12:00:00');
+        setNextEvent({
+          day: date.getDate().toString(),
+          month: date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase(),
+          title: ev.title,
+          time: ev.time || 'Por definir',
+          loc: ev.location,
+        });
+      }
+    });
   }, []);
 
-  if (!hero) return <div className="min-h-[100svh] bg-bg" />;
+  // Autorotación cada 8s (los dots permiten saltar; respeta reduced-motion)
+  useEffect(() => {
+    if (slides.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 8000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+
+  const slide = slides[Math.min(idx, slides.length - 1)];
+  // Si el media remoto falla, la foto local sostiene el liquid glass
+  const media = failed[slide.media] ? LOCAL_MEDIA : (slide.media || LOCAL_MEDIA);
+  const markFailed = () => setFailed(f => ({ ...f, [slide.media]: true }));
+
+  // Coreografía de scroll: la foto se aleja y agranda lentamente,
+  // el contenido sube y se desvanece a otra velocidad (profundidad real)
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const bgY       = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
+  const bgScale   = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const textY     = useTransform(scrollYProgress, [0, 1], [0, -110]);
+  const textFade  = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+  const cardY     = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  const cardFade  = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section id="inicio" className="relative min-h-[100svh] overflow-hidden bg-bg">
-      {hero.image && hero.image.endsWith('.mp4') ? (
-        <video 
-          src={hero.image} 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="absolute inset-0 w-full h-full object-cover animate-hero-1"
-        />
-      ) : (
-        <img
-          src={hero.image || hero.image_url || 'https://images.unsplash.com/photo-1438283173091-5dbf5c5a3206?auto=format&fit=crop&q=80'}
-          alt={hero.title}
-          className="absolute inset-0 w-full h-full object-cover animate-hero-1"
-        />
+    <section ref={heroRef} id="inicio" className="relative min-h-[100svh] overflow-hidden bg-bg">
+      {/* Fondo por slide con crossfade — key por URL: si dos slides
+          comparten foto no hay parpadeo */}
+      <AnimatePresence initial={false}>
+        {media.endsWith('.mp4') ? (
+          <motion.video
+            key={media}
+            src={media}
+            autoPlay
+            loop
+            muted
+            playsInline
+            onError={markFailed}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+            style={{ y: bgY, scale: bgScale }}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <motion.img
+            key={media}
+            src={media}
+            alt=""
+            onError={markFailed}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+            style={{ y: bgY, scale: bgScale }}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+      </AnimatePresence>
+      {/* Scrims: legibilidad del texto sin apagar la foto */}
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/20 to-transparent" />
+
+      {/* Globo 3D — "Luz para las Naciones" girando detrás del contenido */}
+      {show3D && (
+        <Suspense fallback={null}>
+          <div className="absolute z-[5] top-[6%] right-[-14%] w-[780px] h-[780px] mix-blend-screen opacity-70 pointer-events-none">
+            <GlobeHero />
+          </div>
+        </Suspense>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/30 to-transparent" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 flex flex-col items-center justify-center text-center min-h-[100svh] pb-24 pt-32">
-        <div className="flex items-center justify-center gap-3 mb-6 text-white tracking-widest text-[11px] font-bold uppercase">
-          Casa del Rey · Huehuetenango
-        </div>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 min-h-[100svh] flex items-center pt-32 pb-24">
+        <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-center w-full">
 
-        <h1
-          className="display-mega text-white animate-hero-2"
-          style={{ fontSize: 'clamp(4rem, 10vw, 9rem)', lineHeight: '0.9' }}
-          dangerouslySetInnerHTML={{ __html: hero.title.replace('\\n', '<br />') }}
-        />
+          {/* Texto editorial — izquierda. Cambia con cada slide del carrusel */}
+          <motion.div style={{ y: textY, opacity: textFade }} className="text-left">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 26 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -18 }}
+                transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                <div className="mb-6 text-white/80 text-[15px] font-semibold">
+                  {slide.label}
+                </div>
+                <h1
+                  className="display-mega text-white"
+                  style={{ fontSize: 'clamp(3rem, 8vw, 7.5rem)', lineHeight: '0.92' }}
+                >
+                  {slide.l1}
+                  {slide.l2 && <><br />{slide.l2}</>}
+                </h1>
+                {slide.subtitle && (
+                  <p className="mt-8 max-w-xl text-[17px] md:text-[20px] leading-relaxed text-white/80 font-medium">
+                    {slide.subtitle}
+                  </p>
+                )}
+                {slide.schedule && (
+                  <p className="mt-4 text-[14px] font-semibold text-white/60">
+                    {slide.schedule}
+                  </p>
+                )}
+                {slide.ctaText && (
+                  slide.ctaUrl?.startsWith('http') ? (
+                    <motion.a
+                      href={slide.ctaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      {...PRESS}
+                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-[15px] font-bold focus-ring"
+                    >
+                      {slide.ctaText}
+                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                    </motion.a>
+                  ) : slide.ctaUrl?.startsWith('/') ? (
+                    <MotionLink
+                      to={slide.ctaUrl}
+                      {...PRESS}
+                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-[15px] font-bold focus-ring"
+                    >
+                      {slide.ctaText}
+                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                    </MotionLink>
+                  ) : (
+                    <motion.button
+                      onClick={onPlan}
+                      {...PRESS}
+                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-[15px] font-bold focus-ring"
+                    >
+                      {slide.ctaText}
+                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                    </motion.button>
+                  )
+                )}
+              </motion.div>
+            </AnimatePresence>
 
-        <p className="mt-8 max-w-2xl text-[18px] md:text-[22px] leading-relaxed text-white/80 font-medium animate-hero-3">
-          {hero.subtitle}
-        </p>
+            {/* Dots del carrusel — saltar a cualquier slide */}
+            {slides.length > 1 && (
+              <div className="mt-10 flex gap-2.5" role="tablist" aria-label="Slides del hero">
+                {slides.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setIdx(i)}
+                    aria-label={`Ir a slide ${i + 1}: ${s.l1}`}
+                    className={`h-1.5 rounded-full transition-all duration-500 focus-ring ${
+                      i === idx ? 'w-9 bg-white' : 'w-3.5 bg-white/30 hover:bg-white/60'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </motion.div>
 
-        <div className="mt-12 animate-hero-4">
-          <button
-            onClick={onPlan}
-            className="inline-flex items-center justify-center gap-4 rounded-full liquid-glass text-white px-8 py-5 text-[16px] font-bold tracking-tightish btn-spring focus-ring"
+          {/* Tarjeta de cristal claro — próximo evento real de /events (Frame 1).
+              El wrapper lleva la coreografía de scroll; el Tilt interno la
+              inclinación 3D al cursor (no pueden compartir elemento). */}
+          <motion.div
+            style={{ y: cardY, opacity: cardFade }}
+            className="animate-hero-4 max-w-[340px] w-full justify-self-start lg:justify-self-end"
           >
-            {hero.buttonText || 'Planifica tu visita'}
-            <Icon name="arrow" className="w-5 h-5" stroke={2} />
-          </button>
+          <Tilt max={7} className="glass-light rounded-[22px] p-7 md:p-8">
+            <div className="text-[13px] font-semibold text-bg/60 mb-3">
+              {eventLabel}
+            </div>
+            <div className="flex items-center gap-4 text-bg">
+              <div className="text-center shrink-0">
+                <div className="text-[44px] font-extrabold leading-none tracking-tighter">{nextEvent.day}</div>
+                <div className="text-[11px] font-bold tracking-widest mt-1">{nextEvent.month}</div>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[17px] font-bold leading-tight">{nextEvent.title}</p>
+                <p className="mt-1 text-[13px] font-semibold text-bg/70">{nextEvent.time}</p>
+                {nextEvent.loc && <p className="text-[13px] font-semibold text-bg/70">{nextEvent.loc}</p>}
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-2.5">
+              <motion.button
+                onClick={onPlan}
+                {...PRESS}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white text-bg px-5 py-3.5 text-[14px] font-bold focus-ring shadow-card"
+              >
+                Planifica tu visita
+                <Icon name="arrow" className="w-4 h-4" stroke={2} />
+              </motion.button>
+              <MotionLink
+                to="/events"
+                {...PRESS}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-bg/10 text-bg px-5 py-3.5 text-[14px] font-bold focus-ring hover:bg-bg/15 transition-colors"
+              >
+                <Icon name="calendar" className="w-4 h-4" />
+                Ver todos los eventos
+              </MotionLink>
+            </div>
+          </Tilt>
+          </motion.div>
+
         </div>
+      </div>
+    </section>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════
+// 1.5 · ANUNCIOS — lo que los admins publican en el panel aparece aquí.
+// Sin anuncios activos la franja no existe (feed 100% curado).
+// ════════════════════════════════════════════════════════════════════
+function AnnouncementsBar() {
+  const data = useApi('/announcements');
+  const now = Date.now();
+  const list = (Array.isArray(data) ? data : [])
+    .filter(a => !a.expires_at || new Date(a.expires_at).getTime() > now)
+    .slice(0, 2);
+
+  if (list.length === 0) return null;
+
+  return (
+    <section className="relative bg-bg border-t border-white/5 py-10">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-4">
+        {list.map((a, i) => (
+          <Reveal key={a.ID} delay={i * 0.08}>
+            <Tilt max={3} className="liquid-glass rounded-[18px] px-6 py-5 flex items-start md:items-center gap-5">
+              <div className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                <Icon name="spark" className="w-5 h-5 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[16px] font-bold text-white leading-tight">{a.title}</p>
+                <p className="text-[14px] text-white/70 mt-1 line-clamp-2">{a.content}</p>
+              </div>
+            </Tilt>
+          </Reveal>
+        ))}
       </div>
     </section>
   );
@@ -93,11 +381,11 @@ function HeroCarousel({ onPlan }) {
 // ════════════════════════════════════════════════════════════════════
 // 2 · AGENDA (Eventos)
 // ════════════════════════════════════════════════════════════════════
-function Agenda() {
+function Agenda({ bg }) {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    apiClient.get('/events')
+    apiClient.get('/events/')
       .then(res => {
         if (res.data && res.data.length > 0) {
           const formatted = res.data.map(ev => {
@@ -133,46 +421,53 @@ function Agenda() {
 
   return (
     <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
-      {/* Liquid glowing orbs */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-rose/20 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-blob" style={{ animationDelay: '2s' }} />
-      
-      {/* Background image */}
-      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      <ParallaxImg src={bg} alt="Eventos" className="opacity-60" />
       <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-bg/10" />
-      
+
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
         <div className="flex flex-col justify-center">
-          <div className="text-white/60 text-[11px] font-bold uppercase tracking-widest mb-4">
-            Agenda Mensual
-          </div>
-          <h2 className="display-mega text-white leading-[0.85] tracking-tighter mb-12" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}>
-            PRÓXIMOS<br />EVENTOS
-          </h2>
+          <Reveal>
+            <div className="text-white/70 text-[14px] font-semibold mb-4">
+              Agenda mensual
+            </div>
+            <h2 className="display-mega text-white leading-[0.85] tracking-tighter mb-8" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}>
+              PRÓXIMOS<br />EVENTOS
+            </h2>
+          </Reveal>
+          <MotionLink
+            to="/events"
+            {...PRESS}
+            className="mb-12 inline-flex items-center gap-3 self-start px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring"
+          >
+            Ver calendario completo
+            <Icon name="arrow" className="w-4 h-4" stroke={2} />
+          </MotionLink>
           
-          <div className="rounded-[32px] p-8 md:p-10 liquid-glass card-spring flex flex-col md:flex-row items-center gap-8">
+          <Reveal delay={0.1}>
+          <Tilt max={4} className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8">
             <div className="text-center shrink-0">
               <div className="text-[72px] font-extrabold text-white leading-none tracking-tighter">{featured.day}</div>
               <div className="text-[14px] font-bold text-white tracking-widest mt-2">{featured.month}</div>
             </div>
             <div className="flex-1 w-full text-center md:text-left">
-              <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3 inline-block">Destacado</span>
+              <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-[12px] font-semibold mb-3 inline-block">Destacado</span>
               <h3 className="text-[28px] font-bold text-white tracking-tight mb-3">{featured.title}</h3>
               <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-[14px] text-white/60">
                 <span className="flex items-center gap-1.5"><Icon name="clock" className="w-4 h-4" /> {featured.time}</span>
                 <span className="flex items-center gap-1.5"><Icon name="pin" className="w-4 h-4" /> {featured.loc}</span>
               </div>
             </div>
-          </div>
+          </Tilt>
+          </Reveal>
         </div>
 
-        <div className="liquid-glass rounded-[32px] p-8 md:p-12 border border-white/10">
-          <div className="text-white/40 text-[11px] font-bold uppercase tracking-widest mb-8">
+        <Reveal from="right" className="liquid-glass rounded-[24px] p-8 md:p-12 border border-white/10">
+          <div className="text-white/50 text-[14px] font-semibold mb-8">
             También este mes
           </div>
-          <div className="space-y-4">
+          <RevealList className="space-y-4">
             {others.map((ev) => (
-              <div key={ev.id} className="group rounded-[24px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
+              <RevealItem key={ev.id} className="group rounded-[18px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
                 <div className="text-center sm:text-left shrink-0">
                   <div className="text-[32px] font-extrabold text-white leading-none">{ev.day}</div>
                   <div className="text-[10px] text-white font-bold tracking-widest mt-1">{ev.month}</div>
@@ -187,10 +482,10 @@ function Agenda() {
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0">
                   <Icon name="arrow" className="w-4 h-4" />
                 </div>
-              </div>
+              </RevealItem>
             ))}
-          </div>
-        </div>
+          </RevealList>
+        </Reveal>
       </div>
     </section>
   );
@@ -199,7 +494,7 @@ function Agenda() {
 // ════════════════════════════════════════════════════════════════════
 // 3 · CÉLULAS Y COMUNIDAD
 // ════════════════════════════════════════════════════════════════════
-function CelulasSection() {
+function CelulasSection({ bg }) {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -223,48 +518,61 @@ function CelulasSection() {
 
   return (
     <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob" style={{ animationDelay: '4s' }} />
-
-      <img src="/images/bg-hero.jpg" alt="Comunidad" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <ParallaxImg src={bg} alt="Comunidad" className="opacity-50" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
-      
+
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="mb-16 text-center">
+        <Reveal className="mb-16 text-center">
           <Eyebrow>Comunidad</Eyebrow>
           <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
-            Grupos de Vida
+            Células
           </h2>
           <p className="mt-6 text-[18px] text-white/70 max-w-2xl mx-auto">
-            No somos solo un edificio, somos una familia. Tenemos espacios diseñados para cada etapa de tu vida.
+            Grupos que se reúnen en casas durante la semana. Cada clasificación
+            tiene sus propias células — entra y encuentra la tuya.
           </p>
-        </div>
+          <MotionLink
+            to="/celulas"
+            {...PRESS}
+            className="mt-8 inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring"
+          >
+            Encuentra tu célula
+            <Icon name="arrow" className="w-4 h-4" stroke={2} />
+          </MotionLink>
+        </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
+        <RevealList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
           {categories.map((cat, i) => {
             let gridSpan = 'md:col-span-1';
-            if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2'; 
-            else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2'; 
+            if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2';
+            else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2';
 
             return (
-            <div key={i} className={`group relative rounded-[32px] flex flex-col card-spring liquid-glass ${gridSpan}`}>
-              <div className="absolute inset-0 rounded-[32px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+            <RevealItem key={i} className={gridSpan}>
+            <Tilt
+              as={Link}
+              to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
+              max={5}
+              className="group relative rounded-[24px] flex flex-col liquid-glass h-full"
+            >
+              <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
                 <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
               </div>
               <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
                 <div>
-                  <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest mb-4 inline-block backdrop-blur-md">
+                  <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[12px] font-semibold mb-4 inline-block backdrop-blur-md">
                     {cat.age_group}
                   </span>
                   <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
                   <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
                 </div>
               </div>
-            </div>
+            </Tilt>
+            </RevealItem>
             );
           })}
-        </div>
+        </RevealList>
       </div>
     </section>
   );
@@ -273,39 +581,74 @@ function CelulasSection() {
 // ════════════════════════════════════════════════════════════════════
 // 4 · MENSAJES (Prédicas en Liquid Glass)
 // ════════════════════════════════════════════════════════════════════
-function MensajesCarousel() {
-  const [sermons, setSermons] = useState([]);
+// Fallback con fotos reales de la iglesia (DOMINGOS 2026/PASTORES)
+const SERMONS_FALLBACK = [
+  { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026', image: '/images/predicas/predica-1.jpg', to: '/blog' },
+  { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026', image: '/images/predicas/predica-2.jpg', to: '/blog' },
+  { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026', image: '/images/predicas/predica-3.jpg', to: '/blog' },
+];
+
+function MensajesCarousel({ bg }) {
+  const [sermons, setSermons] = useState(SERMONS_FALLBACK);
 
   useEffect(() => {
-    setSermons([
-      { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026', image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&q=80' },
-      { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026', image: 'https://images.unsplash.com/photo-1510563800743-aed236490d08?auto=format&fit=crop&q=80' },
-      { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026', image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80' },
-    ]);
+    // Preview del BLOG: lo que los admins publican ahí (incluidos los
+    // posts que redirigen a redes) es lo que se asoma en el Home
+    fetchOnce('/blog/').then(blog => {
+      const posts = (Array.isArray(blog) ? blog : [])
+        .slice(0, 8)
+        .map((p, i) => ({
+          id: p.ID || p.id,
+          title: p.title,
+          date: p.CreatedAt
+            ? new Date(p.CreatedAt).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+            : '',
+          image: p.cover_image || `/images/predicas/predica-${(i % 3) + 1}.jpg`,
+          ...(p.redirect_url
+            ? { href: p.redirect_url }
+            : { to: p.slug ? `/blog/${p.slug}` : '/blog' }),
+        }));
+      if (posts.length > 0) setSermons(posts);
+    });
   }, []);
 
   if (sermons.length === 0) return null;
 
   return (
     <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber/10 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '1s' }} />
-      
-      <img src="/images/bg-ensenanzas.jpg" alt="Mensajes Background" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+      <ParallaxImg src={bg} alt="Mensajes Background" className="opacity-50" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/20" />
-      
-      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12">
-        <Eyebrow>Últimas Prédicas</Eyebrow>
-        <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
-          Alimenta tu <span className="text-white">espíritu</span>.
-        </h2>
-      </div>
+
+      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <Eyebrow>Últimas Prédicas</Eyebrow>
+          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+            Alimenta tu espíritu.
+          </h2>
+        </div>
+        <MotionLink
+          to="/blog"
+          {...PRESS}
+          className="inline-flex items-center gap-3 self-start md:self-auto px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring shrink-0"
+        >
+          Ver todas las enseñanzas
+          <Icon name="arrow" className="w-4 h-4" stroke={2} />
+        </MotionLink>
+      </Reveal>
 
       <div className="relative z-10 flex overflow-x-auto gap-6 px-6 pb-12 snap-x snap-mandatory scrollbar-hide" style={{ scrollPaddingLeft: '1.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
         <div className="w-[1px] shrink-0 md:w-[calc((100vw-72rem)/2)] hidden md:block" />
         
         {sermons.map((s) => (
-          <a href="#" key={s.id} className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[32px] liquid-glass hover:border-white/30 snap-start card-spring overflow-hidden">
+          <Tilt
+            key={s.id}
+            max={5}
+            {...(s.href
+              ? { as: 'a', href: s.href, target: '_blank', rel: 'noopener noreferrer' }
+              : { as: Link, to: s.to })}
+            className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[24px] liquid-glass hover:border-white/30 snap-start overflow-hidden"
+          >
             <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
             <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
             
@@ -316,10 +659,10 @@ function MensajesCarousel() {
             </div>
 
             <div className="absolute bottom-0 left-0 p-8 w-full z-10">
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-white/80 mb-2">{s.date}</div>
+              <div className="text-[13px] font-semibold text-white/70 mb-2">{s.date}</div>
               <h3 className="text-[20px] md:text-[24px] font-bold text-white leading-tight">{s.title}</h3>
             </div>
-          </a>
+          </Tilt>
         ))}
         <div className="w-6 shrink-0" />
       </div>
@@ -328,47 +671,192 @@ function MensajesCarousel() {
 }
 
 // ════════════════════════════════════════════════════════════════════
+// 4.7 · FEED SOCIAL — el grid editorial que los admins arman en
+// AdminSocial (small 1×1 · medium 2×1 · large 2×2) publicado tal cual.
+// Fotos subidas por ellos (image_url), link a la publicación real.
+// ════════════════════════════════════════════════════════════════════
+const PLATFORM_ICON = { instagram: 'instagram', youtube: 'youtube', facebook: 'heart', tiktok: 'music' };
+const FEED_SPAN = {
+  small:  'col-span-1 row-span-1',
+  medium: 'col-span-2 row-span-1',
+  large:  'col-span-2 row-span-2',
+};
+
+const NETWORKS = [
+  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  icon: 'heart' },
+  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', icon: 'instagram' },
+  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    icon: 'music' },
+];
+
+function FeedSection() {
+  const data = useApi('/social/feed');
+  const posts = (Array.isArray(data) ? data : []).filter(p => p.is_active !== false);
+
+  return (
+    <section id="feed" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <Eyebrow>Nuestro feed</Eyebrow>
+          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+            Lo que está pasando.
+          </h2>
+        </div>
+        <div className="flex gap-3 shrink-0">
+          {NETWORKS.map(n => (
+            <motion.a
+              key={n.label}
+              href={n.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              {...PRESS}
+              className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white focus-ring"
+              aria-label={n.label}
+            >
+              <Icon name={n.icon} className="w-5 h-5" />
+            </motion.a>
+          ))}
+        </div>
+      </Reveal>
+
+      {posts.length > 0 && (
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <RevealList className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 auto-rows-[170px] md:auto-rows-[200px]">
+            {posts.map(p => (
+              <RevealItem key={p.ID} className={FEED_SPAN[p.featured_size] || FEED_SPAN.small}>
+                <Tilt
+                  as="a"
+                  href={p.post_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  max={6}
+                  className="group relative block h-full rounded-[18px] overflow-hidden liquid-glass border border-white/5 hover:border-white/25"
+                >
+                  {p.image_url && (
+                    <img
+                      src={p.image_url}
+                      alt={p.caption || p.platform}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/85 via-bg/15 to-transparent" />
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-bg/50 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/80">
+                    <Icon name={PLATFORM_ICON[p.platform] || 'spark'} className="w-4 h-4" />
+                  </div>
+                  {p.caption && (
+                    <div className="absolute bottom-0 inset-x-0 p-4">
+                      <p className="text-[13.5px] font-semibold text-white leading-snug line-clamp-2">{p.caption}</p>
+                    </div>
+                  )}
+                </Tilt>
+              </RevealItem>
+            ))}
+          </RevealList>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════
 // 5 · UBICACIÓN (Visítanos)
 // ════════════════════════════════════════════════════════════════════
-function Ubicacion({ onPlan }) {
+function Ubicacion({ bg }) {
   return (
-    <section id="ubicacion" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-celeste/20 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style={{ animationDelay: '3s' }} />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob" />
+    <section id="ubicacion" className="relative py-24 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
+      <ParallaxImg src={bg} alt="Ubicación" className="opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/20" />
 
-      <img src="/images/bg-ubicacion.jpg" alt="Ubicación" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/10" />
-      
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-8">
-          
-          <div className="rounded-[32px] liquid-glass p-10 md:p-14 flex flex-col justify-center card-spring">
-            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center border border-white/20 mb-8 backdrop-blur-md">
-              <Icon name="pin" className="w-6 h-6 text-white" />
+        {/* Titular editorial del cierre */}
+        <Reveal className="text-center mb-14">
+          <Eyebrow>Visítanos</Eyebrow>
+          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)' }}>
+            Te esperamos en casa.
+          </h2>
+        </Reveal>
+
+        <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
+          {/* Dirección protagonista */}
+          <Reveal from="left">
+          <Tilt max={3} className="rounded-[24px] liquid-glass p-10 md:p-14 h-full flex flex-col justify-between gap-10">
+            <div>
+              <div className="flex items-center gap-3 text-white/60 text-[13px] font-bold mb-6">
+                <span className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                  <Icon name="pin" className="w-5 h-5 text-white" />
+                </span>
+                Huehuetenango, Guatemala
+              </div>
+              <p className="display-mega text-white leading-[1.15]" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.6rem)' }}>
+                7ª. Calle 12-66 zona 4,<br />
+                carretera a las Ruinas<br />
+                de Zaculeu
+              </p>
             </div>
-            <h3 className="display-mega text-white mb-4" style={{ fontSize: '2.5rem' }}>Visítanos</h3>
-            <p className="text-[16px] text-white/70 font-medium mb-8 max-w-sm">
-              7ª. Calle 12-66 zona 4,<br />
-              carretera a las Ruinas de Zaculeu,<br />
-              Huehuetenango
-            </p>
-            <a href="#" className="inline-flex items-center justify-between px-6 py-4 rounded-full bg-transparent border border-white/20 text-white text-[14px] font-bold hover:bg-white/10 transition-all btn-spring w-full md:w-max backdrop-blur-md">
-              Ver en Google Maps
-              <Icon name="arrow" className="w-4 h-4 ml-4" />
-            </a>
-          </div>
 
-          <div className="rounded-[32px] liquid-glass p-10 md:p-14 flex flex-col justify-center card-spring">
-            <h3 className="display-mega text-white mb-4" style={{ fontSize: '2.5rem' }}>¿Es tu primera vez?</h3>
-            <p className="text-[16px] text-white/70 font-medium mb-8 max-w-sm">
-              Queremos conocerte. Planifica tu visita y nos aseguraremos de que te sientas en casa desde el primer minuto.
-            </p>
-            <button onClick={onPlan} className="inline-flex items-center justify-between px-6 py-4 rounded-full liquid-glass text-white text-[14px] font-bold hover:border-white/40 transition-all btn-spring w-full md:w-max">
-              Planificar Visita
-              <Icon name="arrow" className="w-4 h-4 ml-4" />
-            </button>
-          </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <motion.a
+                href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
+                target="_blank"
+                rel="noopener noreferrer"
+                {...PRESS}
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-[14px] font-bold focus-ring shadow-card"
+              >
+                Cómo llegar
+                <Icon name="arrow" className="w-4 h-4" stroke={2} />
+              </motion.a>
+              {NETWORKS.map(n => (
+                <motion.a
+                  key={n.label}
+                  href={n.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  {...PRESS}
+                  aria-label={n.label}
+                  className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white focus-ring"
+                >
+                  <Icon name={n.icon} className="w-5 h-5" />
+                </motion.a>
+              ))}
+            </div>
+          </Tilt>
+          </Reveal>
 
+          {/* Primera vez + podcast */}
+          <div className="flex flex-col gap-6">
+            <Reveal from="right" delay={0.05}>
+            <Tilt max={4} className="rounded-[24px] liquid-glass p-9 md:p-10">
+              <h3 className="text-[26px] font-bold text-white tracking-tight mb-3">¿Es tu primera vez?</h3>
+              <p className="text-[15px] text-white/70 font-medium mb-7">
+                Queremos conocerte. Escríbenos y te recibimos desde el primer minuto.
+              </p>
+              <motion.a
+                href="https://www.instagram.com/ig.casadelrey/"
+                target="_blank"
+                rel="noopener noreferrer"
+                {...PRESS}
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring hover:border-white/40"
+              >
+                <Icon name="instagram" className="w-4 h-4" />
+                Escríbenos
+              </motion.a>
+            </Tilt>
+            </Reveal>
+
+            <Reveal from="right" delay={0.12}>
+            <Tilt max={4} className="rounded-[24px] liquid-glass p-9 md:p-10 flex items-center gap-5">
+              <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                <Icon name="music" className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-[17px] font-bold text-white leading-tight">Podcast Inusual Youth</p>
+                <p className="text-[13.5px] text-white/60 font-semibold mt-1">
+                  92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
+                </p>
+              </div>
+            </Tilt>
+            </Reveal>
+          </div>
         </div>
       </div>
     </section>
@@ -378,69 +866,62 @@ function Ubicacion({ onPlan }) {
 // ════════════════════════════════════════════════════════════════════
 // 4.5 · GALERÍA (Preview)
 // ════════════════════════════════════════════════════════════════════
+// Álbumes reales de la iglesia (DOMINGOS 2026) como fallback sin API
+const ALBUMS_FALLBACK = {
+  'Alabanza': [{ url: '/images/albums/alabanza.jpg' }],
+  'Danza':    [{ url: '/images/albums/danza.jpg' }],
+  'Niños':    [{ url: '/images/albums/ninos.jpg' }],
+  'Miembros': [{ url: '/images/albums/miembros.jpg' }],
+};
+
 function GalleryPreviewSection() {
-  const [gallery, setGallery] = useState([]);
-  const [albums, setAlbums] = useState({});
-
-  useEffect(() => {
-    apiClient.get('/gallery/')
-      .then(res => {
-        const data = res.data?.data || res.data || [];
-        setGallery(data);
-        
-        const grouped = {};
-        data.forEach(photo => {
-          let albumName = "Otros";
-          if (photo.title && photo.title.includes(" - ")) {
-            albumName = photo.title.split(" - ")[0].trim();
-          }
-          if (!grouped[albumName]) grouped[albumName] = [];
-          grouped[albumName].push(photo);
-        });
-        setAlbums(grouped);
-      })
-      .catch(console.error);
-  }, []);
-
-  if (gallery.length === 0) return null;
+  // Mismo fetch cacheado que usa useBackdrops — un solo GET /gallery/
+  const gallery = useApi('/gallery/');
+  const photos = gallery?.data || gallery;
+  const albums = Array.isArray(photos) && photos.length > 0
+    ? groupAlbums(photos)
+    : ALBUMS_FALLBACK;
 
   const topAlbums = Object.entries(albums).slice(0, 4); // Tomar solo los primeros 4 para el preview
 
   return (
     <section id="galeria-preview" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-rose/10 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" />
-      
-      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+
+      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <Eyebrow>Galería</Eyebrow>
           <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
             Momentos <span className="text-white">vivos</span>.
           </h2>
         </div>
-        <Link to="/gallery" className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-full liquid-glass text-white font-bold hover:bg-white/10 transition-colors btn-spring border border-white/20 shrink-0">
+        <MotionLink to="/gallery" {...PRESS} className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-full liquid-glass text-white font-bold hover:bg-white/10 transition-colors border border-white/20 shrink-0">
           Explorar Galería
           <Icon name="arrow" className="w-4 h-4" />
-        </Link>
-      </div>
+        </MotionLink>
+      </Reveal>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <RevealList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {topAlbums.map(([albumName, photos]) => (
-            <Link to="/gallery" key={albumName} className="group relative rounded-[24px] overflow-hidden aspect-[4/5] liquid-glass card-spring block border border-white/5 hover:border-white/20">
+            <RevealItem key={albumName}>
+            <Tilt as={Link} to="/gallery" max={6} className="group relative rounded-[18px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
               <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
               <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
                 <div>
                   <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
-                  <p className="text-white/60 text-[12px] font-medium mt-1">{photos.length} fotos</p>
+                  {photos.length > 1 && (
+                    <p className="text-white/60 text-[12px] font-medium mt-1">{photos.length} fotos</p>
+                  )}
                 </div>
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0 backdrop-blur-md">
                   <Icon name="arrow" className="w-3 h-3" />
                 </div>
               </div>
-            </Link>
+            </Tilt>
+            </RevealItem>
           ))}
-        </div>
+        </RevealList>
       </div>
     </section>
   );
@@ -450,18 +931,33 @@ function GalleryPreviewSection() {
 // COMPONENTE PRINCIPAL
 // ════════════════════════════════════════════════════════════════════
 export default function Home() {
-  const handlePlan = () => {
-    alert("Aquí iría la integración con el formulario o modal para planificar visita.");
-  };
+  const show3D = use3D();
+  // Fondos de sección curados desde la galería del admin (fallback local)
+  const backdrops = useBackdrops();
+  // "Planifica tu visita" lleva a la sección de ubicación/primera vez
+  const handlePlan = () =>
+    document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
     <main className="bg-bg w-full">
+      {/* Polvo de luz 3D global: vive entre los fondos (z-auto) y el
+          contenido (z-10) — las cards de cristal lo difuminan con su
+          backdrop-blur. Una sola capa fixed para todo el Home. */}
+      {show3D && (
+        <Suspense fallback={null}>
+          <div aria-hidden className="fixed inset-0 z-[4] pointer-events-none mix-blend-screen">
+            <ParticleField />
+          </div>
+        </Suspense>
+      )}
       <HeroCarousel onPlan={handlePlan} />
-      <Agenda />
-      <CelulasSection />
-      <MensajesCarousel />
+      <AnnouncementsBar />
+      <Agenda bg={backdrops.agenda} />
+      <CelulasSection bg={backdrops.celulas} />
+      <MensajesCarousel bg={backdrops.mensajes} />
       <GalleryPreviewSection />
-      <Ubicacion onPlan={handlePlan} />
+      <FeedSection />
+      <Ubicacion bg={backdrops.ubicacion} />
     </main>
   );
 }

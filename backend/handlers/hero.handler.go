@@ -18,14 +18,17 @@ func NewHeroHandler(db *gorm.DB) *HeroHandler {
 	return &HeroHandler{DB: db}
 }
 
-// GetActive GET /api/v1/hero/active — público, retorna el hero activo o fallback.
+// GetActive GET /api/v1/hero/active — público. Devuelve TODOS los heroes
+// activos (array, más reciente primero) para el carrusel del Home; si no
+// hay ninguno configurado responde el hero default como única slide.
+// Nota: el panel hoy activa uno a la vez (Activate desactiva el resto);
+// el array deja listo el carrusel para cuando se permitan varios.
 func (h *HeroHandler) GetActive(c echo.Context) error {
-	var hero models.HeroSetting
-	if err := h.DB.Where("is_active = ?", true).Order("updated_at DESC").First(&hero).Error; err != nil {
-		// Fallback: hero default si no hay configurado
-		return c.JSON(http.StatusOK, defaultHero())
+	var heroes []models.HeroSetting
+	if err := h.DB.Where("is_active = ?", true).Order("updated_at DESC").Find(&heroes).Error; err != nil || len(heroes) == 0 {
+		return c.JSON(http.StatusOK, []models.HeroSetting{defaultHero()})
 	}
-	return c.JSON(http.StatusOK, hero)
+	return c.JSON(http.StatusOK, heroes)
 }
 
 // GetAll GET /api/v1/admin/hero — admin lista todos los heroes (campañas guardadas).

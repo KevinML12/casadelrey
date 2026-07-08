@@ -97,14 +97,18 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	donationsGroup.POST("/create-paypal-order",  donationHandler.CreatePayPalOrder)
 	donationsGroup.POST("/capture-paypal-order", donationHandler.CapturePayPalOrder)
 
-	// Eventos (público: lectura + RSVP)
+	// Eventos (público: lectura + RSVP) — con y sin slash final:
+	// Echo no redirige entre ambos y el frontend histórico usa /events
 	eventsGroup := api.Group("/events")
+	eventsGroup.GET("",               eventHandler.GetEvents)
 	eventsGroup.GET("/",              eventHandler.GetEvents)
 	eventsGroup.POST("/:id/rsvp",    rsvpHandler.RegisterRSVP)
 
-	// Células (público: lectura de categorías)
+	// Células (público: lectura de categorías + listado seguro de células)
 	cellsGroup := api.Group("/cell-categories")
+	cellsGroup.GET("", cellCategoryHandler.GetCellCategories)
 	cellsGroup.GET("/", cellCategoryHandler.GetCellCategories)
+	api.GET("/cells", cellCategoryHandler.GetPublicCells)
 
 	// Feed social
 	api.GET("/social/feed", socialHandler.GetSocialFeed)

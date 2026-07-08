@@ -45,3 +45,6 @@ frontend/WILD\ YOUTH\ FOTOGRAFR*
 frontend/liquid\ glass/
 apple_sample/
 frontend/ComposingCustomLayoutsWithSwiftUI/
+
+# Contexto del cliente con direcciones/telefonos privados - NUNCA al repo publico
+docs/CONTEXTO_IGLESIA.md

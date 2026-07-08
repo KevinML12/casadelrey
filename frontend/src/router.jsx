@@ -17,6 +17,7 @@ import PrayerPage       from './pages/public/PrayerPage';
 import VolunteeringPage from './pages/public/VolunteeringPage';
 import AboutPage        from './pages/public/AboutPage';
 import GalleryPage      from './pages/public/GalleryPage';
+import CelulasPage      from './pages/public/CelulasPage';
 import NotFound         from './pages/NotFound';
 
 // Lazy — evita inflar el bundle principal con páginas de uso infrecuente
@@ -134,6 +135,7 @@ export const router = createBrowserRouter([
       { path: 'blog/:slug',            element: <BlogPage /> },
       { path: 'events',                element: <EventsPage /> },
       { path: 'gallery',               element: <GalleryPage /> },
+      { path: 'celulas',               element: <CelulasPage /> },
       { path: 'prayer',                element: <ProtectedRoute leaderOrAdmin><PrayerPage /></ProtectedRoute> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },

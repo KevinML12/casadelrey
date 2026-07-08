@@ -91,14 +91,13 @@ export function Badge({ children, icon, className = '', tone = 'celeste' }) {
   );
 }
 
-/* ---------- Section eyebrow — editorial 11px tracking-widest ---------- */
-export function Eyebrow({ children, tone = 'celeste' }) {
-  const color = tone === 'celeste' ? 'text-celeste' : 'text-ink-2';
-  const rule  = tone === 'celeste' ? 'bg-gradient-to-r from-celeste to-transparent' : 'bg-ink-line';
+/* ---------- Section eyebrow — pill de cristal: en liquid glass el
+   material ES el acento, nada de colores planos ---------- */
+export function Eyebrow({ children }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
-      <span className={`h-px w-10 ${rule}`} />
-      <span className={`${color} text-[11px] font-bold uppercase tracking-widest`}>{children}</span>
+    <div className="inline-flex items-center gap-2.5 mb-4 px-4 py-1.5 rounded-full liquid-glass text-white/90 text-[12.5px] font-bold">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+      {children}
     </div>
   );
 }

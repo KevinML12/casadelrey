@@ -1,0 +1,10 @@
+# Binarios compilados localmente — la imagen se compila en el builder
+*.exe
+tmp_*
+
+# No van en la imagen
+scripts/
+docs/
+tests/
+.env
+.env.example
