@@ -50,11 +50,23 @@ coverage/
 *.out
 
 # ── Media y muestras locales (fotos originales sin optimizar) ───────
+# Regla: las fotos crudas NUNCA van al repo. Solo se commitean las
+# optimizadas en frontend/public/images/ (las que usa el sitio).
 frontend/DOMINGOS\ 2026/
 frontend/WILD\ YOUTH\ FOTOGRAFR*
 frontend/liquid\ glass/
 apple_sample/
 frontend/ComposingCustomLayoutsWithSwiftUI/
+# Zona segura: suelta aquí cualquier foto nueva (WhatsApp, cámara, etc.)
+frontend/fotos-crudas/
+# Red de seguridad: imágenes y videos sueltos en la raíz de frontend/
+frontend/*.jpg
+frontend/*.jpeg
+frontend/*.png
+frontend/*.heic
+frontend/*.mp4
+frontend/*.mov
+frontend/*.zip
 
 # ── Config local de Claude Code ─────────────────────────────────────
 .claude/settings.local.json
