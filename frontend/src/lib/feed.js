@@ -56,6 +56,16 @@ const LOCAL_FALLBACKS = {
 };
 
 /**
+ * Hook: foto de un slot fijo administrable (AdminSitePhotos), con
+ * fallback local garantizado si el admin no ha subido nada aún o si
+ * la API falla — el slot SIEMPRE se ve, nunca un hueco en blanco.
+ */
+export function useSitePhoto(key, fallback) {
+  const photos = useApi('/site-photos');
+  return (photos && photos[key]) || fallback;
+}
+
+/**
  * Hook: fondos de sección curados desde la galería del admin.
  * Devuelve { agenda, celulas, mensajes, ubicacion } — URLs de foto.
  * Sin API (o galería vacía) quedan los fondos locales de siempre.

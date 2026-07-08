@@ -6,6 +6,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import { useSitePhoto } from '../../lib/feed';
 
 const MotionLink = motion.create(Link);
 const PRESS = {
@@ -28,6 +29,12 @@ const STATS = [
 ];
 
 export default function AboutPage() {
+  // Fotos administrables (AdminSitePhotos) con fallback local garantizado
+  const pastoresImg   = useSitePhoto('about_pastores',   '/images/nosotros/pastores.jpg');
+  const servidoresImg = useSitePhoto('about_servidores', '/images/nosotros/servidores.jpg');
+  const comunidadImg  = useSitePhoto('about_comunidad',  '/images/nosotros/comunidad.jpg');
+  const lideresImg    = useSitePhoto('about_lideres',    '/images/nosotros/lideres.jpg');
+
   return (
     <main className="min-h-screen bg-bg text-white">
       <PageHero
@@ -39,7 +46,7 @@ export default function AboutPage() {
       {/* Fundadores + estructura actual — fotografía real de la congregación
           en adoración como ambiente (no atribuida a nadie en particular) */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src="/images/nosotros/pastores.jpg" alt="" className="opacity-55" />
+        <ParallaxImg src={pastoresImg} alt="" className="opacity-55" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12">
@@ -85,7 +92,7 @@ export default function AboutPage() {
 
       {/* Misión y Visión */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src="/images/nosotros/servidores.jpg" alt="" className="opacity-45" />
+        <ParallaxImg src={servidoresImg} alt="" className="opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12">
@@ -121,7 +128,7 @@ export default function AboutPage() {
 
       {/* Comunidad en números + departamentos de voluntariado */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src="/images/nosotros/comunidad.jpg" alt="" className="opacity-55" />
+        <ParallaxImg src={comunidadImg} alt="" className="opacity-55" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/45 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12 text-center">
@@ -169,7 +176,7 @@ export default function AboutPage() {
 
       {/* Células — acceso directo al módulo */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src="/images/nosotros/lideres.jpg" alt="" className="opacity-45" />
+        <ParallaxImg src={lideresImg} alt="" className="opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="liquid-glass rounded-[24px] p-9 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between">

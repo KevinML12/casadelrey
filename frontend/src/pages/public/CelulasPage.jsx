@@ -81,19 +81,31 @@ const TYPE_TO_KEY = {
 export default function CelulasPage() {
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
+  const apiCategories = useApi('/cell-categories');
   const [active, setActive] = useState(null);
 
   // Si el backend ya tiene células cargadas, sustituyen al fallback
   // dentro de su grupo; los grupos sin datos de API conservan el suyo.
+  // La FOTO de cada grupo también prefiere la que suba el admin en
+  // AdminSitePhotos (CellCategory.image_url) sobre el fallback local.
   const groups = useMemo(() => {
-    if (!Array.isArray(apiCells) || apiCells.length === 0) return GROUPS_FALLBACK;
+    const imageByName = {};
+    if (Array.isArray(apiCategories)) {
+      apiCategories.forEach(cat => { if (cat.image_url) imageByName[cat.name] = cat.image_url; });
+    }
+
+    const withImages = GROUPS_FALLBACK.map(g =>
+      imageByName[g.name] ? { ...g, image: imageByName[g.name] } : g
+    );
+
+    if (!Array.isArray(apiCells) || apiCells.length === 0) return withImages;
     const byKey = {};
     apiCells.forEach(c => {
       const key = TYPE_TO_KEY[(c.type || '').toLowerCase()] || 'otros';
       (byKey[key] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code });
     });
-    return GROUPS_FALLBACK.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
-  }, [apiCells]);
+    return withImages.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
+  }, [apiCells, apiCategories]);
 
   // ?tipo=Adolescentes (desde las cards del Home) selecciona ese grupo
   useEffect(() => {

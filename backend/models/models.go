@@ -49,6 +49,18 @@ type CellCategory struct {
 	IsActive    bool   `json:"is_active" gorm:"default:true"`
 }
 
+// SitePhoto — fotos ambiente administrables por slot fijo (p.ej. los
+// fondos de sección de la página Nosotros). El admin las reemplaza
+// subiendo a R2; si un slot no tiene foto propia, el frontend cae al
+// fallback local empacado en public/images/ (garantiza disponibilidad
+// aunque R2 o la API fallen).
+type SitePhoto struct {
+	gorm.Model
+	Key      string `json:"key" gorm:"type:varchar(60);unique;not null"` // slot fijo, ej. "about_pastores"
+	Label    string `json:"label" gorm:"type:varchar(150)"`              // texto legible para el admin
+	ImageURL string `json:"image_url" gorm:"type:varchar(500)"`
+}
+
 type Post struct {
 	gorm.Model
 	Title          string `json:"title" gorm:"not null"`

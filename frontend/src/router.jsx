@@ -48,6 +48,7 @@ const AdminFAQs          = lazy(() => import('./pages/admin/AdminFAQs'));
 const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
 const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
 const AdminHero          = lazy(() => import('./pages/admin/AdminHero'));
+const AdminSitePhotos    = lazy(() => import('./pages/admin/AdminSitePhotos'));
 const ReceiptPage        = lazy(() => import('./pages/public/ReceiptPage'));
 const ProfilePage        = lazy(() => import('./pages/public/ProfilePage'));
 
@@ -89,6 +90,7 @@ export const router = createBrowserRouter([
       { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
       { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
       { path: 'hero',            element: <Suspense fallback={<PageFallback />}><AdminHero /></Suspense> },
+      { path: 'site-photos',     element: <Suspense fallback={<PageFallback />}><AdminSitePhotos /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],
   },

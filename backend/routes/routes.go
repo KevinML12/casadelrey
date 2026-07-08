@@ -31,6 +31,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	uploadHandler        := handlers.NewUploadHandler(store)
 	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
 	heroHandler          := handlers.NewHeroHandler(db)
+	sitePhotoHandler     := handlers.NewSitePhotoHandler(db)
 	announcementHandler  := handlers.NewAnnouncementHandler(db)
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
@@ -73,6 +74,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Hero del home — público: obtener el activo
 	api.GET("/hero/active", heroHandler.GetActive, cacheShort)
+
+	// Fotos del sitio — público: solo los slots con foto subida
+	api.GET("/site-photos", sitePhotoHandler.GetSitePhotos, cacheLong)
 
 	// Voluntariado
 	api.POST("/volunteer/register",   volunteerHandler.Register)
@@ -173,6 +177,15 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.PUT("/hero/:id",           heroHandler.Update)
 	adminGroup.PUT("/hero/:id/activate",  heroHandler.Activate)
 	adminGroup.DELETE("/hero/:id",        heroHandler.Delete)
+
+	// Fotos del sitio (fondos ambiente de secciones fijas) — admin
+	adminGroup.GET("/site-photos",       sitePhotoHandler.GetAllSitePhotos)
+	adminGroup.PUT("/site-photos/:key",  sitePhotoHandler.UpdateSitePhoto)
+
+	// Categorías de células — admin edita la foto de cada tipo
+	adminGroup.GET("/cell-categories",      cellCategoryHandler.GetAllCellCategoriesAdmin)
+	adminGroup.POST("/cell-categories",     cellCategoryHandler.CreateCellCategory)
+	adminGroup.PUT("/cell-categories/:id",  cellCategoryHandler.UpdateCellCategoryImage)
 
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)
