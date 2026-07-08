@@ -21,6 +21,20 @@ func hash(pw string) string {
 	return string(b)
 }
 
+// Contraseñas SIEMPRE por variable de entorno — nunca hardcodeadas:
+// este repo es público y las del seed original terminaron funcionando
+// en producción (rotadas el 8 jul 2026).
+func seedPassword(envKey string) string {
+	pw := os.Getenv(envKey)
+	if pw == "" {
+		log.Fatalf("%s no configurada — exportala antes de correr el seed (ej: set %s=...)", envKey, envKey)
+	}
+	if len(pw) < 10 {
+		log.Fatalf("%s demasiado corta (mínimo 10 caracteres)", envKey)
+	}
+	return hash(pw)
+}
+
 func main() {
 	_ = godotenv.Load()
 	dsn := os.Getenv("DATABASE_URL")
@@ -38,15 +52,19 @@ func main() {
 	)
 	fmt.Println("Tablas migradas")
 
+	adminPw  := seedPassword("SEED_ADMIN_PASSWORD")
+	leaderPw := seedPassword("SEED_LEADER_PASSWORD")
+	volPw    := seedPassword("SEED_VOLUNTEER_PASSWORD")
+
 	users := []models.User{
-		{Name: "Pastor Roberto Mendez", Email: "pastor@casadelrey.org", Password: hash("Admin2026!"), Role: "admin",     EmailVerified: true},
-		{Name: "Carlos Mendez",         Email: "carlos@casadelrey.org", Password: hash("Admin2026!"), Role: "admin",     EmailVerified: true},
-		{Name: "Leonel Garcia",         Email: "leonel@casadelrey.org", Password: hash("Lider2026!"), Role: "leader",    CellCode: "H1", CellType: "hombres", EmailVerified: true},
-		{Name: "Ana Perez",             Email: "ana@casadelrey.org",    Password: hash("Lider2026!"), Role: "leader",    CellCode: "M1", CellType: "mujeres", EmailVerified: true},
-		{Name: "Diego Rodriguez",       Email: "diego@casadelrey.org",  Password: hash("Lider2026!"), Role: "leader",    CellCode: "J1", CellType: "jovenes", EmailVerified: true},
-		{Name: "Josue Ramirez",         Email: "josue@casadelrey.org",  Password: hash("Lider2026!"), Role: "leader",    CellCode: "H2", CellType: "hombres", EmailVerified: true},
-		{Name: "Sofia Castillo",        Email: "sofia@casadelrey.org",  Password: hash("Lider2026!"), Role: "leader",    CellCode: "P1", CellType: "prejus",  EmailVerified: true},
-		{Name: "Juan Voluntario",       Email: "juan.v@casadelrey.org", Password: hash("Vol2026!"),   Role: "volunteer", EmailVerified: true},
+		{Name: "Pastor Roberto Mendez", Email: "pastor@casadelrey.org", Password: adminPw,  Role: "admin",     EmailVerified: true},
+		{Name: "Carlos Mendez",         Email: "carlos@casadelrey.org", Password: adminPw,  Role: "admin",     EmailVerified: true},
+		{Name: "Leonel Garcia",         Email: "leonel@casadelrey.org", Password: leaderPw, Role: "leader",    CellCode: "H1", CellType: "hombres", EmailVerified: true},
+		{Name: "Ana Perez",             Email: "ana@casadelrey.org",    Password: leaderPw, Role: "leader",    CellCode: "M1", CellType: "mujeres", EmailVerified: true},
+		{Name: "Diego Rodriguez",       Email: "diego@casadelrey.org",  Password: leaderPw, Role: "leader",    CellCode: "J1", CellType: "jovenes", EmailVerified: true},
+		{Name: "Josue Ramirez",         Email: "josue@casadelrey.org",  Password: leaderPw, Role: "leader",    CellCode: "H2", CellType: "hombres", EmailVerified: true},
+		{Name: "Sofia Castillo",        Email: "sofia@casadelrey.org",  Password: leaderPw, Role: "leader",    CellCode: "P1", CellType: "prejus",  EmailVerified: true},
+		{Name: "Juan Voluntario",       Email: "juan.v@casadelrey.org", Password: volPw,    Role: "volunteer", EmailVerified: true},
 	}
 	for i := range users {
 		var ex models.User
@@ -249,8 +267,6 @@ func main() {
 	log.Println("Hero setting planted.")
 
 	fmt.Println("\nSeed completado!")
-	fmt.Println("\nCredenciales:")
-	fmt.Println("  Admin:      pastor@casadelrey.org / Admin2026!")
-	fmt.Println("  Lider:      leonel@casadelrey.org / Lider2026!")
-	fmt.Println("  Voluntario: juan.v@casadelrey.org / Vol2026!")
+	fmt.Println("\nCredenciales: las que definiste en SEED_ADMIN_PASSWORD /")
+	fmt.Println("SEED_LEADER_PASSWORD / SEED_VOLUNTEER_PASSWORD (no se imprimen).")
 }
