@@ -4,12 +4,14 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { Icon } from '../ui/Glass';
 
+// Espeja las secciones reales del sitio (mismo orden que el Footer).
+// "Dar" no va aquí: es el CTA de la derecha cuando hay sesión.
 const NAV_LINKS = [
-  { label: 'Inicio',       to: '/' },
-  { label: 'Ministerios',  to: '/about' },
-  { label: 'Eventos',      to: '/events' },
-  { label: 'Galería',      to: '/gallery' },
-  { label: 'Dar',          to: '/donate' },
+  { label: 'Inicio',     to: '/' },
+  { label: 'Células',    to: '/celulas' },
+  { label: 'Eventos',    to: '/events' },
+  { label: 'Enseñanzas', to: '/blog' },
+  { label: 'Galería',    to: '/gallery' },
 ];
 
 export default function Header() {
@@ -41,6 +43,17 @@ export default function Header() {
   useEffect(() => { setMenuOpen(false); }, [location]);
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
+
+  // CTA: con sesión va a Dar; sin sesión "Planifica tu visita" lleva a la
+  // sección de ubicación del Home (antes mentía: decía visita e iba a /donate)
+  const handleCta = () => {
+    setMenuOpen(false);
+    if (isAuthenticated) { navigate('/donate'); return; }
+    const scroll = () =>
+      document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname === '/') scroll();
+    else { navigate('/'); setTimeout(scroll, 450); }
+  };
 
   return (
     <motion.header
@@ -134,13 +147,13 @@ export default function Header() {
               </div>
             )}
 
-            <Link
-              to="/donate"
+            <button
+              onClick={handleCta}
               className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg text-white text-[14px] font-bold btn-spring focus-ring hover:bg-bg-soft"
             >
               {isAuthenticated ? 'Dar' : 'Planifica tu visita'}
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
-            </Link>
+            </button>
 
             <button
               onClick={() => setMenuOpen(o => !o)}
@@ -198,14 +211,13 @@ export default function Header() {
                   </button>
                 </>
               )}
-                <Link
-                  to="/donate"
-                  onClick={() => setMenuOpen(false)}
-                  className="mt-1 flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-[14.5px] font-bold btn-spring hover:bg-bg-soft"
+                <button
+                  onClick={handleCta}
+                  className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-[14.5px] font-bold btn-spring hover:bg-bg-soft"
                 >
-                  {isAuthenticated ? 'Donar' : 'Planifica tu visita'}
+                  {isAuthenticated ? 'Dar' : 'Planifica tu visita'}
                   <Icon name="arrow" className="w-4 h-4" stroke={2} />
-                </Link>
+                </button>
             </div>
           </div>
         </div>

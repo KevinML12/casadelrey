@@ -212,8 +212,11 @@ function HeroCarousel({ onPlan }) {
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 min-h-[100svh] flex items-center pt-32 pb-24">
         <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-center w-full">
 
-          {/* Texto editorial — izquierda. Cambia con cada slide del carrusel */}
+          {/* Texto editorial — izquierda. Cambia con cada slide del carrusel.
+              min-height fija + contenido centrado: cada slide mide distinto
+              y sin esto el bloque (y la card vecina) brincan sin animación */}
           <motion.div style={{ y: textY, opacity: textFade }} className="text-left">
+            <div className="min-h-[340px] md:min-h-[420px] lg:min-h-[460px] flex flex-col justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={idx}
@@ -276,6 +279,7 @@ function HeroCarousel({ onPlan }) {
                 )}
               </motion.div>
             </AnimatePresence>
+            </div>
 
             {/* Dots del carrusel — saltar a cualquier slide */}
             {slides.length > 1 && (

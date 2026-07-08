@@ -10,6 +10,7 @@ const NAV = [
   { id: '/events',  label: 'Eventos' },
   { id: '/blog',    label: 'Enseñanzas' },
   { id: '/gallery', label: 'Galería' },
+  { id: '/about',   label: 'Nosotros' },
   { id: '/donate',  label: 'Dar' },
 ];
 
