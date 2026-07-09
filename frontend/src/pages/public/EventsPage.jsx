@@ -9,6 +9,7 @@ import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import use3D from '../../components/three/use3D';
+import { useGlassPane } from '../../components/three/GlassLayerContext';
 
 const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 
@@ -209,6 +210,109 @@ function RSVPModal({ event, onClose }) {
   );
 }
 
+function EventCard({ ev, i, isCarousel, onRsvp }) {
+  const nodeRef = useRef(null);
+  useGlassPane(nodeRef, i === 0 ? 'featured' : 'standard');
+
+  const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
+  const dayNum   = d ? d.getDate() : null;
+  const monthStr = d ? d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase() : null;
+  const weekday  = d ? d.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase() : 'EVENTO';
+  const details  = [ev.time, ev.location]
+    .filter(Boolean)
+    .map(s => s[0].toUpperCase() + s.slice(1))
+    .join(' · ');
+  const bgImage = ev.cover_image || '/images/bg-eventos.jpg';
+  const bentoSpan = i === 0 ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
+
+  return (
+    <motion.div
+      ref={nodeRef}
+      layout="position"
+      initial={{ opacity: 0, y: 20, ...(isCarousel ? {} : { rotateX: 10, scale: 0.96 }) }}
+      animate={{ opacity: 1, y: 0, ...(isCarousel ? {} : { rotateX: 0, scale: 1 }) }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
+      style={isCarousel ? undefined : { transformPerspective: 1000 }}
+      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+    >
+
+      {/* Flyer de fondo */}
+      <img src={bgImage} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
+
+      {/* Gradiente para leer el texto */}
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
+
+      {/* Etiqueta de próximo evento si es el primero */}
+      {i === 0 && (
+        <motion.div layout className="absolute top-6 left-6 z-20">
+          <span className="liquid-glass px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
+            Próximo evento
+          </span>
+        </motion.div>
+      )}
+
+      {/* Contenido (Liquid Glass Panel) */}
+      <motion.div layout className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6' : 'p-5'}`}>
+        <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col gap-4 ${isCarousel ? 'p-6' : 'p-5'}`}>
+
+          <motion.div layout className="flex items-center gap-4 w-full min-w-0">
+            {/* Fecha */}
+            {dayNum && (
+              <motion.div layout className="text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner w-[60px] h-[60px]">
+                <div className="font-black leading-none text-white tracking-tighter text-[24px]">
+                  {dayNum}
+                </div>
+                <div className="font-bold tracking-[2px] mt-1 text-white/50 text-[9px]">
+                  {monthStr}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Detalles */}
+            <motion.div layout className="min-w-0 flex-1">
+              <p className="font-mono text-[10px] tracking-[1.5px] text-white/40 uppercase mb-1">
+                {weekday}
+              </p>
+              <h3 className="font-bold tracking-tight text-white line-clamp-1 text-[20px] leading-tight">
+                {ev.title}
+              </h3>
+            </motion.div>
+          </motion.div>
+
+          {details && (
+            <p className="truncate text-white/60 flex items-center gap-1.5 text-[13px]">
+              <Icon name="pin" className="w-3.5 h-3.5 text-white/40 shrink-0" />
+              {details}
+            </p>
+          )}
+
+          <motion.div layout className="shrink-0 flex flex-col gap-3 w-full pt-3 border-t border-white/10">
+            {ev.requires_payment && (
+              <span className="font-bold text-[12px] text-white/80 flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
+                Q{Number(ev.price_gtq).toFixed(0)}
+              </span>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              onClick={() => onRsvp(ev)}
+              className={`rounded-full liquid-glass text-white text-[14px] font-bold hover:border-white/30 inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'}`}
+            >
+              {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
+              <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />
+            </motion.button>
+          </motion.div>
+
+        </div>
+      </motion.div>
+
+    </motion.div>
+  );
+}
+
 function ModalWrapper({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -319,110 +423,9 @@ export default function EventsPage() {
           style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
 
             <AnimatePresence>
-            {events.map((ev, i) => {
-              const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
-              const dayNum   = d ? d.getDate() : null;
-              const monthStr = d ? d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase() : null;
-              const weekday  = d ? d.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase() : 'EVENTO';
-              const details  = [ev.time, ev.location]
-                .filter(Boolean)
-                .map(s => s[0].toUpperCase() + s.slice(1))
-                .join(' · ');
-
-              const bgImage = ev.cover_image || '/images/bg-eventos.jpg';
-
-              const isCarousel = viewMode === 'carousel';
-              // Bento asimétrico en modo cuadrícula: el primero destaca
-              // grande, el resto rellena en celdas normales
-              const bentoSpan = i === 0 ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
-
-              return (
-                <motion.div
-                  layout="position"
-                  initial={{ opacity: 0, y: 20, ...(isCarousel ? {} : { rotateX: 10, scale: 0.96 }) }}
-                  animate={{ opacity: 1, y: 0, ...(isCarousel ? {} : { rotateX: 0, scale: 1 }) }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-                  style={isCarousel ? undefined : { transformPerspective: 1000 }}
-                  key={ev.ID}
-                  className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
-                >
-                  
-                  {/* Flyer de fondo */}
-                  <img src={bgImage} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
-                  
-                  {/* Gradiente para leer el texto */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
-
-                  {/* Etiqueta de próximo evento si es el primero */}
-                  {i === 0 && (
-                    <motion.div layout className="absolute top-6 left-6 z-20">
-                      <span className="liquid-glass px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
-                        Próximo evento
-                      </span>
-                    </motion.div>
-                  )}
-
-                  {/* Contenido (Liquid Glass Panel) */}
-                  <motion.div layout className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6' : 'p-5'}`}>
-                    <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col gap-4 ${isCarousel ? 'p-6' : 'p-5'}`}>
-                      
-                      <motion.div layout className="flex items-center gap-4 w-full min-w-0">
-                        {/* Fecha */}
-                        {dayNum && (
-                          <motion.div layout className="text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner w-[60px] h-[60px]">
-                            <div className="font-black leading-none text-white tracking-tighter text-[24px]">
-                              {dayNum}
-                            </div>
-                            <div className="font-bold tracking-[2px] mt-1 text-white/50 text-[9px]">
-                              {monthStr}
-                            </div>
-                          </motion.div>
-                        )}
-
-                        {/* Detalles */}
-                        <motion.div layout className="min-w-0 flex-1">
-                          <p className="font-mono text-[10px] tracking-[1.5px] text-white/40 uppercase mb-1">
-                            {weekday}
-                          </p>
-                          <h3 className="font-bold tracking-tight text-white line-clamp-1 text-[20px] leading-tight">
-                            {ev.title}
-                          </h3>
-                        </motion.div>
-                      </motion.div>
-
-                      {details && (
-                        <p className="truncate text-white/60 flex items-center gap-1.5 text-[13px]">
-                          <Icon name="pin" className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                          {details}
-                        </p>
-                      )}
-
-                      <motion.div layout className="shrink-0 flex flex-col gap-3 w-full pt-3 border-t border-white/10">
-                        {ev.requires_payment && (
-                          <span className="font-bold text-[12px] text-white/80 flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
-                            Q{Number(ev.price_gtq).toFixed(0)}
-                          </span>
-                        )}
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.95 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                          onClick={() => setRsvpEvent(ev)}
-                          className={`rounded-full liquid-glass text-white text-[14px] font-bold hover:border-white/30 inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'}`}
-                        >
-                          {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-                          <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />
-                        </motion.button>
-                      </motion.div>
-
-                    </div>
-                  </motion.div>
-
-                </motion.div>
-              );
-            })}
+            {events.map((ev, i) => (
+              <EventCard key={ev.ID} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} />
+            ))}
             </AnimatePresence>
           </motion.div>
         )}
@@ -465,7 +468,7 @@ export default function EventsPage() {
             <RevealList className="space-y-3">
               {faqs.map(faq => (
                 <RevealItem key={faq.ID} depth>
-                <div className="liquid-glass rounded-[20px] overflow-hidden">
+                <Tilt max={3} glass="standard" className="liquid-glass rounded-[20px] overflow-hidden block">
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
                     className="w-full px-6 py-5 text-left flex items-center justify-between group cursor-pointer"
@@ -493,7 +496,7 @@ export default function EventsPage() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </Tilt>
                 </RevealItem>
               ))}
             </RevealList>

@@ -320,6 +320,9 @@ function HeroCarousel({ onPlan }) {
             style={{ y: cardY, opacity: cardFade }}
             className="animate-hero-4 max-w-[340px] w-full justify-self-start lg:justify-self-end"
           >
+          {/* Sin `glass`: esta card es glass-light (blanco/crema) — el
+              vidrio WebGL está afinado en tono azul para el liquid-glass
+              oscuro, chocaría aquí en la tarjeta más visible del sitio */}
           <Tilt max={7} className="glass-light rounded-[22px] p-7 md:p-8">
             <div className="text-[13px] font-semibold text-bg/60 mb-3">
               {eventLabel}
@@ -381,7 +384,7 @@ function AnnouncementsBar() {
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-4">
         {list.map((a, i) => (
           <Reveal key={a.ID} delay={i * 0.08}>
-            <Tilt max={3} className="liquid-glass rounded-[18px] px-6 py-5 flex items-start md:items-center gap-5">
+            <Tilt max={3} glass="standard" className="liquid-glass rounded-[18px] px-6 py-5 flex items-start md:items-center gap-5">
               <div className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
                 <Icon name="spark" className="w-5 h-5 text-white" />
               </div>
@@ -463,7 +466,7 @@ function Agenda({ bg }) {
           </MotionLink>
           
           <Reveal delay={0.1}>
-          <Tilt max={4} className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8">
+          <Tilt max={4} glass="featured" className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8">
             <div className="text-center shrink-0">
               <div className="text-[72px] font-extrabold text-white leading-none tracking-tighter">{featured.day}</div>
               <div className="text-[14px] font-bold text-white tracking-widest mt-2">{featured.month}</div>
@@ -572,6 +575,7 @@ function CelulasSection({ bg }) {
               as={Link}
               to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
               max={5}
+              glass={i === 0 ? 'featured' : 'standard'}
               className="group relative rounded-[24px] flex flex-col liquid-glass h-full"
             >
               <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
@@ -663,6 +667,7 @@ function MensajesCarousel({ bg }) {
           <Tilt
             key={s.id}
             max={5}
+            glass="standard"
             {...(s.href
               ? { as: 'a', href: s.href, target: '_blank', rel: 'noopener noreferrer' }
               : { as: Link, to: s.to })}
@@ -748,6 +753,7 @@ function FeedSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   max={6}
+                  glass={p.featured_size === 'large' ? 'featured' : 'standard'}
                   className="group relative block h-full rounded-[18px] overflow-hidden liquid-glass border border-white/5 hover:border-white/25"
                 >
                   {p.image_url && (
@@ -798,7 +804,7 @@ function Ubicacion({ bg }) {
         <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
           {/* Dirección protagonista */}
           <Reveal from="left">
-          <Tilt max={3} className="rounded-[24px] liquid-glass p-10 md:p-14 h-full flex flex-col justify-between gap-10">
+          <Tilt max={3} glass="featured" className="rounded-[24px] liquid-glass p-10 md:p-14 h-full flex flex-col justify-between gap-10">
             <div>
               <div className="flex items-center gap-3 text-white/60 text-[13px] font-bold mb-6">
                 <span className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
@@ -844,7 +850,7 @@ function Ubicacion({ bg }) {
           {/* Primera vez + podcast */}
           <div className="flex flex-col gap-6">
             <Reveal from="right" delay={0.05}>
-            <Tilt max={4} className="rounded-[24px] liquid-glass p-9 md:p-10">
+            <Tilt max={4} glass="standard" className="rounded-[24px] liquid-glass p-9 md:p-10">
               <h3 className="text-[26px] font-bold text-white tracking-tight mb-3">¿Es tu primera vez?</h3>
               <p className="text-[15px] text-white/70 font-medium mb-7">
                 Queremos conocerte. Escríbenos y te recibimos desde el primer minuto.
@@ -863,7 +869,7 @@ function Ubicacion({ bg }) {
             </Reveal>
 
             <Reveal from="right" delay={0.12}>
-            <Tilt max={4} className="rounded-[24px] liquid-glass p-9 md:p-10 flex items-center gap-5">
+            <Tilt max={4} glass="standard" className="rounded-[24px] liquid-glass p-9 md:p-10 flex items-center gap-5">
               <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
                 <Icon name="music" className="w-6 h-6 text-white" />
               </div>
@@ -923,7 +929,7 @@ function GalleryPreviewSection() {
         <RevealList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {topAlbums.map(([albumName, photos]) => (
             <RevealItem key={albumName}>
-            <Tilt as={Link} to="/gallery" max={6} className="group relative rounded-[18px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
+            <Tilt as={Link} to="/gallery" max={6} glass="standard" className="group relative rounded-[18px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
               <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
               <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">

@@ -42,7 +42,7 @@ export default function ReceiptPage() {
 
           {/* Datos bancarios */}
           <Reveal delay={0.05}>
-            <Tilt max={3} className="mb-6 liquid-glass rounded-[24px] p-7">
+            <Tilt max={3} glass="featured" className="mb-6 liquid-glass rounded-[24px] p-7">
               <Eyebrow>Datos para depósito</Eyebrow>
               <div className="space-y-2.5 mt-4">
                 {BANK_INFO.map(({ label, value }) => (

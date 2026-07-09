@@ -72,6 +72,7 @@ export default function SocialSection({ title = 'Nuestro feed', showDirectAccess
                   target="_blank"
                   rel="noopener noreferrer"
                   max={6}
+                  glass={p.featured_size === 'large' ? 'featured' : 'standard'}
                   className="group relative block h-full rounded-[18px] overflow-hidden liquid-glass border border-white/5 hover:border-white/25"
                 >
                   {p.image_url && (

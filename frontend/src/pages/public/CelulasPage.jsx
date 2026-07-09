@@ -215,7 +215,7 @@ export default function CelulasPage() {
                   <RevealList className="grid sm:grid-cols-2 gap-3 p-6 md:p-8">
                     {current.cells.map((c, i) => (
                       <RevealItem key={`${c.name}-${i}`} depth>
-                        <Tilt max={4} className="rounded-[16px] bg-white/5 border border-white/10 p-5 flex items-center gap-4 h-full">
+                        <Tilt max={4} glass="standard" className="rounded-[16px] bg-white/5 border border-white/10 p-5 flex items-center gap-4 h-full">
                           <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
                             <Icon name="users" className="w-5 h-5" />
                           </div>

@@ -202,6 +202,7 @@ function PostList({ posts }) {
           <RevealItem key={p.ID} depth className={span}>
             <Tilt
               max={5}
+              glass={featured ? 'featured' : 'standard'}
               {...(isExternal
                 ? { as: 'a', href: p.redirect_url, target: '_blank', rel: 'noopener noreferrer' }
                 : { as: Link, to: `/blog/${p.slug}` })}

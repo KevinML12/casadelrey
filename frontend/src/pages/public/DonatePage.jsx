@@ -36,7 +36,7 @@ export default function DonatePage() {
               <RevealList className="space-y-3">
                 {IMPACT.map(({ icon, title, desc }) => (
                   <RevealItem key={title}>
-                    <Tilt max={3} className="flex items-center gap-4 liquid-glass rounded-[20px] p-5">
+                    <Tilt max={3} glass="standard" className="flex items-center gap-4 liquid-glass rounded-[20px] p-5">
                       <span className="grid place-items-center w-12 h-12 rounded-full bg-white/10 border border-white/15 text-white shrink-0">
                         <Icon name={icon} className="w-5 h-5" />
                       </span>

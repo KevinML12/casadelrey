@@ -5,6 +5,8 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Splash from './components/ui/Splash';
 import StarField from './components/three/StarField';
+import GlassLayer from './components/three/GlassLayer';
+import { GlassLayerProvider } from './components/three/GlassLayerContext';
 
 // Public shell — Liquid Glass sobre canvas navy.
 // Lenis da scroll suave con inercia (se desactiva con prefers-reduced-motion).
@@ -25,14 +27,17 @@ export default function App() {
   useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg text-ink">
-      <Splash />
-      <StarField />
-      <Header />
-      <main className="flex-1 w-full">
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <GlassLayerProvider>
+      <div className="min-h-screen flex flex-col bg-bg text-ink">
+        <Splash />
+        <StarField />
+        <GlassLayer />
+        <Header />
+        <main className="flex-1 w-full">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </GlassLayerProvider>
   );
 }

@@ -58,7 +58,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <Tilt max={4} className="liquid-glass rounded-[24px] p-8 md:p-10 h-full">
+              <Tilt max={4} glass="standard" className="liquid-glass rounded-[24px] p-8 md:p-10 h-full">
                 <div className="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
                   <Icon name="crown" className="w-6 h-6 text-white" />
                 </div>
@@ -73,7 +73,7 @@ export default function AboutPage() {
             </RevealItem>
 
             <RevealItem>
-              <Tilt max={4} className="liquid-glass rounded-[24px] p-8 md:p-10 h-full">
+              <Tilt max={4} glass="featured" className="liquid-glass rounded-[24px] p-8 md:p-10 h-full">
                 <div className="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
                   <Icon name="users" className="w-6 h-6 text-white" />
                 </div>
@@ -104,7 +104,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <Tilt max={3} className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
+              <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
                 <h3 className="text-[20px] font-bold text-white mb-4">Misión</h3>
                 <p className="text-[17px] md:text-[19px] text-white/75 leading-relaxed">
                   Somos una iglesia cristiana familiar, enfocada en cumplir la gran comisión de
@@ -114,7 +114,7 @@ export default function AboutPage() {
               </Tilt>
             </RevealItem>
             <RevealItem>
-              <Tilt max={3} className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
+              <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
                 <h3 className="text-[20px] font-bold text-white mb-4">Visión</h3>
                 <p className="text-[17px] md:text-[19px] text-white/75 leading-relaxed">
                   Ser una iglesia de restauración familiar, punta de lanza, que proclama la
@@ -144,7 +144,7 @@ export default function AboutPage() {
           <RevealList className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {STATS.map(s => (
               <RevealItem key={s.label}>
-                <Tilt max={3} className="liquid-glass rounded-[20px] p-6 md:p-8 text-center h-full">
+                <Tilt max={3} glass="standard" className="liquid-glass rounded-[20px] p-6 md:p-8 text-center h-full">
                   <div className="text-[36px] md:text-[44px] font-extrabold text-white tracking-tighter leading-none">{s.n}</div>
                   <div className="mt-2 text-[13px] font-semibold text-white/60">{s.label}</div>
                 </Tilt>
@@ -206,7 +206,7 @@ export default function AboutPage() {
       <section className="relative py-16 md:py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
-            <Tilt max={4} className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
+            <Tilt max={4} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
               <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
                 <Icon name="pin" className="w-5 h-5 text-white" />
               </div>
@@ -229,7 +229,7 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal from="right" delay={0.08}>
-            <Tilt max={4} className="liquid-glass rounded-[24px] p-9 md:p-11 h-full flex flex-col justify-center">
+            <Tilt max={4} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full flex flex-col justify-center">
               <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
                 <Icon name="music" className="w-5 h-5 text-white" />
               </div>

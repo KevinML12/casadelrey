@@ -171,6 +171,7 @@ export default function VolunteeringPage() {
                     type="button"
                     onClick={() => handleAreaClick(value)}
                     max={4}
+                    glass="standard"
                     className={`w-full h-full flex items-start gap-4 p-6 rounded-[20px] text-left liquid-glass transition-colors ${
                       isSelected ? 'border-white/40 bg-white/10' : 'hover:bg-white/5'
                     }`}

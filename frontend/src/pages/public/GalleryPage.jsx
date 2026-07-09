@@ -93,6 +93,7 @@ export default function GalleryPage() {
               <RevealItem key={albumName} depth className="mb-6 break-inside-avoid">
               <Tilt
                 max={5}
+                glass="standard"
                 onClick={() => { setSelectedAlbum({ name: albumName, photos }); setVisibleCount(12); }}
                 className={`w-full ${MASONRY_H[i % MASONRY_H.length]} rounded-[24px] overflow-hidden relative group cursor-pointer liquid-glass hover:border-white/25`}
               >

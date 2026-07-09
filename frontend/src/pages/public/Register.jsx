@@ -13,7 +13,7 @@ export default function Register() {
           Obtener una cuenta.
         </h1>
 
-        <Tilt max={3} className="mt-10 liquid-glass rounded-[24px] p-8 md:p-10 text-left">
+        <Tilt max={3} glass="standard" className="mt-10 liquid-glass rounded-[24px] p-8 md:p-10 text-left">
           <div className="flex items-start gap-4">
             <span className="grid place-items-center w-12 h-12 rounded-full bg-white/10 border border-white/15 text-white shrink-0">
               <Icon name="users" className="w-5 h-5" />
