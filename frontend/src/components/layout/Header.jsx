@@ -76,13 +76,16 @@ export default function Header() {
             <span className="text-[15px] font-extrabold tracking-tightish text-bg">Casa del Rey</span>
           </Link>
 
-          {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Desktop nav links — solo desde lg (1024px): entre 768-1024 el
+              pill quedaba apretadísimo con 6 links + avatar + CTA, así que
+              ese rango usa el menú hamburguesa (limpio) en vez de un punto
+              intermedio incómodo donde "se ve" pero mal. */}
+          <div className="hidden lg:flex items-center gap-0.5">
             {NAV_LINKS.map(n => (
               <NavLink key={n.to} to={n.to} end={n.to === '/'}>
                 {({ isActive }) => (
                   <span
-                    className={`px-4 py-2 rounded-pill text-[14px] font-semibold cursor-pointer transition-all duration-300 ${
+                    className={`px-3.5 py-2 rounded-pill text-[13.5px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 ${
                       isActive
                         ? 'bg-white text-bg shadow-card'
                         : 'text-bg/70 hover:text-bg hover:bg-bg/5'
@@ -158,7 +161,7 @@ export default function Header() {
 
             <button
               onClick={() => setMenuOpen(o => !o)}
-              className="md:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring"
+              className="lg:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring"
               aria-label="Menú"
             >
               <Icon name={menuOpen ? 'close' : 'menu'} />
@@ -166,9 +169,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile sheet */}
+        {/* Mobile sheet — cubre tablet y laptop angosto (< 1024px) */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-500 ease-spring ${
+          className={`lg:hidden overflow-hidden transition-all duration-500 ease-spring ${
             menuOpen ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
           }`}
         >

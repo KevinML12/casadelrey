@@ -1,14 +1,22 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import use3D from '../../components/three/use3D';
+
+const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
+
+// Alturas variables para el masonry — determinístico por índice (no
+// random en cada render) para que el layout no "salte" al re-montar.
+const MASONRY_H = ['h-[280px]', 'h-[360px]', 'h-[320px]', 'h-[400px]', 'h-[300px]'];
 
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
+  const show3D = use3D();
   
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [visibleCount, setVisibleCount] = useState(12);
@@ -42,16 +50,32 @@ export default function GalleryPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      <ParallaxImg src="/images/bg-eventos.jpg" alt="Galería" className="opacity-25" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
+      {/* Corte diagonal: la foto del hero termina en un quiebre, no en
+          una línea recta — rompe la sensación de "ventana tras ventana" */}
+      <div
+        className="absolute top-0 inset-x-0 h-[560px] overflow-hidden"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 82%, 0 100%)' }}
+      >
+        <ParallaxImg src="/images/bg-eventos.jpg" alt="Galería" className="opacity-30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/40" />
+      </div>
 
-      <Reveal className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        <Eyebrow>Momentos vivos</Eyebrow>
-        <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>GALERÍA</h1>
-        <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
-          Momentos capturados de lo que Dios está haciendo en nuestra casa.
-        </p>
-      </Reveal>
+      <div className="relative z-10 pt-32 pb-16 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
+        {show3D && (
+          <Suspense fallback={null}>
+            <div aria-hidden className="absolute top-[6%] right-[2%] w-[280px] h-[280px] pointer-events-none opacity-90">
+              <GlassOrnament />
+            </div>
+          </Suspense>
+        )}
+        <Reveal>
+          <Eyebrow>Momentos vivos</Eyebrow>
+          <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>GALERÍA</h1>
+          <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
+            Momentos capturados de lo que Dios está haciendo en nuestra casa.
+          </p>
+        </Reveal>
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 pb-32 w-full flex-1">
         {gallery.length === 0 ? (
@@ -62,13 +86,15 @@ export default function GalleryPage() {
             </p>
           </div>
         ) : (
-          <RevealList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Object.entries(albums).map(([albumName, photos]) => (
-              <RevealItem key={albumName}>
+          /* Masonry real (CSS columns): alturas variables, ritmo visual
+             en vez de la cuadrícula pareja de antes */
+          <RevealList className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 [column-fill:_balance]">
+            {Object.entries(albums).map(([albumName, photos], i) => (
+              <RevealItem key={albumName} depth className="mb-6 break-inside-avoid">
               <Tilt
                 max={5}
                 onClick={() => { setSelectedAlbum({ name: albumName, photos }); setVisibleCount(12); }}
-                className="w-full aspect-[3/4] rounded-[24px] overflow-hidden relative group cursor-pointer liquid-glass hover:border-white/25"
+                className={`w-full ${MASONRY_H[i % MASONRY_H.length]} rounded-[24px] overflow-hidden relative group cursor-pointer liquid-glass hover:border-white/25`}
               >
                 <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                 <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
@@ -129,7 +155,7 @@ export default function GalleryPage() {
               <div className="p-8 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                 <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                   {selectedAlbum.photos.slice(0, visibleCount).map((photo, idx) => (
-                    <RevealItem key={photo.ID}>
+                    <RevealItem key={photo.ID} depth>
                     <Tilt max={6} className="rounded-[16px] overflow-hidden aspect-[4/5] relative group liquid-glass block">
                       <img src={photo.url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">

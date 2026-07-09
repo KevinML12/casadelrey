@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
@@ -8,6 +8,9 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import use3D from '../../components/three/use3D';
+
+const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -224,6 +227,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const show3D = use3D();
 
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
@@ -263,27 +267,37 @@ export default function EventsPage() {
       <ParallaxImg src="/images/bg-eventos.jpg" alt="Eventos" className="opacity-25" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
-      <Reveal className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        <Eyebrow>Agenda</Eyebrow>
-        <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
-        <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
-          Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
-        </p>
-
-        {events.length > 0 && (
-          <div className="w-full flex justify-end max-w-7xl">
-            <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.94 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-              onClick={() => setViewMode(v => v === 'carousel' ? 'grid' : 'carousel')}
-              className="liquid-glass px-4 py-2 rounded-full text-white/70 hover:text-white text-[13px] font-bold transition-colors"
-            >
-              {viewMode === 'carousel' ? 'Vista en cuadrícula' : 'Vista en carrusel'}
-            </motion.button>
-          </div>
+      <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
+        {show3D && (
+          <Suspense fallback={null}>
+            <div aria-hidden className="absolute top-[4%] right-[4%] w-[260px] h-[260px] pointer-events-none opacity-90">
+              <GlassOrnament />
+            </div>
+          </Suspense>
         )}
-      </Reveal>
+        <Reveal>
+          <Eyebrow>Agenda</Eyebrow>
+          <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
+          <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
+            Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
+          </p>
+
+          {events.length > 0 && (
+            <div className="w-full flex justify-end max-w-7xl">
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                onClick={() => setViewMode(v => v === 'carousel' ? 'grid' : 'carousel')}
+                className="liquid-glass px-4 py-2 rounded-full text-white/70 hover:text-white text-[13px] font-bold transition-colors flex items-center gap-2"
+              >
+                <Icon name={viewMode === 'carousel' ? 'search' : 'calendar'} className="w-4 h-4" />
+                {viewMode === 'carousel' ? 'Vista en cuadrícula' : 'Vista en carrusel'}
+              </motion.button>
+            </div>
+          )}
+        </Reveal>
+      </div>
 
       <motion.div layout className={`relative z-10 mx-auto pb-32 w-full flex-1 ${viewMode === 'carousel' ? 'max-w-none pl-6 md:pl-12' : 'max-w-7xl px-6'}`}>
         {events.length === 0 ? (
@@ -298,12 +312,12 @@ export default function EventsPage() {
           </div>
         ) : (
           /* ── Contenedor de Eventos ── */
-          <motion.div ref={scrollRef} layout className={viewMode === 'carousel' 
-            ? "flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pr-6 md:pr-12 hide-scrollbar" 
-            : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-          } 
+          <motion.div ref={scrollRef} layout className={viewMode === 'carousel'
+            ? "flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pr-6 md:pr-12 hide-scrollbar"
+            : "grid grid-cols-2 lg:grid-cols-4 auto-rows-[220px] gap-6"
+          }
           style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
-            
+
             <AnimatePresence>
             {events.map((ev, i) => {
               const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
@@ -316,18 +330,22 @@ export default function EventsPage() {
                 .join(' · ');
 
               const bgImage = ev.cover_image || '/images/bg-eventos.jpg';
-              
+
               const isCarousel = viewMode === 'carousel';
+              // Bento asimétrico en modo cuadrícula: el primero destaca
+              // grande, el resto rellena en celdas normales
+              const bentoSpan = i === 0 ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
 
               return (
-                <motion.div 
+                <motion.div
                   layout="position"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20, ...(isCarousel ? {} : { rotateX: 10, scale: 0.96 }) }}
+                  animate={{ opacity: 1, y: 0, ...(isCarousel ? {} : { rotateX: 0, scale: 1 }) }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-                  key={ev.ID} 
-                  className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : 'w-full aspect-[4/5] md:aspect-square'} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+                  style={isCarousel ? undefined : { transformPerspective: 1000 }}
+                  key={ev.ID}
+                  className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
                 >
                   
                   {/* Flyer de fondo */}
@@ -337,7 +355,7 @@ export default function EventsPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
 
                   {/* Etiqueta de próximo evento si es el primero */}
-                  {i === 0 && isCarousel && (
+                  {i === 0 && (
                     <motion.div layout className="absolute top-6 left-6 z-20">
                       <span className="liquid-glass px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
@@ -446,7 +464,7 @@ export default function EventsPage() {
 
             <RevealList className="space-y-3">
               {faqs.map(faq => (
-                <RevealItem key={faq.ID}>
+                <RevealItem key={faq.ID} depth>
                 <div className="liquid-glass rounded-[20px] overflow-hidden">
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}

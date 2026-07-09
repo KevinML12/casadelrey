@@ -8,11 +8,14 @@
 //  ver CONTEXTO_IGLESIA). API-first (GET /cells + /cell-categories)
 //  con fallback del directorio real jul-2026 en su versión segura.
 // ============================================================
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+import use3D from '../../components/three/use3D';
+
+const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 import Tilt from '../../components/ui/Tilt';
 import { useApi } from '../../lib/feed';
 
@@ -83,6 +86,7 @@ export default function CelulasPage() {
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');
   const [active, setActive] = useState(null);
+  const show3D = use3D();
 
   // Si el backend ya tiene células cargadas, sustituyen al fallback
   // dentro de su grupo; los grupos sin datos de API conservan el suyo.
@@ -125,6 +129,13 @@ export default function CelulasPage() {
           <img src="/images/bg-ministerios.jpg" alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/30" />
         </div>
+        {show3D && (
+          <Suspense fallback={null}>
+            <div aria-hidden className="absolute top-[8%] right-[4%] w-[250px] h-[250px] pointer-events-none opacity-90">
+              <GlassOrnament />
+            </div>
+          </Suspense>
+        )}
         <Reveal className="relative z-10 max-w-6xl mx-auto px-6">
           <Eyebrow>Comunidad</Eyebrow>
           <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}>
@@ -203,7 +214,7 @@ export default function CelulasPage() {
                   {/* Células del grupo */}
                   <RevealList className="grid sm:grid-cols-2 gap-3 p-6 md:p-8">
                     {current.cells.map((c, i) => (
-                      <RevealItem key={`${c.name}-${i}`}>
+                      <RevealItem key={`${c.name}-${i}`} depth>
                         <Tilt max={4} className="rounded-[16px] bg-white/5 border border-white/10 p-5 flex items-center gap-4 h-full">
                           <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
                             <Icon name="users" className="w-5 h-5" />

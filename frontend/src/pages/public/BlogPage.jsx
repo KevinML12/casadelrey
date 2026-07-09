@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
@@ -8,6 +8,9 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import use3D from '../../components/three/use3D';
+
+const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 
 const MOCK_POSTS_FALLBACK = [
   { ID: 1, title: 'El Precio del Propósito', slug: 'precio-proposito', category: 'ENSEÑANZA', excerpt: 'Descubre cómo el propósito moldea nuestra identidad.', content: '<p>Descubre cómo el propósito moldea nuestra identidad.</p>' },
@@ -157,34 +160,37 @@ function PostList({ posts }) {
   }
 
   return (
-    <RevealList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    /* Bento asimétrico: el primer post ocupa 2×2 (destacado real), el
+       resto rellena en celdas normales — nada de grid parejo repetido */
+    <RevealList className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[190px] gap-5">
       {posts.map((p, i) => {
         const isExternal = !!p.redirect_url;
         const featured   = i === 0;
         const excerpt    = p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 110);
         const category   = (p.category || (isExternal ? 'Red social' : 'Enseñanza'));
+        const span = featured ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
 
         const cardInner = (
           <>
-            <div className="h-48 w-full shrink-0 relative overflow-hidden">
+            <div className="absolute inset-0">
               {p.cover_image
                 ? <img src={p.cover_image} alt={p.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 : <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
               }
-              <div className="absolute inset-0 bg-gradient-to-t from-bg/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/30 to-transparent" />
             </div>
-            <div className="p-6 flex flex-col gap-2.5 flex-1">
-              <p className="text-[12px] font-bold text-white/50 flex items-center gap-1.5">
+            <div className="relative z-10 h-full p-6 flex flex-col justify-end gap-2">
+              <p className="text-[12px] font-bold text-white/60 flex items-center gap-1.5">
                 {category}
                 {isExternal && <Icon name="spark" className="w-3 h-3" />}
               </p>
-              <p className={`font-bold leading-snug line-clamp-2 text-white ${featured ? 'text-[22px]' : 'text-[19px]'}`}>
+              <p className={`font-bold leading-snug line-clamp-2 text-white ${featured ? 'text-[26px] md:text-[30px]' : 'text-[17px]'}`}>
                 {p.title}
               </p>
-              {excerpt && (
-                <p className="text-[14px] leading-relaxed line-clamp-2 text-white/60">{excerpt}</p>
+              {featured && excerpt && (
+                <p className="text-[15px] leading-relaxed line-clamp-2 text-white/70 max-w-md">{excerpt}</p>
               )}
-              <span className="text-[14px] font-bold text-white mt-1 inline-flex items-center gap-1.5">
+              <span className="text-[13.5px] font-bold text-white mt-1 inline-flex items-center gap-1.5">
                 {isExternal ? 'Ver' : 'Leer'}
                 <Icon name="arrow" className="w-3.5 h-3.5" />
               </span>
@@ -193,13 +199,13 @@ function PostList({ posts }) {
         );
 
         return (
-          <RevealItem key={p.ID}>
+          <RevealItem key={p.ID} depth className={span}>
             <Tilt
               max={5}
               {...(isExternal
                 ? { as: 'a', href: p.redirect_url, target: '_blank', rel: 'noopener noreferrer' }
                 : { as: Link, to: `/blog/${p.slug}` })}
-              className="group rounded-[24px] overflow-hidden flex flex-col liquid-glass h-full"
+              className="group relative rounded-[24px] overflow-hidden liquid-glass h-full block"
             >
               {cardInner}
             </Tilt>
@@ -215,6 +221,7 @@ export default function BlogPage() {
   const [post,    setPost]    = useState(null);
   const [loading, setLoading] = useState(true);
   const { slug } = useParams();
+  const show3D = use3D();
 
   useEffect(() => {
     setLoading(true);
@@ -255,13 +262,22 @@ export default function BlogPage() {
       <ParallaxImg src="/images/bg-ensenanzas.jpg" alt="" className="opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
-      <Reveal className="relative z-10 pt-40 pb-16 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
-        <Eyebrow>Enseñanzas</Eyebrow>
-        <h1 className="display-mega text-white mt-4 mb-4" style={{ fontSize: 'clamp(2.6rem, 7vw, 4.5rem)' }}>Blog</h1>
-        <p className="text-[17px] text-white/70 max-w-xl mx-auto">
-          Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual.
-        </p>
-      </Reveal>
+      <div className="relative z-10 pt-40 pb-16 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
+        {show3D && (
+          <Suspense fallback={null}>
+            <div aria-hidden className="absolute top-[2%] left-[6%] w-[240px] h-[240px] pointer-events-none opacity-90">
+              <GlassOrnament />
+            </div>
+          </Suspense>
+        )}
+        <Reveal>
+          <Eyebrow>Enseñanzas</Eyebrow>
+          <h1 className="display-mega text-white mt-4 mb-4" style={{ fontSize: 'clamp(2.6rem, 7vw, 4.5rem)' }}>Blog</h1>
+          <p className="text-[17px] text-white/70 max-w-xl mx-auto">
+            Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual.
+          </p>
+        </Reveal>
+      </div>
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 pb-32"><PostList posts={posts} /></div>
     </main>
