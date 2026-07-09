@@ -16,13 +16,17 @@ import use3D from './use3D';
 // El material de transmisión SOLO puede refractar lo que esté DENTRO
 // de esta misma escena three.js — nunca el HTML de atrás. Con un
 // Environment brillante (el "city" original: cielo diurno) el vidrio
-// se veía blanco lavado. Con "night" + más tinte que transmisión,
-// se ve como una gota de líquido navy real, no una ventana vacía.
+// se veía blanco lavado. Con "night" alcanza para evitar eso, pero la
+// primera pasada bajó tanto la transmisión/distancia de atenuación que
+// se fue al otro extremo: una tarjeta navy casi sólida, sin lectura de
+// vidrio. Aquí: transmisión y distancia de atenuación más altas (más
+// "ve a través"), atenuación un toque más clara — sigue sin blanquearse
+// porque el environment de fondo sigue siendo oscuro.
 const FEATURED_PROPS = {
-  thickness: 1.1, roughness: 0.15, transmission: 0.82, ior: 1.4,
-  chromaticAberration: 0.03, anisotropy: 0.15, distortion: 0.12,
-  distortionScale: 0.25, temporalDistortion: 0.12,
-  color: '#3D6EC2', attenuationColor: '#0A1E4D', attenuationDistance: 0.6,
+  thickness: 1.1, roughness: 0.1, transmission: 0.94, ior: 1.4,
+  chromaticAberration: 0.035, anisotropy: 0.2, distortion: 0.14,
+  distortionScale: 0.28, temporalDistortion: 0.12,
+  color: '#3D6EC2', attenuationColor: '#12306E', attenuationDistance: 1.4,
 };
 
 // Cámara ortográfica: actualiza el frustum al tamaño real de la
@@ -74,13 +78,13 @@ function Pane({ el, variant }) {
         // "gotita" en el borde, transmission bajo = domina el tinte
         // navy en vez de verse como una ventana en blanco.
         <meshPhysicalMaterial
-          transmission={0.7}
+          transmission={0.9}
           thickness={0.8}
-          roughness={0.18}
+          roughness={0.16}
           ior={1.3}
           color="#2E5CA8"
-          attenuationColor="#0A1E4D"
-          attenuationDistance={0.7}
+          attenuationColor="#12306E"
+          attenuationDistance={1.3}
           clearcoat={1}
           clearcoatRoughness={0.1}
         />

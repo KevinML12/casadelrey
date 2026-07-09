@@ -543,7 +543,8 @@ function Agenda({ bg }) {
           </Reveal>
         </div>
 
-        <Reveal from="right" className="liquid-glass rounded-[24px] p-8 md:p-12 border border-white/10">
+        <Reveal from="right">
+        <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-8 md:p-12 border border-white/10">
           <div className="text-white/50 text-[14px] font-semibold mb-8">
             También este mes
           </div>
@@ -567,6 +568,7 @@ function Agenda({ bg }) {
               </RevealItem>
             ))}
           </RevealList>
+        </Tilt>
         </Reveal>
       </div>
     </section>
