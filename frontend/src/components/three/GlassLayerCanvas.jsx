@@ -13,10 +13,16 @@ import { MeshTransmissionMaterial, Environment, RoundedBox } from '@react-three/
 import { useGlassLayer } from './GlassLayerContext';
 import use3D from './use3D';
 
+// El material de transmisión SOLO puede refractar lo que esté DENTRO
+// de esta misma escena three.js — nunca el HTML de atrás. Con un
+// Environment brillante (el "city" original: cielo diurno) el vidrio
+// se veía blanco lavado. Con "night" + más tinte que transmisión,
+// se ve como una gota de líquido navy real, no una ventana vacía.
 const FEATURED_PROPS = {
-  thickness: 0.5, roughness: 0.08, transmission: 1, ior: 1.4,
-  chromaticAberration: 0.035, anisotropy: 0.1, distortion: 0.1,
-  distortionScale: 0.2, temporalDistortion: 0.1, color: '#BFD9FF',
+  thickness: 1.1, roughness: 0.15, transmission: 0.82, ior: 1.4,
+  chromaticAberration: 0.03, anisotropy: 0.15, distortion: 0.12,
+  distortionScale: 0.25, temporalDistortion: 0.12,
+  color: '#3D6EC2', attenuationColor: '#0A1E4D', attenuationDistance: 0.6,
 };
 
 // Cámara ortográfica: actualiza el frustum al tamaño real de la
@@ -64,15 +70,19 @@ function Pane({ el, variant }) {
       ) : (
         // Variante liviana: material nativo de three.js (una sola pasada,
         // sin las muestras extra de MeshTransmissionMaterial) — barato de
-        // repetir en muchas cards a la vez.
+        // repetir en muchas cards a la vez. clearcoat = el brillo de
+        // "gotita" en el borde, transmission bajo = domina el tinte
+        // navy en vez de verse como una ventana en blanco.
         <meshPhysicalMaterial
-          transmission={1}
-          thickness={0.4}
-          roughness={0.12}
+          transmission={0.7}
+          thickness={0.8}
+          roughness={0.18}
           ior={1.3}
-          color="#BFD9FF"
-          attenuationColor="#BFD9FF"
-          attenuationDistance={2}
+          color="#2E5CA8"
+          attenuationColor="#0A1E4D"
+          attenuationDistance={0.7}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
         />
       )}
     </mesh>
@@ -82,9 +92,13 @@ function Pane({ el, variant }) {
 function Scene({ items }) {
   return (
     <>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[0, 5, 5]} intensity={1} />
-      <Environment preset="city" resolution={64} background={false} />
+      <ambientLight intensity={0.35} />
+      {/* Luz puntual desde arriba-frente: crea el brillo especular de
+          "gotita" en el borde superior del panel, en vez de depender
+          solo del environment para las reflexiones */}
+      <directionalLight position={[0, 8, 10]} intensity={1.4} />
+      <directionalLight position={[-4, -2, 6]} intensity={0.4} color="#7FA9F0" />
+      <Environment preset="night" resolution={64} background={false} />
       {items.map(({ id, el, variant }) => <Pane key={id} el={el} variant={variant} />)}
     </>
   );

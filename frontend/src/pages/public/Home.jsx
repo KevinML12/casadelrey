@@ -80,6 +80,12 @@ function HeroCarousel({ onPlan }) {
   const [failed, setFailed] = useState({});
   // El globo 3D solo en desktop con mouse y sin reduced-motion
   const show3D = use3D();
+  // Carril horizontal real: las fotos viven aquí, se navegan con
+  // swipe/scroll/trackpad — no solo con los dots. El texto (abajo)
+  // se mantiene fijo y solo cambia de contenido según qué slide
+  // quedó centrado, sincronizado por scroll listener.
+  const trackRef = useRef(null);
+  const isSyncing = useRef(false);
 
   useEffect(() => {
     Promise.all([fetchOnce('/hero/active'), fetchOnce('/events/')]).then(([heroData, events]) => {
@@ -141,17 +147,51 @@ function HeroCarousel({ onPlan }) {
     });
   }, []);
 
-  // Autorotación cada 8s (los dots permiten saltar; respeta reduced-motion)
+  // Lleva el carril a un slide dado — scroll real, no solo estado.
+  // isSyncing evita que el listener de scroll (abajo) rebote el idx
+  // mientras la animación programática todavía está en camino.
+  const goTo = (i) => {
+    const track = trackRef.current;
+    if (!track) return;
+    isSyncing.current = true;
+    track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+    setIdx(i);
+    setTimeout(() => { isSyncing.current = false; }, 700);
+  };
+
+  // El usuario desliza/hace scroll con el trackpad o el dedo → detecta
+  // qué slide quedó centrado y sincroniza el texto + los dots.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let raf;
+    const onScroll = () => {
+      if (isSyncing.current) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const i = Math.round(track.scrollLeft / track.clientWidth);
+        setIdx(prev => (prev === i ? prev : i));
+      });
+    };
+    track.addEventListener('scroll', onScroll, { passive: true });
+    return () => { track.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+  }, []);
+
+  // Autorotación cada 8s — programa el scroll real (no solo el índice),
+  // así el carril y los dots siempre concuerdan con lo que se ve.
   useEffect(() => {
     if (slides.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 8000);
+    const t = setInterval(() => {
+      setIdx(i => { const next = (i + 1) % slides.length; goTo(next); return next; });
+    }, 8000);
     return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slides.length]);
 
   const slide = slides[Math.min(idx, slides.length - 1)];
   // Si el media remoto falla, la foto local sostiene el liquid glass
-  const media = failed[slide.media] ? LOCAL_MEDIA : (slide.media || LOCAL_MEDIA);
-  const markFailed = () => setFailed(f => ({ ...f, [slide.media]: true }));
+  const mediaFor = (s) => failed[s.media] ? LOCAL_MEDIA : (s.media || LOCAL_MEDIA);
+  const markFailed = (url) => setFailed(f => ({ ...f, [url]: true }));
 
   // Coreografía de scroll: la foto se aleja y agranda lentamente,
   // el contenido sube y se desvanece a otra velocidad (profundidad real)
@@ -166,45 +206,42 @@ function HeroCarousel({ onPlan }) {
 
   return (
     <section ref={heroRef} id="inicio" className="relative min-h-[100svh] overflow-hidden bg-bg">
-      {/* Fondo por slide: crossfade + Ken Burns (entra a 1.06 y asienta).
-          El wrapper externo lleva el parallax de scroll; el interno la
-          transición — framer no puede animar scale dos veces en el mismo
-          elemento. Key por URL: si dos slides comparten foto, no parpadea */}
+      {/* Carril horizontal REAL: cada slide es una ventana de 100vw que se
+          navega deslizando (touch, trackpad, scrollbar) — no solo con los
+          dots. El wrapper externo lleva el parallax de scroll de página
+          (Ken Burns al bajar); el carril interno es scroll-snap propio. */}
       <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0">
-        <AnimatePresence initial={false}>
-          {media.endsWith('.mp4') ? (
-            <motion.video
-              key={media}
-              src={media}
-              autoPlay
-              loop
-              muted
-              playsInline
-              onError={markFailed}
-              initial={{ opacity: 0, scale: 1.06 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ opacity: { duration: 0.9, ease: 'easeOut' }, scale: { duration: 1.8, ease: EASE_OUT } }}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <motion.img
-              key={media}
-              src={media}
-              alt=""
-              onError={markFailed}
-              initial={{ opacity: 0, scale: 1.06 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ opacity: { duration: 0.9, ease: 'easeOut' }, scale: { duration: 1.8, ease: EASE_OUT } }}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          )}
-        </AnimatePresence>
+        <div
+          ref={trackRef}
+          className="h-full w-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+          {slides.map((s, i) => {
+            const url = mediaFor(s);
+            return (
+              <div key={i} className="relative h-full w-full shrink-0 snap-center">
+                {url.endsWith('.mp4') ? (
+                  <video
+                    src={url} autoPlay loop muted playsInline
+                    onError={() => markFailed(s.media)}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={url} alt=""
+                    onError={() => markFailed(s.media)}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </motion.div>
       {/* Scrims: legibilidad del texto sin apagar la foto */}
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/20 to-transparent pointer-events-none" />
 
       {/* Globo 3D — "Luz para las Naciones" girando detrás del contenido */}
       {show3D && (
@@ -296,19 +333,42 @@ function HeroCarousel({ onPlan }) {
             </AnimatePresence>
             </div>
 
-            {/* Dots del carrusel — saltar a cualquier slide */}
+            {/* Dots + flechas — saltar a cualquier slide, o deslizar/hacer
+                scroll horizontal directo sobre las fotos (touch, trackpad) */}
             {slides.length > 1 && (
-              <div className="mt-10 flex gap-2.5" role="tablist" aria-label="Slides del hero">
-                {slides.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setIdx(i)}
-                    aria-label={`Ir a slide ${i + 1}: ${s.l1}`}
-                    className={`h-1.5 rounded-full transition-all duration-500 focus-ring ${
-                      i === idx ? 'w-9 bg-white' : 'w-3.5 bg-white/30 hover:bg-white/60'
-                    }`}
-                  />
-                ))}
+              <div className="mt-10 flex items-center gap-4">
+                <div className="flex gap-2.5" role="tablist" aria-label="Slides del hero">
+                  {slides.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      aria-label={`Ir a slide ${i + 1}: ${s.l1}`}
+                      className={`h-1.5 rounded-full transition-all duration-500 focus-ring ${
+                        i === idx ? 'w-9 bg-white' : 'w-3.5 bg-white/30 hover:bg-white/60'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="hidden sm:flex items-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => goTo((idx - 1 + slides.length) % slides.length)}
+                    aria-label="Slide anterior"
+                    className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
+                  >
+                    <Icon name="arrow" className="w-3.5 h-3.5 rotate-180" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => goTo((idx + 1) % slides.length)}
+                    aria-label="Siguiente slide"
+                    className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
+                  >
+                    <Icon name="arrow" className="w-3.5 h-3.5" />
+                  </motion.button>
+                </div>
               </div>
             )}
           </motion.div>

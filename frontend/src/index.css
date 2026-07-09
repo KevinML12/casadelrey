@@ -286,6 +286,39 @@ html.lenis, html.lenis body { height: auto; }
   .liquid-glass:hover::after,
   .glass-light:hover::after { opacity: 1; }
 
+  /* Brillo líquido animado — la versión para touch/móvil del mismo
+     material: sin cursor que lo dispare, una franja de luz recorre
+     la card sola, en loop lento. Mismo tinte navy que el vidrio 3D
+     de escritorio (Tilt + GlassLayer), para que ambos se sientan
+     como el mismo material y no dos efectos distintos. Se apaga
+     solo con prefers-reduced-motion (regla global más abajo). */
+  .liquid-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-shine::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    pointer-events: none;
+    background: linear-gradient(
+      115deg,
+      transparent 35%,
+      rgba(127, 169, 240, 0.16) 47%,
+      rgba(255, 255, 255, 0.22) 50%,
+      rgba(127, 169, 240, 0.16) 53%,
+      transparent 65%
+    );
+    transform: translateX(-100%);
+    animation: liquid-shine-sweep 5.5s ease-in-out infinite;
+    animation-delay: var(--shine-delay, 0s);
+  }
+  @keyframes liquid-shine-sweep {
+    0%, 15%   { transform: translateX(-120%); }
+    50%, 65%  { transform: translateX(0%); }
+    100%      { transform: translateX(120%); }
+  }
+
   /* Surface sólida elevada (no translúcida) */
   .surface {
     background: var(--bg);
