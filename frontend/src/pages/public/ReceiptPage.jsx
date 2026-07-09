@@ -1,7 +1,9 @@
 import { useSearchParams } from 'react-router-dom';
 import PageHero from '../../components/layout/PageHero';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
-import { Icon, Halos } from '../../components/ui/Glass';
+import { Icon, Eyebrow } from '../../components/ui/Glass';
+import Reveal from '../../components/ui/Reveal';
+import Tilt from '../../components/ui/Tilt';
 
 const BANK_INFO = [
   { label: 'Banco',       value: 'Banrural' },
@@ -16,61 +18,55 @@ export default function ReceiptPage() {
   const eventName = params.get('event') || null;
 
   return (
-    <main className="min-h-screen bg-bg text-ink">
+    <main className="min-h-screen bg-bg text-white">
       <PageHero
-        icon="receipt_long"
         eyebrow="Comprobante"
         title="Sube tu depósito."
         subtitle="Lo verificamos y confirmamos tu pago lo antes posible."
       />
 
-      <section className="relative py-16 md:py-24 overflow-hidden">
-        <Halos variant="soft" />
+      <section className="relative py-16 md:py-24">
         <div className="relative z-10 max-w-2xl mx-auto px-6">
 
           {eventName && (
-            <div className="mb-6 flex items-center gap-3 bg-bg border border-ink-soft shadow-card rounded-card px-5 py-4">
-              <span className="grid place-items-center w-11 h-11 rounded-sm bg-bg-soft text-celeste shrink-0">
+            <Reveal className="mb-6 flex items-center gap-4 liquid-glass rounded-[20px] px-5 py-4">
+              <span className="grid place-items-center w-11 h-11 rounded-full bg-white/10 border border-white/15 text-white shrink-0">
                 <Icon name="calendar" className="w-5 h-5" />
               </span>
               <div>
-                <p className="text-[10.5px] font-extrabold uppercase tracking-widest text-celeste">Pago para</p>
-                <p className="text-[15px] font-extrabold tracking-tightish text-ink mt-0.5">{eventName}</p>
+                <p className="text-[12px] font-bold text-white/50">Pago para</p>
+                <p className="text-[15px] font-bold text-white mt-0.5">{eventName}</p>
               </div>
-            </div>
+            </Reveal>
           )}
 
           {/* Datos bancarios */}
-          <div className="mb-8 bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 relative overflow-hidden">
-            <div className="absolute inset-0 -z-10 pointer-events-none">
-              <div className="halo" style={{ width: 280, height: 280, top: -100, right: -60, background: 'rgba(124,212,255,0.16)' }} />
-            </div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Datos para depósito</span>
-            </div>
-
-            <div className="space-y-2.5">
-              {BANK_INFO.map(({ label, value }) => (
-                <div key={label} className="flex items-center gap-3 rounded-md bg-bg-soft border border-ink-soft px-4 py-3">
-                  <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-ink-3 w-28 shrink-0">{label}</span>
-                  <span className="text-[14.5px] font-extrabold tracking-tightish text-ink">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Reveal delay={0.05}>
+            <Tilt max={3} className="mb-6 liquid-glass rounded-[24px] p-7">
+              <Eyebrow>Datos para depósito</Eyebrow>
+              <div className="space-y-2.5 mt-4">
+                {BANK_INFO.map(({ label, value }) => (
+                  <div key={label} className="flex items-center gap-3 rounded-[14px] bg-white/5 border border-white/10 px-4 py-3">
+                    <span className="text-[12px] font-bold text-white/50 w-28 shrink-0">{label}</span>
+                    <span className="text-[14.5px] font-bold text-white">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </Tilt>
+          </Reveal>
 
           {/* Formulario */}
-          <div className="bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 md:p-9">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-gradient-to-r from-electric to-transparent" />
-              <span className="text-celeste text-[11px] font-extrabold uppercase tracking-widest">Sube el comprobante</span>
+          <Reveal delay={0.1}>
+            <div className="liquid-glass rounded-[24px] p-7 md:p-9">
+              <Eyebrow>Sube el comprobante</Eyebrow>
+              <div className="mt-4">
+                <ReceiptUploadForm
+                  eventId={eventId}
+                  purpose={eventId ? 'evento' : 'donacion'}
+                />
+              </div>
             </div>
-            <ReceiptUploadForm
-              eventId={eventId}
-              purpose={eventId ? 'evento' : 'donacion'}
-            />
-          </div>
+          </Reveal>
         </div>
       </section>
     </main>

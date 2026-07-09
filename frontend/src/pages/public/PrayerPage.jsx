@@ -1,6 +1,8 @@
 import PrayerForm from '../../components/sections/PrayerForm';
 import PageHero from '../../components/layout/PageHero';
 import { Icon, Halos } from '../../components/ui/Glass';
+import Reveal from '../../components/ui/Reveal';
+import Tilt from '../../components/ui/Tilt';
 
 const TRUST = [
   { icon: 'users', text: 'Comunidad que ora contigo' },
@@ -32,11 +34,11 @@ export default function PrayerPage() {
 
       <section className="relative py-16 md:py-24 overflow-hidden">
         <Halos variant="soft" />
-        <div className="relative z-10 max-w-3xl mx-auto px-6">
-          <div className="bg-bg border border-ink-soft shadow-card-lg rounded-card p-7 md:p-10">
+        <Reveal className="relative z-10 max-w-3xl mx-auto px-6">
+          <Tilt max={3} className="liquid-glass rounded-[24px] p-7 md:p-10">
             <PrayerForm />
-          </div>
-        </div>
+          </Tilt>
+        </Reveal>
       </section>
     </main>
   );

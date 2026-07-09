@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { Icon } from '../../components/ui/Glass';
+import Reveal from '../../components/ui/Reveal';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -54,7 +56,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-surf py-12">
-      <div className="max-w-xl mx-auto px-6">
+      <Reveal className="max-w-xl mx-auto px-6">
         <h1 className="text-headline-s text-on-surf font-black mb-8">Mi Perfil</h1>
 
         {/* Avatar */}
@@ -72,11 +74,11 @@ export default function ProfilePage() {
         {/* Info */}
         <div className="bg-surf-low border border-outline-var rounded-xl overflow-hidden mb-8">
           {[
-            { icon: 'mail',   label: 'Correo electrónico', value: user?.email || '—' },
-            { icon: 'shield', label: 'Rol',                value: user?.role || 'usuario', capitalize: true },
+            { icon: 'mail', label: 'Correo electrónico', value: user?.email || '—' },
+            { icon: 'user', label: 'Rol',                value: user?.role || 'usuario', capitalize: true },
           ].map(({ icon, label, value, capitalize }) => (
             <div key={label} className="flex items-center gap-3 px-5 py-4 border-b border-outline-var last:border-0">
-              <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>{icon}</span>
+              <Icon name={icon} className="w-[18px] h-[18px] text-on-surf-var" />
               <div>
                 <p className="text-label-s text-on-surf-var font-medium">{label}</p>
                 <p className={`text-body-s text-on-surf font-medium mt-0.5 ${capitalize ? 'capitalize' : ''}`}>{value}</p>
@@ -84,7 +86,7 @@ export default function ProfilePage() {
             </div>
           ))}
           <div className="flex items-center gap-3 px-5 py-4">
-            <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>person</span>
+            <Icon name="user" className="w-[18px] h-[18px] text-on-surf-var" />
             <div>
               <p className="text-label-s text-on-surf-var font-medium">Estado de cuenta</p>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-label-s font-medium bg-ter-con text-on-ter-con mt-0.5">
@@ -98,7 +100,7 @@ export default function ProfilePage() {
         {/* Metas */}
         <div className="mb-8">
           <h2 className="text-title-l text-on-surf font-bold mb-4 flex items-center gap-2">
-            <span className="ms text-pri" style={{ fontSize: 22 }}>flag</span>
+            <Icon name="spark" className="w-[22px] h-[22px] text-pri" />
             Mis metas
           </h2>
           <form onSubmit={addGoal} className="flex gap-2 mb-4">
@@ -112,9 +114,9 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={adding || !newTitle.trim()}
-              className="w-10 h-10 rounded-full bg-pri text-on-pri flex items-center justify-center hover:opacity-90 disabled:opacity-50 transition-opacity"
+              className="w-10 h-10 rounded-full bg-pri text-on-pri flex items-center justify-center text-[20px] font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              <span className="ms" style={{ fontSize: 20 }}>add</span>
+              +
             </button>
           </form>
 
@@ -135,7 +137,7 @@ export default function ProfilePage() {
                       g.completed ? 'bg-ter border-ter text-ink' : 'border-outline hover:border-pri'
                     }`}
                   >
-                    {g.completed && <span className="ms" style={{ fontSize: 14 }}>check</span>}
+                    {g.completed && <Icon name="check" className="w-3.5 h-3.5" />}
                   </button>
                   <div className="flex-1 min-w-0">
                     <p className={`text-body-s text-on-surf font-medium ${g.completed ? 'line-through text-on-surf-var' : ''}`}>
@@ -147,7 +149,7 @@ export default function ProfilePage() {
                   </div>
                   <button onClick={() => deleteGoal(g.ID)}
                     className="text-on-surf-var hover:text-err p-1 shrink-0 transition-colors">
-                    <span className="ms" style={{ fontSize: 16 }}>delete</span>
+                    <Icon name="close" className="w-4 h-4" />
                   </button>
                 </div>
               ))}
@@ -157,15 +159,14 @@ export default function ProfilePage() {
 
         <div className="flex gap-3">
           <Button variant="tonal" onClick={() => toast('Próximamente disponible')}>
-            <span className="ms" style={{ fontSize: 16 }}>edit</span>
             Editar perfil
           </Button>
           <Button variant="outlined" onClick={() => toast('Próximamente disponible')}>
-            <span className="ms" style={{ fontSize: 16 }}>lock</span>
+            <Icon name="lock" className="w-4 h-4" />
             Cambiar contraseña
           </Button>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }

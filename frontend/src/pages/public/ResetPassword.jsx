@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
+import AuthCard from '../../components/ui/AuthCard';
+import { Icon } from '../../components/ui/Glass';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -25,43 +27,44 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-surf flex items-center justify-center p-6">
-      <div className="w-full max-w-sm animate-fade-in">
-
-        <div className="mb-8">
-          <div className="w-12 h-12 rounded-xl bg-surf-high border border-outline-var flex items-center justify-center mb-5">
-            <span className="ms text-on-surf-var" style={{ fontSize: 22 }}>lock_reset</span>
-          </div>
-          <h1 className="text-headline-s text-on-surf font-black mb-1">Nueva contraseña</h1>
-          <p className="text-body-m text-on-surf-var">Elige una contraseña segura para tu cuenta.</p>
+    <AuthCard>
+      <div className="mb-8">
+        <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-5">
+          <Icon name="lock" className="w-5 h-5 text-white" />
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Nueva contraseña"
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="••••••••"
-            helperText="Mínimo 6 caracteres"
-            required
-          />
-          <Input
-            label="Confirmar contraseña"
-            type="password"
-            value={confirm}
-            onChange={e => setConfirm(e.target.value)}
-            placeholder="••••••••"
-            required
-          />
-          <Button type="submit" variant="filled" size="lg" className="w-full justify-center mt-2" disabled={loading}>
-            {loading
-              ? <><span className="ms" style={{ fontSize: 18 }}>hourglass_empty</span>Guardando...</>
-              : <><span className="ms" style={{ fontSize: 18 }}>check_circle</span>Guardar contraseña</>
-            }
-          </Button>
-        </form>
+        <h1 className="text-[22px] font-bold text-white mb-1.5">Nueva contraseña</h1>
+        <p className="text-[15px] text-white/60">Elige una contraseña segura para tu cuenta.</p>
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Nueva contraseña"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          placeholder="••••••••"
+          helperText="Mínimo 6 caracteres"
+          required
+        />
+        <Input
+          label="Confirmar contraseña"
+          type="password"
+          value={confirm}
+          onChange={e => setConfirm(e.target.value)}
+          placeholder="••••••••"
+          required
+        />
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-[15px] font-bold disabled:opacity-50 mt-2"
+        >
+          {loading ? 'Guardando…' : 'Guardar contraseña'}
+        </motion.button>
+      </form>
+    </AuthCard>
   );
 }

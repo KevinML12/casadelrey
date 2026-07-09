@@ -1,10 +1,13 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import { Icon, Eyebrow } from '../../components/ui/Glass';
+import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+import Tilt from '../../components/ui/Tilt';
+import ParallaxImg from '../../components/ui/ParallaxImg';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -257,29 +260,30 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" />
-      <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" style={{ animationDelay: '2s' }} />
-      <img src="/images/bg-eventos.jpg" alt="Eventos" className="absolute inset-0 w-full h-full object-cover opacity-20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/40" />
+      <ParallaxImg src="/images/bg-eventos.jpg" alt="Eventos" className="opacity-25" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
-      <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
+      <Reveal className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
+        <Eyebrow>Agenda</Eyebrow>
+        <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
         <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
           Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
         </p>
-        
+
         {events.length > 0 && (
           <div className="w-full flex justify-end max-w-7xl">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               onClick={() => setViewMode(v => v === 'carousel' ? 'grid' : 'carousel')}
-              className="liquid-glass px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest transition-colors"
+              className="liquid-glass px-4 py-2 rounded-full text-white/70 hover:text-white text-[13px] font-bold transition-colors"
             >
-              <span className="material-symbols-rounded" style={{ fontSize: 16 }}>{viewMode === 'carousel' ? 'grid_view' : 'view_carousel'}</span>
               {viewMode === 'carousel' ? 'Vista en cuadrícula' : 'Vista en carrusel'}
-            </button>
+            </motion.button>
           </div>
         )}
-      </div>
+      </Reveal>
 
       <motion.div layout className={`relative z-10 mx-auto pb-32 w-full flex-1 ${viewMode === 'carousel' ? 'max-w-none pl-6 md:pl-12' : 'max-w-7xl px-6'}`}>
         {events.length === 0 ? (
@@ -335,9 +339,9 @@ export default function EventsPage() {
                   {/* Etiqueta de próximo evento si es el primero */}
                   {i === 0 && isCarousel && (
                     <motion.div layout className="absolute top-6 left-6 z-20">
-                      <span className="liquid-glass px-4 py-1.5 rounded-full bg-white/5 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20 flex items-center gap-2 backdrop-blur-md">
+                      <span className="liquid-glass px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
-                        Próximo Evento
+                        Próximo evento
                       </span>
                     </motion.div>
                   )}
@@ -371,26 +375,28 @@ export default function EventsPage() {
                       </motion.div>
 
                       {details && (
-                        <p className="truncate text-white/60 flex items-center gap-1.5 text-[12px]">
-                          <span className="material-symbols-rounded text-[14px] text-white/40">location_on</span>
+                        <p className="truncate text-white/60 flex items-center gap-1.5 text-[13px]">
+                          <Icon name="pin" className="w-3.5 h-3.5 text-white/40 shrink-0" />
                           {details}
                         </p>
                       )}
 
                       <motion.div layout className="shrink-0 flex flex-col gap-3 w-full pt-3 border-t border-white/10">
                         {ev.requires_payment && (
-                          <span className="font-bold text-[12px] font-mono text-white/80 tracking-wider flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
-                            <span className="material-symbols-rounded text-[12px]">payments</span>
+                          <span className="font-bold text-[12px] text-white/80 flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
                             Q{Number(ev.price_gtq).toFixed(0)}
                           </span>
                         )}
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                           onClick={() => setRsvpEvent(ev)}
-                          className={`rounded-full liquid-glass bg-white/5 text-white text-[14px] font-bold hover:bg-white/10 hover:border-white/30 transition-all duration-300 btn-spring inline-flex items-center justify-center gap-3 group/btn border border-white/10 ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'}`}
+                          className={`rounded-full liquid-glass text-white text-[14px] font-bold hover:border-white/30 inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'}`}
                         >
                           {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-                          <span className="material-symbols-rounded text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
-                        </button>
+                          <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />
+                        </motion.button>
                       </motion.div>
 
                     </div>
@@ -407,41 +413,53 @@ export default function EventsPage() {
       {/* Botones de navegación del carrusel (solo visibles en modo carrusel) */}
       {viewMode === 'carousel' && events.length > 0 && (
         <div className="relative z-10 flex justify-center gap-4 pb-20">
-          <button 
+          <motion.button
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.92 }}
             onClick={() => scrollContainer('left')}
-            className="w-12 h-12 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
           >
-            <span className="material-symbols-rounded">arrow_back</span>
-          </button>
-          <button 
+            <Icon name="arrow" className="w-5 h-5 rotate-180" stroke={2} />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.92 }}
             onClick={() => scrollContainer('right')}
-            className="w-12 h-12 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
           >
-            <span className="material-symbols-rounded">arrow_forward</span>
-          </button>
+            <Icon name="arrow" className="w-5 h-5" stroke={2} />
+          </motion.button>
         </div>
       )}
 
       {/* Secciones dinámicas: FAQs */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/10 pt-20 mt-10">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/5 pt-20 mt-10">
 
         {/* FAQs */}
         {faqs.length > 0 && (
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-[28px] font-bold text-white mb-2 text-center">Preguntas Frecuentes</h2>
-            <p className="text-white/50 mb-10 text-center max-w-2xl mx-auto">Todo lo que necesitas saber antes de asistir a nuestros eventos.</p>
-            
-            <div className="space-y-4">
+            <Reveal className="text-center mb-10">
+              <Eyebrow>Ayuda</Eyebrow>
+              <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)' }}>Preguntas frecuentes</h2>
+              <p className="text-white/60 mt-4 max-w-2xl mx-auto">Todo lo que necesitas saber antes de asistir a nuestros eventos.</p>
+            </Reveal>
+
+            <RevealList className="space-y-3">
               {faqs.map(faq => (
-                <div key={faq.ID} className="liquid-glass bg-white/5 border border-white/10 rounded-[24px] overflow-hidden">
-                  <button 
+                <RevealItem key={faq.ID}>
+                <div className="liquid-glass rounded-[20px] overflow-hidden">
+                  <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
                     className="w-full px-6 py-5 text-left flex items-center justify-between group cursor-pointer"
                   >
-                    <span className="text-white font-medium pr-4">{faq.question}</span>
-                    <span className={`material-symbols-rounded text-white/50 transition-transform duration-300 ${openFaq === faq.ID ? 'rotate-180' : ''}`}>
-                      expand_more
-                    </span>
+                    <span className="text-white font-semibold pr-4">{faq.question}</span>
+                    <motion.span
+                      animate={{ rotate: openFaq === faq.ID ? 90 : 0 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                      className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0"
+                    >
+                      <Icon name="arrow" className="w-4 h-4" />
+                    </motion.span>
                   </button>
                   <AnimatePresence>
                     {openFaq === faq.ID && (
@@ -458,8 +476,9 @@ export default function EventsPage() {
                     )}
                   </AnimatePresence>
                 </div>
+                </RevealItem>
               ))}
-            </div>
+            </RevealList>
           </div>
         )}
       </div>

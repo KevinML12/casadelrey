@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PageHero from '../../components/layout/PageHero';
 import apiClient from '../../lib/apiClient';
-import { Halos } from '../../components/ui/Glass';
+import { Icon, Eyebrow } from '../../components/ui/Glass';
+import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+import Tilt from '../../components/ui/Tilt';
+import ParallaxImg from '../../components/ui/ParallaxImg';
 
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
@@ -40,56 +42,50 @@ export default function GalleryPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob" />
-      <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-white/5 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" style={{ animationDelay: '2s' }} />
-      <img src="/images/bg-eventos.jpg" alt="Galería" className="absolute inset-0 w-full h-full object-cover opacity-20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/40" />
+      <ParallaxImg src="/images/bg-eventos.jpg" alt="Galería" className="opacity-25" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
-      <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>GALERÍA</h1>
+      <Reveal className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
+        <Eyebrow>Momentos vivos</Eyebrow>
+        <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>GALERÍA</h1>
         <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
-          Momentos capturados de lo que Dios está haciendo en nuestra casa. 
+          Momentos capturados de lo que Dios está haciendo en nuestra casa.
         </p>
-      </div>
+      </Reveal>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 pb-32 w-full flex-1">
         {gallery.length === 0 ? (
           <div className="py-32 flex flex-col items-center gap-5">
-            <p className="font-mono text-[11px] tracking-[2px] text-white/40 uppercase">Álbumes</p>
             <p className="font-bold leading-[1.05] tracking-[-0.02em] text-center whitespace-pre-line text-white/50"
               style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
               {'Sin fotos\npublicadas aún.'}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <RevealList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Object.entries(albums).map(([albumName, photos]) => (
-              <div 
-                key={albumName} 
+              <RevealItem key={albumName}>
+              <Tilt
+                max={5}
                 onClick={() => { setSelectedAlbum({ name: albumName, photos }); setVisibleCount(12); }}
-                className="w-full aspect-[3/4] rounded-[32px] overflow-hidden relative group shadow-2xl cursor-pointer border border-white/5 hover:border-white/20 transition-all duration-500"
+                className="w-full aspect-[3/4] rounded-[24px] overflow-hidden relative group cursor-pointer liquid-glass hover:border-white/25"
               >
-                {/* Cover image */}
-                <img src={photos[0].url} alt={albumName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                
-                {/* Gradiente sutil para texto */}
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent opacity-90" />
+                <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
 
-                {/* Panel flotante Liquid Glass */}
-                <div className="absolute bottom-5 inset-x-5 flex flex-col justify-end">
-                  <div className="liquid-glass bg-white/10 border border-white/20 backdrop-blur-md p-5 rounded-[24px] transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 flex justify-between items-center shadow-lg">
-                    <div>
-                      <p className="text-white font-bold text-[20px] leading-tight line-clamp-1">{albumName}</p>
-                      <p className="text-white/60 text-[13px] font-medium mt-1">{photos.length} fotografías</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/80 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0">
-                      <span className="material-symbols-rounded">arrow_forward</span>
-                    </div>
+                <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
+                  <div>
+                    <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
+                    <p className="text-white/60 text-[13px] font-medium mt-1">{photos.length} fotografías</p>
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/70 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0 backdrop-blur-md">
+                    <Icon name="arrow" className="w-4 h-4" />
                   </div>
                 </div>
-              </div>
+              </Tilt>
+              </RevealItem>
             ))}
-          </div>
+          </RevealList>
         )}
       </div>
 
@@ -110,45 +106,53 @@ export default function GalleryPage() {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="relative w-full max-w-6xl max-h-[90vh] liquid-glass bg-white/5 border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="relative w-full max-w-6xl max-h-[90vh] liquid-glass rounded-[32px] overflow-hidden flex flex-col"
             >
               {/* Encabezado fijo */}
-              <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5 shrink-0">
+              <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center shrink-0">
                 <div>
                   <h3 className="text-2xl font-bold text-white">{selectedAlbum.name}</h3>
                   <p className="text-white/50 text-sm font-medium">{selectedAlbum.photos.length} fotografías</p>
                 </div>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() => setSelectedAlbum(null)}
-                  className="w-12 h-12 rounded-full liquid-glass bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                  className="w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
                 >
-                  <span className="material-symbols-rounded">close</span>
-                </button>
+                  <Icon name="close" className="w-4 h-4" />
+                </motion.button>
               </div>
-              
+
               {/* Cuadrícula de fotos con scroll */}
               <div className="p-8 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                   {selectedAlbum.photos.slice(0, visibleCount).map((photo, idx) => (
-                    <div key={photo.ID} className="rounded-[20px] overflow-hidden aspect-[4/5] relative group bg-black/20 shadow-lg border border-white/5">
+                    <RevealItem key={photo.ID}>
+                    <Tilt max={6} className="rounded-[16px] overflow-hidden aspect-[4/5] relative group liquid-glass block">
                       <img src={photo.url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <span className="material-symbols-rounded text-white text-3xl">zoom_in</span>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <Icon name="search" className="w-6 h-6 text-white" />
                       </div>
-                    </div>
+                    </Tilt>
+                    </RevealItem>
                   ))}
-                </div>
-                
+                </RevealList>
+
                 {/* Botón Cargar Más */}
                 {visibleCount < selectedAlbum.photos.length && (
                   <div className="flex justify-center mt-10">
-                    <button 
+                    <motion.button
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.94 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                       onClick={() => setVisibleCount(prev => prev + 12)}
-                      className="px-8 py-3 rounded-full liquid-glass bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-colors flex items-center gap-2 btn-spring"
+                      className="px-8 py-3.5 rounded-pill liquid-glass text-white font-bold flex items-center gap-2"
                     >
-                      <span className="material-symbols-rounded text-[18px]">add</span>
                       Cargar más fotos
-                    </button>
+                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                    </motion.button>
                   </div>
                 )}
               </div>
