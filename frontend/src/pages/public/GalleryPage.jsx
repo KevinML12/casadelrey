@@ -1,13 +1,10 @@
-import React, { useEffect, useState, useMemo, lazy, Suspense } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
-import use3D from '../../components/three/use3D';
-
-const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 
 // Alturas variables para el masonry — determinístico por índice (no
 // random en cada render) para que el layout no "salte" al re-montar.
@@ -16,8 +13,7 @@ const MASONRY_H = ['h-[280px]', 'h-[360px]', 'h-[320px]', 'h-[400px]', 'h-[300px
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
-  const show3D = use3D();
-  
+
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [visibleCount, setVisibleCount] = useState(12);
 
@@ -61,13 +57,6 @@ export default function GalleryPage() {
       </div>
 
       <div className="relative z-10 pt-32 pb-16 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        {show3D && (
-          <Suspense fallback={null}>
-            <div aria-hidden className="absolute top-[6%] right-[2%] w-[280px] h-[280px] pointer-events-none opacity-90">
-              <GlassOrnament />
-            </div>
-          </Suspense>
-        )}
         <Reveal>
           <Eyebrow>Momentos vivos</Eyebrow>
           <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>GALERÍA</h1>

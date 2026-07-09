@@ -45,11 +45,12 @@ export default function Header() {
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-  // CTA: con sesión va a Dar; sin sesión "Planifica tu visita" lleva a la
-  // sección de ubicación del Home (antes mentía: decía visita e iba a /donate)
-  const handleCta = () => {
+  // "Planifica tu visita" siempre lleva a la sección de ubicación —
+  // "Dar" (donaciones) es un link real y visible aparte, para TODOS
+  // los visitantes (antes solo aparecía si había sesión iniciada, así
+  // que un visitante anónimo nunca veía cómo donar).
+  const handlePlanVisit = () => {
     setMenuOpen(false);
-    if (isAuthenticated) { navigate('/donate'); return; }
     const scroll = () =>
       document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' });
     if (location.pathname === '/') scroll();
@@ -151,11 +152,19 @@ export default function Header() {
               </div>
             )}
 
+            <Link
+              to="/donate"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-[14px] font-bold transition-all duration-300 focus-ring"
+            >
+              <Icon name="heart" className="w-4 h-4" />
+              Dar
+            </Link>
+
             <button
-              onClick={handleCta}
+              onClick={handlePlanVisit}
               className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg text-white text-[14px] font-bold btn-spring focus-ring hover:bg-bg-soft"
             >
-              {isAuthenticated ? 'Dar' : 'Planifica tu visita'}
+              Planifica tu visita
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
             </button>
 
@@ -215,11 +224,19 @@ export default function Header() {
                   </button>
                 </>
               )}
+                <Link
+                  to="/donate"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill text-bg text-[14.5px] font-bold hover:bg-bg/5 transition-colors"
+                >
+                  <Icon name="heart" className="w-4 h-4" />
+                  Dar
+                </Link>
                 <button
-                  onClick={handleCta}
+                  onClick={handlePlanVisit}
                   className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-[14.5px] font-bold btn-spring hover:bg-bg-soft"
                 >
-                  {isAuthenticated ? 'Dar' : 'Planifica tu visita'}
+                  Planifica tu visita
                   <Icon name="arrow" className="w-4 h-4" stroke={2} />
                 </button>
             </div>

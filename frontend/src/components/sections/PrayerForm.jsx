@@ -4,6 +4,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea, Select } from '../ui/Input';
 import Button from '../ui/Button';
+import { Icon } from '../ui/Glass';
 
 const CATEGORIES = [
   { value: 'salud',      label: 'Salud y Sanidad' },
@@ -32,8 +33,8 @@ export default function PrayerForm({ compact = false }) {
   if (submitted) {
     return (
       <div className="flex flex-col items-center text-center py-12 animate-fade-in">
-        <div className="w-16 h-16 rounded-full bg-ter-con flex items-center justify-center mb-5">
-          <span className="ms text-on-ter-con" style={{ fontSize: 32 }}>favorite</span>
+        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-5">
+          <Icon name="heart" className="w-7 h-7 text-on-surf" />
         </div>
         <h3 className="text-title-l text-on-surf font-bold mb-2">¡Recibida con amor!</h3>
         <p className="text-body-m text-on-surf-var max-w-xs leading-relaxed mb-6">
@@ -78,18 +79,15 @@ export default function PrayerForm({ compact = false }) {
         <Textarea label="Petición *" rows={5} error={errors.message}
           {...register('message', { required: 'Escribe tu petición', minLength: { value: 10, message: 'Escribe un poco más' } })} />
 
-        <div className="flex items-start gap-3 p-3.5 rounded-lg bg-surf-high border border-outline-var">
-          <span className="ms text-on-surf-var mt-0.5 shrink-0" style={{ fontSize: 16 }}>lock</span>
+        <div className="flex items-start gap-3 p-3.5 rounded-[14px] bg-white/5 border border-white/10">
+          <Icon name="lock" className="w-4 h-4 text-on-surf-var mt-0.5 shrink-0" />
           <p className="text-label-s text-on-surf-var leading-relaxed">
             Tu petición es confidencial. Solo el equipo pastoral tiene acceso.
           </p>
         </div>
 
         <Button type="submit" variant="filled" size="lg" className="w-full justify-center" disabled={isSubmitting}>
-          {isSubmitting
-            ? <><span className="ms" style={{ fontSize: 18 }}>hourglass_empty</span>Enviando...</>
-            : <><span className="ms" style={{ fontSize: 18 }}>send</span>Enviar Petición</>
-          }
+          {isSubmitting ? 'Enviando…' : <><Icon name="arrow" className="w-4 h-4" stroke={2} />Enviar petición</>}
         </Button>
       </form>
     </div>

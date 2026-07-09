@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, lazy, Suspense } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
@@ -8,10 +8,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
-import use3D from '../../components/three/use3D';
 import { useGlassPane } from '../../components/three/GlassLayerContext';
-
-const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -331,7 +328,6 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const show3D = use3D();
 
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
@@ -372,13 +368,6 @@ export default function EventsPage() {
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
       <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        {show3D && (
-          <Suspense fallback={null}>
-            <div aria-hidden className="absolute top-[4%] right-[4%] w-[260px] h-[260px] pointer-events-none opacity-90">
-              <GlassOrnament />
-            </div>
-          </Suspense>
-        )}
         <Reveal>
           <Eyebrow>Agenda</Eyebrow>
           <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>

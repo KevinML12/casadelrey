@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
@@ -8,9 +8,6 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
-import use3D from '../../components/three/use3D';
-
-const GlassOrnament = lazy(() => import('../../components/three/GlassOrnament'));
 
 const MOCK_POSTS_FALLBACK = [
   { ID: 1, title: 'El Precio del Propósito', slug: 'precio-proposito', category: 'ENSEÑANZA', excerpt: 'Descubre cómo el propósito moldea nuestra identidad.', content: '<p>Descubre cómo el propósito moldea nuestra identidad.</p>' },
@@ -222,7 +219,6 @@ export default function BlogPage() {
   const [post,    setPost]    = useState(null);
   const [loading, setLoading] = useState(true);
   const { slug } = useParams();
-  const show3D = use3D();
 
   useEffect(() => {
     setLoading(true);
@@ -264,13 +260,6 @@ export default function BlogPage() {
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
       <div className="relative z-10 pt-40 pb-16 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
-        {show3D && (
-          <Suspense fallback={null}>
-            <div aria-hidden className="absolute top-[2%] left-[6%] w-[240px] h-[240px] pointer-events-none opacity-90">
-              <GlassOrnament />
-            </div>
-          </Suspense>
-        )}
         <Reveal>
           <Eyebrow>Enseñanzas</Eyebrow>
           <h1 className="display-mega text-white mt-4 mb-4" style={{ fontSize: 'clamp(2.6rem, 7vw, 4.5rem)' }}>Blog</h1>

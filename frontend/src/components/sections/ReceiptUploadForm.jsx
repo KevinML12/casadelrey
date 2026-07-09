@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { Icon } from '../ui/Glass';
 
 const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'Agromercantil', 'Promerica', 'Citibank', 'Otro'];
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full rounded-[14px] bg-white/5 border border-white/10 px-4 py-3 text-[15px] text-white placeholder-white/40 transition-all focus:outline-none focus:bg-white/10 focus:border-white/30';
+const labelCls = 'block text-[13px] font-semibold text-white/50 mb-1.5';
 
 const EMPTY = {
   payer_name: '', payer_email: '', payer_phone: '',
@@ -56,12 +59,12 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
   };
 
   if (sent) return (
-    <div className="text-center py-10 animate-fade-in">
-      <div className="w-16 h-16 rounded-full bg-ter-con flex items-center justify-center mx-auto mb-4">
-        <span className="ms text-on-ter-con" style={{ fontSize: 32 }}>check_circle</span>
+    <div className="text-center py-10">
+      <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-4">
+        <Icon name="check" className="w-7 h-7 text-white" stroke={2.4} />
       </div>
-      <h3 className="text-title-l text-on-surf font-bold mb-2">¡Comprobante recibido!</h3>
-      <p className="text-body-s text-on-surf-var">El equipo verificará tu pago en 24-48 horas y recibirás confirmación.</p>
+      <h3 className="text-[20px] font-bold text-white mb-2">¡Comprobante recibido!</h3>
+      <p className="text-[14px] text-white/60">El equipo verificará tu pago en 24-48 horas y recibirás confirmación.</p>
     </div>
   );
 
@@ -70,33 +73,33 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
 
       {/* Datos del pagador */}
       <div className="space-y-3">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Tus datos</p>
+        <p className="text-[13px] font-semibold text-white/50">Tus datos</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Nombre completo <span className="text-err">*</span></label>
+            <label className={labelCls}>Nombre completo *</label>
             <input value={form.payer_name} onChange={set('payer_name')} className={fieldCls} placeholder="Juan García" required />
           </div>
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Teléfono</label>
+            <label className={labelCls}>Teléfono</label>
             <input value={form.payer_phone} onChange={set('payer_phone')} className={fieldCls} placeholder="+502 5555 0000" />
           </div>
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Correo electrónico</label>
+          <label className={labelCls}>Correo electrónico</label>
           <input type="email" value={form.payer_email} onChange={set('payer_email')} className={fieldCls} placeholder="correo@email.com" />
         </div>
       </div>
 
       {/* Datos del pago */}
       <div className="space-y-3">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Datos del depósito</p>
+        <p className="text-[13px] font-semibold text-white/50">Datos del depósito</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Monto depositado (Q) <span className="text-err">*</span></label>
+            <label className={labelCls}>Monto depositado (Q) *</label>
             <input type="number" min="1" step="0.01" value={form.amount} onChange={set('amount')} className={fieldCls} placeholder="0.00" required />
           </div>
           <div>
-            <label className="block text-label-l text-on-surf-var mb-1.5">Banco</label>
+            <label className={labelCls}>Banco</label>
             <select value={form.bank_name} onChange={set('bank_name')} className={fieldCls}>
               <option value="">Seleccionar banco…</option>
               {BANKS.map(b => <option key={b} value={b}>{b}</option>)}
@@ -104,45 +107,53 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
           </div>
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Número de referencia / No. de boleta</label>
+          <label className={labelCls}>Número de referencia / No. de boleta</label>
           <input value={form.reference_number} onChange={set('reference_number')} className={fieldCls} placeholder="Ej. 202600123456" />
         </div>
       </div>
 
       {/* Foto del comprobante */}
       <div>
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-3">Foto del comprobante</p>
+        <p className="text-[13px] font-semibold text-white/50 mb-3">Foto del comprobante</p>
         {form.receipt_image_url ? (
-          <div className="flex items-center gap-4 p-4 rounded-2xl border border-ter-con bg-ter-con/10">
-            <img src={form.receipt_image_url} alt="comprobante" className="h-20 w-20 object-cover rounded-xl border border-outline-var" />
+          <div className="flex items-center gap-4 p-4 rounded-[16px] liquid-glass border-white/20">
+            <img src={form.receipt_image_url} alt="comprobante" className="h-20 w-20 object-cover rounded-[10px] border border-white/10" />
             <div className="flex-1">
-              <p className="text-body-s text-on-surf font-medium flex items-center gap-1.5">
-                <span className="ms text-ter" style={{ fontSize: 16 }}>check_circle</span>
+              <p className="text-[14px] text-white font-bold flex items-center gap-1.5">
+                <Icon name="check" className="w-4 h-4" stroke={2.4} />
                 Comprobante cargado
               </p>
               <button type="button" onClick={() => setForm(p => ({ ...p, receipt_image_url: '' }))}
-                className="text-label-s text-on-surf-var hover:text-err transition-colors mt-1">
+                className="text-[12.5px] font-semibold text-white/50 hover:text-white transition-colors mt-1">
                 Cambiar foto
               </button>
             </div>
           </div>
         ) : (
-          <label className={`flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-colors ${uploading ? 'border-outline-var opacity-60' : 'border-outline-var hover:border-pri hover:bg-surf-low'}`}>
-            <span className="ms text-on-surf-var" style={{ fontSize: 40 }}>{uploading ? 'hourglass_empty' : 'add_photo_alternate'}</span>
+          <label className={`flex flex-col items-center justify-center gap-3 p-8 rounded-[16px] border-2 border-dashed border-white/15 bg-white/5 cursor-pointer transition-all ${uploading ? 'opacity-60' : 'hover:border-white/30 hover:bg-white/10'}`}>
+            <span className="grid place-items-center w-12 h-12 rounded-full bg-white/10 text-white">
+              <Icon name={uploading ? 'clock' : 'gift'} className={`w-6 h-6 ${uploading ? 'animate-spin' : ''}`} />
+            </span>
             <div className="text-center">
-              <p className="text-body-s text-on-surf font-medium">{uploading ? 'Subiendo…' : 'Toca para subir la foto'}</p>
-              <p className="text-label-s text-on-surf-var mt-0.5">JPG, PNG o PDF · máx. 10 MB</p>
+              <p className="text-[14.5px] font-bold text-white">{uploading ? 'Subiendo…' : 'Toca para subir la foto'}</p>
+              <p className="text-[12px] text-white/50 mt-0.5">JPG, PNG o PDF · máx. 10 MB</p>
             </div>
             <input type="file" accept="image/*,.pdf" className="hidden" onChange={handlePhoto} disabled={uploading} />
           </label>
         )}
       </div>
 
-      <button type="submit" disabled={submitting || uploading || !form.receipt_image_url}
-        className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-40">
-        <span className="ms" style={{ fontSize: 18 }}>{submitting ? 'hourglass_empty' : 'send'}</span>
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        type="submit"
+        disabled={submitting || uploading || !form.receipt_image_url}
+        className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg font-bold text-[15px] disabled:opacity-40"
+      >
         {submitting ? 'Enviando…' : 'Enviar comprobante'}
-      </button>
+        {!submitting && <Icon name="arrow" className="w-4 h-4" stroke={2} />}
+      </motion.button>
     </form>
   );
 }
