@@ -8,7 +8,6 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
-import { useGlassPane } from '../../components/three/GlassLayerContext';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -209,7 +208,6 @@ function RSVPModal({ event, onClose }) {
 
 function EventCard({ ev, i, isCarousel, onRsvp }) {
   const nodeRef = useRef(null);
-  useGlassPane(nodeRef, i === 0 ? 'featured' : 'standard');
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
   const dayNum   = d ? d.getDate() : null;
@@ -231,7 +229,7 @@ function EventCard({ ev, i, isCarousel, onRsvp }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={isCarousel ? undefined : { transformPerspective: 1000 }}
-      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} liquid-shine relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
     >
 
       {/* Flyer de fondo */}

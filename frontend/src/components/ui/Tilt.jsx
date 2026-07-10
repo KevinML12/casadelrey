@@ -1,25 +1,20 @@
 // ============================================================
-//  Tilt — Fase 3: la card de cristal se inclina en 3D siguiendo
-//  al cursor, con física de resorte real (framer-motion), y de
-//  paso alimenta el brillo especular (--spec-x/--spec-y) que ya
-//  usan .liquid-glass/.glass-light. NO combinar con .card-spring:
-//  esa clase transiciona transform en CSS y pelea con el resorte.
+//  Tilt — la card se inclina en 3D siguiendo al cursor, con física
+//  de resorte real (framer-motion), y de paso alimenta el brillo
+//  especular (--spec-x/--spec-y) que usan .liquid-glass/.glass-light.
+//  NO combinar con .card-spring: esa clase transiciona transform en
+//  CSS y pelea con el resorte.
 //
-//  prop `glass` ("standard" | "featured"): además del tilt CSS,
-//  registra esta card en el GlassLayer compartido — un panel de
-//  vidrio con refracción REAL (WebGL) se renderiza justo detrás,
-//  seguido en cada frame a la posición real de la card en pantalla.
-//  "featured" usa MeshTransmissionMaterial (alta calidad, pocas a
-//  la vez); "standard" usa un material nativo más barato (se puede
-//  repetir en muchas cards sin pesar). Sin desktop+puntero fino (o
-//  sea, en touch/móvil), el vidrio WebGL no existe — la misma card
-//  recibe en su lugar `.liquid-shine`, una franja de luz en CSS puro
-//  con el mismo tinte navy, para que ambos casos se sientan como el
-//  mismo material y no como dos experiencias distintas.
+//  prop `glass` (cualquier valor truthy): la card recibe además
+//  `.liquid-shine`, una franja de luz en CSS puro que barre la card
+//  en loop lento — el efecto "líquido". Es CSS 100%, se ve igual en
+//  escritorio y en móvil (antes esto montaba un canvas WebGL con
+//  refracción real, pero se veía opaco/lavado y se descartó — ver
+//  memoria "liquid glass puro"). El tilt-hover 3D sigue siendo solo
+//  para punteros finos (no tiene sentido en touch).
 // ============================================================
 import { useMemo, useRef } from 'react';
 import { motion, useSpring } from 'framer-motion';
-import { useGlassPane } from '../three/GlassLayerContext';
 
 // Sin mouse fino o con reduced-motion el tilt no existe (ni handlers)
 const FINE =
@@ -27,20 +22,13 @@ const FINE =
   matchMedia('(pointer: fine)').matches &&
   !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// El vidrio WebGL (GlassLayer) exige lo mismo que use3D(): puntero fino
-// Y pantalla ancha. Si dependiera solo de FINE, una ventana de escritorio
-// angosta tendría el tilt-hover pero registraría un panel que GlassLayer
-// nunca monta (use3D exige el ancho) — un limbo a medias. Con este check
-// separado, esa misma ventana angosta cae limpio al shine CSS.
-const WANTS_3D = FINE && typeof window !== 'undefined' && matchMedia('(min-width: 1024px)').matches;
-
 const SPRING = { stiffness: 260, damping: 20, mass: 0.7 };
 
 /**
  * @param {string} as         — componente a renderizar (p.ej. Link); default div
  * @param {number} max        — grados máximos de inclinación
  * @param {number} hoverScale — escala al hacer hover
- * @param {string} glass      — "standard" | "featured" — vidrio WebGL real detrás
+ * @param {*}      glass      — truthy → agrega el brillo líquido `.liquid-shine`
  */
 export default function Tilt({
   as,
@@ -56,15 +44,12 @@ export default function Tilt({
   const rx = useSpring(0, SPRING);
   const ry = useSpring(0, SPRING);
   const nodeRef = useRef(null);
-  // Solo se registra en el GlassLayer si de verdad va a montarse un
-  // canvas para dibujarlo (WANTS_3D) — nunca con solo FINE.
-  useGlassPane(nodeRef, WANTS_3D ? glass : false);
   // Delay aleatorio (pero estable) por card: si varias tienen shine en
   // pantalla a la vez, que no brillen todas al unísono — se ve más
   // orgánico/líquido y menos "efecto de plantilla".
   const shineDelay = useMemo(() => `${(Math.random() * 4).toFixed(2)}s`, []);
-  const shineCls = glass && !WANTS_3D ? ' liquid-shine' : '';
-  const shineStyle = glass && !WANTS_3D ? { '--shine-delay': shineDelay } : {};
+  const shineCls = glass ? ' liquid-shine' : '';
+  const shineStyle = glass ? { '--shine-delay': shineDelay } : {};
 
   if (!FINE) {
     return (
