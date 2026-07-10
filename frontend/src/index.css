@@ -212,23 +212,36 @@ html.lenis, html.lenis body { height: auto; }
      que es lo que da la lectura de "vidrio curvo" del material de Apple. */
 
   .liquid-glass {
-    background: rgba(255, 255, 255, 0.03);
-    /* blur bajo (8px, antes 24px): el vidrio queda casi transparente y la
-       foto de fondo se lee, apenas suavizada — no un vidrio esmerilado. */
-    -webkit-backdrop-filter: blur(8px) saturate(150%);
-            backdrop-filter: blur(8px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    /* Vidrio real, casi transparente. El realismo NO viene de opacar el
+       fondo (foto sigue legible, blur bajo 8px) sino del MODELADO de la
+       luz en un cristal grueso, todo con box-shadow:
+        · bisel: luz en el borde arriba-izq, sombra abajo-der → espesor
+        · realce celeste inferior: como el agua/vidrio concentra la luz en
+          su borde de abajo (el detalle que lo hace leer como "gota")
+        · hairline superior: filo brillante donde pega la luz
+        · sombra externa: lo despega del fondo, flota */
+    background: linear-gradient(157deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 55%, rgba(255,255,255,0.012) 100%);
+    -webkit-backdrop-filter: blur(8px) saturate(155%) brightness(1.05);
+            backdrop-filter: blur(8px) saturate(155%) brightness(1.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.05),
-      0 8px 32px -4px rgba(0, 0, 0, 0.25);
-    transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+      inset 1.5px 2px 4px rgba(255, 255, 255, 0.22),
+      inset -1.5px -2px 8px rgba(255, 255, 255, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -24px 36px -26px rgba(127, 169, 240, 0.42),
+      0 24px 50px -20px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
     position: relative;
     overflow: hidden;
   }
   .liquid-glass:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.20);
+    box-shadow:
+      inset 1.5px 2px 4px rgba(255, 255, 255, 0.28),
+      inset -1.5px -2px 8px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -26px 40px -26px rgba(127, 169, 240, 0.5),
+      0 30px 60px -22px rgba(0, 0, 0, 0.55);
   }
 
   .glass-light {
@@ -271,9 +284,9 @@ html.lenis, html.lenis body { height: auto; }
     border-radius: inherit;
     pointer-events: none;
     background: radial-gradient(
-      260px circle at var(--spec-x, 50%) var(--spec-y, 0%),
-      rgba(255, 255, 255, 0.12),
-      transparent 65%
+      300px circle at var(--spec-x, 50%) var(--spec-y, 0%),
+      rgba(255, 255, 255, 0.20),
+      transparent 62%
     );
     opacity: 0;
     transition: opacity 0.5s var(--ease-out);
@@ -288,12 +301,12 @@ html.lenis, html.lenis body { height: auto; }
   .liquid-glass:hover::after,
   .glass-light:hover::after { opacity: 1; }
 
-  /* Brillo líquido animado — el efecto "vidrio líquido" de las cards
-     con `glass`: sin cursor que lo dispare, una franja de luz recorre
-     la card sola, en loop lento (Tilt le pone un --shine-delay al azar
-     por card para que no barran todas al unísono). Es 100% CSS, igual
-     en escritorio y móvil. Se apaga solo con prefers-reduced-motion
-     (regla global más abajo). */
+  /* Reflejo de vidrio FIJO (antes barría en loop — se leía como flash de
+     plantilla/IA). Ahora es una franja de luz diagonal estática en la
+     esquina superior, como el reflejo de una ventana sobre el cristal:
+     da vida sin animar solo. El vidrio es calmo y reacciona a la
+     interacción (specular al cursor + tilt), no anima por su cuenta —
+     mismo principio que el material de Apple. */
   .liquid-shine {
     position: relative;
     overflow: hidden;
@@ -301,25 +314,18 @@ html.lenis, html.lenis body { height: auto; }
   .liquid-shine::before {
     content: '';
     position: absolute;
-    inset: -40%;
+    top: -30%; left: -10%; right: 40%; bottom: 40%;
     pointer-events: none;
     background: linear-gradient(
-      115deg,
-      transparent 35%,
-      rgba(127, 169, 240, 0.16) 47%,
-      rgba(255, 255, 255, 0.22) 50%,
-      rgba(127, 169, 240, 0.16) 53%,
-      transparent 65%
+      125deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 35%,
+      transparent 62%
     );
-    transform: translateX(-100%);
-    animation: liquid-shine-sweep 5.5s ease-in-out infinite;
-    animation-delay: var(--shine-delay, 0s);
+    opacity: 0.7;
+    transition: opacity 0.4s var(--ease-out);
   }
-  @keyframes liquid-shine-sweep {
-    0%, 15%   { transform: translateX(-120%); }
-    50%, 65%  { transform: translateX(0%); }
-    100%      { transform: translateX(120%); }
-  }
+  .liquid-shine:hover::before { opacity: 1; }
 
   /* Surface sólida elevada (no translúcida) */
   .surface {
