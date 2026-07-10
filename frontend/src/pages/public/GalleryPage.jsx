@@ -1,35 +1,44 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// ============================================================
+//  GalleryPage — hero de fondo + álbumes como recortes de cristal en
+//  COLLAGE. Al abrir un álbum, sus fotos aparecen en una VENTANA
+//  sobrepuesta (WindowStack); los demás álbumes asoman apilados detrás
+//  y se salta entre ellos. Lenguaje de diseño: docs/DISENO_LIQUID_GLASS.md
+// ============================================================
+import { useEffect, useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import WindowStack from '../../components/ui/WindowStack';
 
-// Alturas variables para el masonry — determinístico por índice (no
-// random en cada render) para que el layout no "salte" al re-montar.
-const MASONRY_H = ['h-[280px]', 'h-[360px]', 'h-[320px]', 'h-[400px]', 'h-[300px]'];
+// Collage: tamaños/inclinaciones variados que se repiten por índice.
+// grid-auto-flow: dense rellena los huecos → recortes sin espacios.
+const SPANS = [
+  'col-span-2 row-span-2', 'col-span-1 row-span-1', 'col-span-1 row-span-1',
+  'col-span-2 row-span-1', 'col-span-1 row-span-2', 'col-span-1 row-span-1',
+];
+const ROT = [-2.2, 1.8, -1.4, 2.4, -2.6, 1.2];
 
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openKey, setOpenKey] = useState(null);
 
-  const [selectedAlbum, setSelectedAlbum] = useState(null);
-  const [visibleCount, setVisibleCount] = useState(12);
-
-  // Agrupar fotos de la galería por álbum (nombre de la carpeta extraído del título)
   const albums = useMemo(() => {
     const grouped = {};
     gallery.forEach(photo => {
-      let albumName = "Otros";
-      if (photo.title && photo.title.includes(" - ")) {
-        albumName = photo.title.split(" - ")[0].trim();
-      }
-      if (!grouped[albumName]) grouped[albumName] = [];
-      grouped[albumName].push(photo);
+      let name = 'Otros';
+      if (photo.title && photo.title.includes(' - ')) name = photo.title.split(' - ')[0].trim();
+      (grouped[name] ||= []).push(photo);
     });
-    return grouped;
+    return Object.entries(grouped).map(([name, photos]) => ({ name, photos }));
   }, [gallery]);
+
+  const windowItems = useMemo(
+    () => albums.map(a => ({ key: a.name, image: a.photos[0]?.url, badge: `${a.photos.length} fotos`, title: a.name })),
+    [albums]
+  );
 
   useEffect(() => {
     apiClient.get('/gallery/')
@@ -45,137 +54,88 @@ export default function GalleryPage() {
   );
 
   return (
-    <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      {/* Corte diagonal: la foto del hero termina en un quiebre, no en
-          una línea recta — rompe la sensación de "ventana tras ventana" */}
-      <div
-        className="absolute top-0 inset-x-0 h-[560px] overflow-hidden"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 82%, 0 100%)' }}
-      >
-        <ParallaxImg src="/images/bg-eventos.jpg" alt="Galería" className="opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/40" />
-      </div>
+    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+      {/* Hero de fondo presente en toda la página */}
+      <ParallaxImg src="/images/bg-galeria.jpg" alt="" className="opacity-45" />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
 
-      <div className="relative z-10 pt-32 pb-16 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        <Reveal>
-          <Eyebrow>Momentos vivos</Eyebrow>
-          <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>GALERÍA</h1>
-          <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
-            Momentos capturados de lo que Dios está haciendo en nuestra casa.
-          </p>
-        </Reveal>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pb-32 w-full flex-1">
-        {gallery.length === 0 ? (
-          <div className="py-32 flex flex-col items-center gap-5">
-            <p className="font-bold leading-[1.05] tracking-[-0.02em] text-center whitespace-pre-line text-white/50"
-              style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
-              {'Sin fotos\npublicadas aún.'}
+      <div className="relative z-10">
+        <section className="pt-40 pb-8 max-w-6xl mx-auto px-6">
+          <Reveal>
+            <Eyebrow>Momentos vivos</Eyebrow>
+            <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}>
+              Galería
+            </h1>
+            <p className="mt-6 text-[18px] text-white/70 max-w-2xl">
+              Lo que Dios está haciendo en nuestra casa. Abre un álbum y recórrelo.
             </p>
-          </div>
-        ) : (
-          /* Masonry real (CSS columns): alturas variables, ritmo visual
-             en vez de la cuadrícula pareja de antes */
-          <RevealList className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 [column-fill:_balance]">
-            {Object.entries(albums).map(([albumName, photos], i) => (
-              <RevealItem key={albumName} depth className="mb-6 break-inside-avoid">
-              <Tilt
-                max={5}
-                glass="standard"
-                onClick={() => { setSelectedAlbum({ name: albumName, photos }); setVisibleCount(12); }}
-                className={`w-full ${MASONRY_H[i % MASONRY_H.length]} rounded-[24px] overflow-hidden relative group cursor-pointer liquid-glass hover:border-white/25`}
-              >
-                <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
+          </Reveal>
+        </section>
 
-                <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
-                  <div>
-                    <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
-                    <p className="text-white/60 text-[13px] font-medium mt-1">{photos.length} fotografías</p>
-                  </div>
-                  <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/70 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0 backdrop-blur-md">
-                    <Icon name="arrow" className="w-4 h-4" />
-                  </div>
-                </div>
-              </Tilt>
-              </RevealItem>
-            ))}
-          </RevealList>
-        )}
+        <section className="max-w-6xl mx-auto px-6 pt-6 pb-28">
+          {albums.length === 0 ? (
+            <div className="py-24 text-center">
+              <p className="font-bold text-white/50" style={{ fontSize: 'clamp(24px,4vw,36px)' }}>
+                Sin fotos publicadas aún.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
+              {albums.map((a, i) => {
+                const big = SPANS[i % SPANS.length].includes('row-span-2');
+                return (
+                  <motion.button
+                    key={a.name}
+                    onClick={() => setOpenKey(a.name)}
+                    initial={{ opacity: 0, y: 24, rotate: ROT[i % ROT.length] }}
+                    whileInView={{ opacity: 1, y: 0, rotate: ROT[i % ROT.length] }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
+                    whileHover={{ rotate: 0, scale: 1.05, y: -6, zIndex: 30 }}
+                    className={`liquid-glass liquid-shine group relative ${SPANS[i % SPANS.length]} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
+                    style={{ transformOrigin: 'center' }}
+                  >
+                    <img src={a.photos[0]?.url} alt="" loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
+                    <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
+                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                        {a.photos.length} fotos
+                      </span>
+                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[24px] sm:text-[30px]' : 'text-[16px] sm:text-[18px]'}`}>
+                        {a.name}
+                      </h3>
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
 
-      {/* Album Modal (Ventana emergente de la Galería) */}
-      <AnimatePresence>
-        {selectedAlbum && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-          >
-            {/* Fondo desenfocado */}
-            <div className="absolute inset-0 bg-bg/90 backdrop-blur-xl" onClick={() => setSelectedAlbum(null)} />
-            
-            {/* Contenedor principal del modal */}
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              className="relative w-full max-w-6xl max-h-[90vh] liquid-glass rounded-[32px] overflow-hidden flex flex-col"
-            >
-              {/* Encabezado fijo */}
-              <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center shrink-0">
-                <div>
-                  <h3 className="text-2xl font-bold text-white">{selectedAlbum.name}</h3>
-                  <p className="text-white/50 text-sm font-medium">{selectedAlbum.photos.length} fotografías</p>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.92 }}
-                  onClick={() => setSelectedAlbum(null)}
-                  className="w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
-                >
-                  <Icon name="close" className="w-4 h-4" />
-                </motion.button>
-              </div>
-
-              {/* Cuadrícula de fotos con scroll */}
-              <div className="p-8 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                  {selectedAlbum.photos.slice(0, visibleCount).map((photo, idx) => (
-                    <RevealItem key={photo.ID} depth>
-                    <Tilt max={6} className="rounded-[16px] overflow-hidden aspect-[4/5] relative group liquid-glass block">
-                      <img src={photo.url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <Icon name="search" className="w-6 h-6 text-white" />
-                      </div>
-                    </Tilt>
-                    </RevealItem>
-                  ))}
-                </RevealList>
-
-                {/* Botón Cargar Más */}
-                {visibleCount < selectedAlbum.photos.length && (
-                  <div className="flex justify-center mt-10">
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.94 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                      onClick={() => setVisibleCount(prev => prev + 12)}
-                      className="px-8 py-3.5 rounded-pill liquid-glass text-white font-bold flex items-center gap-2"
-                    >
-                      Cargar más fotos
-                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
-                    </motion.button>
+      {/* ═══════ VENTANAS SOBREPUESTAS ═══════ */}
+      <WindowStack
+        items={windowItems}
+        openKey={openKey}
+        onChange={setOpenKey}
+        renderContent={(it) => {
+          const a = albums.find(al => al.name === it.key);
+          if (!a) return null;
+          return (
+            <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+              {a.photos.map((photo, idx) => (
+                <RevealItem key={photo.ID ?? idx}>
+                  <div className="rounded-[14px] overflow-hidden aspect-[4/5] relative group liquid-glass">
+                    <img src={photo.url} alt={`Foto ${idx + 1}`} loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                </RevealItem>
+              ))}
+            </RevealList>
+          );
+        }}
+      />
     </main>
   );
 }

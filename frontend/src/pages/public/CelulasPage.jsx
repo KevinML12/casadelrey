@@ -12,12 +12,13 @@
 //  CONTEXTO_IGLESIA). API-first (GET /cells + /cell-categories) con
 //  fallback del directorio real jul-2026 en su versión segura.
 // ============================================================
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import WindowStack from '../../components/ui/WindowStack';
 import { useApi } from '../../lib/feed';
 
 const GROUPS_FALLBACK = [
@@ -83,17 +84,6 @@ const COLLAGE = [
   { span: 'col-span-1 row-span-1', rot: 2.0,  y: -4 },
 ];
 
-// Posición de cada ventana en la PILA según su profundidad (0 = frente).
-// Las de atrás asoman arriba, alternando el lado, como cartas apiladas.
-const stackPose = (depth) => ({
-  scale: 1 - depth * 0.055,
-  y: -depth * 16,
-  x: (depth % 2 === 0 ? 1 : -1) * depth * 12,
-  rotate: (depth % 2 === 0 ? -1 : 1) * depth * 1.6,
-  opacity: depth > 3 ? 0 : 1 - depth * 0.16,
-  zIndex: 50 - depth,
-});
-
 export default function CelulasPage() {
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
@@ -125,41 +115,11 @@ export default function CelulasPage() {
     if (hit) setOpenKey(hit.key);
   }, [params, groups]);
 
-  // La pila: el tipo abierto al frente, los demás detrás en orden.
-  const stack = useMemo(() => {
-    if (!openKey) return [];
-    const idx = groups.findIndex(g => g.key === openKey);
-    if (idx < 0) return [];
-    return [...groups.slice(idx), ...groups.slice(0, idx)]; // rota para que el activo quede primero
-  }, [openKey, groups]);
-
-  const close = useCallback(() => setOpenKey(null), []);
-  const goNext = useCallback(() => {
-    setOpenKey(k => {
-      const i = groups.findIndex(g => g.key === k);
-      return groups[(i + 1) % groups.length].key;
-    });
-  }, [groups]);
-  const goPrev = useCallback(() => {
-    setOpenKey(k => {
-      const i = groups.findIndex(g => g.key === k);
-      return groups[(i - 1 + groups.length) % groups.length].key;
-    });
-  }, [groups]);
-
-  // Teclado + bloqueo de scroll del fondo mientras hay ventana abierta
-  useEffect(() => {
-    if (!openKey) return;
-    const onKey = (e) => {
-      if (e.key === 'Escape') close();
-      else if (e.key === 'ArrowRight') goNext();
-      else if (e.key === 'ArrowLeft') goPrev();
-    };
-    window.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = prevOverflow; };
-  }, [openKey, close, goNext, goPrev]);
+  // Ítems para la pila de ventanas (WindowStack)
+  const windowItems = useMemo(
+    () => groups.map(g => ({ key: g.key, image: g.image, badge: g.age, title: g.name })),
+    [groups]
+  );
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
@@ -245,115 +205,51 @@ export default function CelulasPage() {
       </div>
 
       {/* ═══════ VENTANAS SOBREPUESTAS ═══════ */}
-      <AnimatePresence>
-        {openKey && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Backdrop que oscurece y difumina TODO el fondo */}
-            <motion.div
-              className="absolute inset-0 bg-bg/60"
-              style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
-              onClick={close}
-            />
-
-            {/* Cerrar */}
-            <motion.button
-              onClick={close}
-              whileHover={{ scale: 1.08, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Cerrar"
-              className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-white/80 hover:text-white"
-            >
-              <Icon name="close" className="w-5 h-5" />
-            </motion.button>
-
-            {/* La pila de ventanas */}
-            <div className="relative w-full max-w-[760px] h-[min(80vh,640px)]" style={{ perspective: 1400 }}>
-              {stack.map((g, depth) => {
-                const pose = stackPose(depth);
-                const isFront = depth === 0;
-                return (
-                  <motion.div
-                    key={g.key}
-                    layout
-                    initial={false}
-                    animate={pose}
-                    transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-                    onClick={() => !isFront && setOpenKey(g.key)}
-                    className={`absolute inset-0 liquid-glass rounded-[28px] overflow-hidden ${isFront ? '' : 'cursor-pointer'}`}
-                    style={{ transformOrigin: 'top center', pointerEvents: depth > 3 ? 'none' : 'auto' }}
+      <WindowStack
+        items={windowItems}
+        openKey={openKey}
+        onChange={setOpenKey}
+        renderContent={(it) => {
+          const g = groups.find(gr => gr.key === it.key);
+          if (!g) return null;
+          return (
+            <>
+              <p className="text-[13px] font-semibold text-white/55 mb-4">
+                {g.cells.length} {g.cells.length === 1 ? 'célula activa' : 'células activas'}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {g.cells.map((c, i) => (
+                  <motion.a
+                    key={`${c.name}-${i}`}
+                    href={`https://wa.me/?text=${encodeURIComponent(`Hola, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    aria-label={`Unirme a la célula ${c.name}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.06 + i * 0.035 }}
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    className="liquid-glass liquid-shine group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
                   >
-                    {/* Banner de la ventana */}
-                    <div className="relative h-32 sm:h-40 shrink-0">
-                      <img src={g.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-70" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A1526] via-[#0A1526]/50 to-transparent" />
-                      <div className="absolute bottom-0 left-0 p-5 sm:p-6">
-                        <span className="bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold backdrop-blur-md">
-                          {g.age}
-                        </span>
-                        <h2 className="text-[26px] sm:text-[32px] font-bold text-white tracking-tight mt-2 leading-none">{g.name}</h2>
-                      </div>
+                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
+                      <Icon name="users" className="w-5 h-5" />
                     </div>
-
-                    {/* Galería de células (solo interactiva en la del frente) */}
-                    {isFront && (
-                      <div className="p-5 sm:p-6 overflow-y-auto" style={{ maxHeight: 'calc(min(80vh,640px) - 160px)' }}>
-                        <div className="flex items-center justify-between mb-4">
-                          <p className="text-[13px] font-semibold text-white/55">
-                            {g.cells.length} {g.cells.length === 1 ? 'célula activa' : 'células activas'}
-                          </p>
-                          <div className="flex gap-1.5">
-                            {groups.map(gr => (
-                              <button
-                                key={gr.key}
-                                onClick={() => setOpenKey(gr.key)}
-                                aria-label={gr.name}
-                                className={`h-1.5 rounded-full transition-all ${gr.key === openKey ? 'w-6 bg-white' : 'w-1.5 bg-white/30 hover:bg-white/60'}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                          {g.cells.map((c, i) => (
-                            <motion.a
-                              key={`${c.name}-${i}`}
-                              href={`https://wa.me/?text=${encodeURIComponent(`Hola, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`)}`}
-                              target="_blank" rel="noopener noreferrer"
-                              aria-label={`Unirme a la célula ${c.name}`}
-                              initial={{ opacity: 0, y: 12 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.06 + i * 0.035 }}
-                              whileHover={{ y: -3, scale: 1.02 }}
-                              className="liquid-glass liquid-shine group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
-                                <Icon name="users" className="w-5 h-5" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-[15px] font-bold text-white leading-tight truncate">{c.name}</p>
-                                <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">{c.leader}</p>
-                              </div>
-                              <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
-                                {c.zone}
-                              </span>
-                              <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
-                                <Icon name="arrow" className="w-4 h-4" />
-                              </span>
-                            </motion.a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-bold text-white leading-tight truncate">{c.name}</p>
+                      <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">{c.leader}</p>
+                    </div>
+                    <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
+                      {c.zone}
+                    </span>
+                    <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
+                      <Icon name="arrow" className="w-4 h-4" />
+                    </span>
+                  </motion.a>
+                ))}
+              </div>
+            </>
+          );
+        }}
+      />
     </main>
   );
 }
