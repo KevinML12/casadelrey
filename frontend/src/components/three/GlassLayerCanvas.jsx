@@ -9,24 +9,23 @@
 // ============================================================
 import { useRef, useEffect, useState, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MeshTransmissionMaterial, Environment, RoundedBox } from '@react-three/drei';
+import { Environment, RoundedBox } from '@react-three/drei';
 import { useGlassLayer } from './GlassLayerContext';
 import use3D from './use3D';
 
-// El material de transmisión SOLO puede refractar lo que esté DENTRO
-// de esta misma escena three.js — nunca el HTML de atrás. Con un
-// Environment brillante (el "city" original: cielo diurno) el vidrio
-// se veía blanco lavado. Con "night" alcanza para evitar eso, pero la
-// primera pasada bajó tanto la transmisión/distancia de atenuación que
-// se fue al otro extremo: una tarjeta navy casi sólida, sin lectura de
-// vidrio. Aquí: transmisión y distancia de atenuación más altas (más
-// "ve a través"), atenuación un toque más clara — sigue sin blanquearse
-// porque el environment de fondo sigue siendo oscuro.
-const FEATURED_PROPS = {
-  thickness: 1.1, roughness: 0.1, transmission: 0.94, ior: 1.4,
-  chromaticAberration: 0.035, anisotropy: 0.2, distortion: 0.14,
-  distortionScale: 0.28, temporalDistortion: 0.12,
-  color: '#3D6EC2', attenuationColor: '#12306E', attenuationDistance: 1.4,
+// CLAVE (lección de las 3 pasadas anteriores): un material de TRANSMISIÓN
+// sólo refracta lo que está DENTRO de la escena three.js (el Environment)
+// — NUNCA la foto del DOM detrás del canvas. Por eso, por más que se
+// ajustara el tinte, el panel SIEMPRE se veía como una caja de color
+// opaca: estaba refractando el cielo "night", no la foto de fondo.
+// Para que el vidrio sea DE VERDAD transparente y deje ver la foto,
+// usamos material físico SEMITRANSPARENTE (transparent + opacity baja):
+// el alpha del canvas deja pasar la foto real que está detrás (z menor),
+// y el backdrop-filter del CSS de la card la difumina como cristal
+// líquido. clearcoat = el brillo especular que corre por el borde.
+const GLASS = {
+  standard: { opacity: 0.13, color: '#5A86D0', roughness: 0.16, clearcoatRoughness: 0.16, ior: 1.42 },
+  featured: { opacity: 0.19, color: '#6A93DC', roughness: 0.09, clearcoatRoughness: 0.09, ior: 1.5 },
 };
 
 // Cámara ortográfica: actualiza el frustum al tamaño real de la
@@ -65,30 +64,27 @@ function Pane({ el, variant }) {
   });
 
   const radius = 0.16; // proporción del lado corto, RoundedBox la escala con el mesh
+  const p = GLASS[variant === 'featured' ? 'featured' : 'standard'];
 
   return (
     <mesh ref={ref}>
       <RoundedBox args={[1, 1, 0.06]} radius={radius} smoothness={3} />
-      {variant === 'featured' ? (
-        <MeshTransmissionMaterial {...FEATURED_PROPS} />
-      ) : (
-        // Variante liviana: material nativo de three.js (una sola pasada,
-        // sin las muestras extra de MeshTransmissionMaterial) — barato de
-        // repetir en muchas cards a la vez. clearcoat = el brillo de
-        // "gotita" en el borde, transmission bajo = domina el tinte
-        // navy en vez de verse como una ventana en blanco.
-        <meshPhysicalMaterial
-          transmission={0.9}
-          thickness={0.8}
-          roughness={0.16}
-          ior={1.3}
-          color="#2E5CA8"
-          attenuationColor="#12306E"
-          attenuationDistance={1.3}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-        />
-      )}
+      {/* Semitransparente (NO transmission): deja ver la foto de fondo por
+          el alpha del canvas. clearcoat aporta el glint especular movible.
+          depthWrite=false para que los paneles semitransparentes no se
+          recorten mal entre sí al superponerse. */}
+      <meshPhysicalMaterial
+        transparent
+        opacity={p.opacity}
+        color={p.color}
+        roughness={p.roughness}
+        metalness={0}
+        ior={p.ior}
+        reflectivity={0.5}
+        clearcoat={1}
+        clearcoatRoughness={p.clearcoatRoughness}
+        depthWrite={false}
+      />
     </mesh>
   );
 }
@@ -96,12 +92,13 @@ function Pane({ el, variant }) {
 function Scene({ items }) {
   return (
     <>
-      <ambientLight intensity={0.35} />
-      {/* Luz puntual desde arriba-frente: crea el brillo especular de
-          "gotita" en el borde superior del panel, en vez de depender
-          solo del environment para las reflexiones */}
-      <directionalLight position={[0, 8, 10]} intensity={1.4} />
-      <directionalLight position={[-4, -2, 6]} intensity={0.4} color="#7FA9F0" />
+      <ambientLight intensity={0.4} />
+      {/* Luz direccional arriba-frente: el glint especular que corre por el
+          borde superior del panel al hacer scroll. La segunda, celeste y
+          floja, tinta apenas el lado opuesto. Intensidades bajas: con el
+          material casi transparente, mucha luz sólo lo lava a gris. */}
+      <directionalLight position={[3, 6, 8]} intensity={1.05} />
+      <directionalLight position={[-5, -3, 5]} intensity={0.5} color="#8FB4F5" />
       <Environment preset="night" resolution={64} background={false} />
       {items.map(({ id, el, variant }) => <Pane key={id} el={el} variant={variant} />)}
     </>
