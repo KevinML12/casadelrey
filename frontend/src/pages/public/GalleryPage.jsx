@@ -20,6 +20,25 @@ const SPANS = [
 ];
 const ROT = [-2.2, 1.8, -1.4, 2.4, -2.6, 1.2];
 
+// Apartados CURADOS (fotos reales de la iglesia, DOMINGOS 2026) — el
+// módulo siempre tiene contenido con cara propia, no depende solo de lo
+// que suba el admin. Se combinan con los álbumes de la API (más abajo).
+const LOCAL_APARTADOS = [
+  { name: 'Alabanza',  slug: 'alabanza',  count: 8 },
+  { name: 'Danza',     slug: 'danza',     count: 8 },
+  { name: 'Niños',     slug: 'ninos',     count: 8 },
+  { name: 'Miembros',  slug: 'miembros',  count: 8 },
+  { name: 'Jóvenes',   slug: 'jovenes',   count: 8 },
+  { name: 'Mujeres',   slug: 'mujeres',   count: 8 },
+  { name: 'Liderazgo', slug: 'liderazgo', count: 7 },
+].map(a => ({
+  name: a.name,
+  photos: Array.from({ length: a.count }, (_, i) => ({
+    ID: `${a.slug}-${i}`,
+    url: `/images/gallery/${a.slug}/${i + 1}.jpg`,
+  })),
+}));
+
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +51,16 @@ export default function GalleryPage() {
       if (photo.title && photo.title.includes(' - ')) name = photo.title.split(' - ')[0].trim();
       (grouped[name] ||= []).push(photo);
     });
-    return Object.entries(grouped).map(([name, photos]) => ({ name, photos }));
+    const apiAlbums = Object.entries(grouped).map(([name, photos]) => ({ name, photos }));
+    // Los apartados curados van siempre; si el admin sube un álbum con el
+    // mismo nombre (p.ej. otra tanda de "Danza"), sus fotos se suman a las
+    // curadas en vez de crear un álbum duplicado.
+    const merged = LOCAL_APARTADOS.map(local => {
+      const fromApi = apiAlbums.find(a => a.name.toLowerCase() === local.name.toLowerCase());
+      return fromApi ? { name: local.name, photos: [...local.photos, ...fromApi.photos] } : local;
+    });
+    const extra = apiAlbums.filter(a => !LOCAL_APARTADOS.some(l => l.name.toLowerCase() === a.name.toLowerCase()));
+    return [...merged, ...extra];
   }, [gallery]);
 
   const windowItems = useMemo(
