@@ -19,7 +19,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
-import { useApi } from '../../lib/feed';
+import { useApi, useSitePhoto } from '../../lib/feed';
 
 const GROUPS_FALLBACK = [
   {
@@ -85,6 +85,7 @@ const COLLAGE = [
 ];
 
 export default function CelulasPage() {
+  const heroImg = useSitePhoto('hero_celulas', '/images/bg-ministerios.jpg');
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');
@@ -124,7 +125,7 @@ export default function CelulasPage() {
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
       {/* Hero de fondo presente en toda la página */}
-      <ParallaxImg src="/images/bg-ministerios.jpg" alt="" className="opacity-45" />
+      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
       <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
 
       <div className="relative z-10">

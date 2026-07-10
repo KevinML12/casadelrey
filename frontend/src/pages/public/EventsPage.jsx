@@ -8,6 +8,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import { useSitePhoto } from '../../lib/feed';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -323,6 +324,7 @@ function ModalWrapper({ children, onClose }) {
 }
 
 export default function EventsPage() {
+  const heroImg = useSitePhoto('hero_eventos', '/images/bg-eventos.jpg');
   const [events, setEvents] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -362,7 +364,7 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      <ParallaxImg src="/images/bg-eventos.jpg" alt="Eventos" className="opacity-25" />
+      <ParallaxImg src={heroImg} alt="Eventos" className="opacity-25" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
 
       <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">

@@ -11,6 +11,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
+import { useSitePhoto } from '../../lib/feed';
 
 // Collage: tamaños/inclinaciones variados que se repiten por índice.
 // grid-auto-flow: dense rellena los huecos → recortes sin espacios.
@@ -21,6 +22,7 @@ const SPANS = [
 const ROT = [-2.2, 1.8, -1.4, 2.4, -2.6, 1.2];
 
 export default function GalleryPage() {
+  const heroImg = useSitePhoto('hero_galeria', '/images/bg-galeria.jpg');
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openKey, setOpenKey] = useState(null);
@@ -63,7 +65,7 @@ export default function GalleryPage() {
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
       {/* Hero de fondo presente en toda la página */}
-      <ParallaxImg src="/images/bg-galeria.jpg" alt="" className="opacity-45" />
+      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
       <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
 
       <div className="relative z-10">

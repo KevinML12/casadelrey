@@ -26,6 +26,10 @@ var knownSlots = []struct{ Key, Label string }{
 	{"about_servidores", "Nosotros — Misión y visión"},
 	{"about_comunidad", "Nosotros — Comunidad"},
 	{"about_lideres", "Nosotros — Encuentra tu célula"},
+	{"hero_blog", "Blog — Fondo del encabezado"},
+	{"hero_galeria", "Galería — Fondo del encabezado"},
+	{"hero_celulas", "Células — Fondo del encabezado"},
+	{"hero_eventos", "Eventos — Fondo del encabezado"},
 }
 
 // GetSitePhotos GET /api/v1/site-photos — público, solo los slots con foto.
