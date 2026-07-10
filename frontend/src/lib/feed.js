@@ -71,7 +71,7 @@ export function useSitePhoto(key, fallback) {
  * Sin API (o galería vacía) quedan los fondos locales de siempre.
  */
 export function useBackdrops() {
-  const gallery = useApi('/gallery/');
+  const gallery = useApi('/gallery/?limit=200');
   const [backdrops, setBackdrops] = useState(LOCAL_FALLBACKS);
 
   useEffect(() => {

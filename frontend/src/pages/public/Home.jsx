@@ -963,7 +963,7 @@ const ALBUMS_FALLBACK = {
 
 function GalleryPreviewSection() {
   // Mismo fetch cacheado que usa useBackdrops — un solo GET /gallery/
-  const gallery = useApi('/gallery/');
+  const gallery = useApi('/gallery/?limit=200');
   const photos = gallery?.data || gallery;
   const albums = Array.isArray(photos) && photos.length > 0
     ? groupAlbums(photos)

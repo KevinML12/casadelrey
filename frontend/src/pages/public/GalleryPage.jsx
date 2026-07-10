@@ -20,30 +20,15 @@ const SPANS = [
 ];
 const ROT = [-2.2, 1.8, -1.4, 2.4, -2.6, 1.2];
 
-// Apartados CURADOS (fotos reales de la iglesia, DOMINGOS 2026) — el
-// módulo siempre tiene contenido con cara propia, no depende solo de lo
-// que suba el admin. Se combinan con los álbumes de la API (más abajo).
-const LOCAL_APARTADOS = [
-  { name: 'Alabanza',  slug: 'alabanza',  count: 8 },
-  { name: 'Danza',     slug: 'danza',     count: 8 },
-  { name: 'Niños',     slug: 'ninos',     count: 8 },
-  { name: 'Miembros',  slug: 'miembros',  count: 8 },
-  { name: 'Jóvenes',   slug: 'jovenes',   count: 8 },
-  { name: 'Mujeres',   slug: 'mujeres',   count: 8 },
-  { name: 'Liderazgo', slug: 'liderazgo', count: 7 },
-].map(a => ({
-  name: a.name,
-  photos: Array.from({ length: a.count }, (_, i) => ({
-    ID: `${a.slug}-${i}`,
-    url: `/images/gallery/${a.slug}/${i + 1}.jpg`,
-  })),
-}));
-
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openKey, setOpenKey] = useState(null);
 
+  // Los apartados curados (Alabanza, Danza, Niños...) ya NO viven como
+  // archivos locales — se subieron a R2 y son GalleryPhoto reales en la
+  // DB (ver backend/scripts/seed_curated_gallery), igual que cualquier
+  // foto que suba el admin. Agrupar por álbum es solo leer el título.
   const albums = useMemo(() => {
     const grouped = {};
     gallery.forEach(photo => {
@@ -51,16 +36,7 @@ export default function GalleryPage() {
       if (photo.title && photo.title.includes(' - ')) name = photo.title.split(' - ')[0].trim();
       (grouped[name] ||= []).push(photo);
     });
-    const apiAlbums = Object.entries(grouped).map(([name, photos]) => ({ name, photos }));
-    // Los apartados curados van siempre; si el admin sube un álbum con el
-    // mismo nombre (p.ej. otra tanda de "Danza"), sus fotos se suman a las
-    // curadas en vez de crear un álbum duplicado.
-    const merged = LOCAL_APARTADOS.map(local => {
-      const fromApi = apiAlbums.find(a => a.name.toLowerCase() === local.name.toLowerCase());
-      return fromApi ? { name: local.name, photos: [...local.photos, ...fromApi.photos] } : local;
-    });
-    const extra = apiAlbums.filter(a => !LOCAL_APARTADOS.some(l => l.name.toLowerCase() === a.name.toLowerCase()));
-    return [...merged, ...extra];
+    return Object.entries(grouped).map(([name, photos]) => ({ name, photos }));
   }, [gallery]);
 
   const windowItems = useMemo(
@@ -69,7 +45,10 @@ export default function GalleryPage() {
   );
 
   useEffect(() => {
-    apiClient.get('/gallery/')
+    // limit=200 (el máximo que acepta el backend): con los apartados
+    // curados ya son ~75+ fotos, el default de 20 dejaba fuera álbumes
+    // enteros (los más viejos, por created_at DESC).
+    apiClient.get('/gallery/?limit=200')
       .then(res => setGallery(res.data?.data || res.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
