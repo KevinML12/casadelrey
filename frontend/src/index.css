@@ -112,42 +112,29 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 
-/* Helvetica Neue self-hosted (woff2) — la tipografía de Apple clásica.
-   Sólo 4 pesos, con font-display:swap (no bloquea el render; mientras
-   carga, cae al system font que es casi idéntico). Medium cubre 500-600
-   y Heavy cubre 800-900 porque Helvetica Neue no trae semibold/black
-   intermedios que el sitio necesite por separado. */
+/* Arimo self-hosted (woff2 variable, subset latin, ~20KB) — clon
+   métricamente idéntico a Helvetica/Arial, licencia Apache (libre, sin
+   el problema de licencia de Helvetica Neue). UN solo archivo variable
+   cubre todo el eje de peso 400-700. font-display:swap con el system
+   stack de Apple de fallback. Ojo: Arimo NO pasa de 700 (Bold), igual
+   que Helvetica — los display en 800 se muestran en 700, que es lo
+   correcto tipográficamente. */
 @font-face {
-  font-family: 'Helvetica Neue';
-  src: url('/fonts/HelveticaNeue-Roman.woff2') format('woff2');
-  font-weight: 400; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'Helvetica Neue';
-  src: url('/fonts/HelveticaNeue-Medium.woff2') format('woff2');
-  font-weight: 500 600; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'Helvetica Neue';
-  src: url('/fonts/HelveticaNeue-Bold.woff2') format('woff2');
-  font-weight: 700; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'Helvetica Neue';
-  src: url('/fonts/HelveticaNeue-Heavy.woff2') format('woff2');
-  font-weight: 800 900; font-style: normal; font-display: swap;
+  font-family: 'Arimo';
+  src: url('/fonts/Arimo.woff2') format('woff2');
+  font-weight: 400 700; font-style: normal; font-display: swap;
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
   }
-  /* Helvetica Neue self-hosted como principal; el system stack de Apple
-     queda de fallback mientras carga (font-display:swap) o si fallara. */
+  /* Arimo (clon libre de Helvetica) como principal; el system stack de
+     Apple queda de fallback mientras carga (font-display:swap) o si fallara. */
   body {
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Arimo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
