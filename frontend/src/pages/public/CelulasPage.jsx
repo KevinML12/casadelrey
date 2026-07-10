@@ -318,12 +318,16 @@ export default function CelulasPage() {
                         </div>
                         <div className="flex flex-wrap gap-3">
                           {g.cells.map((c, i) => (
-                            <motion.div
+                            <motion.a
                               key={`${c.name}-${i}`}
+                              href={`https://wa.me/?text=${encodeURIComponent(`Hola, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`)}`}
+                              target="_blank" rel="noopener noreferrer"
+                              aria-label={`Unirme a la célula ${c.name}`}
                               initial={{ opacity: 0, y: 12 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.06 + i * 0.035 }}
-                              className="liquid-glass rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px]"
+                              whileHover={{ y: -3, scale: 1.02 }}
+                              className="liquid-glass liquid-shine group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
                             >
                               <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
                                 <Icon name="users" className="w-5 h-5" />
@@ -335,7 +339,10 @@ export default function CelulasPage() {
                               <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
                                 {c.zone}
                               </span>
-                            </motion.div>
+                              <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
+                                <Icon name="arrow" className="w-4 h-4" />
+                              </span>
+                            </motion.a>
                           ))}
                         </div>
                       </div>
