@@ -76,8 +76,8 @@ export default {
       },
 
       fontFamily: {
-        sans:    ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans:    ['Helvetica Neue', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Helvetica Neue', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         serif:   ['New York', 'Georgia', 'serif'],
         mono:    ['SF Mono', 'Cascadia Code', 'Consolas', 'Menlo', 'monospace'],
       },
