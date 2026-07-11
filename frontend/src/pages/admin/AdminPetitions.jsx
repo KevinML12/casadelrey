@@ -24,6 +24,17 @@ function EmptyState() {
   );
 }
 
+// Escapa HTML — las peticiones vienen de un formulario PÚBLICO sin
+// autenticación (POST /contact/petition): sin esto, un nombre o mensaje
+// con <script> se ejecuta en la ventana de impresión del admin (XSS
+// almacenado). Todo campo con datos del usuario pasa por aquí antes de
+// interpolarse en el HTML.
+function esc(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
 function printWeeklyPetitions(data) {
   const { petitions, week_start, week_end } = data;
   if (!petitions?.length) { toast('No hay peticiones esta semana'); return; }
@@ -34,24 +45,24 @@ function printWeeklyPetitions(data) {
     <div class="page">
       <div class="header">
         <h1>Casa del Rey</h1>
-        <p class="sub">Petición de oración — Semana ${fmtDate(week_start)} al ${fmtDate(week_end)}</p>
+        <p class="sub">Petición de oración — Semana ${esc(fmtDate(week_start))} al ${esc(fmtDate(week_end))}</p>
         <p class="num">${i + 1} / ${petitions.length}</p>
       </div>
       <div class="body">
-        <div class="field"><span class="lbl">Nombre</span><span class="val">${p.name || '—'}</span></div>
-        ${p.email    ? `<div class="field"><span class="lbl">Correo</span><span class="val">${p.email}</span></div>` : ''}
-        ${p.phone    ? `<div class="field"><span class="lbl">Teléfono</span><span class="val">${p.phone}</span></div>` : ''}
-        ${p.category ? `<div class="field"><span class="lbl">Categoría</span><span class="val">${p.category}</span></div>` : ''}
-        ${p.subject  ? `<div class="field"><span class="lbl">Asunto</span><span class="val">${p.subject}</span></div>` : ''}
+        <div class="field"><span class="lbl">Nombre</span><span class="val">${esc(p.name) || '—'}</span></div>
+        ${p.email    ? `<div class="field"><span class="lbl">Correo</span><span class="val">${esc(p.email)}</span></div>` : ''}
+        ${p.phone    ? `<div class="field"><span class="lbl">Teléfono</span><span class="val">${esc(p.phone)}</span></div>` : ''}
+        ${p.category ? `<div class="field"><span class="lbl">Categoría</span><span class="val">${esc(p.category)}</span></div>` : ''}
+        ${p.subject  ? `<div class="field"><span class="lbl">Asunto</span><span class="val">${esc(p.subject)}</span></div>` : ''}
         <div class="msg-label">Mensaje de oración</div>
-        <div class="msg">${p.message || '—'}</div>
-        <div class="date">Recibida el ${p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '—'}</div>
+        <div class="msg">${esc(p.message) || '—'}</div>
+        <div class="date">Recibida el ${p.CreatedAt ? esc(new Date(p.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })) : '—'}</div>
       </div>
     </div>
   `).join('');
 
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-    <title>Peticiones Semana ${week_start}</title>
+    <title>Peticiones Semana ${esc(week_start)}</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { font-family: Georgia, serif; color: #0a0a0a; background: white; }

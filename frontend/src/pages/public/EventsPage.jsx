@@ -10,14 +10,7 @@ import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
-
-const MOCK_EVENTS_FALLBACK = [
-  { ID: 1, title: 'Noche de Jóvenes', date: '2026-08-15', time: '19:30', location: 'Auditorio Central', requires_payment: false, cover_image: '/images/bg-hero.jpg' },
-  { ID: 2, title: 'Encuentro de Líderes', date: '2026-08-18', time: '18:00', location: 'Salón 2', requires_payment: false, cover_image: '/images/bg-eventos.jpg' },
-  { ID: 3, title: 'Retiro "Reinicio"', date: '2026-08-23', time: '08:00', location: 'Casa de campo', requires_payment: true, price_gtq: 150, payment_deadline: '2026-08-20', cover_image: '/images/bg-hero.jpg' },
-  { ID: 4, title: 'Servicio General', date: '2026-08-24', time: '10:00', location: 'Auditorio Central', requires_payment: false, cover_image: '/images/bg-eventos.jpg' }
-];
+const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-white/15 bg-white/5 text-[14px] text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all';
 
 // Datos bancarios de la iglesia (centralizado)
 const BANK_INFO = [
@@ -29,25 +22,25 @@ const BANK_INFO = [
 
 function PaymentBanner({ event }) {
   return (
-    <div className="rounded-2xl border border-outline-var bg-surf-low p-4 space-y-3 mb-4">
+    <div className="rounded-[18px] border border-white/12 bg-white/5 p-4 space-y-3 mb-4">
       <div className="flex items-center justify-between">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Evento con costo</p>
-        <span className="text-headline-s text-on-surf font-black">Q{Number(event.price_gtq).toFixed(2)}</span>
+        <p className="text-[12px] text-white/70 font-bold uppercase tracking-wide">Evento con costo</p>
+        <span className="text-[22px] text-white font-black">Q{Number(event.price_gtq).toFixed(2)}</span>
       </div>
-      <p className="text-body-s text-on-surf-var">
+      <p className="text-[13.5px] text-white/60">
         Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
       </p>
-      <div className="space-y-1.5 pt-1 border-t border-outline-var">
+      <div className="space-y-1.5 pt-1 border-t border-white/10">
         {BANK_INFO.map(({ label, value }) => (
-          <div key={label} className="flex gap-2 text-body-s">
-            <span className="text-on-surf-var w-24 shrink-0">{label}</span>
-            <span className="text-on-surf font-semibold">{value}</span>
+          <div key={label} className="flex gap-2 text-[13.5px]">
+            <span className="text-white/50 w-24 shrink-0">{label}</span>
+            <span className="text-white font-semibold">{value}</span>
           </div>
         ))}
       </div>
       {event.payment_deadline && (
-        <p className="text-label-s text-err flex items-center gap-1">
-          <span className="ms" style={{ fontSize: 14 }}>schedule</span>
+        <p className="text-[12.5px] text-rose flex items-center gap-1.5">
+          <Icon name="clock" className="w-3.5 h-3.5" />
           Fecha límite de pago: {new Date(event.payment_deadline + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
         </p>
       )}
@@ -99,13 +92,13 @@ function RSVPModal({ event, onClose }) {
   // ── Pantalla: éxito sin pago
   if (step === 'success') return (
     <ModalWrapper onClose={onClose}>
-      <div className="text-center py-6 animate-fade-in">
-        <div className="w-16 h-16 rounded-full bg-ter-con flex items-center justify-center mx-auto mb-4">
-          <span className="ms text-on-ter-con" style={{ fontSize: 32 }}>check_circle</span>
+      <div className="text-center py-6">
+        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-4">
+          <Icon name="check" className="w-7 h-7 text-white" stroke={2} />
         </div>
-        <h3 className="text-title-l text-on-surf font-bold mb-2">¡Registro confirmado!</h3>
-        <p className="text-body-s text-on-surf-var">{successMsg}</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
+        <h3 className="text-[19px] text-white font-bold mb-2">¡Registro confirmado!</h3>
+        <p className="text-[14px] text-white/60">{successMsg}</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full liquid-glass text-white text-[14px] font-semibold">
           Listo
         </button>
       </div>
@@ -115,14 +108,14 @@ function RSVPModal({ event, onClose }) {
   // ── Pantalla: registrado pero pago pendiente de verificación
   if (step === 'pending_payment') return (
     <ModalWrapper onClose={onClose}>
-      <div className="text-center py-6 animate-fade-in">
-        <div className="w-16 h-16 rounded-full bg-pri-con flex items-center justify-center mx-auto mb-4">
-          <span className="ms text-on-pri-con" style={{ fontSize: 32 }}>schedule</span>
+      <div className="text-center py-6">
+        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-4">
+          <Icon name="clock" className="w-7 h-7 text-white" />
         </div>
-        <h3 className="text-title-l text-on-surf font-bold mb-2">Registro recibido</h3>
-        <p className="text-body-s text-on-surf-var mb-1">Tu comprobante está pendiente de verificación.</p>
-        <p className="text-body-s text-on-surf-var">Recibirás confirmación cuando sea aprobado.</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
+        <h3 className="text-[19px] text-white font-bold mb-2">Registro recibido</h3>
+        <p className="text-[14px] text-white/60 mb-1">Tu comprobante está pendiente de verificación.</p>
+        <p className="text-[14px] text-white/60">Recibirás confirmación cuando sea aprobado.</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full liquid-glass text-white text-[14px] font-semibold">
           Entendido
         </button>
       </div>
@@ -132,28 +125,28 @@ function RSVPModal({ event, onClose }) {
   // ── Pantalla: necesita subir boleta primero
   if (step === 'need_payment') return (
     <ModalWrapper onClose={onClose}>
-      <div className="animate-fade-in space-y-4">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-err-con flex items-center justify-center shrink-0">
-            <span className="ms text-err" style={{ fontSize: 20 }}>receipt_long</span>
+          <div className="w-10 h-10 rounded-[14px] bg-rose/15 border border-rose/25 flex items-center justify-center shrink-0">
+            <Icon name="book" className="w-5 h-5 text-rose" />
           </div>
           <div>
-            <h3 className="text-title-s text-on-surf font-bold">Comprobante requerido</h3>
-            <p className="text-body-s text-on-surf-var">Debes pagar antes de registrarte.</p>
+            <h3 className="text-[16px] text-white font-bold">Comprobante requerido</h3>
+            <p className="text-[13.5px] text-white/60">Debes pagar antes de registrarte.</p>
           </div>
         </div>
 
         <PaymentBanner event={event} />
-        <p className="text-body-s text-on-surf-var">
+        <p className="text-[13.5px] text-white/60">
           Después de depositar, sube la foto de tu comprobante. Una vez verificado, vuelve aquí para completar tu registro.
         </p>
         <button onClick={goToReceipt}
-          className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
-          <span className="ms" style={{ fontSize: 16 }}>upload</span>
+          className="w-full flex items-center justify-center gap-2 h-11 rounded-full liquid-glass text-white text-[14px] font-semibold">
+          <Icon name="arrow" className="w-4 h-4 -rotate-90" />
           Subir mi comprobante
         </button>
         <button onClick={() => setStep('form')}
-          className="w-full h-10 rounded-xl border border-outline-var text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+          className="w-full h-10 rounded-full border border-white/15 text-[14px] text-white/60 hover:text-white hover:bg-white/5 transition-colors">
           Ya lo subí, intentar de nuevo
         </button>
       </div>
@@ -164,40 +157,40 @@ function RSVPModal({ event, onClose }) {
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-label-l text-white font-semibold uppercase tracking-widest">Confirmar asistencia</p>
-          <p className="text-body-s text-white/60 mt-0.5 truncate max-w-64">{event.title}</p>
+          <p className="text-[12px] text-white font-bold uppercase tracking-wide">Confirmar asistencia</p>
+          <p className="text-[13.5px] text-white/60 mt-0.5 truncate max-w-64">{event.title}</p>
         </div>
         <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-          <span className="ms text-white/60" style={{ fontSize: 18 }}>close</span>
+          <Icon name="close" className="w-4 h-4 text-white/60" />
         </button>
       </div>
       {event.requires_payment && <PaymentBanner event={event} />}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-label-l text-white/60 mb-1">Nombre <span className="text-rose">*</span></label>
+          <label className="block text-[12px] font-bold text-white/60 mb-1">Nombre <span className="text-rose">*</span></label>
           <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
         </div>
         <div>
-          <label className="block text-label-l text-white/60 mb-1">Correo <span className="text-rose">*</span></label>
+          <label className="block text-[12px] font-bold text-white/60 mb-1">Correo <span className="text-rose">*</span></label>
           <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="El mismo correo del comprobante" required />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-label-l text-white/60 mb-1">Teléfono</label>
+            <label className="block text-[12px] font-bold text-white/60 mb-1">Teléfono</label>
             <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" />
           </div>
           <div>
-            <label className="block text-label-l text-white/60 mb-1">Asistentes</label>
+            <label className="block text-[12px] font-bold text-white/60 mb-1">Asistentes</label>
             <input type="number" min={1} max={20} value={form.attendee_count} onChange={set('attendee_count')} className={fieldCls} />
           </div>
         </div>
         <div>
-          <label className="block text-label-l text-white/60 mb-1">Notas</label>
+          <label className="block text-[12px] font-bold text-white/60 mb-1">Notas</label>
           <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${fieldCls} resize-none`} placeholder="¿Algo que debamos saber?" />
         </div>
         <div className="flex gap-3 pt-2 border-t border-white/10">
           <Button type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
-            <span className="ms" style={{ fontSize: 16 }}>check_circle</span>
+            <Icon name="check" className="w-4 h-4" stroke={2} />
             {loading ? 'Verificando…' : event.requires_payment ? 'Verificar y registrar' : 'Confirmar asistencia'}
           </Button>
           <Button type="button" variant="text" onClick={onClose} className="text-white/60 hover:text-white">Cancelar</Button>
@@ -346,7 +339,7 @@ export default function EventsPage() {
 
   useEffect(() => {
     Promise.all([
-      apiClient.get('/events/').catch(() => ({ data: MOCK_EVENTS_FALLBACK })),
+      apiClient.get('/events/').catch(() => ({ data: [] })),
       apiClient.get('/faqs/').catch(() => ({ data: [] }))
     ])
       .then(([eventsRes, faqsRes]) => {

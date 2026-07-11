@@ -9,6 +9,7 @@
 //  panel de cristal flotante con el contenido.
 // ============================================================
 import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { Icon } from '../ui/Glass';
 import Reveal from '../ui/Reveal';
 import TTSPlayer from './TTSPlayer';
@@ -73,7 +74,10 @@ export default function ArticleReader({ post }) {
               <TTSPlayer content={post.content} />
             </div>
 
-            <div className="prose max-w-full leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content }} />
+            {/* Sanitizado: aunque el contenido lo escribe un admin/líder
+                autenticado, es la única defensa si esa cuenta se ve
+                comprometida o el editor permite pegar HTML crudo. */}
+            <div className="prose max-w-full leading-relaxed" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || '') }} />
           </div>
         </Reveal>
       </div>

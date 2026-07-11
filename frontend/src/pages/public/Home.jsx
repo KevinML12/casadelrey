@@ -666,15 +666,13 @@ function CelulasSection({ bg }) {
 // ════════════════════════════════════════════════════════════════════
 // 4 · MENSAJES (Prédicas en Liquid Glass)
 // ════════════════════════════════════════════════════════════════════
-// Fallback con fotos reales de la iglesia (DOMINGOS 2026/PASTORES)
-const SERMONS_FALLBACK = [
-  { id: 1, title: 'El Precio del Propósito', date: 'Agosto 2026', image: '/images/predicas/predica-1.jpg', to: '/blog' },
-  { id: 2, title: 'Identidad Inquebrantable', date: 'Julio 2026', image: '/images/predicas/predica-2.jpg', to: '/blog' },
-  { id: 3, title: 'Fe en la Tormenta', date: 'Junio 2026', image: '/images/predicas/predica-3.jpg', to: '/blog' },
-];
+// Sin fallback de títulos inventados: la sección solo existe si hay
+// posts reales del blog (ver `if (sermons.length === 0) return null`
+// más abajo) — mostrar "El Precio del Propósito" como si fuera un
+// sermón real cuando la API falla contradice "nada estático".
 
 function MensajesCarousel({ bg }) {
-  const [sermons, setSermons] = useState(SERMONS_FALLBACK);
+  const [sermons, setSermons] = useState([]);
 
   useEffect(() => {
     // Preview del BLOG: lo que los admins publican ahí (incluidos los
