@@ -5,11 +5,41 @@ import Input, { Textarea } from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
 
-const EMPTY = { title: '', date: '', location: '', description: '' };
+const EMPTY = {
+  title: '', date: '', time: '', location: '', description: '', cover_image: '',
+  requires_payment: false, price_gtq: '', payment_deadline: '',
+};
 
 function EventForm({ onSave, onCancel, loading }) {
   const [form, setForm] = useState(EMPTY);
+  const [uploading, setUploading] = useState(false);
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  const fieldCls = 'w-full px-3 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Solo se aceptan imágenes'); return; }
+    if (file.size > 5 * 1024 * 1024)    { toast.error('Máx 5 MB'); return; }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(p => ({ ...p, cover_image: res.data.url }));
+      toast.success('Imagen subida');
+    } catch { toast.error('Error al subir'); }
+    finally { setUploading(false); }
+  };
+
+  const handleSubmit = () => {
+    onSave({
+      ...form,
+      price_gtq: form.requires_payment ? Number(form.price_gtq) || 0 : 0,
+      payment_deadline: form.requires_payment ? form.payment_deadline : '',
+    });
+  };
 
   return (
     <div className="bg-surf-low border border-outline-var rounded-2xl p-6 mb-6 animate-fade-in">
@@ -24,10 +54,50 @@ function EventForm({ onSave, onCancel, loading }) {
           <Input label="Título *" value={form.title} onChange={set('title')} required />
           <Input label="Fecha *" type="date" value={form.date} onChange={set('date')} required />
         </div>
-        <Input label="Ubicación" value={form.location} onChange={set('location')} placeholder="Ej: Salón Principal" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input label="Hora" type="time" value={form.time} onChange={set('time')} />
+          <Input label="Ubicación" value={form.location} onChange={set('location')} placeholder="Ej: Salón Principal" />
+        </div>
         <Textarea label="Descripción" rows={3} value={form.description} onChange={set('description')} />
+
+        <div>
+          <label className="block text-label-l text-on-surf-var mb-1.5">Foto de portada</label>
+          <div className="flex gap-2">
+            <input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')}
+              className={`flex-1 ${fieldCls}`} />
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-outline-var text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-on-surf-var`}>
+              <span className="ms" style={{ fontSize: 16 }}>image</span>
+              {uploading ? 'Subiendo…' : 'Subir'}
+              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+            </label>
+          </div>
+          {form.cover_image && (
+            <div className="mt-2 relative">
+              <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-outline-var" />
+              <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-ink flex items-center justify-center hover:bg-black/70">
+                <span className="ms" style={{ fontSize: 14 }}>close</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        <label className="flex items-center gap-2.5 cursor-pointer w-fit">
+          <input type="checkbox" checked={form.requires_payment}
+            onChange={e => setForm(p => ({ ...p, requires_payment: e.target.checked }))}
+            className="w-4 h-4 accent-pri" />
+          <span className="text-body-s text-on-surf">Este evento requiere pago</span>
+        </label>
+
+        {form.requires_payment && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-1 border-l-2 border-pri/30 pl-4">
+            <Input label="Precio (Q)" type="number" min="0" step="0.01" value={form.price_gtq} onChange={set('price_gtq')} />
+            <Input label="Fecha límite de pago" type="date" value={form.payment_deadline} onChange={set('payment_deadline')} />
+          </div>
+        )}
+
         <div className="flex gap-3 pt-2 border-t border-outline-var">
-          <Button variant="filled" onClick={() => onSave(form)} disabled={loading || !form.title}>
+          <Button variant="filled" onClick={handleSubmit} disabled={loading || !form.title || uploading}>
             <span className="ms" style={{ fontSize: 16 }}>check</span>
             {loading ? 'Guardando…' : 'Guardar evento'}
           </Button>
