@@ -89,6 +89,23 @@ type Petition struct {
 	UserID     *uint     `json:"user_id" gorm:"index"` // líder/admin que envía
 }
 
+// ConnectCard — tarjeta de conexión: un visitante NUEVO se registra él
+// mismo (formulario público, sin auth) y el equipo de seguimiento lo
+// contacta. Distinto de MemberBoleta (que llena un LÍDER durante su
+// reporte de célula) — ver DB_SCHEMA.md "connect_cards".
+type ConnectCard struct {
+	gorm.Model
+	Name              string `json:"name" gorm:"type:varchar(100);not null"`
+	Phone             string `json:"phone" gorm:"type:varchar(30)"`
+	Email             string `json:"email" gorm:"type:varchar(100)"`
+	HowFound          string `json:"how_found" gorm:"type:varchar(30)"`          // invitacion|redes|publicidad|otro
+	Category          string `json:"category" gorm:"type:varchar(30);not null"` // primera_vez|reconciliado|busco_celula
+	LeaderAssignedID  *uint  `json:"leader_assigned_id" gorm:"index"`
+	LeaderAssigned    *User  `json:"leader_assigned,omitempty" gorm:"foreignKey:LeaderAssignedID"`
+	Status            string `json:"status" gorm:"type:varchar(20);default:'nuevo'"` // nuevo|contactado|integrado
+	Notes             string `json:"notes" gorm:"type:text"`
+}
+
 type Donation struct {
 	gorm.Model
 	Name             string  `json:"name" gorm:"type:varchar(100);not null"`

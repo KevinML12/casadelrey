@@ -29,6 +29,7 @@ func (h *NotificationHandler) GetCounts(c echo.Context) error {
 	var pendingReports int64
 	var pendingVolunteers int64
 	var pendingReceipts int64
+	var pendingConnectCards int64
 
 	if err := h.DB.Model(&models.Petition{}).Where("is_answered = ?", false).Count(&unreadPetitions).Error; err != nil {
 		log.Printf("[Notifications] Error petitions: %v", err)
@@ -56,11 +57,18 @@ func (h *NotificationHandler) GetCounts(c echo.Context) error {
 		}
 	}
 
+	// Tarjetas de conexión sin contactar aún — visible a admin y líder por
+	// igual (nacen sin asignar; cualquiera del equipo puede darles seguimiento).
+	if err := h.DB.Model(&models.ConnectCard{}).Where("status = ?", "nuevo").Count(&pendingConnectCards).Error; err != nil {
+		log.Printf("[Notifications] Error connect cards: %v", err)
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"unread_petitions":   unreadPetitions,
-		"pending_reports":    pendingReports,
-		"pending_volunteers": pendingVolunteers,
-		"pending_receipts":   pendingReceipts,
-		"total":              unreadPetitions + pendingReports + pendingVolunteers + pendingReceipts,
+		"unread_petitions":      unreadPetitions,
+		"pending_reports":       pendingReports,
+		"pending_volunteers":    pendingVolunteers,
+		"pending_receipts":      pendingReceipts,
+		"pending_connect_cards": pendingConnectCards,
+		"total":                 unreadPetitions + pendingReports + pendingVolunteers + pendingReceipts + pendingConnectCards,
 	})
 }

@@ -924,18 +924,16 @@ function Ubicacion({ bg }) {
             <Tilt max={4} glass="standard" className="rounded-[24px] liquid-glass p-9 md:p-10">
               <h3 className="text-[26px] font-bold text-white tracking-tight mb-3">¿Es tu primera vez?</h3>
               <p className="text-[15px] text-white/70 font-medium mb-7">
-                Queremos conocerte. Escríbenos y te recibimos desde el primer minuto.
+                Queremos conocerte. Cuéntanos de ti y te recibimos desde el primer minuto.
               </p>
-              <motion.a
-                href="https://www.instagram.com/ig.casadelrey/"
-                target="_blank"
-                rel="noopener noreferrer"
+              <MotionLink
+                to="/conectate"
                 {...PRESS}
                 className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring hover:border-white/40"
               >
-                <Icon name="instagram" className="w-4 h-4" />
-                Escríbenos
-              </motion.a>
+                <Icon name="spark" className="w-4 h-4" />
+                Conéctate
+              </MotionLink>
             </Tilt>
             </Reveal>
 

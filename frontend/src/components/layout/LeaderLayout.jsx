@@ -7,6 +7,7 @@ import { Icon } from '../ui/Glass';
 
 const NAV = [
   { to: '/leader',                   icon: 'home',       label: 'Inicio',       exact: true },
+  { to: '/leader/connect-cards',     icon: 'contact_page', label: 'Conéctate',  badge: 'pending_connect_cards' },
   { to: '/leader/reports',           icon: 'groups',     label: 'Células',      badge: 'pending_reports' },
   { to: '/leader/boletas',           icon: 'person_add', label: 'Nuevos' },
   { to: '/leader/volunteers',        icon: 'group_add',  label: 'Voluntarios',  badge: 'pending_volunteers' },

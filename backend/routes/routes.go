@@ -39,6 +39,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	rsvpHandler          := handlers.NewRSVPHandler(db)
 	leaderDashHandler    := handlers.NewLeaderDashboardHandler(db)
 	activityLogHandler   := handlers.NewActivityLogHandler(db)
+	connectCardHandler   := handlers.NewConnectCardHandler(db)
 
 	// ── Middlewares ───────────────────────────────────────────────────────────────
 	authMW          := middleware.NewAuthMiddleware(cfg.JWTSecret)
@@ -99,6 +100,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Peticiones de oración
 	contactGroup := api.Group("/contact")
 	contactGroup.POST("/petition", petitionHandler.CreatePetition)
+
+	// Tarjeta de conexión — visitante nuevo se registra él mismo
+	api.POST("/connect-cards", connectCardHandler.Create)
 
 	// Donaciones (registro local + PayPal)
 	donationsGroup := api.Group("/donations")
@@ -242,6 +246,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Boletas (admin: eliminar)
 	adminGroup.DELETE("/boletas/:id", boletaHandler.DeleteBoleta)
 
+	// Tarjetas de conexión — admin elimina
+	adminGroup.DELETE("/connect-cards/:id", connectCardHandler.Delete)
+
 	// ── Admin o Líder ─────────────────────────────────────────────────────────────
 	adminOrLeader := api.Group("/admin", authMW, adminOrLeaderMW)
 
@@ -259,6 +266,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminOrLeader.POST("/cell-reports",      cellReportHandler.CreateCellReport)
 	adminOrLeader.GET("/cell-reports",       cellReportHandler.GetAllCellReports)
 	adminOrLeader.GET("/cell-reports/stats", cellReportHandler.GetCellStats)
+
+	// Tarjetas de conexión — admin y líder ven la lista y dan seguimiento
+	adminOrLeader.GET("/connect-cards",     connectCardHandler.GetAll)
+	adminOrLeader.PUT("/connect-cards/:id", connectCardHandler.Update)
 
 	// Boletas de nuevos miembros
 	adminOrLeader.POST("/boletas",    boletaHandler.CreateBoleta)

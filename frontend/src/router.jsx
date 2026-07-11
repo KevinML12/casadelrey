@@ -18,6 +18,7 @@ import VolunteeringPage from './pages/public/VolunteeringPage';
 import AboutPage        from './pages/public/AboutPage';
 import GalleryPage      from './pages/public/GalleryPage';
 import CelulasPage      from './pages/public/CelulasPage';
+import ConnectPage      from './pages/public/ConnectPage';
 import NotFound         from './pages/NotFound';
 
 // Lazy — evita inflar el bundle principal con páginas de uso infrecuente
@@ -49,6 +50,7 @@ const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
 const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
 const AdminHero          = lazy(() => import('./pages/admin/AdminHero'));
 const AdminSitePhotos    = lazy(() => import('./pages/admin/AdminSitePhotos'));
+const AdminConnectCards  = lazy(() => import('./pages/admin/AdminConnectCards'));
 const ReceiptPage        = lazy(() => import('./pages/public/ReceiptPage'));
 const ProfilePage        = lazy(() => import('./pages/public/ProfilePage'));
 
@@ -59,6 +61,7 @@ const LeaderReports       = lazy(() => import('./pages/leader/LeaderReports'));
 const LeaderBoletas       = lazy(() => import('./pages/leader/LeaderBoletas'));
 const LeaderVolunteers    = lazy(() => import('./pages/leader/LeaderVolunteers'));
 const LeaderCellDirectory = lazy(() => import('./pages/leader/LeaderCellDirectory'));
+const LeaderConnectCards  = lazy(() => import('./pages/leader/LeaderConnectCards'));
 
 // Panel Voluntario — lazy
 import VolunteerLayout      from './components/layout/VolunteerLayout';
@@ -91,6 +94,7 @@ export const router = createBrowserRouter([
       { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
       { path: 'hero',            element: <Suspense fallback={<PageFallback />}><AdminHero /></Suspense> },
       { path: 'site-photos',     element: <Suspense fallback={<PageFallback />}><AdminSitePhotos /></Suspense> },
+      { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><AdminConnectCards /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],
   },
@@ -122,6 +126,7 @@ export const router = createBrowserRouter([
       { path: 'boletas',         element: <Suspense fallback={<PageFallback />}><LeaderBoletas /></Suspense> },
       { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><LeaderVolunteers /></Suspense> },
       { path: 'cell-directory',  element: <Suspense fallback={<PageFallback />}><LeaderCellDirectory /></Suspense> },
+      { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><LeaderConnectCards /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],
   },
@@ -138,6 +143,7 @@ export const router = createBrowserRouter([
       { path: 'events',                element: <EventsPage /> },
       { path: 'gallery',               element: <GalleryPage /> },
       { path: 'celulas',               element: <CelulasPage /> },
+      { path: 'conectate',             element: <ConnectPage /> },
       { path: 'prayer',                element: <ProtectedRoute leaderOrAdmin><PrayerPage /></ProtectedRoute> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },

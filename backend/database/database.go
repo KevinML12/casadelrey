@@ -84,6 +84,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			// Personas
 			&models.Volunteer{},
 			&models.Petition{},
+			&models.ConnectCard{}, // NUEVA — tarjeta de conexión para visitantes nuevos
 			// CMS
 			&models.HeroSetting{},
 			&models.SitePhoto{},
