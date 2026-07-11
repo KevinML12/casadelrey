@@ -575,6 +575,10 @@ function Agenda({ bg }) {
   );
 }
 
+// Inclinaciones cíclicas para el collage de categorías — mismo lenguaje
+// que CelulasPage/GalleryPage/PostCollage (COLLAGE/ROT determinístico).
+const HOME_COLLAGE_ROT = [-2.0, 1.6, -1.4, 2.2, -1.8, 1.2];
+
 // ════════════════════════════════════════════════════════════════════
 // 3 · CÉLULAS Y COMUNIDAD
 // ════════════════════════════════════════════════════════════════════
@@ -625,39 +629,46 @@ function CelulasSection({ bg }) {
           </MotionLink>
         </Reveal>
 
-        <RevealList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
+        {/* Collage (mismo lenguaje que Células/Galería/Blog): recortes
+            inclinados que se enderezan al pasar el cursor, en vez de un
+            grid parejo repetido. Cada card sigue enlazando directo a su
+            tipo en /celulas (abre esa ventana ahí). */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
           {categories.map((cat, i) => {
             let gridSpan = 'md:col-span-1';
             if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2';
             else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2';
+            const rot = HOME_COLLAGE_ROT[i % HOME_COLLAGE_ROT.length];
 
             return (
-            <RevealItem key={i} className={gridSpan}>
-            <Tilt
-              as={Link}
-              to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
-              max={5}
-              glass={i === 0 ? 'featured' : 'standard'}
-              className="group relative rounded-[24px] flex flex-col liquid-glass h-full"
-            >
-              <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
-                <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
-              </div>
-              <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
-                <div>
-                  <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[12px] font-semibold mb-4 inline-block backdrop-blur-md">
-                    {cat.age_group}
-                  </span>
-                  <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
-                  <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
+              <MotionLink
+                key={i}
+                to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
+                initial={{ opacity: 0, y: 24, rotate: rot }}
+                whileInView={{ opacity: 1, y: 0, rotate: rot }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.06 }}
+                whileHover={{ rotate: 0, scale: 1.03, zIndex: 30 }}
+                className={`${gridSpan} liquid-glass liquid-shine group relative rounded-[24px] flex flex-col overflow-hidden ring-1 ring-white/10`}
+                style={{ transformOrigin: 'center' }}
+              >
+                <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+                  <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
                 </div>
-              </div>
-            </Tilt>
-            </RevealItem>
+                <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
+                  <div>
+                    <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[12px] font-semibold mb-4 inline-block backdrop-blur-md">
+                      {cat.age_group}
+                    </span>
+                    <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
+                    <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
+                  </div>
+                </div>
+              </MotionLink>
             );
           })}
-        </RevealList>
+        </div>
       </div>
     </section>
   );

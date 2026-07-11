@@ -19,6 +19,14 @@ export function AuthProvider({ children }) {
   const saveToken = (t) => { localStorage.setItem('token', t); setToken(t); };
   const clearToken = () => { localStorage.removeItem('token'); setToken(null); };
 
+  // apiClient dispara este evento en un 401 — ya limpió localStorage,
+  // pero el estado de React (token/user) necesita enterarse también.
+  useEffect(() => {
+    const onUnauthorized = () => setToken(null);
+    window.addEventListener('auth:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', onUnauthorized);
+  }, []);
+
   // ── Auth actions ─────────────────────────────────────────────
 
   const login = (newToken) => saveToken(newToken);
