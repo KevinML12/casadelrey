@@ -46,7 +46,14 @@ async function createEventViaAdmin(page, { title, requiresPayment = false, photo
     await page.locator('input[type="date"]').nth(1).fill(deadline);
   }
 
-  await page.getByRole('button', { name: /guardar evento/i }).click();
+  const [resp] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/admin/events') && r.request().method() === 'POST'),
+    page.getByRole('button', { name: /guardar evento/i }).click(),
+  ]);
+  if (!resp.ok()) {
+    console.log(`[DEBUG] POST /admin/events respondió ${resp.status()}:`, await resp.text().catch(() => '(sin body)'));
+  }
+  expect(resp.ok(), `POST /admin/events falló con status ${resp.status()}`).toBeTruthy();
   await expect(page.getByText(title)).toBeVisible({ timeout: 10_000 });
 }
 

@@ -188,8 +188,16 @@ export default function AdminEvents() {
   const [showForm, setShowForm] = useState(false);
   const [expanded, setExpanded] = useState(null);
 
+  // /events/ es el endpoint PÚBLICO con Cache-Control de 20s (para que la
+  // página pública no golpee la DB en cada visita) — el panel admin lo
+  // reutiliza porque no hay uno propio, pero eso significa que crear/
+  // editar/borrar un evento y refrescar puede devolver la respuesta
+  // cacheada de hace segundos, sin el cambio recién hecho. Cache-bust
+  // con un query param propio para que el admin SIEMPRE vea el estado
+  // real tras guardar (detectado por la suite E2E: el evento creado no
+  // aparecía en la lista hasta pasados ~20s).
   const load = () =>
-    apiClient.get('/events/')
+    apiClient.get(`/events/?_t=${Date.now()}`)
       .then(r => setEvents(r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
