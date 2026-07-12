@@ -60,9 +60,14 @@ async function createEventViaAdmin(page, { title, requiresPayment = false, photo
 async function deleteEventViaAdmin(page, title) {
   await page.goto('/admin/events');
   const row = page.locator('div.group', { hasText: title }).first();
-  if (await row.count() === 0) return;
+  // Sin early-return silencioso: si la fila no aparece, el test debe
+  // FALLAR (antes un `return` temprano dejaba eventos huérfanos en
+  // producción sin que la suite se diera cuenta).
+  await expect(row).toBeVisible({ timeout: 10_000 });
   page.once('dialog', (d) => d.accept());
-  await row.getByRole('button').last().click(); // botón de eliminar (icono, sin texto accesible propio salvo title)
+  // El ícono "delete" (Material Symbols) es texto real → accessible
+  // name = "delete", más confiable que una posición ordinal.
+  await row.getByRole('button', { name: 'delete' }).click();
   await expect(page.getByText(title)).toHaveCount(0, { timeout: 10_000 });
 }
 
@@ -81,7 +86,9 @@ test.describe('Eventos — flujo completo (admin → público → RSVP)', () => 
     await card.getByRole('button', { name: /confirmar|registrarme/i }).click();
 
     // Modal de RSVP
-    await expect(page.getByText('Confirmar asistencia')).toBeVisible();
+    // "Confirmar asistencia" aparece tanto en el título del modal (<p>) como
+    // en el botón de enviar — scoping al párrafo para no chocar con strict mode.
+    await expect(page.locator('p', { hasText: 'Confirmar asistencia' })).toBeVisible();
     await page.locator('input[placeholder="Tu nombre completo"]').fill('Visitante E2E');
     await page.locator('input[placeholder="El mismo correo del comprobante"]').fill(`e2e.${stamp}@example.com`);
     await page.getByRole('button', { name: /confirmar asistencia/i }).click();
