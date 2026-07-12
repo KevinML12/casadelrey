@@ -641,15 +641,19 @@ function CelulasSection({ bg }) {
             const rot = HOME_COLLAGE_ROT[i % HOME_COLLAGE_ROT.length];
 
             return (
-              <MotionLink
+              <Tilt
+                as={Link}
                 key={i}
+                max={4}
+                scrollMax={3}
                 to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
                 initial={{ opacity: 0, y: 24, rotate: rot }}
                 whileInView={{ opacity: 1, y: 0, rotate: rot }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.06 }}
                 whileHover={{ rotate: 0, scale: 1.03, zIndex: 30 }}
-                className={`${gridSpan} liquid-glass liquid-shine group relative rounded-[24px] flex flex-col overflow-hidden ring-1 ring-white/10`}
+                glass
+                className={`${gridSpan} liquid-glass group relative rounded-[24px] flex flex-col overflow-hidden ring-1 ring-white/10`}
                 style={{ transformOrigin: 'center' }}
               >
                 <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
@@ -665,7 +669,7 @@ function CelulasSection({ bg }) {
                     <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
                   </div>
                 </div>
-              </MotionLink>
+              </Tilt>
             );
           })}
         </div>

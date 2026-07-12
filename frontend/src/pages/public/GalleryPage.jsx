@@ -5,12 +5,12 @@
 //  y se salta entre ellos. Lenguaje de diseño: docs/DISENO_LIQUID_GLASS.md
 // ============================================================
 import { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
+import Tilt from '../../components/ui/Tilt';
 import { useSitePhoto } from '../../lib/feed';
 
 // Collage: tamaños/inclinaciones variados que se repiten por índice.
@@ -93,15 +93,19 @@ export default function GalleryPage() {
               {albums.map((a, i) => {
                 const big = SPANS[i % SPANS.length].includes('row-span-2');
                 return (
-                  <motion.button
+                  <Tilt
+                    as="button"
                     key={a.name}
+                    max={4}
+                    scrollMax={3}
                     onClick={() => setOpenKey(a.name)}
                     initial={{ opacity: 0, y: 24, rotate: ROT[i % ROT.length] }}
                     whileInView={{ opacity: 1, y: 0, rotate: ROT[i % ROT.length] }}
                     viewport={{ once: true, margin: '-60px' }}
                     transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
                     whileHover={{ rotate: 0, scale: 1.05, y: -6, zIndex: 30 }}
-                    className={`liquid-glass liquid-shine group relative ${SPANS[i % SPANS.length]} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
+                    glass
+                    className={`liquid-glass group relative ${SPANS[i % SPANS.length]} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
                     style={{ transformOrigin: 'center' }}
                   >
                     <img src={a.photos[0]?.url} alt="" loading="lazy"
@@ -115,7 +119,7 @@ export default function GalleryPage() {
                         {a.name}
                       </h3>
                     </div>
-                  </motion.button>
+                  </Tilt>
                 );
               })}
             </div>
@@ -135,10 +139,10 @@ export default function GalleryPage() {
             <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
               {a.photos.map((photo, idx) => (
                 <RevealItem key={photo.ID ?? idx}>
-                  <div className="rounded-[14px] overflow-hidden aspect-[4/5] relative group liquid-glass">
+                  <Tilt max={5} glass className="rounded-[14px] overflow-hidden aspect-[4/5] relative group liquid-glass">
                     <img src={photo.url} alt={`Foto ${idx + 1}`} loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  </div>
+                  </Tilt>
                 </RevealItem>
               ))}
             </RevealList>

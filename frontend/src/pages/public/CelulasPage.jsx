@@ -14,11 +14,11 @@
 // ============================================================
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
+import Tilt from '../../components/ui/Tilt';
 import { useApi, useSitePhoto } from '../../lib/feed';
 
 const GROUPS_FALLBACK = [
@@ -149,15 +149,19 @@ export default function CelulasPage() {
               const c = COLLAGE[i % COLLAGE.length];
               const big = c.span.includes('row-span-2');
               return (
-                <motion.button
+                <Tilt
+                  as="button"
                   key={g.key}
+                  max={4}
+                  scrollMax={3}
                   onClick={() => setOpenKey(g.key)}
                   initial={{ opacity: 0, y: 24 + c.y, rotate: c.rot }}
                   whileInView={{ opacity: 1, y: c.y, rotate: c.rot }}
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ type: 'spring', stiffness: 120, damping: 16, delay: i * 0.06 }}
                   whileHover={{ rotate: 0, scale: 1.05, y: c.y - 6, zIndex: 30 }}
-                  className={`liquid-glass liquid-shine group relative ${c.span} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
+                  glass
+                  className={`liquid-glass group relative ${c.span} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
                   style={{ transformOrigin: 'center' }}
                 >
                   <img
@@ -177,14 +181,14 @@ export default function CelulasPage() {
                       {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'} · abrir
                     </p>
                   </div>
-                </motion.button>
+                </Tilt>
               );
             })}
           </div>
 
           {/* Contacto — sin exponer direcciones */}
           <Reveal delay={0.1} className="mt-14">
-            <div className="liquid-glass liquid-shine rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
+            <Tilt max={3} glass className="liquid-glass rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
                 <h3 className="text-[22px] font-bold text-white">¿No sabes cuál es para ti?</h3>
                 <p className="text-[15px] text-white/70 mt-2 max-w-lg">
@@ -200,7 +204,7 @@ export default function CelulasPage() {
                 <Icon name="instagram" className="w-4 h-4" />
                 Escríbenos
               </a>
-            </div>
+            </Tilt>
           </Reveal>
         </section>
       </div>
@@ -220,8 +224,10 @@ export default function CelulasPage() {
               </p>
               <div className="flex flex-wrap gap-3">
                 {g.cells.map((c, i) => (
-                  <motion.a
+                  <Tilt
+                    as="a"
                     key={`${c.name}-${i}`}
+                    max={3}
                     href={`https://wa.me/?text=${encodeURIComponent(`Hola, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`)}`}
                     target="_blank" rel="noopener noreferrer"
                     aria-label={`Unirme a la célula ${c.name}`}
@@ -229,7 +235,8 @@ export default function CelulasPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.06 + i * 0.035 }}
                     whileHover={{ y: -3, scale: 1.02 }}
-                    className="liquid-glass liquid-shine group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
+                    glass
+                    className="liquid-glass group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
                   >
                     <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
                       <Icon name="users" className="w-5 h-5" />
@@ -244,7 +251,7 @@ export default function CelulasPage() {
                     <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
                       <Icon name="arrow" className="w-4 h-4" />
                     </span>
-                  </motion.a>
+                  </Tilt>
                 ))}
               </div>
             </>

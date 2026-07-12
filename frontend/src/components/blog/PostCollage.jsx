@@ -4,11 +4,8 @@
 //  Células. Sin posts → estado vacío real (nunca contenido de mentira).
 // ============================================================
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Icon } from '../ui/Glass';
-
-const MotionLink = motion.create(Link);
-const MotionA = motion.create('a');
+import Tilt from '../ui/Tilt';
 
 const SPANS = [
   'col-span-2 row-span-2', 'col-span-1 row-span-1', 'col-span-1 row-span-1',
@@ -37,11 +34,13 @@ export default function PostCollage({ posts }) {
         const big = span.includes('row-span-2');
         const excerpt = p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 110);
         const category = p.category || (isExternal ? 'Red social' : 'Enseñanza');
-        const Comp = isExternal ? MotionA : MotionLink;
 
         return (
-          <Comp
+          <Tilt
+            as={isExternal ? 'a' : Link}
             key={p.ID}
+            max={4}
+            scrollMax={3}
             {...(isExternal
               ? { href: p.redirect_url, target: '_blank', rel: 'noopener noreferrer' }
               : { to: `/blog/${p.slug}` })}
@@ -50,7 +49,8 @@ export default function PostCollage({ posts }) {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
             whileHover={{ rotate: 0, scale: 1.04, y: -6, zIndex: 30 }}
-            className={`liquid-glass liquid-shine group relative ${span} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10 block`}
+            glass
+            className={`liquid-glass group relative ${span} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10 block`}
             style={{ transformOrigin: 'center' }}
           >
             <div className="absolute inset-0">
@@ -77,7 +77,7 @@ export default function PostCollage({ posts }) {
                 <Icon name="arrow" className="w-3.5 h-3.5" />
               </span>
             </div>
-          </Comp>
+          </Tilt>
         );
       })}
     </div>
