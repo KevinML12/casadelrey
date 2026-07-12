@@ -168,6 +168,14 @@ html.lenis, html.lenis body { height: auto; }
    Cristal sobre lienzo blanco — hairline + whisper shadow para que no
    se pierdan elementos blancos sobre blanco.
 ═══════════════════════════════════════════════════════════════════ */
+
+/* Registra --spec-x/--spec-y como <length> animable: al transicionar
+   la propiedad en el elemento, el brillo especular (que la consume en
+   el radial-gradient del ::after) se desliza con inercia en vez de
+   saltar de golpe — el "líquido movible" sin JS ni WebGL extra. */
+@property --spec-x { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --spec-y { syntax: '<length>'; inherits: true; initial-value: 0px; }
+
 @layer components {
 
   /* Cristal estándar — la base para cards translúcidas y navbars */
@@ -233,44 +241,47 @@ html.lenis, html.lenis body { height: auto; }
           su borde de abajo (el detalle que lo hace leer como "gota")
         · hairline superior: filo brillante donde pega la luz
         · sombra externa: lo despega del fondo, flota */
-    background: linear-gradient(157deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.02) 55%, rgba(255,255,255,0.012) 100%);
-    -webkit-backdrop-filter: blur(9px) saturate(140%) brightness(1.04);
-            backdrop-filter: blur(9px) saturate(140%) brightness(1.04);
+    background: linear-gradient(157deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 55%, rgba(255,255,255,0.008) 100%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%) brightness(1.05);
+            backdrop-filter: blur(8px) saturate(150%) brightness(1.05);
     border: 1px solid rgba(255, 255, 255, 0.11);
     /* Monocromático a propósito (mismo tono que el .glass-light claro):
        el modelado es sólo blanco/neutro — bisel + realce inferior tenue —
        nada de tinte celeste, para que el cristal se sienta sobrio y
        uniforme, no colorido. */
     box-shadow:
-      inset 1.5px 2px 4px rgba(255, 255, 255, 0.20),
-      inset -1.5px -2px 8px rgba(255, 255, 255, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 -22px 34px -26px rgba(255, 255, 255, 0.11),
+      inset 1.5px 2.5px 5px rgba(255, 255, 255, 0.26),
+      inset -1.5px -2px 8px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20),
+      inset 0 -26px 40px -26px rgba(255, 255, 255, 0.15),
       0 24px 50px -20px rgba(0, 0, 0, 0.5);
-    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
+                --spec-x 0.55s var(--ease-out), --spec-y 0.55s var(--ease-out);
     position: relative;
     overflow: hidden;
   }
   .liquid-glass:hover {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.22);
     box-shadow:
-      inset 1.5px 2px 4px rgba(255, 255, 255, 0.26),
-      inset -1.5px -2px 8px rgba(255, 255, 255, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.20),
-      inset 0 -24px 38px -26px rgba(255, 255, 255, 0.15),
+      inset 1.5px 2.5px 5px rgba(255, 255, 255, 0.32),
+      inset -1.5px -2px 8px rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -28px 44px -26px rgba(255, 255, 255, 0.20),
       0 30px 60px -22px rgba(0, 0, 0, 0.55);
   }
 
   .glass-light {
-    background: rgba(255, 255, 255, 0.55);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
-            backdrop-filter: blur(32px) saturate(180%);
+    background: rgba(255, 255, 255, 0.48);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+            backdrop-filter: blur(28px) saturate(190%);
     border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.3),
       0 24px 60px -20px rgba(10, 21, 38, 0.45),
       0 4px 12px rgba(10, 21, 38, 0.12);
+    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
+                --spec-x 0.55s var(--ease-out), --spec-y 0.55s var(--ease-out);
     position: relative;
     overflow: hidden;
   }
@@ -300,20 +311,21 @@ html.lenis, html.lenis body { height: auto; }
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    background: radial-gradient(
-      300px circle at var(--spec-x, 50%) var(--spec-y, 0%),
-      rgba(255, 255, 255, 0.20),
-      transparent 62%
-    );
-    opacity: 0;
+    /* Dos capas: un núcleo apretado (el "punto" de luz que refracta) más
+       un halo ancho y suave (la dispersión en el cristal) — un solo
+       radial se leía plano, dos leen como lente líquida. */
+    background:
+      radial-gradient(120px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.30), transparent 60%),
+      radial-gradient(340px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.15), transparent 65%);
+    /* --spec-o: además del :hover (mouse), Tilt la setea directo en scroll
+       para que el brillo también viva en touch — donde :hover no dispara. */
+    opacity: var(--spec-o, 0);
     transition: opacity 0.5s var(--ease-out);
   }
   .glass-light::after {
-    background: radial-gradient(
-      260px circle at var(--spec-x, 50%) var(--spec-y, 0%),
-      rgba(255, 255, 255, 0.5),
-      transparent 65%
-    );
+    background:
+      radial-gradient(110px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.7), transparent 58%),
+      radial-gradient(300px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.4), transparent 65%);
   }
   .liquid-glass:hover::after,
   .glass-light:hover::after { opacity: 1; }
