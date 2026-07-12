@@ -14,6 +14,7 @@
 // ============================================================
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -149,45 +150,55 @@ export default function CelulasPage() {
               const c = COLLAGE[i % COLLAGE.length];
               const big = c.span.includes('row-span-2');
               return (
-                <Tilt
-                  as="button"
+                // Wrapper solo para la ENTRADA en 3D (rotateX): Tilt ya es
+                // dueño de rotateX/rotateY para el tilt de cursor/scroll, así
+                // que la profundidad de aparición vive en un nodo aparte —
+                // si compartieran la misma propiedad, una de las dos se
+                // pisaría en silencio.
+                <motion.div
                   key={g.key}
-                  max={4}
-                  scrollMax={3}
-                  onClick={() => setOpenKey(g.key)}
-                  initial={{ opacity: 0, y: 24 + c.y, rotate: c.rot }}
-                  whileInView={{ opacity: 1, y: c.y, rotate: c.rot }}
+                  className={c.span}
+                  initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
+                  whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ type: 'spring', stiffness: 120, damping: 16, delay: i * 0.06 }}
-                  whileHover={{ rotate: 0, scale: 1.05, y: c.y - 6, zIndex: 30 }}
-                  glass
-                  className={`liquid-glass group relative ${c.span} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
-                  style={{ transformOrigin: 'center' }}
+                  style={{ transformPerspective: 1000, transformOrigin: 'center' }}
                 >
-                  <img
-                    src={g.image}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover opacity-45 group-hover:opacity-65 transition-all duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/45 to-bg/5" />
-                  <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                    <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
-                      {g.age}
-                    </span>
-                    <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[28px] sm:text-[34px]' : 'text-[17px] sm:text-[19px]'}`}>
-                      {g.name}
-                    </h3>
-                    <p className="text-[12.5px] text-white/60 font-medium mt-1.5">
-                      {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'} · abrir
-                    </p>
-                  </div>
-                </Tilt>
+                  <Tilt
+                    as="button"
+                    max={4}
+                    scrollMax={3}
+                    onClick={() => setOpenKey(g.key)}
+                    whileHover={{ rotate: 0, scale: 1.05, y: c.y - 6, zIndex: 30 }}
+                    glass
+                    className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
+                    style={{ rotate: c.rot, y: c.y, transformOrigin: 'center' }}
+                  >
+                    <img
+                      src={g.image}
+                      alt=""
+                      className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-45 group-hover:opacity-65 transition-all duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/45 to-bg/5" />
+                    <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
+                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                        {g.age}
+                      </span>
+                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[28px] sm:text-[34px]' : 'text-[17px] sm:text-[19px]'}`}>
+                        {g.name}
+                      </h3>
+                      <p className="text-[12.5px] text-white/60 font-medium mt-1.5">
+                        {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'} · abrir
+                      </p>
+                    </div>
+                  </Tilt>
+                </motion.div>
               );
             })}
           </div>
 
           {/* Contacto — sin exponer direcciones */}
-          <Reveal delay={0.1} className="mt-14">
+          <Reveal delay={0.1} depth className="mt-14">
             <Tilt max={3} glass className="liquid-glass rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
                 <h3 className="text-[22px] font-bold text-white">¿No sabes cuál es para ti?</h3>

@@ -44,6 +44,7 @@ export default function Tilt({
   max = 6,
   scrollMax = 4,
   hoverScale = 1.012,
+  tapScale = 0.97,
   glass,
   style,
   ...props
@@ -85,6 +86,10 @@ export default function Tilt({
       el.style.setProperty('--spec-x', `${50 + Math.sin(p * Math.PI + phase) * 38}%`);
       el.style.setProperty('--spec-y', `${(p * 0.5 + 0.5) * 100}%`);
       el.style.setProperty('--spec-o', FINE ? '0.55' : '0.7');
+      // -1..1 expuesto para que la foto DENTRO de la card (.parallax-layer)
+      // se mueva un poco más lento que la card — profundidad, sin JS extra
+      // por imagen: index.css la lee vía calc(var(--scroll-p)).
+      el.style.setProperty('--scroll-p', p.toFixed(3));
     };
     const requestApply = () => { if (!raf) raf = requestAnimationFrame(apply); };
 
@@ -112,6 +117,7 @@ export default function Tilt({
       <Comp
         ref={nodeRef}
         className={className + shineCls}
+        whileTap={REDUCED_MOTION ? undefined : { scale: tapScale }}
         style={{ ...style, ...shineStyle, rotateX: rx, rotateY: ry, transformPerspective: 900 }}
         {...props}
       >
@@ -144,6 +150,7 @@ export default function Tilt({
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       whileHover={{ scale: hoverScale }}
+      whileTap={{ scale: tapScale }}
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
       style={{ ...style, ...shineStyle, rotateX: rx, rotateY: ry, transformPerspective: 900 }}
       {...props}

@@ -175,6 +175,11 @@ html.lenis, html.lenis body { height: auto; }
    saltar de golpe — el "líquido movible" sin JS ni WebGL extra. */
 @property --spec-x { syntax: '<length>'; inherits: true; initial-value: 0px; }
 @property --spec-y { syntax: '<length>'; inherits: true; initial-value: 0px; }
+/* -1 (card entra por abajo) → 0 (centro del viewport) → 1 (sale por arriba),
+   la misma que Tilt usa para rotateX/rotateY. La foto DENTRO de la card
+   (.parallax-layer) la lee para moverse más lento que la card — profundidad
+   ambiental mientras haces scroll, sin JS por imagen. */
+@property --scroll-p { syntax: '<number>'; inherits: true; initial-value: 0; }
 
 @layer components {
 
@@ -355,6 +360,16 @@ html.lenis, html.lenis body { height: auto; }
     transition: opacity 0.4s var(--ease-out);
   }
   .liquid-shine:hover::before { opacity: 1; }
+
+  /* Parallax por card — la foto vive un poco "más atrás" que el vidrio:
+     se desplaza y se acerca sutilmente con --scroll-p (la misma señal de
+     Tilt). scale(1.14) da margen para que la traslación no deje huecos
+     en los bordes. Se pone en el <img> de portada de cada card. */
+  .parallax-layer {
+    transform: translateY(calc(var(--scroll-p, 0) * -16px)) scale(1.14);
+    transition: transform 0.5s var(--ease-out);
+    will-change: transform;
+  }
 
   /* Surface sólida elevada (no translúcida) */
   .surface {

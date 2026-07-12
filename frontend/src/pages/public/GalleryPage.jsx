@@ -5,6 +5,7 @@
 //  y se salta entre ellos. Lenguaje de diseño: docs/DISENO_LIQUID_GLASS.md
 // ============================================================
 import { useEffect, useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
@@ -93,33 +94,38 @@ export default function GalleryPage() {
               {albums.map((a, i) => {
                 const big = SPANS[i % SPANS.length].includes('row-span-2');
                 return (
-                  <Tilt
-                    as="button"
+                  <motion.div
                     key={a.name}
-                    max={4}
-                    scrollMax={3}
-                    onClick={() => setOpenKey(a.name)}
-                    initial={{ opacity: 0, y: 24, rotate: ROT[i % ROT.length] }}
-                    whileInView={{ opacity: 1, y: 0, rotate: ROT[i % ROT.length] }}
+                    className={SPANS[i % SPANS.length]}
+                    initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
+                    whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
                     viewport={{ once: true, margin: '-60px' }}
                     transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
-                    whileHover={{ rotate: 0, scale: 1.05, y: -6, zIndex: 30 }}
-                    glass
-                    className={`liquid-glass group relative ${SPANS[i % SPANS.length]} rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10`}
-                    style={{ transformOrigin: 'center' }}
+                    style={{ transformPerspective: 1000, transformOrigin: 'center' }}
                   >
-                    <img src={a.photos[0]?.url} alt="" loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
-                    <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
-                        {a.photos.length} fotos
-                      </span>
-                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[24px] sm:text-[30px]' : 'text-[16px] sm:text-[18px]'}`}>
-                        {a.name}
-                      </h3>
-                    </div>
-                  </Tilt>
+                    <Tilt
+                      as="button"
+                      max={4}
+                      scrollMax={3}
+                      onClick={() => setOpenKey(a.name)}
+                      whileHover={{ rotate: 0, scale: 1.05, y: -6, zIndex: 30 }}
+                      glass
+                      className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
+                      style={{ rotate: ROT[i % ROT.length], transformOrigin: 'center' }}
+                    >
+                      <img src={a.photos[0]?.url} alt="" loading="lazy"
+                        className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
+                      <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
+                        <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                          {a.photos.length} fotos
+                        </span>
+                        <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[24px] sm:text-[30px]' : 'text-[16px] sm:text-[18px]'}`}>
+                          {a.name}
+                        </h3>
+                      </div>
+                    </Tilt>
+                  </motion.div>
                 );
               })}
             </div>

@@ -11,6 +11,13 @@
 //   openKey        key abierta (o null = cerrado)
 //   onChange(key)  cambia la ventana activa; null cierra
 //   renderContent(item) → cuerpo (scrollable) de la ventana del frente
+//
+//  NOTA: se intentó un morph con layoutId (la foto de la card "se convierte"
+//  en el banner de la ventana) — se descartó: el motion.div de cada tarjeta
+//  de la pila ya se anima con `animate={stackPose(depth)}` para el efecto
+//  de cartas apiladas, y ese `animate` explícito pelea con el sistema de
+//  `layout` que necesita layoutId (la imagen se quedaba pegada al tamaño
+//  chico de la card de origen). No reintroducir sin resolver ese conflicto.
 // ============================================================
 import { useMemo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

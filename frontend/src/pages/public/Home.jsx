@@ -641,35 +641,40 @@ function CelulasSection({ bg }) {
             const rot = HOME_COLLAGE_ROT[i % HOME_COLLAGE_ROT.length];
 
             return (
-              <Tilt
-                as={Link}
+              <motion.div
                 key={i}
-                max={4}
-                scrollMax={3}
-                to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
-                initial={{ opacity: 0, y: 24, rotate: rot }}
-                whileInView={{ opacity: 1, y: 0, rotate: rot }}
+                className={gridSpan}
+                initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
+                whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.06 }}
-                whileHover={{ rotate: 0, scale: 1.03, zIndex: 30 }}
-                glass
-                className={`${gridSpan} liquid-glass group relative rounded-[24px] flex flex-col overflow-hidden ring-1 ring-white/10`}
-                style={{ transformOrigin: 'center' }}
+                style={{ transformPerspective: 1000, transformOrigin: 'center' }}
               >
-                <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
-                  <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
-                </div>
-                <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
-                  <div>
-                    <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[12px] font-semibold mb-4 inline-block backdrop-blur-md">
-                      {cat.age_group}
-                    </span>
-                    <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
-                    <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
+                <Tilt
+                  as={Link}
+                  max={4}
+                  scrollMax={3}
+                  to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
+                  whileHover={{ rotate: 0, scale: 1.03, zIndex: 30 }}
+                  glass
+                  className="liquid-glass group relative w-full h-full rounded-[24px] flex flex-col overflow-hidden ring-1 ring-white/10"
+                  style={{ rotate: rot, transformOrigin: 'center' }}
+                >
+                  <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+                    <img src={cat.image_url} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
                   </div>
-                </div>
-              </Tilt>
+                  <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
+                    <div>
+                      <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[12px] font-semibold mb-4 inline-block backdrop-blur-md">
+                        {cat.age_group}
+                      </span>
+                      <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
+                      <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
+                    </div>
+                  </div>
+                </Tilt>
+              </motion.div>
             );
           })}
         </div>
