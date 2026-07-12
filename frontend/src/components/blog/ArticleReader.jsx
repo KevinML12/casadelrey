@@ -8,6 +8,7 @@
 //  inmersivo — hero de foto de portada que se disuelve en el canvas,
 //  panel de cristal flotante con el contenido.
 // ============================================================
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { Icon } from '../ui/Glass';
@@ -25,6 +26,12 @@ function getSocialPlatform(url = '') {
 
 export default function ArticleReader({ post }) {
   const social = getSocialPlatform(post.redirect_url);
+
+  // Título de pestaña = título del artículo (el mapa estático de App.jsx
+  // solo cubre rutas fijas; /blog/:slug pone el suyo aquí).
+  useEffect(() => {
+    if (post?.title) document.title = `${post.title} · Casa del Rey`;
+  }, [post?.title]);
 
   return (
     <main className="relative bg-bg min-h-screen overflow-hidden">

@@ -6,6 +6,26 @@ import Footer from './components/layout/Footer';
 import Splash from './components/ui/Splash';
 import StarField from './components/three/StarField';
 
+// Título de pestaña por ruta (SEO + pestañas distinguibles). Rutas
+// dinámicas (/blog/:slug) ponen título propio desde su componente;
+// aquí gana el prefijo más largo que haga match.
+const BASE_TITLE = 'Casa del Rey — Huehuetenango';
+const ROUTE_TITLES = {
+  '/about':        'Nosotros',
+  '/celulas':      'Células',
+  '/events':       'Eventos',
+  '/blog':         'Blog',
+  '/gallery':      'Galería',
+  '/conectate':    'Conéctate',
+  '/prayer':       'Oración',
+  '/donate':       'Dar',
+  '/volunteering': 'Voluntariado',
+  '/comprobante':  'Comprobante',
+  '/profile':      'Mi perfil',
+  '/login':        'Iniciar sesión',
+  '/register':     'Crear cuenta',
+};
+
 // Public shell — Liquid Glass sobre canvas navy.
 // Lenis da scroll suave con inercia (se desactiva con prefers-reduced-motion).
 export default function App() {
@@ -21,8 +41,14 @@ export default function App() {
     return () => { cancelAnimationFrame(raf); lenis.destroy(); };
   }, []);
 
-  // Al cambiar de ruta, arrancar arriba
-  useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+  // Al cambiar de ruta, arrancar arriba + título de pestaña
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const hit = Object.keys(ROUTE_TITLES)
+      .filter(p => location.pathname === p || location.pathname.startsWith(p + '/'))
+      .sort((a, b) => b.length - a.length)[0];
+    document.title = hit ? `${ROUTE_TITLES[hit]} · Casa del Rey` : BASE_TITLE;
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col bg-bg text-ink">

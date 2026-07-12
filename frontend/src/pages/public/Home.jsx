@@ -66,16 +66,12 @@ const LINE = {
   exit:   { y: '-115%', transition: { duration: 0.35, ease: EASE_IN } },
 };
 
-// Fallback si /events no responde — mismo shape que el mapeo de la API
-const NEXT_EVENT_DEFAULT = {
-  day: '15', month: 'AGO', title: 'Noche de Jóvenes',
-  time: 'Viernes · 7:30 PM', loc: 'Auditorio Central',
-};
-
 function HeroCarousel({ onPlan }) {
   const [slides, setSlides] = useState([SLIDE_FALLBACK]);
   const [idx, setIdx] = useState(0);
-  const [nextEvent, setNextEvent] = useState(NEXT_EVENT_DEFAULT);
+  // null = sin evento real que mostrar (la tarjeta oculta ese bloque);
+  // nunca un evento inventado como placeholder — regla "nada estático".
+  const [nextEvent, setNextEvent] = useState(null);
   const [eventLabel, setEventLabel] = useState('Próximo evento');
   const [failed, setFailed] = useState({});
   // El globo 3D solo en desktop con mouse y sin reduced-motion
@@ -384,22 +380,29 @@ function HeroCarousel({ onPlan }) {
               vidrio WebGL está afinado en tono azul para el liquid-glass
               oscuro, chocaría aquí en la tarjeta más visible del sitio */}
           <Tilt max={7} className="glass-light rounded-[22px] p-7 md:p-8">
-            <div className="text-[13px] font-semibold text-bg/60 mb-3">
-              {eventLabel}
-            </div>
-            <div className="flex items-center gap-4 text-bg">
-              <div className="text-center shrink-0">
-                <div className="text-[44px] font-extrabold leading-none tracking-tighter">{nextEvent.day}</div>
-                <div className="text-[11px] font-bold tracking-widest mt-1">{nextEvent.month}</div>
-              </div>
-              <div className="min-w-0">
-                <p className="text-[17px] font-bold leading-tight">{nextEvent.title}</p>
-                <p className="mt-1 text-[13px] font-semibold text-bg/70">{nextEvent.time}</p>
-                {nextEvent.loc && <p className="text-[13px] font-semibold text-bg/70">{nextEvent.loc}</p>}
-              </div>
-            </div>
+            {/* El bloque de evento solo existe con un evento REAL de la API;
+                sin datos, la tarjeta queda solo con sus CTAs (que sí son
+                reales) en vez de mostrar un evento de mentira. */}
+            {nextEvent && (
+              <>
+                <div className="text-[13px] font-semibold text-bg/60 mb-3">
+                  {eventLabel}
+                </div>
+                <div className="flex items-center gap-4 text-bg">
+                  <div className="text-center shrink-0">
+                    <div className="text-[44px] font-extrabold leading-none tracking-tighter">{nextEvent.day}</div>
+                    <div className="text-[11px] font-bold tracking-widest mt-1">{nextEvent.month}</div>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[17px] font-bold leading-tight">{nextEvent.title}</p>
+                    <p className="mt-1 text-[13px] font-semibold text-bg/70">{nextEvent.time}</p>
+                    {nextEvent.loc && <p className="text-[13px] font-semibold text-bg/70">{nextEvent.loc}</p>}
+                  </div>
+                </div>
+              </>
+            )}
 
-            <div className="mt-6 flex flex-col gap-2.5">
+            <div className={`${nextEvent ? 'mt-6' : ''} flex flex-col gap-2.5`}>
               <motion.button
                 onClick={onPlan}
                 {...PRESS}
@@ -467,33 +470,26 @@ function Agenda({ bg }) {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
+    // Sin fallback inventado: si la API falla o no hay eventos, la sección
+    // no existe (return null abajo) — regla "nada estático" de la guía.
+    // Los eventos de mentira que vivían aquí venían del mockup de Figma.
     apiClient.get('/events/')
       .then(res => {
-        if (res.data && res.data.length > 0) {
-          const formatted = res.data.map(ev => {
-            const date = new Date(ev.date + 'T12:00:00');
-            return {
-              id: ev.ID,
-              day: date.getDate().toString(),
-              month: date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase(),
-              title: ev.title,
-              time: ev.time || 'Por definir',
-              loc: ev.location,
-              isFeatured: ev.is_featured
-            };
-          });
-          setEvents(formatted);
-        } else {
-          throw new Error("Empty events");
-        }
+        const list = Array.isArray(res.data) ? res.data : [];
+        setEvents(list.map(ev => {
+          const date = new Date(ev.date + 'T12:00:00');
+          return {
+            id: ev.ID,
+            day: date.getDate().toString(),
+            month: date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase(),
+            title: ev.title,
+            time: ev.time || 'Por definir',
+            loc: ev.location,
+            isFeatured: ev.is_featured
+          };
+        }));
       })
-      .catch(err => {
-        setEvents([
-          { id: 1, day: '15', month: 'AGO', title: 'Noche de Jóvenes', time: 'Viernes · 7:30 PM', loc: 'Auditorio Central', isFeatured: true },
-          { id: 2, day: '18', month: 'AGO', title: 'Encuentro de Líderes', time: 'Jueves · 6:00 PM', loc: 'Salón 2', isFeatured: false },
-          { id: 3, day: '23', month: 'AGO', title: 'Retiro "Reinicio"', time: 'Sábado · Todo el día', loc: 'Casa de campo', isFeatured: false }
-        ]);
-      });
+      .catch(() => {});
   }, []);
 
   if (events.length === 0) return null;
