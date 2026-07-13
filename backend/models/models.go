@@ -113,7 +113,7 @@ type Donation struct {
 	UserID           *uint   `json:"user_id" gorm:"index"` // si el donante es miembro
 	Amount           float64 `json:"amount" gorm:"type:decimal(10,2);not null"`
 	Currency         string  `json:"currency" gorm:"type:varchar(3);default:'GTQ'"`
-	PaymentMethod    string  `json:"payment_method" gorm:"type:varchar(50)"` // transferencia|tigo_money|presencial
+	PaymentMethod    string  `json:"payment_method" gorm:"type:varchar(50)"` // transferencia|presencial (tigo_money solo en registros históricos)
 	PaymentReference string  `json:"payment_reference" gorm:"type:varchar(255)"`
 	ReceiptURL       string  `json:"receipt_url" gorm:"type:varchar(500)"`
 	ReceiptID        *uint   `json:"receipt_id" gorm:"index"` // FK → PaymentReceipt

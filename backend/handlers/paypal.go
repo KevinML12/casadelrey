@@ -11,7 +11,7 @@ import (
 
 func (h *DonationHandler) CreatePayPalOrder(c echo.Context) error {
 	return c.JSON(http.StatusGone, map[string]string{
-		"error": "PayPal fue removido. Usa transferencia bancaria o Tigo Money.",
+		"error": "PayPal fue removido. Usa transferencia bancaria.",
 	})
 }
 

@@ -18,6 +18,8 @@ const PAYMENT_METHODS = [
   { icon: 'heart', label: 'En persona',             sub: 'Te recibimos un domingo',        value: 'presencial' },
 ];
 
+// ⚠️ El número de cuenta viene del mockup de Figma — PENDIENTE confirmar
+// la cuenta real con el pastor.
 const BANK_INFO = [
   { label: 'Banco',       value: 'Banrural' },
   { label: 'Cuenta',      value: '3061234567890' },

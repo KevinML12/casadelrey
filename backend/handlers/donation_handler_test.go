@@ -121,7 +121,10 @@ func TestRegisterDonation_CuerpoInvalido_Retorna400(t *testing.T) {
 }
 
 func TestRegisterDonation_MetodosValidos_SeGuardan(t *testing.T) {
-	metodos := []string{"transferencia", "tigo_money", "presencial"}
+	// tigo_money ya NO es válido (removido 13 jul 2026) — cae al default
+	// "presencial", igual se guarda. Solo transferencia y presencial son
+	// métodos de primera clase.
+	metodos := []string{"transferencia", "presencial"}
 	for _, metodo := range metodos {
 		db, mock, sqlDB := newMockDB(t)
 		h := handlers.NewDonationHandler(db)

@@ -5,11 +5,13 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 
+// Sin Tigo Money — decisión del usuario 13 jul 2026: solo transferencia/
+// depósito bancario. ⚠️ El número de cuenta viene del mockup de Figma —
+// PENDIENTE confirmar la cuenta real con el pastor.
 const BANK_INFO = [
   { label: 'Banco',       value: 'Banrural' },
   { label: 'Cuenta',      value: '3061234567890' },
   { label: 'A nombre de', value: 'Iglesia Casa del Rey' },
-  { label: 'Tigo Money',  value: '+502 4760-0636' },
 ];
 
 export default function ReceiptPage() {

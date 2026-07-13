@@ -4,7 +4,7 @@ package handlers_test
 // endpoints devuelven 410 Gone incondicionalmente. Los tests anteriores
 // validaban montos/nombres/credenciales de un flujo que ya no existe.
 // Estos verifican el contrato actual: siempre 410 con mensaje que apunta
-// a los métodos vigentes (transferencia / Tigo Money).
+// al método vigente (transferencia bancaria).
 
 import (
 	"net/http"

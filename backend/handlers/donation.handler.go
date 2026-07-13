@@ -44,9 +44,11 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El nombre es obligatorio."})
 	}
 
+	// Tigo Money removido (13 jul 2026, decisión del usuario) — solo
+	// transferencia/depósito bancario o en persona. Los registros viejos
+	// con tigo_money quedan en la DB; solo se rechaza para NUEVAS.
 	validMethods := map[string]bool{
 		"transferencia": true,
-		"tigo_money":    true,
 		"presencial":    true,
 	}
 	if req.PaymentMethod == "" || !validMethods[req.PaymentMethod] {

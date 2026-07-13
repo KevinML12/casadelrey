@@ -12,12 +12,14 @@ import { useSitePhoto } from '../../lib/feed';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-white/15 bg-white/5 text-[14px] text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all';
 
-// Datos bancarios de la iglesia (centralizado)
+// Datos bancarios de la iglesia (centralizado). Sin Tigo Money — decisión
+// del usuario 13 jul 2026: solo transferencia/depósito bancario.
+// ⚠️ El número de cuenta viene del mockup de Figma — PENDIENTE confirmar
+// la cuenta real con el pastor antes de promover eventos con costo.
 const BANK_INFO = [
   { label: 'Banco',      value: 'Banrural' },
   { label: 'Cuenta',     value: '3061234567890' },
   { label: 'A nombre de',value: 'Iglesia Casa del Rey' },
-  { label: 'Tigo Money', value: '+502 4760-0636' },
 ];
 
 function PaymentBanner({ event }) {

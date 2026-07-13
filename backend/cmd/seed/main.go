@@ -239,7 +239,7 @@ func main() {
 
 	donations := []models.Donation{
 		{Name: "Pedro Alvarado",  Email: "pedro.a@email.com",  Amount: 500.00,  Currency: "GTQ", PaymentMethod: "transferencia", PaymentReference: "TRF-2026-001", IsSuccessful: true, DonationPurpose: "Diezmo"},
-		{Name: "Sandra Lopez",    Email: "sandra.l@email.com", Amount: 200.00,  Currency: "GTQ", PaymentMethod: "tigo_money",    PaymentReference: "TM-2026-002",  IsSuccessful: true, DonationPurpose: "Ofrenda"},
+		{Name: "Sandra Lopez",    Email: "sandra.l@email.com", Amount: 200.00,  Currency: "GTQ", PaymentMethod: "transferencia", PaymentReference: "TR-2026-002",  IsSuccessful: true, DonationPurpose: "Ofrenda"},
 		{Name: "Familia Ramirez", Email: "fam.r@email.com",    Amount: 1000.00, Currency: "GTQ", PaymentMethod: "presencial",    PaymentReference: "PRES-2026-003",IsSuccessful: true, DonationPurpose: "Construccion"},
 	}
 	for i := range donations {
