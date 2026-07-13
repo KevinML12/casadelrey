@@ -3,9 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
-import Input from '../../components/ui/Input';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon } from '../../components/ui/Glass';
+import { Icon, GlassField } from '../../components/ui/Glass';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -37,7 +36,7 @@ export default function ResetPassword() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
+        <GlassField
           label="Nueva contraseña"
           type="password"
           value={password}
@@ -46,7 +45,7 @@ export default function ResetPassword() {
           helperText="Mínimo 6 caracteres"
           required
         />
-        <Input
+        <GlassField
           label="Confirmar contraseña"
           type="password"
           value={confirm}

@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import Input from '../../components/ui/Input';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon } from '../../components/ui/Glass';
+import { Icon, GlassField } from '../../components/ui/Glass';
 
 export default function ForgotPassword() {
   const [email, setEmail]         = useState('');
@@ -53,7 +52,7 @@ export default function ForgotPassword() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
+            <GlassField
               label="Correo electrónico"
               type="email"
               value={email}

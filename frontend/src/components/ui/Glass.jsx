@@ -111,29 +111,52 @@ export function Eyebrow({ children }) {
   );
 }
 
-/* ---------- Pill button (squircle 12, spring physics) ---------- */
+/* ---------- Pill button (lenguaje actual del sitio) ----------
+   Antes: relleno bg-celeste plano + rounded-sm — sobreviviente del
+   sistema S9 viejo, se leía "botón genérico de IA". La guía es clara:
+   el material ES el acento, nada de colores planos. El primario del
+   sitio es el pill BLANCO (como en el hero/Login), el secundario es
+   cristal con borde. */
 export const GlassButton = forwardRef(function GlassButton(
   { children, variant = 'primary', icon, className = '', as: As = 'button', ...props },
   ref,
 ) {
-  const base = 'group inline-flex items-center justify-center gap-2 rounded-sm font-bold tracking-tightish btn-spring select-none cursor-pointer focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
+  const base = 'group inline-flex items-center justify-center gap-2 rounded-pill font-bold tracking-tightish btn-spring select-none cursor-pointer focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
   const variants = {
-    // Primary — sapphire fill, navy text? no: white text. Pop shadow.
-    primary: 'px-6 py-3.5 text-[15px] text-white bg-celeste shadow-pri hover:bg-celeste-hov hover:shadow-pri-lg',
-    // Glass — white translucent over light bg, ink text
-    glass:   'px-6 py-3.5 text-[15px] text-ink glass glass-sheen hover:bg-white',
-    // Ink — solid navy chip
-    ink:     'px-6 py-3.5 text-[15px] text-white bg-ink hover:bg-celeste shadow-whisper',
-    // Ghost — minimal
-    ghost:   'px-5 py-2.5 text-[14px] text-ink-2 hover:text-ink hover:bg-bg-soft',
+    // Primario — pill blanco sobre navy (el CTA estándar del sitio)
+    primary: 'px-6 py-3.5 text-[15px] text-bg bg-white shadow-card hover:shadow-card-lg',
+    // Cristal — vidrio con borde, texto blanco
+    glass:   'px-6 py-3.5 text-[15px] text-white liquid-glass border border-white/20 hover:border-white/40',
+    // Ghost — mínimo
+    ghost:   'px-5 py-2.5 text-[14px] text-white/60 hover:text-white hover:bg-white/5',
   };
   return (
-    <As ref={ref} className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <As ref={ref} className={`${base} ${variants[variant] || variants.primary} ${className}`} {...props}>
       {children}
       {icon && <Icon name={icon} className="w-[18px] h-[18px] transition-transform duration-300 group-hover:translate-x-0.5" stroke={2} />}
     </As>
   );
 });
+
+/* ---------- Campo de formulario público (sobre cristal/navy) ----------
+   Para páginas públicas (auth, formularios sobre .liquid-glass). El
+   Input de ui/Input.jsx es Material Design 3 y es EXCLUSIVO del panel
+   admin — no mezclarlo en el público (docs/DISENO_LIQUID_GLASS.md §1). */
+const glassFieldStyle = {
+  background: 'rgba(255,255,255,0.05)',
+  borderColor: 'rgba(255,255,255,0.12)',
+  color: '#fff',
+};
+
+export function GlassField({ label, error, className = '', ...props }) {
+  return (
+    <label className="block text-left">
+      {label && <span className="block text-[13px] font-semibold text-white/60 mb-2">{label}</span>}
+      <input className={`input-squircle ${className}`} style={glassFieldStyle} {...props} />
+      {error && <span className="block text-[12.5px] font-medium text-red-400 mt-1.5">{error}</span>}
+    </label>
+  );
+}
 
 /* ---------- Form field (input/select/textarea) ---------- */
 export function Field({ label, type = 'text', name, value, onChange, error, placeholder, as = 'input', children, ...rest }) {

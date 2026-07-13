@@ -171,17 +171,23 @@ export default function DonationCard() {
       {/* Montos */}
       <div>
         <label className={labelCls}>Monto (Q)</label>
-        <div className="grid grid-cols-4 gap-2 mb-3">
+        {/* Pills, no cajas: el seleccionado es el pill blanco estándar del
+            sitio; los demás son .liquid-btn (vidrio con cuerpo) — la clase
+            .liquid-glass pelada en chips chicos sobre panel navy se leía
+            como caja gris genérica. */}
+        <div className="grid grid-cols-4 gap-2.5 mb-3">
           {AMOUNTS.map(a => {
             const active = amount === a && !custom;
             return (
               <motion.button
                 key={a}
                 type="button"
+                whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 onClick={() => { setAmount(a); setCustom(''); }}
-                className={`py-3 rounded-[14px] text-[14.5px] font-bold transition-colors ${
-                  active ? 'bg-white text-bg' : 'liquid-glass text-white hover:border-white/25'
+                className={`py-3 rounded-pill text-[14.5px] font-bold transition-colors focus-ring ${
+                  active ? 'bg-white text-bg shadow-card' : 'liquid-btn'
                 }`}
               >
                 Q{a}
@@ -202,19 +208,22 @@ export default function DonationCard() {
       {/* Destino */}
       <div>
         <label className={labelCls}>Destino</label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {PURPOSES.map(p => {
             const active = purpose === p.value;
             return (
               <motion.button
                 key={p.value}
                 type="button"
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 onClick={() => setPurpose(p.value)}
-                className={`text-left rounded-[14px] px-4 py-3 text-[14px] font-bold transition-colors ${
-                  active ? 'bg-white/15 border border-white/30 text-white' : 'liquid-glass text-white/70 hover:text-white hover:border-white/25'
+                className={`flex items-center gap-2.5 rounded-pill px-5 py-3 text-[14px] font-bold transition-colors focus-ring ${
+                  active ? 'bg-white text-bg shadow-card' : 'liquid-btn !text-white/75 hover:!text-white'
                 }`}
               >
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-celeste' : 'bg-white/30'}`} />
                 {p.label}
               </motion.button>
             );
@@ -232,10 +241,12 @@ export default function DonationCard() {
               <motion.button
                 key={m.value}
                 type="button"
+                whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 onClick={() => setMethod(m.value)}
-                className={`w-full flex items-center gap-4 rounded-[16px] px-4 py-4 text-left transition-colors liquid-glass ${
-                  active ? 'border-white/30 bg-white/10' : 'hover:border-white/20'
+                className={`w-full flex items-center gap-4 rounded-[18px] px-4 py-4 text-left transition-all liquid-glass liquid-shine focus-ring ${
+                  active ? 'border-white/35 bg-white/10 shadow-card' : 'hover:border-white/20'
                 }`}
               >
                 <span className={`grid place-items-center w-11 h-11 rounded-full shrink-0 ${

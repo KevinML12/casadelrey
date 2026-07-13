@@ -4,9 +4,8 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
-import Input from '../../components/ui/Input';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon } from '../../components/ui/Glass';
+import { Icon, GlassField } from '../../components/ui/Glass';
 
 export default function Login() {
   const [email, setEmail]       = useState('');
@@ -43,7 +42,7 @@ export default function Login() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
+        <GlassField
           label="Correo electrónico"
           type="email"
           value={email}
@@ -51,7 +50,7 @@ export default function Login() {
           placeholder="tu@correo.com"
           required
         />
-        <Input
+        <GlassField
           label="Contraseña"
           type="password"
           value={password}
