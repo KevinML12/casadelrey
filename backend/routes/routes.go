@@ -204,6 +204,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Peticiones admin
 	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
+	adminGroup.DELETE("/petitions/:id",   petitionHandler.DeletePetition)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")

@@ -114,6 +114,36 @@ func (h *PetitionHandler) MarkAsRead(c echo.Context) error {
 	return c.JSON(http.StatusOK, petition)
 }
 
+// DeletePetition godoc
+// DELETE /api/v1/admin/petitions/:id  [Requiere auth + rol admin]
+// Elimina una petición (soft-delete de GORM — conserva el registro con
+// deleted_at para auditoría). Lo usa el panel pastoral y la limpieza de
+// los tests E2E (regla del repo: todo test borra los datos que crea).
+func (h *PetitionHandler) DeletePetition(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "ID de petición inválido.",
+		})
+	}
+
+	result := h.DB.Delete(&models.Petition{}, id)
+	if result.Error != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "No se pudo eliminar la petición.",
+		})
+	}
+	if result.RowsAffected == 0 {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": "Petición no encontrada.",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"message": "Petición eliminada correctamente.",
+	})
+}
+
 // GetWeeklyPetitions godoc
 // GET /api/v1/admin/petitions/weekly  [Requiere auth + rol admin o leader]
 // Retorna todas las peticiones de la semana en curso (lunes–domingo)

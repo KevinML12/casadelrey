@@ -152,6 +152,18 @@ export default function Header() {
               </div>
             )}
 
+            {/* Sin sesión: entrada visible a /login (antes no existía —
+                imposible llegar al panel admin sin teclear la URL) */}
+            {!isAuthenticated && (
+              <Link
+                to="/login"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-[14px] font-bold transition-all duration-300 focus-ring"
+              >
+                <Icon name="user" className="w-4 h-4" />
+                Ingresar
+              </Link>
+            )}
+
             <Link
               to="/donate"
               className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-[14px] font-bold transition-all duration-300 focus-ring"
@@ -198,6 +210,15 @@ export default function Header() {
             ))}
 
             <div className="pt-2 mt-1 border-t border-bg/10 flex flex-col gap-1">
+              {!isAuthenticated && (
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="px-4 py-2.5 rounded-md text-[14px] font-medium text-bg hover:bg-bg/5 transition-colors"
+                >
+                  Ingresar
+                </Link>
+              )}
               {isAuthenticated && (
                 <>
                   {(isAdmin || user?.role === 'leader') && (

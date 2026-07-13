@@ -186,6 +186,9 @@ func TestGetAll_ConFiltroDepartamento_Retorna200(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewVolunteerHandler(db)
 
+	// GetAll ahora pagina: primero un COUNT, luego el SELECT de la pagina
+	mock.ExpectQuery(`SELECT count\(\*\) FROM "volunteers"`).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
 	mock.ExpectQuery(`SELECT .* FROM "volunteers"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "department"}).
 			AddRow(1, "Pedro", "alabanza"))
@@ -202,6 +205,8 @@ func TestGetAll_Leader_SoloVeSuyos_Retorna200(t *testing.T) {
 	h := handlers.NewVolunteerHandler(db)
 
 	// Con role=leader y userID=7, la query lleva WHERE assigned_leader_id = 7
+	mock.ExpectQuery(`SELECT count\(\*\) FROM "volunteers"`).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
 	mock.ExpectQuery(`SELECT .* FROM "volunteers"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "assigned_leader_id"}).
 			AddRow(1, "Ana", 7))
@@ -210,9 +215,12 @@ func TestGetAll_Leader_SoloVeSuyos_Retorna200(t *testing.T) {
 	require.NoError(t, h.GetAll(c))
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var list []map[string]interface{}
-	decodeBody(t, rec, &list)
-	assert.Len(t, list, 1)
+	// La respuesta ahora es paginada: { data: [...], meta: {...} }
+	var resp struct {
+		Data []map[string]interface{} `json:"data"`
+	}
+	decodeBody(t, rec, &resp)
+	assert.Len(t, resp.Data, 1)
 }
 
 // ─── CreateUserFromVolunteer: email duplicado ──────────────────────────────────
@@ -242,6 +250,8 @@ func TestGetAll_Admin_VeTodos_Retorna200(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewVolunteerHandler(db)
 
+	mock.ExpectQuery(`SELECT count\(\*\) FROM "volunteers"`).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(2))
 	mock.ExpectQuery(`SELECT .* FROM "volunteers"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "department", "status"}).
 			AddRow(1, "Ana", "alabanza", "pendiente").
@@ -251,9 +261,12 @@ func TestGetAll_Admin_VeTodos_Retorna200(t *testing.T) {
 	require.NoError(t, h.GetAll(c))
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var list []map[string]interface{}
-	decodeBody(t, rec, &list)
-	assert.Len(t, list, 2)
+	// La respuesta ahora es paginada: { data: [...], meta: {...} }
+	var resp struct {
+		Data []map[string]interface{} `json:"data"`
+	}
+	decodeBody(t, rec, &resp)
+	assert.Len(t, resp.Data, 2)
 }
 
 func TestGetAll_ErrorDB_Retorna500(t *testing.T) {

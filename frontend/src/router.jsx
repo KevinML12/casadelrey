@@ -144,7 +144,10 @@ export const router = createBrowserRouter([
       { path: 'gallery',               element: <GalleryPage /> },
       { path: 'celulas',               element: <CelulasPage /> },
       { path: 'conectate',             element: <ConnectPage /> },
-      { path: 'prayer',                element: <ProtectedRoute leaderOrAdmin><PrayerPage /></ProtectedRoute> },
+      // Pública a propósito: cualquiera manda su petición con sus datos,
+      // le llega al equipo pastoral (panel admin) y se leen los domingos.
+      // Estuvo por error detrás de ProtectedRoute leaderOrAdmin.
+      { path: 'prayer',                element: <PrayerPage /> },
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },

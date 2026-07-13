@@ -145,3 +145,57 @@ func TestGetAllPetitions_Retorna200(t *testing.T) {
 	decodeBody(t, rec, &resp)
 	assert.Len(t, resp["data"].([]interface{}), 2)
 }
+
+// ─── DeletePetition ───────────────────────────────────────────────────────────
+
+func TestDeletePetition_IDInvalido_Retorna400(t *testing.T) {
+	db, _, sqlDB := newMockDB(t)
+	defer sqlDB.Close()
+	h := handlers.NewPetitionHandler(db)
+
+	c, rec := newCtx(t, ctxOpts{
+		method: "DELETE",
+		params: map[string]string{"id": "abc"},
+	})
+	require.NoError(t, h.DeletePetition(c))
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+}
+
+func TestDeletePetition_NoExiste_Retorna404(t *testing.T) {
+	db, mock, sqlDB := newMockDB(t)
+	defer sqlDB.Close()
+	h := handlers.NewPetitionHandler(db)
+
+	// Soft-delete de GORM = UPDATE petitions SET deleted_at=... → 0 filas
+	mock.ExpectBegin()
+	mock.ExpectExec(`UPDATE "petitions"`).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectCommit()
+
+	c, rec := newCtx(t, ctxOpts{
+		method: "DELETE",
+		params: map[string]string{"id": "999"},
+	})
+	require.NoError(t, h.DeletePetition(c))
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+}
+
+func TestDeletePetition_OK_Retorna200(t *testing.T) {
+	db, mock, sqlDB := newMockDB(t)
+	defer sqlDB.Close()
+	h := handlers.NewPetitionHandler(db)
+
+	mock.ExpectBegin()
+	mock.ExpectExec(`UPDATE "petitions"`).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
+	c, rec := newCtx(t, ctxOpts{
+		method: "DELETE",
+		params: map[string]string{"id": "3"},
+	})
+	require.NoError(t, h.DeletePetition(c))
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	var resp map[string]string
+	decodeBody(t, rec, &resp)
+	assert.Contains(t, resp["message"], "eliminada")
+}
