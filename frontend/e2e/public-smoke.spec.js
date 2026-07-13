@@ -33,6 +33,19 @@ test.describe('Sitio público — smoke', () => {
     }
   });
 
+  test('login y registro tienen foto real de fondo (no navy plano)', async ({ page }) => {
+    // Sin foto detrás, el cristal se lee como caja gris — la guía exige
+    // "hero de fondo siempre".
+    await page.goto('/login');
+    await expect(page.locator('img[src*="bg-auth"], img[src*="site-photos"]').first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/register');
+    await expect(page.locator('img[src*="bg-registro"], img[src*="site-photos"]').first()).toBeVisible({ timeout: 15_000 });
+    // Los 3 pasos del camino de cuenta
+    await expect(page.getByText('Habla con tu líder')).toBeVisible();
+    await expect(page.getByText('Te crean la cuenta')).toBeVisible();
+    await expect(page.getByText('Ingresa y listo')).toBeVisible();
+  });
+
   test('células abre su ventana sobrepuesta (WindowStack) accesible', async ({ page }) => {
     await page.goto('/celulas');
     // Abrir la primera card del collage
