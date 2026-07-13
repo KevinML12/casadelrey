@@ -587,7 +587,9 @@ function CelulasSection({ bg }) {
         if (res.data && res.data.length > 0) setCategories(res.data);
         else throw new Error("No categories");
       })
-      .catch(err => {
+      .catch(() => {
+        // Fallback PERMITIDO por la guía: categorías estructurales reales
+        // de la iglesia (no contenido inventado), con fotos reales.
         setCategories([
           { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: '/images/celulas/adolescentes.jpg' },
           { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: '/images/celulas/jovenes.jpg' },

@@ -1,14 +1,29 @@
+// ============================================================
+//  ProfilePage — perfil del usuario en el lenguaje PÚBLICO (Liquid
+//  Glass). Antes estaba construida con los tokens Material Design 3
+//  del panel admin (bg-surf, text-on-surf, bg-pri-con...) — la guía
+//  prohíbe mezclar los dos sistemas en la cara pública.
+// ============================================================
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
+import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
+import Tilt from '../../components/ui/Tilt';
+import ParallaxImg from '../../components/ui/ParallaxImg';
+import { useSitePhoto } from '../../lib/feed';
+
+const PRESS = {
+  whileHover: { scale: 1.02 },
+  whileTap: { scale: 0.97 },
+  transition: { type: 'spring', stiffness: 400, damping: 17 },
+};
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const heroImg = useSitePhoto('hero_perfil', '/images/bg-hero.jpg');
   const [goals,    setGoals]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [newTitle, setNewTitle] = useState('');
@@ -55,118 +70,125 @@ export default function ProfilePage() {
   const initial = (user?.name || user?.email || '?')[0].toUpperCase();
 
   return (
-    <div className="min-h-screen bg-surf py-12">
-      <Reveal className="max-w-xl mx-auto px-6">
-        <h1 className="text-headline-s text-on-surf font-black mb-8">Mi Perfil</h1>
+    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+      {/* Hero de fondo presente en toda la página */}
+      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
 
-        {/* Avatar */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-full bg-pri-con flex items-center justify-center shrink-0">
-            <span className="text-on-pri-con text-headline-s font-black">{initial}</span>
-          </div>
-          <div>
-            <p className="text-title-l text-on-surf font-bold">{user?.name || 'Sin nombre'}</p>
-            <p className="text-body-s text-on-surf-var">{user?.email}</p>
-            <p className="text-label-s text-on-surf-var capitalize mt-0.5">{user?.role || 'usuario'}</p>
-          </div>
-        </div>
+      <div className="relative z-10 max-w-2xl mx-auto px-6 pt-40 pb-28">
+        <Reveal>
+          <Eyebrow>Tu espacio</Eyebrow>
+          <h1 className="display-mega text-white mt-4 mb-10" style={{ fontSize: 'clamp(2.6rem, 6vw, 4.5rem)' }}>
+            Mi Perfil
+          </h1>
+        </Reveal>
 
-        {/* Info */}
-        <div className="bg-surf-low border border-outline-var rounded-xl overflow-hidden mb-8">
-          {[
-            { icon: 'mail', label: 'Correo electrónico', value: user?.email || '—' },
-            { icon: 'user', label: 'Rol',                value: user?.role || 'usuario', capitalize: true },
-          ].map(({ icon, label, value, capitalize }) => (
-            <div key={label} className="flex items-center gap-3 px-5 py-4 border-b border-outline-var last:border-0">
-              <Icon name={icon} className="w-[18px] h-[18px] text-on-surf-var" />
-              <div>
-                <p className="text-label-s text-on-surf-var font-medium">{label}</p>
-                <p className={`text-body-s text-on-surf font-medium mt-0.5 ${capitalize ? 'capitalize' : ''}`}>{value}</p>
+        {/* Identidad */}
+        <Reveal delay={0.05}>
+          <Tilt max={3} glass className="liquid-glass rounded-[24px] p-7 md:p-8 mb-6">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                <span className="text-[26px] font-bold text-white">{initial}</span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[20px] font-bold text-white leading-tight truncate">{user?.name || 'Sin nombre'}</p>
+                <p className="text-[14px] text-white/60 truncate">{user?.email}</p>
+                <span className="inline-flex items-center gap-1.5 mt-2 bg-white/10 border border-white/15 text-white/80 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold capitalize">
+                  <span className="w-1.5 h-1.5 rounded-full bg-celeste" />
+                  {user?.role || 'usuario'} · cuenta activa
+                </span>
               </div>
             </div>
-          ))}
-          <div className="flex items-center gap-3 px-5 py-4">
-            <Icon name="user" className="w-[18px] h-[18px] text-on-surf-var" />
-            <div>
-              <p className="text-label-s text-on-surf-var font-medium">Estado de cuenta</p>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-label-s font-medium bg-ter-con text-on-ter-con mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-ter" />
-                Activa
-              </span>
-            </div>
-          </div>
-        </div>
+          </Tilt>
+        </Reveal>
 
         {/* Metas */}
-        <div className="mb-8">
-          <h2 className="text-title-l text-on-surf font-bold mb-4 flex items-center gap-2">
-            <Icon name="spark" className="w-[22px] h-[22px] text-pri" />
-            Mis metas
-          </h2>
-          <form onSubmit={addGoal} className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              placeholder="Nueva meta..."
-              className="flex-1 px-4 py-2.5 rounded-full border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri transition-colors"
-            />
-            <button
-              type="submit"
-              disabled={adding || !newTitle.trim()}
-              className="w-10 h-10 rounded-full bg-pri text-on-pri flex items-center justify-center text-[20px] font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
-            >
-              +
-            </button>
-          </form>
+        <Reveal delay={0.1}>
+          <Tilt max={2} glass className="liquid-glass rounded-[24px] p-7 md:p-8">
+            <h2 className="text-[20px] font-bold text-white tracking-tight mb-5 flex items-center gap-2.5">
+              <Icon name="spark" className="w-5 h-5 text-celeste" />
+              Mis metas
+            </h2>
 
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="w-5 h-5 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
-            </div>
-          ) : goals.length === 0 ? (
-            <p className="text-body-s text-on-surf-var py-4">Aún no tienes metas. ¡Agrega una!</p>
-          ) : (
-            <div className="space-y-2">
-              {goals.map(g => (
-                <div key={g.ID}
-                  className={`flex items-center gap-3 p-4 rounded-xl border border-outline-var bg-surf-low ${g.completed ? 'opacity-60' : ''}`}>
-                  <button
-                    onClick={() => toggleGoal(g)}
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                      g.completed ? 'bg-ter border-ter text-ink' : 'border-outline hover:border-pri'
-                    }`}
-                  >
-                    {g.completed && <Icon name="check" className="w-3.5 h-3.5" />}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-body-s text-on-surf font-medium ${g.completed ? 'line-through text-on-surf-var' : ''}`}>
-                      {g.title}
-                    </p>
-                    {g.target_date && (
-                      <p className="text-label-s text-on-surf-var mt-0.5">Para: {g.target_date}</p>
-                    )}
+            <form onSubmit={addGoal} className="flex gap-2.5 mb-5">
+              <input
+                type="text"
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+                placeholder="Nueva meta..."
+                className="input-squircle flex-1"
+                style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: '#fff' }}
+              />
+              <motion.button
+                type="submit"
+                {...PRESS}
+                disabled={adding || !newTitle.trim()}
+                aria-label="Agregar meta"
+                className="w-11 h-11 rounded-full bg-white text-bg flex items-center justify-center text-[22px] font-bold focus-ring disabled:opacity-50 shrink-0"
+              >
+                +
+              </motion.button>
+            </form>
+
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+              </div>
+            ) : goals.length === 0 ? (
+              <p className="text-[14.5px] text-white/50 py-3">Aún no tienes metas. ¡Agrega una!</p>
+            ) : (
+              <div className="space-y-2.5">
+                {goals.map(g => (
+                  <div key={g.ID}
+                    className={`flex items-center gap-3.5 p-4 rounded-[16px] bg-white/5 border border-white/10 ${g.completed ? 'opacity-60' : ''}`}>
+                    <button
+                      onClick={() => toggleGoal(g)}
+                      aria-label={g.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors focus-ring ${
+                        g.completed ? 'bg-celeste border-celeste text-white' : 'border-white/30 hover:border-white/60'
+                      }`}
+                    >
+                      {g.completed && <Icon name="check" className="w-3.5 h-3.5" />}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-[14.5px] font-medium text-white ${g.completed ? 'line-through text-white/50' : ''}`}>
+                        {g.title}
+                      </p>
+                      {g.target_date && (
+                        <p className="text-[12px] text-white/50 mt-0.5">Para: {g.target_date}</p>
+                      )}
+                    </div>
+                    <button onClick={() => deleteGoal(g.ID)} aria-label="Eliminar meta"
+                      className="text-white/40 hover:text-white p-1 shrink-0 transition-colors focus-ring rounded-full">
+                      <Icon name="close" className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button onClick={() => deleteGoal(g.ID)}
-                    className="text-on-surf-var hover:text-err p-1 shrink-0 transition-colors">
-                    <Icon name="close" className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </Tilt>
+        </Reveal>
 
-        <div className="flex gap-3">
-          <Button variant="tonal" onClick={() => toast('Próximamente disponible')}>
-            Editar perfil
-          </Button>
-          <Button variant="outlined" onClick={() => toast('Próximamente disponible')}>
-            <Icon name="lock" className="w-4 h-4" />
-            Cambiar contraseña
-          </Button>
-        </div>
-      </Reveal>
-    </div>
+        <Reveal delay={0.15}>
+          <div className="flex flex-wrap gap-3 mt-8">
+            <motion.button
+              type="button" {...PRESS}
+              onClick={() => toast('Próximamente disponible')}
+              className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-6 py-3.5 text-[14px] font-bold focus-ring"
+            >
+              Editar perfil
+            </motion.button>
+            <motion.button
+              type="button" {...PRESS}
+              onClick={() => toast('Próximamente disponible')}
+              className="inline-flex items-center gap-2 rounded-pill liquid-glass border border-white/20 px-6 py-3.5 text-[14px] font-bold text-white focus-ring"
+            >
+              <Icon name="lock" className="w-4 h-4" />
+              Cambiar contraseña
+            </motion.button>
+          </div>
+        </Reveal>
+      </div>
+    </main>
   );
 }

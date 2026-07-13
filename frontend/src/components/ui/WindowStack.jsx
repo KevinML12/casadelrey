@@ -19,9 +19,11 @@
 //  `layout` que necesita layoutId (la imagen se quedaba pegada al tamaño
 //  chico de la card de origen). No reintroducir sin resolver ese conflicto.
 // ============================================================
-import { useMemo, useEffect, useCallback } from 'react';
+import { useMemo, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from './Glass';
+
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 // Posición de cada ventana según su profundidad (0 = frente). Las de
 // atrás asoman hacia arriba, alternando el lado, como cartas apiladas.
@@ -35,6 +37,7 @@ const stackPose = (depth) => ({
 });
 
 export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80vh, 640px)' }) {
+  const overlayRef = useRef(null);
   const stack = useMemo(() => {
     if (!openKey) return [];
     const idx = items.findIndex(it => it.key === openKey);
@@ -51,21 +54,43 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
 
   useEffect(() => {
     if (!openKey) return;
+    // Focus trap: es un modal — el Tab no debe escaparse a la página de
+    // atrás (que sigue en el DOM, solo difuminada). Al abrir, el foco
+    // entra a la ventana; al cerrar, vuelve a donde estaba.
+    const prevFocus = document.activeElement;
+    overlayRef.current?.querySelector(FOCUSABLE)?.focus();
+
     const onKey = (e) => {
       if (e.key === 'Escape') close();
       else if (e.key === 'ArrowRight') go(1);
       else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'Tab') {
+        const nodes = overlayRef.current?.querySelectorAll(FOCUSABLE);
+        if (!nodes?.length) return;
+        const first = nodes[0], last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        else if (!overlayRef.current.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      }
     };
     window.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+      prevFocus?.focus?.();
+    };
   }, [openKey, close, go]);
 
   return (
     <AnimatePresence>
       {openKey && (
         <motion.div
+          ref={overlayRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={items.find(it => it.key === openKey)?.title}
           className="fixed inset-0 z-[100] flex items-center justify-center px-4"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
