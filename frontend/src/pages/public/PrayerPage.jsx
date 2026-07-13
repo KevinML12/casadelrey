@@ -18,6 +18,8 @@ export default function PrayerPage() {
         eyebrow="Peticiones de oración"
         title="Clama y Él responde."
         subtitle='"Clama a mí, y yo te responderé." — Jeremías 33:3'
+        photoSlot="hero_oracion"
+        photoFallback="/images/bg-ensenanzas.jpg"
       >
         <div className="flex flex-wrap justify-center gap-3 mt-8">
           {TRUST.map(({ icon, text }) => (

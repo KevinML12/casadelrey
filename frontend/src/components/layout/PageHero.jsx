@@ -1,13 +1,34 @@
 import { Halos } from '../ui/Glass';
+import ParallaxImg from '../ui/ParallaxImg';
+import { useSitePhoto } from '../../lib/feed';
 
 // Shared page hero — Liquid Glass Dark Mode.
-// Backward-compatible: legacy callers pass `icon` (Material Symbol name string),
-// `title`, `subtitle`, and optional `children` (CTAs underneath).
-export default function PageHero({ icon, eyebrow, title, subtitle, children }) {
+//
+// Con `photoSlot` (+ `photoFallback` local) el fondo es una FOTO REAL de la
+// iglesia administrable desde /admin/site-photos, como pide la guía ("hero
+// de fondo siempre"). Los Halos quedan solo como luz ambiental estática
+// detrás de la foto. Sin `photoSlot` se comporta como antes (solo halos) —
+// backward-compatible con cualquier caller que no haya migrado.
+//
+// Legacy props: `icon` (Material Symbol string), `title`, `subtitle`,
+// `children` (CTAs debajo).
+export default function PageHero({ icon, eyebrow, title, subtitle, children, photoSlot, photoFallback }) {
+  const photo = useSitePhoto(photoSlot || '', photoFallback || '');
+  const hasPhoto = Boolean(photoSlot && photo);
+
   return (
     <section className="relative pt-40 pb-20 md:pt-48 md:pb-28 overflow-hidden bg-bg">
-      <Halos variant="hero" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-bg" />
+      {hasPhoto ? (
+        <>
+          <ParallaxImg src={photo} alt="" className="opacity-45" />
+          <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
+        </>
+      ) : (
+        <>
+          <Halos variant="hero" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-bg" />
+        </>
+      )}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center animate-rise">
         {(icon || eyebrow) && (
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 liquid-glass border border-white/20 mb-6">

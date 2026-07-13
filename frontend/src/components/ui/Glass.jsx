@@ -56,14 +56,17 @@ export function Icon({ name, className = 'w-5 h-5', stroke = 1.6 }) {
   );
 }
 
-/* ---------- Soft halos (Apple-style luminous backdrop on white) ---------- */
+/* ---------- Soft halos (luz ambiental ESTÁTICA) ----------
+   Sin animación a propósito: la guía prohíbe loops ("se leen como
+   plantilla/IA") — antes pulsaban con haloPulse infinite. Son luz de
+   ambiente detrás del cristal, no un elemento animado. */
 export function Halos({ variant = 'hero' }) {
   if (variant === 'hero') {
     return (
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="halo" style={{ width: 640, height: 640, top: -180, right: -140, background: 'radial-gradient(circle, rgba(59,130,246,0.26), transparent 70%)', animation: 'haloPulse 11s ease-in-out infinite' }} />
-        <div className="halo" style={{ width: 520, height: 520, top: '30%', left: -160, background: 'radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%)', animation: 'haloPulse 13s ease-in-out infinite' }} />
-        <div className="halo" style={{ width: 520, height: 380, bottom: -200, left: '35%', background: 'radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%)', animation: 'haloPulse 15s ease-in-out infinite' }} />
+        <div className="halo" style={{ width: 640, height: 640, top: -180, right: -140, background: 'radial-gradient(circle, rgba(59,130,246,0.26), transparent 70%)' }} />
+        <div className="halo" style={{ width: 520, height: 520, top: '30%', left: -160, background: 'radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%)' }} />
+        <div className="halo" style={{ width: 520, height: 380, bottom: -200, left: '35%', background: 'radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%)' }} />
       </div>
     );
   }

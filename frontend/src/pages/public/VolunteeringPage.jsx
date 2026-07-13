@@ -6,6 +6,7 @@ import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import apiClient from '../../lib/apiClient';
+import { useSitePhoto } from '../../lib/feed';
 import toast from 'react-hot-toast';
 
 const PRESS = {
@@ -134,6 +135,9 @@ function VolunteerForm({ preselected, onClearPreselected }) {
 export default function VolunteeringPage() {
   const [selected, setSelected] = useState('');
   const formRef = useRef(null);
+  // Administrable desde /admin/site-photos (antes ruta hardcodeada — el
+  // admin no podía cambiarla sin deploy). El local queda de fallback.
+  const sectionImg = useSitePhoto('voluntariado_seccion', '/images/nosotros/servidores.jpg');
 
   const handleAreaClick = (value) => {
     setSelected(value);
@@ -146,10 +150,12 @@ export default function VolunteeringPage() {
         eyebrow="Sirve con tus talentos"
         title="Voluntariado"
         subtitle="Cada persona tiene un lugar. Únete a los más de 90 voluntarios que ya sirven en 10 departamentos."
+        photoSlot="hero_voluntariado"
+        photoFallback="/images/bg-ministerios.jpg"
       />
 
       <section className="relative py-4 pb-24 overflow-hidden">
-        <ParallaxImg src="/images/nosotros/servidores.jpg" alt="" className="opacity-40" />
+        <ParallaxImg src={sectionImg} alt="" className="opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/55 to-bg" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6">

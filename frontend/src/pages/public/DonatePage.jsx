@@ -18,6 +18,8 @@ export default function DonatePage() {
         eyebrow="Generosidad"
         title="Tu generosidad transforma."
         subtitle="Cada quetzal sembrado con fe produce fruto eterno."
+        photoSlot="hero_donar"
+        photoFallback="/images/bg-legado.jpg"
       />
 
       <section className="relative py-16 md:py-24 z-10">

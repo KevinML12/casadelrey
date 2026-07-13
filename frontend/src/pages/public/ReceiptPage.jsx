@@ -23,6 +23,8 @@ export default function ReceiptPage() {
         eyebrow="Comprobante"
         title="Sube tu depósito."
         subtitle="Lo verificamos y confirmamos tu pago lo antes posible."
+        photoSlot="hero_comprobante"
+        photoFallback="/images/bg-ubicacion.jpg"
       />
 
       <section className="relative py-16 md:py-24">
