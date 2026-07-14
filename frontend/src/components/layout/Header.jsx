@@ -45,18 +45,10 @@ export default function Header() {
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
-  // "Planifica tu visita" siempre lleva a la sección de ubicación —
-  // "Dar" (donaciones) es un link real y visible aparte, para TODOS
-  // los visitantes (antes solo aparecía si había sesión iniciada, así
-  // que un visitante anónimo nunca veía cómo donar).
-  const handlePlanVisit = () => {
-    setMenuOpen(false);
-    const scroll = () =>
-      document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' });
-    if (location.pathname === '/') scroll();
-    else { navigate('/'); setTimeout(scroll, 450); }
-  };
-
+  // CTA principal = "Conéctate" (tarjeta de conexión real, /conectate):
+  // la acción de primer contacto de un visitante nuevo. Reemplazó a
+  // "Planifica tu visita", que sólo hacía scroll a la dirección y se
+  // sentía genérica. "Dar" (donaciones) es un link visible aparte.
   return (
     <motion.header
       animate={{ y: hidden ? '-130%' : '0%' }}
@@ -172,13 +164,13 @@ export default function Header() {
               Dar
             </Link>
 
-            <button
-              onClick={handlePlanVisit}
+            <Link
+              to="/conectate"
               className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg text-white text-[14px] font-bold btn-spring focus-ring hover:bg-bg-soft"
             >
-              Planifica tu visita
+              Conéctate
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
-            </button>
+            </Link>
 
             <button
               onClick={() => setMenuOpen(o => !o)}
@@ -253,13 +245,14 @@ export default function Header() {
                   <Icon name="heart" className="w-4 h-4" />
                   Dar
                 </Link>
-                <button
-                  onClick={handlePlanVisit}
+                <Link
+                  to="/conectate"
+                  onClick={() => setMenuOpen(false)}
                   className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-[14.5px] font-bold btn-spring hover:bg-bg-soft"
                 >
-                  Planifica tu visita
+                  Conéctate
                   <Icon name="arrow" className="w-4 h-4" stroke={2} />
-                </button>
+                </Link>
             </div>
           </div>
         </div>

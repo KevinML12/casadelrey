@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
@@ -37,7 +37,7 @@ const SLIDE_FALLBACK = {
   subtitle: '',
   schedule: '',
   media: LOCAL_MEDIA,
-  ctaText: 'Planifica tu visita', ctaUrl: '#',
+  ctaText: 'Conéctate', ctaUrl: '/conectate',
 };
 
 const fmtEventDate = (d) =>
@@ -403,14 +403,14 @@ function HeroCarousel({ onPlan }) {
             )}
 
             <div className={`${nextEvent ? 'mt-6' : ''} flex flex-col gap-2.5`}>
-              <motion.button
-                onClick={onPlan}
+              <MotionLink
+                to="/conectate"
                 {...PRESS}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white text-bg px-5 py-3.5 text-[14px] font-bold focus-ring shadow-card"
               >
-                Planifica tu visita
+                Conéctate
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />
-              </motion.button>
+              </MotionLink>
               <MotionLink
                 to="/events"
                 {...PRESS}
@@ -1034,9 +1034,10 @@ function GalleryPreviewSection() {
 export default function Home() {
   // Fondos de sección curados desde la galería del admin (fallback local)
   const backdrops = useBackdrops();
-  // "Planifica tu visita" lleva a la sección de ubicación/primera vez
-  const handlePlan = () =>
-    document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' });
+  const navigate = useNavigate();
+  // Fallback del CTA del hero (si un slide del backend trae un ctaUrl no
+  // navegable): la acción de primer contacto es Conéctate, no un scroll.
+  const handlePlan = () => navigate('/conectate');
 
   return (
     <main className="bg-bg w-full">
