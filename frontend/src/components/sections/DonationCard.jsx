@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../ui/Glass';
+import BankDetails from './BankDetails';
 
 const AMOUNTS  = [50, 100, 250, 500];
 const PURPOSES = [
@@ -26,14 +27,6 @@ const PURPOSES = [
 const PAYMENT_METHODS = [
   { icon: 'spark', label: 'Transferencia bancaria', sub: 'Sube tu boleta y la verificamos', value: 'transferencia' },
   { icon: 'heart', label: 'En persona',             sub: 'Te recibimos un domingo',        value: 'presencial' },
-];
-
-// ⚠️ El número de cuenta viene del mockup de Figma — PENDIENTE confirmar
-// la cuenta real con el pastor.
-const BANK_INFO = [
-  { label: 'Banco',       value: 'Banrural' },
-  { label: 'Cuenta',      value: '3061234567890' },
-  { label: 'A nombre de', value: 'Iglesia Casa del Rey' },
 ];
 
 const PRESS = {
@@ -365,14 +358,7 @@ export default function DonationCard() {
 
                         {isTransfer && (
                           <>
-                            <div className="space-y-2">
-                              {BANK_INFO.map(({ label, value }) => (
-                                <div key={label} className="flex items-center justify-between rounded-[12px] bg-white/5 px-4 py-3 border border-white/10">
-                                  <span className="text-[12.5px] font-semibold text-white/60">{label}</span>
-                                  <span className="text-[14.5px] font-bold text-white">{value}</span>
-                                </div>
-                              ))}
-                            </div>
+                            <BankDetails />
 
                             {receiptUrl ? (
                               <div className="flex items-center gap-4 rounded-[14px] bg-white/5 border border-white/15 p-4">

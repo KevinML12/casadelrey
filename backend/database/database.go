@@ -89,6 +89,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			// CMS
 			&models.HeroSetting{},
 			&models.SitePhoto{},
+			&models.SiteSetting{}, // config texto administrable (datos bancarios)
 			// Sistema
 			&models.UserGoal{},
 			&models.ActivityLog{},

@@ -61,6 +61,17 @@ type SitePhoto struct {
 	ImageURL string `json:"image_url" gorm:"type:varchar(500)"`
 }
 
+// SiteSetting — configuración de texto administrable (clave-valor). Lo
+// usa el admin para datos que NO deben estar hardcodeados: cuenta
+// bancaria, nombre del titular, etc. Público lee /settings; el admin
+// edita en /admin/settings. Evita "números de cuenta inventados en el
+// código" (regla del proyecto: nada estático).
+type SiteSetting struct {
+	gorm.Model
+	Key   string `json:"key" gorm:"type:varchar(60);unique;not null"`
+	Value string `json:"value" gorm:"type:varchar(300)"`
+}
+
 type Post struct {
 	gorm.Model
 	Title          string `json:"title" gorm:"not null"`

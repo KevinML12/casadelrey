@@ -51,6 +51,7 @@ const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
 const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
 const AdminHero          = lazy(() => import('./pages/admin/AdminHero'));
 const AdminSitePhotos    = lazy(() => import('./pages/admin/AdminSitePhotos'));
+const AdminSettings      = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminConnectCards  = lazy(() => import('./pages/admin/AdminConnectCards'));
 const ReceiptPage        = lazy(() => import('./pages/public/ReceiptPage'));
 const ProfilePage        = lazy(() => import('./pages/public/ProfilePage'));
@@ -96,6 +97,7 @@ export const router = createBrowserRouter([
       { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
       { path: 'hero',            element: <Suspense fallback={<PageFallback />}><AdminHero /></Suspense> },
       { path: 'site-photos',     element: <Suspense fallback={<PageFallback />}><AdminSitePhotos /></Suspense> },
+      { path: 'settings',        element: <Suspense fallback={<PageFallback />}><AdminSettings /></Suspense> },
       { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><AdminConnectCards /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
     ],

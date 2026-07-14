@@ -8,19 +8,10 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import BankDetails from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-white/15 bg-white/5 text-[14px] text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all';
-
-// Datos bancarios de la iglesia (centralizado). Sin Tigo Money — decisión
-// del usuario 13 jul 2026: solo transferencia/depósito bancario.
-// ⚠️ El número de cuenta viene del mockup de Figma — PENDIENTE confirmar
-// la cuenta real con el pastor antes de promover eventos con costo.
-const BANK_INFO = [
-  { label: 'Banco',      value: 'Banrural' },
-  { label: 'Cuenta',     value: '3061234567890' },
-  { label: 'A nombre de',value: 'Iglesia Casa del Rey' },
-];
 
 function PaymentBanner({ event }) {
   return (
@@ -32,13 +23,9 @@ function PaymentBanner({ event }) {
       <p className="text-[13.5px] text-white/60">
         Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
       </p>
-      <div className="space-y-1.5 pt-1 border-t border-white/10">
-        {BANK_INFO.map(({ label, value }) => (
-          <div key={label} className="flex gap-2 text-[13.5px]">
-            <span className="text-white/50 w-24 shrink-0">{label}</span>
-            <span className="text-white font-semibold">{value}</span>
-          </div>
-        ))}
+      {/* Datos bancarios administrables (nunca un número inventado) */}
+      <div className="pt-1 border-t border-white/10">
+        <BankDetails />
       </div>
       {event.payment_deadline && (
         <p className="text-[12.5px] text-rose flex items-center gap-1.5">

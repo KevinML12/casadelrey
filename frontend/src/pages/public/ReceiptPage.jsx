@@ -4,15 +4,7 @@ import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
-
-// Sin Tigo Money — decisión del usuario 13 jul 2026: solo transferencia/
-// depósito bancario. ⚠️ El número de cuenta viene del mockup de Figma —
-// PENDIENTE confirmar la cuenta real con el pastor.
-const BANK_INFO = [
-  { label: 'Banco',       value: 'Banrural' },
-  { label: 'Cuenta',      value: '3061234567890' },
-  { label: 'A nombre de', value: 'Iglesia Casa del Rey' },
-];
+import BankDetails from '../../components/sections/BankDetails';
 
 export default function ReceiptPage() {
   const [params] = useSearchParams();
@@ -48,13 +40,8 @@ export default function ReceiptPage() {
           <Reveal delay={0.05}>
             <Tilt max={3} glass="featured" className="mb-6 liquid-glass rounded-[24px] p-7">
               <Eyebrow>Datos para depósito</Eyebrow>
-              <div className="space-y-2.5 mt-4">
-                {BANK_INFO.map(({ label, value }) => (
-                  <div key={label} className="flex items-center gap-3 rounded-[14px] bg-white/5 border border-white/10 px-4 py-3">
-                    <span className="text-[12px] font-bold text-white/50 w-28 shrink-0">{label}</span>
-                    <span className="text-[14.5px] font-bold text-white">{value}</span>
-                  </div>
-                ))}
+              <div className="mt-4">
+                <BankDetails />
               </div>
             </Tilt>
           </Reveal>

@@ -5,26 +5,59 @@ import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import toast from 'react-hot-toast';
 import { Icon } from '../ui/Glass';
 
-const NAV = [
-  { to: '/admin',                  icon: 'dashboard',          label: 'Dashboard',     exact: true },
-  { to: '/admin/hero',             icon: 'view_carousel',      label: 'Hero' },
-  { to: '/admin/site-photos',      icon: 'photo_camera',       label: 'Fotos del sitio' },
-  { to: '/admin/users',            icon: 'manage_accounts',    label: 'Usuarios' },
-  { to: '/admin/leaders',          icon: 'badge',              label: 'Líderes' },
-  { to: '/admin/blog',             icon: 'article',            label: 'Blog' },
-  { to: '/admin/events',           icon: 'calendar_month',     label: 'Eventos' },
-  { to: '/admin/faqs',             icon: 'help_center',        label: 'FAQs' },
-  { to: '/admin/announcements',    icon: 'campaign',           label: 'Anuncios' },
-  { to: '/admin/connect-cards',    icon: 'contact_page',       label: 'Conéctate',    badge: 'pending_connect_cards' },
-  { to: '/admin/petitions',        icon: 'volunteer_activism', label: 'Peticiones',    badge: 'unread_petitions' },
-  { to: '/admin/volunteers',       icon: 'group_add',          label: 'Voluntarios',   badge: 'pending_volunteers' },
-  { to: '/admin/cell-reports',     icon: 'groups',             label: 'Células',       badge: 'pending_reports' },
-  { to: '/admin/boletas',          icon: 'person_add',         label: 'Nuevos' },
-  { to: '/admin/receipts',         icon: 'receipt_long',       label: 'Comprobantes', badge: 'pending_receipts' },
-  { to: '/admin/gallery',          icon: 'photo_library',      label: 'Galería' },
-  { to: '/admin/social',           icon: 'share',              label: 'Redes' },
-  { to: '/admin/activity-log',     icon: 'history',            label: 'Actividad' },
-  { to: '/admin/profile',          icon: 'person',             label: 'Perfil' },
+// Nav agrupado por área — un listado plano de 20 ítems se leía como una
+// bandeja de entrada sin orden; las secciones lo hacen escaneable.
+const NAV_GROUPS = [
+  {
+    section: null, // Inicio, sin encabezado
+    items: [
+      { to: '/admin', icon: 'dashboard', label: 'Dashboard', exact: true },
+    ],
+  },
+  {
+    section: 'Sitio web',
+    items: [
+      { to: '/admin/hero',        icon: 'view_carousel', label: 'Hero' },
+      { to: '/admin/site-photos', icon: 'photo_camera',  label: 'Fotos del sitio' },
+      { to: '/admin/settings',    icon: 'settings',      label: 'Configuración' },
+    ],
+  },
+  {
+    section: 'Contenido',
+    items: [
+      { to: '/admin/blog',          icon: 'article',        label: 'Blog' },
+      { to: '/admin/events',        icon: 'calendar_month', label: 'Eventos' },
+      { to: '/admin/gallery',       icon: 'photo_library',  label: 'Galería' },
+      { to: '/admin/social',        icon: 'share',          label: 'Redes' },
+      { to: '/admin/faqs',          icon: 'help_center',    label: 'FAQs' },
+      { to: '/admin/announcements', icon: 'campaign',       label: 'Anuncios' },
+    ],
+  },
+  {
+    section: 'Comunidad',
+    items: [
+      { to: '/admin/users',         icon: 'manage_accounts',    label: 'Usuarios' },
+      { to: '/admin/leaders',       icon: 'badge',              label: 'Líderes' },
+      { to: '/admin/volunteers',    icon: 'group_add',          label: 'Voluntarios',  badge: 'pending_volunteers' },
+      { to: '/admin/connect-cards', icon: 'contact_page',       label: 'Conéctate',    badge: 'pending_connect_cards' },
+      { to: '/admin/petitions',     icon: 'volunteer_activism', label: 'Peticiones',   badge: 'unread_petitions' },
+      { to: '/admin/cell-reports',  icon: 'groups',             label: 'Células',      badge: 'pending_reports' },
+      { to: '/admin/boletas',       icon: 'person_add',         label: 'Nuevos' },
+    ],
+  },
+  {
+    section: 'Finanzas',
+    items: [
+      { to: '/admin/receipts', icon: 'receipt_long', label: 'Comprobantes', badge: 'pending_receipts' },
+    ],
+  },
+  {
+    section: 'Sistema',
+    items: [
+      { to: '/admin/activity-log', icon: 'history', label: 'Actividad' },
+      { to: '/admin/profile',      icon: 'person',  label: 'Perfil' },
+    ],
+  },
 ];
 
 function SidebarContent({ onClose }) {
@@ -54,34 +87,45 @@ function SidebarContent({ onClose }) {
         </Link>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {NAV.map(({ to, icon, label, exact, badge }) => {
-          const count = badge ? (notifCounts[badge] || 0) : 0;
-          return (
-            <NavLink
-              key={to}
-              to={to}
-              end={exact}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px] font-semibold tracking-tightish transition-all duration-300 ${
-                  isActive
-                    ? 'bg-ink text-white shadow-whisper'
-                    : 'text-ink-2 hover:text-ink hover:bg-bg-soft'
-                }`
-              }
-            >
-              <span className="ms shrink-0" style={{ fontSize: 18 }}>{icon}</span>
-              <span className="flex-1">{label}</span>
-              {count > 0 && (
-                <span className="min-w-[20px] h-5 rounded-full bg-celeste text-white text-[10.5px] font-bold flex items-center justify-center px-1.5 shadow-pri">
-                  {count > 99 ? '99+' : count}
-                </span>
-              )}
-            </NavLink>
-          );
-        })}
+      {/* Nav agrupado */}
+      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+        {NAV_GROUPS.map((group, gi) => (
+          <div key={group.section || 'inicio'} className={gi > 0 ? 'mt-5' : ''}>
+            {group.section && (
+              <p className="px-3 mb-1.5 text-[10.5px] font-extrabold uppercase tracking-widest text-ink-3">
+                {group.section}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map(({ to, icon, label, exact, badge }) => {
+                const count = badge ? (notifCounts[badge] || 0) : 0;
+                return (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={exact}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px] font-semibold tracking-tightish transition-all duration-300 ${
+                        isActive
+                          ? 'bg-ink text-white shadow-whisper'
+                          : 'text-ink-2 hover:text-ink hover:bg-bg-soft'
+                      }`
+                    }
+                  >
+                    <span className="ms shrink-0" style={{ fontSize: 18 }}>{icon}</span>
+                    <span className="flex-1">{label}</span>
+                    {count > 0 && (
+                      <span className="min-w-[20px] h-5 rounded-full bg-celeste text-white text-[10.5px] font-bold flex items-center justify-center px-1.5 shadow-pri">
+                        {count > 99 ? '99+' : count}
+                      </span>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Footer */}

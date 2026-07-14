@@ -32,6 +32,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
 	heroHandler          := handlers.NewHeroHandler(db)
 	sitePhotoHandler     := handlers.NewSitePhotoHandler(db)
+	siteSettingHandler   := handlers.NewSiteSettingHandler(db)
 	announcementHandler  := handlers.NewAnnouncementHandler(db)
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
@@ -85,6 +86,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Fotos del sitio — público: solo los slots con foto subida
 	api.GET("/site-photos", sitePhotoHandler.GetSitePhotos, cacheLong)
+
+	// Configuración pública (datos bancarios, contacto) — administrable
+	api.GET("/settings", siteSettingHandler.GetPublic, cacheShort)
 
 	// Voluntariado
 	api.POST("/volunteer/register",   volunteerHandler.Register)
@@ -195,6 +199,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Fotos del sitio (fondos ambiente de secciones fijas) — admin
 	adminGroup.GET("/site-photos",       sitePhotoHandler.GetAllSitePhotos)
 	adminGroup.PUT("/site-photos/:key",  sitePhotoHandler.UpdateSitePhoto)
+
+	// Configuración de texto (datos bancarios) — admin
+	adminGroup.GET("/settings",          siteSettingHandler.GetAll)
+	adminGroup.PUT("/settings/:key",     siteSettingHandler.UpdateSetting)
 
 	// Categorías de células — admin edita la foto de cada tipo
 	adminGroup.GET("/cell-categories",      cellCategoryHandler.GetAllCellCategoriesAdmin)

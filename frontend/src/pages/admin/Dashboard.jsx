@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
+import { useAuth } from '../../context/AuthContext';
 import { downloadCsv } from '../../lib/exportCsv';
 import Button from '../../components/ui/Button';
 
 const METHOD_LABEL = {
   transferencia: 'Transferencia',
-  tigo_money:    'Tigo Money',
   presencial:    'En persona',
-  paypal:        'PayPal',
+  tigo_money:    'Tigo Money', // histórico (método removido)
+};
+
+const saludo = () => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Buenos días';
+  if (h < 19) return 'Buenas tardes';
+  return 'Buenas noches';
 };
 
 function StatCard({ icon, label, value, tint = 'pri', sub }) {
@@ -49,6 +56,7 @@ const Spinner = () => (
 );
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [kpis,      setKpis]      = useState(null);
   const [cellStats, setCellStats] = useState(null);
   const [donations, setDonations] = useState([]);
@@ -67,15 +75,15 @@ export default function Dashboard() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
 
-      {/* Page header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-          <span className="ms text-on-pri-con" style={{ fontSize: 22 }}>dashboard</span>
-        </div>
-        <div>
-          <h1 className="text-headline-s text-on-surf font-black leading-tight">Dashboard</h1>
-          <p className="text-body-s text-on-surf-var mt-0.5">Resumen general de la iglesia</p>
-        </div>
+      {/* Saludo personalizado */}
+      <div className="mb-8">
+        <p className="text-body-s text-on-surf-var capitalize">
+          {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+        </p>
+        <h1 className="text-headline-s text-on-surf font-black leading-tight mt-0.5">
+          {saludo()}, {(user?.name || 'bienvenido').split(' ')[0]}
+        </h1>
+        <p className="text-body-s text-on-surf-var mt-1">Este es el resumen de la iglesia hoy.</p>
       </div>
 
       {/* Alertas pendientes */}
