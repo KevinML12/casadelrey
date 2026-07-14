@@ -133,3 +133,37 @@ func TestUploadFile_NombreMalicioso_SeSanitiza(t *testing.T) {
 	assert.NotContains(t, store.lastFilename, "<")
 	assert.False(t, strings.Contains(store.lastFilename, " "), "espacios deben volverse _")
 }
+
+// UploadReceipt es PÚBLICO (donante/asistente anónimo) pero fija la
+// carpeta a "comprobantes" — el cliente NO la controla, aunque mande
+// otro ?folder.
+func TestUploadReceipt_CarpetaFijaComprobantes(t *testing.T) {
+	store := &fakeStore{}
+	h := handlers.NewUploadHandler(store)
+
+	e := echo.New()
+	// Aunque intente forzar otra carpeta por query, se ignora.
+	req := multipartReq(t, "/?folder=hero", "boleta.jpg", "data")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	require.NoError(t, h.UploadReceipt(c))
+	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.Equal(t, "comprobantes", store.lastFolder, "la carpeta debe ser fija, no la del query")
+}
+
+// El /upload autenticado ya no acepta carpetas arbitrarias: lo que no
+// está en la lista blanca cae a "general".
+func TestUploadFile_FolderNoPermitido_CaeAGeneral(t *testing.T) {
+	store := &fakeStore{}
+	h := handlers.NewUploadHandler(store)
+
+	e := echo.New()
+	req := multipartReq(t, "/?folder=../../etc", "x.png", "data")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	require.NoError(t, h.UploadFile(c))
+	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.Equal(t, "general", store.lastFolder)
+}

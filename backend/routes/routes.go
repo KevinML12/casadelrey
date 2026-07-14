@@ -71,8 +71,14 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// ── API v1 ────────────────────────────────────────────────────────────────────
 	api := e.Group("/api/v1")
 
-	// Comprobantes bancarios — público: enviar
+	// Comprobantes bancarios — público: enviar el registro + subir la foto.
+	// La subida es pública a propósito (un donante/asistente anónimo no
+	// tiene cuenta) pero con carpeta FIJA "comprobantes" y rate-limit; el
+	// /upload general sigue exigiendo login. Antes ambos formularios
+	// públicos subían a /upload (auth) → un anónimo recibía 401 y NO podía
+	// donar por transferencia ni subir su boleta.
 	api.POST("/receipts", receiptHandler.Submit)
+	api.POST("/receipts/upload", uploadHandler.UploadReceipt, middleware.AuthRateLimit())
 
 	// Hero del home — público: obtener el activo
 	api.GET("/hero/active", heroHandler.GetActive, cacheShort)

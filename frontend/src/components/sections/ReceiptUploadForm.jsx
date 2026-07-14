@@ -30,7 +30,7 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await apiClient.post('/upload?folder=comprobantes', fd, {
+      const res = await apiClient.post('/receipts/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setForm(p => ({ ...p, receipt_image_url: res.data.url }));

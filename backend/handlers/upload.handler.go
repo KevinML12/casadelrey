@@ -19,11 +19,18 @@ func NewUploadHandler(store storage.Store) *UploadHandler {
 	return &UploadHandler{store: store}
 }
 
-// UploadFile POST /api/v1/upload
-// Acepta multipart/form-data con campo "file".
-// Query param opcional: ?folder=celulas|galeria|comprobantes|blog
-// Retorna la URL pública del archivo.
-func (h *UploadHandler) UploadFile(c echo.Context) error {
+// Carpetas permitidas para el upload autenticado (paneles admin/líder).
+// El folder venía crudo del query param: un usuario podía escribir a
+// cualquier carpeta ("hero", "comprobantes"…). Ahora se valida contra
+// esta lista; lo desconocido cae a "general".
+var allowedFolders = map[string]bool{
+	"general": true, "blog": true, "galeria": true, "eventos": true,
+	"celulas": true, "lideres": true, "hero": true, "site-photos": true,
+	"comprobantes": true,
+}
+
+// saveUpload valida y guarda el archivo del form-data en `folder`.
+func (h *UploadHandler) saveUpload(c echo.Context, folder string) error {
 	file, err := c.FormFile("file")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -54,12 +61,6 @@ func (h *UploadHandler) UploadFile(c echo.Context) error {
 	}
 	defer src.Close()
 
-	// Carpeta según el contexto (query param ?folder=celulas)
-	folder := c.QueryParam("folder")
-	if folder == "" {
-		folder = "general"
-	}
-
 	uniqueName := storage.UniqueFilename(file.Filename)
 	contentType := storage.DetectContentType(file.Filename, nil)
 
@@ -77,6 +78,25 @@ func (h *UploadHandler) UploadFile(c echo.Context) error {
 		"size":     file.Size,
 		"backend":  string(h.store.ActiveBackend()),
 	})
+}
+
+// UploadFile POST /api/v1/upload  [requiere auth]
+// Acepta multipart/form-data con campo "file". Query param opcional
+// ?folder= debe estar en la lista blanca; si no, va a "general".
+func (h *UploadHandler) UploadFile(c echo.Context) error {
+	folder := c.QueryParam("folder")
+	if !allowedFolders[folder] {
+		folder = "general"
+	}
+	return h.saveUpload(c, folder)
+}
+
+// UploadReceipt POST /api/v1/receipts/upload  [PÚBLICO]
+// Un visitante anónimo que dona por transferencia o sube el comprobante
+// de un evento necesita subir su boleta SIN cuenta. Carpeta fija
+// "comprobantes" (no la controla el cliente); rate-limit en la ruta.
+func (h *UploadHandler) UploadReceipt(c echo.Context) error {
+	return h.saveUpload(c, "comprobantes")
 }
 
 // isAllowedType valida que el archivo sea imagen o PDF.

@@ -76,7 +76,7 @@ export default function DonationCard() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await apiClient.post('/upload?folder=comprobantes', fd, {
+      const res = await apiClient.post('/receipts/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setReceiptUrl(res.data.url);
