@@ -85,12 +85,27 @@ const COLLAGE = [
   { span: 'col-span-1 row-span-1', rot: 2.0,  y: -4 },
 ];
 
+// Normaliza nombres para matchear célula ↔ directorio de líderes
+// ("Cristian de León" vs "cristian de leon")
+const norm = (s) =>
+  (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+
 export default function CelulasPage() {
   const heroImg = useSitePhoto('hero_celulas', '/images/bg-ministerios.jpg');
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');
+  // Directorio de líderes (foto + WhatsApp) — curado por el admin en
+  // /admin/leaders. Si el líder de una célula está en el directorio, su
+  // card gana foto real y el botón escribe DIRECTO a su WhatsApp.
+  const apiLeaders = useApi('/leaders');
   const [openKey, setOpenKey] = useState(null); // ventana abierta (o null)
+
+  const leaderByName = useMemo(() => {
+    const map = {};
+    (Array.isArray(apiLeaders) ? apiLeaders : []).forEach(l => { map[norm(l.name)] = l; });
+    return map;
+  }, [apiLeaders]);
 
   const groups = useMemo(() => {
     const imageByName = {};
@@ -234,14 +249,22 @@ export default function CelulasPage() {
                 {g.cells.length} {g.cells.length === 1 ? 'célula activa' : 'células activas'}
               </p>
               <div className="flex flex-wrap gap-3">
-                {g.cells.map((c, i) => (
+                {g.cells.map((c, i) => {
+                  // Si el líder está en el directorio: foto real + WhatsApp
+                  // directo a SU número (antes el wa.me iba sin destino).
+                  const dir = leaderByName[norm(c.leader)];
+                  const waText = encodeURIComponent(`Hola${dir ? ` ${c.leader.split(' ')[0]}` : ''}, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`);
+                  const href = dir?.phone
+                    ? `https://wa.me/${dir.phone.replace(/\D/g, '')}?text=${waText}`
+                    : `https://wa.me/?text=${waText}`;
+                  return (
                   <Tilt
                     as="a"
                     key={`${c.name}-${i}`}
                     max={3}
-                    href={`https://wa.me/?text=${encodeURIComponent(`Hola, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`)}`}
+                    href={href}
                     target="_blank" rel="noopener noreferrer"
-                    aria-label={`Unirme a la célula ${c.name}`}
+                    aria-label={`Escribir al líder de la célula ${c.name}`}
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.06 + i * 0.035 }}
@@ -249,12 +272,19 @@ export default function CelulasPage() {
                     glass
                     className="liquid-glass group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
                   >
-                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
-                      <Icon name="users" className="w-5 h-5" />
-                    </div>
+                    {dir?.photo_url ? (
+                      <img src={dir.photo_url} alt={c.leader}
+                        className="w-10 h-10 rounded-full object-cover border border-white/20 shrink-0" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
+                        <Icon name="users" className="w-5 h-5" />
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <p className="text-[15px] font-bold text-white leading-tight truncate">{c.name}</p>
-                      <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">{c.leader}</p>
+                      <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">
+                        {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
+                      </p>
                     </div>
                     <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
                       {c.zone}
@@ -263,7 +293,8 @@ export default function CelulasPage() {
                       <Icon name="arrow" className="w-4 h-4" />
                     </span>
                   </Tilt>
-                ))}
+                  );
+                })}
               </div>
             </>
           );

@@ -320,3 +320,19 @@ type FAQ struct {
 	IsActive  bool   `json:"is_active" gorm:"default:true"`
 	SortOrder int    `json:"sort_order" gorm:"default:0"`
 }
+
+// Leader — directorio de líderes con foto e información de contacto.
+// Lo curan los admins desde /admin/leaders (NO estático); alimenta el
+// apartado "comunícate con tu líder" en Células (público) y en el
+// dashboard de voluntarios. Solo se expone lo que el líder acepta
+// mostrar (is_active) — el directorio interno completo sigue siendo
+// CONTEXTO_IGLESIA/panel, nunca esta tabla.
+type Leader struct {
+	gorm.Model
+	Name     string `json:"name" gorm:"type:varchar(100);not null"`
+	PhotoURL string `json:"photo_url" gorm:"type:varchar(500)"`
+	Phone    string `json:"phone" gorm:"type:varchar(30)"` // WhatsApp, formato 502XXXXXXXX
+	Email    string `json:"email" gorm:"type:varchar(100)"`
+	Area     string `json:"area" gorm:"type:varchar(120)"` // "Célula Adolescentes", "Alabanza"...
+	IsActive bool   `json:"is_active" gorm:"default:true"`
+}

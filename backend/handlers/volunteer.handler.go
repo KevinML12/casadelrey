@@ -160,7 +160,20 @@ func (h *VolunteerHandler) GetMyInfo(c echo.Context) error {
 	if err := h.DB.Where("email = ?", user.Email).First(&v).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Sin registro de voluntario aún."})
 	}
-	return c.JSON(http.StatusOK, v)
+
+	// Nombre del líder asignado (para el apartado "Tu líder" del dashboard;
+	// el frontend lo cruza con el directorio /leaders para foto y WhatsApp).
+	resp := struct {
+		models.Volunteer
+		AssignedLeaderName string `json:"assigned_leader_name,omitempty"`
+	}{Volunteer: v}
+	if v.AssignedLeaderID != nil {
+		var leader models.User
+		if err := h.DB.Select("name").First(&leader, *v.AssignedLeaderID).Error; err == nil {
+			resp.AssignedLeaderName = leader.Name
+		}
+	}
+	return c.JSON(http.StatusOK, resp)
 }
 
 // CreateUserFromVolunteer POST /api/v1/admin/volunteers/:id/create-user

@@ -119,6 +119,7 @@ function NewGoalForm({ onSave, onCancel }) {
 export default function VolunteerDashboard() {
   const { user } = useAuth();
   const [volunteer, setVolunteer] = useState(null);
+  const [leaders,   setLeaders]   = useState([]);
   const [goals,     setGoals]     = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [showForm,  setShowForm]  = useState(false);
@@ -126,12 +127,14 @@ export default function VolunteerDashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [goalsRes, volRes] = await Promise.allSettled([
+      const [goalsRes, volRes, leadersRes] = await Promise.allSettled([
         apiClient.get('/profile/goals'),
         apiClient.get('/volunteer/me'),
+        apiClient.get('/leaders'),
       ]);
-      if (goalsRes.status === 'fulfilled') setGoals(goalsRes.value.data || []);
-      if (volRes.status === 'fulfilled')   setVolunteer(volRes.value.data);
+      if (goalsRes.status === 'fulfilled')   setGoals(goalsRes.value.data || []);
+      if (volRes.status === 'fulfilled')     setVolunteer(volRes.value.data);
+      if (leadersRes.status === 'fulfilled') setLeaders(leadersRes.value.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -158,6 +161,13 @@ export default function VolunteerDashboard() {
   };
 
   const dept = volunteer?.department ? DEPT_INFO[volunteer.department] : null;
+
+  // "Tu líder": cruza el nombre del líder asignado con el directorio
+  // público (/leaders, curado en /admin/leaders) para foto y contacto.
+  const normName = (x) => (x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const myLeader = volunteer?.assigned_leader_name
+    ? leaders.find(l => normName(l.name) === normName(volunteer.assigned_leader_name))
+    : null;
   const pending   = goals.filter(g => !g.completed).length;
   const completed = goals.filter(g => g.completed).length;
 
@@ -184,6 +194,56 @@ export default function VolunteerDashboard() {
           </div>
         )}
       </div>
+
+      {/* Tu líder — comunicación directa (directorio /admin/leaders) */}
+      {volunteer?.assigned_leader_name ? (
+        <section className="rounded-2xl border border-outline-var bg-surf p-5">
+          <p className="text-label-s text-on-surf-var uppercase tracking-widest mb-3">Tu líder</p>
+          <div className="flex items-center gap-4">
+            {myLeader?.photo_url ? (
+              <img src={myLeader.photo_url} alt={volunteer.assigned_leader_name}
+                className="w-14 h-14 rounded-full object-cover border border-outline-var shrink-0" />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-surf-container border border-outline-var grid place-items-center shrink-0">
+                <span className="ms text-on-surf-var">person</span>
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-title-s text-on-surf font-medium truncate">{volunteer.assigned_leader_name}</p>
+              {myLeader?.area && <p className="text-body-s text-on-surf-var truncate">{myLeader.area}</p>}
+            </div>
+            <div className="flex gap-2 shrink-0">
+              {myLeader?.phone && (
+                <a
+                  href={`https://wa.me/${myLeader.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${volunteer.assigned_leader_name.split(' ')[0]}, soy ${user?.name || 'voluntario'} de ${dept?.label || 'voluntariado'}.`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity"
+                >
+                  <span className="ms" style={{ fontSize: 16 }}>chat</span>
+                  WhatsApp
+                </a>
+              )}
+              {myLeader?.email && (
+                <a href={`mailto:${myLeader.email}`} title={myLeader.email}
+                  className="grid place-items-center w-9 h-9 rounded-full border border-outline-var text-on-surf-var hover:text-on-surf hover:border-on-surf-var transition-colors">
+                  <span className="ms" style={{ fontSize: 16 }}>mail</span>
+                </a>
+              )}
+            </div>
+          </div>
+          {!myLeader && (
+            <p className="text-body-s text-on-surf-var mt-3">
+              Tu líder aún no tiene contacto en el directorio — pídele al equipo que lo agregue en el panel.
+            </p>
+          )}
+        </section>
+      ) : volunteer && (
+        <section className="rounded-2xl border border-dashed border-outline-var bg-surf-low p-5 text-center">
+          <p className="text-body-s text-on-surf-var">
+            Aún no te asignan líder. El equipo se comunicará contigo pronto.
+          </p>
+        </section>
+      )}
 
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 gap-4">

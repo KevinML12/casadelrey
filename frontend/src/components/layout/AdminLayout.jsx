@@ -10,6 +10,7 @@ const NAV = [
   { to: '/admin/hero',             icon: 'view_carousel',      label: 'Hero' },
   { to: '/admin/site-photos',      icon: 'photo_camera',       label: 'Fotos del sitio' },
   { to: '/admin/users',            icon: 'manage_accounts',    label: 'Usuarios' },
+  { to: '/admin/leaders',          icon: 'badge',              label: 'Líderes' },
   { to: '/admin/blog',             icon: 'article',            label: 'Blog' },
   { to: '/admin/events',           icon: 'calendar_month',     label: 'Eventos' },
   { to: '/admin/faqs',             icon: 'help_center',        label: 'FAQs' },

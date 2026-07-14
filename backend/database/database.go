@@ -82,6 +82,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.PaymentReceipt{},   // NUEVA — verifica comprobantes bancarios
 			&models.Donation{},
 			// Personas
+			&models.Leader{},           // directorio de líderes (foto + contacto)
 			&models.Volunteer{},
 			&models.Petition{},
 			&models.ConnectCard{}, // NUEVA — tarjeta de conexión para visitantes nuevos

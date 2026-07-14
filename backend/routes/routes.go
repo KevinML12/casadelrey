@@ -36,6 +36,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	notificationHandler  := handlers.NewNotificationHandler(db)
 	galleryHandler       := handlers.NewGalleryHandler(db)
 	faqHandler           := handlers.NewFAQHandler(db)
+	leaderDirHandler     := handlers.NewLeaderDirectoryHandler(db)
 	rsvpHandler          := handlers.NewRSVPHandler(db)
 	leaderDashHandler    := handlers.NewLeaderDashboardHandler(db)
 	activityLogHandler   := handlers.NewActivityLogHandler(db)
@@ -137,6 +138,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	faqGroup := api.Group("/faqs")
 	faqGroup.GET("/", faqHandler.GetFAQs, cacheLong)
 
+	// Directorio de líderes (foto + contacto) — público solo activos
+	api.GET("/leaders", leaderDirHandler.GetPublic, cacheShort)
+
 	// Perfil y metas (usuario autenticado)
 	profileGroup := api.Group("/profile", authMW)
 	profileGroup.GET("/goals",        profileHandler.GetGoals)
@@ -202,6 +206,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminBlog.DELETE("/:id", blogHandler.DeletePost)
 
 	// Peticiones admin
+	adminGroup.GET("/leaders",            leaderDirHandler.GetAll)
+	adminGroup.POST("/leaders",           leaderDirHandler.Create)
+	adminGroup.PUT("/leaders/:id",        leaderDirHandler.Update)
+	adminGroup.DELETE("/leaders/:id",     leaderDirHandler.Delete)
 	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
 	adminGroup.DELETE("/petitions/:id",   petitionHandler.DeletePetition)

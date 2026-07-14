@@ -17,6 +17,8 @@ const PASOS = [
     icon: 'users',
     title: 'Habla con tu líder',
     desc: 'Tu líder de célula o el equipo de la iglesia piden tu acceso.',
+    // El directorio de líderes vive en Células: foto + WhatsApp directo
+    cta: { label: 'Comunícate', to: '/celulas' },
   },
   {
     icon: 'spark',
@@ -62,6 +64,15 @@ export default function Register() {
                 </div>
                 <h3 className="text-[15.5px] font-bold text-white leading-tight">{p.title}</h3>
                 <p className="mt-1.5 text-[13px] text-white/60 leading-relaxed">{p.desc}</p>
+                {p.cta && (
+                  <Link
+                    to={p.cta.to}
+                    className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-bold text-white hover:text-white/70 transition-colors"
+                  >
+                    {p.cta.label}
+                    <Icon name="arrow" className="w-3.5 h-3.5" stroke={2.2} />
+                  </Link>
+                )}
               </Tilt>
             </RevealItem>
           ))}
