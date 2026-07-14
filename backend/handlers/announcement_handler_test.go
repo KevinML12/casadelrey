@@ -171,3 +171,25 @@ func TestGetAllAnnouncements_Retorna200(t *testing.T) {
 	assert.NotNil(t, resp["data"])
 	assert.NotNil(t, resp["meta"])
 }
+
+// ─── GetAnnouncements: filtro de expiración ───────────────────────────────────
+
+// El API público NO debe devolver anuncios expirados. La query debe incluir
+// el filtro expires_at; si el handler lo quita, este ExpectQuery no matchea →
+// el mock devuelve error → 500 y el test falla. Es el guard de la regresión.
+func TestGetAnnouncements_FiltraExpirados(t *testing.T) {
+	db, mock, sqlDB := newMockDB(t)
+	defer sqlDB.Close()
+	h := handlers.NewAnnouncementHandler(db)
+	mock.MatchExpectationsInOrder(false)
+
+	mock.ExpectQuery(`SELECT .* FROM "announcements" WHERE .*expires_at IS NULL OR expires_at`).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title"}).AddRow(1, "Vigente"))
+	// Preload("Author") puede disparar una consulta a users; lenient.
+	mock.ExpectQuery(`SELECT .* FROM "users"`).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name"}))
+
+	c, rec := newCtx(t, ctxOpts{method: "GET"})
+	require.NoError(t, h.GetAnnouncements(c))
+	assert.Equal(t, http.StatusOK, rec.Code)
+}

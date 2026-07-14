@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import App from './App';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -110,6 +110,8 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+      // Sin index, /volunteer renderizaba un Outlet vacío (página en blanco).
+      { index: true, element: <Navigate to="dashboard" replace /> },
       { path: 'dashboard', element: <Suspense fallback={<PageFallback />}><VolunteerDashboard /></Suspense> },
     ],
   },

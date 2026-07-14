@@ -10,6 +10,7 @@ import (
 	"casadelrey/backend/config"
 	"casadelrey/backend/database"
 	"casadelrey/backend/handlers"
+	appmw "casadelrey/backend/middleware"
 	"casadelrey/backend/routes"
 	"casadelrey/backend/storage"
 
@@ -76,9 +77,11 @@ func main() {
 	// 6. Registrar todas las rutas (públicas y protegidas).
 	routes.Register(e, db, cfg, store)
 
-	// 6b. TTS — registrado aquí explícitamente para asegurar que esté en el deploy
+	// 6b. TTS — registrado aquí explícitamente para asegurar que esté en el
+	// deploy. Rate-limit propio: es público (lector del blog) pero manda
+	// texto largo a un proveedor de pago; sin él se puede abusar la cuota.
 	tts := handlers.NewTTSHandler()
-	e.POST("/api/v1/tts", tts.Synthesize)
+	e.POST("/api/v1/tts", tts.Synthesize, appmw.TTSRateLimit())
 	e.GET("/api/v1/tts/health", tts.Health)
 
 	// 7. Iniciar el servidor en el puerto configurado.

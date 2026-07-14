@@ -24,7 +24,12 @@ func NewAnnouncementHandler(db *gorm.DB) *AnnouncementHandler {
 func (h *AnnouncementHandler) GetAnnouncements(c echo.Context) error {
 	role, _ := c.Get("user_role").(string)
 
-	q := h.DB.Where("is_active = ?", true).Order("published_at DESC, created_at DESC")
+	// Solo anuncios vigentes: sin fecha de expiración o aún no expirados.
+	// Antes el API devolvía los expirados (solo el front los ocultaba).
+	q := h.DB.
+		Where("is_active = ?", true).
+		Where("expires_at IS NULL OR expires_at > ?", time.Now()).
+		Order("published_at DESC, created_at DESC")
 
 	if role == "" || role == "member" {
 		q = q.Where("role_target IN ?", []string{"all", "member"})

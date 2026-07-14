@@ -42,10 +42,10 @@ function LeaderForm({ onSave, onCancel, initialData }) {
     setLoading(true);
     try {
       if (form.ID) {
-        await apiClient.put(`/admin/leaders/${form.ID}`, form);
+        await apiClient.put(`/admin/leader-directory/${form.ID}`, form);
         toast.success('Líder actualizado');
       } else {
-        await apiClient.post('/admin/leaders', form);
+        await apiClient.post('/admin/leader-directory', form);
         toast.success('Líder agregado');
       }
       onSave();
@@ -118,7 +118,7 @@ export default function AdminLeaders() {
 
   const load = () => {
     setLoading(true);
-    apiClient.get('/admin/leaders')
+    apiClient.get('/admin/leader-directory')
       .then(r => setLeaders(r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -128,7 +128,7 @@ export default function AdminLeaders() {
 
   const handleToggle = async (l) => {
     try {
-      await apiClient.put(`/admin/leaders/${l.ID}`, { is_active: !l.is_active });
+      await apiClient.put(`/admin/leader-directory/${l.ID}`, { is_active: !l.is_active });
       toast.success(l.is_active ? 'Ocultado del sitio' : 'Visible en el sitio');
       load();
     } catch { toast.error('Error al actualizar'); }
@@ -137,7 +137,7 @@ export default function AdminLeaders() {
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar a este líder del directorio?')) return;
     try {
-      await apiClient.delete(`/admin/leaders/${id}`);
+      await apiClient.delete(`/admin/leader-directory/${id}`);
       toast.success('Eliminado');
       load();
     } catch { toast.error('Error al eliminar'); }

@@ -105,11 +105,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Tarjeta de conexión — visitante nuevo se registra él mismo
 	api.POST("/connect-cards", connectCardHandler.Create)
 
-	// Donaciones (registro local + PayPal)
+	// Donaciones (registro local). PayPal fue removido (may-2026): sus
+	// rutas se quitaron para no ocupar el router ni el rate-limit; los
+	// handlers 410 Gone quedan solo por si un cliente viejo los llama.
 	donationsGroup := api.Group("/donations")
-	donationsGroup.POST("/register",             donationHandler.RegisterDonation)
-	donationsGroup.POST("/create-paypal-order",  donationHandler.CreatePayPalOrder)
-	donationsGroup.POST("/capture-paypal-order", donationHandler.CapturePayPalOrder)
+	donationsGroup.POST("/register", donationHandler.RegisterDonation)
 
 	// Eventos (público: lectura + RSVP) — con y sin slash final:
 	// Echo no redirige entre ambos y el frontend histórico usa /events
@@ -205,11 +205,17 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminBlog.PUT("/:id",    blogHandler.UpdatePost)
 	adminBlog.DELETE("/:id", blogHandler.DeletePost)
 
+	// Directorio de líderes (foto + contacto) — CRUD admin. Ruta DISTINTA
+	// de GET /admin/leaders (arriba), que devuelve los USUARIOS con rol
+	// líder para los selects de asignación de voluntarios/connect-cards.
+	// Antes ambos usaban /admin/leaders: Echo dejaba ganar al último y
+	// rompía silenciosamente esos selects.
+	adminGroup.GET("/leader-directory",        leaderDirHandler.GetAll)
+	adminGroup.POST("/leader-directory",       leaderDirHandler.Create)
+	adminGroup.PUT("/leader-directory/:id",    leaderDirHandler.Update)
+	adminGroup.DELETE("/leader-directory/:id", leaderDirHandler.Delete)
+
 	// Peticiones admin
-	adminGroup.GET("/leaders",            leaderDirHandler.GetAll)
-	adminGroup.POST("/leaders",           leaderDirHandler.Create)
-	adminGroup.PUT("/leaders/:id",        leaderDirHandler.Update)
-	adminGroup.DELETE("/leaders/:id",     leaderDirHandler.Delete)
 	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
 	adminGroup.DELETE("/petitions/:id",   petitionHandler.DeletePetition)
@@ -286,7 +292,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminOrLeader.PUT("/boletas/:id", boletaHandler.UpdateBoleta)
 
 	// ── Panel Líder ───────────────────────────────────────────────────────────────
-	leaderGroup := api.Group("/leader", authMW)
+	// adminOrLeaderMW: sin él, cualquier usuario autenticado (incluido un
+	// voluntario o miembro) podía leer /leader/kpis y /leader/cell-directory
+	// (roster de líderes + conteos). Ahora exige rol líder o admin.
+	leaderGroup := api.Group("/leader", authMW, adminOrLeaderMW)
 
 	leaderGroup.GET("/kpis",            leaderDashHandler.GetLeaderKPIs)
 	leaderGroup.GET("/cell-directory",  leaderDashHandler.GetCellDirectory)

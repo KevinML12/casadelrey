@@ -37,6 +37,38 @@ func GlobalRateLimit() echo.MiddlewareFunc {
 	return middleware.RateLimiterWithConfig(config)
 }
 
+// TTSRateLimit protege el endpoint público de síntesis de voz (/tts).
+// Es público (lo usa el lector del blog) pero cada request puede enviar
+// hasta 12K caracteres a ElevenLabs/Google (de pago) — sin un límite
+// propio, un abusador podría agotar la cuota/dinero. ~1 cada 3s con
+// ráfaga de 3 por IP: cómodo para leer un artículo, caro de abusar.
+func TTSRateLimit() echo.MiddlewareFunc {
+	config := middleware.RateLimiterConfig{
+		Skipper: middleware.DefaultSkipper,
+		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+			middleware.RateLimiterMemoryStoreConfig{
+				Rate:      rate.Limit(0.34), // ~1 cada 3 segundos
+				Burst:     3,
+				ExpiresIn: 3 * 60 * 1000000000,
+			},
+		),
+		IdentifierExtractor: func(ctx echo.Context) (string, error) {
+			return ctx.RealIP(), nil
+		},
+		ErrorHandler: func(context echo.Context, err error) error {
+			return context.JSON(http.StatusTooManyRequests, map[string]string{
+				"error": "Demasiadas solicitudes de audio. Espera un momento.",
+			})
+		},
+		DenyHandler: func(context echo.Context, identifier string, err error) error {
+			return context.JSON(http.StatusTooManyRequests, map[string]string{
+				"error": "Límite de lectura de audio excedido. Espera un momento.",
+			})
+		},
+	}
+	return middleware.RateLimiterWithConfig(config)
+}
+
 // AuthRateLimit protege endpoints sensibles (Login, Register).
 // 1 req/s con ráfaga de 5 por IP: un humano nunca lo nota, un ataque
 // de fuerza bruta queda a ~60 intentos/minuto (repo público → asumir
