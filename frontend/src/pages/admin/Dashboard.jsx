@@ -55,7 +55,8 @@ export default function Dashboard() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
 
-      {/* Saludo personalizado */}
+      {/* Saludo personalizado — texto suelto sobre el canvas navy, no es
+          un módulo/card: se queda blanco. */}
       <div className="mb-8">
         <p className="text-[13.5px] text-white/40 capitalize">
           {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -66,62 +67,65 @@ export default function Dashboard() {
         <p className="text-[13.5px] text-white/40 mt-1">Este es el resumen de la iglesia hoy.</p>
       </div>
 
-      {/* Alertas pendientes */}
+      {/* Alertas pendientes — módulo sin foto de fondo → glass-light */}
       {!loading && notifs && (notifs.pending_cell_reports > 0 || notifs.unread_petitions > 0 || notifs.pending_volunteers > 0) && (
-        <div className="mb-8 liquid-glass rounded-[24px] p-4 flex flex-wrap gap-4 items-center border border-rose/20">
+        <div className="mb-8 glass-light rounded-[24px] p-4 flex flex-wrap gap-4 items-center border border-rose/30">
           <Icon name="notifications_active" className="w-5 h-5 text-rose" stroke={1.8} />
           <div className="flex-1 flex flex-wrap gap-4">
             {notifs.pending_cell_reports > 0 && (
-              <span className="text-[13.5px] text-white/75 font-medium">
-                <strong className="text-white">{notifs.pending_cell_reports}</strong> reporte{notifs.pending_cell_reports !== 1 ? 's' : ''} de células pendiente{notifs.pending_cell_reports !== 1 ? 's' : ''}
+              <span className="text-[13.5px] text-bg/75 font-medium">
+                <strong className="text-bg">{notifs.pending_cell_reports}</strong> reporte{notifs.pending_cell_reports !== 1 ? 's' : ''} de células pendiente{notifs.pending_cell_reports !== 1 ? 's' : ''}
               </span>
             )}
             {notifs.unread_petitions > 0 && (
-              <span className="text-[13.5px] text-white/75 font-medium">
-                <strong className="text-white">{notifs.unread_petitions}</strong> petición{notifs.unread_petitions !== 1 ? 'es' : ''} sin leer
+              <span className="text-[13.5px] text-bg/75 font-medium">
+                <strong className="text-bg">{notifs.unread_petitions}</strong> petición{notifs.unread_petitions !== 1 ? 'es' : ''} sin leer
               </span>
             )}
             {notifs.pending_volunteers > 0 && (
-              <span className="text-[13.5px] text-white/75 font-medium">
-                <strong className="text-white">{notifs.pending_volunteers}</strong> voluntario{notifs.pending_volunteers !== 1 ? 's' : ''} pendiente{notifs.pending_volunteers !== 1 ? 's' : ''}
+              <span className="text-[13.5px] text-bg/75 font-medium">
+                <strong className="text-bg">{notifs.pending_volunteers}</strong> voluntario{notifs.pending_volunteers !== 1 ? 's' : ''} pendiente{notifs.pending_volunteers !== 1 ? 's' : ''}
               </span>
             )}
           </div>
         </div>
       )}
 
-      {/* General KPIs */}
+      {/* General KPIs — todas las cards sin foto de fondo → glass-light */}
       <SectionLabel icon="bar_chart">General</SectionLabel>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <StatCard icon="person"           label="Usuarios"        tint="pri"
+        <StatCard icon="person"           label="Usuarios"        tint="pri" variant="light"
           value={loading ? '…' : kpis?.total_users ?? 0} />
-        <StatCard icon="favorite"         label="Donaciones"      tint="err"
+        <StatCard icon="favorite"         label="Donaciones"      tint="err" variant="light"
           value={loading ? '…' : kpis?.total_donations ?? 0} />
-        <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter"
+        <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter" variant="light"
           value={loading ? '…' : kpis?.total_petitions ?? 0} />
         <StatCard icon="payments"         label="Recaudado"       tint="sec" variant="light"
           value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
-        <StatCard icon="visibility"       label="Vistas blog"     tint="pri"
+        <StatCard icon="visibility"       label="Vistas blog"     tint="pri" variant="light"
           value={loading ? '…' : kpis?.total_blog_views ?? 0} />
-        <StatCard icon="groups"           label="Rept. células"   tint="ter"
+        <StatCard icon="groups"           label="Rept. células"   tint="ter" variant="light"
           value={loading ? '…' : kpis?.total_cell_reports ?? 0} />
       </div>
 
       {/* Cell KPIs */}
       <SectionLabel icon="church">Almas ganadas</SectionLabel>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <StatCard icon="person_add"       label="Convertidos"     tint="ter"
+        <StatCard icon="person_add"       label="Convertidos"     tint="ter" variant="light"
           value={loading ? '…' : cellStats?.total_converts ?? 0}
           sub="Este período" />
-        <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec"
+        <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec" variant="light"
           value={loading ? '…' : cellStats?.total_reconciled ?? 0}
           sub="Este período" />
-        <StatCard icon="savings"          label="Ofrenda células" tint="pri"
+        <StatCard icon="savings"          label="Ofrenda células" tint="pri" variant="light"
           value={loading ? '…' : cellStats?.total_offering != null ? `Q${Number(cellStats.total_offering).toFixed(0)}` : 'Q0'}
           sub="Total acumulado" />
       </div>
 
-      {/* Últimas donaciones */}
+      {/* Últimas donaciones — tabla densa: se queda oscura por legibilidad
+          (muchas filas de texto pequeño, el blanco compite más con la
+          data que ayuda). Regla: glass-light es para fragmentos sin foto
+          de fondo, no un mandato absoluto sobre tablas de datos densas. */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Icon name="payments" className="w-[18px] h-[18px] text-white/40" stroke={1.8} />
