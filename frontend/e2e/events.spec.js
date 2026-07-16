@@ -113,9 +113,13 @@ test.describe('Eventos — flujo completo (admin → público → RSVP)', () => 
     await expect(card.getByText('Q150')).toBeVisible();
     await card.getByRole('button', { name: /registrarme/i }).click();
 
-    // El modal debe mostrar el banner con los datos bancarios
+    // El modal debe mostrar el banner de pago. Los datos bancarios son
+    // administrables (/admin/settings) — sin cuenta configurada invita a
+    // coordinar por contacto en vez de mostrar un número hardcodeado.
     await expect(page.getByText('Evento con costo')).toBeVisible();
-    await expect(page.getByText('Banrural')).toBeVisible();
+    await expect(
+      page.getByText(/coordinar tu depósito/i).or(page.getByText('Banco'))
+    ).toBeVisible({ timeout: 10_000 });
 
     await page.locator('input[placeholder="Tu nombre completo"]').fill('Visitante E2E Pago');
     await page.locator('input[placeholder="El mismo correo del comprobante"]').fill(`e2e.pago.${stamp}@example.com`);

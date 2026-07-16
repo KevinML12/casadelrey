@@ -22,9 +22,16 @@ test.describe('Donar — acordeón de pasos', () => {
     await page.getByRole('button', { name: /células/i }).click();
     await page.getByRole('button', { name: /continuar/i }).click();
 
-    // Paso 3 · Pago — transferencia por defecto: banco visible, bloquea sin boleta
+    // Paso 3 · Pago — transferencia por defecto. BankDetails es
+    // administrable (/admin/settings): sin cuenta configurada NUNCA
+    // muestra un número — invita a coordinar por contacto. Con cuenta
+    // configurada, muestra los datos reales. Ambos casos son válidos;
+    // solo verificamos que el bloque de pago renderizó algo coherente,
+    // no un número hardcodeado que ya no existe en el código.
     await expect(page.getByText('¿Cómo quieres darlo?')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Banrural')).toBeVisible();
+    await expect(
+      page.getByText(/coordinar tu depósito/i).or(page.getByText('Banco'))
+    ).toBeVisible({ timeout: 10_000 });
     // Esperar a que el paso anterior termine su animación de salida (durante
     // ~300ms coexisten dos "Continuar" y el strict mode revienta)
     await expect(page.getByRole('button', { name: /continuar/i })).toHaveCount(1, { timeout: 5_000 });

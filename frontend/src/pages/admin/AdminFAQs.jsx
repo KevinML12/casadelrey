@@ -57,7 +57,7 @@ function FAQForm({ onSave, onCancel, initialData }) {
       </div>
       <div className="flex gap-3 pt-2 border-t border-outline-var">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>save</span>
+          <span className="ms" style={{ fontSize: 16 }}>save</span>
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Agregar FAQ')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -107,7 +107,7 @@ export default function AdminFAQs() {
           <p className="text-body-m text-on-surf-var">Gestiona las preguntas comunes que aparecen en la página de Eventos.</p>
         </div>
         <Button variant="filled" onClick={() => { setEditingFaq(null); setShowForm(!showForm); }}>
-          <span className="material-symbols-rounded">{showForm ? 'close' : 'add'}</span>
+          <span className="ms">{showForm ? 'close' : 'add'}</span>
           {showForm ? 'Cancelar' : 'Nueva FAQ'}
         </Button>
       </div>

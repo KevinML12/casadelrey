@@ -18,9 +18,17 @@ const saludo = () => {
 };
 
 function StatCard({ icon, label, value, tint = 'pri', sub }) {
+  // 'sec' en tailwind.config.js mapea a var(--bg-soft) — un tono casi
+  // negro pensado para fondos de chip (bg-sec-con + texto blanco encima,
+  // que sí funciona en el resto del panel). Pero como COLOR DE VALOR
+  // (texto grande sobre esta misma card oscura) es texto oscuro sobre
+  // fondo oscuro: invisible. Bug real encontrado al verificar el
+  // dashboard — "Recaudado" no mostraba ningún monto. Ámbar para
+  // distinguirlo del azul (pri/ter) y rosa (err); además calza bien
+  // semánticamente con dinero.
   const tintMap = {
     pri: { bg: 'bg-pri-con', text: 'text-on-pri-con', val: 'text-pri' },
-    sec: { bg: 'bg-sec-con', text: 'text-on-sec-con', val: 'text-sec' },
+    sec: { bg: 'bg-amber-soft', text: 'text-amber', val: 'text-amber' },
     ter: { bg: 'bg-ter-con', text: 'text-on-ter-con', val: 'text-ter' },
     err: { bg: 'bg-err-con', text: 'text-on-err-con', val: 'text-err' },
   };

@@ -14,7 +14,6 @@ export default function PrayerPage() {
   return (
     <main className="min-h-screen bg-bg text-ink">
       <PageHero
-        icon="volunteer_activism"
         eyebrow="Peticiones de oración"
         title="Clama y Él responde."
         subtitle='"Clama a mí, y yo te responderé." — Jeremías 33:3'

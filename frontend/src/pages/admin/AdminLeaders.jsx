@@ -61,12 +61,12 @@ function LeaderForm({ onSave, onCancel, initialData }) {
           <img src={form.photo_url} alt={form.name} className="w-16 h-16 rounded-full object-cover border border-outline-var" />
         ) : (
           <div className="w-16 h-16 rounded-full bg-surf-container border border-outline-var grid place-items-center">
-            <span className="material-symbols-rounded text-on-surf-var">person</span>
+            <span className="ms text-on-surf-var">person</span>
           </div>
         )}
         <label className="cursor-pointer">
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-outline-var text-body-s text-on-surf hover:border-on-surf-var transition-colors">
-            <span className="material-symbols-rounded" style={{ fontSize: 16 }}>photo_camera</span>
+            <span className="ms" style={{ fontSize: 16 }}>photo_camera</span>
             {uploading ? 'Subiendo…' : form.photo_url ? 'Cambiar foto' : 'Subir foto'}
           </span>
           <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
@@ -101,7 +101,7 @@ function LeaderForm({ onSave, onCancel, initialData }) {
 
       <div className="flex gap-3 pt-2 border-t border-outline-var">
         <Button type="submit" variant="filled" disabled={loading || uploading} className="flex-1 justify-center">
-          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>save</span>
+          <span className="ms" style={{ fontSize: 16 }}>save</span>
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Agregar líder')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -154,7 +154,7 @@ export default function AdminLeaders() {
           </p>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          <span className="material-symbols-rounded">{showForm ? 'close' : 'add'}</span>
+          <span className="ms">{showForm ? 'close' : 'add'}</span>
           {showForm ? 'Cancelar' : 'Nuevo líder'}
         </Button>
       </div>
@@ -184,7 +184,7 @@ export default function AdminLeaders() {
                 <img src={l.photo_url} alt={l.name} className="w-14 h-14 rounded-full object-cover border border-outline-var shrink-0" />
               ) : (
                 <div className="w-14 h-14 rounded-full bg-surf-container border border-outline-var grid place-items-center shrink-0">
-                  <span className="material-symbols-rounded text-on-surf-var">person</span>
+                  <span className="ms text-on-surf-var">person</span>
                 </div>
               )}
               <div className="flex-1 min-w-0">
@@ -195,15 +195,15 @@ export default function AdminLeaders() {
               <div className="flex flex-col gap-1 shrink-0">
                 <button onClick={() => { setEditing(l); setShowForm(true); }} title="Editar"
                   className="p-1.5 rounded-full hover:bg-surf-container text-on-surf-var hover:text-on-surf transition-colors">
-                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>edit</span>
+                  <span className="ms" style={{ fontSize: 18 }}>edit</span>
                 </button>
                 <button onClick={() => handleToggle(l)} title={l.is_active ? 'Ocultar' : 'Mostrar'}
                   className="p-1.5 rounded-full hover:bg-surf-container text-on-surf-var hover:text-on-surf transition-colors">
-                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>{l.is_active ? 'visibility' : 'visibility_off'}</span>
+                  <span className="ms" style={{ fontSize: 18 }}>{l.is_active ? 'visibility' : 'visibility_off'}</span>
                 </button>
                 <button onClick={() => handleDelete(l.ID)} title="Eliminar"
                   className="p-1.5 rounded-full hover:bg-surf-container text-on-surf-var hover:text-err transition-colors">
-                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>delete</span>
+                  <span className="ms" style={{ fontSize: 18 }}>delete</span>
                 </button>
               </div>
             </div>

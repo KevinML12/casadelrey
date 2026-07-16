@@ -426,7 +426,11 @@ html.lenis, html.lenis body { height: auto; }
     }
   }
 
-  /* Material Symbols */
+  /* Material Symbols — panel admin/líder/voluntario (íconos por ligadura:
+     el texto "dashboard" se sustituye por el glifo vía OpenType 'liga').
+     Sin font-feature-settings:'liga' el navegador NO hace la sustitución
+     y se ve el nombre del ícono como texto plano — bug real que afectaba
+     TODOS los íconos de los 3 paneles, encontrado al verificar el admin. */
   .ms {
     font-family: 'Material Symbols Rounded', sans-serif;
     font-size: 24px;
@@ -434,7 +438,12 @@ html.lenis, html.lenis body { height: auto; }
     font-style: normal;
     font-weight: normal;
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    -webkit-font-feature-settings: 'liga';
+            font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
     display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
     user-select: none;
     flex-shrink: 0;
     vertical-align: middle;

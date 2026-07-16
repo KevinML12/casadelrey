@@ -61,7 +61,7 @@ export default function AdminSettings() {
 
       {accountMissing && (
         <div className="flex items-start gap-3 p-4 rounded-2xl border border-pri/40 bg-pri-con/40">
-          <span className="material-symbols-rounded text-on-pri-con mt-0.5" style={{ fontSize: 20 }}>account_balance</span>
+          <span className="ms text-on-pri-con mt-0.5" style={{ fontSize: 20 }}>account_balance</span>
           <div>
             <p className="text-title-s text-on-surf font-semibold">Falta la cuenta bancaria real</p>
             <p className="text-body-s text-on-surf-var mt-0.5">
