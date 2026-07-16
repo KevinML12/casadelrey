@@ -163,23 +163,32 @@ export function Halos({ variant = 'hero' }) {
     );
   }
   if (variant === 'mesh') {
-    /* Fondo de "malla" a color, estático (sin loop) — reemplaza la
-       dependencia de fotos reales que no existen en el panel admin. La
-       idea: en vez de 2 blobs celestes en las esquinas, varios blobs de
-       colores de marca (celeste/esmeralda/ámbar/rosa, todos ya en la
-       paleta — nada nuevo) distribuidos por TODO el viewport, para que
-       cualquier card glass-light tenga color real detrás sin importar en
-       qué parte de la grilla caiga. Mismo principio que el fondo
-       degradado estático de apps tipo Notion/Linear: no es una foto, es
-       un lienzo de color que no cambia ni anima solo. */
+    /* Lienzo de color de viewport COMPLETO, estático (sin loop) — la
+       traducción a nuestra marca del fondo degradado saturado de las
+       referencias tipo PlanMaker/Notion: donde ellos ponen un lavado
+       rosa/teal, nosotros usamos celeste dominante + rosa/esmeralda/ámbar
+       de acento (todos ya en la paleta). El primer intento fueron 5 blobs
+       tímidos al 9-20% de opacidad — no se notaban y las cards blancas
+       salían grises. Esto es UN solo div con varios radial-gradients
+       compuestos (sin filter:blur, más barato que los .halo con blur 80px)
+       a intensidad real: el color debe VERSE a través del cristal, es el
+       sustituto de la foto de fondo del sitio público. Las esquinas del
+       lavado se sienten distintas entre sí a propósito (celeste arriba-izq,
+       esmeralda arriba-der, rosa abajo-izq, ámbar abajo-der) para que cada
+       zona del panel tenga su propio ambiente, como la referencia. */
     return (
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="halo" style={{ width: 620, height: 620, top: '-8%', left: '-8%', background: 'radial-gradient(circle, rgba(59,130,246,0.20), transparent 70%)' }} />
-        <div className="halo" style={{ width: 560, height: 560, top: '2%', right: '4%', background: 'radial-gradient(circle, rgba(16,185,129,0.13), transparent 70%)' }} />
-        <div className="halo" style={{ width: 640, height: 520, bottom: '-12%', left: '18%', background: 'radial-gradient(ellipse, rgba(245,158,11,0.11), transparent 72%)' }} />
-        <div className="halo" style={{ width: 520, height: 520, bottom: '4%', right: '-6%', background: 'radial-gradient(circle, rgba(244,63,94,0.09), transparent 70%)' }} />
-        <div className="halo" style={{ width: 900, height: 700, top: '22%', left: '30%', background: 'radial-gradient(ellipse, rgba(96,165,250,0.10), transparent 72%)' }} />
-      </div>
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{
+          background: [
+            'radial-gradient(1000px 750px at 6% -4%, rgba(59,130,246,0.42), transparent 64%)',
+            'radial-gradient(850px 650px at 98% 4%, rgba(16,185,129,0.24), transparent 62%)',
+            'radial-gradient(1100px 850px at 22% 108%, rgba(244,63,94,0.30), transparent 62%)',
+            'radial-gradient(800px 650px at 96% 96%, rgba(245,158,11,0.20), transparent 62%)',
+            'radial-gradient(1300px 950px at 55% 48%, rgba(96,165,250,0.18), transparent 68%)',
+          ].join(', '),
+        }}
+      />
     );
   }
   return (
