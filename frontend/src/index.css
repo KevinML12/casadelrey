@@ -348,16 +348,13 @@ html.lenis, html.lenis body { height: auto; }
   }
 
   /* Brillo especular interactivo — sigue al cursor vía --spec-x/--spec-y
-     (seteadas con pointermove/touchmove, ver useGlassSpecular.js). Antes
-     eran 2 círculos perfectos concéntricos — se leían como un foco de luz
-     genérico. Ahora 3 capas elípticas (no circulares: el agua/vidrio real
-     nunca refracta en un círculo perfecto) que imitan cómo la luz se
-     comporta en la superficie de agua: un núcleo caliente pequeño, un
-     halo de dispersión ancho, y un anillo tenue justo en el borde del
-     núcleo — ese anillo es la clave, es el detalle de "refracción" que
-     antes faltaba y que hace que el punto de luz se sienta líquido en vez
-     de un simple spot. Reemplaza al shine en loop: el material de Apple
-     es calmo y reacciona a la interacción, no anima solo. */
+     (seteadas con pointermove/touchmove, ver useGlassSpecular.js). Dos
+     capas elípticas nada más (no circulares: el agua real no refracta en
+     un círculo perfecto): un núcleo suave pequeño + un halo de dispersión
+     ancho, ambos con caída de opacidad gradual — gota de agua sutil, sin
+     ningún borde/anillo marcado (se probó un anillo de refracción y se
+     veía artificial, descartado). Reemplaza al shine en loop: el material
+     de Apple es calmo y reacciona a la interacción, no anima solo. */
   .liquid-glass::after,
   .glass-light::after {
     content: '';
@@ -366,9 +363,8 @@ html.lenis, html.lenis body { height: auto; }
     border-radius: inherit;
     pointer-events: none;
     background:
-      radial-gradient(75px 55px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.4), transparent 62%),
-      radial-gradient(230px 170px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.16), transparent 68%),
-      radial-gradient(95px 70px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), transparent 46%, rgba(255, 255, 255, 0.22) 54%, transparent 62%);
+      radial-gradient(65px 48px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.30), transparent 68%),
+      radial-gradient(200px 150px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.11), transparent 72%);
     /* --spec-o: además del :hover (mouse), useGlassSpecular la fuerza a 1
        en touch — donde :hover no dispara. */
     opacity: var(--spec-o, 0);
@@ -376,9 +372,8 @@ html.lenis, html.lenis body { height: auto; }
   }
   .glass-light::after {
     background:
-      radial-gradient(70px 50px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.8), transparent 60%),
-      radial-gradient(210px 155px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.42), transparent 68%),
-      radial-gradient(88px 64px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), transparent 44%, rgba(255, 255, 255, 0.5) 53%, transparent 62%);
+      radial-gradient(60px 44px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.55), transparent 66%),
+      radial-gradient(185px 140px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.26), transparent 72%);
   }
   .liquid-glass:hover::after,
   .glass-light:hover::after { opacity: 1; }
