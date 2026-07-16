@@ -166,6 +166,12 @@ export function Halos({ variant = 'hero' }) {
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <div className="halo" style={{ width: 480, height: 480, top: '10%', left: '-10%', background: 'radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%)' }} />
       <div className="halo" style={{ width: 420, height: 420, bottom: '-10%', right: '-6%', background: 'radial-gradient(circle, rgba(96,165,250,0.12), transparent 70%)' }} />
+      {/* Tercer halo, centrado y más ancho: las cards glass-light (blancas)
+          necesitan brillo real detrás para no leerse grises — los dos
+          halos de esquina no llegaban al centro de la grilla. Este es más
+          grande y tenue, pensado para bañar el contenido, no para verse
+          como un foco. */}
+      <div className="halo" style={{ width: 900, height: 700, top: '5%', left: '25%', background: 'radial-gradient(ellipse, rgba(96,165,250,0.09), transparent 72%)' }} />
     </div>
   );
 }

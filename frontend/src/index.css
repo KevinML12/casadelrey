@@ -296,16 +296,21 @@ html.lenis, html.lenis body { height: auto; }
   }
 
   .glass-light {
-    /* Antes: rgba(255,255,255,0.48) plano — sin gradiente de luz se leía
-       como una caja blanca lechosa en vez de vidrio, sobre todo sin foto
-       detrás (paneles admin). Mismo tratamiento que .liquid-glass: un
-       gradiente diagonal (más claro arriba-izq, más tenue abajo-der) +
-       bisel asimétrico (borde superior/izquierdo más brillante que el
-       inferior/derecho) — así el material se sostiene solo, con o sin
-       foto detrás. */
-    background: linear-gradient(155deg, rgba(255,255,255,0.64) 0%, rgba(255,255,255,0.42) 55%, rgba(255,255,255,0.30) 100%);
-    -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
-            backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
+    /* v1: rgba(255,255,255,0.48) plano — caja blanca lechosa, sin luz.
+       v2: gradiente 0.64→0.30 — mejor bisel, pero sobre navy liso (donde
+       no llega el halo) el backdrop-filter mezcla tanto navy oscuro que
+       sale gris azulado apagado ("parece pañal"). El material dependía
+       demasiado de lo que hubiera detrás.
+       v3 (actual): opacidad base mucho más alta (0.90→0.62) — el blanco
+       ya NO depende de que haya brillo detrás para leerse blanco, es
+       blanco de verdad. El gradiente + bisel asimétrico + backdrop-filter
+       (blur/saturate/brightness) siguen dando la textura de vidrio, ya no
+       la opacidad en sí. Menos "ves a través", pero es la variante que SÍ
+       se sostiene sola sobre navy plano — igual que el vidrio esmerilado
+       real de iOS/macOS, que es opaco y aun así lee como cristal. */
+    background: linear-gradient(155deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.76) 55%, rgba(255,255,255,0.62) 100%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.12);
+            backdrop-filter: blur(24px) saturate(180%) brightness(1.12);
     border-width: 1px;
     border-style: solid;
     border-color: rgba(255, 255, 255, 0.7) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.62);
