@@ -1,27 +1,29 @@
 /**
- * M3 Chips — https://m3.material.io/components/chips
+ * Liquid Glass Chips — pastilla de cristal, mismo lenguaje que Badge/Eyebrow
+ * del sitio público. Reemplaza el Chip M3 plano (bg-pri-con sólido).
  *
- * Chip (default):  assist / status — non-interactive label, shape: small = 8dp
- * FilterChip:      interactive filter, selected state + check icon + state layer
+ * Chip (default):  assist / status — etiqueta no interactiva
+ * FilterChip:      filtro interactivo, estado seleccionado + check
  */
+import { Icon } from './Glass';
 
 const colorMap = {
-  default:   'bg-surf-high text-on-surf-var',
-  primary:   'bg-pri-con text-on-pri-con',
-  secondary: 'bg-sec-con text-on-sec-con',
-  tertiary:  'bg-ter-con text-on-ter-con',
-  error:     'bg-err-con text-on-err-con',
+  default:   'bg-white/8 border border-white/12 text-white/75',
+  primary:   'bg-celeste-soft/60 border border-celeste/30 text-celeste-hov',
+  secondary: 'bg-white/8 border border-white/12 text-white',
+  tertiary:  'bg-celeste-soft/60 border border-celeste/30 text-celeste-hov',
+  error:     'bg-rose-soft/60 border border-rose/30 text-rose',
 };
 
 export default function Chip({ color = 'default', icon, children, className = '', ...props }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 h-7 px-3 rounded-lg
-        text-label-m font-medium whitespace-nowrap select-none
+      className={`inline-flex items-center gap-1.5 h-7 px-3 rounded-full
+        text-[12px] font-semibold whitespace-nowrap select-none
         ${colorMap[color]} ${className}`}
       {...props}
     >
-      {icon && <span className="ms" style={{ fontSize: 14 }}>{icon}</span>}
+      {icon && <Icon name={icon} className="w-3.5 h-3.5" stroke={1.8} />}
       {children}
     </span>
   );
@@ -32,24 +34,21 @@ export function FilterChip({ selected, icon, count, children, className = '', ..
     <button
       type="button"
       className={
-        'inline-flex items-center gap-1.5 h-8 px-4 rounded-lg border ' +
-        'text-label-l font-medium whitespace-nowrap ' +
-        'cursor-pointer select-none transition-all duration-150 ' +
-        'relative overflow-hidden ' +
-        'before:content-[""] before:absolute before:inset-0 before:opacity-0 ' +
-        'before:transition-opacity before:duration-150 before:pointer-events-none ' +
+        'inline-flex items-center gap-1.5 h-8 px-4 rounded-full border ' +
+        'text-[13px] font-semibold whitespace-nowrap ' +
+        'cursor-pointer select-none transition-all duration-200 ' +
         (selected
-          ? 'bg-sec-con text-on-sec-con border-transparent before:bg-on-sec-con hover:before:opacity-[.08] active:before:opacity-[.12] '
-          : 'bg-transparent text-on-surf-var border-outline-var before:bg-on-surf hover:before:opacity-[.08] active:before:opacity-[.12] '
+          ? 'liquid-glass text-white border-white/25 '
+          : 'bg-transparent text-white/50 border-white/12 hover:text-white hover:bg-white/6 '
         ) + className
       }
       {...props}
     >
-      <span className="ms" style={{ fontSize: 16, opacity: selected ? 1 : 0, width: selected ? 'auto' : 0, overflow: 'hidden', transition: 'all .15s' }}>check</span>
-      {!selected && icon && <span className="ms" style={{ fontSize: 16 }}>{icon}</span>}
+      {selected && <Icon name="check" className="w-3.5 h-3.5" stroke={2.2} />}
+      {!selected && icon && <Icon name={icon} className="w-3.5 h-3.5" stroke={1.8} />}
       <span>{children}</span>
       {count != null && (
-        <span className={`text-label-s ml-0.5 ${selected ? 'opacity-70' : 'opacity-60'}`}>
+        <span className={`text-[11px] ml-0.5 ${selected ? 'opacity-70' : 'opacity-50'}`}>
           {count}
         </span>
       )}

@@ -7,15 +7,16 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { Icon } from '../../components/ui/Glass';
 
 function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
   return (
-    <div className="flex items-center gap-4 p-4 rounded-2xl border border-outline-var">
-      <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-surf-low border border-outline-var">
+    <div className="flex items-center gap-4 p-4 rounded-2xl border border-white/10">
+      <div className="liquid-glass rounded-[20px] card-spring w-20 h-20 overflow-hidden shrink-0">
         {imageUrl
           ? <img src={imageUrl} alt="" className="w-full h-full object-cover" />
           : <div className="w-full h-full flex items-center justify-center text-on-surf-var">
-              <span className="ms" style={{ fontSize: 26 }}>image</span>
+              <Icon name="image" className="w-[26px] h-[26px]" stroke={1.8} />
             </div>
         }
       </div>
@@ -24,7 +25,7 @@ function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
         {sublabel && <p className="text-label-s text-on-surf-var mt-0.5">{sublabel}</p>}
         {!imageUrl && <p className="text-label-s mt-1" style={{ color: 'var(--pri)' }}>Usando la imagen por defecto del sitio</p>}
       </div>
-      <label className="shrink-0 px-4 py-2.5 rounded-full border border-outline-var text-label-m font-semibold text-on-surf hover:bg-surf-low cursor-pointer transition-colors">
+      <label className="shrink-0 px-4 py-2.5 rounded-full border border-white/10 text-label-m font-semibold text-on-surf hover:bg-surf-low cursor-pointer transition-colors">
         {uploading ? 'Subiendo…' : 'Cambiar foto'}
         <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={onPick} />
       </label>

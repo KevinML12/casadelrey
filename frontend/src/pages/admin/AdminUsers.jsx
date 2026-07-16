@@ -3,6 +3,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip, { FilterChip } from '../../components/ui/Chip';
 import CellCodePicker from '../../components/ui/CellCodePicker';
+import { Icon } from '../../components/ui/Glass';
 
 const ROLES = ['member', 'leader', 'volunteer', 'admin'];
 
@@ -34,14 +35,14 @@ function CellModal({ user, onClose, onSaved }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-surf rounded-2xl border border-outline-var shadow-elev-3 w-full max-w-md p-6 animate-fade-in">
+      <div className="relative bg-surf rounded-2xl border border-white/10 shadow-elev-3 w-full max-w-md p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-title-l text-on-surf font-bold">Código de célula</h3>
             <p className="text-body-s text-on-surf-var mt-0.5">{user.name}</p>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surf-dim text-on-surf-var transition-colors">
-            <span className="ms" style={{ fontSize: 18 }}>close</span>
+            <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
           </button>
         </div>
 
@@ -51,13 +52,13 @@ function CellModal({ user, onClose, onSaved }) {
           onChange={({ cell_code, cell_type }) => { setCellCode(cell_code); setCellType(cell_type); }}
         />
 
-        <div className="flex gap-3 mt-6 pt-4 border-t border-outline-var">
+        <div className="flex gap-3 mt-6 pt-4 border-t border-white/10">
           <button
             onClick={handleSave}
             disabled={saving}
             className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            <span className="ms" style={{ fontSize: 16 }}>save</span>
+            <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {saving ? 'Guardando…' : 'Guardar'}
           </button>
           <button onClick={onClose} className="px-4 h-10 rounded-xl text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
@@ -86,7 +87,7 @@ function RoleSelect({ userId, currentRole, onUpdated }) {
 
   return (
     <select value={currentRole} onChange={change} disabled={saving}
-      className="text-label-m h-8 px-3 rounded-lg border border-outline-var bg-transparent text-on-surf focus:outline-none focus:border-pri transition-colors cursor-pointer">
+      className="text-label-m h-8 px-3 rounded-lg border border-white/10 bg-transparent text-on-surf focus:outline-none focus:border-pri transition-colors cursor-pointer">
       {ROLES.map(r => <option key={r} value={r}>{ROLE_CONFIG[r]?.label || r}</option>)}
     </select>
   );
@@ -103,7 +104,7 @@ function UserAvatar({ name }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
   </div>
 );
 
@@ -152,7 +153,7 @@ export default function AdminUsers() {
       {/* Page header */}
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-          <span className="ms text-on-pri-con" style={{ fontSize: 22 }}>manage_accounts</span>
+          <Icon name="manage_accounts" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-on-surf font-black leading-tight">Usuarios</h1>
@@ -163,9 +164,9 @@ export default function AdminUsers() {
       {/* Barra de búsqueda */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="flex-1 relative">
-          <span className="ms absolute left-3 top-1/2 -translate-y-1/2 text-on-surf-var pointer-events-none" style={{ fontSize: 18 }}>search</span>
+          <Icon name="search" className="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-on-surf-var pointer-events-none" stroke={1.8} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nombre o correo…"
-            className="w-full pl-10 pr-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all" />
+            className="w-full pl-10 pr-4 py-2.5 rounded border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all" />
         </div>
       </div>
 
@@ -187,11 +188,11 @@ export default function AdminUsers() {
       </div>
 
       {/* Lista */}
-      <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
+      <div className="liquid-glass rounded-[24px] card-spring overflow-hidden">
         {loading ? <Spinner /> : filtered.length === 0 ? (
           <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-            <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
-              <span className="ms" style={{ fontSize: 32 }}>person_search</span>
+            <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+              <Icon name="person_search" className="w-[32px] h-[32px]" stroke={1.8} />
             </div>
             <div className="text-center">
               <p className="text-body-l text-on-surf font-medium">Sin resultados</p>
@@ -201,11 +202,11 @@ export default function AdminUsers() {
             </div>
           </div>
         ) : (
-          <div className="divide-y divide-outline-var">
+          <div className="divide-y divide-white/8">
             {filtered.map(u => {
               const cfg = ROLE_CONFIG[u.role] || ROLE_CONFIG.member;
               return (
-                <div key={u.ID} className="flex items-center gap-4 px-5 py-4 hover:bg-surf-high transition-colors">
+                <div key={u.ID} className="flex items-center gap-4 px-5 py-4 hover:bg-white/8 transition-colors">
 
                   {/* Avatar */}
                   <UserAvatar name={u.name} />
@@ -229,10 +230,10 @@ export default function AdminUsers() {
                   {u.role === 'leader' && (
                     <button
                       onClick={() => setCellModal(u)}
-                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-outline-var text-label-m text-on-surf-var hover:border-pri hover:text-pri transition-colors font-mono"
+                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-white/10 text-label-m text-on-surf-var hover:border-pri hover:text-pri transition-colors font-mono"
                       title="Editar código de célula"
                     >
-                      <span className="ms" style={{ fontSize: 14 }}>tag</span>
+                      <Icon name="tag" className="w-[14px] h-[14px]" stroke={1.8} />
                       {u.cell_code || 'Sin código'}
                     </button>
                   )}

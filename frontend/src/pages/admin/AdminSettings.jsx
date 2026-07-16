@@ -9,7 +9,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 // Pistas por llave para guiar al admin
 const HINTS = {
@@ -61,7 +61,7 @@ export default function AdminSettings() {
 
       {accountMissing && (
         <div className="flex items-start gap-3 p-4 rounded-2xl border border-pri/40 bg-pri-con/40">
-          <span className="ms text-on-pri-con mt-0.5" style={{ fontSize: 20 }}>account_balance</span>
+          <Icon name="account_balance" className="w-[20px] h-[20px] text-on-pri-con mt-0.5" stroke={1.8} />
           <div>
             <p className="text-title-s text-on-surf font-semibold">Falta la cuenta bancaria real</p>
             <p className="text-body-s text-on-surf-var mt-0.5">
@@ -77,7 +77,7 @@ export default function AdminSettings() {
       ) : (
         <div className="space-y-4">
           {settings.map(s => (
-            <div key={s.key} className="p-4 sm:p-5 rounded-2xl bg-surf border border-outline-var">
+            <div key={s.key} className="p-4 sm:p-5 rounded-2xl bg-surf border border-white/10">
               <label className="block text-label-l text-on-surf-var mb-1.5">
                 {s.label}
                 {s.using_default && s.value === '' && (

@@ -3,18 +3,19 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip from '../../components/ui/Chip';
 import Button, { IconButton } from '../../components/ui/Button';
+import { Icon } from '../../components/ui/Glass';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
   </div>
 );
 
 function EmptyState() {
   return (
     <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-      <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
-        <span className="ms" style={{ fontSize: 32 }}>inbox</span>
+      <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+        <Icon name="inbox" className="w-[32px] h-[32px]" stroke={1.8} />
       </div>
       <div className="text-center">
         <p className="text-body-l text-on-surf font-medium">Sin peticiones</p>
@@ -129,7 +130,7 @@ export default function AdminPetitions() {
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-ter-con flex items-center justify-center shrink-0">
-            <span className="ms text-on-ter-con" style={{ fontSize: 22 }}>volunteer_activism</span>
+            <Icon name="volunteer_activism" className="w-[22px] h-[22px] text-on-ter-con" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-on-surf font-black leading-tight">Peticiones</h1>
@@ -143,32 +144,31 @@ export default function AdminPetitions() {
         <div className="flex items-center gap-3">
           {unread > 0 && <Chip color="primary">{unread} nueva{unread > 1 ? 's' : ''}</Chip>}
           <Button variant="outlined" onClick={handleWeeklyPdf} disabled={pdfLoading}>
-            <span className="ms" style={{ fontSize: 16 }}>print</span>
+            <Icon name="print" className="w-[16px] h-[16px]" stroke={1.8} />
             {pdfLoading ? 'Cargando…' : 'PDF semanal'}
           </Button>
         </div>
       </div>
 
       {loading ? <Spinner /> : petitions.length === 0 ? (
-        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
+        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden">
           <EmptyState />
         </div>
       ) : (
-        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden divide-y divide-outline-var">
+        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
           {petitions.map(p => (
             <div key={p.ID}
               className={`flex items-start gap-4 p-5 transition-colors ${
-                p.is_answered ? 'opacity-60' : 'hover:bg-surf-high'
+                p.is_answered ? 'opacity-60' : 'hover:bg-white/8'
               }`}
             >
               {/* Leading icon */}
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                p.is_answered ? 'bg-surf-high' : 'bg-ter-con'
+                p.is_answered ? 'bg-white/8' : 'bg-ter-con'
               }`}>
-                <span className={`ms ${p.is_answered ? 'text-on-surf-var' : 'text-on-ter-con'}`}
-                  style={{ fontSize: 18 }}>
-                  {p.is_answered ? 'mark_email_read' : 'volunteer_activism'}
-                </span>
+                <Icon name={p.is_answered ? 'mark_email_read' : 'volunteer_activism'}
+                  className={`w-[18px] h-[18px] ${p.is_answered ? 'text-on-surf-var' : 'text-on-ter-con'}`}
+                  stroke={1.8} />
               </div>
 
               {/* Content */}
@@ -186,7 +186,7 @@ export default function AdminPetitions() {
                   <p className="text-body-s text-on-surf-var mb-2">{p.email}</p>
                 )}
                 {p.message && (
-                  <p className="text-body-s text-on-surf-var leading-relaxed bg-surf border border-outline-var rounded-xl px-4 py-3">
+                  <p className="text-body-s text-on-surf-var leading-relaxed bg-surf border border-white/10 rounded-xl px-4 py-3">
                     {p.message}
                   </p>
                 )}
@@ -205,7 +205,7 @@ export default function AdminPetitions() {
                   title="Marcar como respondida"
                   className="shrink-0 mt-0.5"
                 >
-                  <span className="ms" style={{ fontSize: 18 }}>check</span>
+                  <Icon name="check" className="w-[18px] h-[18px]" stroke={1.8} />
                 </IconButton>
               )}
             </div>

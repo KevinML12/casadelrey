@@ -11,7 +11,7 @@ const ACTION_COLORS = {
   update:  { bg: 'bg-pri-con', text: 'text-on-pri-con', icon: 'edit' },
   delete:  { bg: 'bg-err-con', text: 'text-on-err-con', icon: 'delete' },
   approve: { bg: 'bg-ter-con', text: 'text-on-ter-con', icon: 'check_circle' },
-  login:   { bg: 'bg-surf-high', text: 'text-on-surf',   icon: 'login' },
+  login:   { bg: 'bg-white/8', text: 'text-on-surf',   icon: 'login' },
 };
 
 function fmtDate(d) {
@@ -48,7 +48,7 @@ export default function AdminActivityLog() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-          <span className="ms text-on-pri-con" style={{ fontSize: 22 }}>history</span>
+          <Icon name="history" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-on-surf font-black leading-tight">Historial de Actividad</h1>
@@ -85,30 +85,30 @@ export default function AdminActivityLog() {
       {/* List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
         </div>
       ) : logs.length === 0 ? (
-        <div className="bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
-            <span className="ms text-on-surf-var" style={{ fontSize: 32 }}>history</span>
+        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+            <Icon name="history" className="w-[32px] h-[32px] text-on-surf-var" stroke={1.8} />
           </div>
           <p className="text-body-l text-on-surf font-medium">Sin actividad registrada</p>
         </div>
       ) : (
-        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden divide-y divide-outline-var">
+        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
           {logs.map(log => {
             const style = ACTION_COLORS[log.action] || ACTION_COLORS.login;
             return (
-              <div key={log.ID} className="flex items-start gap-4 p-4 hover:bg-surf-high transition-colors">
+              <div key={log.ID} className="flex items-start gap-4 p-4 hover:bg-white/8 transition-colors">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${style.bg}`}>
-                  <span className={`ms ${style.text}`} style={{ fontSize: 16 }}>{style.icon}</span>
+                  <Icon name={style.icon} className={`w-[16px] h-[16px] ${style.text}`} stroke={1.8} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-0.5">
                     <span className="text-body-s text-on-surf font-medium">{log.user_name || `User #${log.user_id}`}</span>
-                    <span className="text-label-s text-on-surf-var px-2 py-0.5 rounded-full bg-surf-high">{log.action}</span>
+                    <span className="text-label-s text-on-surf-var px-2 py-0.5 rounded-full bg-white/8">{log.action}</span>
                     <span className="text-label-s text-on-surf-var">→</span>
-                    <span className="text-label-s text-on-surf-var px-2 py-0.5 rounded-full bg-surf-high">{log.resource}</span>
+                    <span className="text-label-s text-on-surf-var px-2 py-0.5 rounded-full bg-white/8">{log.resource}</span>
                     {log.resource_id > 0 && (
                       <span className="text-label-s text-on-surf-var">#{log.resource_id}</span>
                     )}

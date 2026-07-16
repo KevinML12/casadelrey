@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button, { IconButton } from '../../components/ui/Button';
+import { Icon } from '../../components/ui/Glass';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = { question: '', answer: '', sort_order: 0, is_active: true };
 
@@ -55,9 +56,9 @@ function FAQForm({ onSave, onCancel, initialData }) {
           </label>
         </div>
       </div>
-      <div className="flex gap-3 pt-2 border-t border-outline-var">
+      <div className="flex gap-3 pt-2 border-t border-white/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <span className="ms" style={{ fontSize: 16 }}>save</span>
+          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Agregar FAQ')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -107,13 +108,13 @@ export default function AdminFAQs() {
           <p className="text-body-m text-on-surf-var">Gestiona las preguntas comunes que aparecen en la página de Eventos.</p>
         </div>
         <Button variant="filled" onClick={() => { setEditingFaq(null); setShowForm(!showForm); }}>
-          <span className="ms">{showForm ? 'close' : 'add'}</span>
+          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nueva FAQ'}
         </Button>
       </div>
 
       {showForm && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-surf border border-outline-var">
+        <div className="p-4 sm:p-6 rounded-2xl bg-surf border border-white/10">
           <h2 className="text-title-m mb-4">{editingFaq ? 'Editar FAQ' : 'Agregar FAQ'}</h2>
           <FAQForm 
             initialData={editingFaq} 
@@ -126,13 +127,13 @@ export default function AdminFAQs() {
       {loading ? (
         <div className="text-center py-12 text-on-surf-var">Cargando...</div>
       ) : faqs.length === 0 ? (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-outline-var text-on-surf-var">
+        <div className="text-center py-12 rounded-2xl border border-dashed border-white/10 text-on-surf-var">
           No hay FAQs agregadas.
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {faqs.map(faq => (
-            <div key={faq.ID} className={`p-4 sm:p-5 rounded-2xl border ${faq.is_active ? 'bg-surf border-outline-var' : 'bg-surf-container border-outline/50'} flex flex-col sm:flex-row gap-4 items-start`}>
+            <div key={faq.ID} className={`p-4 sm:p-5 rounded-2xl border ${faq.is_active ? 'bg-surf border-white/10' : 'bg-surf-container border-outline/50'} flex flex-col sm:flex-row gap-4 items-start`}>
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">

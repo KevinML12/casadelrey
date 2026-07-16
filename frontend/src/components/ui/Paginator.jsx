@@ -1,4 +1,5 @@
-import Button, { IconButton } from './Button';
+import { IconButton } from './Button';
+import { Icon } from './Glass';
 
 export default function Paginator({ meta, onPage }) {
   if (!meta || meta.pages <= 1) return null;
@@ -16,15 +17,15 @@ export default function Paginator({ meta, onPage }) {
       <IconButton
         disabled={page <= 1}
         onClick={() => onPage(page - 1)}
-        className="text-on-surf-var disabled:opacity-30"
+        className="disabled:opacity-30"
       >
-        <span className="ms" style={{ fontSize: 18 }}>chevron_left</span>
+        <Icon name="chevron_left" className="w-[18px] h-[18px]" stroke={2} />
       </IconButton>
 
       {pages_arr[0] > 1 && (
         <>
           <PageBtn num={1} active={page === 1} onClick={onPage} />
-          {pages_arr[0] > 2 && <span className="text-on-surf-var text-body-s px-1">…</span>}
+          {pages_arr[0] > 2 && <span className="text-white/40 text-[13px] px-1">…</span>}
         </>
       )}
 
@@ -35,7 +36,7 @@ export default function Paginator({ meta, onPage }) {
       {pages_arr[pages_arr.length - 1] < pages && (
         <>
           {pages_arr[pages_arr.length - 1] < pages - 1 && (
-            <span className="text-on-surf-var text-body-s px-1">…</span>
+            <span className="text-white/40 text-[13px] px-1">…</span>
           )}
           <PageBtn num={pages} active={page === pages} onClick={onPage} />
         </>
@@ -44,12 +45,12 @@ export default function Paginator({ meta, onPage }) {
       <IconButton
         disabled={page >= pages}
         onClick={() => onPage(page + 1)}
-        className="text-on-surf-var disabled:opacity-30"
+        className="disabled:opacity-30"
       >
-        <span className="ms" style={{ fontSize: 18 }}>chevron_right</span>
+        <Icon name="chevron_right" className="w-[18px] h-[18px]" stroke={2} />
       </IconButton>
 
-      <span className="text-label-s text-on-surf-var ml-2">
+      <span className="text-[12px] text-white/40 ml-2">
         {meta.total} total
       </span>
     </div>
@@ -60,10 +61,10 @@ function PageBtn({ num, active, onClick }) {
   return (
     <button
       onClick={() => onClick(num)}
-      className={`w-9 h-9 rounded-lg text-label-l font-medium transition-colors ${
+      className={`w-9 h-9 rounded-full text-[13.5px] font-semibold transition-colors ${
         active
-          ? 'bg-pri text-on-pri'
-          : 'text-on-surf-var hover:bg-surf-high hover:text-on-surf'
+          ? 'bg-celeste text-white'
+          : 'text-white/50 hover:bg-white/8 hover:text-white'
       }`}
     >
       {num}

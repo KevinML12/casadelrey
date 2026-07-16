@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { Icon } from '../../components/ui/Glass';
 
 // Descripciones de cada departamento
 const DEPT_INFO = {
@@ -19,22 +20,22 @@ const DEPT_INFO = {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-12">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
   </div>
 );
 
 function GoalCard({ goal, onToggle, onDelete }) {
   return (
     <div className={`flex items-start gap-4 p-4 rounded-2xl border transition-colors ${
-      goal.completed ? 'border-outline-var bg-surf-low opacity-60' : 'border-outline-var bg-surf hover:bg-surf-low'
+      goal.completed ? 'border-white/10 bg-surf-low opacity-60' : 'border-white/10 bg-surf hover:bg-surf-low'
     }`}>
       <button
         onClick={() => onToggle(goal)}
         className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-          goal.completed ? 'bg-ter-con border-transparent' : 'border-outline-var hover:border-pri'
+          goal.completed ? 'bg-ter-con border-transparent' : 'border-white/10 hover:border-pri'
         }`}
       >
-        {goal.completed && <span className="ms text-on-ter-con" style={{ fontSize: 14 }}>check</span>}
+        {goal.completed && <Icon name="check" className="w-[14px] h-[14px] text-on-ter-con" stroke={1.8} />}
       </button>
       <div className="flex-1 min-w-0">
         <p className={`text-body-m font-medium ${goal.completed ? 'line-through text-on-surf-var' : 'text-on-surf'}`}>
@@ -45,7 +46,7 @@ function GoalCard({ goal, onToggle, onDelete }) {
         )}
         {goal.target_date && (
           <p className="text-label-s text-on-surf-var mt-2 flex items-center gap-1">
-            <span className="ms" style={{ fontSize: 12 }}>event</span>
+            <Icon name="event" className="w-[12px] h-[12px]" stroke={1.8} />
             {new Date(goal.target_date + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
           </p>
         )}
@@ -55,7 +56,7 @@ function GoalCard({ goal, onToggle, onDelete }) {
         className="text-on-surf-var hover:text-err transition-colors shrink-0 mt-0.5"
         title="Eliminar meta"
       >
-        <span className="ms" style={{ fontSize: 16 }}>delete</span>
+        <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
       </button>
     </div>
   );
@@ -64,7 +65,7 @@ function GoalCard({ goal, onToggle, onDelete }) {
 function NewGoalForm({ onSave, onCancel }) {
   const [form, setForm] = useState({ title: '', description: '', target_date: '' });
   const [loading, setLoading] = useState(false);
-  const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+  const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -104,7 +105,7 @@ function NewGoalForm({ onSave, onCancel }) {
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={loading}
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-          <span className="ms" style={{ fontSize: 16 }}>save</span>
+          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Guardar'}
         </button>
         <button type="button" onClick={onCancel}
@@ -175,21 +176,21 @@ export default function VolunteerDashboard() {
     <div className="max-w-2xl mx-auto px-6 py-10 space-y-8">
 
       {/* Bienvenida */}
-      <div className="rounded-2xl overflow-hidden border border-outline-var">
+      <div className="rounded-2xl overflow-hidden border border-white/10">
         <div className="px-6 py-5" style={{ background: '#060D24' }}>
           <p className="text-label-m mb-1" style={{ color: 'rgba(255,255,255,.5)' }}>Bienvenido,</p>
           <h1 className="text-headline-s text-ink font-black leading-tight">{user?.name}</h1>
           {dept && (
             <div className="flex items-center gap-2 mt-3">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,.12)' }}>
-                <span className="ms text-ink" style={{ fontSize: 16 }}>{dept.icon}</span>
+                <Icon name={dept.icon} className="w-[16px] h-[16px] text-ink" stroke={1.8} />
               </div>
               <span className="text-label-l text-ink font-medium">{dept.label}</span>
             </div>
           )}
         </div>
         {dept && (
-          <div className="px-6 py-4 bg-surf-low border-t border-outline-var">
+          <div className="liquid-glass rounded-[24px] card-spring px-6 py-4 border-t">
             <p className="text-body-s text-on-surf-var leading-relaxed">{dept.desc}</p>
           </div>
         )}
@@ -197,15 +198,15 @@ export default function VolunteerDashboard() {
 
       {/* Tu líder — comunicación directa (directorio /admin/leaders) */}
       {volunteer?.assigned_leader_name ? (
-        <section className="rounded-2xl border border-outline-var bg-surf p-5">
+        <section className="rounded-2xl border border-white/10 bg-surf p-5">
           <p className="text-label-s text-on-surf-var uppercase tracking-widest mb-3">Tu líder</p>
           <div className="flex items-center gap-4">
             {myLeader?.photo_url ? (
               <img src={myLeader.photo_url} alt={volunteer.assigned_leader_name}
-                className="w-14 h-14 rounded-full object-cover border border-outline-var shrink-0" />
+                className="w-14 h-14 rounded-full object-cover border border-white/10 shrink-0" />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-surf-container border border-outline-var grid place-items-center shrink-0">
-                <span className="ms text-on-surf-var">person</span>
+              <div className="w-14 h-14 rounded-full bg-surf-container border border-white/10 grid place-items-center shrink-0">
+                <Icon name="person" className="w-[20px] h-[20px] text-on-surf-var" stroke={1.8} />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -219,14 +220,14 @@ export default function VolunteerDashboard() {
                   target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity"
                 >
-                  <span className="ms" style={{ fontSize: 16 }}>chat</span>
+                  <Icon name="chat" className="w-[16px] h-[16px]" stroke={1.8} />
                   WhatsApp
                 </a>
               )}
               {myLeader?.email && (
                 <a href={`mailto:${myLeader.email}`} title={myLeader.email}
-                  className="grid place-items-center w-9 h-9 rounded-full border border-outline-var text-on-surf-var hover:text-on-surf hover:border-on-surf-var transition-colors">
-                  <span className="ms" style={{ fontSize: 16 }}>mail</span>
+                  className="grid place-items-center w-9 h-9 rounded-full border border-white/10 text-on-surf-var hover:text-on-surf hover:border-on-surf-var transition-colors">
+                  <Icon name="mail" className="w-[16px] h-[16px]" stroke={1.8} />
                 </a>
               )}
             </div>
@@ -238,7 +239,7 @@ export default function VolunteerDashboard() {
           )}
         </section>
       ) : volunteer && (
-        <section className="rounded-2xl border border-dashed border-outline-var bg-surf-low p-5 text-center">
+        <section className="liquid-glass rounded-[24px] card-spring border-dashed p-5 text-center">
           <p className="text-body-s text-on-surf-var">
             Aún no te asignan líder. El equipo se comunicará contigo pronto.
           </p>
@@ -247,16 +248,16 @@ export default function VolunteerDashboard() {
 
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-outline-var bg-surf p-4">
+        <div className="rounded-2xl border border-white/10 bg-surf p-4">
           <div className="w-8 h-8 rounded-lg bg-pri-con flex items-center justify-center mb-3">
-            <span className="ms text-on-pri-con" style={{ fontSize: 16 }}>task_alt</span>
+            <Icon name="task_alt" className="w-[16px] h-[16px] text-on-pri-con" stroke={1.8} />
           </div>
           <p className="text-label-s text-on-surf-var uppercase tracking-widest">Pendientes</p>
           <p className="text-headline-m text-on-surf font-black">{pending}</p>
         </div>
-        <div className="rounded-2xl border border-outline-var bg-surf p-4">
+        <div className="rounded-2xl border border-white/10 bg-surf p-4">
           <div className="w-8 h-8 rounded-lg bg-ter-con flex items-center justify-center mb-3">
-            <span className="ms text-on-ter-con" style={{ fontSize: 16 }}>check_circle</span>
+            <Icon name="check_circle" className="w-[16px] h-[16px] text-on-ter-con" stroke={1.8} />
           </div>
           <p className="text-label-s text-on-surf-var uppercase tracking-widest">Completadas</p>
           <p className="text-headline-m text-on-surf font-black">{completed}</p>
@@ -271,7 +272,7 @@ export default function VolunteerDashboard() {
             onClick={() => setShowForm(s => !s)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity"
           >
-            <span className="ms" style={{ fontSize: 16 }}>{showForm ? 'close' : 'add'}</span>
+            <Icon name={showForm ? 'close' : 'add'} className="w-[16px] h-[16px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nueva meta'}
           </button>
         </div>
@@ -286,8 +287,8 @@ export default function VolunteerDashboard() {
         )}
 
         {loading ? <Spinner /> : goals.length === 0 ? (
-          <div className="flex flex-col items-center py-12 text-on-surf-var border border-outline-var rounded-2xl bg-surf-low gap-3">
-            <span className="ms" style={{ fontSize: 40 }}>task_alt</span>
+          <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-12 text-on-surf-var gap-3">
+            <Icon name="task_alt" className="w-[40px] h-[40px]" stroke={1.8} />
             <p className="text-body-m">Aún no tienes metas registradas.</p>
             <button onClick={() => setShowForm(true)}
               className="text-label-m text-pri hover:underline font-medium">

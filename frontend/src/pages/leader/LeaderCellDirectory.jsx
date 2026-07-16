@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
+import { Icon } from '../../components/ui/Glass';
 
 const TYPE_LABELS = {
   hombres: { label: 'Hombres',   icon: 'man',     bg: 'bg-pri-con',  text: 'text-on-pri-con' },
@@ -24,7 +25,7 @@ export default function LeaderCellDirectory() {
     <div className="p-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-          <span className="ms text-on-sec-con" style={{ fontSize: 22 }}>contacts</span>
+          <Icon name="contacts" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-on-surf font-black leading-tight">Directorio de Células</h1>
@@ -34,38 +35,38 @@ export default function LeaderCellDirectory() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
         </div>
       ) : cells.length === 0 ? (
-        <div className="bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4 text-on-surf-var">
-          <span className="ms" style={{ fontSize: 48 }}>contacts</span>
+        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-on-surf-var">
+          <Icon name="contacts" className="w-[48px] h-[48px]" stroke={1.8} />
           <p className="text-body-l text-on-surf font-medium">Sin células asignadas</p>
         </div>
       ) : (
         <div className="space-y-4">
           {cells.map(cell => {
-            const typeInfo = TYPE_LABELS[cell.cell_type] || { label: cell.cell_type, icon: 'groups', bg: 'bg-surf-high', text: 'text-on-surf' };
+            const typeInfo = TYPE_LABELS[cell.cell_type] || { label: cell.cell_type, icon: 'groups', bg: 'bg-white/8', text: 'text-on-surf' };
             return (
-              <div key={cell.id} className="bg-surf-low border border-outline-var rounded-2xl p-5">
+              <div key={cell.id} className="liquid-glass rounded-[24px] card-spring p-5">
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${typeInfo.bg}`}>
-                    <span className={`ms ${typeInfo.text}`} style={{ fontSize: 22 }}>{typeInfo.icon}</span>
+                    <Icon name={typeInfo.icon} className={`w-[22px] h-[22px] ${typeInfo.text}`} stroke={1.8} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-title-s text-on-surf font-bold">{cell.cell_code}</span>
-                      <span className="text-label-s text-on-surf-var px-2 py-0.5 rounded-full bg-surf-high">{typeInfo.label}</span>
+                      <span className="text-label-s text-on-surf-var px-2 py-0.5 rounded-full bg-white/8">{typeInfo.label}</span>
                     </div>
                     <p className="text-body-s text-on-surf-var">{cell.member_count} miembro{cell.member_count !== 1 ? 's' : ''}</p>
                   </div>
                 </div>
                 <div className="space-y-2 text-body-s text-on-surf-var">
                   <div className="flex items-center gap-2">
-                    <span className="ms" style={{ fontSize: 16 }}>person</span>
+                    <Icon name="person" className="w-[16px] h-[16px]" stroke={1.8} />
                     <span className="text-on-surf">{cell.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="ms" style={{ fontSize: 16 }}>email</span>
+                    <Icon name="email" className="w-[16px] h-[16px]" stroke={1.8} />
                     <span>{cell.email}</span>
                   </div>
                 </div>

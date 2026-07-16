@@ -8,6 +8,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { Icon } from '../../components/ui/Glass';
 
 function slugify(text) {
   return text
@@ -25,10 +26,10 @@ function EditorToolbar({ editor }) {
     <button
       type="button" onClick={onClick} title={title}
       className={`p-1.5 rounded-md transition-colors ${
-        active ? 'bg-pri text-on-pri' : 'text-on-surf-var hover:bg-surf-high hover:text-on-surf'
+        active ? 'bg-pri text-on-pri' : 'text-on-surf-var hover:bg-white/8 hover:text-on-surf'
       }`}
     >
-      <span className="ms" style={{ fontSize: 16 }}>{icon}</span>
+      <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
     </button>
   );
 
@@ -38,7 +39,7 @@ function EditorToolbar({ editor }) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-outline-var bg-surf rounded-t-lg">
+    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-white/10 bg-surf rounded-t-lg">
       {btn(editor.isActive('bold'),            () => editor.chain().focus().toggleBold().run(),           'format_bold',        'Negrita')}
       {btn(editor.isActive('italic'),          () => editor.chain().focus().toggleItalic().run(),         'format_italic',      'Cursiva')}
       <div className="w-px h-4 bg-outline-var mx-1" />
@@ -112,14 +113,14 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     onSave({ ...form, content: editor.getHTML() });
   };
 
-  const fieldCls = 'w-full px-3 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+  const fieldCls = 'w-full px-3 py-2.5 rounded border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
   return (
-    <div className="bg-surf-low border border-outline-var rounded-2xl p-6 mb-6 animate-fade-in">
+    <div className="liquid-glass rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
         <p className="text-label-l text-pri font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
         <button onClick={onCancel} className="text-on-surf-var hover:text-on-surf transition-colors">
-          <span className="ms" style={{ fontSize: 20 }}>close</span>
+          <Icon name="close" className="w-[20px] h-[20px]" stroke={1.8} />
         </button>
       </div>
 
@@ -134,18 +135,18 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
           <div className="flex gap-2">
             <input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')}
               className={`flex-1 ${fieldCls}`} />
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-outline-var text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-on-surf-var`}>
-              <span className="ms" style={{ fontSize: 16 }}>image</span>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-on-surf-var`}>
+              <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
             </label>
           </div>
           {form.cover_image && (
             <div className="mt-2 relative">
-              <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-outline-var" />
+              <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-white/10" />
               <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
                 className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-ink flex items-center justify-center hover:bg-black/70">
-                <span className="ms" style={{ fontSize: 14 }}>close</span>
+                <Icon name="close" className="w-[14px] h-[14px]" stroke={1.8} />
               </button>
             </div>
           )}
@@ -174,20 +175,20 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <div className="flex items-center gap-3">
               <button type="button" onClick={insertContentImage}
                 className="flex items-center gap-1 text-label-s text-on-surf-var hover:text-pri transition-colors">
-                <span className="ms" style={{ fontSize: 14 }}>image</span> Insertar imagen
+                <Icon name="image" className="w-[14px] h-[14px]" stroke={1.8} /> Insertar imagen
               </button>
               <button type="button" onClick={() => setPreview(p => !p)}
                 className="flex items-center gap-1 text-label-s text-on-surf-var hover:text-pri transition-colors">
-                <span className="ms" style={{ fontSize: 14 }}>{preview ? 'edit' : 'preview'}</span>
+                <Icon name={preview ? 'edit' : 'preview'} className="w-[14px] h-[14px]" stroke={1.8} />
                 {preview ? 'Editor' : 'Preview'}
               </button>
             </div>
           </div>
           {preview ? (
-            <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-outline-var bg-surf text-body-s leading-relaxed"
+            <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-white/10 bg-surf text-body-s leading-relaxed"
               dangerouslySetInnerHTML={{ __html: editor?.getHTML() || '' }} />
           ) : (
-            <div className="rounded-lg border border-outline-var overflow-hidden focus-within:border-pri focus-within:ring-2 focus-within:ring-pri/15 transition-all">
+            <div className="rounded-lg border border-white/10 overflow-hidden focus-within:border-pri focus-within:ring-2 focus-within:ring-pri/15 transition-all">
               <EditorToolbar editor={editor} />
               <EditorContent editor={editor} />
             </div>
@@ -197,17 +198,17 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         <label className="flex items-center gap-2 text-body-s text-on-surf cursor-pointer select-none">
           <input type="checkbox" checked={form.status === 'published'}
             onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'published' : 'draft' }))}
-            className="rounded border-outline-var accent-pri w-4 h-4" />
+            className="rounded border-white/10 accent-pri w-4 h-4" />
           Publicar inmediatamente
         </label>
 
-        <div className="flex gap-2 pt-1 border-t border-outline-var">
+        <div className="flex gap-2 pt-1 border-t border-white/10">
           <Button size="sm" variant="filled" onClick={handleSave} disabled={loading}>
-            <span className="ms" style={{ fontSize: 14 }}>check</span>
+            <Icon name="check" className="w-[14px] h-[14px]" stroke={1.8} />
             {loading ? 'Guardando…' : 'Guardar'}
           </Button>
           <Button size="sm" variant="text" onClick={onCancel}>
-            <span className="ms" style={{ fontSize: 14 }}>close</span>
+            <Icon name="close" className="w-[14px] h-[14px]" stroke={1.8} />
             Cancelar
           </Button>
         </div>
@@ -218,7 +219,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
   </div>
 );
 
@@ -271,7 +272,7 @@ export default function AdminBlog() {
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-            <span className="ms text-on-pri-con" style={{ fontSize: 22 }}>article</span>
+            <Icon name="article" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-on-surf font-black leading-tight">Blog</h1>
@@ -280,7 +281,7 @@ export default function AdminBlog() {
         </div>
         {!showForm && !editing && (
           <Button variant="filled" onClick={() => setShowForm(true)}>
-            <span className="ms" style={{ fontSize: 18 }}>add</span>
+            <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nuevo post
           </Button>
         )}
@@ -291,11 +292,11 @@ export default function AdminBlog() {
       )}
 
       {loading ? <Spinner /> : (
-        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
+        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-              <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
-                <span className="ms" style={{ fontSize: 32 }}>article</span>
+              <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+                <Icon name="article" className="w-[32px] h-[32px]" stroke={1.8} />
               </div>
               <div className="text-center">
                 <p className="text-body-l text-on-surf font-medium">Sin posts</p>
@@ -303,19 +304,19 @@ export default function AdminBlog() {
               </div>
             </div>
           ) : posts.map(post => (
-            <div key={post.ID} className="divide-y divide-outline-var">
+            <div key={post.ID} className="divide-y divide-white/8">
               {editing?.ID === post.ID ? (
                 <div className="p-5">
                   <PostForm initial={{ ...post }} onSave={handleSave}
                     onCancel={() => setEditing(null)} loading={saving} />
                 </div>
               ) : (
-                <div className="flex items-center gap-4 px-5 py-4 border-b border-outline-var last:border-0 hover:bg-surf-high transition-colors group">
+                <div className="flex items-center gap-4 px-5 py-4 border-b border-white/10 last:border-0 hover:bg-white/8 transition-colors group">
                   {post.cover_image ? (
-                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-outline-var" />
+                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
                   ) : (
-                    <div className="w-12 h-10 rounded-lg bg-surf-high border border-outline-var flex items-center justify-center shrink-0">
-                      <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>article</span>
+                    <div className="w-12 h-10 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">
+                      <Icon name="article" className="w-[18px] h-[18px] text-on-surf-var" stroke={1.8} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
@@ -327,13 +328,13 @@ export default function AdminBlog() {
                     <span className={`inline-flex items-center h-7 px-3 rounded-lg text-label-m font-medium ${
                       post.status === 'published'
                         ? 'bg-ter-con text-on-ter-con'
-                        : 'bg-surf-high text-on-surf-var'
+                        : 'bg-white/8 text-on-surf-var'
                     }`}>
                       {post.status === 'published' ? 'Publicado' : 'Borrador'}
                     </span>
                     {post.redirect_url && (
                       <span className="inline-flex items-center h-7 px-3 rounded-lg bg-sec-con text-on-sec-con text-label-m font-medium gap-1">
-                        <span className="ms" style={{ fontSize: 12 }}>open_in_new</span>
+                        <Icon name="open_in_new" className="w-[12px] h-[12px]" stroke={1.8} />
                         Externo
                       </span>
                     )}
@@ -341,13 +342,13 @@ export default function AdminBlog() {
                       onClick={() => { setEditing(post); setShowForm(false); }}
                       className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-pri hover:bg-pri-con transition-all"
                     >
-                      <span className="ms" style={{ fontSize: 16 }}>edit</span>
+                      <Icon name="edit" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>
                     <button
                       onClick={() => handleDelete(post.ID)}
                       className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-err hover:bg-err-con transition-all"
                     >
-                      <span className="ms" style={{ fontSize: 16 }}>delete</span>
+                      <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>
                   </div>
                 </div>

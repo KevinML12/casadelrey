@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip, { FilterChip } from '../../components/ui/Chip';
+import { Icon } from '../../components/ui/Glass';
 
 const CATEGORIES = [
   { value: 'convertido',   label: 'Convertido',   color: 'tertiary',  icon: 'church' },
@@ -13,7 +14,7 @@ const CATEGORIES = [
 
 const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.value, c]));
 
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 const EMPTY = { date: '', inviter_name: '', inviter_phone: '', guest_name: '', guest_phone: '', address: '', category: 'nuevo', notes: '' };
 
 function FieldLabel({ children, required }) {
@@ -28,7 +29,7 @@ function SectionHeader({ icon, children }) {
   return (
     <div className="flex items-center gap-2 mb-4">
       <div className="w-7 h-7 rounded-lg bg-pri-con flex items-center justify-center">
-        <span className="ms text-on-pri-con" style={{ fontSize: 14 }}>{icon}</span>
+        <Icon name={icon} className="w-[14px] h-[14px] text-on-pri-con" stroke={1.8} />
       </div>
       <p className="text-label-l text-on-surf font-semibold">{children}</p>
     </div>
@@ -121,9 +122,9 @@ function BoletaForm({ onSave, onCancel }) {
           className={`${fieldCls} resize-none`} placeholder="Observaciones adicionales…" />
       </div>
 
-      <div className="flex gap-3 pt-2 border-t border-outline-var">
+      <div className="flex gap-3 pt-2 border-t border-white/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <span className="ms" style={{ fontSize: 16 }}>save</span>
+          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Guardar boleta'}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -174,7 +175,7 @@ export default function AdminBoletas() {
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-            <span className="ms text-on-sec-con" style={{ fontSize: 22 }}>person_add</span>
+            <Icon name="person_add" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-on-surf font-black leading-tight">Boletas de Nuevos</h1>
@@ -185,7 +186,7 @@ export default function AdminBoletas() {
         </div>
         <div className="flex gap-2">
           <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-            <span className="ms" style={{ fontSize: 18 }}>{showForm ? 'close' : 'add'}</span>
+            <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nueva boleta'}
           </Button>
         </div>
@@ -193,7 +194,7 @@ export default function AdminBoletas() {
 
       {/* Formulario inline */}
       {showForm && (
-        <div className="mb-8 p-6 rounded-2xl bg-surf-low border border-outline-var">
+        <div className="liquid-glass rounded-[24px] card-spring mb-8 p-6">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-5">Registrar nuevo miembro</p>
           <BoletaForm onSave={() => { setShowForm(false); refresh(); }} onCancel={() => setShowForm(false)} />
         </div>
@@ -216,12 +217,12 @@ export default function AdminBoletas() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
         </div>
       ) : boletas.length === 0 ? (
-        <div className="bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4 text-on-surf-var">
-          <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
-            <span className="ms" style={{ fontSize: 32 }}>person_add</span>
+        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-on-surf-var">
+          <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+            <Icon name="person_add" className="w-[32px] h-[32px]" stroke={1.8} />
           </div>
           <div className="text-center">
             <p className="text-body-l text-on-surf font-medium">Sin boletas</p>
@@ -231,19 +232,17 @@ export default function AdminBoletas() {
           </div>
         </div>
       ) : (
-        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden divide-y divide-outline-var">
+        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
           {boletas.map(b => {
             const cat = CAT_MAP[b.category];
             return (
-              <div key={b.ID} className="flex items-start gap-4 p-5 hover:bg-surf-high transition-colors">
+              <div key={b.ID} className="flex items-start gap-4 p-5 hover:bg-white/8 transition-colors">
 
                 {/* Leading icon */}
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5
-                  ${cat ? `bg-${cat.color === 'tertiary' ? 'ter' : cat.color === 'secondary' ? 'sec' : 'pri'}-con` : 'bg-surf-high'}`}
+                  ${cat ? `bg-${cat.color === 'tertiary' ? 'ter' : cat.color === 'secondary' ? 'sec' : 'pri'}-con` : 'bg-white/8'}`}
                   style={cat ? {} : {}}>
-                  <span className="ms text-on-pri-con" style={{ fontSize: 18 }}>
-                    {cat?.icon || 'person'}
-                  </span>
+                  <Icon name={cat?.icon || 'person'} className="w-[18px] h-[18px] text-on-pri-con" stroke={1.8} />
                 </div>
 
                 {/* Content */}
@@ -255,24 +254,24 @@ export default function AdminBoletas() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-on-surf-var">
                     {b.guest_phone && (
                       <span className="flex items-center gap-1.5">
-                        <span className="ms" style={{ fontSize: 14 }}>phone</span>{b.guest_phone}
+                        <Icon name="phone" className="w-[14px] h-[14px]" stroke={1.8} />{b.guest_phone}
                       </span>
                     )}
                     {b.address && (
                       <span className="flex items-center gap-1.5">
-                        <span className="ms" style={{ fontSize: 14 }}>location_on</span>{b.address}
+                        <Icon name="location_on" className="w-[14px] h-[14px]" stroke={1.8} />{b.address}
                       </span>
                     )}
                     {b.inviter_name && (
                       <span className="flex items-center gap-1.5">
-                        <span className="ms" style={{ fontSize: 14 }}>person</span>
+                        <Icon name="person" className="w-[14px] h-[14px]" stroke={1.8} />
                         Invitado por <strong className="text-on-surf ml-1">{b.inviter_name}</strong>
                         {b.inviter_phone && ` · ${b.inviter_phone}`}
                       </span>
                     )}
                   </div>
                   {b.notes && (
-                    <p className="text-body-s text-on-surf-var mt-2 bg-surf border border-outline-var rounded-xl px-3 py-2 leading-relaxed">
+                    <p className="text-body-s text-on-surf-var mt-2 bg-surf border border-white/10 rounded-xl px-3 py-2 leading-relaxed">
                       {b.notes}
                     </p>
                   )}
@@ -286,7 +285,7 @@ export default function AdminBoletas() {
                   {isAdmin && (
                     <IconButton onClick={() => deleteBoleta(b.ID)} title="Eliminar"
                       className="text-on-surf-var hover:text-err hover:bg-err-con transition-all">
-                      <span className="ms" style={{ fontSize: 16 }}>delete</span>
+                      <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </IconButton>
                   )}
                 </div>

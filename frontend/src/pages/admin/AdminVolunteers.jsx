@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import Input from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
+import { Icon } from '../../components/ui/Glass';
 
 const STATUS_CHIP = {
   pendiente:      { label: 'Pendiente',      color: 'default' },
@@ -28,15 +29,15 @@ const DEPT_LABEL = {
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
   </div>
 );
 
 function EmptyState({ isAdmin }) {
   return (
     <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-      <div className="w-16 h-16 rounded-[28px] bg-surf-high flex items-center justify-center">
-        <span className="ms" style={{ fontSize: 32 }}>group_add</span>
+      <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+        <Icon name="group_add" className="w-[32px] h-[32px]" stroke={1.8} />
       </div>
       <div className="text-center">
         <p className="text-body-l text-on-surf font-medium">Sin voluntarios</p>
@@ -100,7 +101,7 @@ export default function AdminVolunteers() {
       {/* Page header */}
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-          <span className="ms text-on-sec-con" style={{ fontSize: 22 }}>group_add</span>
+          <Icon name="group_add" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-on-surf font-black leading-tight">Voluntarios</h1>
@@ -113,20 +114,20 @@ export default function AdminVolunteers() {
       </div>
 
       {loading ? <Spinner /> : volunteers.length === 0 ? (
-        <div className="bg-surf-low border border-outline-var rounded-2xl">
+        <div className="liquid-glass rounded-[24px] card-spring">
           <EmptyState isAdmin={isAdmin} />
         </div>
       ) : (
-        <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden divide-y divide-outline-var">
+        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
           {volunteers.map(v => {
             const chip = STATUS_CHIP[v.status] || STATUS_CHIP.pendiente;
             const deptLabel = DEPT_LABEL[v.department] || v.department || v.area;
             return (
-              <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-surf-high transition-colors">
+              <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-white/8 transition-colors">
 
                 {/* Leading icon */}
                 <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="ms text-on-sec-con" style={{ fontSize: 18 }}>person</span>
+                  <Icon name="person" className="w-[18px] h-[18px] text-on-sec-con" stroke={1.8} />
                 </div>
 
                 {/* Content */}
@@ -149,7 +150,7 @@ export default function AdminVolunteers() {
                 <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                   {isAdmin && v.status !== 'usuario_creado' && (
                     <select
-                      className="text-label-m rounded-lg border border-outline-var bg-surf px-3 py-1.5 text-on-surf focus:outline-none focus:border-pri transition-colors"
+                      className="text-label-m rounded-lg border border-white/10 bg-surf px-3 py-1.5 text-on-surf focus:outline-none focus:border-pri transition-colors"
                       value={v.assigned_leader_id || ''}
                       onChange={e => handleAssign(v.ID, e.target.value)}
                       disabled={!!assigning}
@@ -160,7 +161,7 @@ export default function AdminVolunteers() {
                   )}
                   {v.status !== 'usuario_creado' && (
                     <Button variant="tonal" size="sm" onClick={() => setCreateModal(v.ID)}>
-                      <span className="ms" style={{ fontSize: 16 }}>person_add</span>
+                      <Icon name="person_add" className="w-[16px] h-[16px]" stroke={1.8} />
                       Crear usuario
                     </Button>
                   )}
@@ -183,7 +184,7 @@ export default function AdminVolunteers() {
 
               {/* Dialog icon */}
               <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center mx-auto mb-4">
-                <span className="ms text-on-pri-con" style={{ fontSize: 24 }}>person_add</span>
+                <Icon name="person_add" className="w-[24px] h-[24px] text-on-pri-con" stroke={1.8} />
               </div>
 
               <h3 className="text-headline-s text-on-surf font-black text-center mb-2">Crear usuario</h3>

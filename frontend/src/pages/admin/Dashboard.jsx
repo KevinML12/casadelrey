@@ -3,6 +3,8 @@ import apiClient from '../../lib/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { downloadCsv } from '../../lib/exportCsv';
 import Button from '../../components/ui/Button';
+import StatCard from '../../components/ui/StatCard';
+import { Icon } from '../../components/ui/Glass';
 
 const METHOD_LABEL = {
   transferencia: 'Transferencia',
@@ -17,49 +19,19 @@ const saludo = () => {
   return 'Buenas noches';
 };
 
-function StatCard({ icon, label, value, tint = 'pri', sub }) {
-  // 'sec' en tailwind.config.js mapea a var(--bg-soft) — un tono casi
-  // negro pensado para fondos de chip (bg-sec-con + texto blanco encima,
-  // que sí funciona en el resto del panel). Pero como COLOR DE VALOR
-  // (texto grande sobre esta misma card oscura) es texto oscuro sobre
-  // fondo oscuro: invisible. Bug real encontrado al verificar el
-  // dashboard — "Recaudado" no mostraba ningún monto. Ámbar para
-  // distinguirlo del azul (pri/ter) y rosa (err); además calza bien
-  // semánticamente con dinero.
-  const tintMap = {
-    pri: { bg: 'bg-pri-con', text: 'text-on-pri-con', val: 'text-pri' },
-    sec: { bg: 'bg-amber-soft', text: 'text-amber', val: 'text-amber' },
-    ter: { bg: 'bg-ter-con', text: 'text-on-ter-con', val: 'text-ter' },
-    err: { bg: 'bg-err-con', text: 'text-on-err-con', val: 'text-err' },
-  };
-  const t = tintMap[tint] || tintMap.pri;
-  return (
-    <div className="bg-surf-low border border-outline-var rounded-2xl p-5 flex flex-col gap-3">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${t.bg}`}>
-        <span className={`ms ${t.text}`} style={{ fontSize: 20 }}>{icon}</span>
-      </div>
-      <div>
-        <p className="text-label-s text-on-surf-var uppercase tracking-widest mb-1">{label}</p>
-        <p className={`text-headline-m font-black ${t.val}`}>{value ?? '—'}</p>
-        {sub && <p className="text-label-s text-on-surf-var mt-0.5">{sub}</p>}
-      </div>
-    </div>
-  );
-}
-
 function SectionLabel({ icon, children }) {
   return (
     <div className="flex items-center gap-2 mb-4">
-      <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>{icon}</span>
-      <p className="text-label-l text-on-surf-var font-semibold uppercase tracking-widest">{children}</p>
-      <div className="flex-1 h-px bg-outline-var ml-2" />
+      <Icon name={icon} className="w-[18px] h-[18px] text-white/40" stroke={1.8} />
+      <p className="text-[12.5px] text-white/40 font-semibold uppercase tracking-widest">{children}</p>
+      <div className="flex-1 h-px bg-white/10 ml-2" />
     </div>
   );
 }
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/15 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -85,33 +57,33 @@ export default function Dashboard() {
 
       {/* Saludo personalizado */}
       <div className="mb-8">
-        <p className="text-body-s text-on-surf-var capitalize">
+        <p className="text-[13.5px] text-white/40 capitalize">
           {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
-        <h1 className="text-headline-s text-on-surf font-black leading-tight mt-0.5">
+        <h1 className="text-[26px] text-white font-black leading-tight mt-0.5">
           {saludo()}, {(user?.name || 'bienvenido').split(' ')[0]}
         </h1>
-        <p className="text-body-s text-on-surf-var mt-1">Este es el resumen de la iglesia hoy.</p>
+        <p className="text-[13.5px] text-white/40 mt-1">Este es el resumen de la iglesia hoy.</p>
       </div>
 
       {/* Alertas pendientes */}
       {!loading && notifs && (notifs.pending_cell_reports > 0 || notifs.unread_petitions > 0 || notifs.pending_volunteers > 0) && (
-        <div className="mb-8 bg-err-con border border-err/20 rounded-2xl p-4 flex flex-wrap gap-4 items-center">
-          <span className="ms text-err" style={{ fontSize: 20 }}>notifications_active</span>
+        <div className="mb-8 liquid-glass rounded-[24px] p-4 flex flex-wrap gap-4 items-center border border-rose/20">
+          <Icon name="notifications_active" className="w-5 h-5 text-rose" stroke={1.8} />
           <div className="flex-1 flex flex-wrap gap-4">
             {notifs.pending_cell_reports > 0 && (
-              <span className="text-body-s text-on-err-con font-medium">
-                <strong>{notifs.pending_cell_reports}</strong> reporte{notifs.pending_cell_reports !== 1 ? 's' : ''} de células pendiente{notifs.pending_cell_reports !== 1 ? 's' : ''}
+              <span className="text-[13.5px] text-white/75 font-medium">
+                <strong className="text-white">{notifs.pending_cell_reports}</strong> reporte{notifs.pending_cell_reports !== 1 ? 's' : ''} de células pendiente{notifs.pending_cell_reports !== 1 ? 's' : ''}
               </span>
             )}
             {notifs.unread_petitions > 0 && (
-              <span className="text-body-s text-on-err-con font-medium">
-                <strong>{notifs.unread_petitions}</strong> petición{notifs.unread_petitions !== 1 ? 'es' : ''} sin leer
+              <span className="text-[13.5px] text-white/75 font-medium">
+                <strong className="text-white">{notifs.unread_petitions}</strong> petición{notifs.unread_petitions !== 1 ? 'es' : ''} sin leer
               </span>
             )}
             {notifs.pending_volunteers > 0 && (
-              <span className="text-body-s text-on-err-con font-medium">
-                <strong>{notifs.pending_volunteers}</strong> voluntario{notifs.pending_volunteers !== 1 ? 's' : ''} pendiente{notifs.pending_volunteers !== 1 ? 's' : ''}
+              <span className="text-[13.5px] text-white/75 font-medium">
+                <strong className="text-white">{notifs.pending_volunteers}</strong> voluntario{notifs.pending_volunteers !== 1 ? 's' : ''} pendiente{notifs.pending_volunteers !== 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -152,45 +124,45 @@ export default function Dashboard() {
       {/* Últimas donaciones */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>payments</span>
-          <p className="text-label-l text-on-surf-var font-semibold uppercase tracking-widest">Últimas donaciones</p>
+          <Icon name="payments" className="w-[18px] h-[18px] text-white/40" stroke={1.8} />
+          <p className="text-[12.5px] text-white/40 font-semibold uppercase tracking-widest">Últimas donaciones</p>
         </div>
         <Button variant="tonal" size="sm" onClick={() => downloadCsv('/admin/export/donations', 'donaciones.csv')}>
-          <span className="ms" style={{ fontSize: 16 }}>download</span>
+          <Icon name="download" className="w-4 h-4" stroke={1.8} />
           Exportar CSV
         </Button>
       </div>
-      <div className="bg-surf-low border border-outline-var rounded-2xl overflow-hidden">
+      <div className="liquid-glass rounded-[24px] overflow-hidden">
         {loading ? <Spinner /> : donations.length === 0 ? (
-          <div className="flex flex-col items-center py-16 text-on-surf-var gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-surf-high flex items-center justify-center">
-              <span className="ms" style={{ fontSize: 28 }}>payments</span>
+          <div className="flex flex-col items-center py-16 text-white/40 gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-white/6 flex items-center justify-center">
+              <Icon name="payments" className="w-7 h-7" stroke={1.5} />
             </div>
-            <p className="text-body-s">No hay donaciones registradas.</p>
+            <p className="text-[13.5px]">No hay donaciones registradas.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-outline-var bg-surf">
+                <tr className="border-b border-white/10">
                   {['#', 'Nombre', 'Destino', 'Monto', 'Método', 'Fecha'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 text-label-s text-on-surf-var uppercase tracking-widest">{h}</th>
+                    <th key={h} className="text-left px-5 py-3 text-[11px] text-white/40 uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-var">
+              <tbody className="divide-y divide-white/8">
                 {donations.slice(0, 15).map(d => (
-                  <tr key={d.ID} className="hover:bg-surf-high transition-colors">
-                    <td className="px-5 py-3.5 text-label-s text-on-surf-var font-mono">{d.ID}</td>
-                    <td className="px-5 py-3.5 text-body-s text-on-surf font-medium">{d.name}</td>
-                    <td className="px-5 py-3.5 text-body-s text-on-surf-var capitalize">{d.donation_purpose || '—'}</td>
-                    <td className="px-5 py-3.5 text-body-s text-ter font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
+                  <tr key={d.ID} className="hover:bg-white/5 transition-colors">
+                    <td className="px-5 py-3.5 text-[11.5px] text-white/40 font-mono">{d.ID}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-white font-medium">{d.name}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-white/50 capitalize">{d.donation_purpose || '—'}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-celeste-hov font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
                     <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-lg bg-surf-high text-on-surf-var text-label-m font-medium">
+                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-white/8 text-white/60 text-[12px] font-medium">
                         {METHOD_LABEL[d.payment_method] || d.payment_method || '—'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-body-s text-on-surf-var whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-[13.5px] text-white/50 whitespace-nowrap">
                       {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
                     </td>
                   </tr>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { Icon } from '../../components/ui/Glass';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = {
   label_top: '', title_line_1: '', title_line_2: '', verse_reference: '',
@@ -25,7 +26,7 @@ function Field({ label, hint, children }) {
 // Preview en vivo del hero
 function HeroPreview({ data }) {
   return (
-    <div className="rounded-2xl overflow-hidden border border-outline-var relative aspect-video">
+    <div className="rounded-2xl overflow-hidden border border-white/10 relative aspect-video">
       {/* Background */}
       <div className="absolute inset-0" style={{
         backgroundImage: data.background_image_url ? `url(${data.background_image_url})` : 'none',
@@ -134,7 +135,7 @@ function HeroForm({ initial, onSave, onCancel }) {
       <form onSubmit={submit} className="space-y-5">
 
         {/* Textos */}
-        <div className="space-y-3 p-5 rounded-2xl border border-outline-var bg-surf-low">
+        <div className="liquid-glass rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Textos</p>
 
           <Field label="Label superior" hint='Ej. "● IGLESIA CRISTIANA · HUEHUETENANGO"'>
@@ -164,7 +165,7 @@ function HeroForm({ initial, onSave, onCancel }) {
         </div>
 
         {/* CTAs */}
-        <div className="space-y-3 p-5 rounded-2xl border border-outline-var bg-surf-low">
+        <div className="liquid-glass rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Botones</p>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Botón primario texto">
@@ -185,19 +186,19 @@ function HeroForm({ initial, onSave, onCancel }) {
         </div>
 
         {/* Visual */}
-        <div className="space-y-3 p-5 rounded-2xl border border-outline-var bg-surf-low">
+        <div className="liquid-glass rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Imagen de fondo</p>
 
           <Field label="Foto del hero">
             {form.background_image_url ? (
               <div className="flex items-center gap-3">
-                <img src={form.background_image_url} alt="hero" className="w-20 h-20 rounded-xl object-cover border border-outline-var" />
+                <img src={form.background_image_url} alt="hero" className="w-20 h-20 rounded-xl object-cover border border-white/10" />
                 <button type="button" onClick={() => setForm(p => ({ ...p, background_image_url: '' }))}
                   className="text-label-m text-err hover:underline">Quitar imagen</button>
               </div>
             ) : (
-              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-outline-var cursor-pointer hover:border-pri transition-colors">
-                <span className="ms text-on-surf-var" style={{ fontSize: 28 }}>{uploading ? 'hourglass_empty' : 'add_photo_alternate'}</span>
+              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-white/10 cursor-pointer hover:border-pri transition-colors">
+                <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-on-surf-var" stroke={1.8} />
                 <p className="text-body-s text-on-surf">{uploading ? 'Subiendo…' : 'Subir foto del hero'}</p>
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
               </label>
@@ -206,7 +207,7 @@ function HeroForm({ initial, onSave, onCancel }) {
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Color del overlay">
-              <input type="color" value={form.overlay_color} onChange={set('overlay_color')} className="w-full h-10 rounded-xl border border-outline-var cursor-pointer" />
+              <input type="color" value={form.overlay_color} onChange={set('overlay_color')} className="w-full h-10 rounded-xl border border-white/10 cursor-pointer" />
             </Field>
             <Field label={`Opacidad del overlay: ${form.overlay_opacity}%`}>
               <input type="range" min="0" max="100" value={form.overlay_opacity}
@@ -219,11 +220,11 @@ function HeroForm({ initial, onSave, onCancel }) {
         <div className="flex gap-3">
           <button type="submit" disabled={loading}
             className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-            <span className="ms" style={{ fontSize: 16 }}>save</span>
+            <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {loading ? 'Guardando…' : initial?.ID ? 'Guardar cambios' : 'Crear hero'}
           </button>
           <button type="button" onClick={onCancel}
-            className="px-4 h-11 rounded-xl border border-outline-var text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+            className="px-4 h-11 rounded-xl border border-white/10 text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
             Cancelar
           </button>
         </div>
@@ -278,7 +279,7 @@ export default function AdminHero() {
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => setEditing(null)} className="w-9 h-9 rounded-full hover:bg-surf-dim flex items-center justify-center transition-colors">
-            <span className="ms text-on-surf-var" style={{ fontSize: 18 }}>arrow_back</span>
+            <Icon name="arrow_back" className="w-[18px] h-[18px] text-on-surf-var" stroke={1.8} />
           </button>
           <div>
             <h1 className="text-headline-s text-on-surf font-black">{editing?.ID ? 'Editar hero' : 'Nuevo hero'}</h1>
@@ -296,7 +297,7 @@ export default function AdminHero() {
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-            <span className="ms text-on-pri-con" style={{ fontSize: 22 }}>view_carousel</span>
+            <Icon name="view_carousel" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-on-surf font-black">Hero del sitio</h1>
@@ -305,39 +306,39 @@ export default function AdminHero() {
         </div>
         <button onClick={() => setEditing(EMPTY)}
           className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
-          <span className="ms" style={{ fontSize: 18 }}>add</span>
+          <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
           Nuevo hero
         </button>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
         </div>
       ) : heroes.length === 0 ? (
-        <div className="bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4 text-on-surf-var">
-          <span className="ms" style={{ fontSize: 48 }}>view_carousel</span>
+        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-on-surf-var">
+          <Icon name="view_carousel" className="w-[48px] h-[48px]" stroke={1.8} />
           <div className="text-center">
             <p className="text-body-l text-on-surf font-medium">Sin heroes guardados</p>
             <p className="text-body-s mt-1">El sitio usa el hero por defecto. Crea uno para personalizarlo.</p>
           </div>
           <button onClick={() => setEditing(EMPTY)}
             className="mt-2 flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
-            <span className="ms" style={{ fontSize: 16 }}>add</span>
+            <Icon name="add" className="w-[16px] h-[16px]" stroke={1.8} />
             Crear el primer hero
           </button>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-5">
           {heroes.map(h => (
-            <div key={h.ID} className="rounded-2xl border border-outline-var overflow-hidden">
+            <div key={h.ID} className="rounded-2xl border border-white/10 overflow-hidden">
               <HeroPreview data={h} />
               <div className="p-4 bg-surf-low space-y-3">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-title-s text-on-surf font-bold">{h.title_line_1} {h.title_line_2}</h3>
                   {h.is_active && (
                     <span className="px-2 py-0.5 rounded-full bg-ter-con text-on-ter-con text-label-s font-semibold flex items-center gap-1">
-                      <span className="ms" style={{ fontSize: 12 }}>check_circle</span>
+                      <Icon name="check_circle" className="w-[12px] h-[12px]" stroke={1.8} />
                       Activo en sitio
                     </span>
                   )}
@@ -346,18 +347,18 @@ export default function AdminHero() {
                   {!h.is_active && (
                     <button onClick={() => activate(h.ID)}
                       className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
-                      <span className="ms" style={{ fontSize: 14 }}>publish</span>
+                      <Icon name="publish" className="w-[14px] h-[14px]" stroke={1.8} />
                       Activar
                     </button>
                   )}
                   <button onClick={() => setEditing(h)}
-                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-outline-var text-label-m text-on-surf-var hover:bg-surf-dim transition-colors">
-                    <span className="ms" style={{ fontSize: 14 }}>edit</span>
+                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-white/10 text-label-m text-on-surf-var hover:bg-surf-dim transition-colors">
+                    <Icon name="edit" className="w-[14px] h-[14px]" stroke={1.8} />
                     Editar
                   </button>
                   <button onClick={() => remove(h.ID)}
                     className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m text-err hover:bg-err-con transition-colors">
-                    <span className="ms" style={{ fontSize: 14 }}>delete</span>
+                    <Icon name="delete" className="w-[14px] h-[14px]" stroke={1.8} />
                   </button>
                 </div>
               </div>

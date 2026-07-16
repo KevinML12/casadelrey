@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import { Icon } from '../../components/ui/Glass';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const PLATFORMS = [
   { value: 'instagram', label: 'Instagram', icon: 'photo_camera' },
@@ -21,7 +22,7 @@ const EMPTY = { platform: 'instagram', post_url: '', caption: '', image_url: '',
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
   </div>
 );
 
@@ -67,20 +68,20 @@ function Form({ initial, onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-5 p-6 rounded-2xl bg-surf-low border border-outline-var">
+    <form onSubmit={submit} className="liquid-glass rounded-[24px] card-spring space-y-5 p-6">
 
       {/* Imagen */}
       <div>
         <label className="block text-label-l text-on-surf-var mb-2">Imagen del post *</label>
         {form.image_url ? (
           <div className="flex items-center gap-4">
-            <img src={form.image_url} alt="post" className="w-24 h-24 rounded-xl object-cover border border-outline-var" />
+            <img src={form.image_url} alt="post" className="w-24 h-24 rounded-xl object-cover border border-white/10" />
             <button type="button" onClick={() => setForm(p => ({ ...p, image_url: '' }))}
               className="text-label-m text-err hover:underline">Cambiar imagen</button>
           </div>
         ) : (
-          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-outline-var cursor-pointer hover:border-pri transition-colors">
-            <span className="ms text-on-surf-var" style={{ fontSize: 28 }}>{uploading ? 'hourglass_empty' : 'add_photo_alternate'}</span>
+          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-white/10 cursor-pointer hover:border-pri transition-colors">
+            <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-on-surf-var" stroke={1.8} />
             <p className="text-body-s text-on-surf">{uploading ? 'Subiendo…' : 'Subir foto del post'}</p>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
           </label>
@@ -119,7 +120,7 @@ function Form({ initial, onSave, onCancel }) {
               className={`flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m font-semibold transition-colors ${
                 form.featured_size === s.value
                   ? 'bg-pri-con text-on-pri-con'
-                  : 'border border-outline-var text-on-surf-var hover:bg-surf-dim'
+                  : 'border border-white/10 text-on-surf-var hover:bg-surf-dim'
               }`}>
               {s.label}
             </button>
@@ -143,10 +144,10 @@ function Form({ initial, onSave, onCancel }) {
         </label>
       </div>
 
-      <div className="flex gap-3 pt-2 border-t border-outline-var">
+      <div className="flex gap-3 pt-2 border-t border-white/10">
         <button type="submit" disabled={loading}
           className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-          <span className="ms" style={{ fontSize: 16 }}>save</span>
+          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : initial?.ID ? 'Actualizar' : 'Agregar'}
         </button>
         <button type="button" onClick={onCancel}
@@ -187,7 +188,7 @@ export default function AdminSocial() {
       <div className="flex items-start justify-between mb-2 gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3">
-            <span className="ms text-on-surf" style={{ fontSize: 26 }}>share</span>
+            <Icon name="share" className="w-[26px] h-[26px] text-on-surf" stroke={1.8} />
             <h1 className="text-headline-s text-on-surf font-black">Galería desde redes</h1>
           </div>
           <p className="text-body-s text-on-surf-var mt-1 max-w-xl">
@@ -198,7 +199,7 @@ export default function AdminSocial() {
         {!editing && (
           <button onClick={() => setEditing({})}
             className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
-            <span className="ms" style={{ fontSize: 18 }}>add</span>
+            <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nueva publicación
           </button>
         )}
@@ -211,8 +212,8 @@ export default function AdminSocial() {
       )}
 
       {loading ? <Spinner /> : posts.length === 0 ? (
-        <div className="mt-6 bg-surf-low border border-outline-var rounded-2xl flex flex-col items-center py-20 gap-4 text-on-surf-var">
-          <span className="ms" style={{ fontSize: 48 }}>photo_library</span>
+        <div className="liquid-glass rounded-[24px] card-spring mt-6 flex flex-col items-center py-20 gap-4 text-on-surf-var">
+          <Icon name="photo_library" className="w-[48px] h-[48px]" stroke={1.8} />
           <div className="text-center">
             <p className="text-body-l text-on-surf font-medium">Sin publicaciones</p>
             <p className="text-body-s mt-1">Vincula tu primer post para que aparezca en la home.</p>
@@ -225,17 +226,17 @@ export default function AdminSocial() {
             const plat = PLATFORMS.find(pl => pl.value === p.platform);
             return (
               <div key={p.ID}
-                className={`relative rounded-xl overflow-hidden border border-outline-var group ${sizeClass} ${!p.is_active ? 'opacity-50' : ''}`}>
+                className={`relative rounded-xl overflow-hidden border border-white/10 group ${sizeClass} ${!p.is_active ? 'opacity-50' : ''}`}>
                 {p.image_url ? (
                   <img src={p.image_url} alt={p.caption} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-surf-high flex items-center justify-center">
-                    <span className="ms text-on-surf-var" style={{ fontSize: 32 }}>broken_image</span>
+                  <div className="w-full h-full bg-white/8 flex items-center justify-center">
+                    <Icon name="broken_image" className="w-[32px] h-[32px] text-on-surf-var" stroke={1.8} />
                   </div>
                 )}
                 {/* Badge plataforma */}
                 <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm flex items-center gap-1">
-                  <span className="ms text-ink" style={{ fontSize: 12 }}>{plat?.icon}</span>
+                  <Icon name={plat?.icon} className="w-[12px] h-[12px] text-ink" stroke={1.8} />
                   <span className="text-[10px] text-ink font-semibold uppercase tracking-wider">{plat?.label}</span>
                 </div>
                 {/* Hover overlay con acciones */}
@@ -244,15 +245,15 @@ export default function AdminSocial() {
                   <div className="flex gap-2">
                     <button onClick={() => setEditing(p)}
                       className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                      <span className="ms text-ink" style={{ fontSize: 16 }}>edit</span>
+                      <Icon name="edit" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </button>
                     <a href={p.post_url} target="_blank" rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                      <span className="ms text-ink" style={{ fontSize: 16 }}>open_in_new</span>
+                      <Icon name="open_in_new" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </a>
                     <button onClick={() => remove(p.ID)}
                       className="w-9 h-9 rounded-full bg-err/80 hover:bg-err flex items-center justify-center transition-colors">
-                      <span className="ms text-ink" style={{ fontSize: 16 }}>delete</span>
+                      <Icon name="delete" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </button>
                   </div>
                 </div>
