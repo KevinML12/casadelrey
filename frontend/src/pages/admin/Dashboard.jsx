@@ -99,7 +99,7 @@ export default function Dashboard() {
           value={loading ? '…' : kpis?.total_donations ?? 0} />
         <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter"
           value={loading ? '…' : kpis?.total_petitions ?? 0} />
-        <StatCard icon="payments"         label="Recaudado"       tint="sec"
+        <StatCard icon="payments"         label="Recaudado"       tint="sec" variant="light"
           value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
         <StatCard icon="visibility"       label="Vistas blog"     tint="pri"
           value={loading ? '…' : kpis?.total_blog_views ?? 0} />

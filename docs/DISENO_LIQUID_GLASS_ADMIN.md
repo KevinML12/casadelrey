@@ -87,6 +87,44 @@ bisel de luz arriba-izquierda, un realce blanco tenue en el borde inferior
 que lo "despega" del fondo. Sube la intensidad un poco al hacer `:hover`
 (ya incluido en la clase, no hace falta nada extra).
 
+### `.glass-light` — el acento blanco, UN elemento por pantalla
+
+El material por defecto de todo el sitio es `.liquid-glass` (oscuro). Existe
+una segunda variante, `.glass-light` (cristal claro escarchado, texto navy
+en vez de blanco), pero se usa con moderación a propósito:
+
+- **Regla**: si el elemento flota sobre una **foto de fondo** (sitio
+  público), usa `.glass-light` sobre la foto. Si no hay foto (panel admin),
+  úsalo sobre el **halo ambiental más brillante** de la sección — nunca
+  sobre navy liso sin nada de luz detrás, se ve como una caja blanca
+  lechosa en vez de vidrio.
+- **Nunca es el material dominante.** Como máximo UN elemento destacado por
+  pantalla (la métrica más importante, un CTA principal) — el resto de la
+  página se queda en `.liquid-glass`. Si todo es blanco, deja de leerse
+  como acento.
+- Igual que `.liquid-glass`, `.glass-light` usa un **gradiente diagonal**
+  (no un `rgba()` plano) y un **bisel asimétrico** (borde superior/
+  izquierdo más brillante que el inferior/derecho) — eso es lo que lo hace
+  leer como vidrio curvo con o sin foto detrás.
+- **Componente ya integrado**: `StatCard` (`components/ui/StatCard.jsx`)
+  acepta `variant="light"` — úsalo en un solo `<StatCard>` por dashboard,
+  nunca en toda la fila:
+  ```jsx
+  <StatCard icon="payments" label="Recaudado" value="Q2,000" variant="light" />
+  ```
+
+### El brillo especular ("como agua")
+
+El pseudo-elemento `::after` de `.liquid-glass`/`.glass-light` dibuja el
+punto de luz que sigue al cursor (alimentado por
+`hooks/useGlassSpecular.js`, sección 5). Son 3 capas elípticas superpuestas
+— núcleo caliente pequeño, halo de dispersión ancho, y un anillo tenue justo
+en el borde del núcleo (el detalle de "refracción" que lo hace sentir
+líquido en vez de un spot de luz genérico). La forma es elíptica, no
+circular — el agua/vidrio real no refracta en un círculo perfecto. No lo
+reinventes por página: ya está en `index.css`, cualquier `.liquid-glass`/
+`.glass-light` lo hereda automáticamente.
+
 ### `.card-spring` — micro-interacción de hover, se combina con `.liquid-glass`
 
 ```css

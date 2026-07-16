@@ -240,11 +240,20 @@ html.lenis, html.lenis body { height: auto; }
   }
 
   /* ── LIQUID GLASS — MATERIALES (Apple HIG) ──
-     Dos variantes:
-     · .liquid-glass  → cristal OSCURO transparente, para elementos sobre
-                        el canvas navy o sobre fotos oscuras. Texto blanco.
-     · .glass-light   → cristal CLARO escarchado (mockups Frame 1/4), para
-                        elementos que flotan sobre fotos. Texto navy (tinta).
+     Dos variantes, misma regla de cuándo usar cada una en TODO el sitio
+     (público y admin):
+     · .liquid-glass  → el material por defecto. Elementos sobre el canvas
+                        navy, sobre fotos oscuras, o sobre los halos
+                        ambientales del panel admin. Texto blanco.
+     · .glass-light   → cristal CLARO escarchado, texto navy. Se reserva
+                        para UN acento por página — nunca material
+                        dominante. Regla: si hay foto de fondo (público),
+                        va sobre la foto; si no hay foto (admin), va sobre
+                        el halo más brillante de la sección. El modelado de
+                        luz (gradiente diagonal + bisel asimétrico, igual
+                        que .liquid-glass) es lo que lo hace leer como
+                        vidrio real y no como una caja blanca lechosa —
+                        NUNCA bajar a un rgba() plano sin gradiente.
      Ambos con lensing de borde: highlight superior + hairline inferior,
      que es lo que da la lectura de "vidrio curvo" del material de Apple. */
 
@@ -272,7 +281,7 @@ html.lenis, html.lenis body { height: auto; }
       inset 0 -26px 40px -26px rgba(255, 255, 255, 0.15),
       0 24px 50px -20px rgba(0, 0, 0, 0.5);
     transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
-                --spec-x 0.55s var(--ease-out), --spec-y 0.55s var(--ease-out);
+                --spec-x 0.6s var(--ease-spring), --spec-y 0.6s var(--ease-spring);
     position: relative;
     overflow: hidden;
   }
@@ -287,19 +296,40 @@ html.lenis, html.lenis body { height: auto; }
   }
 
   .glass-light {
-    background: rgba(255, 255, 255, 0.48);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
-            backdrop-filter: blur(28px) saturate(190%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    /* Antes: rgba(255,255,255,0.48) plano — sin gradiente de luz se leía
+       como una caja blanca lechosa en vez de vidrio, sobre todo sin foto
+       detrás (paneles admin). Mismo tratamiento que .liquid-glass: un
+       gradiente diagonal (más claro arriba-izq, más tenue abajo-der) +
+       bisel asimétrico (borde superior/izquierdo más brillante que el
+       inferior/derecho) — así el material se sostiene solo, con o sin
+       foto detrás. */
+    background: linear-gradient(155deg, rgba(255,255,255,0.64) 0%, rgba(255,255,255,0.42) 55%, rgba(255,255,255,0.30) 100%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
+            backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.7) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.62);
     box-shadow:
+      inset 1.5px 2px 4px rgba(255, 255, 255, 0.85),
+      inset -1.5px -1.5px 6px rgba(255, 255, 255, 0.22),
       inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -22px 36px -24px rgba(255, 255, 255, 0.55),
       0 24px 60px -20px rgba(10, 21, 38, 0.45),
       0 4px 12px rgba(10, 21, 38, 0.12);
     transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
-                --spec-x 0.55s var(--ease-out), --spec-y 0.55s var(--ease-out);
+                --spec-x 0.6s var(--ease-spring), --spec-y 0.6s var(--ease-spring);
     position: relative;
     overflow: hidden;
+  }
+  .glass-light:hover {
+    border-color: rgba(255, 255, 255, 0.82) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.72);
+    box-shadow:
+      inset 1.5px 2px 4px rgba(255, 255, 255, 0.92),
+      inset -1.5px -1.5px 6px rgba(255, 255, 255, 0.28),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -24px 40px -24px rgba(255, 255, 255, 0.6),
+      0 30px 70px -22px rgba(10, 21, 38, 0.5),
+      0 4px 12px rgba(10, 21, 38, 0.14);
   }
 
   /* .liquid-btn: Botones secundarios estilo cristal. */
@@ -318,8 +348,16 @@ html.lenis, html.lenis body { height: auto; }
   }
 
   /* Brillo especular interactivo — sigue al cursor vía --spec-x/--spec-y
-     (seteadas con pointermove). Reemplaza al shine en loop: el material
-     de Apple es calmo y reacciona a la interacción, no anima solo. */
+     (seteadas con pointermove/touchmove, ver useGlassSpecular.js). Antes
+     eran 2 círculos perfectos concéntricos — se leían como un foco de luz
+     genérico. Ahora 3 capas elípticas (no circulares: el agua/vidrio real
+     nunca refracta en un círculo perfecto) que imitan cómo la luz se
+     comporta en la superficie de agua: un núcleo caliente pequeño, un
+     halo de dispersión ancho, y un anillo tenue justo en el borde del
+     núcleo — ese anillo es la clave, es el detalle de "refracción" que
+     antes faltaba y que hace que el punto de luz se sienta líquido en vez
+     de un simple spot. Reemplaza al shine en loop: el material de Apple
+     es calmo y reacciona a la interacción, no anima solo. */
   .liquid-glass::after,
   .glass-light::after {
     content: '';
@@ -327,21 +365,20 @@ html.lenis, html.lenis body { height: auto; }
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    /* Dos capas: un núcleo apretado (el "punto" de luz que refracta) más
-       un halo ancho y suave (la dispersión en el cristal) — un solo
-       radial se leía plano, dos leen como lente líquida. */
     background:
-      radial-gradient(120px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.30), transparent 60%),
-      radial-gradient(340px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.15), transparent 65%);
-    /* --spec-o: además del :hover (mouse), Tilt la setea directo en scroll
-       para que el brillo también viva en touch — donde :hover no dispara. */
+      radial-gradient(75px 55px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.4), transparent 62%),
+      radial-gradient(230px 170px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.16), transparent 68%),
+      radial-gradient(95px 70px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), transparent 46%, rgba(255, 255, 255, 0.22) 54%, transparent 62%);
+    /* --spec-o: además del :hover (mouse), useGlassSpecular la fuerza a 1
+       en touch — donde :hover no dispara. */
     opacity: var(--spec-o, 0);
     transition: opacity 0.5s var(--ease-out);
   }
   .glass-light::after {
     background:
-      radial-gradient(110px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.7), transparent 58%),
-      radial-gradient(300px circle at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.4), transparent 65%);
+      radial-gradient(70px 50px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.8), transparent 60%),
+      radial-gradient(210px 155px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.42), transparent 68%),
+      radial-gradient(88px 64px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), transparent 44%, rgba(255, 255, 255, 0.5) 53%, transparent 62%);
   }
   .liquid-glass:hover::after,
   .glass-light:hover::after { opacity: 1; }
