@@ -24,8 +24,8 @@ export default function VolunteerLayout() {
       {/* Topbar — panel de cristal flotante */}
       <header className="relative z-10 m-3 mb-0 liquid-glass rounded-[24px] h-16 flex items-center px-6 gap-4 shrink-0 sticky top-3">
         <Link to="/" className="flex items-center gap-2.5 mr-auto group">
-          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste text-white shadow-pri">
-            <Icon name="crown" className="w-5 h-5" stroke={2} />
+          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste shadow-pri">
+            <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="hidden sm:block">
             <p className="text-[14.5px] font-extrabold tracking-tightish text-white leading-tight">Casa del Rey</p>

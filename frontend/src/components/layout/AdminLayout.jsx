@@ -78,8 +78,10 @@ function SidebarContent({ onClose }) {
       {/* Logo */}
       <div className="px-5 py-6 border-b border-white/10">
         <Link to="/admin" onClick={onClose} className="flex items-center gap-2.5 group">
-          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste text-white shadow-pri">
-            <Icon name="crown" className="w-5 h-5" stroke={2} />
+          {/* Logo oficial (globo "Luz para las Naciones"), no un ícono
+              genérico — mismo patrón de chip que el Header público. */}
+          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste shadow-pri">
+            <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="min-w-0">
             <p className="text-[14.5px] font-extrabold tracking-tightish text-white leading-tight">Casa del Rey</p>
@@ -166,7 +168,7 @@ export default function AdminLayout() {
 
   return (
     <div className="relative flex h-screen bg-bg overflow-hidden text-ink">
-      <Halos variant="mesh" />
+      <Halos variant="section" />
 
       {/* Sidebar desktop — panel de cristal flotante */}
       <aside className="hidden md:flex w-72 shrink-0 flex-col p-3 relative z-10">

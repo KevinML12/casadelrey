@@ -19,34 +19,28 @@ const saludo = () => {
   return 'Buenas noches';
 };
 
-function SectionLabel({ icon, children }) {
+function SectionLabel({ icon, children, light = false }) {
+  const tone = light ? 'text-bg/50' : 'text-white/40';
   return (
     <div className="flex items-center gap-2 mb-4">
-      <Icon name={icon} className="w-[18px] h-[18px] text-white/40" stroke={1.8} />
-      <p className="text-[12.5px] text-white/40 font-semibold uppercase tracking-widest">{children}</p>
-      <div className="flex-1 h-px bg-white/10 ml-2" />
+      <Icon name={icon} className={`w-[18px] h-[18px] ${tone}`} stroke={1.8} />
+      <p className={`text-[12.5px] ${tone} font-semibold uppercase tracking-widest`}>{children}</p>
+      <div className={`flex-1 h-px ml-2 ${light ? 'bg-bg/10' : 'bg-white/10'}`} />
     </div>
   );
 }
 
-// Card contenedora — el "lienzo" oscuro grande que agrupa un tema (General,
-// Almas ganadas). Las StatCard glass-light flotan ENCIMA de esta, en vez de
-// una grilla pareja suelta directo sobre el canvas de la página — así el
-// dashboard lee como módulos agrupados, no como 9 cajas idénticas repetidas.
-// El glow interno (celeste, esquina superior-izq) es lo que le da "más
-// efectos" a la contenedora frente a las cards chicas que tiene adentro.
-function SectionContainer({ icon, label, glow = 'celeste', children }) {
-  const glowColor = { celeste: '59,130,246', emerald: '16,185,129', amber: '245,158,11' }[glow];
+// Card contenedora — agrupa un tema (General, Almas ganadas) en UNA pieza
+// grande en vez de una grilla pareja de cajas sueltas. Usa .glass-nav: el
+// MISMO blanco escarchado del header/nav público (el que al usuario le
+// gusta), texto navy encima. Antes fue liquid-glass oscuro con un glow de
+// color interno — descartado junto con el fondo multicolor ("se nota que
+// está hecho por IA"); el material blanco ES el efecto, sin decoración.
+function SectionContainer({ icon, label, children }) {
   return (
-    <div className="relative liquid-glass rounded-[32px] p-6 md:p-7 mb-8 overflow-hidden">
-      <div
-        className="absolute -top-28 -left-20 w-80 h-80 rounded-full pointer-events-none"
-        style={{ background: `radial-gradient(circle, rgba(${glowColor},0.22), transparent 70%)`, filter: 'blur(6px)' }}
-      />
-      <div className="relative">
-        <SectionLabel icon={icon}>{label}</SectionLabel>
-        {children}
-      </div>
+    <div className="glass-nav rounded-[32px] p-6 md:p-7 mb-8">
+      <SectionLabel icon={icon} light>{label}</SectionLabel>
+      {children}
     </div>
   );
 }
@@ -115,7 +109,7 @@ export default function Dashboard() {
 
       {/* General KPIs — agrupados en UNA card contenedora grande, las
           StatCard blancas flotan encima */}
-      <SectionContainer icon="bar_chart" label="General" glow="celeste">
+      <SectionContainer icon="bar_chart" label="General">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard icon="person"           label="Usuarios"        tint="pri" variant="light"
             value={loading ? '…' : kpis?.total_users ?? 0} />
@@ -134,7 +128,7 @@ export default function Dashboard() {
 
       {/* Cell KPIs — segunda card contenedora, glow esmeralda para
           diferenciarla visualmente de "General" */}
-      <SectionContainer icon="church" label="Almas ganadas" glow="emerald">
+      <SectionContainer icon="church" label="Almas ganadas">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard icon="person_add"       label="Convertidos"     tint="ter" variant="light"
             value={loading ? '…' : cellStats?.total_converts ?? 0}

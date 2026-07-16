@@ -32,8 +32,8 @@ function SidebarContent({ onClose }) {
     <div className="flex flex-col h-full liquid-glass rounded-[28px] overflow-hidden">
       <div className="px-5 py-6 border-b border-white/10">
         <Link to="/leader" onClick={onClose} className="flex items-center gap-2.5 group">
-          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste text-white shadow-pri">
-            <Icon name="crown" className="w-5 h-5" stroke={2} />
+          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste shadow-pri">
+            <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="min-w-0">
             <p className="text-[14.5px] font-extrabold tracking-tightish text-white leading-tight">Casa del Rey</p>
