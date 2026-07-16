@@ -28,19 +28,16 @@ ventanas**:
    como "plantilla/IA"). El cristal reacciona al cursor (brillo especular +
    tilt 3D) y a la navegación. Todo respeta `prefers-reduced-motion`.
 
-### ⚠️ DOS sistemas de diseño distintos — no mezclar
+### Un solo sistema de diseño (desde jul-2026)
 
-- **Público** (`pages/public/*`, `components/blog/*`, `components/ui/Glass.jsx`,
-  `Tilt`, `WindowStack`…): Liquid Glass. Tokens `--bg`/`--ink`/`--celeste`,
-  clases `.liquid-glass`/`.glass-light`/`.liquid-shine`, set de íconos SVG
-  propio (`Icon` de `Glass.jsx`).
-- **Admin/Líder/Voluntario** (`pages/admin/*`, `pages/leader/*`,
-  `pages/volunteer/*`, `components/ui/Input.jsx`, `Button.jsx`, `Chip.jsx`):
-  **Material Design 3** a propósito — tokens `--pri`/`--on-surf`/`--outline-var`,
-  iconos `<span className="ms">nombre</span>` (Material Symbols), `Chip`/
-  `FilterChip`. Es un panel de gestión, no la cara pública — mantiene su
-  propio lenguaje intencionalmente. **Nunca** meterle `.liquid-glass` o el
-  set de íconos SVG público, y viceversa.
+Antes el admin era Material Design 3 a propósito. **Ya no** — desde el
+commit `e60203d` el panel Admin/Líder/Voluntario usa el mismo material
+Liquid Glass que esta guía describe (mismos tokens, mismas clases
+`.liquid-glass`/`.card-spring`, mismo set de íconos SVG de `Glass.jsx`).
+La diferencia es de **patrones**, no de material: el admin no usa `Tilt`,
+`WindowStack` ni el collage desordenado (es un panel de datos denso, no una
+vitrina editorial), y no tiene fotos de fondo (usa halos ambientales fijos
+en vez de `ParallaxImg`). Ver la guía dedicada: `DISENO_LIQUID_GLASS_ADMIN.md`.
 
 ---
 
