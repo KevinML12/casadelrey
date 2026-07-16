@@ -166,7 +166,7 @@ export default function AdminLayout() {
 
   return (
     <div className="relative flex h-screen bg-bg overflow-hidden text-ink">
-      <Halos variant="section" />
+      <Halos variant="mesh" />
 
       {/* Sidebar desktop — panel de cristal flotante */}
       <aside className="hidden md:flex w-72 shrink-0 flex-col p-3 relative z-10">

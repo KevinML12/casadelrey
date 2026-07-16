@@ -162,6 +162,26 @@ export function Halos({ variant = 'hero' }) {
       </div>
     );
   }
+  if (variant === 'mesh') {
+    /* Fondo de "malla" a color, estático (sin loop) — reemplaza la
+       dependencia de fotos reales que no existen en el panel admin. La
+       idea: en vez de 2 blobs celestes en las esquinas, varios blobs de
+       colores de marca (celeste/esmeralda/ámbar/rosa, todos ya en la
+       paleta — nada nuevo) distribuidos por TODO el viewport, para que
+       cualquier card glass-light tenga color real detrás sin importar en
+       qué parte de la grilla caiga. Mismo principio que el fondo
+       degradado estático de apps tipo Notion/Linear: no es una foto, es
+       un lienzo de color que no cambia ni anima solo. */
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="halo" style={{ width: 620, height: 620, top: '-8%', left: '-8%', background: 'radial-gradient(circle, rgba(59,130,246,0.20), transparent 70%)' }} />
+        <div className="halo" style={{ width: 560, height: 560, top: '2%', right: '4%', background: 'radial-gradient(circle, rgba(16,185,129,0.13), transparent 70%)' }} />
+        <div className="halo" style={{ width: 640, height: 520, bottom: '-12%', left: '18%', background: 'radial-gradient(ellipse, rgba(245,158,11,0.11), transparent 72%)' }} />
+        <div className="halo" style={{ width: 520, height: 520, bottom: '4%', right: '-6%', background: 'radial-gradient(circle, rgba(244,63,94,0.09), transparent 70%)' }} />
+        <div className="halo" style={{ width: 900, height: 700, top: '22%', left: '30%', background: 'radial-gradient(ellipse, rgba(96,165,250,0.10), transparent 72%)' }} />
+      </div>
+    );
+  }
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <div className="halo" style={{ width: 480, height: 480, top: '10%', left: '-10%', background: 'radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%)' }} />

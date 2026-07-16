@@ -29,6 +29,28 @@ function SectionLabel({ icon, children }) {
   );
 }
 
+// Card contenedora — el "lienzo" oscuro grande que agrupa un tema (General,
+// Almas ganadas). Las StatCard glass-light flotan ENCIMA de esta, en vez de
+// una grilla pareja suelta directo sobre el canvas de la página — así el
+// dashboard lee como módulos agrupados, no como 9 cajas idénticas repetidas.
+// El glow interno (celeste, esquina superior-izq) es lo que le da "más
+// efectos" a la contenedora frente a las cards chicas que tiene adentro.
+function SectionContainer({ icon, label, glow = 'celeste', children }) {
+  const glowColor = { celeste: '59,130,246', emerald: '16,185,129', amber: '245,158,11' }[glow];
+  return (
+    <div className="relative liquid-glass rounded-[32px] p-6 md:p-7 mb-8 overflow-hidden">
+      <div
+        className="absolute -top-28 -left-20 w-80 h-80 rounded-full pointer-events-none"
+        style={{ background: `radial-gradient(circle, rgba(${glowColor},0.22), transparent 70%)`, filter: 'blur(6px)' }}
+      />
+      <div className="relative">
+        <SectionLabel icon={icon}>{label}</SectionLabel>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
     <div className="w-6 h-6 rounded-full border-2 border-white/15 border-t-celeste animate-spin" />
@@ -91,36 +113,40 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* General KPIs — todas las cards sin foto de fondo → glass-light */}
-      <SectionLabel icon="bar_chart">General</SectionLabel>
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <StatCard icon="person"           label="Usuarios"        tint="pri" variant="light"
-          value={loading ? '…' : kpis?.total_users ?? 0} />
-        <StatCard icon="favorite"         label="Donaciones"      tint="err" variant="light"
-          value={loading ? '…' : kpis?.total_donations ?? 0} />
-        <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter" variant="light"
-          value={loading ? '…' : kpis?.total_petitions ?? 0} />
-        <StatCard icon="payments"         label="Recaudado"       tint="sec" variant="light"
-          value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
-        <StatCard icon="visibility"       label="Vistas blog"     tint="pri" variant="light"
-          value={loading ? '…' : kpis?.total_blog_views ?? 0} />
-        <StatCard icon="groups"           label="Rept. células"   tint="ter" variant="light"
-          value={loading ? '…' : kpis?.total_cell_reports ?? 0} />
-      </div>
+      {/* General KPIs — agrupados en UNA card contenedora grande, las
+          StatCard blancas flotan encima */}
+      <SectionContainer icon="bar_chart" label="General" glow="celeste">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <StatCard icon="person"           label="Usuarios"        tint="pri" variant="light"
+            value={loading ? '…' : kpis?.total_users ?? 0} />
+          <StatCard icon="favorite"         label="Donaciones"      tint="err" variant="light"
+            value={loading ? '…' : kpis?.total_donations ?? 0} />
+          <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter" variant="light"
+            value={loading ? '…' : kpis?.total_petitions ?? 0} />
+          <StatCard icon="payments"         label="Recaudado"       tint="sec" variant="light"
+            value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
+          <StatCard icon="visibility"       label="Vistas blog"     tint="pri" variant="light"
+            value={loading ? '…' : kpis?.total_blog_views ?? 0} />
+          <StatCard icon="groups"           label="Rept. células"   tint="ter" variant="light"
+            value={loading ? '…' : kpis?.total_cell_reports ?? 0} />
+        </div>
+      </SectionContainer>
 
-      {/* Cell KPIs */}
-      <SectionLabel icon="church">Almas ganadas</SectionLabel>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <StatCard icon="person_add"       label="Convertidos"     tint="ter" variant="light"
-          value={loading ? '…' : cellStats?.total_converts ?? 0}
-          sub="Este período" />
-        <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec" variant="light"
-          value={loading ? '…' : cellStats?.total_reconciled ?? 0}
-          sub="Este período" />
-        <StatCard icon="savings"          label="Ofrenda células" tint="pri" variant="light"
-          value={loading ? '…' : cellStats?.total_offering != null ? `Q${Number(cellStats.total_offering).toFixed(0)}` : 'Q0'}
-          sub="Total acumulado" />
-      </div>
+      {/* Cell KPIs — segunda card contenedora, glow esmeralda para
+          diferenciarla visualmente de "General" */}
+      <SectionContainer icon="church" label="Almas ganadas" glow="emerald">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard icon="person_add"       label="Convertidos"     tint="ter" variant="light"
+            value={loading ? '…' : cellStats?.total_converts ?? 0}
+            sub="Este período" />
+          <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec" variant="light"
+            value={loading ? '…' : cellStats?.total_reconciled ?? 0}
+            sub="Este período" />
+          <StatCard icon="savings"          label="Ofrenda células" tint="pri" variant="light"
+            value={loading ? '…' : cellStats?.total_offering != null ? `Q${Number(cellStats.total_offering).toFixed(0)}` : 'Q0'}
+            sub="Total acumulado" />
+        </div>
+      </SectionContainer>
 
       {/* Últimas donaciones — tabla densa: se queda oscura por legibilidad
           (muchas filas de texto pequeño, el blanco compite más con la
