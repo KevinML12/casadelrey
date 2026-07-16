@@ -1,221 +1,302 @@
-# Panel Admin/Líder/Voluntario — Liquid Glass
+# Sistema de diseño "Liquid Glass" — Panel Admin/Líder/Voluntario
 
-> Desde jul-2026 los 3 paneles (`pages/admin/*`, `pages/leader/*`,
-> `pages/volunteer/*`) usan el **mismo material Liquid Glass** que el sitio
-> público — ya NO es Material Design 3. Esta guía documenta las clases y el
-> patrón para construir cualquier página nueva del panel.
->
-> El sitio **público** tiene su propia guía en `DISENO_LIQUID_GLASS.md` —
-> comparten los mismos tokens/materiales de `index.css`, pero el admin NO usa
-> `Tilt`, `WindowStack` ni el collage desordenado (es un panel de datos denso,
-> no una experiencia editorial). Ver diferencias en la sección 6.
+> Este documento es autocontenido: no asume que hayas leído nada más de este
+> repositorio ni que conozcas el historial del proyecto. Si tu tarea es
+> construir o modificar una página del panel de administración de esta app,
+> lee esto completo antes de escribir código.
 
----
+## 0. Contexto mínimo del proyecto
 
-## 1. La diferencia clave: sin foto de fondo
-
-El público apoya el cristal sobre fotos reales (`ParallaxImg` + gradiente). El
-admin es un canvas navy plano (`--bg: #0A1526`) sin fotos — la "identidad" que
-reemplaza a la foto es:
-
-1. **Halos ambientales fijos** — `<Halos variant="section" />` (de
-   `components/ui/Glass.jsx`) montado UNA vez en cada layout (`AdminLayout`,
-   `LeaderLayout`, `VolunteerLayout`), detrás del sidebar y del contenido.
-   Dos blobs radiales celestes muy tenues (opacity 0.12-0.14, blur 80px),
-   posicionados absolutos respecto al contenedor `h-screen` — quedan fijos
-   aunque el `<main>` haga scroll, como una luz de ambiente constante.
-2. **El propio material del cristal** — `.liquid-glass` no necesita nada
-   detrás para leerse como vidrio: el bisel + realce inferior + hairline
-   superior (todo `box-shadow`) ya modelan la luz. Sobre el halo se ve mejor,
-   pero funciona sobre navy liso también.
-3. **El brillo que sigue al cursor** (`useGlassSpecular`, sección 5) — es lo
-   que más vende la sensación de "cristal real" sin foto: al mover el mouse
-   sobre cualquier card, un punto de luz se desliza por dentro.
-
-No se necesita imagen para que una card se sienta de cristal — con halo +
-bisel + specular basta.
+- Stack: **React 19 + Vite**, estilos con **Tailwind CSS** + clases custom
+  definidas en `frontend/src/index.css`, sin librería de componentes UI
+  externa (todo es propio, en `frontend/src/components/ui/`).
+- La app tiene tres "áreas" de páginas protegidas por rol, cada una con su
+  propio layout:
+  - `frontend/src/pages/admin/*.jsx` — envuelto por
+    `frontend/src/components/layout/AdminLayout.jsx`
+  - `frontend/src/pages/leader/*.jsx` — envuelto por
+    `frontend/src/components/layout/LeaderLayout.jsx`
+  - `frontend/src/pages/volunteer/*.jsx` — envuelto por
+    `frontend/src/components/layout/VolunteerLayout.jsx`
+- Esas tres áreas comparten **un solo sistema visual**: "Liquid Glass" —
+  fondo navy oscuro, cards de cristal translúcido con blur, texto blanco,
+  acento azul (celeste). Es el mismo lenguaje que usa el sitio público de
+  esta app, pero **sin fotos de fondo** (el admin es un panel de datos, no
+  una página de marketing).
+- Todo lo que necesitas para construir en este sistema — colores, clases
+  CSS, componentes reutilizables, íconos — está documentado abajo con
+  ejemplos de código copiables. No hace falta ir a leer otros archivos del
+  repo salvo que este documento te remita explícitamente a uno.
 
 ---
 
-## 2. Tokens (los mismos que el público)
+## 1. Paleta y tokens
 
-Definidos en `index.css` (`:root`) y espejados en `tailwind.config.js`. El
-admin los usa vía clases Tailwind normales: `bg-bg`, `text-white`,
-`text-celeste-hov`, etc.
+Estos colores ya existen como variables CSS (`index.css`, bloque `:root`) y
+como clases de Tailwind (`tailwind.config.js`). Úsalos por su nombre de clase
+Tailwind directamente en `className`, nunca escribas un color hexadecimal
+a mano en JSX.
 
-| Token | Valor | Uso |
-|---|---|---|
-| `--bg` | `#0A1526` | Canvas del panel |
-| `--bg-soft` | `#131F33` | Superficie sólida ocasional (inputs, no cards) |
-| `--celeste` | `#3B82F6` | Acento primario (botón "filled", activo del nav) |
-| `--celeste-hov` | `#60A5FA` | Texto/ícono sobre fondos celeste-soft |
-| `--celeste-soft` | `#1E3A8A` | Fondo de chip/ícono con tinte celeste |
-| `--rose` / `--rose-soft` | `#F43F5E` / `#881337` | Error, logout, rechazar |
-| `--amber` / `--amber-soft` | `#F59E0B` / `#78350F` | Advertencia, "Recaudado" |
-| `--emerald` / `--emerald-soft` | `#10B981` / `#064E3B` | Éxito, aprobado |
-| Texto | `text-white`, `text-white/50`, `text-white/40` | Primario / secundario / terciario — NO usar los tokens viejos `text-on-surf-var` en código nuevo, aunque siguen funcionando (alias) |
+| Variable CSS | Clase Tailwind equivalente | Valor | Uso |
+|---|---|---|---|
+| `--bg` | `bg-bg` / `text-bg` | `#0A1526` | Canvas de fondo de toda la app (navy muy oscuro) |
+| `--bg-soft` | `bg-bg-soft` | `#131F33` | Fondo sólido de inputs (NO de cards) |
+| `--ink` | `text-white` (usar directo) | `#FFFFFF` | Texto principal |
+| — | `text-white/50` | blanco 50% opacidad | Texto secundario |
+| — | `text-white/40` | blanco 40% opacidad | Texto terciario / labels |
+| `--celeste` | `bg-celeste` / `text-celeste` | `#3B82F6` | Acento primario: botón CTA, ítem activo del menú |
+| `--celeste-hov` | `text-celeste-hov` | `#60A5FA` | Texto/ícono sobre fondos con tinte celeste |
+| `--celeste-soft` | `bg-celeste-soft` | `#1E3A8A` | Fondo de chip/ícono con tinte celeste (úsalo con `/60` de opacidad, ej. `bg-celeste-soft/60`) |
+| `--rose` / `--rose-soft` | `text-rose` / `bg-rose-soft` | `#F43F5E` / `#881337` | Error, cerrar sesión, rechazar, eliminar |
+| `--amber` / `--amber-soft` | `text-amber` / `bg-amber-soft` | `#F59E0B` / `#78350F` | Advertencia, montos de dinero |
+| `--emerald` / `--emerald-soft` | `text-emerald` / `bg-emerald-soft` | `#10B981` / `#064E3B` | Éxito, aprobado, verificado |
 
-Los tokens legacy MD3 (`--pri`, `--on-surf`, `--outline-var`…) siguen
-declarados en `tailwind.config.js` como **alias** de estos mismos valores —
-código viejo que aún los use no se ve roto, pero **no uses esos nombres en
-código nuevo**: usa los tokens de arriba o clases `white/N` directas.
+**Regla**: para bordes/divisores usa siempre blanco translúcido, nunca gris
+sólido: `border-white/10` (borde normal), `divide-white/8` (separador entre
+filas de una lista), `bg-white/8` (fondo "elevado" tenue, ej. un pozo de
+ícono o un hover de fila).
 
 ---
 
-## 3. Materiales de cristal (clases de `index.css`)
+## 2. Las clases de cristal (CSS)
 
-| Clase | Qué es | Cuándo usarla |
-|---|---|---|
-| `.liquid-glass` | Cristal oscuro casi transparente: `backdrop-filter: blur(8px) saturate(150%)`, bisel + realce inferior blanco neutro + hairline, sombra externa. Texto blanco. | **La card por defecto de todo el panel.** Sidebar, formularios, listas, estados vacíos, StatCard. |
-| `.glass-light` | Cristal claro escarchado, texto navy. | Casi nunca en admin (es para elementos sobre fotos claras del público) — no usar salvo caso excepcional. |
-| `.card-spring` | Hover: `translateY(-2px) scale(1.005)`, sombra más grande, el radio "respira" a 20px. | Combinar con `.liquid-glass` en TODA card clicable/interactiva. |
-| `card-spring` en un botón | usa en su lugar `.btn-spring` (ya incluida en `Button`/`GlassButton`) | Botones, no cards |
+Ya están definidas en `frontend/src/index.css` — no las reescribas, solo
+aplícalas por nombre. Estas son las que importan para el panel admin:
 
-**Patrón estándar de card**, tres clases juntas:
+### `.liquid-glass` — LA clase base de cualquier card
+
+```css
+.liquid-glass {
+  background: linear-gradient(157deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 55%, rgba(255,255,255,0.008) 100%);
+  backdrop-filter: blur(8px) saturate(150%) brightness(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow:
+    inset 1.5px 2.5px 5px rgba(255, 255, 255, 0.26),
+    inset -1.5px -2px 8px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -26px 40px -26px rgba(255, 255, 255, 0.15),
+    0 24px 50px -20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+```
+
+Efecto visual: vidrio casi transparente (no opaca lo que hay detrás), con un
+bisel de luz arriba-izquierda, un realce blanco tenue en el borde inferior
+(como si la luz se concentrara en el filo del vidrio), y una sombra externa
+que lo "despega" del fondo. Sube la intensidad un poco al hacer `:hover`
+(ya incluido en la clase, no hace falta nada extra).
+
+### `.card-spring` — micro-interacción de hover, se combina con `.liquid-glass`
+
+```css
+.card-spring {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              border-radius 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.card-spring:hover {
+  transform: translateY(-2px) scale(1.005);
+  box-shadow: var(--sh-card-lg);
+  border-radius: 20px; /* el radio "respira" un poco al hover */
+}
+```
+
+**Patrón obligatorio para toda card**: las dos clases juntas, más un radio
+explícito:
 
 ```jsx
 <div className="liquid-glass rounded-[24px] card-spring p-6">
-  {/* contenido */}
+  {/* contenido de la card */}
 </div>
 ```
 
-Radios según tamaño de card (mismo criterio squircle del público):
-- `rounded-[24px]` — card estándar (formularios, filas de lista contenedoras)
-- `rounded-[20px]` — card chica (inputs de imagen, íconos de 20x20 well)
-- `rounded-[28px]` — panel grande (sidebar completo, estado vacío grande)
+Radios estándar (elige según tamaño):
+- `rounded-[24px]` → card normal (formulario, bloque de lista, panel)
+- `rounded-[20px]` → card chica (preview de imagen, well de ícono mediano)
+- `rounded-[28px]` → panel grande (sidebar completo, estado vacío grande)
 
-**No repetir a mano** el bisel/sombra — SIEMPRE vía la clase `.liquid-glass`,
-nunca `box-shadow` inline.
+Si la card NO es clicable/interactiva (por ejemplo, solo un contenedor
+informativo estático), puedes omitir `card-spring` y dejar solo
+`liquid-glass rounded-[24px]`.
+
+### `.glass-light` — NO usar en el panel admin
+
+Existe una variante clara (`glass-light`, cristal blanco escarchado con
+texto navy) pensada para el sitio público cuando flota sobre una foto clara.
+**En el panel admin no la uses** — todo el panel es sobre fondo oscuro, así
+que siempre es `.liquid-glass`.
 
 ---
 
-## 4. Set de íconos SVG (`components/ui/Glass.jsx`)
+## 3. El fondo del panel: halos ambientales (sin fotos)
 
-El panel dejó de usar Material Symbols (`<span className="ms">nombre</span>`)
-— esa fuente por ligadura fallaba en silencio (si tardaba en cargar, se veía
-el nombre del ícono como texto en inglés: "campaign", "delete"…). Ahora usa
-el mismo componente `Icon` que el público:
+El sitio público de esta app pone fotos reales detrás del cristal. El panel
+admin NO tiene fotos — en su lugar, cada layout (`AdminLayout.jsx`,
+`LeaderLayout.jsx`, `VolunteerLayout.jsx`) monta un componente `<Halos
+variant="section" />` una sola vez, como fondo ambiente fijo:
 
 ```jsx
-import { Icon } from '../../components/ui/Glass'; // ajustar profundidad relativa
+import { Halos } from '../ui/Glass'; // frontend/src/components/ui/Glass.jsx
+
+// dentro del layout, como hijo del contenedor raíz (position: relative):
+<Halos variant="section" />
+```
+
+`Halos` pinta 2 blobs radiales celestes muy tenues (`opacity` 0.12-0.14,
+`filter: blur(80px)`), posicionados absolutos. No necesitas tocarlo ni
+repetirlo dentro de páginas individuales — ya está en los 3 layouts, cubre
+toda página que renderice dentro de ellos.
+
+**Por qué esto basta como "identidad visual" sin fotos**: el bisel de
+`.liquid-glass` + el halo detrás + el brillo que sigue al cursor (sección 5)
+ya dan la sensación de "vidrio real flotando sobre algo", sin necesitar una
+imagen.
+
+---
+
+## 4. Íconos: SVG propios, nunca fuentes de íconos
+
+**Regla dura**: nunca uses `<span className="material-icons">nombre</span>`
+ni ninguna fuente de íconos por ligadura de texto. Esta app tuvo un bug real
+por eso: si la fuente de íconos tardaba en cargar (o fallaba), el usuario
+veía el nombre del ícono como texto plano en inglés ("delete", "campaign")
+en vez del glifo. La solución fue un componente de íconos 100% SVG que no
+depende de ninguna fuente externa.
+
+Usa siempre:
+
+```jsx
+import { Icon } from '../../components/ui/Glass'; // ajusta la ruta relativa según profundidad
 
 <Icon name="calendar_month" className="w-[22px] h-[22px] text-celeste-hov" stroke={1.8} />
 ```
 
-- `name` — string, debe existir en el objeto `PATHS` de `Glass.jsx` (~116
-  íconos ya cubiertos: dashboard, settings, article, calendar_month,
-  photo_library, share, help_center, campaign, manage_accounts, badge,
-  group_add, contact_page, volunteer_activism, groups, person_add,
-  receipt_long, history, logout, public, chevron_left/right, download,
-  payments, notifications_active, bar_chart, church, savings, edit, delete,
-  add, image, save, cancel, undo, print, inbox, verified, visibility,
-  account_balance, tag, info, open_in_new, publish, task_alt, apps, circle,
-  hourglass_empty, expand_more, warning, arrow_back, broken_image,
-  check_circle, mark_email_read, add_circle, login, star, shield, thumb_up,
-  play_circle, y varios alias de nombres MD equivalentes — `person`→`user`,
-  `groups`/`contacts`→`users`, `favorite`→`heart`, `email`→`mail`,
-  `location_on`→`pin`, `photo_camera`→`camera`, `schedule`→`clock`,
-  `calendar_today`/`event`→`calendar`, etc.).
-- **Si necesitas un ícono que no existe**: agrégalo a `PATHS` en `Glass.jsx`
-  (un `<path>`/`<circle>`/`<polyline>` con `viewBox="0 0 24 24"`, estilo
-  stroke consistente con los demás) o alíalo a uno existente si el glifo es
-  casi igual (`PATHS.nuevo_nombre = PATHS.existente;` al final del archivo).
-  **Nunca** vuelvas a usar `<span className="ms">`.
-- `className` controla tamaño (`w-[Npx] h-[Npx]`) y color (clases de texto).
-- `stroke` — grosor del trazo, `1.8` es el estándar del panel (`2` para
-  botones/acciones destacadas, `2.2` para checks pequeños).
+Props de `Icon`:
+- `name` (string, requerido) — debe existir como clave en el objeto `PATHS`
+  dentro de `frontend/src/components/ui/Glass.jsx`. Ya hay ~116 nombres
+  cubiertos (usa nombres al estilo Material Symbols por convención:
+  `dashboard`, `settings`, `article`, `calendar_month`, `delete`, `edit`,
+  `add`, `save`, `check`, `close`, `search`, `person`, `groups`,
+  `person_add`, `payments`, `visibility`, `warning`, `check_circle`, etc.).
+- `className` — controla tamaño (`w-[Npx] h-[Npx]`) y color (clase de
+  texto). El tamaño estándar en el panel es 16-22px según contexto.
+- `stroke` — grosor de línea del SVG. `1.8` es el valor por defecto del
+  panel; usa `2` en botones/acciones destacadas.
 
----
-
-## 5. `useGlassSpecular` — el brillo que sigue al cursor
-
-`hooks/useGlassSpecular.js` — un hook sin argumentos, se llama **una sola
-vez por layout** (ya está en `AdminLayout`, `LeaderLayout`,
-`VolunteerLayout`):
+**Si necesitas un ícono que no existe todavía**: abre
+`frontend/src/components/ui/Glass.jsx`, busca el objeto `const PATHS = {
+... }` (arriba del archivo) y agrega tu entrada al final, o justo después
+del objeto con la sintaxis de alias (`PATHS.nombre_nuevo = <><path
+d="..."/></>;`). Sigue el mismo estilo de las entradas existentes:
+`viewBox="0 0 24 24"` implícito (lo pone el componente `Icon`, no lo
+repitas), trazos con `stroke="currentColor"` (también lo pone el
+componente — tú solo defines los `<path>`/`<circle>`/`<polyline>` internos).
+Si el ícono que necesitas es visualmente casi igual a uno que ya existe,
+usa un alias en vez de duplicar el path:
 
 ```jsx
-import useGlassSpecular from '../../hooks/useGlassSpecular';
-
-export default function MiLayout() {
-  useGlassSpecular();
-  // ...
-}
+PATHS.mi_icono_nuevo = PATHS.check_circle; // reutiliza el mismo dibujo
 ```
-
-Qué hace: un único listener delegado (`document.addEventListener('pointermove', …)`
-+ `touchmove` para tablets) que detecta cuál `.liquid-glass`/`.glass-light`
-está bajo el cursor/dedo y le mueve `--spec-x`/`--spec-y` (las variables que
-consume `.liquid-glass::after` para el brillo). En touch fuerza `--spec-o:1`
-porque no existe `:hover` real; con mouse el `:hover` de CSS ya se encarga.
-
-**No hay que envolver cada card** ni pasarle props — cualquier elemento con
-`.liquid-glass` en cualquier página, presente o futura, hereda el efecto
-automáticamente en cuanto el layout que lo contiene llama el hook una vez.
-Si agregas un panel nuevo fuera de los 3 layouts existentes (poco probable),
-llama `useGlassSpecular()` ahí también.
-
-A diferencia de `Tilt.jsx` (público): NO hace inclinación 3D ni usa
-framer-motion — en un panel denso en datos/formularios el tilt por card
-estorbaría la usabilidad. Solo el brillo, más barato y menos intrusivo.
 
 ---
 
-## 6. Componentes compartidos del panel (`components/ui/`)
+## 5. El brillo que sigue al cursor (specular highlight)
 
-Todos migrados de MD3 a liquid-glass; mismas props/API que antes — el código
-viejo que los use no se rompe, solo se ve distinto.
+Cada card `.liquid-glass` tiene un pseudo-elemento (`::after`) que dibuja un
+punto de luz radial en la posición marcada por las variables CSS `--spec-x`
+y `--spec-y`, con opacidad controlada por `--spec-o`. Esto ya está en
+`index.css`, no lo toques.
 
-### `Button.jsx` (default export) + `IconButton`/`FAB`
+Lo que sí necesitas saber: existe un hook, `frontend/src/hooks/useGlassSpecular.js`,
+que **ya está activado una sola vez en cada uno de los 3 layouts**
+(`AdminLayout`, `LeaderLayout`, `VolunteerLayout`). Es un único listener de
+`pointermove`/`touchmove` a nivel de `document` que detecta cuál
+`.liquid-glass` está bajo el cursor o el dedo, y mueve el brillo hacia esa
+posición en tiempo real.
+
+**Consecuencia práctica para ti**: no tienes que hacer nada para que una
+card nueva tenga el efecto de brillo al pasar el cursor — basta con que le
+pongas la clase `.liquid-glass`. El efecto es automático y global dentro de
+cualquier página que viva bajo uno de los 3 layouts. Solo tendrías que
+llamar el hook tú mismo (`useGlassSpecular()`, sin argumentos) si estuvieras
+construyendo una CUARTA área de la app fuera de esos 3 layouts — algo que
+normalmente no vas a necesitar.
+
+---
+
+## 6. Componentes de UI reutilizables
+
+Todos viven en `frontend/src/components/ui/`. Impórtalos siempre en vez de
+reescribir un botón/input/chip a mano.
+
+### `Button.jsx` (export default) + `IconButton`, `FAB` (named exports)
 
 ```jsx
 import Button, { IconButton, FAB } from '../../components/ui/Button';
 
-<Button variant="filled">Guardar</Button>   {/* pill blanco, texto navy — CTA primario */}
-<Button variant="tonal">Cancelar</Button>   {/* .liquid-glass — el más usado */}
-<Button variant="outlined">…</Button>       {/* borde blanco/20, transparente */}
-<Button variant="text">…</Button>           {/* mínimo, texto white/60 */}
-<Button variant="glass">…</Button>          {/* alias de tonal */}
-<Button size="sm|md|lg" as="link" to="/admin/x">…</Button>
+<Button variant="filled">Guardar</Button>
+<Button variant="tonal">Cancelar</Button>
+<Button variant="outlined">Ver más</Button>
+<Button variant="text">Omitir</Button>
+<Button size="sm" onClick={...}>Acción chica</Button>
+<Button as="link" to="/admin/eventos">Ir a Eventos</Button>
 ```
 
-`IconButton` (círculo 40px): `variant="standard|filled|tonal|outlined"`.
-`FAB`: círculo/squircle flotante, `bg-celeste` + `shadow-pop`.
+Variantes disponibles y su look:
+- `filled` — pill blanco sólido con texto navy (`bg-white text-bg`). Es el
+  CTA primario, úsalo solo una vez por sección/formulario.
+- `tonal` (o su alias `glass`) — `.liquid-glass` con texto blanco. **El más
+  usado** para acciones secundarias/frecuentes.
+- `outlined` — transparente con borde blanco translúcido.
+- `text` — sin fondo ni borde, solo texto atenuado (`text-white/60`).
 
-### `Chip.jsx` (default) + `FilterChip`
+`size`: `sm | md | lg` (default `md`).
+
+`IconButton` — botón circular de 40px para un solo ícono:
+```jsx
+<IconButton variant="standard" onClick={...}>
+  <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
+</IconButton>
+```
+
+### `Chip.jsx` (export default) + `FilterChip` (named export)
 
 ```jsx
 import Chip, { FilterChip } from '../../components/ui/Chip';
 
-<Chip color="default|primary|secondary|tertiary|error" icon="tag">Etiqueta</Chip>
-<FilterChip selected={activo} onClick={...} count={5}>Pendientes</FilterChip>
+<Chip color="primary" icon="tag">Activo</Chip>
+<FilterChip selected={filtroActivo === 'pendientes'} onClick={...} count={5}>
+  Pendientes
+</FilterChip>
 ```
 
-Pastilla de cristal (`bg-white/8 border border-white/12`) o con tinte
-celeste/rosa según `color`. `icon` acepta el mismo `name` que `<Icon>`.
+`color`: `default | primary | secondary | tertiary | error`. `icon` acepta
+el mismo `name` que el componente `Icon` (sección 4).
 
-### `Input.jsx` (default) + `Select`, `Textarea`
+### `Input.jsx` (export default) + `Select`, `Textarea` (named exports)
 
 ```jsx
 import Input, { Select, Textarea } from '../../components/ui/Input';
 
-<Input label="Título" value={..} onChange={..} />
-<Select label="Rol" options={[{value:'admin', label:'Admin'}]} />
-<Textarea label="Descripción" rows={4} />
+<Input label="Título" value={titulo} onChange={e => setTitulo(e.target.value)} required />
+<Select label="Rol" value={rol} onChange={...} options={[{ value: 'admin', label: 'Admin' }]} />
+<Textarea label="Descripción" rows={4} value={desc} onChange={...} />
 ```
 
-Usan la clase `.input-squircle` (ya definida en `index.css`, compartida con
-los formularios públicos): fondo `--bg-soft`, hairline, focus con anillo
-celeste. `size="sm|md|lg"` en `Input` ajusta padding.
+Todos usan por dentro la clase `.input-squircle` (fondo `--bg-soft`, borde
+translúcido, anillo celeste al enfocar). No la apliques tú manualmente,
+usa siempre estos componentes.
 
-### `Paginator.jsx` (default)
+### `Paginator.jsx` (export default)
 
 ```jsx
-<Paginator meta={{ page, pages, total }} onPage={setPage} />
+import Paginator from '../../components/ui/Paginator';
+
+<Paginator meta={{ page: 1, pages: 5, total: 42 }} onPage={setPage} />
 ```
 
-Flechas `chevron_left/right` vía `Icon`, página activa en `bg-celeste`.
-
-### `StatCard.jsx` (default) — nuevo, antes vivía duplicado dentro de `Dashboard.jsx`
+### `StatCard.jsx` (export default) — para mostrar una métrica/KPI
 
 ```jsx
 import StatCard from '../../components/ui/StatCard';
@@ -223,63 +304,113 @@ import StatCard from '../../components/ui/StatCard';
 <StatCard icon="payments" label="Recaudado" value="Q2000" tint="sec" sub="Este período" />
 ```
 
-`tint`: `pri` (celeste, default) · `sec` (ámbar — úsalo para dinero/montos,
-evita azul-sobre-azul) · `ter` (celeste alterno) · `err` (rosa) · `ok`
-(verde). Card `liquid-glass rounded-[24px]` con chip de ícono + valor grande.
+`tint`: `pri` (celeste, default) · `sec` (ámbar — úsalo para dinero/montos)
+· `ter` (celeste alterno, para variar visualmente en una fila de varias
+stat cards) · `err` (rosa) · `ok` (verde). `sub` es opcional, texto chico
+debajo del valor.
 
 ---
 
-## 7. Cómo construir una página nueva del panel
+## 7. Receta paso a paso: construir una página nueva del panel
 
-1. **Layout**: la página vive bajo una ruta ya envuelta por `AdminLayout` /
-   `LeaderLayout` / `VolunteerLayout` (el router ya lo resuelve) — no montes
-   el layout a mano, y no vuelvas a llamar `useGlassSpecular()` desde la
-   página (ya corre en el layout padre).
-2. **Contenedor de página**: `<div className="p-6 max-w-5xl mx-auto">` (o
-   `max-w-3xl` si es más angosta) — mismo patrón que `Dashboard.jsx`.
-3. **Encabezado de sección** (opcional, para separar bloques dentro de la
-   página): ícono `white/40` + label uppercase `text-[12.5px] text-white/40
-   tracking-widest` + línea `flex-1 h-px bg-white/10` — ver `SectionLabel`
-   en `Dashboard.jsx`.
-4. **Cards de contenido**: `liquid-glass rounded-[24px] card-spring` (sección
-   3). Formularios adentro usan `Input`/`Select`/`Textarea`. Botones de
-   acción usan `Button`.
-5. **Listas/tablas**: envolver en una sola card `liquid-glass rounded-[24px]
-   overflow-hidden`, con `divide-y divide-white/8` entre filas y
-   `hover:bg-white/5` por fila — no crear una card por fila (eso sí lo hace
-   el collage público, no el admin).
-6. **Estado vacío**: card `liquid-glass rounded-[24px] card-spring flex
-   flex-col items-center py-20 gap-4`, con un ícono grande en un pozo
-   `bg-white/8 rounded-[28px]` — patrón ya repetido en Eventos, Anuncios,
-   Boletas, etc.
-7. **Íconos**: siempre `<Icon name="..." />` (sección 4), nunca
-   `<span className="ms">`.
-8. **Badges de notificación en el nav** (si tu módulo tiene pendientes):
-   agrega la entrada a `NAV_GROUPS` en `AdminLayout.jsx` con `badge:
-   'nombre_del_contador'`, y el contador real en
-   `hooks/useNotificationCounts.js` + el endpoint de kpis del backend.
-9. **Verificar**: `npm run build` limpio, y probar en el navegador contra el
-   backend real (login real, no mocks — mismo principio de "nada estático"
-   que el público).
+Supongamos que necesitas crear `frontend/src/pages/admin/AdminAlgo.jsx`.
+
+**1. Estructura base de la página** (se renderiza dentro de `<AdminLayout>`,
+que ya provee el sidebar, el fondo con halos, y el efecto de brillo — no
+repitas nada de eso):
+
+```jsx
+import { useEffect, useState } from 'react';
+import apiClient from '../../lib/apiClient';
+import Button from '../../components/ui/Button';
+import { Icon } from '../../components/ui/Glass';
+
+export default function AdminAlgo() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiClient.get('/admin/algo')
+      .then(r => setItems(r.data?.data || r.data || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto">
+      {/* Encabezado */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-[26px] text-white font-black leading-tight">Algo</h1>
+          <p className="text-[13.5px] text-white/40 mt-1">{items.length} registros</p>
+        </div>
+        <Button variant="filled">
+          <Icon name="add" className="w-[18px] h-[18px]" stroke={2} />
+          Nuevo
+        </Button>
+      </div>
+
+      {/* Lista dentro de UNA sola card de cristal, no una card por fila */}
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="w-6 h-6 rounded-full border-2 border-white/15 border-t-celeste animate-spin" />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+            <Icon name="inbox" className="w-[32px] h-[32px]" stroke={1.8} />
+          </div>
+          <p className="text-[15px] text-white font-medium">Sin registros todavía</p>
+        </div>
+      ) : (
+        <div className="liquid-glass rounded-[24px] overflow-hidden divide-y divide-white/8">
+          {items.map(item => (
+            <div key={item.ID} className="flex items-center justify-between p-5 hover:bg-white/5 transition-colors">
+              <span className="text-[13.5px] text-white font-medium">{item.name}</span>
+              <Icon name="chevron_right" className="w-[18px] h-[18px] text-white/40" stroke={1.8} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**2. Regístrala en el router** (busca dónde están registradas las demás
+rutas `/admin/*` en el archivo de rutas de React Router del proyecto — no
+está documentado aquí porque cambia de nombre/ubicación con el tiempo,
+pero sigue el mismo patrón que cualquier otra ruta `/admin/x` ya existente).
+
+**3. Si necesita aparecer en el menú lateral**, edita
+`frontend/src/components/layout/AdminLayout.jsx`: busca el array
+`NAV_GROUPS` (una lista de secciones, cada una con `items: [{ to, icon,
+label, badge? }]`) y agrega tu entrada al grupo que corresponda
+semánticamente.
+
+**4. Verifica antes de dar por terminado**:
+- `cd frontend && npm run build` debe compilar sin errores.
+- No debe quedar ningún `<span className="ms">` ni ningún nombre de ícono
+  como texto plano en la UI — todo ícono va por `<Icon name="..." />`.
+- Toda card usa `liquid-glass` + un radio `rounded-[Npx]` (nunca
+  `bg-gray-800`, `bg-slate-900` ni ningún color sólido plano como fondo de
+  card).
 
 ---
 
-## 8. Diferencias con el público (no copiar esos patrones al admin)
+## 8. Errores comunes a evitar
 
-| Patrón público | En el admin |
-|---|---|
-| `<Tilt glass>` (tilt 3D + framer-motion por card) | NO — usar solo `.liquid-glass card-spring` + `useGlassSpecular` (ya cubre el brillo, sin inclinación) |
-| `<WindowStack>` (ventanas apiladas modales) | NO — el admin usa formularios inline/expandibles (`expand_more` como toggle) o rutas propias, nunca el patrón de ventana de galería |
-| Collage desordenado (spans/rotaciones variados) | NO — el admin es grid/lista ordenada, es una herramienta de trabajo, no una vitrina editorial |
-| `ParallaxImg` + foto de fondo por sección | NO — el admin no tiene fotos de fondo, usa los halos ambientales del layout (sección 1) |
-| Fuente Arimo | Igual — se hereda global desde `index.css`, no hace falta nada especial en el admin |
-
----
-
-## 9. Historial
-
-Redise "diseñado" en jul-2026 (commit `e60203d`): reemplaza el MD3 viejo del
-panel (roto — íconos de Material Symbols mostrando texto crudo cuando la
-fuente tardaba en cargar, `StatCard` con texto invisible por bug de
-contraste). Ver `project_casadelrey.md` (memoria) para el detalle de la
-migración.
+- ❌ Poner una imagen de fondo en una página del admin — el admin no lleva
+  fotos, usa los halos del layout (sección 3).
+- ❌ Usar `box-shadow` o `backdrop-filter` escritos a mano en vez de la
+  clase `.liquid-glass` — rompe la consistencia visual entre páginas.
+- ❌ Crear una card de cristal por cada fila de una tabla larga — eso es
+  carísimo visualmente y de rendimiento; una lista es UNA card con
+  `divide-y divide-white/8` adentro.
+- ❌ Un ícono como texto (`<span>delete</span>` o similar) — siempre
+  `<Icon name="delete" />`.
+- ❌ Colores sólidos planos como fondo de un botón/card fuera de la paleta
+  de la sección 1 (nada de `bg-blue-500`, `bg-gray-800`, etc. — son de
+  otro sistema de diseño y no van a combinar).
+- ❌ Envolver cada card individualmente con un listener de mouse para el
+  brillo — ya es automático (sección 5), no lo repitas.
