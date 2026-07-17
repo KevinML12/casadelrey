@@ -11,8 +11,8 @@ const EMPTY = {
   requires_payment: false, price_gtq: '', payment_deadline: '',
 };
 
-function EventForm({ onSave, onCancel, loading }) {
-  const [form, setForm] = useState(EMPTY);
+function EventForm({ initial, onSave, onCancel, loading }) {
+  const [form, setForm] = useState({ ...EMPTY, ...initial });
   const [uploading, setUploading] = useState(false);
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -45,7 +45,7 @@ function EventForm({ onSave, onCancel, loading }) {
   return (
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
-        <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Nuevo evento</p>
+        <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">{initial?.ID ? 'Editar evento' : 'Nuevo evento'}</p>
         <IconButton onClick={onCancel}>
           <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
         </IconButton>
@@ -100,7 +100,7 @@ function EventForm({ onSave, onCancel, loading }) {
         <div className="flex gap-3 pt-2 border-t border-bg/10">
           <Button variant="filled" onClick={handleSubmit} disabled={loading || !form.title || uploading}>
             <Icon name="check" className="w-[16px] h-[16px]" stroke={1.8} />
-            {loading ? 'Guardando…' : 'Guardar evento'}
+            {loading ? 'Guardando…' : initial?.ID ? 'Guardar cambios' : 'Guardar evento'}
           </Button>
           <Button variant="text" onClick={onCancel}>Cancelar</Button>
         </div>
@@ -138,7 +138,7 @@ function EventRSVPs({ eventId }) {
   useEffect(() => {
     apiClient.get(`/admin/events/${eventId}/rsvps`)
       .then(r => {
-        const data = r.data?.rsvps || [];
+        const data = r.data?.data || [];
         setRsvps(data);
         setTotAtts(r.data?.total_attendees || data.reduce((s, x) => s + (x.attendee_count || 1), 0));
       })
@@ -187,6 +187,7 @@ export default function AdminEvents() {
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editing,  setEditing]  = useState(null);
   const [expanded, setExpanded] = useState(null);
 
   // /events/ es el endpoint PÚBLICO con Cache-Control de 20s (para que la
@@ -208,9 +209,15 @@ export default function AdminEvents() {
   const handleSave = async (form) => {
     setSaving(true);
     try {
-      await apiClient.post('/admin/events/', form);
-      toast.success('Evento creado');
+      if (editing) {
+        await apiClient.put(`/admin/events/${editing.ID}`, form);
+        toast.success('Evento actualizado');
+      } else {
+        await apiClient.post('/admin/events/', form);
+        toast.success('Evento creado');
+      }
       setShowForm(false);
+      setEditing(null);
       load();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al guardar');
@@ -241,7 +248,7 @@ export default function AdminEvents() {
           </div>
         </div>
         {!showForm && (
-          <Button variant="filled" onClick={() => setShowForm(true)}>
+          <Button variant="filled" onClick={() => { setEditing(null); setShowForm(true); }}>
             <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nuevo evento
           </Button>
@@ -249,7 +256,8 @@ export default function AdminEvents() {
       </div>
 
       {showForm && (
-        <EventForm onSave={handleSave} onCancel={() => setShowForm(false)} loading={saving} />
+        <EventForm initial={editing} onSave={handleSave}
+          onCancel={() => { setShowForm(false); setEditing(null); }} loading={saving} />
       )}
 
       {loading ? <Spinner /> : events.length === 0 ? (
@@ -304,8 +312,14 @@ export default function AdminEvents() {
                     <Icon name="expand_more" className="w-[18px] h-[18px]" stroke={1.8} />
                   </span>
                   <IconButton
+                    onClick={(e) => { e.stopPropagation(); setEditing(ev); setShowForm(true); }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-bg/50 hover:text-bg hover:bg-bg/8"
+                  >
+                    <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
+                  </IconButton>
+                  <IconButton
                     onClick={(e) => { e.stopPropagation(); handleDelete(ev.ID); }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-bg/50 hover:text-err hover:bg-err-con"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-bg/50 hover:text-rose hover:bg-rose/8"
                   >
                     <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
                   </IconButton>
