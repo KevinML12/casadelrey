@@ -253,10 +253,12 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
 
 function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
   const nodeRef = useRef(null);
-  // Antes, sin cover_image, caia a la MISMA foto stock generica en todos
-  // los eventos sin foto -- se sentia repetido/falso. Ahora esos eventos
-  // muestran la card entera en liquid-glass (sin foto), con un resplandor
-  // ambiental detras en vez de una imagen prestada.
+  // Antes, sin cover_image, la card caia a glass-light (blanco/tinta navy) --
+  // mezclada con las cards CON foto (liquid-glass oscuro) en el mismo grid,
+  // se leian como dos estilos distintos sin motivo real (glass-light es
+  // para UN acento por pagina, no un material repetido). Ahora TODA card
+  // es liquid-glass -- con o sin foto -- y lo que de verdad se clasifica
+  // visualmente es gratis vs. pagado (badge), no si el admin subio flyer.
   const hasPhoto = Boolean(ev.cover_image);
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
@@ -269,16 +271,15 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
     .join(' · ');
   const bentoSpan = GRID_SPANS[i % GRID_SPANS.length];
 
-  // Sin foto la card es glass-light (blanco), con foto sigue siendo el
-  // liquid-glass oscuro de siempre -- la tinta cambia con el material.
-  const ink        = hasPhoto ? 'text-white'      : 'text-bg';
-  const ink80      = hasPhoto ? 'text-white/80'    : 'text-bg/70';
-  const ink60      = hasPhoto ? 'text-white/60'    : 'text-bg/55';
-  const ink50      = hasPhoto ? 'text-white/50'    : 'text-bg/45';
-  const ink40      = hasPhoto ? 'text-white/40'    : 'text-bg/40';
-  const ink35      = hasPhoto ? 'text-white/35'    : 'text-bg/35';
-  const wellBg     = hasPhoto ? 'bg-white/5'       : 'bg-bg/6';
-  const wellBorder = hasPhoto ? 'border-white/10'  : 'border-bg/10';
+  // Tinta blanca siempre -- todas las cards son liquid-glass oscuro ahora.
+  const ink        = 'text-white';
+  const ink80      = 'text-white/80';
+  const ink60      = 'text-white/60';
+  const ink50      = 'text-white/50';
+  const ink40      = 'text-white/40';
+  const ink35      = 'text-white/35';
+  const wellBg     = 'bg-white/5';
+  const wellBorder = 'border-white/10';
 
   return (
     <motion.div
@@ -289,7 +290,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={isCarousel ? undefined : { transformPerspective: 1000 }}
-      className={`${isCarousel ? 'snap-start' : bentoSpan} w-full h-full liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'glass-light'} ${isCarousel ? 'shadow-card-lg' : ''} transition-shadow`}
+      className={`${isCarousel ? 'snap-start' : bentoSpan} w-full h-full liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'liquid-glass'} ${isCarousel ? 'shadow-card-lg' : ''} transition-shadow`}
     >
 
       {hasPhoto && (
@@ -350,22 +351,25 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
           )}
 
           <div className={`shrink-0 flex flex-col gap-3 w-full pt-3 border-t ${wellBorder}`}>
-            {(ev.requires_payment || ev.spots_remaining != null) && (
-              <div className="flex flex-wrap gap-2">
-                {ev.requires_payment && (
-                  <span className={`font-bold text-[12px] ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
-                    Q{Number(ev.price_gtq).toFixed(0)}
-                  </span>
-                )}
-                {ev.spots_remaining != null && (
-                  <span className={`font-bold text-[12px] flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
-                    ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : `${ink80} ${wellBg} ${wellBorder}`
-                  }`}>
-                    {ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupo${ev.spots_remaining === 1 ? '' : 's'} disponible${ev.spots_remaining === 1 ? '' : 's'}`}
-                  </span>
-                )}
-              </div>
-            )}
+            {/* Gratis vs. pagado: la clasificación real de la card, siempre visible */}
+            <div className="flex flex-wrap gap-2">
+              {ev.requires_payment ? (
+                <span className={`font-bold text-[12px] ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
+                  Q{Number(ev.price_gtq).toFixed(0)}
+                </span>
+              ) : (
+                <span className={`font-bold text-[12px] ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
+                  Gratis
+                </span>
+              )}
+              {ev.spots_remaining != null && (
+                <span className={`font-bold text-[12px] flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
+                  ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : `${ink80} ${wellBg} ${wellBorder}`
+                }`}>
+                  {ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupo${ev.spots_remaining === 1 ? '' : 's'} disponible${ev.spots_remaining === 1 ? '' : 's'}`}
+                </span>
+              )}
+            </div>
             <motion.button
               whileHover={ev.is_full ? undefined : { scale: 1.03 }}
               whileTap={ev.is_full ? undefined : { scale: 0.95 }}
@@ -375,9 +379,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
               className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
                 ev.is_full
                   ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
-                  : hasPhoto
-                    ? 'liquid-glass text-white hover:border-white/30'
-                    : 'bg-white text-bg shadow-card hover:opacity-90'
+                  : 'liquid-glass text-white hover:border-white/30'
               }`}
             >
               {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
@@ -386,7 +388,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
             <button
               type="button"
               onClick={() => onCancelRsvp(ev)}
-              className={`${ink35} ${hasPhoto ? 'hover:text-white/60' : 'hover:text-bg/60'} text-[11.5px] font-medium transition-colors self-center`}
+              className={`${ink35} hover:text-white/60 text-[11.5px] font-medium transition-colors self-center`}
             >
               ¿Ya te registraste? Cancelar mi registro
             </button>
