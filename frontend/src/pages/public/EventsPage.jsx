@@ -3,14 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon, Eyebrow, GlassButton } from '../../components/ui/Glass';
+import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
-import BankDetails from '../../components/sections/BankDetails';
+import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-white/15 bg-white/5 text-[14px] text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all';
+// El modal de RSVP es glass-light (blanco/translucido) -- .input-light es
+// el mismo campo claro del panel admin/VolunteeringPage, funciona igual
+// de bien aca. btnPrimary/btnGhost reemplazan a GlassButton (esa es
+// oscura/liquid-glass, pensada para el fondo navy del sitio publico).
+const btnPrimary = 'flex-1 justify-center inline-flex items-center gap-2 rounded-full bg-bg text-white text-[14px] font-bold px-5 py-3 shadow-card hover:opacity-90 disabled:opacity-50 transition-opacity';
+const btnGhost = 'inline-flex items-center justify-center gap-2 rounded-full text-bg/55 hover:text-bg hover:bg-bg/5 text-[14px] font-semibold px-5 py-3 transition-colors';
 
 // Collage estilo Galería para la vista de cuadrícula: variedad de tamaños
 // para TODOS los eventos (no solo el primero), con [grid-auto-flow:dense]
@@ -22,19 +27,52 @@ const GRID_SPANS = [
   'col-span-2 row-span-1',
 ];
 
+// BankDetails.jsx es texto blanco a proposito -- lo comparten Donar y
+// Comprobante, paginas oscuras. Aca el modal es claro, asi que se
+// reusa solo el hook (useBankInfo) y se renderiza con tinta navy en
+// vez de tocar el componente compartido.
+function LightBankDetails() {
+  const { hasAccount, rows, whatsapp } = useBankInfo();
+
+  if (!hasAccount) {
+    const href = whatsapp ? `https://wa.me/${whatsapp.replace(/\D/g, '')}` : '/conectate';
+    return (
+      <a
+        href={href}
+        {...(whatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        className="block rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4 text-center hover:bg-bg/10 transition-colors focus-ring"
+      >
+        <p className="text-[14px] font-bold text-bg">Escríbenos para coordinar tu depósito</p>
+        <p className="text-[12.5px] text-bg/55 mt-1">Te compartimos los datos bancarios al momento</p>
+      </a>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {rows.map(({ label, value }) => (
+        <div key={label} className="flex items-center justify-between rounded-[12px] bg-bg/5 px-4 py-3 border border-bg/10">
+          <span className="text-[12.5px] font-semibold text-bg/60">{label}</span>
+          <span className="text-[14.5px] font-bold text-bg">{value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PaymentBanner({ event }) {
   return (
-    <div className="rounded-[18px] border border-white/12 bg-white/5 p-4 space-y-3 mb-4">
+    <div className="rounded-[18px] border border-bg/12 bg-bg/5 p-4 space-y-3 mb-4">
       <div className="flex items-center justify-between">
-        <p className="text-[12px] text-white/70 font-bold uppercase tracking-wide">Evento con costo</p>
-        <span className="text-[22px] text-white font-black">Q{Number(event.price_gtq).toFixed(2)}</span>
+        <p className="text-[12px] text-bg/70 font-bold uppercase tracking-wide">Evento con costo</p>
+        <span className="text-[22px] text-bg font-black">Q{Number(event.price_gtq).toFixed(2)}</span>
       </div>
-      <p className="text-[13.5px] text-white/60">
+      <p className="text-[13.5px] text-bg/60">
         Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
       </p>
       {/* Datos bancarios administrables (nunca un número inventado) */}
-      <div className="pt-1 border-t border-white/10">
-        <BankDetails />
+      <div className="pt-1 border-t border-bg/10">
+        <LightBankDetails />
       </div>
       {event.payment_deadline && (
         <p className="text-[12.5px] text-rose flex items-center gap-1.5">
@@ -91,12 +129,12 @@ function RSVPModal({ event, onClose }) {
   if (step === 'success') return (
     <ModalWrapper onClose={onClose}>
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-4">
-          <Icon name="check" className="w-7 h-7 text-white" stroke={2} />
+        <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
+          <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
         </div>
-        <h3 className="text-[19px] text-white font-bold mb-2">¡Registro confirmado!</h3>
-        <p className="text-[14px] text-white/60">{successMsg}</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full liquid-glass text-white text-[14px] font-semibold">
+        <h3 className="text-[19px] text-bg font-bold mb-2">¡Registro confirmado!</h3>
+        <p className="text-[14px] text-bg/60">{successMsg}</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
           Listo
         </button>
       </div>
@@ -107,13 +145,13 @@ function RSVPModal({ event, onClose }) {
   if (step === 'pending_payment') return (
     <ModalWrapper onClose={onClose}>
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-4">
-          <Icon name="clock" className="w-7 h-7 text-white" />
+        <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
+          <Icon name="clock" className="w-7 h-7 text-bg" />
         </div>
-        <h3 className="text-[19px] text-white font-bold mb-2">Registro recibido</h3>
-        <p className="text-[14px] text-white/60 mb-1">Tu comprobante está pendiente de verificación.</p>
-        <p className="text-[14px] text-white/60">Recibirás confirmación cuando sea aprobado.</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full liquid-glass text-white text-[14px] font-semibold">
+        <h3 className="text-[19px] text-bg font-bold mb-2">Registro recibido</h3>
+        <p className="text-[14px] text-bg/60 mb-1">Tu comprobante está pendiente de verificación.</p>
+        <p className="text-[14px] text-bg/60">Recibirás confirmación cuando sea aprobado.</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
           Entendido
         </button>
       </div>
@@ -129,22 +167,22 @@ function RSVPModal({ event, onClose }) {
             <Icon name="book" className="w-5 h-5 text-rose" />
           </div>
           <div>
-            <h3 className="text-[16px] text-white font-bold">Comprobante requerido</h3>
-            <p className="text-[13.5px] text-white/60">Debes pagar antes de registrarte.</p>
+            <h3 className="text-[16px] text-bg font-bold">Comprobante requerido</h3>
+            <p className="text-[13.5px] text-bg/60">Debes pagar antes de registrarte.</p>
           </div>
         </div>
 
         <PaymentBanner event={event} />
-        <p className="text-[13.5px] text-white/60">
+        <p className="text-[13.5px] text-bg/60">
           Después de depositar, sube la foto de tu comprobante. Una vez verificado, vuelve aquí para completar tu registro.
         </p>
         <button onClick={goToReceipt}
-          className="w-full flex items-center justify-center gap-2 h-11 rounded-full liquid-glass text-white text-[14px] font-semibold">
+          className="w-full flex items-center justify-center gap-2 h-11 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
           <Icon name="arrow" className="w-4 h-4 -rotate-90" />
           Subir mi comprobante
         </button>
         <button onClick={() => setStep('form')}
-          className="w-full h-10 rounded-full border border-white/15 text-[14px] text-white/60 hover:text-white hover:bg-white/5 transition-colors">
+          className="w-full h-10 rounded-full border border-bg/15 text-[14px] text-bg/60 hover:text-bg hover:bg-bg/5 transition-colors">
           Ya lo subí, intentar de nuevo
         </button>
       </div>
@@ -155,48 +193,48 @@ function RSVPModal({ event, onClose }) {
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-[12px] text-white font-bold uppercase tracking-wide">Confirmar asistencia</p>
-          <p className="text-[13.5px] text-white/60 mt-0.5 truncate max-w-64">{event.title}</p>
+          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Confirmar asistencia</p>
+          <p className="text-[13.5px] text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
         </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-          <Icon name="close" className="w-4 h-4 text-white/60" />
+        <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
+          <Icon name="close" className="w-4 h-4 text-bg/60" />
         </button>
       </div>
       {event.requires_payment && <PaymentBanner event={event} />}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-[12px] font-bold text-white/60 mb-1">Nombre <span className="text-rose">*</span></label>
-          <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
+          <label className="block text-[12px] font-bold text-bg/60 mb-1">Nombre <span className="text-rose">*</span></label>
+          <input value={form.name} onChange={set('name')} className="input-light" placeholder="Tu nombre completo" required />
         </div>
         <div>
-          <label className="block text-[12px] font-bold text-white/60 mb-1">Correo <span className="text-rose">*</span></label>
-          <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="El mismo correo del comprobante" required />
+          <label className="block text-[12px] font-bold text-bg/60 mb-1">Correo <span className="text-rose">*</span></label>
+          <input type="email" value={form.email} onChange={set('email')} className="input-light" placeholder="El mismo correo del comprobante" required />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[12px] font-bold text-white/60 mb-1">Teléfono</label>
-            <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" />
+            <label className="block text-[12px] font-bold text-bg/60 mb-1">Teléfono</label>
+            <input value={form.phone} onChange={set('phone')} className="input-light" placeholder="+502 …" />
           </div>
           <div>
-            <label className="block text-[12px] font-bold text-white/60 mb-1">Asistentes</label>
-            <input type="number" min={1} max={event.spots_remaining ?? 20} value={form.attendee_count} onChange={set('attendee_count')} className={fieldCls} />
+            <label className="block text-[12px] font-bold text-bg/60 mb-1">Asistentes</label>
+            <input type="number" min={1} max={event.spots_remaining ?? 20} value={form.attendee_count} onChange={set('attendee_count')} className="input-light" />
             {event.spots_remaining != null && (
-              <p className="text-[11px] text-white/40 mt-1">
+              <p className="text-[11px] text-bg/40 mt-1">
                 {event.spots_remaining} cupo{event.spots_remaining === 1 ? '' : 's'} disponible{event.spots_remaining === 1 ? '' : 's'}
               </p>
             )}
           </div>
         </div>
         <div>
-          <label className="block text-[12px] font-bold text-white/60 mb-1">Notas</label>
-          <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${fieldCls} resize-none`} placeholder="¿Algo que debamos saber?" />
+          <label className="block text-[12px] font-bold text-bg/60 mb-1">Notas</label>
+          <textarea rows={2} value={form.notes} onChange={set('notes')} className="input-light resize-none" placeholder="¿Algo que debamos saber?" />
         </div>
-        <div className="flex gap-3 pt-2 border-t border-white/10">
-          <GlassButton type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
+        <div className="flex gap-3 pt-2 border-t border-bg/10">
+          <button type="submit" disabled={loading} className={btnPrimary}>
             <Icon name="check" className="w-4 h-4" stroke={2} />
             {loading ? 'Verificando…' : event.requires_payment ? 'Verificar y registrar' : 'Confirmar asistencia'}
-          </GlassButton>
-          <GlassButton type="button" variant="ghost" onClick={onClose}>Cancelar</GlassButton>
+          </button>
+          <button type="button" onClick={onClose} className={btnGhost}>Cancelar</button>
         </div>
       </form>
     </ModalWrapper>
@@ -228,23 +266,23 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-[12px] text-white font-bold uppercase tracking-wide">Cancelar registro</p>
-          <p className="text-[13.5px] text-white/60 mt-0.5 truncate max-w-64">{event.title}</p>
+          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Cancelar registro</p>
+          <p className="text-[13.5px] text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
         </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-          <Icon name="close" className="w-4 h-4 text-white/60" />
+        <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
+          <Icon name="close" className="w-4 h-4 text-bg/60" />
         </button>
       </div>
       <form onSubmit={handleCancel} className="space-y-3">
         <div>
-          <label className="block text-[12px] font-bold text-white/60 mb-1">Correo con el que te registraste</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className={fieldCls} placeholder="tu@correo.com" required autoFocus />
+          <label className="block text-[12px] font-bold text-bg/60 mb-1">Correo con el que te registraste</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-light" placeholder="tu@correo.com" required autoFocus />
         </div>
-        <div className="flex gap-3 pt-2 border-t border-white/10">
-          <GlassButton type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
+        <div className="flex gap-3 pt-2 border-t border-bg/10">
+          <button type="submit" disabled={loading} className={btnPrimary}>
             {loading ? 'Cancelando…' : 'Cancelar mi registro'}
-          </GlassButton>
-          <GlassButton type="button" variant="ghost" onClick={onClose}>Volver</GlassButton>
+          </button>
+          <button type="button" onClick={onClose} className={btnGhost}>Volver</button>
         </div>
       </form>
     </ModalWrapper>
@@ -405,7 +443,7 @@ function ModalWrapper({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div
-        className="liquid-glass border border-white/20 w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-white"
+        className="glass-light w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-bg"
         style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
         onClick={e => e.stopPropagation()}
       >
@@ -506,18 +544,33 @@ export default function EventsPage() {
           </div>
         ) : (
           /* ── Contenedor de Eventos ── */
-          <motion.div ref={scrollRef} layout className={viewMode === 'carousel'
-            ? "grid grid-flow-col grid-rows-[repeat(2,350px)] sm:grid-rows-[repeat(2,380px)] auto-cols-[300px] sm:auto-cols-[340px] gap-5 overflow-x-auto snap-x snap-mandatory pb-12 pr-6 md:pr-12 hide-scrollbar"
-            : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-5 [grid-auto-flow:dense]"
-          }
-          style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
-
-            <AnimatePresence>
-            {events.map((ev, i) => (
-              <EventCard key={`${ev.ID}-${viewMode}`} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
-            ))}
-            </AnimatePresence>
-          </motion.div>
+          /* key={viewMode} en el contenedor (no en cada card): al alternar
+             cuadricula/carrusel, el contenedor VIEJO (con sus cards viejas,
+             clasificadas para el grid template anterior) debe desmontarse
+             POR COMPLETO antes de que el nuevo monte -- si coexistian como
+             hijos del mismo grid (como pasaba antes, con solo la key de
+             cada card sufijada), el grid intentaba ubicar cards viejas y
+             nuevas a la vez con templates distintos y el resultado se veia
+             roto/superpuesto. mode="wait" fuerza esa secuencia. */
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={viewMode}
+              ref={scrollRef}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className={viewMode === 'carousel'
+                ? "grid grid-flow-col grid-rows-[repeat(2,350px)] sm:grid-rows-[repeat(2,380px)] auto-cols-[300px] sm:auto-cols-[340px] gap-5 overflow-x-auto snap-x snap-mandatory pb-12 pr-6 md:pr-12 hide-scrollbar"
+                : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-5 [grid-auto-flow:dense]"
+              }
+              style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}
+            >
+              {events.map((ev, i) => (
+                <EventCard key={ev.ID} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
+              ))}
+            </motion.div>
+          </AnimatePresence>
         )}
       </motion.div>
 
