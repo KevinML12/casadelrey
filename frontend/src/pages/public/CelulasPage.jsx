@@ -119,7 +119,7 @@ export default function CelulasPage() {
     const byKey = {};
     apiCells.forEach(c => {
       const key = TYPE_TO_KEY[(c.type || '').toLowerCase()] || 'otros';
-      (byKey[key] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code });
+      (byKey[key] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code, description: c.description });
     });
     return withImages.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
   }, [apiCells, apiCategories]);
@@ -270,28 +270,37 @@ export default function CelulasPage() {
                     transition={{ delay: 0.06 + i * 0.035 }}
                     whileHover={{ y: -3, scale: 1.02 }}
                     glass
-                    className="liquid-glass group rounded-[16px] p-4 flex items-center gap-3.5 grow basis-[240px] focus-ring cursor-pointer"
+                    className="liquid-glass group rounded-[16px] p-4 flex flex-col gap-3 grow basis-[260px] focus-ring cursor-pointer"
                   >
-                    {dir?.photo_url ? (
-                      <img src={dir.photo_url} alt={c.leader}
-                        className="w-10 h-10 rounded-full object-cover border border-white/20 shrink-0" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
-                        <Icon name="users" className="w-5 h-5" />
+                    <div className="flex items-center gap-3.5">
+                      {dir?.photo_url ? (
+                        <img src={dir.photo_url} alt={c.leader}
+                          className="w-10 h-10 rounded-full object-cover border border-white/20 shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
+                          <Icon name="users" className="w-5 h-5" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-bold text-white leading-tight truncate">{c.name}</p>
+                        <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">
+                          {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
+                        </p>
                       </div>
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-bold text-white leading-tight truncate">{c.name}</p>
-                      <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">
-                        {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
-                      </p>
+                      {c.zone && (
+                        <span className="shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
+                          {c.zone}
+                        </span>
+                      )}
+                      <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
+                        <Icon name="arrow" className="w-4 h-4" />
+                      </span>
                     </div>
-                    <span className="ml-auto shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
-                      {c.zone}
-                    </span>
-                    <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
-                      <Icon name="arrow" className="w-4 h-4" />
-                    </span>
+                    {c.description && (
+                      <p className="text-[13px] text-white/55 leading-relaxed line-clamp-2 pt-3 border-t border-white/10">
+                        {c.description}
+                      </p>
+                    )}
                   </Tilt>
                   );
                 })}

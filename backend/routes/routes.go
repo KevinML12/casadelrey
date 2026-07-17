@@ -211,6 +211,12 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.POST("/cell-categories",     cellCategoryHandler.CreateCellCategory)
 	adminGroup.PUT("/cell-categories/:id",  cellCategoryHandler.UpdateCellCategoryImage)
 
+	// Células individuales — admin (antes solo existían hardcodeadas en el frontend)
+	adminGroup.GET("/cells",       cellCategoryHandler.GetAllCellsAdmin)
+	adminGroup.POST("/cells",      cellCategoryHandler.CreateCell)
+	adminGroup.PUT("/cells/:id",   cellCategoryHandler.UpdateCell)
+	adminGroup.DELETE("/cells/:id", cellCategoryHandler.DeleteCell)
+
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)
 

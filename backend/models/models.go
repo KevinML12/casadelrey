@@ -29,14 +29,15 @@ type User struct {
 // Cell normaliza las células. Evita repetir código/nombre/tipo en cada reporte.
 type Cell struct {
 	gorm.Model
-	Code     string `json:"code" gorm:"type:varchar(10);unique;not null"` // H1, M2, J3…
-	Name     string `json:"name" gorm:"type:varchar(100);not null"`
-	Type     string `json:"type" gorm:"type:varchar(20);not null"` // hombres|mujeres|jovenes|prejus|ninos
-	LeaderID uint   `json:"leader_id" gorm:"index;not null"`
-	PastorID *uint  `json:"pastor_id" gorm:"index"`
-	Zone     string `json:"zone" gorm:"type:varchar(80)"` // zona/sector aproximado — lo ÚNICO de ubicación que va público
-	IsActive bool   `json:"is_active" gorm:"default:true"`
-	Leader   User   `json:"leader" gorm:"foreignKey:LeaderID"`
+	Code        string `json:"code" gorm:"type:varchar(10);unique;not null"` // H1, M2, J3…
+	Name        string `json:"name" gorm:"type:varchar(100);not null"`
+	Type        string `json:"type" gorm:"type:varchar(20);not null"` // hombres|mujeres|jovenes|prejus|ninos
+	Description string `json:"description" gorm:"type:text"`
+	LeaderID    uint   `json:"leader_id" gorm:"index;not null"`
+	PastorID    *uint  `json:"pastor_id" gorm:"index"`
+	Zone        string `json:"zone" gorm:"type:varchar(80)"` // zona/sector aproximado — lo ÚNICO de ubicación que va público
+	IsActive    bool   `json:"is_active" gorm:"default:true"`
+	Leader      User   `json:"leader" gorm:"foreignKey:LeaderID"`
 }
 
 // CellCategory agrupa células por tipos (Adolescentes, Jóvenes, Varones, Mujeres, etc.)

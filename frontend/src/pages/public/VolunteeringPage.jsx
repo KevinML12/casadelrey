@@ -7,6 +7,7 @@ import Tilt from '../../components/ui/Tilt';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import apiClient from '../../lib/apiClient';
 import { useSitePhoto } from '../../lib/feed';
+import { VOLUNTEER_AREAS as AREAS } from '../../lib/volunteerAreas';
 import toast from 'react-hot-toast';
 
 const PRESS = {
@@ -14,20 +15,6 @@ const PRESS = {
   whileTap: { scale: 0.96 },
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
-
-// Los 10 departamentos reales de voluntariado (CONTEXTO_IGLESIA jul-2026)
-const AREAS = [
-  { value: 'alabanza',               icon: 'mic',         title: 'Alabanza',                desc: 'Lidera la adoración y la música en los servicios y células.' },
-  { value: 'danza',                  icon: 'spark',       title: 'Danza',                   desc: 'Expresa la adoración a través del movimiento en los servicios.' },
-  { value: 'servidores',             icon: 'heart',       title: 'Servidores',              desc: 'Recibe a cada persona; cuida la recepción y la limpieza de la iglesia.' },
-  { value: 'protocolo',              icon: 'crown',       title: 'Protocolo',               desc: 'Atención VIP a políticos, pastores invitados y personas de alto nivel.' },
-  { value: 'pancartas',              icon: 'flag',        title: 'Pancartas',               desc: 'Porta y coordina las pancartas durante los días de culto.' },
-  { value: 'maestros_ninos',         icon: 'book',        title: 'Maestros de Niños',       desc: 'Enseña e inspira a los más pequeños con creatividad y amor.' },
-  { value: 'tecnicos_audiovisuales', icon: 'headphones',  title: 'Técnicos Audiovisuales',  desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.' },
-  { value: 'multimedia',             icon: 'camera',      title: 'Multimedia',              desc: 'Diseño gráfico, video y redes sociales para la comunicación de la iglesia.' },
-  { value: 'oracion',                icon: 'pray',        title: 'Oración',                 desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
-  { value: 'logistica',              icon: 'box',         title: 'Logística',               desc: 'Coordina recursos, transporte y organización de eventos y servicios.' },
-];
 
 function VolunteerForm({ preselected, onClearPreselected }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', department: preselected || '', message: '' });

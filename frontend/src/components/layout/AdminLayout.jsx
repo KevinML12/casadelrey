@@ -39,6 +39,7 @@ const NAV_GROUPS = [
     items: [
       { to: '/admin/users',         icon: 'manage_accounts',    label: 'Usuarios' },
       { to: '/admin/leaders',       icon: 'badge',              label: 'Líderes' },
+      { to: '/admin/cells',         icon: 'groups',             label: 'Células' },
       { to: '/admin/volunteers',    icon: 'group_add',          label: 'Voluntarios',  badge: 'pending_volunteers' },
       { to: '/admin/connect-cards', icon: 'contact_page',       label: 'Conéctate',    badge: 'pending_connect_cards' },
       { to: '/admin/petitions',     icon: 'volunteer_activism', label: 'Peticiones',   badge: 'unread_petitions' },
