@@ -195,7 +195,7 @@ export default function AdminBoletas() {
       {/* Formulario inline */}
       {showForm && (
         <div className="glass-light rounded-[24px] card-spring mb-8 p-6">
-          <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-5">Registrar nuevo miembro</p>
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest mb-5">Registrar nuevo miembro</p>
           <BoletaForm onSave={() => { setShowForm(false); refresh(); }} onCancel={() => setShowForm(false)} />
         </div>
       )}

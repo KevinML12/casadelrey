@@ -45,7 +45,7 @@ function EventForm({ onSave, onCancel, loading }) {
   return (
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Nuevo evento</p>
+        <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Nuevo evento</p>
         <IconButton onClick={onCancel}>
           <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
         </IconButton>

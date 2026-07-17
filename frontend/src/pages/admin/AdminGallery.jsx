@@ -128,7 +128,7 @@ export default function AdminGallery() {
 
       {showForm && (
         <div className="glass-light rounded-[24px] card-spring mb-8 p-6">
-          <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-5">Nueva foto</p>
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest mb-5">Nueva foto</p>
           <PhotoForm onSave={() => { setShowForm(false); load(1); setPage(1); }} onCancel={() => setShowForm(false)} />
         </div>
       )}

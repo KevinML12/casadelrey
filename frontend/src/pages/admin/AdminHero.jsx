@@ -3,13 +3,19 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
 
+// Nota importante: el hero público (Home.jsx) NO tiene botón secundario —
+// solo lee cta_primary_text/cta_primary_url (como "ctaText"/"ctaUrl"). Los
+// campos cta_secondary_* de este formulario NUNCA se renderizaron en el
+// sitio — un admin los llenaba pensando que agregaban un segundo botón y
+// no pasaba nada. Se eliminan del formulario en vez de dejarlos ahí sin
+// función (bug real encontrado al comparar esta preview contra Home.jsx).
+
 const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = {
   label_top: '', title_line_1: '', title_line_2: '', verse_reference: '',
   subtitle: '', schedule_text: '',
   cta_primary_text: '', cta_primary_url: '/events',
-  cta_secondary_text: '', cta_secondary_url: '/about',
   background_image_url: '', overlay_color: '#060D24', overlay_opacity: 50,
 };
 
@@ -23,14 +29,20 @@ function Field({ label, hint, children }) {
   );
 }
 
-// Preview en vivo del hero
+// Preview en vivo del hero — replica EXACTAMENTE cómo Home.jsx renderiza
+// el slide real (mismo texto blanco sin colores inventados, misma fusión
+// de horario+versículo, mismo botón liquid-glass): antes tenía un morado
+// #7C3AED que no existe en ningún lado del sitio y una línea 2 con
+// contorno que Home.jsx dejó de usar hace tiempo — la vista previa llevaba
+// meses sin coincidir con lo que ve un visitante real.
 function HeroPreview({ data }) {
+  const schedule = [data.schedule_text, data.verse_reference].filter(Boolean).join(' · ');
   return (
     <div className="rounded-2xl overflow-hidden border border-bg/10 relative aspect-video">
       {/* Background */}
       <div className="absolute inset-0" style={{
         backgroundImage: data.background_image_url ? `url(${data.background_image_url})` : 'none',
-        backgroundColor: data.background_image_url ? 'transparent' : '#060D24',
+        backgroundColor: data.background_image_url ? 'transparent' : '#0A1526',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }} />
@@ -43,47 +55,36 @@ function HeroPreview({ data }) {
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center px-8 py-6">
         {data.label_top && (
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] mb-3" style={{ color: '#7C3AED' }}>
+          <p className="text-white/80 text-[11px] font-semibold mb-2">
             {data.label_top}
           </p>
         )}
-        {data.verse_reference && (
-          <p className="absolute top-4 right-6 text-[9px] font-mono tracking-[0.2em]" style={{ color: '#7C3AED' }}>
-            {data.verse_reference}
-          </p>
-        )}
-        <h1 className="text-ink font-black leading-[0.95]" style={{
+        <h1 className="text-white font-black leading-[0.95]" style={{
           fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
           letterSpacing: '-0.04em',
         }}>
           {data.title_line_1 || 'LUZ PARA'}
         </h1>
-        <h1 className="font-black leading-[0.95] ml-8" style={{
-          fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-          letterSpacing: '-0.04em',
-          color: 'transparent',
-          WebkitTextStroke: '1.5px white',
-        }}>
-          {data.title_line_2 || 'LAS NACIONES'}
-        </h1>
+        {data.title_line_2 && (
+          <h1 className="text-white font-black leading-[0.95]" style={{
+            fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+            letterSpacing: '-0.04em',
+          }}>
+            {data.title_line_2}
+          </h1>
+        )}
         {data.subtitle && (
-          <p className="text-ink/80 text-xs mt-3">{data.subtitle}</p>
+          <p className="text-white/80 text-xs mt-3">{data.subtitle}</p>
         )}
-        {data.schedule_text && (
-          <p className="text-ink/60 text-[10px] uppercase tracking-widest mt-1">{data.schedule_text}</p>
+        {schedule && (
+          <p className="text-white/60 text-[10px] font-semibold mt-1">{schedule}</p>
         )}
-        <div className="flex gap-2 mt-3">
-          {data.cta_primary_text && (
-            <span className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-ink" style={{ background: '#7C3AED' }}>
-              {data.cta_primary_text}
-            </span>
-          )}
-          {data.cta_secondary_text && (
-            <span className="px-3 py-1.5 text-[10px] font-semibold text-ink/80">
-              {data.cta_secondary_text} →
-            </span>
-          )}
-        </div>
+        {data.cta_primary_text && (
+          <div className="mt-3 inline-flex w-fit items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass text-white text-[10px] font-bold">
+            {data.cta_primary_text}
+            <Icon name="arrow" className="w-3 h-3" stroke={2.2} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -136,22 +137,22 @@ function HeroForm({ initial, onSave, onCancel }) {
 
         {/* Textos */}
         <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
-          <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Textos</p>
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Textos</p>
 
           <Field label="Label superior" hint='Ej. "● IGLESIA CRISTIANA · HUEHUETENANGO"'>
             <input value={form.label_top} onChange={set('label_top')} className={fieldCls} placeholder="● IGLESIA CRISTIANA · HUEHUETENANGO" />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Título línea 1 *" hint="Sólido, peso 900">
+            <Field label="Título línea 1 *">
               <input value={form.title_line_1} onChange={set('title_line_1')} className={fieldCls} placeholder="LUZ PARA" required />
             </Field>
-            <Field label="Título línea 2" hint="Outline">
+            <Field label="Título línea 2" hint="Opcional">
               <input value={form.title_line_2} onChange={set('title_line_2')} className={fieldCls} placeholder="LAS NACIONES" />
             </Field>
           </div>
 
-          <Field label="Versículo (esquina superior derecha)">
+          <Field label="Versículo" hint="Se muestra junto al horario, ej. «Domingos 10am · MATEO 5:14»">
             <input value={form.verse_reference} onChange={set('verse_reference')} className={fieldCls} placeholder="MATEO 5:14" />
           </Field>
 
@@ -164,30 +165,22 @@ function HeroForm({ initial, onSave, onCancel }) {
           </Field>
         </div>
 
-        {/* CTAs */}
+        {/* CTA — el hero público solo soporta UN botón */}
         <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
-          <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Botones</p>
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Botón</p>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Botón primario texto">
+            <Field label="Texto">
               <input value={form.cta_primary_text} onChange={set('cta_primary_text')} className={fieldCls} placeholder="Ver próximos eventos" />
             </Field>
-            <Field label="Botón primario URL">
+            <Field label="URL">
               <input value={form.cta_primary_url} onChange={set('cta_primary_url')} className={fieldCls} placeholder="/events" />
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Botón secundario texto">
-              <input value={form.cta_secondary_text} onChange={set('cta_secondary_text')} className={fieldCls} placeholder="Conócenos" />
-            </Field>
-            <Field label="Botón secundario URL">
-              <input value={form.cta_secondary_url} onChange={set('cta_secondary_url')} className={fieldCls} placeholder="/about" />
             </Field>
           </div>
         </div>
 
         {/* Visual */}
         <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
-          <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Imagen de fondo</p>
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Imagen de fondo</p>
 
           <Field label="Foto del hero">
             {form.background_image_url ? (

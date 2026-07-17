@@ -118,7 +118,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
   return (
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
+        <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
         <button onClick={onCancel} className="text-bg/50 hover:text-bg transition-colors">
           <Icon name="close" className="w-[20px] h-[20px]" stroke={1.8} />
         </button>
