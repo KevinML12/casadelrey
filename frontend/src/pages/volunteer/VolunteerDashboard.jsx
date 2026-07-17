@@ -291,7 +291,7 @@ export default function VolunteerDashboard() {
             <Icon name="task_alt" className="w-[40px] h-[40px]" stroke={1.8} />
             <p className="text-body-m">Aún no tienes metas registradas.</p>
             <button onClick={() => setShowForm(true)}
-              className="text-label-m text-pri hover:underline font-medium">
+              className="text-label-m text-bg hover:underline font-medium">
               Crear tu primera meta →
             </button>
           </div>

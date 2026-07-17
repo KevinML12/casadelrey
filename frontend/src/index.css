@@ -685,8 +685,10 @@ html.lenis, html.lenis body { height: auto; }
   font-size: 1.375rem;
   line-height: 1.5;
 }
-.prose a { color: var(--celeste); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(59, 130, 246, 0.4); }
-.prose a:hover { text-decoration-color: var(--celeste); }
+.prose a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, 0.4); }
+.prose a:hover { text-decoration-color: var(--ink); }
+.admin-light .prose a { color: var(--bg); text-decoration-color: rgba(10, 21, 38, 0.4); }
+.admin-light .prose a:hover { text-decoration-color: var(--bg); }
 .prose img { max-width: 100%; border-radius: var(--r-xl); margin: 2rem 0; }
 .prose strong { font-weight: 700; color: var(--ink); }
 

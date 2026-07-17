@@ -136,7 +136,7 @@ export default function AdminPetitions() {
             <h1 className="text-headline-s text-bg font-black leading-tight">Peticiones</h1>
             <p className="text-body-s text-bg/50 mt-0.5">
               {unread > 0
-                ? <><span className="text-pri font-semibold">{unread}</span> sin responder</>
+                ? <><span className="text-bg font-semibold">{unread}</span> sin responder</>
                 : 'Todas respondidas'}
             </p>
           </div>

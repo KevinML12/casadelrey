@@ -311,7 +311,7 @@ export default function Dashboard() {
                     <td className="px-5 py-3.5 text-[11.5px] text-bg/40 font-mono">{d.ID}</td>
                     <td className="px-5 py-3.5 text-[13.5px] text-bg font-medium">{d.name}</td>
                     <td className="px-5 py-3.5 text-[13.5px] text-bg/55 capitalize">{d.donation_purpose || '—'}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-celeste font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-bg font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-bg/6 text-bg/60 text-[12px] font-medium">
                         {METHOD_LABEL[d.payment_method] || d.payment_method || '—'}

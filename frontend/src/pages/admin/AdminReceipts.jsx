@@ -238,7 +238,7 @@ export default function AdminReceipts() {
             <h1 className="text-headline-s text-bg font-black">Comprobantes</h1>
             <p className="text-body-s text-bg/50 mt-0.5">
               {pending > 0
-                ? <><span className="text-pri font-semibold">{pending}</span> pendiente{pending > 1 ? 's' : ''} de verificar</>
+                ? <><span className="text-bg font-semibold">{pending}</span> pendiente{pending > 1 ? 's' : ''} de verificar</>
                 : 'Todos verificados'}
             </p>
           </div>

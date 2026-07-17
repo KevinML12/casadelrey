@@ -76,7 +76,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     extensions: [
       StarterKit,
       Image.configure({ inline: false, allowBase64: true }),
-      Link.configure({ openOnClick: false, HTMLAttributes: { class: 'text-pri underline' } }),
+      Link.configure({ openOnClick: false, HTMLAttributes: { class: 'text-bg underline' } }),
       Placeholder.configure({ placeholder: 'Escribe el contenido del post aquí…' }),
     ],
     content: initial.content || '',
@@ -135,7 +135,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
           <div className="flex gap-2">
             <input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')}
               className={`flex-1 ${fieldCls}`} />
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-bg/50`}>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-bg'} text-bg/50`}>
               <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -174,11 +174,11 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <label className="text-label-l text-bg/50">Contenido <span className="font-normal text-bg/40">(opcional si hay enlace)</span></label>
             <div className="flex items-center gap-3">
               <button type="button" onClick={insertContentImage}
-                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-pri transition-colors">
+                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-bg transition-colors">
                 <Icon name="image" className="w-[14px] h-[14px]" stroke={1.8} /> Insertar imagen
               </button>
               <button type="button" onClick={() => setPreview(p => !p)}
-                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-pri transition-colors">
+                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-bg transition-colors">
                 <Icon name={preview ? 'edit' : 'preview'} className="w-[14px] h-[14px]" stroke={1.8} />
                 {preview ? 'Editor' : 'Preview'}
               </button>

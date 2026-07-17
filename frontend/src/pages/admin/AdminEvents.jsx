@@ -70,7 +70,7 @@ function EventForm({ initial, onSave, onCancel, loading }) {
           <div className="flex gap-2">
             <input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')}
               className={`flex-1 ${fieldCls}`} />
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-bg/50`}>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-bg'} text-bg/50`}>
               <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />

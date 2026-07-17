@@ -97,7 +97,7 @@ export default function CellReportsPage() {
             <h1 className="text-headline-s text-bg font-black leading-tight">Reportes de Células</h1>
             <p className="text-body-s text-bg/50 mt-0.5">
               {isAdmin && pendingCount > 0
-                ? <><span className="text-pri font-semibold">{pendingCount}</span> pendiente{pendingCount !== 1 ? 's' : ''} de aprobación</>
+                ? <><span className="text-bg font-semibold">{pendingCount}</span> pendiente{pendingCount !== 1 ? 's' : ''} de aprobación</>
                 : `${reports.length} reporte${reports.length !== 1 ? 's' : ''}`
               }
             </p>
@@ -167,13 +167,13 @@ export default function CellReportsPage() {
                 {stats.by_cell.map((c, i) => (
                   <tr key={i} className="hover:bg-bg/8 transition-colors">
                     <td className="px-5 py-3 text-body-s text-bg font-medium">
-                      {c.cell_code && <span className="text-pri mr-1.5 font-mono">[{c.cell_code}]</span>}{c.cell_name}
+                      {c.cell_code && <span className="text-bg mr-1.5 font-mono">[{c.cell_code}]</span>}{c.cell_name}
                     </td>
                     <td className="px-5 py-3 text-body-s text-bg/50">{c.reports}</td>
                     <td className="px-5 py-3 text-body-s text-bg/50">{c.total_attendees}</td>
                     <td className="px-5 py-3 text-body-s text-bg/50">{c.converts}</td>
                     <td className="px-5 py-3 text-body-s text-bg/50">{c.reconciled}</td>
-                    <td className="px-5 py-3 text-body-s text-ter font-semibold">Q{Number(c.total_offering ?? 0).toFixed(0)}</td>
+                    <td className="px-5 py-3 text-body-s text-bg font-semibold">Q{Number(c.total_offering ?? 0).toFixed(0)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -237,7 +237,7 @@ export default function CellReportsPage() {
                         {r.total_attendees ?? 0} asist.
                       </span>
                       {((r.converts ?? 0) + (r.reconciled ?? 0)) > 0 && (
-                        <span className="flex items-center gap-1 text-ter font-medium">
+                        <span className="flex items-center gap-1 text-bg font-medium">
                           <Icon name="person_add" className="w-[13px] h-[13px]" stroke={1.8} />
                           {(r.converts || 0) + (r.reconciled || 0)} nuevos
                         </span>

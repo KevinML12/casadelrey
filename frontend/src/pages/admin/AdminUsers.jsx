@@ -230,7 +230,7 @@ export default function AdminUsers() {
                   {u.role === 'leader' && (
                     <button
                       onClick={() => setCellModal(u)}
-                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-pri hover:text-pri transition-colors font-mono"
+                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-pri hover:text-bg transition-colors font-mono"
                       title="Editar código de célula"
                     >
                       <Icon name="tag" className="w-[14px] h-[14px]" stroke={1.8} />

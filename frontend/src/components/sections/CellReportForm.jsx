@@ -109,7 +109,7 @@ export default function CellReportForm({ onSuccess }) {
 
       {/* Identificación */}
       <div className="p-5 rounded-2xl bg-bg/4 border border-bg/10 space-y-4">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Identificación</p>
+        <p className="text-label-l text-bg font-semibold uppercase tracking-widest">Identificación</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
             <Field label="Tipo y código de célula">
@@ -132,7 +132,7 @@ export default function CellReportForm({ onSuccess }) {
 
       {/* Responsables */}
       <div className="p-5 rounded-2xl bg-bg/4 border border-bg/10 space-y-4">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Responsables</p>
+        <p className="text-label-l text-bg font-semibold uppercase tracking-widest">Responsables</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Líder">
             <input value={form.leader_name} onChange={onInput('leader_name')}
@@ -146,7 +146,7 @@ export default function CellReportForm({ onSuccess }) {
 
       {/* Anfitrión */}
       <div className="p-5 rounded-2xl bg-bg/4 border border-bg/10 space-y-4">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Anfitrión</p>
+        <p className="text-label-l text-bg font-semibold uppercase tracking-widest">Anfitrión</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Nombre del anfitrión"><input value={form.host_name} onChange={onInput('host_name')} className={fieldCls} placeholder="Dueño de la casa" /></Field>
           <Field label="Teléfono"><input value={form.host_phone} onChange={onInput('host_phone')} className={fieldCls} placeholder="+502 5555 0000" /></Field>
@@ -156,13 +156,13 @@ export default function CellReportForm({ onSuccess }) {
 
       {/* Tema */}
       <div className="p-5 rounded-2xl bg-bg/4 border border-bg/10">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest mb-4">Tema</p>
+        <p className="text-label-l text-bg font-semibold uppercase tracking-widest mb-4">Tema</p>
         <Field label="Tema de la reunión"><input value={form.topic} onChange={onInput('topic')} className={fieldCls} placeholder="Ej. Fe que mueve montañas" /></Field>
       </div>
 
       {/* Números */}
       <div className="p-5 rounded-2xl bg-bg/4 border border-bg/10 space-y-4">
-        <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Números</p>
+        <p className="text-label-l text-bg font-semibold uppercase tracking-widest">Números</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <NumField label="Total asistentes" name="total_attendees" value={form.total_attendees} onChange={set} />
           <NumField label="Convertidos" name="converts" value={form.converts} onChange={set} />
@@ -189,7 +189,7 @@ export default function CellReportForm({ onSuccess }) {
         </Field>
         <Field label="Foto de la reunión">
           <div className="flex items-center gap-3">
-            <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-bg/50`}>
+            <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-bg'} text-bg/50`}>
               <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : form.photo_url ? 'Cambiar foto' : 'Subir foto'}
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
