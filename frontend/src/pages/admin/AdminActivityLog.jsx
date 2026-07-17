@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import Paginator from '../../components/ui/Paginator';
 import { FilterChip } from '../../components/ui/Chip';
+import { Icon } from '../../components/ui/Glass';
 
 const ACTIONS = ['create', 'update', 'delete', 'approve', 'login'];
 const RESOURCES = ['user', 'post', 'event', 'boleta', 'cell_report', 'volunteer', 'announcement', 'gallery'];

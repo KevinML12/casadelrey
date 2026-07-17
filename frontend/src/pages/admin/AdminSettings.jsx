@@ -1,13 +1,13 @@
 // ============================================================
 //  AdminSettings — datos que NO deben estar hardcodeados: cuenta
 //  bancaria, titular, WhatsApp de contacto. El sitio público los lee
-//  de /settings; aquí el admin los edita sin deploy. Diseño MD3 del
-//  panel (a propósito, no glass-light).
+//  de /settings; aquí el admin los edita sin deploy.
 // ============================================================
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import { Icon } from '../../components/ui/Glass';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
