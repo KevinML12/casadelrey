@@ -243,6 +243,11 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
 
 function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
   const nodeRef = useRef(null);
+  // Antes, sin cover_image, caia a la MISMA foto stock generica en todos
+  // los eventos sin foto -- se sentia repetido/falso. Ahora esos eventos
+  // muestran la card entera en liquid-glass (sin foto), con un resplandor
+  // ambiental detras en vez de una imagen prestada.
+  const hasPhoto = Boolean(ev.cover_image);
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
   const dayNum   = d ? d.getDate() : null;
@@ -252,7 +257,6 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
     .filter(Boolean)
     .map(s => s[0].toUpperCase() + s.slice(1))
     .join(' · ');
-  const bgImage = ev.cover_image || '/images/bg-eventos.jpg';
   const bentoSpan = i === 0 ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
 
   return (
@@ -264,14 +268,24 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={isCarousel ? undefined : { transformPerspective: 1000 }}
-      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} liquid-shine relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} liquid-shine relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow ${!hasPhoto ? 'liquid-glass' : ''}`}
     >
 
-      {/* Flyer de fondo */}
-      <img src={bgImage} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
-
-      {/* Gradiente para leer el texto */}
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
+      {hasPhoto ? (
+        <>
+          {/* Flyer de fondo */}
+          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
+          {/* Gradiente para leer el texto */}
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
+        </>
+      ) : (
+        /* Sin foto: resplandor ambiental (blanco, no celeste) detras del
+           vidrio en vez de una imagen prestada */
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="halo" style={{ width: 420, height: 420, top: '-15%', right: '-20%', background: 'radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%)' }} />
+          <div className="halo" style={{ width: 360, height: 360, bottom: '-15%', left: '-15%', background: 'radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%)' }} />
+        </div>
+      )}
 
       {/* Etiqueta de próximo evento si es el primero */}
       {i === 0 && (
@@ -284,8 +298,11 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
       )}
 
       {/* Contenido (Liquid Glass Panel) */}
-      <motion.div layout className={`absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6' : 'p-5'}`}>
-        <div className={`liquid-glass rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-2xl flex flex-col gap-4 ${isCarousel ? 'p-6' : 'p-5'}`}>
+      <motion.div layout className={hasPhoto
+        ? `absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6' : 'p-5'}`
+        : `relative z-20 h-full flex flex-col justify-end ${isCarousel ? 'p-6' : 'p-5'}`
+      }>
+        <div className={`${hasPhoto ? 'liquid-glass bg-white/5 border border-white/10 backdrop-blur-2xl' : ''} rounded-[24px] flex flex-col gap-4 ${isCarousel ? 'p-6' : 'p-5'}`}>
 
           <motion.div layout className="flex items-center gap-4 w-full min-w-0">
             {/* Fecha */}
@@ -442,7 +459,7 @@ export default function EventsPage() {
           </p>
 
           {events.length > 0 && (
-            <div className="w-full flex justify-end max-w-7xl">
+            <div className="w-full flex justify-center">
               <motion.button
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.94 }}
