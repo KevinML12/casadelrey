@@ -3,7 +3,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = {
   label_top: '', title_line_1: '', title_line_2: '', verse_reference: '',
@@ -16,9 +16,9 @@ const EMPTY = {
 function Field({ label, hint, children }) {
   return (
     <div>
-      <label className="block text-label-l text-on-surf-var mb-1.5">{label}</label>
+      <label className="block text-label-l text-bg/50 mb-1.5">{label}</label>
       {children}
-      {hint && <p className="text-label-s text-on-surf-var mt-1">{hint}</p>}
+      {hint && <p className="text-label-s text-bg/50 mt-1">{hint}</p>}
     </div>
   );
 }
@@ -26,7 +26,7 @@ function Field({ label, hint, children }) {
 // Preview en vivo del hero
 function HeroPreview({ data }) {
   return (
-    <div className="rounded-2xl overflow-hidden border border-white/10 relative aspect-video">
+    <div className="rounded-2xl overflow-hidden border border-bg/10 relative aspect-video">
       {/* Background */}
       <div className="absolute inset-0" style={{
         backgroundImage: data.background_image_url ? `url(${data.background_image_url})` : 'none',
@@ -135,7 +135,7 @@ function HeroForm({ initial, onSave, onCancel }) {
       <form onSubmit={submit} className="space-y-5">
 
         {/* Textos */}
-        <div className="liquid-glass rounded-[24px] card-spring space-y-3 p-5">
+        <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Textos</p>
 
           <Field label="Label superior" hint='Ej. "● IGLESIA CRISTIANA · HUEHUETENANGO"'>
@@ -165,7 +165,7 @@ function HeroForm({ initial, onSave, onCancel }) {
         </div>
 
         {/* CTAs */}
-        <div className="liquid-glass rounded-[24px] card-spring space-y-3 p-5">
+        <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Botones</p>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Botón primario texto">
@@ -186,20 +186,20 @@ function HeroForm({ initial, onSave, onCancel }) {
         </div>
 
         {/* Visual */}
-        <div className="liquid-glass rounded-[24px] card-spring space-y-3 p-5">
+        <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-pri font-semibold uppercase tracking-widest">Imagen de fondo</p>
 
           <Field label="Foto del hero">
             {form.background_image_url ? (
               <div className="flex items-center gap-3">
-                <img src={form.background_image_url} alt="hero" className="w-20 h-20 rounded-xl object-cover border border-white/10" />
+                <img src={form.background_image_url} alt="hero" className="w-20 h-20 rounded-xl object-cover border border-bg/10" />
                 <button type="button" onClick={() => setForm(p => ({ ...p, background_image_url: '' }))}
                   className="text-label-m text-err hover:underline">Quitar imagen</button>
               </div>
             ) : (
-              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-white/10 cursor-pointer hover:border-pri transition-colors">
-                <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-on-surf-var" stroke={1.8} />
-                <p className="text-body-s text-on-surf">{uploading ? 'Subiendo…' : 'Subir foto del hero'}</p>
+              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-pri transition-colors">
+                <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
+                <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del hero'}</p>
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
               </label>
             )}
@@ -207,7 +207,7 @@ function HeroForm({ initial, onSave, onCancel }) {
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Color del overlay">
-              <input type="color" value={form.overlay_color} onChange={set('overlay_color')} className="w-full h-10 rounded-xl border border-white/10 cursor-pointer" />
+              <input type="color" value={form.overlay_color} onChange={set('overlay_color')} className="w-full h-10 rounded-xl border border-bg/10 cursor-pointer" />
             </Field>
             <Field label={`Opacidad del overlay: ${form.overlay_opacity}%`}>
               <input type="range" min="0" max="100" value={form.overlay_opacity}
@@ -224,7 +224,7 @@ function HeroForm({ initial, onSave, onCancel }) {
             {loading ? 'Guardando…' : initial?.ID ? 'Guardar cambios' : 'Crear hero'}
           </button>
           <button type="button" onClick={onCancel}
-            className="px-4 h-11 rounded-xl border border-white/10 text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+            className="px-4 h-11 rounded-xl border border-bg/10 text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
             Cancelar
           </button>
         </div>
@@ -232,9 +232,9 @@ function HeroForm({ initial, onSave, onCancel }) {
 
       {/* Preview sticky */}
       <div className="lg:sticky lg:top-6 lg:self-start">
-        <p className="text-label-l text-on-surf-var uppercase tracking-widest mb-2">Vista previa</p>
+        <p className="text-label-l text-bg/50 uppercase tracking-widest mb-2">Vista previa</p>
         <HeroPreview data={form} />
-        <p className="text-label-s text-on-surf-var mt-2 text-center">
+        <p className="text-label-s text-bg/50 mt-2 text-center">
           La vista pública se renderizará a tamaño completo
         </p>
       </div>
@@ -278,12 +278,12 @@ export default function AdminHero() {
     return (
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
-          <button onClick={() => setEditing(null)} className="w-9 h-9 rounded-full hover:bg-surf-dim flex items-center justify-center transition-colors">
-            <Icon name="arrow_back" className="w-[18px] h-[18px] text-on-surf-var" stroke={1.8} />
+          <button onClick={() => setEditing(null)} className="w-9 h-9 rounded-full hover:bg-bg/8 flex items-center justify-center transition-colors">
+            <Icon name="arrow_back" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
           </button>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black">{editing?.ID ? 'Editar hero' : 'Nuevo hero'}</h1>
-            <p className="text-body-s text-on-surf-var">Personaliza el hero del sitio público</p>
+            <h1 className="text-headline-s text-bg font-black">{editing?.ID ? 'Editar hero' : 'Nuevo hero'}</h1>
+            <p className="text-body-s text-bg/50">Personaliza el hero del sitio público</p>
           </div>
         </div>
         <HeroForm initial={editing} onSave={() => { setEditing(null); load(); }} onCancel={() => setEditing(null)} />
@@ -300,8 +300,8 @@ export default function AdminHero() {
             <Icon name="view_carousel" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
           </div>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black">Hero del sitio</h1>
-            <p className="text-body-s text-on-surf-var">Controla lo que ven los visitantes al entrar</p>
+            <h1 className="text-headline-s text-bg font-black">Hero del sitio</h1>
+            <p className="text-body-s text-bg/50">Controla lo que ven los visitantes al entrar</p>
           </div>
         </div>
         <button onClick={() => setEditing(EMPTY)}
@@ -313,13 +313,13 @@ export default function AdminHero() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
         </div>
       ) : heroes.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-on-surf-var">
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
           <Icon name="view_carousel" className="w-[48px] h-[48px]" stroke={1.8} />
           <div className="text-center">
-            <p className="text-body-l text-on-surf font-medium">Sin heroes guardados</p>
+            <p className="text-body-l text-bg font-medium">Sin heroes guardados</p>
             <p className="text-body-s mt-1">El sitio usa el hero por defecto. Crea uno para personalizarlo.</p>
           </div>
           <button onClick={() => setEditing(EMPTY)}
@@ -331,11 +331,11 @@ export default function AdminHero() {
       ) : (
         <div className="grid md:grid-cols-2 gap-5">
           {heroes.map(h => (
-            <div key={h.ID} className="rounded-2xl border border-white/10 overflow-hidden">
+            <div key={h.ID} className="rounded-2xl border border-bg/10 overflow-hidden">
               <HeroPreview data={h} />
-              <div className="p-4 bg-surf-low space-y-3">
+              <div className="p-4 bg-bg/6 space-y-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-title-s text-on-surf font-bold">{h.title_line_1} {h.title_line_2}</h3>
+                  <h3 className="text-title-s text-bg font-bold">{h.title_line_1} {h.title_line_2}</h3>
                   {h.is_active && (
                     <span className="px-2 py-0.5 rounded-full bg-ter-con text-on-ter-con text-label-s font-semibold flex items-center gap-1">
                       <Icon name="check_circle" className="w-[12px] h-[12px]" stroke={1.8} />
@@ -352,7 +352,7 @@ export default function AdminHero() {
                     </button>
                   )}
                   <button onClick={() => setEditing(h)}
-                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-white/10 text-label-m text-on-surf-var hover:bg-surf-dim transition-colors">
+                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:bg-bg/8 transition-colors">
                     <Icon name="edit" className="w-[14px] h-[14px]" stroke={1.8} />
                     Editar
                   </button>

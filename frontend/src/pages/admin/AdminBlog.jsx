@@ -26,7 +26,7 @@ function EditorToolbar({ editor }) {
     <button
       type="button" onClick={onClick} title={title}
       className={`p-1.5 rounded-md transition-colors ${
-        active ? 'bg-pri text-on-pri' : 'text-on-surf-var hover:bg-white/8 hover:text-on-surf'
+        active ? 'bg-pri text-on-pri' : 'text-bg/50 hover:bg-bg/8 hover:text-bg'
       }`}
     >
       <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
@@ -39,18 +39,18 @@ function EditorToolbar({ editor }) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-white/10 bg-surf rounded-t-lg">
+    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-bg/10 bg-bg/4 rounded-t-lg">
       {btn(editor.isActive('bold'),            () => editor.chain().focus().toggleBold().run(),           'format_bold',        'Negrita')}
       {btn(editor.isActive('italic'),          () => editor.chain().focus().toggleItalic().run(),         'format_italic',      'Cursiva')}
-      <div className="w-px h-4 bg-outline-var mx-1" />
+      <div className="w-px h-4 bg-bg/10 mx-1" />
       {btn(editor.isActive('heading', {level:2}), () => editor.chain().focus().toggleHeading({level:2}).run(), 'title', 'Título H2')}
       {btn(editor.isActive('bulletList'),      () => editor.chain().focus().toggleBulletList().run(),     'format_list_bulleted', 'Lista')}
       {btn(editor.isActive('orderedList'),     () => editor.chain().focus().toggleOrderedList().run(),    'format_list_numbered', 'Numerada')}
-      <div className="w-px h-4 bg-outline-var mx-1" />
+      <div className="w-px h-4 bg-bg/10 mx-1" />
       {btn(editor.isActive('link'),            addLink,                                                   'link',               'Enlace')}
       {btn(false,                              () => editor.chain().focus().undo().run(),                  'undo',               'Deshacer')}
       {btn(false,                              () => editor.chain().focus().redo().run(),                  'redo',               'Rehacer')}
-      <div className="w-px h-4 bg-outline-var mx-1" />
+      <div className="w-px h-4 bg-bg/10 mx-1" />
       {btn(editor.isActive('blockquote'),      () => editor.chain().focus().toggleBlockquote().run(),     'format_quote',       'Cita')}
     </div>
   );
@@ -82,7 +82,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     content: initial.content || '',
     editorProps: {
       attributes: {
-        class: 'prose max-w-none min-h-[280px] px-4 py-3 focus:outline-none text-on-surf text-body-s leading-relaxed',
+        class: 'prose max-w-none min-h-[280px] px-4 py-3 focus:outline-none text-bg text-body-s leading-relaxed',
       },
     },
   });
@@ -113,13 +113,13 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     onSave({ ...form, content: editor.getHTML() });
   };
 
-  const fieldCls = 'w-full px-3 py-2.5 rounded border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var hover:border-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+  const fieldCls = 'w-full px-3 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
   return (
-    <div className="liquid-glass rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
+    <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
         <p className="text-label-l text-pri font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
-        <button onClick={onCancel} className="text-on-surf-var hover:text-on-surf transition-colors">
+        <button onClick={onCancel} className="text-bg/50 hover:text-bg transition-colors">
           <Icon name="close" className="w-[20px] h-[20px]" stroke={1.8} />
         </button>
       </div>
@@ -131,11 +131,11 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         </div>
 
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Imagen de portada</label>
+          <label className="block text-label-l text-bg/50 mb-1.5">Imagen de portada</label>
           <div className="flex gap-2">
             <input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')}
               className={`flex-1 ${fieldCls}`} />
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-on-surf-var`}>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-pri'} text-bg/50`}>
               <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -143,9 +143,9 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
           </div>
           {form.cover_image && (
             <div className="mt-2 relative">
-              <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-white/10" />
+              <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-bg/10" />
               <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-ink flex items-center justify-center hover:bg-black/70">
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center hover:bg-black/70">
                 <Icon name="close" className="w-[14px] h-[14px]" stroke={1.8} />
               </button>
             </div>
@@ -153,15 +153,15 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         </div>
 
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">
-            Enlace a red social <span className="font-normal text-on-surf-var/60">(opcional — redirige al hacer clic)</span>
+          <label className="block text-label-l text-bg/50 mb-1.5">
+            Enlace a red social <span className="font-normal text-bg/50/60">(opcional — redirige al hacer clic)</span>
           </label>
           <input type="url" placeholder="https://facebook.com/..." value={form.redirect_url} onChange={set('redirect_url')}
             className={fieldCls} />
         </div>
 
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">
+          <label className="block text-label-l text-bg/50 mb-1.5">
             Extracto <span className="font-normal">(resumen visible en la lista)</span>
           </label>
           <textarea rows={2} value={form.excerpt} onChange={set('excerpt')}
@@ -171,38 +171,38 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-label-l text-on-surf-var">Contenido <span className="font-normal text-on-surf-var/60">(opcional si hay enlace)</span></label>
+            <label className="text-label-l text-bg/50">Contenido <span className="font-normal text-bg/50/60">(opcional si hay enlace)</span></label>
             <div className="flex items-center gap-3">
               <button type="button" onClick={insertContentImage}
-                className="flex items-center gap-1 text-label-s text-on-surf-var hover:text-pri transition-colors">
+                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-pri transition-colors">
                 <Icon name="image" className="w-[14px] h-[14px]" stroke={1.8} /> Insertar imagen
               </button>
               <button type="button" onClick={() => setPreview(p => !p)}
-                className="flex items-center gap-1 text-label-s text-on-surf-var hover:text-pri transition-colors">
+                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-pri transition-colors">
                 <Icon name={preview ? 'edit' : 'preview'} className="w-[14px] h-[14px]" stroke={1.8} />
                 {preview ? 'Editor' : 'Preview'}
               </button>
             </div>
           </div>
           {preview ? (
-            <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-white/10 bg-surf text-body-s leading-relaxed"
+            <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-bg/10 bg-bg/4 text-body-s leading-relaxed"
               dangerouslySetInnerHTML={{ __html: editor?.getHTML() || '' }} />
           ) : (
-            <div className="rounded-lg border border-white/10 overflow-hidden focus-within:border-pri focus-within:ring-2 focus-within:ring-pri/15 transition-all">
+            <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-pri focus-within:ring-2 focus-within:ring-pri/15 transition-all">
               <EditorToolbar editor={editor} />
               <EditorContent editor={editor} />
             </div>
           )}
         </div>
 
-        <label className="flex items-center gap-2 text-body-s text-on-surf cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-body-s text-bg cursor-pointer select-none">
           <input type="checkbox" checked={form.status === 'published'}
             onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'published' : 'draft' }))}
-            className="rounded border-white/10 accent-pri w-4 h-4" />
+            className="rounded border-bg/10 accent-pri w-4 h-4" />
           Publicar inmediatamente
         </label>
 
-        <div className="flex gap-2 pt-1 border-t border-white/10">
+        <div className="flex gap-2 pt-1 border-t border-bg/10">
           <Button size="sm" variant="filled" onClick={handleSave} disabled={loading}>
             <Icon name="check" className="w-[14px] h-[14px]" stroke={1.8} />
             {loading ? 'Guardando…' : 'Guardar'}
@@ -219,7 +219,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
   </div>
 );
 
@@ -275,8 +275,8 @@ export default function AdminBlog() {
             <Icon name="article" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
           </div>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black leading-tight">Blog</h1>
-            <p className="text-body-s text-on-surf-var mt-0.5">{posts.length} publicaciones</p>
+            <h1 className="text-headline-s text-bg font-black leading-tight">Blog</h1>
+            <p className="text-body-s text-bg/50 mt-0.5">{posts.length} publicaciones</p>
           </div>
         </div>
         {!showForm && !editing && (
@@ -292,43 +292,43 @@ export default function AdminBlog() {
       )}
 
       {loading ? <Spinner /> : (
-        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden">
           {posts.length === 0 ? (
-            <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-              <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+            <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
+              <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
                 <Icon name="article" className="w-[32px] h-[32px]" stroke={1.8} />
               </div>
               <div className="text-center">
-                <p className="text-body-l text-on-surf font-medium">Sin posts</p>
-                <p className="text-body-s text-on-surf-var mt-1">Crea el primero con el botón de arriba.</p>
+                <p className="text-body-l text-bg font-medium">Sin posts</p>
+                <p className="text-body-s text-bg/50 mt-1">Crea el primero con el botón de arriba.</p>
               </div>
             </div>
           ) : posts.map(post => (
-            <div key={post.ID} className="divide-y divide-white/8">
+            <div key={post.ID} className="divide-y divide-bg/8">
               {editing?.ID === post.ID ? (
                 <div className="p-5">
                   <PostForm initial={{ ...post }} onSave={handleSave}
                     onCancel={() => setEditing(null)} loading={saving} />
                 </div>
               ) : (
-                <div className="flex items-center gap-4 px-5 py-4 border-b border-white/10 last:border-0 hover:bg-white/8 transition-colors group">
+                <div className="flex items-center gap-4 px-5 py-4 border-b border-bg/10 last:border-0 hover:bg-bg/8 transition-colors group">
                   {post.cover_image ? (
-                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
+                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-bg/10" />
                   ) : (
-                    <div className="w-12 h-10 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">
-                      <Icon name="article" className="w-[18px] h-[18px] text-on-surf-var" stroke={1.8} />
+                    <div className="w-12 h-10 rounded-lg bg-bg/8 border border-bg/10 flex items-center justify-center shrink-0">
+                      <Icon name="article" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-body-m text-on-surf font-medium truncate">{post.title}</p>
-                    <p className="text-label-s text-on-surf-var mt-0.5 truncate font-mono">{post.slug}</p>
+                    <p className="text-body-m text-bg font-medium truncate">{post.title}</p>
+                    <p className="text-label-s text-bg/50 mt-0.5 truncate font-mono">{post.slug}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-label-s text-on-surf-var hidden sm:block">{post.view_count ?? 0} vistas</span>
+                    <span className="text-label-s text-bg/50 hidden sm:block">{post.view_count ?? 0} vistas</span>
                     <span className={`inline-flex items-center h-7 px-3 rounded-lg text-label-m font-medium ${
                       post.status === 'published'
                         ? 'bg-ter-con text-on-ter-con'
-                        : 'bg-white/8 text-on-surf-var'
+                        : 'bg-bg/8 text-bg/50'
                     }`}>
                       {post.status === 'published' ? 'Publicado' : 'Borrador'}
                     </span>
@@ -340,13 +340,13 @@ export default function AdminBlog() {
                     )}
                     <button
                       onClick={() => { setEditing(post); setShowForm(false); }}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-pri hover:bg-pri-con transition-all"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-pri hover:bg-pri-con transition-all"
                     >
                       <Icon name="edit" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>
                     <button
                       onClick={() => handleDelete(post.ID)}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-on-surf-var hover:text-err hover:bg-err-con transition-all"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-err hover:bg-err-con transition-all"
                     >
                       <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>

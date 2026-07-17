@@ -2,9 +2,10 @@ import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 
 /**
- * Liquid Glass Button — mismo lenguaje de material que el sitio público
- * (GlassButton de Glass.jsx), adaptado a los 5 "variant" que ya usan las
- * 20 páginas del panel para no tener que tocar cada call site.
+ * Botón del panel admin/líder/voluntario — MODO CLARO estilo Apple
+ * (jul-2026): el panel es tinta navy sobre canvas off-white; este kit es
+ * EXCLUSIVO del panel (el público usa GlassButton de Glass.jsx — la única
+ * página pública que importaba este Button, EventsPage, ya se migró).
  *
  * variant: 'filled' | 'tonal' | 'outlined' | 'elevated' | 'text' | 'glass'
  * size:    'sm' | 'md' | 'lg'
@@ -18,14 +19,14 @@ const base =
   'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none';
 
 const variants = {
-  // Primario — pill blanco (mismo CTA del sitio público)
-  filled:   'bg-white text-bg shadow-card hover:shadow-card-lg',
-  // Cristal — vidrio con borde, uso más frecuente en el panel
-  tonal:    'liquid-glass text-white',
-  glass:    'liquid-glass text-white',
-  elevated: 'liquid-glass text-white shadow-card-lg',
-  outlined: 'bg-transparent text-white border border-white/20 hover:bg-white/6 hover:border-white/35',
-  text:     'bg-transparent text-white/60 hover:text-white hover:bg-white/6',
+  // Primario — pill navy sólido (mismo CTA que el header público)
+  filled:   'bg-bg text-white shadow-card hover:shadow-card-lg',
+  // Escarchado — blanco translúcido con hairline, el más usado
+  tonal:    'glass-light text-bg',
+  glass:    'glass-light text-bg',
+  elevated: 'glass-light text-bg shadow-card-lg',
+  outlined: 'bg-transparent text-bg border border-bg/20 hover:bg-bg/5 hover:border-bg/35',
+  text:     'bg-transparent text-bg/60 hover:text-bg hover:bg-bg/5',
 };
 
 const sizes = {
@@ -55,10 +56,10 @@ export default Button;
 
 export function IconButton({ children, variant = 'standard', className = '', ...props }) {
   const variantCls = {
-    standard: 'bg-transparent text-white/55 hover:text-white hover:bg-white/8',
+    standard: 'bg-transparent text-bg/55 hover:text-bg hover:bg-bg/8',
     filled:   'bg-celeste text-white hover:bg-celeste-hov',
-    tonal:    'liquid-glass text-white',
-    outlined: 'bg-transparent text-white border border-white/20 hover:bg-white/8',
+    tonal:    'glass-light text-bg',
+    outlined: 'bg-transparent text-bg border border-bg/20 hover:bg-bg/5',
   }[variant];
 
   return (

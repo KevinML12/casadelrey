@@ -7,19 +7,19 @@ import { Icon } from '../../components/ui/Glass';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
   </div>
 );
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-      <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+    <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
+      <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
         <Icon name="inbox" className="w-[32px] h-[32px]" stroke={1.8} />
       </div>
       <div className="text-center">
-        <p className="text-body-l text-on-surf font-medium">Sin peticiones</p>
-        <p className="text-body-s text-on-surf-var mt-1">Las peticiones de oración aparecerán aquí.</p>
+        <p className="text-body-l text-bg font-medium">Sin peticiones</p>
+        <p className="text-body-s text-bg/50 mt-1">Las peticiones de oración aparecerán aquí.</p>
       </div>
     </div>
   );
@@ -133,8 +133,8 @@ export default function AdminPetitions() {
             <Icon name="volunteer_activism" className="w-[22px] h-[22px] text-on-ter-con" stroke={1.8} />
           </div>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black leading-tight">Peticiones</h1>
-            <p className="text-body-s text-on-surf-var mt-0.5">
+            <h1 className="text-headline-s text-bg font-black leading-tight">Peticiones</h1>
+            <p className="text-body-s text-bg/50 mt-0.5">
               {unread > 0
                 ? <><span className="text-pri font-semibold">{unread}</span> sin responder</>
                 : 'Todas respondidas'}
@@ -151,46 +151,46 @@ export default function AdminPetitions() {
       </div>
 
       {loading ? <Spinner /> : petitions.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden">
           <EmptyState />
         </div>
       ) : (
-        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {petitions.map(p => (
             <div key={p.ID}
               className={`flex items-start gap-4 p-5 transition-colors ${
-                p.is_answered ? 'opacity-60' : 'hover:bg-white/8'
+                p.is_answered ? 'opacity-60' : 'hover:bg-bg/8'
               }`}
             >
               {/* Leading icon */}
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                p.is_answered ? 'bg-white/8' : 'bg-ter-con'
+                p.is_answered ? 'bg-bg/8' : 'bg-ter-con'
               }`}>
                 <Icon name={p.is_answered ? 'mark_email_read' : 'volunteer_activism'}
-                  className={`w-[18px] h-[18px] ${p.is_answered ? 'text-on-surf-var' : 'text-on-ter-con'}`}
+                  className={`w-[18px] h-[18px] ${p.is_answered ? 'text-bg/50' : 'text-on-ter-con'}`}
                   stroke={1.8} />
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-body-l text-on-surf font-medium">{p.name}</span>
+                  <span className="text-body-l text-bg font-medium">{p.name}</span>
                   {p.subject && (
-                    <span className="text-body-s text-on-surf-var">· {p.subject}</span>
+                    <span className="text-body-s text-bg/50">· {p.subject}</span>
                   )}
                   {!p.is_answered && (
                     <Chip color="primary">Nueva</Chip>
                   )}
                 </div>
                 {p.email && (
-                  <p className="text-body-s text-on-surf-var mb-2">{p.email}</p>
+                  <p className="text-body-s text-bg/50 mb-2">{p.email}</p>
                 )}
                 {p.message && (
-                  <p className="text-body-s text-on-surf-var leading-relaxed bg-surf border border-white/10 rounded-xl px-4 py-3">
+                  <p className="text-body-s text-bg/50 leading-relaxed bg-bg/4 border border-bg/10 rounded-xl px-4 py-3">
                     {p.message}
                   </p>
                 )}
-                <p className="text-label-s text-on-surf-var mt-2">
+                <p className="text-label-s text-bg/50 mt-2">
                   {p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('es-ES', {
                     day: '2-digit', month: 'long', year: 'numeric'
                   }) : '—'}

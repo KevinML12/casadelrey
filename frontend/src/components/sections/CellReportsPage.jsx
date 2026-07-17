@@ -15,7 +15,7 @@ const STATUS_CONFIG = {
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
   </div>
 );
 
@@ -26,13 +26,13 @@ function MiniStat({ icon, label, value, tint = 'pri' }) {
     ter: 'bg-ter-con text-on-ter-con',
   };
   return (
-    <div className="liquid-glass rounded-[24px] card-spring p-4 flex flex-col gap-2">
+    <div className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
       <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tintMap[tint]}`}>
         <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
       </div>
       <div>
-        <p className="text-label-s text-on-surf-var uppercase tracking-widest">{label}</p>
-        <p className="text-headline-s text-on-surf font-black">{value}</p>
+        <p className="text-label-s text-bg/50 uppercase tracking-widest">{label}</p>
+        <p className="text-headline-s text-bg font-black">{value}</p>
       </div>
     </div>
   );
@@ -94,8 +94,8 @@ export default function CellReportsPage() {
             <Icon name="groups" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
           </div>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black leading-tight">Reportes de Células</h1>
-            <p className="text-body-s text-on-surf-var mt-0.5">
+            <h1 className="text-headline-s text-bg font-black leading-tight">Reportes de Células</h1>
+            <p className="text-body-s text-bg/50 mt-0.5">
               {isAdmin && pendingCount > 0
                 ? <><span className="text-pri font-semibold">{pendingCount}</span> pendiente{pendingCount !== 1 ? 's' : ''} de aprobación</>
                 : `${reports.length} reporte${reports.length !== 1 ? 's' : ''}`
@@ -113,7 +113,7 @@ export default function CellReportsPage() {
 
       {/* Formulario */}
       {showForm && (
-        <div className="liquid-glass rounded-[24px] card-spring mb-8 p-6">
+        <div className="glass-light rounded-[24px] card-spring mb-8 p-6">
           <CellReportForm onSuccess={() => { setShowForm(false); refresh(); }} />
         </div>
       )}
@@ -149,30 +149,30 @@ export default function CellReportsPage() {
 
       {/* Resumen por célula */}
       {stats?.by_cell?.length > 0 && (
-        <div className="liquid-glass rounded-[24px] card-spring mb-8 overflow-hidden">
-          <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
+        <div className="glass-light rounded-[24px] card-spring mb-8 overflow-hidden">
+          <div className="px-5 py-4 border-b border-bg/10 flex items-center gap-2">
             <Icon name="bar_chart" className="w-[18px] h-[18px] text-pri" stroke={1.8} />
-            <h3 className="text-title-s text-on-surf font-semibold">Resumen por célula</h3>
+            <h3 className="text-title-s text-bg font-semibold">Resumen por célula</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10 bg-surf">
+                <tr className="border-b border-bg/10 bg-bg/4">
                   {['Célula', 'Reportes', 'Asistentes', 'Conv.', 'Rec.', 'Ofrenda'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 text-label-s text-on-surf-var uppercase tracking-widest">{h}</th>
+                    <th key={h} className="text-left px-5 py-3 text-label-s text-bg/50 uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/8">
+              <tbody className="divide-y divide-bg/8">
                 {stats.by_cell.map((c, i) => (
-                  <tr key={i} className="hover:bg-white/8 transition-colors">
-                    <td className="px-5 py-3 text-body-s text-on-surf font-medium">
+                  <tr key={i} className="hover:bg-bg/8 transition-colors">
+                    <td className="px-5 py-3 text-body-s text-bg font-medium">
                       {c.cell_code && <span className="text-pri mr-1.5 font-mono">[{c.cell_code}]</span>}{c.cell_name}
                     </td>
-                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.reports}</td>
-                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.total_attendees}</td>
-                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.converts}</td>
-                    <td className="px-5 py-3 text-body-s text-on-surf-var">{c.reconciled}</td>
+                    <td className="px-5 py-3 text-body-s text-bg/50">{c.reports}</td>
+                    <td className="px-5 py-3 text-body-s text-bg/50">{c.total_attendees}</td>
+                    <td className="px-5 py-3 text-body-s text-bg/50">{c.converts}</td>
+                    <td className="px-5 py-3 text-body-s text-bg/50">{c.reconciled}</td>
                     <td className="px-5 py-3 text-body-s text-ter font-semibold">Q{Number(c.total_offering ?? 0).toFixed(0)}</td>
                   </tr>
                 ))}
@@ -184,13 +184,13 @@ export default function CellReportsPage() {
 
       {/* Lista de reportes */}
       {loading ? <Spinner /> : reports.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
-            <Icon name="inbox" className="w-[32px] h-[32px] text-on-surf-var" stroke={1.8} />
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
+            <Icon name="inbox" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
           </div>
           <div className="text-center">
-            <p className="text-body-l text-on-surf font-medium">Sin reportes</p>
-            <p className="text-body-s text-on-surf-var mt-1">
+            <p className="text-body-l text-bg font-medium">Sin reportes</p>
+            <p className="text-body-s text-bg/50 mt-1">
               {filter ? `No hay reportes con estado "${filter}".` : 'Crea el primero con el botón de arriba.'}
             </p>
           </div>
@@ -201,11 +201,11 @@ export default function CellReportsPage() {
             const st = STATUS_CONFIG[r.status] || STATUS_CONFIG.pendiente;
             const open = expanded === r.ID;
             return (
-              <div key={r.ID} className="liquid-glass rounded-[24px] card-spring overflow-hidden">
+              <div key={r.ID} className="glass-light rounded-[24px] card-spring overflow-hidden">
 
                 {/* Accordion trigger */}
                 <button onClick={() => setExpanded(open ? null : r.ID)}
-                  className="w-full text-left flex items-start gap-4 p-5 hover:bg-white/8 transition-colors">
+                  className="w-full text-left flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
                   {/* Leading: cell type indicator */}
                   <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0 mt-0.5">
@@ -217,10 +217,10 @@ export default function CellReportsPage() {
                       {r.cell_code && (
                         <span className="text-label-s font-mono px-2 h-7 flex items-center rounded-lg bg-pri-con text-on-pri-con">{r.cell_code}</span>
                       )}
-                      <span className="text-body-l text-on-surf font-medium">{r.cell_name}</span>
+                      <span className="text-body-l text-bg font-medium">{r.cell_name}</span>
                       <Chip color={st.color} icon={st.icon}>{st.label}</Chip>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-on-surf-var">
+                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-bg/50">
                       {isAdmin && r.leader_name && (
                         <span className="flex items-center gap-1">
                           <Icon name="person" className="w-[13px] h-[13px]" stroke={1.8} />{r.leader_name}
@@ -245,12 +245,12 @@ export default function CellReportsPage() {
                     </div>
                   </div>
 
-                  <Icon name={open ? 'expand_less' : 'expand_more'} className="w-[20px] h-[20px] text-on-surf-var shrink-0 mt-1" stroke={1.8} />
+                  <Icon name={open ? 'expand_less' : 'expand_more'} className="w-[20px] h-[20px] text-bg/50 shrink-0 mt-1" stroke={1.8} />
                 </button>
 
                 {/* Detalle expandido */}
                 {open && (
-                  <div className="border-t border-white/10 p-5 space-y-5 bg-surf">
+                  <div className="border-t border-bg/10 p-5 space-y-5 bg-bg/4">
 
                     {/* Números */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -260,13 +260,13 @@ export default function CellReportsPage() {
                         { icon: 'favorite',    label: 'Reconciliados', value: r.reconciled ?? 0,     tint: 'bg-pri-con text-on-pri-con' },
                         { icon: 'savings',     label: 'Ofrenda',      value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'bg-sec-con text-on-sec-con' },
                       ].map(({ icon, label, value, tint }) => (
-                        <div key={label} className="liquid-glass rounded-[24px] card-spring p-4 flex flex-col gap-2">
+                        <div key={label} className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tint}`}>
                             <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
                           </div>
                           <div>
-                            <p className="text-label-s text-on-surf-var uppercase tracking-widest">{label}</p>
-                            <p className="text-headline-s text-on-surf font-black">{value}</p>
+                            <p className="text-label-s text-bg/50 uppercase tracking-widest">{label}</p>
+                            <p className="text-headline-s text-bg font-black">{value}</p>
                           </div>
                         </div>
                       ))}
@@ -281,20 +281,20 @@ export default function CellReportsPage() {
                         r.address     && { label: 'Dirección', value: r.address },
                       ].filter(Boolean).map(({ label, value }) => (
                         <div key={label} className="flex gap-1.5">
-                          <span className="text-on-surf-var shrink-0">{label}:</span>
-                          <span className="text-on-surf font-medium">{value}</span>
+                          <span className="text-bg/50 shrink-0">{label}:</span>
+                          <span className="text-bg font-medium">{value}</span>
                         </div>
                       ))}
                     </div>
 
                     {r.photo_url && (
                       <img src={r.photo_url} alt="Foto de la reunión"
-                        className="w-full max-h-60 object-cover rounded-2xl border border-white/10" />
+                        className="w-full max-h-60 object-cover rounded-2xl border border-bg/10" />
                     )}
 
                     {r.notes && (
-                      <div className="liquid-glass rounded-[20px] card-spring px-4 py-3">
-                        <p className="text-body-s text-on-surf-var leading-relaxed">{r.notes}</p>
+                      <div className="glass-light rounded-[20px] card-spring px-4 py-3">
+                        <p className="text-body-s text-bg/50 leading-relaxed">{r.notes}</p>
                       </div>
                     )}
 

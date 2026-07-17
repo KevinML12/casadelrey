@@ -78,8 +78,8 @@ export default function AdminConnectCards() {
             <Icon name="contact_page" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
           </div>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black leading-tight">Conéctate</h1>
-            <p className="text-body-s text-on-surf-var mt-0.5">
+            <h1 className="text-headline-s text-bg font-black leading-tight">Conéctate</h1>
+            <p className="text-body-s text-bg/50 mt-0.5">
               {total} registros · {counts.nuevo || 0} sin contactar · {counts.contactado || 0} en seguimiento · {counts.integrado || 0} integrados
             </p>
           </div>
@@ -102,39 +102,39 @@ export default function AdminConnectCards() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
         </div>
       ) : cards.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-on-surf-var">
-          <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
             <Icon name="contact_page" className="w-[32px] h-[32px]" stroke={1.8} />
           </div>
           <div className="text-center">
-            <p className="text-body-l text-on-surf font-medium">Sin tarjetas</p>
-            <p className="text-body-s text-on-surf-var mt-1">
+            <p className="text-body-l text-bg font-medium">Sin tarjetas</p>
+            <p className="text-body-s text-bg/50 mt-1">
               {statusFilter ? `No hay registros con estado "${STATUS_LABEL[statusFilter]}".` : 'Aquí aparecerán los visitantes que se registren en /conectate.'}
             </p>
           </div>
         </div>
       ) : (
-        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {cards.map(card => {
             const cat = CATEGORIES[card.category];
             const nextStatus = STATUS_FLOW[STATUS_FLOW.indexOf(card.status) + 1];
             return (
-              <div key={card.ID} className="flex items-start gap-4 p-5 hover:bg-white/8 transition-colors">
+              <div key={card.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
-                <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon name="person" className="w-[18px] h-[18px] text-on-surf-var" stroke={1.8} />
+                <div className="w-10 h-10 rounded-xl bg-bg/8 flex items-center justify-center shrink-0 mt-0.5">
+                  <Icon name="person" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-body-l text-on-surf font-medium">{card.name}</span>
+                    <span className="text-body-l text-bg font-medium">{card.name}</span>
                     {cat && <Chip color={cat.color}>{cat.label}</Chip>}
                     <Chip color={STATUS_COLOR[card.status]}>{STATUS_LABEL[card.status]}</Chip>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-on-surf-var">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-bg/50">
                     {card.phone && (
                       <span className="flex items-center gap-1.5">
                         <Icon name="phone" className="w-[14px] h-[14px]" stroke={1.8} />{card.phone}
@@ -158,19 +158,19 @@ export default function AdminConnectCards() {
                       <select
                         value={card.leader_assigned_id || ''}
                         onChange={e => updateCard(card.ID, { leader_assigned_id: e.target.value ? Number(e.target.value) : null })}
-                        className="text-label-m px-2.5 py-1.5 rounded-lg border border-white/10 bg-transparent text-on-surf-var focus:outline-none focus:border-pri"
+                        className="text-label-m px-2.5 py-1.5 rounded-lg border border-bg/10 bg-transparent text-bg/50 focus:outline-none focus:border-pri"
                       >
                         <option value="">Sin asignar</option>
                         {leaders.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                       </select>
                     )}
                     {!isAdmin && card.leader_assigned && (
-                      <span className="text-label-m text-on-surf-var">Asignado a {card.leader_assigned.name}</span>
+                      <span className="text-label-m text-bg/50">Asignado a {card.leader_assigned.name}</span>
                     )}
                     {nextStatus && (
                       <button
                         onClick={() => updateCard(card.ID, { status: nextStatus })}
-                        className="text-label-m px-2.5 py-1.5 rounded-lg border border-white/10 text-pri hover:bg-pri-con transition-colors"
+                        className="text-label-m px-2.5 py-1.5 rounded-lg border border-bg/10 text-pri hover:bg-pri-con transition-colors"
                       >
                         Marcar como {STATUS_LABEL[nextStatus].toLowerCase()}
                       </button>
@@ -179,12 +179,12 @@ export default function AdminConnectCards() {
                 </div>
 
                 <div className="flex items-start gap-2 shrink-0">
-                  <p className="text-label-s text-on-surf-var whitespace-nowrap">
+                  <p className="text-label-s text-bg/50 whitespace-nowrap">
                     {card.CreatedAt ? new Date(card.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
                   </p>
                   {isAdmin && (
                     <IconButton onClick={() => deleteCard(card.ID)} title="Eliminar"
-                      className="text-on-surf-var hover:text-err hover:bg-err-con transition-all">
+                      className="text-bg/50 hover:text-err hover:bg-err-con transition-all">
                       <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </IconButton>
                   )}

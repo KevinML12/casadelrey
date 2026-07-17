@@ -11,21 +11,21 @@ import { Icon } from '../../components/ui/Glass';
 
 function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
   return (
-    <div className="flex items-center gap-4 p-4 rounded-2xl border border-white/10">
-      <div className="liquid-glass rounded-[20px] card-spring w-20 h-20 overflow-hidden shrink-0">
+    <div className="flex items-center gap-4 p-4 rounded-2xl border border-bg/10">
+      <div className="glass-light rounded-[20px] card-spring w-20 h-20 overflow-hidden shrink-0">
         {imageUrl
           ? <img src={imageUrl} alt="" className="w-full h-full object-cover" />
-          : <div className="w-full h-full flex items-center justify-center text-on-surf-var">
+          : <div className="w-full h-full flex items-center justify-center text-bg/50">
               <Icon name="image" className="w-[26px] h-[26px]" stroke={1.8} />
             </div>
         }
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-title-s font-semibold text-on-surf truncate">{label}</p>
-        {sublabel && <p className="text-label-s text-on-surf-var mt-0.5">{sublabel}</p>}
+        <p className="text-title-s font-semibold text-bg truncate">{label}</p>
+        {sublabel && <p className="text-label-s text-bg/50 mt-0.5">{sublabel}</p>}
         {!imageUrl && <p className="text-label-s mt-1" style={{ color: 'var(--pri)' }}>Usando la imagen por defecto del sitio</p>}
       </div>
-      <label className="shrink-0 px-4 py-2.5 rounded-full border border-white/10 text-label-m font-semibold text-on-surf hover:bg-surf-low cursor-pointer transition-colors">
+      <label className="shrink-0 px-4 py-2.5 rounded-full border border-bg/10 text-label-m font-semibold text-bg hover:bg-bg/6 cursor-pointer transition-colors">
         {uploading ? 'Subiendo…' : 'Cambiar foto'}
         <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={onPick} />
       </label>
@@ -84,21 +84,21 @@ export default function AdminSitePhotos() {
   };
 
   if (loading) {
-    return <div className="p-8 text-on-surf-var">Cargando…</div>;
+    return <div className="p-8 text-bg/50">Cargando…</div>;
   }
 
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-10">
       <div>
-        <h1 className="text-headline-s font-bold text-on-surf">Fotos del sitio</h1>
-        <p className="text-body-s text-on-surf-var mt-1">
+        <h1 className="text-headline-s font-bold text-bg">Fotos del sitio</h1>
+        <p className="text-body-s text-bg/50 mt-1">
           Estas fotos aparecen como fondo ambiente en la página pública. Si no subes una,
           el sitio usa una imagen por defecto — nunca queda un espacio vacío.
         </p>
       </div>
 
       <section>
-        <h2 className="text-title-m font-bold text-on-surf mb-4">Página Nosotros</h2>
+        <h2 className="text-title-m font-bold text-bg mb-4">Página Nosotros</h2>
         <div className="space-y-3">
           {sitePhotos.map(p => (
             <PhotoRow
@@ -113,8 +113,8 @@ export default function AdminSitePhotos() {
       </section>
 
       <section>
-        <h2 className="text-title-m font-bold text-on-surf mb-4">Categorías de células</h2>
-        <p className="text-label-m text-on-surf-var mb-4 -mt-2">
+        <h2 className="text-title-m font-bold text-bg mb-4">Categorías de células</h2>
+        <p className="text-label-m text-bg/50 mb-4 -mt-2">
           Esta foto aparece en la vista previa del Home y en el panel de /celulas.
         </p>
         <div className="space-y-3">

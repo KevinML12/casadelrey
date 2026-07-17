@@ -1,6 +1,6 @@
 /**
- * Liquid Glass Chips — pastilla de cristal, mismo lenguaje que Badge/Eyebrow
- * del sitio público. Reemplaza el Chip M3 plano (bg-pri-con sólido).
+ * Chips del panel — MODO CLARO estilo Apple (tinta navy sobre blanco).
+ * Pastillas con tinte suave del color semántico, exclusivas del panel.
  *
  * Chip (default):  assist / status — etiqueta no interactiva
  * FilterChip:      filtro interactivo, estado seleccionado + check
@@ -8,11 +8,11 @@
 import { Icon } from './Glass';
 
 const colorMap = {
-  default:   'bg-white/8 border border-white/12 text-white/75',
-  primary:   'bg-celeste-soft/60 border border-celeste/30 text-celeste-hov',
-  secondary: 'bg-white/8 border border-white/12 text-white',
-  tertiary:  'bg-celeste-soft/60 border border-celeste/30 text-celeste-hov',
-  error:     'bg-rose-soft/60 border border-rose/30 text-rose',
+  default:   'bg-bg/6 border border-bg/12 text-bg/70',
+  primary:   'bg-celeste/12 border border-celeste/25 text-celeste',
+  secondary: 'bg-bg/6 border border-bg/12 text-bg',
+  tertiary:  'bg-celeste/10 border border-celeste/20 text-celeste',
+  error:     'bg-rose/10 border border-rose/25 text-rose',
 };
 
 export default function Chip({ color = 'default', icon, children, className = '', ...props }) {
@@ -38,8 +38,8 @@ export function FilterChip({ selected, icon, count, children, className = '', ..
         'text-[13px] font-semibold whitespace-nowrap ' +
         'cursor-pointer select-none transition-all duration-200 ' +
         (selected
-          ? 'liquid-glass text-white border-white/25 '
-          : 'bg-transparent text-white/50 border-white/12 hover:text-white hover:bg-white/6 '
+          ? 'bg-bg text-white border-bg shadow-card '
+          : 'bg-transparent text-bg/55 border-bg/15 hover:text-bg hover:bg-bg/5 '
         ) + className
       }
       {...props}

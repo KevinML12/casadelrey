@@ -3,7 +3,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const PLATFORMS = [
   { value: 'instagram', label: 'Instagram', icon: 'photo_camera' },
@@ -22,7 +22,7 @@ const EMPTY = { platform: 'instagram', post_url: '', caption: '', image_url: '',
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
   </div>
 );
 
@@ -68,21 +68,21 @@ function Form({ initial, onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={submit} className="liquid-glass rounded-[24px] card-spring space-y-5 p-6">
+    <form onSubmit={submit} className="glass-light rounded-[24px] card-spring space-y-5 p-6">
 
       {/* Imagen */}
       <div>
-        <label className="block text-label-l text-on-surf-var mb-2">Imagen del post *</label>
+        <label className="block text-label-l text-bg/50 mb-2">Imagen del post *</label>
         {form.image_url ? (
           <div className="flex items-center gap-4">
-            <img src={form.image_url} alt="post" className="w-24 h-24 rounded-xl object-cover border border-white/10" />
+            <img src={form.image_url} alt="post" className="w-24 h-24 rounded-xl object-cover border border-bg/10" />
             <button type="button" onClick={() => setForm(p => ({ ...p, image_url: '' }))}
               className="text-label-m text-err hover:underline">Cambiar imagen</button>
           </div>
         ) : (
-          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-white/10 cursor-pointer hover:border-pri transition-colors">
-            <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-on-surf-var" stroke={1.8} />
-            <p className="text-body-s text-on-surf">{uploading ? 'Subiendo…' : 'Subir foto del post'}</p>
+          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-pri transition-colors">
+            <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
+            <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del post'}</p>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
           </label>
         )}
@@ -91,13 +91,13 @@ function Form({ initial, onSave, onCancel }) {
       {/* Plataforma + URL */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Plataforma *</label>
+          <label className="block text-label-l text-bg/50 mb-1.5">Plataforma *</label>
           <select value={form.platform} onChange={set('platform')} className={fieldCls}>
             {PLATFORMS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">URL del post *</label>
+          <label className="block text-label-l text-bg/50 mb-1.5">URL del post *</label>
           <input type="url" value={form.post_url} onChange={set('post_url')}
             placeholder="https://instagram.com/p/..." className={fieldCls} required />
         </div>
@@ -105,14 +105,14 @@ function Form({ initial, onSave, onCancel }) {
 
       {/* Caption */}
       <div>
-        <label className="block text-label-l text-on-surf-var mb-1.5">Caption (opcional)</label>
+        <label className="block text-label-l text-bg/50 mb-1.5">Caption (opcional)</label>
         <input value={form.caption} onChange={set('caption')}
           placeholder="Breve descripción que se muestra en hover" className={fieldCls} />
       </div>
 
       {/* Tamaño en el grid */}
       <div>
-        <label className="block text-label-l text-on-surf-var mb-2">Tamaño en el grid editorial</label>
+        <label className="block text-label-l text-bg/50 mb-2">Tamaño en el grid editorial</label>
         <div className="flex gap-2 flex-wrap">
           {SIZES.map(s => (
             <button key={s.value} type="button"
@@ -120,13 +120,13 @@ function Form({ initial, onSave, onCancel }) {
               className={`flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m font-semibold transition-colors ${
                 form.featured_size === s.value
                   ? 'bg-pri-con text-on-pri-con'
-                  : 'border border-white/10 text-on-surf-var hover:bg-surf-dim'
+                  : 'border border-bg/10 text-bg/50 hover:bg-bg/8'
               }`}>
               {s.label}
             </button>
           ))}
         </div>
-        <p className="text-label-s text-on-surf-var mt-1.5">
+        <p className="text-label-s text-bg/50 mt-1.5">
           Mezcla tamaños para crear un layout editorial estilo Wallpaper.
         </p>
       </div>
@@ -134,24 +134,24 @@ function Form({ initial, onSave, onCancel }) {
       {/* Orden + activo */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-label-l text-on-surf-var mb-1.5">Orden (menor = primero)</label>
+          <label className="block text-label-l text-bg/50 mb-1.5">Orden (menor = primero)</label>
           <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} />
         </div>
-        <label className="flex items-end gap-2 text-body-s text-on-surf cursor-pointer pb-2">
+        <label className="flex items-end gap-2 text-body-s text-bg cursor-pointer pb-2">
           <input type="checkbox" checked={form.is_active} onChange={set('is_active')}
             className="rounded accent-pri w-4 h-4" />
           Visible en el sitio
         </label>
       </div>
 
-      <div className="flex gap-3 pt-2 border-t border-white/10">
+      <div className="flex gap-3 pt-2 border-t border-bg/10">
         <button type="submit" disabled={loading}
           className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
           <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : initial?.ID ? 'Actualizar' : 'Agregar'}
         </button>
         <button type="button" onClick={onCancel}
-          className="px-4 h-10 rounded-xl text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+          className="px-4 h-10 rounded-xl text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
           Cancelar
         </button>
       </div>
@@ -188,10 +188,10 @@ export default function AdminSocial() {
       <div className="flex items-start justify-between mb-2 gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3">
-            <Icon name="share" className="w-[26px] h-[26px] text-on-surf" stroke={1.8} />
-            <h1 className="text-headline-s text-on-surf font-black">Galería desde redes</h1>
+            <Icon name="share" className="w-[26px] h-[26px] text-bg" stroke={1.8} />
+            <h1 className="text-headline-s text-bg font-black">Galería desde redes</h1>
           </div>
-          <p className="text-body-s text-on-surf-var mt-1 max-w-xl">
+          <p className="text-body-s text-bg/50 mt-1 max-w-xl">
             Sube fotos de tus posts de Instagram, Facebook, YouTube o TikTok y enlázalas al post original.
             Aparecerán en la página principal como grid editorial.
           </p>
@@ -212,10 +212,10 @@ export default function AdminSocial() {
       )}
 
       {loading ? <Spinner /> : posts.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring mt-6 flex flex-col items-center py-20 gap-4 text-on-surf-var">
+        <div className="glass-light rounded-[24px] card-spring mt-6 flex flex-col items-center py-20 gap-4 text-bg/50">
           <Icon name="photo_library" className="w-[48px] h-[48px]" stroke={1.8} />
           <div className="text-center">
-            <p className="text-body-l text-on-surf font-medium">Sin publicaciones</p>
+            <p className="text-body-l text-bg font-medium">Sin publicaciones</p>
             <p className="text-body-s mt-1">Vincula tu primer post para que aparezca en la home.</p>
           </div>
         </div>
@@ -226,12 +226,12 @@ export default function AdminSocial() {
             const plat = PLATFORMS.find(pl => pl.value === p.platform);
             return (
               <div key={p.ID}
-                className={`relative rounded-xl overflow-hidden border border-white/10 group ${sizeClass} ${!p.is_active ? 'opacity-50' : ''}`}>
+                className={`relative rounded-xl overflow-hidden border border-bg/10 group ${sizeClass} ${!p.is_active ? 'opacity-50' : ''}`}>
                 {p.image_url ? (
                   <img src={p.image_url} alt={p.caption} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-white/8 flex items-center justify-center">
-                    <Icon name="broken_image" className="w-[32px] h-[32px] text-on-surf-var" stroke={1.8} />
+                  <div className="w-full h-full bg-bg/8 flex items-center justify-center">
+                    <Icon name="broken_image" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
                   </div>
                 )}
                 {/* Badge plataforma */}
@@ -244,11 +244,11 @@ export default function AdminSocial() {
                   {p.caption && <p className="text-label-s text-ink text-center line-clamp-2">{p.caption}</p>}
                   <div className="flex gap-2">
                     <button onClick={() => setEditing(p)}
-                      className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                      className="w-9 h-9 rounded-full bg-bg/20 hover:bg-bg/30 flex items-center justify-center transition-colors">
                       <Icon name="edit" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </button>
                     <a href={p.post_url} target="_blank" rel="noopener noreferrer"
-                      className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                      className="w-9 h-9 rounded-full bg-bg/20 hover:bg-bg/30 flex items-center justify-center transition-colors">
                       <Icon name="open_in_new" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </a>
                     <button onClick={() => remove(p.ID)}

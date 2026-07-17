@@ -529,6 +529,39 @@ html.lenis, html.lenis body { height: auto; }
             color: transparent;
   }
 
+  /* ── PANEL ADMIN EN CLARO (jul-2026) ──
+     Los paneles admin/líder/voluntario son modo claro estilo Apple:
+     canvas off-white (bg-paper), tinta navy, cards blancas escarchadas.
+     El sitio público sigue oscuro. Esta clase va en el ROOT de cada
+     layout de panel: corrige color-scheme (el :root global declara dark,
+     que pinta date/time pickers y scrollbars nativos oscuros — mal sobre
+     blanco). */
+  .admin-light {
+    color-scheme: light;
+  }
+  .admin-light ::-webkit-scrollbar-thumb { background: rgba(10, 21, 38, 0.15); }
+  .admin-light ::-webkit-scrollbar-thumb:hover { background: rgba(10, 21, 38, 0.3); }
+
+  /* Input claro del panel (NO tocar .input-squircle: esa es la del
+     público sobre navy y la usa Field/GlassField de Glass.jsx). */
+  .input-light {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(10, 21, 38, 0.12);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    color: var(--bg);
+    font-size: 14.5px;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  .input-light::placeholder { color: rgba(10, 21, 38, 0.35); }
+  .input-light:focus {
+    outline: none;
+    background: #FFFFFF;
+    border-color: var(--celeste);
+    box-shadow: var(--sh-ring);
+  }
+
   /* Squircle inputs — bg-soft inset, hairline */
   .input-squircle {
     width: 100%;

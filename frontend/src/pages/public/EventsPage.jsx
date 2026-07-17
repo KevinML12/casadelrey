@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button from '../../components/ui/Button';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Icon, Eyebrow, GlassButton } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -178,11 +177,11 @@ function RSVPModal({ event, onClose }) {
           <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${fieldCls} resize-none`} placeholder="¿Algo que debamos saber?" />
         </div>
         <div className="flex gap-3 pt-2 border-t border-white/10">
-          <Button type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
+          <GlassButton type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
             <Icon name="check" className="w-4 h-4" stroke={2} />
             {loading ? 'Verificando…' : event.requires_payment ? 'Verificar y registrar' : 'Confirmar asistencia'}
-          </Button>
-          <Button type="button" variant="text" onClick={onClose} className="text-white/60 hover:text-white">Cancelar</Button>
+          </GlassButton>
+          <GlassButton type="button" variant="ghost" onClick={onClose}>Cancelar</GlassButton>
         </div>
       </form>
     </ModalWrapper>

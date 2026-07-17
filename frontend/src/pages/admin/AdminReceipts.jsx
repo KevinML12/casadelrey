@@ -34,19 +34,19 @@ function RevertSection({ receipt, onDone, onClose }) {
 
   if (!confirm) return (
     <button onClick={() => setConfirm(true)}
-      className="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-white/10 text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+      className="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-bg/10 text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
       <Icon name="undo" className="w-[16px] h-[16px]" stroke={1.8} />
       Revertir a pendiente
     </button>
   );
 
   return (
-    <div className="liquid-glass rounded-[24px] card-spring p-4 space-y-3 animate-fade-in">
-      <p className="text-body-s text-on-surf font-semibold flex items-center gap-2">
-        <Icon name="undo" className="w-[18px] h-[18px] text-on-surf-var" stroke={1.8} />
+    <div className="glass-light rounded-[24px] card-spring p-4 space-y-3 animate-fade-in">
+      <p className="text-body-s text-bg font-semibold flex items-center gap-2">
+        <Icon name="undo" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
         ¿Revertir este comprobante a pendiente?
       </p>
-      <p className="text-body-s text-on-surf-var">Volverá a aparecer en la cola de verificación y deberás revisarlo nuevamente.</p>
+      <p className="text-body-s text-bg/50">Volverá a aparecer en la cola de verificación y deberás revisarlo nuevamente.</p>
       <div className="flex gap-2">
         <button onClick={revert} disabled={loading}
           className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
@@ -54,7 +54,7 @@ function RevertSection({ receipt, onDone, onClose }) {
           {loading ? 'Revirtiendo…' : 'Sí, revertir'}
         </button>
         <button onClick={() => setConfirm(false)}
-          className="flex-1 h-10 rounded-xl border border-white/10 text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+          className="flex-1 h-10 rounded-xl border border-bg/10 text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
           Cancelar
         </button>
       </div>
@@ -94,13 +94,13 @@ function VerifyModal({ receipt, onClose, onDone }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-surf rounded-2xl border border-white/10 shadow-elev-3 w-full max-w-lg animate-fade-in overflow-hidden">
+      <div className="absolute inset-0 bg-bg/40" onClick={onClose} />
+      <div className="relative bg-bg/4 rounded-2xl border border-bg/10 shadow-elev-3 w-full max-w-lg animate-fade-in overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <h3 className="text-title-l text-on-surf font-bold">Verificar comprobante</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surf-dim text-on-surf-var transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-bg/10">
+          <h3 className="text-title-l text-bg font-bold">Verificar comprobante</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-bg/8 text-bg/50 transition-colors">
             <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
           </button>
         </div>
@@ -110,9 +110,9 @@ function VerifyModal({ receipt, onClose, onDone }) {
           <div className="px-6 pt-5">
             <a href={receipt.receipt_image_url} target="_blank" rel="noopener noreferrer">
               <img src={receipt.receipt_image_url} alt="comprobante"
-                className="w-full max-h-64 object-contain rounded-xl border border-white/10 hover:opacity-90 transition-opacity" />
+                className="w-full max-h-64 object-contain rounded-xl border border-bg/10 hover:opacity-90 transition-opacity" />
             </a>
-            <p className="text-label-s text-on-surf-var mt-1.5 text-center">Toca la imagen para verla en tamaño completo</p>
+            <p className="text-label-s text-bg/50 mt-1.5 text-center">Toca la imagen para verla en tamaño completo</p>
           </div>
         )}
 
@@ -127,14 +127,14 @@ function VerifyModal({ receipt, onClose, onDone }) {
             { label: 'Propósito',  value: receipt.purpose || '—' },
           ].map(({ label, value }) => (
             <div key={label} className="flex gap-2 text-body-s">
-              <span className="text-on-surf-var w-24 shrink-0">{label}</span>
-              <span className="text-on-surf font-medium">{value}</span>
+              <span className="text-bg/50 w-24 shrink-0">{label}</span>
+              <span className="text-bg font-medium">{value}</span>
             </div>
           ))}
         </div>
 
         {/* Decisión */}
-        <div className="px-6 pb-6 space-y-3 border-t border-white/10 pt-4">
+        <div className="px-6 pb-6 space-y-3 border-t border-bg/10 pt-4">
 
           {/* Solo mostrar selección si el comprobante está pendiente */}
           {receipt.status === 'pendiente' && !confirmStep && (
@@ -145,7 +145,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
                     className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-xl text-label-l font-semibold transition-colors ${
                       status === s
                         ? s === 'verificado' ? 'bg-ter-con text-on-ter-con' : 'bg-err-con text-err'
-                        : 'border border-white/10 text-on-surf-var hover:bg-surf-dim'
+                        : 'border border-bg/10 text-bg/50 hover:bg-bg/8'
                     }`}>
                     <Icon name={s === 'verificado' ? 'check_circle' : 'cancel'} className="w-[16px] h-[16px]" stroke={1.8} />
                     {s === 'verificado' ? 'Aprobar' : 'Rechazar'}
@@ -155,7 +155,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
               {status === 'rechazado' && (
                 <textarea rows={2} value={reason} onChange={e => setReason(e.target.value)}
                   placeholder="Razón del rechazo (opcional)…"
-                  className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-transparent text-body-s text-on-surf placeholder:text-on-surf-var focus:outline-none focus:border-pri resize-none" />
+                  className="w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri resize-none" />
               )}
               <button onClick={handleAction} disabled={loading}
                 className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl text-label-l font-semibold transition-opacity disabled:opacity-50 ${
@@ -172,9 +172,9 @@ function VerifyModal({ receipt, onClose, onDone }) {
             <div className="rounded-2xl border-2 border-err bg-err-con/20 p-4 space-y-3 animate-fade-in">
               <div className="flex items-center gap-2">
                 <Icon name="warning" className="w-[22px] h-[22px] text-err" stroke={1.8} />
-                <p className="text-body-s text-on-surf font-semibold">¿Confirmas el rechazo?</p>
+                <p className="text-body-s text-bg font-semibold">¿Confirmas el rechazo?</p>
               </div>
-              <p className="text-body-s text-on-surf-var">
+              <p className="text-body-s text-bg/50">
                 Esta acción notifica al pagador que su comprobante fue rechazado.
                 Puedes revertirla después si cometiste un error.
               </p>
@@ -186,7 +186,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
                   {loading ? 'Rechazando…' : 'Sí, rechazar'}
                 </button>
                 <button onClick={() => setConfirmStep(false)}
-                  className="flex-1 h-10 rounded-xl border border-white/10 text-label-l text-on-surf-var hover:bg-surf-dim transition-colors">
+                  className="flex-1 h-10 rounded-xl border border-bg/10 text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
                   Volver
                 </button>
               </div>
@@ -235,8 +235,8 @@ export default function AdminReceipts() {
             <Icon name="receipt_long" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
           </div>
           <div>
-            <h1 className="text-headline-s text-on-surf font-black">Comprobantes</h1>
-            <p className="text-body-s text-on-surf-var mt-0.5">
+            <h1 className="text-headline-s text-bg font-black">Comprobantes</h1>
+            <p className="text-body-s text-bg/50 mt-0.5">
               {pending > 0
                 ? <><span className="text-pri font-semibold">{pending}</span> pendiente{pending > 1 ? 's' : ''} de verificar</>
                 : 'Todos verificados'}
@@ -256,40 +256,40 @@ export default function AdminReceipts() {
       {/* Lista */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
         </div>
       ) : receipts.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-on-surf-var">
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
           <Icon name="receipt_long" className="w-[48px] h-[48px]" stroke={1.8} />
-          <p className="text-body-l text-on-surf font-medium">Sin comprobantes</p>
+          <p className="text-body-l text-bg font-medium">Sin comprobantes</p>
           <p className="text-body-s">Los comprobantes enviados por los usuarios aparecerán aquí.</p>
         </div>
       ) : (
-        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {receipts.map(r => {
             const st = STATUS[r.status] || STATUS.pendiente;
             return (
-              <div key={r.ID} className="flex items-start gap-4 p-5 hover:bg-white/8 transition-colors">
+              <div key={r.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
                 {/* Miniatura */}
                 {r.receipt_image_url ? (
                   <img src={r.receipt_image_url} alt="comprobante"
-                    className="w-14 h-14 rounded-xl object-cover border border-white/10 shrink-0 cursor-pointer"
+                    className="w-14 h-14 rounded-xl object-cover border border-bg/10 shrink-0 cursor-pointer"
                     onClick={() => setSelected(r)} />
                 ) : (
-                  <div className="w-14 h-14 rounded-xl bg-white/8 flex items-center justify-center shrink-0">
-                    <Icon name="receipt_long" className="w-[24px] h-[24px] text-on-surf-var" stroke={1.8} />
+                  <div className="w-14 h-14 rounded-xl bg-bg/8 flex items-center justify-center shrink-0">
+                    <Icon name="receipt_long" className="w-[24px] h-[24px] text-bg/50" stroke={1.8} />
                   </div>
                 )}
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-body-l text-on-surf font-medium">{r.payer_name}</span>
+                    <span className="text-body-l text-bg font-medium">{r.payer_name}</span>
                     <Chip color={st.color} icon={st.icon}>{st.label}</Chip>
-                    <span className="text-label-l text-on-surf font-bold">Q{Number(r.amount).toFixed(2)}</span>
+                    <span className="text-label-l text-bg font-bold">Q{Number(r.amount).toFixed(2)}</span>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-on-surf-var">
+                  <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-bg/50">
                     {r.bank_name && <span className="flex items-center gap-1"><Icon name="account_balance" className="w-[13px] h-[13px]" stroke={1.8} />{r.bank_name}</span>}
                     {r.reference_number && <span className="flex items-center gap-1"><Icon name="tag" className="w-[13px] h-[13px]" stroke={1.8} />{r.reference_number}</span>}
                     {r.payer_phone && <span className="flex items-center gap-1"><Icon name="phone" className="w-[13px] h-[13px]" stroke={1.8} />{r.payer_phone}</span>}
@@ -302,7 +302,7 @@ export default function AdminReceipts() {
 
                 {/* Fecha + acción */}
                 <div className="flex items-center gap-2 shrink-0">
-                  <p className="text-label-s text-on-surf-var hidden sm:block">
+                  <p className="text-label-s text-bg/50 hidden sm:block">
                     {r.CreatedAt ? new Date(r.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
                   </p>
                   {r.status === 'pendiente' && (
@@ -313,7 +313,7 @@ export default function AdminReceipts() {
                     </button>
                   )}
                   {r.status !== 'pendiente' && (
-                    <IconButton onClick={() => setSelected(r)} title="Ver detalle" className="text-on-surf-var hover:text-on-surf">
+                    <IconButton onClick={() => setSelected(r)} title="Ver detalle" className="text-bg/50 hover:text-bg">
                       <Icon name="visibility" className="w-[16px] h-[16px]" stroke={1.8} />
                     </IconButton>
                   )}

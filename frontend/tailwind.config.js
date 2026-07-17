@@ -17,6 +17,12 @@ export default {
         'celeste-hov':  '#60A5FA',
         'celeste-soft': '#1E3A8A',     // Darker tint for navy bg
 
+        // Canvas CLARO del panel admin/líder/voluntario (jul-2026): el
+        // panel es modo claro estilo Apple (tinta navy sobre off-white);
+        // el sitio público sigue en navy oscuro. Off-white frío, no #FFF
+        // puro, para que las cards blancas resalten encima.
+        'paper':        '#F2F5FA',
+
         'rose':         '#F43F5E',
         'rose-soft':    '#881337',
         'amber':        '#F59E0B',

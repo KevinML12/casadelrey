@@ -5,7 +5,7 @@ import StatCard from '../../components/ui/StatCard';
 
 const Spinner = () => (
   <div className="p-6 flex justify-center py-20">
-    <div className="w-6 h-6 rounded-full border-2 border-white/15 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/15 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -43,10 +43,10 @@ export default function LeaderDashboard() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-[26px] text-white font-black mb-1">
+      <h1 className="text-[26px] text-bg font-black mb-1">
         {isAdmin ? 'Estadísticas de Células' : 'Mis Células'}
       </h1>
-      <p className="text-[13.5px] text-white/40 mb-6">Resumen de tus reportes</p>
+      <p className="text-[13.5px] text-bg/40 mb-6">Resumen de tus reportes</p>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
@@ -57,13 +57,13 @@ export default function LeaderDashboard() {
 
       {/* Por célula (admin) */}
       {isAdmin && kpis?.by_cell?.length > 0 && (
-        <div className="mb-8 p-5 rounded-[24px] liquid-glass">
-          <h3 className="text-[15px] text-white font-semibold mb-4">Por célula</h3>
+        <div className="mb-8 p-5 rounded-[24px] glass-light">
+          <h3 className="text-[15px] text-bg font-semibold mb-4">Por célula</h3>
           <div className="space-y-2">
             {kpis.by_cell.map((c, i) => (
-              <div key={i} className="flex justify-between items-center py-2 border-b border-white/10 last:border-0">
-                <span className="text-[13.5px] text-white font-medium">{c.cell_name}</span>
-                <span className="text-[13.5px] text-white/50">{c.reports} reportes · {c.attendance} asistentes</span>
+              <div key={i} className="flex justify-between items-center py-2 border-b border-bg/10 last:border-0">
+                <span className="text-[13.5px] text-bg font-medium">{c.cell_name}</span>
+                <span className="text-[13.5px] text-bg/50">{c.reports} reportes · {c.attendance} asistentes</span>
               </div>
             ))}
           </div>
@@ -73,13 +73,13 @@ export default function LeaderDashboard() {
       {/* Últimos reportes (líder) */}
       {!isAdmin && kpis?.recent_reports?.length > 0 && (
         <div>
-          <h3 className="text-[15px] text-white font-semibold mb-3">Últimos reportes</h3>
+          <h3 className="text-[15px] text-bg font-semibold mb-3">Últimos reportes</h3>
           <div className="space-y-2">
             {kpis.recent_reports.map(r => (
               <div key={r.ID}
-                className="flex justify-between items-center py-2.5 px-4 rounded-2xl liquid-glass">
-                <span className="text-[13.5px] text-white font-medium">{r.cell_name}</span>
-                <span className="text-[11.5px] text-white/40">
+                className="flex justify-between items-center py-2.5 px-4 rounded-2xl glass-light">
+                <span className="text-[13.5px] text-bg font-medium">{r.cell_name}</span>
+                <span className="text-[11.5px] text-bg/40">
                   {r.meeting_date || '—'} · {r.total_attendees ?? 0} asistentes
                 </span>
               </div>

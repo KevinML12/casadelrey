@@ -29,19 +29,19 @@ const DEPT_LABEL = {
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
   </div>
 );
 
 function EmptyState({ isAdmin }) {
   return (
-    <div className="flex flex-col items-center py-20 gap-4 text-on-surf-var">
-      <div className="w-16 h-16 rounded-[28px] bg-white/8 flex items-center justify-center">
+    <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
+      <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
         <Icon name="group_add" className="w-[32px] h-[32px]" stroke={1.8} />
       </div>
       <div className="text-center">
-        <p className="text-body-l text-on-surf font-medium">Sin voluntarios</p>
-        <p className="text-body-s text-on-surf-var mt-1">
+        <p className="text-body-l text-bg font-medium">Sin voluntarios</p>
+        <p className="text-body-s text-bg/50 mt-1">
           {isAdmin
             ? 'Las inscripciones del formulario público aparecerán aquí.'
             : 'Los voluntarios asignados a ti aparecerán aquí.'}
@@ -104,8 +104,8 @@ export default function AdminVolunteers() {
           <Icon name="group_add" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
         </div>
         <div>
-          <h1 className="text-headline-s text-on-surf font-black leading-tight">Voluntarios</h1>
-          <p className="text-body-s text-on-surf-var mt-0.5">
+          <h1 className="text-headline-s text-bg font-black leading-tight">Voluntarios</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">
             {isAdmin
               ? 'Inscripciones de interés. Asigna a un líder y crea usuarios.'
               : 'Voluntarios asignados a ti.'}
@@ -114,16 +114,16 @@ export default function AdminVolunteers() {
       </div>
 
       {loading ? <Spinner /> : volunteers.length === 0 ? (
-        <div className="liquid-glass rounded-[24px] card-spring">
+        <div className="glass-light rounded-[24px] card-spring">
           <EmptyState isAdmin={isAdmin} />
         </div>
       ) : (
-        <div className="liquid-glass rounded-[24px] card-spring overflow-hidden divide-y divide-white/8">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {volunteers.map(v => {
             const chip = STATUS_CHIP[v.status] || STATUS_CHIP.pendiente;
             const deptLabel = DEPT_LABEL[v.department] || v.department || v.area;
             return (
-              <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-white/8 transition-colors">
+              <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
                 {/* Leading icon */}
                 <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0 mt-0.5">
@@ -133,16 +133,16 @@ export default function AdminVolunteers() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                    <span className="text-body-l text-on-surf font-medium">{v.name}</span>
+                    <span className="text-body-l text-bg font-medium">{v.name}</span>
                     <Chip color={chip.color}>{chip.label}</Chip>
                     {deptLabel && (
                       <Chip color="secondary">{deptLabel}</Chip>
                     )}
                   </div>
-                  <p className="text-body-s text-on-surf-var">{v.email}</p>
-                  {v.phone && <p className="text-body-s text-on-surf-var">{v.phone}</p>}
+                  <p className="text-body-s text-bg/50">{v.email}</p>
+                  {v.phone && <p className="text-body-s text-bg/50">{v.phone}</p>}
                   {v.message && (
-                    <p className="text-body-s text-on-surf-var mt-2 line-clamp-2 leading-relaxed">{v.message}</p>
+                    <p className="text-body-s text-bg/50 mt-2 line-clamp-2 leading-relaxed">{v.message}</p>
                   )}
                 </div>
 
@@ -150,7 +150,7 @@ export default function AdminVolunteers() {
                 <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                   {isAdmin && v.status !== 'usuario_creado' && (
                     <select
-                      className="text-label-m rounded-lg border border-white/10 bg-surf px-3 py-1.5 text-on-surf focus:outline-none focus:border-pri transition-colors"
+                      className="text-label-m rounded-lg border border-bg/10 bg-bg/4 px-3 py-1.5 text-bg focus:outline-none focus:border-pri transition-colors"
                       value={v.assigned_leader_id || ''}
                       onChange={e => handleAssign(v.ID, e.target.value)}
                       disabled={!!assigning}
@@ -179,7 +179,7 @@ export default function AdminVolunteers() {
             style={{ background: 'rgba(0,0,0,.5)' }}
             onClick={() => { setCreateModal(null); setPassword(''); }} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-surf rounded-[28px] p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"
+            <div className="bg-bg/4 rounded-[28px] p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"
               onClick={e => e.stopPropagation()}>
 
               {/* Dialog icon */}
@@ -187,8 +187,8 @@ export default function AdminVolunteers() {
                 <Icon name="person_add" className="w-[24px] h-[24px] text-on-pri-con" stroke={1.8} />
               </div>
 
-              <h3 className="text-headline-s text-on-surf font-black text-center mb-2">Crear usuario</h3>
-              <p className="text-body-m text-on-surf-var text-center mb-6 leading-relaxed">
+              <h3 className="text-headline-s text-bg font-black text-center mb-2">Crear usuario</h3>
+              <p className="text-body-m text-bg/50 text-center mb-6 leading-relaxed">
                 Se creará la cuenta con el nombre y correo del voluntario. Define una contraseña temporal.
               </p>
 

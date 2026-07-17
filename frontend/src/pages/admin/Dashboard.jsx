@@ -19,27 +19,23 @@ const saludo = () => {
   return 'Buenas noches';
 };
 
-function SectionLabel({ icon, children, light = false }) {
-  const tone = light ? 'text-bg/50' : 'text-white/40';
+function SectionLabel({ icon, children }) {
   return (
     <div className="flex items-center gap-2 mb-4">
-      <Icon name={icon} className={`w-[18px] h-[18px] ${tone}`} stroke={1.8} />
-      <p className={`text-[12.5px] ${tone} font-semibold uppercase tracking-widest`}>{children}</p>
-      <div className={`flex-1 h-px ml-2 ${light ? 'bg-bg/10' : 'bg-white/10'}`} />
+      <Icon name={icon} className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
+      <p className="text-[12.5px] text-bg/45 font-semibold uppercase tracking-widest">{children}</p>
+      <div className="flex-1 h-px bg-bg/10 ml-2" />
     </div>
   );
 }
 
 // Card contenedora — agrupa un tema (General, Almas ganadas) en UNA pieza
 // grande en vez de una grilla pareja de cajas sueltas. Usa .glass-nav: el
-// MISMO blanco escarchado del header/nav público (el que al usuario le
-// gusta), texto navy encima. Antes fue liquid-glass oscuro con un glow de
-// color interno — descartado junto con el fondo multicolor ("se nota que
-// está hecho por IA"); el material blanco ES el efecto, sin decoración.
+// MISMO blanco escarchado del header/nav público, texto navy encima.
 function SectionContainer({ icon, label, children }) {
   return (
     <div className="glass-nav rounded-[32px] p-6 md:p-7 mb-8">
-      <SectionLabel icon={icon} light>{label}</SectionLabel>
+      <SectionLabel icon={icon}>{label}</SectionLabel>
       {children}
     </div>
   );
@@ -47,7 +43,7 @@ function SectionContainer({ icon, label, children }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-white/15 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/12 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -71,19 +67,18 @@ export default function Dashboard() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
 
-      {/* Saludo personalizado — texto suelto sobre el canvas navy, no es
-          un módulo/card: se queda blanco. */}
+      {/* Saludo personalizado */}
       <div className="mb-8">
-        <p className="text-[13.5px] text-white/40 capitalize">
+        <p className="text-[13.5px] text-bg/45 capitalize">
           {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
-        <h1 className="text-[26px] text-white font-black leading-tight mt-0.5">
+        <h1 className="text-[26px] text-bg font-black leading-tight mt-0.5">
           {saludo()}, {(user?.name || 'bienvenido').split(' ')[0]}
         </h1>
-        <p className="text-[13.5px] text-white/40 mt-1">Este es el resumen de la iglesia hoy.</p>
+        <p className="text-[13.5px] text-bg/45 mt-1">Este es el resumen de la iglesia hoy.</p>
       </div>
 
-      {/* Alertas pendientes — módulo sin foto de fondo → glass-light */}
+      {/* Alertas pendientes */}
       {!loading && notifs && (notifs.pending_cell_reports > 0 || notifs.unread_petitions > 0 || notifs.pending_volunteers > 0) && (
         <div className="mb-8 glass-light rounded-[24px] p-4 flex flex-wrap gap-4 items-center border border-rose/30">
           <Icon name="notifications_active" className="w-5 h-5 text-rose" stroke={1.8} />
@@ -111,55 +106,51 @@ export default function Dashboard() {
           StatCard blancas flotan encima */}
       <SectionContainer icon="bar_chart" label="General">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatCard icon="person"           label="Usuarios"        tint="pri" variant="light"
+          <StatCard icon="person"           label="Usuarios"        tint="pri"
             value={loading ? '…' : kpis?.total_users ?? 0} />
-          <StatCard icon="favorite"         label="Donaciones"      tint="err" variant="light"
+          <StatCard icon="favorite"         label="Donaciones"      tint="err"
             value={loading ? '…' : kpis?.total_donations ?? 0} />
-          <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter" variant="light"
+          <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter"
             value={loading ? '…' : kpis?.total_petitions ?? 0} />
-          <StatCard icon="payments"         label="Recaudado"       tint="sec" variant="light"
+          <StatCard icon="payments"         label="Recaudado"       tint="sec"
             value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
-          <StatCard icon="visibility"       label="Vistas blog"     tint="pri" variant="light"
+          <StatCard icon="visibility"       label="Vistas blog"     tint="pri"
             value={loading ? '…' : kpis?.total_blog_views ?? 0} />
-          <StatCard icon="groups"           label="Rept. células"   tint="ter" variant="light"
+          <StatCard icon="groups"           label="Rept. células"   tint="ter"
             value={loading ? '…' : kpis?.total_cell_reports ?? 0} />
         </div>
       </SectionContainer>
 
-      {/* Cell KPIs — segunda card contenedora, glow esmeralda para
-          diferenciarla visualmente de "General" */}
+      {/* Cell KPIs */}
       <SectionContainer icon="church" label="Almas ganadas">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard icon="person_add"       label="Convertidos"     tint="ter" variant="light"
+          <StatCard icon="person_add"       label="Convertidos"     tint="ter"
             value={loading ? '…' : cellStats?.total_converts ?? 0}
             sub="Este período" />
-          <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec" variant="light"
+          <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec"
             value={loading ? '…' : cellStats?.total_reconciled ?? 0}
             sub="Este período" />
-          <StatCard icon="savings"          label="Ofrenda células" tint="pri" variant="light"
+          <StatCard icon="savings"          label="Ofrenda células" tint="pri"
             value={loading ? '…' : cellStats?.total_offering != null ? `Q${Number(cellStats.total_offering).toFixed(0)}` : 'Q0'}
             sub="Total acumulado" />
         </div>
       </SectionContainer>
 
-      {/* Últimas donaciones — tabla densa: se queda oscura por legibilidad
-          (muchas filas de texto pequeño, el blanco compite más con la
-          data que ayuda). Regla: glass-light es para fragmentos sin foto
-          de fondo, no un mandato absoluto sobre tablas de datos densas. */}
+      {/* Últimas donaciones */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Icon name="payments" className="w-[18px] h-[18px] text-white/40" stroke={1.8} />
-          <p className="text-[12.5px] text-white/40 font-semibold uppercase tracking-widest">Últimas donaciones</p>
+          <Icon name="payments" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
+          <p className="text-[12.5px] text-bg/45 font-semibold uppercase tracking-widest">Últimas donaciones</p>
         </div>
         <Button variant="tonal" size="sm" onClick={() => downloadCsv('/admin/export/donations', 'donaciones.csv')}>
           <Icon name="download" className="w-4 h-4" stroke={1.8} />
           Exportar CSV
         </Button>
       </div>
-      <div className="liquid-glass rounded-[24px] overflow-hidden">
+      <div className="glass-light rounded-[24px] overflow-hidden">
         {loading ? <Spinner /> : donations.length === 0 ? (
-          <div className="flex flex-col items-center py-16 text-white/40 gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-white/6 flex items-center justify-center">
+          <div className="flex flex-col items-center py-16 text-bg/45 gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-bg/6 flex items-center justify-center">
               <Icon name="payments" className="w-7 h-7" stroke={1.5} />
             </div>
             <p className="text-[13.5px]">No hay donaciones registradas.</p>
@@ -168,25 +159,25 @@ export default function Dashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-bg/10">
                   {['#', 'Nombre', 'Destino', 'Monto', 'Método', 'Fecha'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 text-[11px] text-white/40 uppercase tracking-widest">{h}</th>
+                    <th key={h} className="text-left px-5 py-3 text-[11px] text-bg/45 uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/8">
+              <tbody className="divide-y divide-bg/8">
                 {donations.slice(0, 15).map(d => (
-                  <tr key={d.ID} className="hover:bg-white/5 transition-colors">
-                    <td className="px-5 py-3.5 text-[11.5px] text-white/40 font-mono">{d.ID}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-white font-medium">{d.name}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-white/50 capitalize">{d.donation_purpose || '—'}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-celeste-hov font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
+                  <tr key={d.ID} className="hover:bg-bg/4 transition-colors">
+                    <td className="px-5 py-3.5 text-[11.5px] text-bg/40 font-mono">{d.ID}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-bg font-medium">{d.name}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-bg/55 capitalize">{d.donation_purpose || '—'}</td>
+                    <td className="px-5 py-3.5 text-[13.5px] text-celeste font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
                     <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-white/8 text-white/60 text-[12px] font-medium">
+                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-bg/6 text-bg/60 text-[12px] font-medium">
                         {METHOD_LABEL[d.payment_method] || d.payment_method || '—'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-white/50 whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-[13.5px] text-bg/50 whitespace-nowrap">
                       {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
                     </td>
                   </tr>
