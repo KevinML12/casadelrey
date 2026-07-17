@@ -12,7 +12,7 @@ import { Icon } from '../../components/ui/Glass';
 function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
   return (
     <div className="flex items-center gap-4 p-4 rounded-2xl border border-bg/10">
-      <div className="glass-light rounded-[20px] card-spring w-20 h-20 overflow-hidden shrink-0">
+      <div className="bg-bg/8 rounded-[20px] w-20 h-20 overflow-hidden shrink-0">
         {imageUrl
           ? <img src={imageUrl} alt="" className="w-full h-full object-cover" />
           : <div className="w-full h-full flex items-center justify-center text-bg/50">
@@ -23,7 +23,7 @@ function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
       <div className="flex-1 min-w-0">
         <p className="text-title-s font-semibold text-bg truncate">{label}</p>
         {sublabel && <p className="text-label-s text-bg/50 mt-0.5">{sublabel}</p>}
-        {!imageUrl && <p className="text-label-s mt-1" style={{ color: 'var(--pri)' }}>Usando la imagen por defecto del sitio</p>}
+        {!imageUrl && <p className="text-label-s mt-1 text-amber">Usando la imagen por defecto del sitio</p>}
       </div>
       <label className="shrink-0 px-4 py-2.5 rounded-full border border-bg/10 text-label-m font-semibold text-bg hover:bg-bg/6 cursor-pointer transition-colors">
         {uploading ? 'Subiendo…' : 'Cambiar foto'}
