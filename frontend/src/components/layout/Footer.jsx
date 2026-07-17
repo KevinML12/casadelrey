@@ -5,13 +5,14 @@ import { Icon } from '../ui/Glass';
 // redes oficiales, podcast y fundadores. Nada inventado — teléfono,
 // correo y horarios se agregan cuando el pastor los entregue.
 const NAV = [
-  { id: '/',        label: 'Inicio' },
-  { id: '/about',   label: 'Nosotros' },
-  { id: '/celulas', label: 'Células' },
-  { id: '/events',  label: 'Eventos' },
-  { id: '/blog',    label: 'Blog' },
-  { id: '/gallery', label: 'Galería' },
-  { id: '/donate',  label: 'Dar' },
+  { id: '/',             label: 'Inicio' },
+  { id: '/about',        label: 'Nosotros' },
+  { id: '/celulas',      label: 'Células' },
+  { id: '/volunteering', label: 'Voluntariado' },
+  { id: '/events',       label: 'Eventos' },
+  { id: '/blog',         label: 'Blog' },
+  { id: '/gallery',      label: 'Galería' },
+  { id: '/donate',       label: 'Dar' },
 ];
 
 const SOCIAL = [

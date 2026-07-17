@@ -7,12 +7,13 @@ import { Icon } from '../ui/Glass';
 // Espeja las secciones reales del sitio (mismo orden que el Footer).
 // "Dar" no va aquí: es el CTA de la derecha cuando hay sesión.
 const NAV_LINKS = [
-  { label: 'Inicio',   to: '/' },
-  { label: 'Nosotros', to: '/about' },
-  { label: 'Células',  to: '/celulas' },
-  { label: 'Eventos',  to: '/events' },
-  { label: 'Blog',     to: '/blog' },
-  { label: 'Galería',  to: '/gallery' },
+  { label: 'Inicio',       to: '/' },
+  { label: 'Nosotros',     to: '/about' },
+  { label: 'Células',      to: '/celulas' },
+  { label: 'Voluntariado', to: '/volunteering' },
+  { label: 'Eventos',      to: '/events' },
+  { label: 'Blog',         to: '/blog' },
+  { label: 'Galería',      to: '/gallery' },
 ];
 
 export default function Header() {
@@ -69,11 +70,13 @@ export default function Header() {
             <span className="text-[15px] font-extrabold tracking-tightish text-bg">Casa del Rey</span>
           </Link>
 
-          {/* Desktop nav links — solo desde lg (1024px): entre 768-1024 el
-              pill quedaba apretadísimo con 6 links + avatar + CTA, así que
-              ese rango usa el menú hamburguesa (limpio) en vez de un punto
-              intermedio incómodo donde "se ve" pero mal. */}
-          <div className="hidden lg:flex items-center gap-0.5">
+          {/* Desktop nav links — solo desde xl (1280px). Con 7 links (se
+              agregó Voluntariado) + avatar + Dar + Conéctate, medido en
+              vivo: a 1024px (lg) el hueco entre los links y las acciones
+              de la derecha era 0px, sin margen — cualquier nombre de
+              usuario un poco más largo lo desbordaba. Subido a xl para
+              tener aire real; 1024-1280 usa el menú hamburguesa. */}
+          <div className="hidden xl:flex items-center gap-0.5">
             {NAV_LINKS.map(n => (
               <NavLink key={n.to} to={n.to} end={n.to === '/'}>
                 {({ isActive }) => (
@@ -174,7 +177,7 @@ export default function Header() {
 
             <button
               onClick={() => setMenuOpen(o => !o)}
-              className="lg:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring"
+              className="xl:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring"
               aria-label="Menú"
             >
               <Icon name={menuOpen ? 'close' : 'menu'} />
@@ -182,9 +185,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile sheet — cubre tablet y laptop angosto (< 1024px) */}
+        {/* Mobile sheet — cubre tablet y laptop angosto (< 1280px) */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-500 ease-spring ${
+          className={`xl:hidden overflow-hidden transition-all duration-500 ease-spring ${
             menuOpen ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
