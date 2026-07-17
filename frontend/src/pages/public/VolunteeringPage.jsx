@@ -16,6 +16,22 @@ const PRESS = {
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
 
+const STATS = [
+  { n: '~90', label: 'Voluntarios sirviendo' },
+  { n: '10', label: 'Departamentos' },
+  { n: '20', label: 'Líderes de célula' },
+];
+
+// Agrupa los 10 departamentos en familias temáticas -- antes era un solo
+// grid plano de 10 tarjetas idénticas, sin jerarquía visual.
+const CATEGORIES = [
+  { name: 'Alabanza y arte', values: ['alabanza', 'danza'] },
+  { name: 'Anfitrionaje y protocolo', values: ['servidores', 'protocolo', 'pancartas'] },
+  { name: 'Niños y enseñanza', values: ['maestros_ninos'] },
+  { name: 'Multimedia y producción', values: ['tecnicos_audiovisuales', 'multimedia'] },
+  { name: 'Oración y logística', values: ['oracion', 'logistica'] },
+];
+
 function VolunteerForm({ preselected, onClearPreselected }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', department: preselected || '', message: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -116,6 +132,36 @@ function VolunteerForm({ preselected, onClearPreselected }) {
   );
 }
 
+function AreaCard({ value, icon, title, desc, isSelected, onClick }) {
+  return (
+    <Tilt
+      as="button"
+      type="button"
+      onClick={onClick}
+      max={4}
+      glass="standard"
+      className={`w-full h-full flex items-start gap-4 p-6 rounded-[20px] text-left glass-light transition-colors ${
+        isSelected ? 'ring-2 ring-bg' : 'hover:bg-bg/5'
+      }`}
+    >
+      <div className={`grid place-items-center w-12 h-12 rounded-full shrink-0 transition-colors ${
+        isSelected ? 'bg-bg text-white' : 'bg-bg/8 text-bg/70 border border-bg/12'
+      }`}>
+        <Icon name={icon} className="w-5 h-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <h3 className="text-[16.5px] font-bold text-bg tracking-tight mb-1">{title}</h3>
+        <p className="text-[13.5px] text-bg/50 leading-relaxed">{desc}</p>
+      </div>
+      {isSelected && (
+        <span className="w-6 h-6 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
+          <Icon name="check" className="w-3.5 h-3.5" stroke={2.4} />
+        </span>
+      )}
+    </Tilt>
+  );
+}
+
 export default function VolunteeringPage() {
   const [selected, setSelected] = useState('');
   const formRef = useRef(null);
@@ -151,40 +197,31 @@ export default function VolunteeringPage() {
             <p className="mt-4 text-[15.5px] text-white/70">Toca un área para preseleccionarla en el formulario.</p>
           </Reveal>
 
-          <RevealList className="grid sm:grid-cols-2 gap-4 mb-16">
-            {AREAS.map(({ value, icon, title, desc }) => {
-              const isSelected = selected === value;
-              return (
-                <RevealItem key={value}>
-                  <Tilt
-                    as="button"
-                    type="button"
-                    onClick={() => handleAreaClick(value)}
-                    max={4}
-                    glass="standard"
-                    className={`w-full h-full flex items-start gap-4 p-6 rounded-[20px] text-left glass-light transition-colors ${
-                      isSelected ? 'ring-2 ring-bg' : 'hover:bg-bg/5'
-                    }`}
-                  >
-                    <div className={`grid place-items-center w-12 h-12 rounded-full shrink-0 transition-colors ${
-                      isSelected ? 'bg-bg text-white' : 'bg-bg/8 text-bg/70 border border-bg/12'
-                    }`}>
-                      <Icon name={icon} className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-[16.5px] font-bold text-bg tracking-tight mb-1">{title}</h3>
-                      <p className="text-[13.5px] text-bg/50 leading-relaxed">{desc}</p>
-                    </div>
-                    {isSelected && (
-                      <span className="w-6 h-6 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
-                        <Icon name="check" className="w-3.5 h-3.5" stroke={2.4} />
-                      </span>
-                    )}
-                  </Tilt>
-                </RevealItem>
-              );
-            })}
+          <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto mb-14">
+            {STATS.map(s => (
+              <RevealItem key={s.label}>
+                <div className="liquid-glass rounded-[18px] px-3 py-5 text-center h-full">
+                  <div className="text-[26px] sm:text-[30px] font-extrabold text-white tracking-tighter leading-none">{s.n}</div>
+                  <div className="mt-1.5 text-[11px] sm:text-[11.5px] font-semibold text-white/55 leading-tight">{s.label}</div>
+                </div>
+              </RevealItem>
+            ))}
           </RevealList>
+
+          <div className="space-y-10 mb-16">
+            {CATEGORIES.map(cat => (
+              <div key={cat.name}>
+                <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
+                <RevealList className="grid sm:grid-cols-2 gap-4">
+                  {AREAS.filter(a => cat.values.includes(a.value)).map(area => (
+                    <RevealItem key={area.value}>
+                      <AreaCard {...area} isSelected={selected === area.value} onClick={() => handleAreaClick(area.value)} />
+                    </RevealItem>
+                  ))}
+                </RevealList>
+              </div>
+            ))}
+          </div>
 
           <Reveal delay={0.1}>
             <div ref={formRef} className="glass-light rounded-[28px] p-8 md:p-11 scroll-mt-24">

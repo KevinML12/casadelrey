@@ -12,6 +12,16 @@ import { useSitePhoto } from '../../lib/feed';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-white/15 bg-white/5 text-[14px] text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all';
 
+// Collage estilo Galería para la vista de cuadrícula: variedad de tamaños
+// para TODOS los eventos (no solo el primero), con [grid-auto-flow:dense]
+// en el contenedor para que no queden huecos. Ver GalleryPage.jsx (SPANS/ROT).
+const GRID_SPANS = [
+  'col-span-2 row-span-2',
+  'col-span-2 sm:col-span-1 row-span-1',
+  'col-span-2 sm:col-span-1 row-span-1',
+  'col-span-2 row-span-1',
+];
+
 function PaymentBanner({ event }) {
   return (
     <div className="rounded-[18px] border border-white/12 bg-white/5 p-4 space-y-3 mb-4">
@@ -257,7 +267,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
     .filter(Boolean)
     .map(s => s[0].toUpperCase() + s.slice(1))
     .join(' · ');
-  const bentoSpan = i === 0 ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
+  const bentoSpan = GRID_SPANS[i % GRID_SPANS.length];
 
   // Sin foto la card es glass-light (blanco), con foto sigue siendo el
   // liquid-glass oscuro de siempre -- la tinta cambia con el material.
@@ -273,13 +283,13 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
   return (
     <motion.div
       ref={nodeRef}
-      layout="position"
       initial={{ opacity: 0, y: 20, ...(isCarousel ? {} : { rotateX: 10, scale: 0.96 }) }}
       animate={{ opacity: 1, y: 0, ...(isCarousel ? {} : { rotateX: 0, scale: 1 }) }}
+      whileHover={isCarousel ? { scale: 1.02 } : { scale: 1.03, zIndex: 20 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={isCarousel ? undefined : { transformPerspective: 1000 }}
-      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'glass-light'} ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
+      className={`${isCarousel ? 'snap-start' : bentoSpan} w-full h-full liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'glass-light'} ${isCarousel ? 'shadow-card-lg' : ''} transition-shadow`}
     >
 
       {hasPhoto && (
@@ -293,44 +303,44 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
 
       {/* Etiqueta de próximo evento si es el primero */}
       {i === 0 && (
-        <motion.div layout className="absolute top-6 left-6 z-20">
+        <div className="absolute top-6 left-6 z-20">
           <span className="liquid-glass px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
             Próximo evento
           </span>
-        </motion.div>
+        </div>
       )}
 
       {/* Contenido (Liquid Glass Panel) */}
-      <motion.div layout className={hasPhoto
-        ? `absolute bottom-0 left-0 right-0 z-20 ${isCarousel ? 'p-6' : 'p-5'}`
-        : `relative z-20 h-full flex flex-col justify-end ${isCarousel ? 'p-6' : 'p-5'}`
+      <div className={hasPhoto
+        ? 'absolute bottom-0 left-0 right-0 z-20 p-5'
+        : 'relative z-20 h-full flex flex-col justify-end p-5'
       }>
-        <div className={`${hasPhoto ? 'liquid-glass bg-white/5 border border-white/10 backdrop-blur-2xl' : ''} rounded-[24px] flex flex-col gap-4 ${isCarousel ? 'p-6' : 'p-5'}`}>
+        <div className={`${hasPhoto ? 'liquid-glass bg-white/5 border border-white/10 backdrop-blur-2xl p-5' : ''} rounded-[24px] flex flex-col gap-4`}>
 
-          <motion.div layout className="flex items-center gap-4 w-full min-w-0">
+          <div className="flex items-center gap-4 w-full min-w-0">
             {/* Fecha */}
             {dayNum && (
-              <motion.div layout className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl ${wellBg} border ${wellBorder} shadow-inner w-[60px] h-[60px]`}>
+              <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl ${wellBg} border ${wellBorder} shadow-inner w-[60px] h-[60px]`}>
                 <div className={`font-black leading-none ${ink} tracking-tighter text-[24px]`}>
                   {dayNum}
                 </div>
                 <div className={`font-bold tracking-[2px] mt-1 ${ink50} text-[9px]`}>
                   {monthStr}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Detalles */}
-            <motion.div layout className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1">
               <p className={`font-mono text-[10px] tracking-[1.5px] ${ink40} uppercase mb-1`}>
                 {weekday}
               </p>
               <h3 className={`font-bold tracking-tight ${ink} line-clamp-1 text-[20px] leading-tight`}>
                 {ev.title}
               </h3>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {details && (
             <p className={`truncate ${ink60} flex items-center gap-1.5 text-[13px]`}>
@@ -339,7 +349,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
             </p>
           )}
 
-          <motion.div layout className={`shrink-0 flex flex-col gap-3 w-full pt-3 border-t ${wellBorder}`}>
+          <div className={`shrink-0 flex flex-col gap-3 w-full pt-3 border-t ${wellBorder}`}>
             {(ev.requires_payment || ev.spots_remaining != null) && (
               <div className="flex flex-wrap gap-2">
                 {ev.requires_payment && (
@@ -362,7 +372,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               onClick={() => !ev.is_full && onRsvp(ev)}
               disabled={ev.is_full}
-              className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'} ${
+              className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
                 ev.is_full
                   ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
                   : hasPhoto
@@ -380,10 +390,10 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
             >
               ¿Ya te registraste? Cancelar mi registro
             </button>
-          </motion.div>
+          </div>
 
         </div>
-      </motion.div>
+      </div>
 
     </motion.div>
   );
@@ -495,14 +505,14 @@ export default function EventsPage() {
         ) : (
           /* ── Contenedor de Eventos ── */
           <motion.div ref={scrollRef} layout className={viewMode === 'carousel'
-            ? "flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pr-6 md:pr-12 hide-scrollbar"
-            : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] gap-6"
+            ? "grid grid-flow-col grid-rows-[repeat(2,350px)] sm:grid-rows-[repeat(2,380px)] auto-cols-[300px] sm:auto-cols-[340px] gap-5 overflow-x-auto snap-x snap-mandatory pb-12 pr-6 md:pr-12 hide-scrollbar"
+            : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-5 [grid-auto-flow:dense]"
           }
           style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
 
             <AnimatePresence>
             {events.map((ev, i) => (
-              <EventCard key={ev.ID} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
+              <EventCard key={`${ev.ID}-${viewMode}`} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
             ))}
             </AnimatePresence>
           </motion.div>
