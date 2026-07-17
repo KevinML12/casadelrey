@@ -64,9 +64,9 @@ function RSVPModal({ event, onClose }) {
       if (status === 402) {
         // No tiene boleta → mandar a subir comprobante
         setStep('need_payment');
-      } else if (status === 409) {
-        toast.error('Ya estás registrado en este evento con ese correo.');
       } else {
+        // 409 puede ser correo duplicado O cupo lleno/insuficiente — el
+        // backend ya manda el mensaje exacto en cada caso.
         toast.error(err.response?.data?.error || 'Error al registrar');
       }
     } finally { setLoading(false); }
@@ -169,7 +169,12 @@ function RSVPModal({ event, onClose }) {
           </div>
           <div>
             <label className="block text-[12px] font-bold text-white/60 mb-1">Asistentes</label>
-            <input type="number" min={1} max={20} value={form.attendee_count} onChange={set('attendee_count')} className={fieldCls} />
+            <input type="number" min={1} max={event.spots_remaining ?? 20} value={form.attendee_count} onChange={set('attendee_count')} className={fieldCls} />
+            {event.spots_remaining != null && (
+              <p className="text-[11px] text-white/40 mt-1">
+                {event.spots_remaining} cupo{event.spots_remaining === 1 ? '' : 's'} disponible{event.spots_remaining === 1 ? '' : 's'}
+              </p>
+            )}
           </div>
         </div>
         <div>
@@ -266,20 +271,36 @@ function EventCard({ ev, i, isCarousel, onRsvp }) {
           )}
 
           <motion.div layout className="shrink-0 flex flex-col gap-3 w-full pt-3 border-t border-white/10">
-            {ev.requires_payment && (
-              <span className="font-bold text-[12px] text-white/80 flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
-                Q{Number(ev.price_gtq).toFixed(0)}
-              </span>
+            {(ev.requires_payment || ev.spots_remaining != null) && (
+              <div className="flex flex-wrap gap-2">
+                {ev.requires_payment && (
+                  <span className="font-bold text-[12px] text-white/80 flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
+                    Q{Number(ev.price_gtq).toFixed(0)}
+                  </span>
+                )}
+                {ev.spots_remaining != null && (
+                  <span className={`font-bold text-[12px] flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
+                    ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : 'text-white/80 bg-white/5 border-white/10'
+                  }`}>
+                    {ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupo${ev.spots_remaining === 1 ? '' : 's'} disponible${ev.spots_remaining === 1 ? '' : 's'}`}
+                  </span>
+                )}
+              </div>
             )}
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={ev.is_full ? undefined : { scale: 1.03 }}
+              whileTap={ev.is_full ? undefined : { scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-              onClick={() => onRsvp(ev)}
-              className={`rounded-full liquid-glass text-white text-[14px] font-bold hover:border-white/30 inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'}`}
+              onClick={() => !ev.is_full && onRsvp(ev)}
+              disabled={ev.is_full}
+              className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'} ${
+                ev.is_full
+                  ? 'bg-white/5 border border-white/10 text-white/40 cursor-not-allowed'
+                  : 'liquid-glass text-white hover:border-white/30'
+              }`}
             >
-              {ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-              <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />
+              {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
+              {!ev.is_full && <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />}
             </motion.button>
           </motion.div>
 

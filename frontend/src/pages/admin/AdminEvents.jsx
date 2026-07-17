@@ -8,7 +8,7 @@ import { Icon } from '../../components/ui/Glass';
 
 const EMPTY = {
   title: '', date: '', time: '', location: '', description: '', cover_image: '',
-  requires_payment: false, price_gtq: '', payment_deadline: '',
+  requires_payment: false, price_gtq: '', payment_deadline: '', capacity: '',
 };
 
 function EventForm({ initial, onSave, onCancel, loading }) {
@@ -39,6 +39,7 @@ function EventForm({ initial, onSave, onCancel, loading }) {
       ...form,
       price_gtq: form.requires_payment ? Number(form.price_gtq) || 0 : 0,
       payment_deadline: form.requires_payment ? form.payment_deadline : '',
+      capacity: Number(form.capacity) || 0,
     });
   };
 
@@ -59,6 +60,9 @@ function EventForm({ initial, onSave, onCancel, loading }) {
           <Input label="Hora" type="time" value={form.time} onChange={set('time')} />
           <Input label="Ubicación" value={form.location} onChange={set('location')} placeholder="Ej: Salón Principal" />
         </div>
+        <Input label="Cupo máximo" type="number" min="0" value={form.capacity} onChange={set('capacity')}
+          placeholder="Sin límite" helperText="Déjalo vacío o en 0 para no limitar los cupos." />
+
         <Textarea label="Descripción" rows={3} value={form.description} onChange={set('description')} />
 
         <div>
@@ -130,10 +134,11 @@ function EventDate({ dateStr }) {
 
 // ─── RSVPs inline per event ──────────────────────────────────────────────────
 
-function EventRSVPs({ eventId }) {
+function EventRSVPs({ eventId, onChanged }) {
   const [rsvps,    setRsvps]    = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [totAtts,  setTotAtts]  = useState(0);
+  const [removing, setRemoving] = useState(null);
 
   useEffect(() => {
     apiClient.get(`/admin/events/${eventId}/rsvps`)
@@ -145,6 +150,20 @@ function EventRSVPs({ eventId }) {
       .catch(() => setRsvps([]))
       .finally(() => setLoading(false));
   }, [eventId]);
+
+  const handleCancel = async (rsvp) => {
+    if (!confirm(`¿Cancelar el registro de ${rsvp.name}?`)) return;
+    setRemoving(rsvp.ID);
+    try {
+      await apiClient.delete(`/admin/rsvps/${rsvp.ID}`);
+      setRsvps(prev => prev.filter(r => r.ID !== rsvp.ID));
+      setTotAtts(prev => Math.max(0, prev - (rsvp.attendee_count || 1)));
+      toast.success('Registro cancelado');
+      onChanged?.(); // refresca el cupo mostrado en la fila del evento
+    } catch {
+      toast.error('Error al cancelar el registro');
+    } finally { setRemoving(null); }
+  };
 
   if (loading) return (
     <div className="px-5 pb-4 flex items-center gap-2 text-body-s text-bg/50">
@@ -175,6 +194,13 @@ function EventRSVPs({ eventId }) {
               <p className="text-label-s text-bg/50">{r.email}{r.phone ? ` · ${r.phone}` : ''}</p>
             </div>
             <Chip color="secondary">{r.attendee_count || 1} {r.attendee_count === 1 ? 'pers.' : 'pers.'}</Chip>
+            <IconButton
+              onClick={() => handleCancel(r)}
+              disabled={removing === r.ID}
+              className="shrink-0 text-bg/40 hover:text-rose hover:bg-rose/8"
+            >
+              <Icon name="close" className="w-[16px] h-[16px]" stroke={1.8} />
+            </IconButton>
           </div>
         ))}
       </div>
@@ -304,6 +330,11 @@ export default function AdminEvents() {
                   {ev.description && (
                     <p className="text-body-s text-bg/50 mt-2 line-clamp-2 leading-relaxed">{ev.description}</p>
                   )}
+                  {ev.capacity > 0 && (
+                    <Chip color={ev.is_full ? 'error' : 'default'} icon="groups" className="mt-2 w-fit">
+                      {ev.attendee_count || 0}/{ev.capacity} cupos{ev.is_full ? ' · lleno' : ''}
+                    </Chip>
+                  )}
                 </div>
 
                 {/* Trailing */}
@@ -327,7 +358,7 @@ export default function AdminEvents() {
               </div>
 
               {/* RSVPs expandido */}
-              {expanded === ev.ID && <EventRSVPs eventId={ev.ID} />}
+              {expanded === ev.ID && <EventRSVPs eventId={ev.ID} onChanged={load} />}
             </div>
           ))}
         </div>

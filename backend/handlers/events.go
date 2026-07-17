@@ -21,6 +21,40 @@ func NewEventHandler(db *gorm.DB) *EventHandler {
 	return &EventHandler{DB: db}
 }
 
+// eventWithAvailability agrega el cupo disponible a la respuesta pública sin
+// tocar la tabla Event. SpotsRemaining queda nil cuando el evento no tiene
+// límite de cupo (Capacity == 0), asi el frontend distingue "sin límite" de
+// "cupo lleno" (spots_remaining: 0).
+type eventWithAvailability struct {
+	models.Event
+	AttendeeCount  int64 `json:"attendee_count"`
+	SpotsRemaining *int  `json:"spots_remaining"`
+	IsFull         bool  `json:"is_full"`
+}
+
+func attendeeCountFor(db *gorm.DB, eventID uint) int64 {
+	var count int64
+	db.Model(&models.EventRegistration{}).
+		Where("event_id = ?", eventID).
+		Select("COALESCE(SUM(attendee_count), 0)").
+		Scan(&count)
+	return count
+}
+
+func withAvailability(db *gorm.DB, ev models.Event) eventWithAvailability {
+	attendeeCount := attendeeCountFor(db, ev.ID)
+	item := eventWithAvailability{Event: ev, AttendeeCount: attendeeCount}
+	if ev.Capacity > 0 {
+		remaining := ev.Capacity - int(attendeeCount)
+		if remaining < 0 {
+			remaining = 0
+		}
+		item.SpotsRemaining = &remaining
+		item.IsFull = remaining <= 0
+	}
+	return item
+}
+
 // GetEvents godoc
 // GET /api/v1/events/
 // Lista todos los eventos activos, ordenados por fecha ascendente.
@@ -38,7 +72,12 @@ func (h *EventHandler) GetEvents(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, events)
+	out := make([]eventWithAvailability, 0, len(events))
+	for _, ev := range events {
+		out = append(out, withAvailability(h.DB, ev))
+	}
+
+	return c.JSON(http.StatusOK, out)
 }
 
 // CreateEvent godoc

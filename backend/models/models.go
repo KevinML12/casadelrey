@@ -164,6 +164,7 @@ type Event struct {
 	RequiresPayment bool    `json:"requires_payment" gorm:"default:false"`
 	PriceGTQ        float64 `json:"price_gtq" gorm:"type:decimal(10,2);default:0"`
 	PaymentDeadline string  `json:"payment_deadline" gorm:"type:varchar(20)"`
+	Capacity        int     `json:"capacity" gorm:"default:0"` // 0 = sin limite de cupo
 }
 
 type CellReport struct {
