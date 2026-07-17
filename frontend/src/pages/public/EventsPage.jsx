@@ -193,7 +193,55 @@ function RSVPModal({ event, onClose }) {
   );
 }
 
-function EventCard({ ev, i, isCarousel, onRsvp }) {
+// El invitado no tiene sesion, asi que el correo con el que se registro es
+// la unica prueba de identidad disponible (misma logica que RegisterRSVP
+// usa para evitar duplicados).
+function CancelRSVPModal({ event, onClose, onCancelled }) {
+  const [email, setEmail]     = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleCancel = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    try {
+      await apiClient.delete(`/events/${event.ID}/rsvp?email=${encodeURIComponent(email)}`);
+      toast.success('Tu registro fue cancelado.');
+      onCancelled?.();
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'No pudimos cancelar tu registro.');
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <ModalWrapper onClose={onClose}>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-[12px] text-white font-bold uppercase tracking-wide">Cancelar registro</p>
+          <p className="text-[13.5px] text-white/60 mt-0.5 truncate max-w-64">{event.title}</p>
+        </div>
+        <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+          <Icon name="close" className="w-4 h-4 text-white/60" />
+        </button>
+      </div>
+      <form onSubmit={handleCancel} className="space-y-3">
+        <div>
+          <label className="block text-[12px] font-bold text-white/60 mb-1">Correo con el que te registraste</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className={fieldCls} placeholder="tu@correo.com" required autoFocus />
+        </div>
+        <div className="flex gap-3 pt-2 border-t border-white/10">
+          <GlassButton type="submit" variant="glass" disabled={loading} className="flex-1 justify-center rounded-full">
+            {loading ? 'Cancelando…' : 'Cancelar mi registro'}
+          </GlassButton>
+          <GlassButton type="button" variant="ghost" onClick={onClose}>Volver</GlassButton>
+        </div>
+      </form>
+    </ModalWrapper>
+  );
+}
+
+function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
   const nodeRef = useRef(null);
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
@@ -302,6 +350,13 @@ function EventCard({ ev, i, isCarousel, onRsvp }) {
               {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
               {!ev.is_full && <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />}
             </motion.button>
+            <button
+              type="button"
+              onClick={() => onCancelRsvp(ev)}
+              className="text-white/35 hover:text-white/60 text-[11.5px] font-medium transition-colors self-center"
+            >
+              ¿Ya te registraste? Cancelar mi registro
+            </button>
           </motion.div>
 
         </div>
@@ -333,6 +388,7 @@ export default function EventsPage() {
 
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
+  const [cancelEvent, setCancelEvent] = useState(null);
   const [viewMode, setViewMode] = useState('carousel');
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -345,6 +401,14 @@ export default function EventsPage() {
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  // Cache-bust: /events/ tiene 20s de Cache-Control (ver AdminEvents.jsx),
+  // por eso tras cancelar un RSVP pedimos con _t para ver el cupo real de
+  // inmediato en vez del spots_remaining cacheado de hace segundos.
+  const reloadEvents = () =>
+    apiClient.get(`/events/?_t=${Date.now()}`)
+      .then(r => setEvents(r.data || []))
+      .catch(() => {});
 
   useEffect(() => {
     Promise.all([
@@ -415,7 +479,7 @@ export default function EventsPage() {
 
             <AnimatePresence>
             {events.map((ev, i) => (
-              <EventCard key={ev.ID} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} />
+              <EventCard key={ev.ID} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
             ))}
             </AnimatePresence>
           </motion.div>
@@ -498,6 +562,13 @@ export default function EventsPage() {
       {/* RSVP Modal */}
       <AnimatePresence>
         {rsvpEvent && <RSVPModal event={rsvpEvent} onClose={() => setRsvpEvent(null)} />}
+        {cancelEvent && (
+          <CancelRSVPModal
+            event={cancelEvent}
+            onClose={() => setCancelEvent(null)}
+            onCancelled={reloadEvents}
+          />
+        )}
       </AnimatePresence>
     </main>
   );

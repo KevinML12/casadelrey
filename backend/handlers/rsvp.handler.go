@@ -196,3 +196,27 @@ func (h *RSVPHandler) DeleteRSVP(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Registro eliminado."})
 }
+
+// CancelMyRSVP DELETE /api/v1/events/:id/rsvp?email=... — público.
+// El invitado cancela su propio registro dando el correo con el que se
+// registró (no hay login para invitados, así que el correo es la unica
+// prueba de identidad que tenemos — igual que RegisterRSVP lo usa para
+// evitar duplicados).
+func (h *RSVPHandler) CancelMyRSVP(c echo.Context) error {
+	eventID := c.Param("id")
+	email := c.QueryParam("email")
+	if email == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Correo requerido."})
+	}
+
+	var reg models.EventRegistration
+	if err := h.DB.Where("event_id = ? AND email = ?", eventID, email).First(&reg).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "No encontramos un registro con ese correo para este evento."})
+	}
+
+	if err := h.DB.Delete(&reg).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al cancelar el registro."})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Registro cancelado."})
+}

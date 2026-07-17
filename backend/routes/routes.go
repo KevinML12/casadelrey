@@ -127,6 +127,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	eventsGroup.GET("",               eventHandler.GetEvents, cacheShort)
 	eventsGroup.GET("/",              eventHandler.GetEvents, cacheShort)
 	eventsGroup.POST("/:id/rsvp",    rsvpHandler.RegisterRSVP)
+	eventsGroup.DELETE("/:id/rsvp",  rsvpHandler.CancelMyRSVP)
 
 	// Células (público: lectura de categorías + listado seguro de células)
 	cellsGroup := api.Group("/cell-categories")
