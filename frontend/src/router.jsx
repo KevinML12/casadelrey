@@ -55,6 +55,11 @@ const AdminSettings      = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminConnectCards  = lazy(() => import('./pages/admin/AdminConnectCards'));
 const ReceiptPage        = lazy(() => import('./pages/public/ReceiptPage'));
 const ProfilePage        = lazy(() => import('./pages/public/ProfilePage'));
+// Perfil dentro del panel (admin/lider) — version clara estilo Apple,
+// distinta de ProfilePage (esa es liquid-glass oscuro, solo para /profile
+// publica). Compartir ProfilePage con el panel dejaba ese unico rincon sin
+// convertir al modo claro, rompiendo consistencia con el resto del panel.
+const AdminProfile       = lazy(() => import('./pages/admin/AdminProfile'));
 
 // Páginas líder — lazy
 import LeaderLayout        from './components/layout/LeaderLayout';
@@ -99,7 +104,7 @@ export const router = createBrowserRouter([
       { path: 'site-photos',     element: <Suspense fallback={<PageFallback />}><AdminSitePhotos /></Suspense> },
       { path: 'settings',        element: <Suspense fallback={<PageFallback />}><AdminSettings /></Suspense> },
       { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><AdminConnectCards /></Suspense> },
-      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
+      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><AdminProfile /></Suspense> },
     ],
   },
 
@@ -133,7 +138,7 @@ export const router = createBrowserRouter([
       { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><LeaderVolunteers /></Suspense> },
       { path: 'cell-directory',  element: <Suspense fallback={<PageFallback />}><LeaderCellDirectory /></Suspense> },
       { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><LeaderConnectCards /></Suspense> },
-      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense> },
+      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><AdminProfile /></Suspense> },
     ],
   },
 
