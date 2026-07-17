@@ -430,10 +430,10 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      <ParallaxImg src={heroImg} alt="Eventos" className="opacity-25" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/40" />
+      <ParallaxImg src={heroImg} alt="Eventos" className="opacity-45" />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg" />
 
-      <div className="relative z-10 pt-32 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
+      <div className="relative z-10 pt-40 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
         <Reveal>
           <Eyebrow>Agenda</Eyebrow>
           <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
@@ -473,7 +473,7 @@ export default function EventsPage() {
           /* ── Contenedor de Eventos ── */
           <motion.div ref={scrollRef} layout className={viewMode === 'carousel'
             ? "flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pr-6 md:pr-12 hide-scrollbar"
-            : "grid grid-cols-2 lg:grid-cols-4 auto-rows-[220px] gap-6"
+            : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] gap-6"
           }
           style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}>
 
