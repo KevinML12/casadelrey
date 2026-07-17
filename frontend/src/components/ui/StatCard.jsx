@@ -19,11 +19,20 @@ const TINTS = {
 
 // variant="dark" queda disponible por si algún contexto vuelve a canvas
 // navy, pero el default del panel es claro.
-export default function StatCard({ icon, label, value, tint = 'pri', sub, variant = 'light' }) {
+//
+// nested=true: usa .glass-light-nested (más transparente) en vez de
+// .glass-light — para cuando la card vive DENTRO de un contenedor
+// .glass-light (ej. SectionContainer del Dashboard), así se distinguen
+// como dos capas de verdad en vez de dos superficies con la misma
+// opacidad. Si la card NO tiene un .glass-light detrás (ej.
+// LeaderDashboard, que la pone directo sobre el canvas), deja nested en
+// false — .glass-light-nested sin nada semi-opaco detrás se lava.
+export default function StatCard({ icon, label, value, tint = 'pri', sub, variant = 'light', nested = false }) {
   const t = TINTS[tint] || TINTS.pri;
   const light = variant !== 'dark';
+  const material = light ? (nested ? 'glass-light-nested' : 'glass-light') : 'liquid-glass';
   return (
-    <div className={`${light ? 'glass-light' : 'liquid-glass'} rounded-[24px] card-spring p-5 flex flex-col gap-3`}>
+    <div className={`${material} rounded-[24px] card-spring p-5 flex flex-col gap-3`}>
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-whisper ${t.well}`}>
         <Icon name={icon} className="w-5 h-5 text-white" stroke={2} />
       </div>

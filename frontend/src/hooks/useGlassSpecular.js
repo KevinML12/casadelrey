@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 
 // Rastrea el cursor/dedo y alimenta --spec-x/--spec-y en CUALQUIER
-// .liquid-glass o .glass-light bajo el puntero — un solo listener
+// .liquid-glass, .glass-light o .glass-light-nested (la capa más
+// transparente que va DENTRO de un .glass-light) bajo el puntero — un
+// solo listener
 // delegado montado una vez por layout, en vez de envolver cada card
 // individualmente (a diferencia del Tilt.jsx del sitio público, que
 // hace tilt 3D por card: en un panel denso en datos/formularios la
@@ -20,7 +22,7 @@ export default function useGlassSpecular() {
     };
 
     const move = (x, y, target) => {
-      const el = target?.closest?.('.liquid-glass, .glass-light');
+      const el = target?.closest?.('.liquid-glass, .glass-light, .glass-light-nested');
       if (el !== current) { clear(); current = el; }
       if (!el) return;
       const r = el.getBoundingClientRect();

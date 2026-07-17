@@ -337,6 +337,41 @@ html.lenis, html.lenis body { height: auto; }
       0 4px 12px rgba(10, 21, 38, 0.14);
   }
 
+  /* .glass-light-nested — segunda capa, MÁS transparente que .glass-light.
+     Referencia del usuario: el Control Center de iOS (fondo → círculo de
+     cristal → otro círculo de cristal más transparente encima) — capas
+     que se distinguen por su nivel de transparencia, no todas al mismo
+     tono. Antes StatCard usaba .glass-light IGUAL que su SectionContainer
+     — dos capas con la misma opacidad no leen como capas, leen como una
+     sola superficie plana. Esta va DENTRO de un .glass-light (o de
+     cualquier superficie clara), nunca directo sobre bg-paper — necesita
+     algo semi-opaco detrás para no lavarse. */
+  .glass-light-nested {
+    background: linear-gradient(155deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.20) 55%, rgba(255,255,255,0.10) 100%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%) brightness(1.08);
+            backdrop-filter: blur(18px) saturate(170%) brightness(1.08);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.55) rgba(255, 255, 255, 0.24) rgba(255, 255, 255, 0.24) rgba(255, 255, 255, 0.4);
+    box-shadow:
+      inset 1px 1.5px 3px rgba(255, 255, 255, 0.7),
+      inset -1px -1px 4px rgba(255, 255, 255, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      0 10px 24px -12px rgba(10, 21, 38, 0.18);
+    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
+                --spec-x 0.6s var(--ease-spring), --spec-y 0.6s var(--ease-spring);
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-light-nested:hover {
+    border-color: rgba(255, 255, 255, 0.65) rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.48);
+    box-shadow:
+      inset 1px 1.5px 3px rgba(255, 255, 255, 0.78),
+      inset -1px -1px 4px rgba(255, 255, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 14px 30px -14px rgba(10, 21, 38, 0.22);
+  }
+
   /* .liquid-btn: Botones secundarios estilo cristal. */
   .liquid-btn {
     background: rgba(255, 255, 255, 0.1);
@@ -365,7 +400,8 @@ html.lenis, html.lenis body { height: auto; }
      material de Apple es calmo y reacciona a la interacción, no anima
      solo. */
   .liquid-glass::after,
-  .glass-light::after {
+  .glass-light::after,
+  .glass-light-nested::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -381,14 +417,16 @@ html.lenis, html.lenis body { height: auto; }
     transition: opacity 0.5s var(--ease-out);
   }
   .liquid-glass::after { mix-blend-mode: overlay; }
-  .glass-light::after {
+  .glass-light::after,
+  .glass-light-nested::after {
     background:
       radial-gradient(28px 18px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.95), transparent 70%),
       radial-gradient(105px 78px ellipse at calc(var(--spec-x, 50%) + 18px) calc(var(--spec-y, 0%) + 22px), rgba(255, 255, 255, 0.4), transparent 74%),
       radial-gradient(210px 160px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.18), transparent 76%);
   }
   .liquid-glass:hover::after,
-  .glass-light:hover::after { opacity: 1; }
+  .glass-light:hover::after,
+  .glass-light-nested:hover::after { opacity: 1; }
 
   /* Reflejo de vidrio FIJO (antes barría en loop — se leía como flash de
      plantilla/IA). Ahora es una franja de luz diagonal estática en la

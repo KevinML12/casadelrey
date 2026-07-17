@@ -107,17 +107,17 @@ export default function Dashboard() {
           StatCard blancas flotan encima */}
       <SectionContainer icon="bar_chart" label="General">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatCard icon="person"           label="Usuarios"        tint="pri"
+          <StatCard nested icon="person"           label="Usuarios"        tint="pri"
             value={loading ? '…' : kpis?.total_users ?? 0} />
-          <StatCard icon="favorite"         label="Donaciones"      tint="err"
+          <StatCard nested icon="favorite"         label="Donaciones"      tint="err"
             value={loading ? '…' : kpis?.total_donations ?? 0} />
-          <StatCard icon="volunteer_activism" label="Peticiones"    tint="ter"
+          <StatCard nested icon="volunteer_activism" label="Peticiones"    tint="ter"
             value={loading ? '…' : kpis?.total_petitions ?? 0} />
-          <StatCard icon="payments"         label="Recaudado"       tint="sec"
+          <StatCard nested icon="payments"         label="Recaudado"       tint="sec"
             value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
-          <StatCard icon="visibility"       label="Vistas blog"     tint="pri"
+          <StatCard nested icon="visibility"       label="Vistas blog"     tint="pri"
             value={loading ? '…' : kpis?.total_blog_views ?? 0} />
-          <StatCard icon="groups"           label="Rept. células"   tint="ter"
+          <StatCard nested icon="groups"           label="Rept. células"   tint="ter"
             value={loading ? '…' : kpis?.total_cell_reports ?? 0} />
         </div>
       </SectionContainer>
@@ -125,13 +125,13 @@ export default function Dashboard() {
       {/* Cell KPIs */}
       <SectionContainer icon="church" label="Almas ganadas">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard icon="person_add"       label="Convertidos"     tint="ter"
+          <StatCard nested icon="person_add"       label="Convertidos"     tint="ter"
             value={loading ? '…' : cellStats?.total_converts ?? 0}
             sub="Este período" />
-          <StatCard icon="favorite_border"  label="Reconciliados"   tint="sec"
+          <StatCard nested icon="favorite_border"  label="Reconciliados"   tint="sec"
             value={loading ? '…' : cellStats?.total_reconciled ?? 0}
             sub="Este período" />
-          <StatCard icon="savings"          label="Ofrenda células" tint="pri"
+          <StatCard nested icon="savings"          label="Ofrenda células" tint="pri"
             value={loading ? '…' : cellStats?.total_offering != null ? `Q${Number(cellStats.total_offering).toFixed(0)}` : 'Q0'}
             sub="Total acumulado" />
         </div>
