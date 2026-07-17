@@ -23,7 +23,7 @@ export default function StatCard({ icon, label, value, tint = 'pri', sub, varian
   const t = TINTS[tint] || TINTS.pri;
   const light = variant !== 'dark';
   return (
-    <div className={`${light ? 'glass-light' : 'liquid-glass'} rounded-[24px] p-5 flex flex-col gap-3`}>
+    <div className={`${light ? 'glass-light' : 'liquid-glass'} rounded-[24px] card-spring p-5 flex flex-col gap-3`}>
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-whisper ${t.well}`}>
         <Icon name={icon} className="w-5 h-5 text-white" stroke={2} />
       </div>

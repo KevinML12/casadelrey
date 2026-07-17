@@ -30,11 +30,12 @@ function SectionLabel({ icon, children }) {
 }
 
 // Card contenedora — agrupa un tema (General, Almas ganadas) en UNA pieza
-// grande en vez de una grilla pareja de cajas sueltas. Usa .glass-nav: el
-// MISMO blanco escarchado del header/nav público, texto navy encima.
+// grande en vez de una grilla pareja de cajas sueltas. .glass-light (no
+// .glass-nav — esa es la clase del navbar público y NUNCA recibe el brillo
+// al cursor, useGlassSpecular.js solo escucha .liquid-glass/.glass-light).
 function SectionContainer({ icon, label, children }) {
   return (
-    <div className="glass-nav rounded-[32px] p-6 md:p-7 mb-8">
+    <div className="glass-light rounded-[32px] card-spring p-6 md:p-7 mb-8">
       <SectionLabel icon={icon}>{label}</SectionLabel>
       {children}
     </div>
@@ -147,7 +148,7 @@ export default function Dashboard() {
           Exportar CSV
         </Button>
       </div>
-      <div className="glass-light rounded-[24px] overflow-hidden">
+      <div className="glass-light rounded-[24px] card-spring overflow-hidden">
         {loading ? <Spinner /> : donations.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-bg/45 gap-3">
             <div className="w-14 h-14 rounded-2xl bg-bg/6 flex items-center justify-center">
