@@ -289,7 +289,7 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
   );
 }
 
-function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
+function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
   const nodeRef = useRef(null);
   // Antes, sin cover_image, la card caia a glass-light (blanco/tinta navy) --
   // mezclada con las cards CON foto (liquid-glass oscuro) en el mismo grid,
@@ -322,13 +322,13 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
   return (
     <motion.div
       ref={nodeRef}
-      initial={{ opacity: 0, y: 20, ...(isCarousel ? {} : { rotateX: 10, scale: 0.96 }) }}
-      animate={{ opacity: 1, y: 0, ...(isCarousel ? {} : { rotateX: 0, scale: 1 }) }}
-      whileHover={isCarousel ? { scale: 1.02 } : { scale: 1.03, zIndex: 20 }}
+      initial={{ opacity: 0, y: 20, rotateX: 10, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      whileHover={{ scale: 1.03, zIndex: 20 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-      style={isCarousel ? undefined : { transformPerspective: 1000 }}
-      className={`${isCarousel ? 'snap-start' : bentoSpan} w-full h-full liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'liquid-glass'} ${isCarousel ? 'shadow-card-lg' : ''} transition-shadow`}
+      style={{ transformPerspective: 1000 }}
+      className={`${bentoSpan} w-full h-full liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'liquid-glass'} transition-shadow`}
     >
 
       {hasPhoto && (
@@ -439,6 +439,34 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
   );
 }
 
+// Card compacta para eventos que ya pasaron -- sin RSVP (no tiene sentido
+// registrarse a un evento que ya ocurrio), sin badge de precio/cupo, mas
+// pequeña y con menos peso visual que las cards de proximos eventos.
+function PastEventCard({ ev }) {
+  const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
+  const dayNum   = d ? d.getDate() : null;
+  const monthStr = d ? d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase() : null;
+  const details  = [ev.time, ev.location]
+    .filter(Boolean)
+    .map(s => s[0].toUpperCase() + s.slice(1))
+    .join(' · ');
+
+  return (
+    <div className="liquid-glass rounded-[20px] p-4 flex items-center gap-4">
+      {dayNum && (
+        <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-xl bg-white/5 border border-white/10 w-12 h-12">
+          <div className="font-black leading-none text-white/70 text-[16px]">{dayNum}</div>
+          <div className="font-bold tracking-[1.5px] text-white/40 text-[7px]">{monthStr}</div>
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <h4 className="font-bold text-white/70 text-[14.5px] tracking-tight line-clamp-1">{ev.title}</h4>
+        {details && <p className="text-white/40 text-[12px] truncate mt-0.5">{details}</p>}
+      </div>
+    </div>
+  );
+}
+
 function ModalWrapper({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -462,18 +490,16 @@ export default function EventsPage() {
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
   const [cancelEvent, setCancelEvent] = useState(null);
-  const [viewMode, setViewMode] = useState('carousel');
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Referencias para el carrusel
-  const scrollRef = useRef(null);
-
-  const scrollContainer = (direction) => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -350 : 350;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
+  // Fecha local (no UTC -- toISOString() se adelanta un dia cerca de
+  // medianoche en Guatemala, UTC-6) para separar proximos de pasados.
+  // El backend ya ordena ASC por fecha; ya no hay que reordenar los
+  // proximos, solo invertir los pasados (mas reciente primero).
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const upcomingEvents = events.filter(ev => !ev.date || ev.date >= todayStr);
+  const pastEvents = events.filter(ev => ev.date && ev.date < todayStr).slice().reverse();
 
   // Cache-bust: /events/ tiene 20s de Cache-Control (ver AdminEvents.jsx),
   // por eso tras cancelar un RSVP pedimos con _t para ver el cupo real de
@@ -510,28 +536,13 @@ export default function EventsPage() {
         <Reveal>
           <Eyebrow>Agenda</Eyebrow>
           <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
-          <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-10">
+          <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-2">
             Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
           </p>
-
-          {events.length > 0 && (
-            <div className="w-full flex justify-center">
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.94 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                onClick={() => setViewMode(v => v === 'carousel' ? 'grid' : 'carousel')}
-                className="liquid-glass px-4 py-2 rounded-full text-white/70 hover:text-white text-[13px] font-bold transition-colors flex items-center gap-2"
-              >
-                <Icon name={viewMode === 'carousel' ? 'search' : 'calendar'} className="w-4 h-4" />
-                {viewMode === 'carousel' ? 'Vista en cuadrícula' : 'Vista en carrusel'}
-              </motion.button>
-            </div>
-          )}
         </Reveal>
       </div>
 
-      <motion.div layout className={`relative z-10 mx-auto pb-32 w-full flex-1 ${viewMode === 'carousel' ? 'max-w-none pl-6 md:pl-12' : 'max-w-7xl px-6'}`}>
+      <div className="relative z-10 mx-auto pb-20 w-full flex-1 max-w-7xl px-6">
         {events.length === 0 ? (
           /* ── Empty state ── */
           <div className="py-32 flex flex-col items-center gap-5">
@@ -542,59 +553,38 @@ export default function EventsPage() {
             </p>
             <p className="text-white/40 text-[16px]">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
           </div>
+        ) : upcomingEvents.length === 0 ? (
+          <div className="py-16 text-center">
+            <p className="text-white/50 font-bold text-[20px]">No hay próximos eventos por ahora.</p>
+            <p className="text-white/40 text-[15px] mt-2">Revisa los eventos pasados más abajo.</p>
+          </div>
         ) : (
-          /* ── Contenedor de Eventos ── */
-          /* key={viewMode} en el contenedor (no en cada card): al alternar
-             cuadricula/carrusel, el contenedor VIEJO (con sus cards viejas,
-             clasificadas para el grid template anterior) debe desmontarse
-             POR COMPLETO antes de que el nuevo monte -- si coexistian como
-             hijos del mismo grid (como pasaba antes, con solo la key de
-             cada card sufijada), el grid intentaba ubicar cards viejas y
-             nuevas a la vez con templates distintos y el resultado se veia
-             roto/superpuesto. mode="wait" fuerza esa secuencia. */
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={viewMode}
-              ref={scrollRef}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className={viewMode === 'carousel'
-                ? "grid grid-flow-col grid-rows-[repeat(2,350px)] sm:grid-rows-[repeat(2,380px)] auto-cols-[300px] sm:auto-cols-[340px] gap-5 overflow-x-auto snap-x snap-mandatory pb-12 pr-6 md:pr-12 hide-scrollbar"
-                : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-5 [grid-auto-flow:dense]"
-              }
-              style={viewMode === 'carousel' ? { scrollPadding: '1.5rem', scrollbarWidth: 'none' } : {}}
-            >
-              {events.map((ev, i) => (
-                <EventCard key={ev.ID} ev={ev} i={i} isCarousel={viewMode === 'carousel'} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
+          /* ── Cuadrícula de próximos eventos ── */
+          <AnimatePresence>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-5 [grid-auto-flow:dense]">
+              {upcomingEvents.map((ev, i) => (
+                <EventCard key={ev.ID} ev={ev} i={i} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
               ))}
-            </motion.div>
+            </div>
           </AnimatePresence>
         )}
-      </motion.div>
 
-      {/* Botones de navegación del carrusel (solo visibles en modo carrusel) */}
-      {viewMode === 'carousel' && events.length > 0 && (
-        <div className="relative z-10 flex justify-center gap-4 pb-20">
-          <motion.button
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={() => scrollContainer('left')}
-            className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
-          >
-            <Icon name="arrow" className="w-5 h-5 rotate-180" stroke={2} />
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={() => scrollContainer('right')}
-            className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
-          >
-            <Icon name="arrow" className="w-5 h-5" stroke={2} />
-          </motion.button>
-        </div>
-      )}
+        {/* ── Eventos pasados: compactos, sin RSVP, mas recientes primero ── */}
+        {pastEvents.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-white/5">
+            <Reveal className="mb-6">
+              <p className="text-[13px] font-bold text-white/40 uppercase tracking-tightish">Eventos pasados</p>
+            </Reveal>
+            <RevealList className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {pastEvents.map(ev => (
+                <RevealItem key={ev.ID}>
+                  <PastEventCard ev={ev} />
+                </RevealItem>
+              ))}
+            </RevealList>
+          </div>
+        )}
+      </div>
 
       {/* Secciones dinámicas: FAQs */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/5 pt-20 mt-10">
