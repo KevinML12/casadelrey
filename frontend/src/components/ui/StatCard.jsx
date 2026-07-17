@@ -2,14 +2,19 @@ import { Icon } from './Glass';
 
 // Panel en MODO CLARO (jul-2026): card blanca escarchada (.glass-light)
 // sobre canvas off-white, tinta navy. El pozo de ícono es estilo iOS
-// Ajustes: cuadrado redondeado de color SÓLIDO con el glifo en blanco —
-// ese es el acento de color del panel, no fondos tintados lavados.
+// Ajustes: cuadrado redondeado de color SÓLIDO con el glifo en blanco.
+//
+// pri/ter usaban celeste/celeste-hov (azul brillante saturado) — se leía
+// "de juguete/IA". El acento por defecto pasa a ser el MISMO navy que ya
+// es la tinta de todo el sitio público (--bg), no un azul nuevo — la
+// marca es monocromática navy+blanco, el celeste queda solo para estados
+// muy puntuales (enlaces, focus ring), nunca como color de bloque grande.
 const TINTS = {
-  pri: { well: 'bg-celeste',  val: 'text-bg' },
-  sec: { well: 'bg-amber',    val: 'text-bg' },
-  ter: { well: 'bg-celeste-hov', val: 'text-bg' },
-  err: { well: 'bg-rose',     val: 'text-bg' },
-  ok:  { well: 'bg-emerald',  val: 'text-bg' },
+  pri: { well: 'bg-bg',          val: 'text-bg' },
+  sec: { well: 'bg-amber',       val: 'text-bg' },
+  ter: { well: 'bg-celeste-soft', val: 'text-bg' },
+  err: { well: 'bg-rose',        val: 'text-bg' },
+  ok:  { well: 'bg-emerald',     val: 'text-bg' },
 };
 
 // variant="dark" queda disponible por si algún contexto vuelve a canvas

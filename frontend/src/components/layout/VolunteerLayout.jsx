@@ -24,12 +24,12 @@ export default function VolunteerLayout() {
       {/* Topbar — panel de cristal flotante */}
       <header className="relative z-10 m-3 mb-0 glass-light rounded-[24px] h-16 flex items-center px-6 gap-4 shrink-0 sticky top-3">
         <Link to="/" className="flex items-center gap-2.5 mr-auto group">
-          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste shadow-pri">
+          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-bg shadow-card">
             <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="hidden sm:block">
             <p className="text-[14.5px] font-extrabold tracking-tightish text-bg leading-tight">Casa del Rey</p>
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-celeste mt-0.5">Voluntario</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-widest text-bg/55 mt-0.5">Voluntario</p>
           </div>
         </Link>
 
@@ -38,7 +38,7 @@ export default function VolunteerLayout() {
             <p className="text-[13.5px] text-bg font-bold leading-tight">{user?.name}</p>
             <p className="text-[11.5px] text-bg/45">{user?.email}</p>
           </div>
-          <span className="grid place-items-center w-9 h-9 rounded-full bg-celeste text-white text-[13px] font-extrabold shadow-pri">
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-[13px] font-extrabold shadow-card">
             {initial}
           </span>
           <button

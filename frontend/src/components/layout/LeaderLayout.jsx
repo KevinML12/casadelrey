@@ -32,12 +32,12 @@ function SidebarContent({ onClose }) {
     <div className="flex flex-col h-full glass-light rounded-[28px] overflow-hidden">
       <div className="px-5 py-6 border-b border-bg/10">
         <Link to="/leader" onClick={onClose} className="flex items-center gap-2.5 group">
-          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-celeste shadow-pri">
+          <span className="grid place-items-center w-10 h-10 rounded-2xl bg-bg shadow-card">
             <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="min-w-0">
             <p className="text-[14.5px] font-extrabold tracking-tightish text-bg leading-tight">Casa del Rey</p>
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-celeste mt-0.5">Panel Líder</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-widest text-bg/55 mt-0.5">Panel Líder</p>
           </div>
         </Link>
       </div>
@@ -54,7 +54,7 @@ function SidebarContent({ onClose }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-2xl text-[13.5px] font-semibold tracking-tightish transition-all duration-300 ${
                   isActive
-                    ? 'bg-celeste text-white shadow-card'
+                    ? 'bg-bg text-white shadow-card'
                     : 'text-bg/60 hover:text-bg hover:bg-bg/6'
                 }`
               }
@@ -73,7 +73,7 @@ function SidebarContent({ onClose }) {
 
       <div className="px-3 pb-4 pt-3 border-t border-bg/10 space-y-0.5">
         <div className="px-3 py-2.5 flex items-center gap-3">
-          <span className="grid place-items-center w-9 h-9 rounded-full bg-celeste text-white text-[13px] font-extrabold shadow-pri shrink-0">
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-[13px] font-extrabold shadow-card shrink-0">
             {(user?.name || user?.email || '?')[0].toUpperCase()}
           </span>
           <div className="min-w-0">

@@ -297,20 +297,20 @@ html.lenis, html.lenis body { height: auto; }
 
   .glass-light {
     /* v1: rgba(255,255,255,0.48) plano — caja blanca lechosa, sin luz.
-       v2: gradiente 0.64→0.30 — mejor bisel, pero sobre navy liso (donde
-       no llega el halo) el backdrop-filter mezcla tanto navy oscuro que
-       sale gris azulado apagado ("parece pañal"). El material dependía
-       demasiado de lo que hubiera detrás.
-       v3 (actual): opacidad base mucho más alta (0.90→0.62) — el blanco
-       ya NO depende de que haya brillo detrás para leerse blanco, es
-       blanco de verdad. El gradiente + bisel asimétrico + backdrop-filter
-       (blur/saturate/brightness) siguen dando la textura de vidrio, ya no
-       la opacidad en sí. Menos "ves a través", pero es la variante que SÍ
-       se sostiene sola sobre navy plano — igual que el vidrio esmerilado
-       real de iOS/macOS, que es opaco y aun así lee como cristal. */
-    background: linear-gradient(155deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.76) 55%, rgba(255,255,255,0.62) 100%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.12);
-            backdrop-filter: blur(24px) saturate(180%) brightness(1.12);
+       v2: gradiente 0.64→0.30 — mejor bisel, pero sobre NAVY liso (el
+       panel admin de esa época) el backdrop-filter mezclaba tanto navy
+       oscuro que salía gris azulado apagado ("parece pañal").
+       v3: opacidad forzada a 0.90→0.62 para que se sostuviera sola sobre
+       ese navy — funcionó, pero quedó demasiado opaca/plana, perdiendo
+       el "ves a través" que sí tiene esta misma clase en el dropdown del
+       header público (que el usuario señaló como referencia).
+       v4 (actual): el panel admin YA NO es navy — es bg-paper claro
+       (ver .admin-light) más los halos celestes. Ya no hay nada oscuro
+       detrás que ensuciar, así que se puede bajar la opacidad de vuelta
+       a un rango translúcido de verdad sin repetir el problema de v2. */
+    background: linear-gradient(155deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.42) 55%, rgba(255,255,255,0.28) 100%);
+    -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.06);
+            backdrop-filter: blur(26px) saturate(180%) brightness(1.06);
     border-width: 1px;
     border-style: solid;
     border-color: rgba(255, 255, 255, 0.7) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.62);
