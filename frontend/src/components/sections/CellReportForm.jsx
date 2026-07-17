@@ -172,11 +172,11 @@ export default function CellReportForm({ onSuccess }) {
               className={fieldCls} placeholder="0.00" />
           </Field>
         </div>
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-pri-con">
-          <Icon name="person_add" className="w-[18px] h-[18px] text-on-pri-con" stroke={1.8} />
-          <span className="text-body-s text-on-pri-con">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-bg">
+          <Icon name="person_add" className="w-[18px] h-[18px] text-white" stroke={1.8} />
+          <span className="text-body-s text-white">
             Nuevos total: <strong>{(parseInt(form.converts, 10) || 0) + (parseInt(form.reconciled, 10) || 0)}</strong>
-            <span className="text-on-pri-con/60 ml-2">({form.converts || 0} conv. + {form.reconciled || 0} rec.)</span>
+            <span className="text-white/60 ml-2">({form.converts || 0} conv. + {form.reconciled || 0} rec.)</span>
           </span>
         </div>
       </div>

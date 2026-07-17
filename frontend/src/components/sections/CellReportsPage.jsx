@@ -21,9 +21,9 @@ const Spinner = () => (
 
 function MiniStat({ icon, label, value, tint = 'pri' }) {
   const tintMap = {
-    pri: 'bg-pri-con text-on-pri-con',
-    sec: 'bg-sec-con text-on-sec-con',
-    ter: 'bg-ter-con text-on-ter-con',
+    pri: 'bg-bg text-white',
+    sec: 'bg-emerald text-white',
+    ter: 'bg-celeste text-white',
   };
   return (
     <div className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
@@ -215,7 +215,7 @@ export default function CellReportsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       {r.cell_code && (
-                        <span className="text-label-s font-mono px-2 h-7 flex items-center rounded-lg bg-pri-con text-on-pri-con">{r.cell_code}</span>
+                        <span className="text-label-s font-mono px-2 h-7 flex items-center rounded-lg bg-bg text-white">{r.cell_code}</span>
                       )}
                       <span className="text-body-l text-bg font-medium">{r.cell_name}</span>
                       <Chip color={st.color} icon={st.icon}>{st.label}</Chip>
@@ -255,10 +255,10 @@ export default function CellReportsPage() {
                     {/* Números */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { icon: 'groups',      label: 'Asistentes',   value: r.total_attendees ?? 0, tint: 'bg-sec-con text-on-sec-con' },
-                        { icon: 'church',      label: 'Convertidos',  value: r.converts ?? 0,        tint: 'bg-ter-con text-on-ter-con' },
-                        { icon: 'favorite',    label: 'Reconciliados', value: r.reconciled ?? 0,     tint: 'bg-pri-con text-on-pri-con' },
-                        { icon: 'savings',     label: 'Ofrenda',      value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'bg-sec-con text-on-sec-con' },
+                        { icon: 'groups',      label: 'Asistentes',   value: r.total_attendees ?? 0, tint: 'bg-bg text-white' },
+                        { icon: 'church',      label: 'Convertidos',  value: r.converts ?? 0,        tint: 'bg-emerald text-white' },
+                        { icon: 'favorite',    label: 'Reconciliados', value: r.reconciled ?? 0,     tint: 'bg-celeste text-white' },
+                        { icon: 'savings',     label: 'Ofrenda',      value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'bg-bg text-white' },
                       ].map(({ icon, label, value, tint }) => (
                         <div key={label} className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tint}`}>

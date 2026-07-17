@@ -12,9 +12,15 @@ export default function ProtectedRoute({
   const { isAuthenticated, isAdmin, isLeader, isVolunteer, canAccessPanel, loading } = useAuth();
 
   if (loading) {
+    // adminOnly/leaderOnly/volunteerOnly/panel envuelven el panel claro
+    // (Apple light); sin ninguna de esas props es /profile publica
+    // (navy oscuro) — bg-surf/border-outline-var ahi SI es correcto, pero
+    // mostraba ese flash oscuro tambien al entrar a /admin, /leader,
+    // /volunteer mientras resolvia el login.
+    const isPanel = adminOnly || leaderOnly || leaderOrAdmin || volunteerOnly || panel;
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surf">
-        <div className="w-10 h-10 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+      <div className={`min-h-screen flex items-center justify-center ${isPanel ? 'bg-paper' : 'bg-surf'}`}>
+        <div className={`w-10 h-10 rounded-full border-2 border-t-pri animate-spin ${isPanel ? 'border-bg/12' : 'border-outline-var'}`} />
       </div>
     );
   }

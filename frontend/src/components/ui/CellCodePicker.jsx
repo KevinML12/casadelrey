@@ -36,8 +36,8 @@ export function buildCode(type, number) {
   return `${t.prefix}${number}`;
 }
 
-const selectCls = 'h-10 px-3 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all disabled:opacity-50 cursor-pointer';
-const inputCls  = 'w-20 h-10 px-3 rounded-xl border border-outline-var bg-transparent text-body-s text-on-surf text-center focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all disabled:opacity-50';
+const selectCls = 'h-10 px-3 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all disabled:opacity-50 cursor-pointer';
+const inputCls  = 'w-20 h-10 px-3 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg text-center hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all disabled:opacity-50';
 
 export default function CellCodePicker({ cellCode, cellType, onChange, disabled = false, className = '' }) {
   const parsed   = parseCode(cellCode);
@@ -80,11 +80,11 @@ export default function CellCodePicker({ cellCode, cellType, onChange, disabled 
 
       {/* Preview del código generado */}
       {preview ? (
-        <span className="inline-flex items-center gap-1.5 px-3 h-10 rounded-xl bg-pri-con text-on-pri-con text-label-l font-bold font-mono">
+        <span className="inline-flex items-center gap-1.5 px-3 h-10 rounded-xl bg-bg text-white text-label-l font-bold font-mono">
           {preview}
         </span>
       ) : (
-        <span className="inline-flex items-center px-3 h-10 rounded-xl border border-dashed border-outline-var text-label-m text-on-surf-var font-mono">
+        <span className="inline-flex items-center px-3 h-10 rounded-xl border border-dashed border-bg/15 text-label-m text-bg/40 font-mono">
           —
         </span>
       )}
