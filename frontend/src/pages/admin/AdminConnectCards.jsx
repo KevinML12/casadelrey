@@ -74,8 +74,8 @@ export default function AdminConnectCards() {
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-            <Icon name="contact_page" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="contact_page" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Conéctate</h1>
@@ -170,7 +170,7 @@ export default function AdminConnectCards() {
                     {nextStatus && (
                       <button
                         onClick={() => updateCard(card.ID, { status: nextStatus })}
-                        className="text-label-m px-2.5 py-1.5 rounded-lg border border-bg/10 text-pri hover:bg-pri-con transition-colors"
+                        className="text-label-m px-2.5 py-1.5 rounded-lg border border-bg/10 text-bg hover:bg-bg/8 transition-colors"
                       >
                         Marcar como {STATUS_LABEL[nextStatus].toLowerCase()}
                       </button>

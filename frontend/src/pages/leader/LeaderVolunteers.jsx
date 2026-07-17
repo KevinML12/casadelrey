@@ -7,9 +7,9 @@ import { Icon } from '../../components/ui/Glass';
 
 const STATUS_CHIP = {
   pendiente:      { label: 'Pendiente',      cls: 'bg-bg/8 text-bg/50' },
-  asignado:       { label: 'Asignado',       cls: 'bg-pri-con text-on-pri-con' },
-  coordinando:    { label: 'Coordinando',    cls: 'bg-sec-con text-on-sec-con' },
-  usuario_creado: { label: 'Usuario creado', cls: 'bg-ter-con text-on-ter-con' },
+  asignado:       { label: 'Asignado',       cls: 'bg-celeste text-white' },
+  coordinando:    { label: 'Coordinando',    cls: 'bg-amber text-white' },
+  usuario_creado: { label: 'Usuario creado', cls: 'bg-emerald text-white' },
 };
 
 const Spinner = () => (
@@ -81,7 +81,7 @@ export default function LeaderVolunteers() {
                   {v.status !== 'usuario_creado' && (
                     <button
                       onClick={() => setCreateModal(v.ID)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pri text-on-pri text-label-m font-medium hover:opacity-90 transition-opacity shrink-0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg text-white text-label-m font-medium hover:opacity-90 transition-opacity shrink-0"
                     >
                       <Icon name="person_add" className="w-[14px] h-[14px]" stroke={1.8} />
                       Crear usuario
@@ -99,7 +99,7 @@ export default function LeaderVolunteers() {
         <>
           <div className="fixed inset-0 bg-bg/40 z-40" onClick={() => { setCreateModal(null); setPassword(''); }} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-bg/4 border border-bg/10 rounded-xl p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"
+            <div className="glass-light rounded-xl p-6 w-full max-w-sm animate-fade-in"
               onClick={e => e.stopPropagation()}>
               <h3 className="text-title-l text-bg font-bold mb-2">Crear usuario</h3>
               <p className="text-body-s text-bg/50 mb-4 leading-relaxed">

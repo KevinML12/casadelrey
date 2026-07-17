@@ -80,7 +80,7 @@ function NewGoalForm({ onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 p-4 rounded-2xl border border-pri/30 bg-pri-con/10">
+    <form onSubmit={handleSubmit} className="space-y-3 p-4 rounded-2xl border border-bg/15 bg-bg/4">
       <input
         value={form.title}
         onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -104,7 +104,7 @@ function NewGoalForm({ onSave, onCancel }) {
       />
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={loading}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
           <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Guardar'}
         </button>
@@ -205,7 +205,7 @@ export default function VolunteerDashboard() {
               <img src={myLeader.photo_url} alt={volunteer.assigned_leader_name}
                 className="w-14 h-14 rounded-full object-cover border border-bg/10 shrink-0" />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-surf-container border border-bg/10 grid place-items-center shrink-0">
+              <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/10 grid place-items-center shrink-0">
                 <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
               </div>
             )}
@@ -218,7 +218,7 @@ export default function VolunteerDashboard() {
                 <a
                   href={`https://wa.me/${myLeader.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${volunteer.assigned_leader_name.split(' ')[0]}, soy ${user?.name || 'voluntario'} de ${dept?.label || 'voluntariado'}.`)}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity"
                 >
                   <Icon name="chat" className="w-[16px] h-[16px]" stroke={1.8} />
                   WhatsApp
@@ -249,15 +249,15 @@ export default function VolunteerDashboard() {
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-2xl border border-bg/10 bg-bg/4 p-4">
-          <div className="w-8 h-8 rounded-lg bg-pri-con flex items-center justify-center mb-3">
-            <Icon name="task_alt" className="w-[16px] h-[16px] text-on-pri-con" stroke={1.8} />
+          <div className="w-8 h-8 rounded-lg bg-bg flex items-center justify-center mb-3">
+            <Icon name="task_alt" className="w-[16px] h-[16px] text-white" stroke={1.8} />
           </div>
           <p className="text-label-s text-bg/50 uppercase tracking-widest">Pendientes</p>
           <p className="text-headline-m text-bg font-black">{pending}</p>
         </div>
         <div className="rounded-2xl border border-bg/10 bg-bg/4 p-4">
-          <div className="w-8 h-8 rounded-lg bg-ter-con flex items-center justify-center mb-3">
-            <Icon name="check_circle" className="w-[16px] h-[16px] text-on-ter-con" stroke={1.8} />
+          <div className="w-8 h-8 rounded-lg bg-emerald flex items-center justify-center mb-3">
+            <Icon name="check_circle" className="w-[16px] h-[16px] text-white" stroke={1.8} />
           </div>
           <p className="text-label-s text-bg/50 uppercase tracking-widest">Completadas</p>
           <p className="text-headline-m text-bg font-black">{completed}</p>
@@ -270,7 +270,7 @@ export default function VolunteerDashboard() {
           <h2 className="text-title-l text-bg font-bold">Mis metas</h2>
           <button
             onClick={() => setShowForm(s => !s)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity"
           >
             <Icon name={showForm ? 'close' : 'add'} className="w-[16px] h-[16px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nueva meta'}

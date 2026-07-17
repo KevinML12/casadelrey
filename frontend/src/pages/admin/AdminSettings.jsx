@@ -60,8 +60,8 @@ export default function AdminSettings() {
       </div>
 
       {accountMissing && (
-        <div className="flex items-start gap-3 p-4 rounded-2xl border border-pri/40 bg-pri-con/40">
-          <Icon name="account_balance" className="w-[20px] h-[20px] text-on-pri-con mt-0.5" stroke={1.8} />
+        <div className="flex items-start gap-3 p-4 rounded-2xl border border-amber/40 bg-amber/10">
+          <Icon name="account_balance" className="w-[20px] h-[20px] text-amber mt-0.5" stroke={1.8} />
           <div>
             <p className="text-title-s text-bg font-semibold">Falta la cuenta bancaria real</p>
             <p className="text-body-s text-bg/50 mt-0.5">
@@ -81,7 +81,7 @@ export default function AdminSettings() {
               <label className="block text-label-l text-bg/50 mb-1.5">
                 {s.label}
                 {s.using_default && s.value === '' && (
-                  <span className="ml-2 text-label-s" style={{ color: 'var(--pri)' }}>· sin configurar</span>
+                  <span className="ml-2 text-label-s text-amber">· sin configurar</span>
                 )}
               </label>
               <div className="flex gap-2">

@@ -127,8 +127,8 @@ export default function AdminAnnouncements() {
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-            <Icon name="campaign" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="campaign" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Anuncios</h1>
@@ -172,8 +172,8 @@ export default function AdminAnnouncements() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {items.map(a => (
             <div key={a.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors group">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${a.is_active ? 'bg-pri-con' : 'bg-bg/8'}`}>
-                <Icon name="campaign" className={`w-[18px] h-[18px] ${a.is_active ? 'text-on-pri-con' : 'text-bg/50'}`} stroke={1.8} />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${a.is_active ? 'bg-bg' : 'bg-bg/8'}`}>
+                <Icon name="campaign" className={`w-[18px] h-[18px] ${a.is_active ? 'text-white' : 'text-bg/50'}`} stroke={1.8} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">

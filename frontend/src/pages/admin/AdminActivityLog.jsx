@@ -8,11 +8,11 @@ const ACTIONS = ['create', 'update', 'delete', 'approve', 'login'];
 const RESOURCES = ['user', 'post', 'event', 'boleta', 'cell_report', 'volunteer', 'announcement', 'gallery'];
 
 const ACTION_COLORS = {
-  create:  { bg: 'bg-sec-con', text: 'text-on-sec-con', icon: 'add_circle' },
-  update:  { bg: 'bg-pri-con', text: 'text-on-pri-con', icon: 'edit' },
-  delete:  { bg: 'bg-err-con', text: 'text-on-err-con', icon: 'delete' },
-  approve: { bg: 'bg-ter-con', text: 'text-on-ter-con', icon: 'check_circle' },
-  login:   { bg: 'bg-bg/8', text: 'text-bg',   icon: 'login' },
+  create:  { bg: 'bg-emerald', text: 'text-white', icon: 'add_circle' },
+  update:  { bg: 'bg-bg',      text: 'text-white', icon: 'edit' },
+  delete:  { bg: 'bg-rose',    text: 'text-white', icon: 'delete' },
+  approve: { bg: 'bg-amber',   text: 'text-white', icon: 'check_circle' },
+  login:   { bg: 'bg-bg/8',    text: 'text-bg',    icon: 'login' },
 };
 
 function fmtDate(d) {
@@ -48,8 +48,8 @@ export default function AdminActivityLog() {
     <div className="p-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-          <Icon name="history" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
+        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+          <Icon name="history" className="w-[22px] h-[22px] text-white" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-bg font-black leading-tight">Historial de Actividad</h1>

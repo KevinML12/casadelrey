@@ -28,8 +28,8 @@ function FieldLabel({ children, required }) {
 function SectionHeader({ icon, children }) {
   return (
     <div className="flex items-center gap-2 mb-4">
-      <div className="w-7 h-7 rounded-lg bg-pri-con flex items-center justify-center">
-        <Icon name={icon} className="w-[14px] h-[14px] text-on-pri-con" stroke={1.8} />
+      <div className="w-7 h-7 rounded-lg bg-bg flex items-center justify-center">
+        <Icon name={icon} className="w-[14px] h-[14px] text-white" stroke={1.8} />
       </div>
       <p className="text-label-l text-bg font-semibold">{children}</p>
     </div>
@@ -238,11 +238,10 @@ export default function AdminBoletas() {
             return (
               <div key={b.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
-                {/* Leading icon */}
+                {/* Leading icon — mismo mapeo de color que el Chip de la categoria */}
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5
-                  ${cat ? `bg-${cat.color === 'tertiary' ? 'ter' : cat.color === 'secondary' ? 'sec' : 'pri'}-con` : 'bg-bg/8'}`}
-                  style={cat ? {} : {}}>
-                  <Icon name={cat?.icon || 'person'} className="w-[18px] h-[18px] text-on-pri-con" stroke={1.8} />
+                  ${cat ? (cat.color === 'secondary' ? 'bg-bg' : 'bg-celeste') : 'bg-bg/8'}`}>
+                  <Icon name={cat?.icon || 'person'} className={`w-[18px] h-[18px] ${cat ? 'text-white' : 'text-bg/50'}`} stroke={1.8} />
                 </div>
 
                 {/* Content */}

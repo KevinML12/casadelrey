@@ -26,7 +26,7 @@ function EditorToolbar({ editor }) {
     <button
       type="button" onClick={onClick} title={title}
       className={`p-1.5 rounded-md transition-colors ${
-        active ? 'bg-pri text-on-pri' : 'text-bg/50 hover:bg-bg/8 hover:text-bg'
+        active ? 'bg-bg text-white' : 'text-bg/50 hover:bg-bg/8 hover:text-bg'
       }`}
     >
       <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
@@ -154,7 +154,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
         <div>
           <label className="block text-label-l text-bg/50 mb-1.5">
-            Enlace a red social <span className="font-normal text-bg/50/60">(opcional — redirige al hacer clic)</span>
+            Enlace a red social <span className="font-normal text-bg/40">(opcional — redirige al hacer clic)</span>
           </label>
           <input type="url" placeholder="https://facebook.com/..." value={form.redirect_url} onChange={set('redirect_url')}
             className={fieldCls} />
@@ -171,7 +171,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-label-l text-bg/50">Contenido <span className="font-normal text-bg/50/60">(opcional si hay enlace)</span></label>
+            <label className="text-label-l text-bg/50">Contenido <span className="font-normal text-bg/40">(opcional si hay enlace)</span></label>
             <div className="flex items-center gap-3">
               <button type="button" onClick={insertContentImage}
                 className="flex items-center gap-1 text-label-s text-bg/50 hover:text-pri transition-colors">
@@ -271,8 +271,8 @@ export default function AdminBlog() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-            <Icon name="article" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="article" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Blog</h1>
@@ -327,7 +327,7 @@ export default function AdminBlog() {
                     <span className="text-label-s text-bg/50 hidden sm:block">{post.view_count ?? 0} vistas</span>
                     <span className={`inline-flex items-center h-7 px-3 rounded-lg text-label-m font-medium ${
                       post.status === 'published'
-                        ? 'bg-ter-con text-on-ter-con'
+                        ? 'bg-emerald text-white'
                         : 'bg-bg/8 text-bg/50'
                     }`}>
                       {post.status === 'published' ? 'Publicado' : 'Borrador'}
@@ -340,13 +340,13 @@ export default function AdminBlog() {
                     )}
                     <button
                       onClick={() => { setEditing(post); setShowForm(false); }}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-pri hover:bg-pri-con transition-all"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-bg hover:bg-bg/8 transition-all"
                     >
                       <Icon name="edit" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>
                     <button
                       onClick={() => handleDelete(post.ID)}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-err hover:bg-err-con transition-all"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-rose hover:bg-rose/8 transition-all"
                     >
                       <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>

@@ -212,7 +212,7 @@ function HeroForm({ initial, onSave, onCancel }) {
 
         <div className="flex gap-3">
           <button type="submit" disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+            className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
             <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {loading ? 'Guardando…' : initial?.ID ? 'Guardar cambios' : 'Crear hero'}
           </button>
@@ -289,8 +289,8 @@ export default function AdminHero() {
 
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-            <Icon name="view_carousel" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="view_carousel" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black">Hero del sitio</h1>
@@ -298,7 +298,7 @@ export default function AdminHero() {
           </div>
         </div>
         <button onClick={() => setEditing(EMPTY)}
-          className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
+          className="flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity">
           <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
           Nuevo hero
         </button>
@@ -316,7 +316,7 @@ export default function AdminHero() {
             <p className="text-body-s mt-1">El sitio usa el hero por defecto. Crea uno para personalizarlo.</p>
           </div>
           <button onClick={() => setEditing(EMPTY)}
-            className="mt-2 flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
+            className="mt-2 flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity">
             <Icon name="add" className="w-[16px] h-[16px]" stroke={1.8} />
             Crear el primer hero
           </button>
@@ -330,7 +330,7 @@ export default function AdminHero() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-title-s text-bg font-bold">{h.title_line_1} {h.title_line_2}</h3>
                   {h.is_active && (
-                    <span className="px-2 py-0.5 rounded-full bg-ter-con text-on-ter-con text-label-s font-semibold flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full bg-bg text-white text-label-s font-semibold flex items-center gap-1">
                       <Icon name="check_circle" className="w-[12px] h-[12px]" stroke={1.8} />
                       Activo en sitio
                     </span>
@@ -339,7 +339,7 @@ export default function AdminHero() {
                 <div className="flex gap-2 flex-wrap">
                   {!h.is_active && (
                     <button onClick={() => activate(h.ID)}
-                      className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
+                      className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity">
                       <Icon name="publish" className="w-[14px] h-[14px]" stroke={1.8} />
                       Activar
                     </button>

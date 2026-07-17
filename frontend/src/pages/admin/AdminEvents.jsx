@@ -121,9 +121,9 @@ function EventDate({ dateStr }) {
   if (!dateStr) return null;
   const d = new Date(dateStr + 'T12:00:00');
   return (
-    <div className="w-12 h-12 rounded-xl bg-pri-con flex flex-col items-center justify-center shrink-0">
-      <span className="text-label-s text-on-pri-con font-bold uppercase leading-none">{MONTH_SHORT[d.getMonth()]}</span>
-      <span className="text-headline-s text-on-pri-con font-black leading-tight">{d.getDate()}</span>
+    <div className="w-12 h-12 rounded-xl bg-bg flex flex-col items-center justify-center shrink-0">
+      <span className="text-label-s text-white font-bold uppercase leading-none">{MONTH_SHORT[d.getMonth()]}</span>
+      <span className="text-headline-s text-white font-black leading-tight">{d.getDate()}</span>
     </div>
   );
 }
@@ -167,8 +167,8 @@ function EventRSVPs({ eventId }) {
       <div className="bg-bg/4 border border-bg/10 rounded-xl overflow-hidden divide-y divide-bg/8">
         {rsvps.map(r => (
           <div key={r.ID} className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-pri-con flex items-center justify-center shrink-0">
-              <Icon name="person" className="w-[14px] h-[14px] text-on-pri-con" stroke={1.8} />
+            <div className="w-8 h-8 rounded-lg bg-bg flex items-center justify-center shrink-0">
+              <Icon name="person" className="w-[14px] h-[14px] text-white" stroke={1.8} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-body-s text-bg font-medium">{r.name}</p>
@@ -232,8 +232,8 @@ export default function AdminEvents() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-ter-con flex items-center justify-center shrink-0">
-            <Icon name="calendar_month" className="w-[22px] h-[22px] text-on-ter-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="calendar_month" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Eventos</h1>

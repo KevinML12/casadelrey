@@ -133,7 +133,7 @@ export default function AdminFAQs() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {faqs.map(faq => (
-            <div key={faq.ID} className={`p-4 sm:p-5 rounded-2xl border ${faq.is_active ? 'bg-bg/4 border-bg/10' : 'bg-surf-container border-bg/20/50'} flex flex-col sm:flex-row gap-4 items-start`}>
+            <div key={faq.ID} className={`p-4 sm:p-5 rounded-2xl border ${faq.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15'} flex flex-col sm:flex-row gap-4 items-start`}>
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
@@ -145,7 +145,7 @@ export default function AdminFAQs() {
                   )}
                 </div>
                 <p className="text-body-m text-bg/50 line-clamp-3">{faq.answer}</p>
-                <div className="mt-3 flex items-center gap-4 text-[12px] text-bg/50/70 font-mono">
+                <div className="mt-3 flex items-center gap-4 text-[12px] text-bg/45 font-mono">
                   <span>Orden: {faq.sort_order}</span>
                 </div>
               </div>

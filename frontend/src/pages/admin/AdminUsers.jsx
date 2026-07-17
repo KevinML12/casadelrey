@@ -35,7 +35,7 @@ function CellModal({ user, onClose, onSaved }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-bg/40" onClick={onClose} />
-      <div className="relative bg-bg/4 rounded-2xl border border-bg/10 shadow-elev-3 w-full max-w-md p-6 animate-fade-in">
+      <div className="relative glass-light rounded-2xl w-full max-w-md p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-title-l text-bg font-bold">Código de célula</h3>
@@ -56,7 +56,7 @@ function CellModal({ user, onClose, onSaved }) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {saving ? 'Guardando…' : 'Guardar'}
@@ -152,8 +152,8 @@ export default function AdminUsers() {
 
       {/* Page header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center shrink-0">
-          <Icon name="manage_accounts" className="w-[22px] h-[22px] text-on-pri-con" stroke={1.8} />
+        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+          <Icon name="manage_accounts" className="w-[22px] h-[22px] text-white" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-bg font-black leading-tight">Usuarios</h1>

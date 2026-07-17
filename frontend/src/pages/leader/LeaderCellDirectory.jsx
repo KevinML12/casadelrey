@@ -3,11 +3,11 @@ import apiClient from '../../lib/apiClient';
 import { Icon } from '../../components/ui/Glass';
 
 const TYPE_LABELS = {
-  hombres: { label: 'Hombres',   icon: 'man',     bg: 'bg-pri-con',  text: 'text-on-pri-con' },
-  mujeres: { label: 'Mujeres',   icon: 'woman',   bg: 'bg-sec-con',  text: 'text-on-sec-con' },
-  jovenes: { label: 'Jóvenes',   icon: 'school',  bg: 'bg-ter-con',  text: 'text-on-ter-con' },
-  prejus:  { label: 'Pre-jus',   icon: 'groups',  bg: 'bg-pri-con',  text: 'text-on-pri-con' },
-  ninos:   { label: 'Niños',     icon: 'child_care', bg: 'bg-sec-con', text: 'text-on-sec-con' },
+  hombres: { label: 'Hombres',   icon: 'man',     bg: 'bg-bg',      text: 'text-white' },
+  mujeres: { label: 'Mujeres',   icon: 'woman',   bg: 'bg-rose',    text: 'text-white' },
+  jovenes: { label: 'Jóvenes',   icon: 'school',  bg: 'bg-celeste', text: 'text-white' },
+  prejus:  { label: 'Pre-jus',   icon: 'groups',  bg: 'bg-amber',   text: 'text-white' },
+  ninos:   { label: 'Niños',     icon: 'child_care', bg: 'bg-emerald', text: 'text-white' },
 };
 
 export default function LeaderCellDirectory() {

@@ -49,7 +49,7 @@ function RevertSection({ receipt, onDone, onClose }) {
       <p className="text-body-s text-bg/50">Volverá a aparecer en la cola de verificación y deberás revisarlo nuevamente.</p>
       <div className="flex gap-2">
         <button onClick={revert} disabled={loading}
-          className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
+          className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
           <Icon name="undo" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Revirtiendo…' : 'Sí, revertir'}
         </button>
@@ -95,7 +95,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-bg/40" onClick={onClose} />
-      <div className="relative bg-bg/4 rounded-2xl border border-bg/10 shadow-elev-3 w-full max-w-lg animate-fade-in overflow-hidden">
+      <div className="relative glass-light rounded-2xl w-full max-w-lg animate-fade-in overflow-hidden">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-bg/10">
@@ -159,7 +159,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
               )}
               <button onClick={handleAction} disabled={loading}
                 className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl text-label-l font-semibold transition-opacity disabled:opacity-50 ${
-                  status === 'rechazado' ? 'bg-err text-ink hover:opacity-90' : 'bg-pri text-on-pri hover:opacity-90'
+                  status === 'rechazado' ? 'bg-err text-ink hover:opacity-90' : 'bg-bg text-white hover:opacity-90'
                 }`}>
                 <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
                 {loading ? 'Guardando…' : status === 'rechazado' ? 'Rechazar comprobante' : 'Aprobar comprobante'}
@@ -307,7 +307,7 @@ export default function AdminReceipts() {
                   </p>
                   {r.status === 'pendiente' && (
                     <button onClick={() => setSelected(r)}
-                      className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-pri text-on-pri text-label-m font-semibold hover:opacity-90 transition-opacity">
+                      className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity">
                       <Icon name="verified" className="w-[14px] h-[14px]" stroke={1.8} />
                       Verificar
                     </button>

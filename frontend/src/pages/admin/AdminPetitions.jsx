@@ -129,8 +129,8 @@ export default function AdminPetitions() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-ter-con flex items-center justify-center shrink-0">
-            <Icon name="volunteer_activism" className="w-[22px] h-[22px] text-on-ter-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="volunteer_activism" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Peticiones</h1>

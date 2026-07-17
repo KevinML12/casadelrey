@@ -61,7 +61,7 @@ function LeaderForm({ onSave, onCancel, initialData }) {
         {form.photo_url ? (
           <img src={form.photo_url} alt={form.name} className="w-16 h-16 rounded-full object-cover border border-bg/10" />
         ) : (
-          <div className="w-16 h-16 rounded-full bg-surf-container border border-bg/10 grid place-items-center">
+          <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/10 grid place-items-center">
             <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
           </div>
         )}
@@ -180,11 +180,11 @@ export default function AdminLeaders() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {leaders.map(l => (
-            <div key={l.ID} className={`p-4 rounded-2xl border flex gap-4 items-center ${l.is_active ? 'bg-bg/4 border-bg/10' : 'bg-surf-container border-bg/20/50 opacity-70'}`}>
+            <div key={l.ID} className={`p-4 rounded-2xl border flex gap-4 items-center ${l.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15 opacity-70'}`}>
               {l.photo_url ? (
                 <img src={l.photo_url} alt={l.name} className="w-14 h-14 rounded-full object-cover border border-bg/10 shrink-0" />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-surf-container border border-bg/10 grid place-items-center shrink-0">
+                <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/10 grid place-items-center shrink-0">
                   <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
                 </div>
               )}
@@ -195,15 +195,15 @@ export default function AdminLeaders() {
               </div>
               <div className="flex flex-col gap-1 shrink-0">
                 <button onClick={() => { setEditing(l); setShowForm(true); }} title="Editar"
-                  className="p-1.5 rounded-full hover:bg-surf-container text-bg/50 hover:text-bg transition-colors">
+                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
                   <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
                 </button>
                 <button onClick={() => handleToggle(l)} title={l.is_active ? 'Ocultar' : 'Mostrar'}
-                  className="p-1.5 rounded-full hover:bg-surf-container text-bg/50 hover:text-bg transition-colors">
+                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
                   <Icon name={l.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
                 </button>
                 <button onClick={() => handleDelete(l.ID)} title="Eliminar"
-                  className="p-1.5 rounded-full hover:bg-surf-container text-bg/50 hover:text-err transition-colors">
+                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-err transition-colors">
                   <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
                 </button>
               </div>

@@ -179,12 +179,12 @@ export default function AdminVolunteers() {
             style={{ background: 'rgba(0,0,0,.5)' }}
             onClick={() => { setCreateModal(null); setPassword(''); }} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-bg/4 rounded-[28px] p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"
+            <div className="glass-light rounded-[28px] p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"
               onClick={e => e.stopPropagation()}>
 
               {/* Dialog icon */}
-              <div className="w-12 h-12 rounded-2xl bg-pri-con flex items-center justify-center mx-auto mb-4">
-                <Icon name="person_add" className="w-[24px] h-[24px] text-on-pri-con" stroke={1.8} />
+              <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center mx-auto mb-4">
+                <Icon name="person_add" className="w-[24px] h-[24px] text-white" stroke={1.8} />
               </div>
 
               <h3 className="text-headline-s text-bg font-black text-center mb-2">Crear usuario</h3>

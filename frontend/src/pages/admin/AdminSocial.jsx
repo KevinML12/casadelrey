@@ -119,7 +119,7 @@ function Form({ initial, onSave, onCancel }) {
               onClick={() => setForm(p => ({ ...p, featured_size: s.value }))}
               className={`flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m font-semibold transition-colors ${
                 form.featured_size === s.value
-                  ? 'bg-pri-con text-on-pri-con'
+                  ? 'bg-bg text-white'
                   : 'border border-bg/10 text-bg/50 hover:bg-bg/8'
               }`}>
               {s.label}
@@ -146,7 +146,7 @@ function Form({ initial, onSave, onCancel }) {
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <button type="submit" disabled={loading}
-          className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+          className="flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
           <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : initial?.ID ? 'Actualizar' : 'Agregar'}
         </button>
@@ -198,7 +198,7 @@ export default function AdminSocial() {
         </div>
         {!editing && (
           <button onClick={() => setEditing({})}
-            className="flex items-center gap-2 h-10 px-4 rounded-xl bg-pri text-on-pri text-label-l font-semibold hover:opacity-90 transition-opacity">
+            className="flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity">
             <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nueva publicación
           </button>
