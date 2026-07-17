@@ -40,10 +40,13 @@ function LightBankDetails() {
       <a
         href={href}
         {...(whatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className="block rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4 text-center hover:bg-bg/10 transition-colors focus-ring"
+        className="flex items-center justify-between gap-3 rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4 hover:bg-bg/10 transition-colors focus-ring"
       >
-        <p className="text-[14px] font-bold text-bg">Escríbenos para coordinar tu depósito</p>
-        <p className="text-[12.5px] text-bg/55 mt-1">Te compartimos los datos bancarios al momento</p>
+        <div className="text-left min-w-0">
+          <p className="text-[14px] font-bold text-bg">Escríbenos para coordinar tu depósito</p>
+          <p className="text-[12.5px] text-bg/55 mt-1">Te compartimos los datos bancarios al momento</p>
+        </div>
+        <Icon name="arrow" className="w-4 h-4 text-bg/35 shrink-0" stroke={2} />
       </a>
     );
   }
@@ -60,14 +63,19 @@ function LightBankDetails() {
   );
 }
 
+// glass-light-nested (segunda capa, mas transparente que el glass-light
+// del modal que la envuelve) -- antes era una caja plana bg-bg/5, se
+// leia como una superficie mas sin jerarquia real. Ver index.css para
+// la regla: solo se sostiene con algo semi-opaco detras, que aca es el
+// propio ModalWrapper.
 function PaymentBanner({ event }) {
   return (
-    <div className="rounded-[18px] border border-bg/12 bg-bg/5 p-4 space-y-3 mb-4">
-      <div className="flex items-center justify-between">
-        <p className="text-[12px] text-bg/70 font-bold uppercase tracking-wide">Evento con costo</p>
-        <span className="text-[22px] text-bg font-black">Q{Number(event.price_gtq).toFixed(2)}</span>
+    <div className="glass-light-nested rounded-[20px] p-5 space-y-4 mb-4">
+      <div>
+        <p className="text-[11px] font-bold text-bg/50 uppercase tracking-widest mb-1.5">Evento con costo</p>
+        <p className="text-[30px] text-bg font-black leading-none tracking-tight">Q{Number(event.price_gtq).toFixed(2)}</p>
       </div>
-      <p className="text-[13.5px] text-bg/60">
+      <p className="text-[13.5px] text-bg/60 leading-relaxed">
         Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
       </p>
       {/* Datos bancarios administrables (nunca un número inventado) */}
@@ -75,10 +83,10 @@ function PaymentBanner({ event }) {
         <LightBankDetails />
       </div>
       {event.payment_deadline && (
-        <p className="text-[12.5px] text-rose flex items-center gap-1.5">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose/10 border border-rose/20 text-rose text-[12px] font-bold w-fit">
           <Icon name="clock" className="w-3.5 h-3.5" />
-          Fecha límite de pago: {new Date(event.payment_deadline + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
-        </p>
+          Fecha límite: {new Date(event.payment_deadline + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
+        </span>
       )}
     </div>
   );
