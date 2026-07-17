@@ -928,15 +928,15 @@ function Ubicacion({ bg }) {
           {/* Primera vez + podcast */}
           <div className="flex flex-col gap-6">
             <Reveal from="right" delay={0.05}>
-            <Tilt max={4} glass="standard" className="rounded-[24px] liquid-glass p-9 md:p-10">
-              <h3 className="text-[26px] font-bold text-white tracking-tight mb-3">¿Es tu primera vez?</h3>
-              <p className="text-[15px] text-white/70 font-medium mb-7">
+            <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10">
+              <h3 className="text-[26px] font-bold text-bg tracking-tight mb-3">¿Es tu primera vez?</h3>
+              <p className="text-[15px] text-bg/60 font-medium mb-7">
                 Queremos conocerte. Cuéntanos de ti y te recibimos desde el primer minuto.
               </p>
               <MotionLink
                 to="/conectate"
                 {...PRESS}
-                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring hover:border-white/40"
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-[14px] font-bold focus-ring shadow-card hover:opacity-90"
               >
                 <Icon name="spark" className="w-4 h-4" />
                 Conéctate
@@ -945,13 +945,13 @@ function Ubicacion({ bg }) {
             </Reveal>
 
             <Reveal from="right" delay={0.12}>
-            <Tilt max={4} glass="standard" className="rounded-[24px] liquid-glass p-9 md:p-10 flex items-center gap-5">
-              <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                <Icon name="music" className="w-6 h-6 text-white" />
+            <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10 flex items-center gap-5">
+              <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/15 flex items-center justify-center shrink-0">
+                <Icon name="music" className="w-6 h-6 text-bg" />
               </div>
               <div>
-                <p className="text-[17px] font-bold text-white leading-tight">Podcast Inusual Youth</p>
-                <p className="text-[13.5px] text-white/60 font-semibold mt-1">
+                <p className="text-[17px] font-bold text-bg leading-tight">Podcast Inusual Youth</p>
+                <p className="text-[13.5px] text-bg/55 font-semibold mt-1">
                   92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
                 </p>
               </div>

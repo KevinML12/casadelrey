@@ -259,6 +259,17 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
     .join(' · ');
   const bentoSpan = i === 0 ? 'col-span-2 row-span-2' : 'col-span-2 sm:col-span-1 row-span-1';
 
+  // Sin foto la card es glass-light (blanco), con foto sigue siendo el
+  // liquid-glass oscuro de siempre -- la tinta cambia con el material.
+  const ink        = hasPhoto ? 'text-white'      : 'text-bg';
+  const ink80      = hasPhoto ? 'text-white/80'    : 'text-bg/70';
+  const ink60      = hasPhoto ? 'text-white/60'    : 'text-bg/55';
+  const ink50      = hasPhoto ? 'text-white/50'    : 'text-bg/45';
+  const ink40      = hasPhoto ? 'text-white/40'    : 'text-bg/40';
+  const ink35      = hasPhoto ? 'text-white/35'    : 'text-bg/35';
+  const wellBg     = hasPhoto ? 'bg-white/5'       : 'bg-bg/6';
+  const wellBorder = hasPhoto ? 'border-white/10'  : 'border-bg/10';
+
   return (
     <motion.div
       ref={nodeRef}
@@ -268,23 +279,16 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={isCarousel ? undefined : { transformPerspective: 1000 }}
-      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} liquid-shine relative overflow-hidden rounded-[32px] group border border-white/10 ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow ${!hasPhoto ? 'liquid-glass' : ''}`}
+      className={`${isCarousel ? 'snap-center shrink-0 w-[85vw] max-w-[400px] md:max-w-[500px] h-[450px] md:h-[500px]' : bentoSpan} liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'glass-light'} ${isCarousel ? 'hover:scale-[1.01] shadow-card-lg' : 'hover:scale-[1.02]'} transition-shadow`}
     >
 
-      {hasPhoto ? (
+      {hasPhoto && (
         <>
           {/* Flyer de fondo */}
           <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
           {/* Gradiente para leer el texto */}
           <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
         </>
-      ) : (
-        /* Sin foto: resplandor ambiental (blanco, no celeste) detras del
-           vidrio en vez de una imagen prestada */
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="halo" style={{ width: 420, height: 420, top: '-15%', right: '-20%', background: 'radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%)' }} />
-          <div className="halo" style={{ width: 360, height: 360, bottom: '-15%', left: '-15%', background: 'radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%)' }} />
-        </div>
       )}
 
       {/* Etiqueta de próximo evento si es el primero */}
@@ -307,11 +311,11 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
           <motion.div layout className="flex items-center gap-4 w-full min-w-0">
             {/* Fecha */}
             {dayNum && (
-              <motion.div layout className="text-center shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner w-[60px] h-[60px]">
-                <div className="font-black leading-none text-white tracking-tighter text-[24px]">
+              <motion.div layout className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl ${wellBg} border ${wellBorder} shadow-inner w-[60px] h-[60px]`}>
+                <div className={`font-black leading-none ${ink} tracking-tighter text-[24px]`}>
                   {dayNum}
                 </div>
-                <div className="font-bold tracking-[2px] mt-1 text-white/50 text-[9px]">
+                <div className={`font-bold tracking-[2px] mt-1 ${ink50} text-[9px]`}>
                   {monthStr}
                 </div>
               </motion.div>
@@ -319,33 +323,33 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
 
             {/* Detalles */}
             <motion.div layout className="min-w-0 flex-1">
-              <p className="font-mono text-[10px] tracking-[1.5px] text-white/40 uppercase mb-1">
+              <p className={`font-mono text-[10px] tracking-[1.5px] ${ink40} uppercase mb-1`}>
                 {weekday}
               </p>
-              <h3 className="font-bold tracking-tight text-white line-clamp-1 text-[20px] leading-tight">
+              <h3 className={`font-bold tracking-tight ${ink} line-clamp-1 text-[20px] leading-tight`}>
                 {ev.title}
               </h3>
             </motion.div>
           </motion.div>
 
           {details && (
-            <p className="truncate text-white/60 flex items-center gap-1.5 text-[13px]">
-              <Icon name="pin" className="w-3.5 h-3.5 text-white/40 shrink-0" />
+            <p className={`truncate ${ink60} flex items-center gap-1.5 text-[13px]`}>
+              <Icon name="pin" className={`w-3.5 h-3.5 ${ink40} shrink-0`} />
               {details}
             </p>
           )}
 
-          <motion.div layout className="shrink-0 flex flex-col gap-3 w-full pt-3 border-t border-white/10">
+          <motion.div layout className={`shrink-0 flex flex-col gap-3 w-full pt-3 border-t ${wellBorder}`}>
             {(ev.requires_payment || ev.spots_remaining != null) && (
               <div className="flex flex-wrap gap-2">
                 {ev.requires_payment && (
-                  <span className="font-bold text-[12px] text-white/80 flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 w-fit">
+                  <span className={`font-bold text-[12px] ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
                     Q{Number(ev.price_gtq).toFixed(0)}
                   </span>
                 )}
                 {ev.spots_remaining != null && (
                   <span className={`font-bold text-[12px] flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
-                    ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : 'text-white/80 bg-white/5 border-white/10'
+                    ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : `${ink80} ${wellBg} ${wellBorder}`
                   }`}>
                     {ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupo${ev.spots_remaining === 1 ? '' : 's'} disponible${ev.spots_remaining === 1 ? '' : 's'}`}
                   </span>
@@ -360,8 +364,10 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
               disabled={ev.is_full}
               className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn ${isCarousel ? 'px-8 py-3.5 w-full md:w-auto' : 'w-full py-3'} ${
                 ev.is_full
-                  ? 'bg-white/5 border border-white/10 text-white/40 cursor-not-allowed'
-                  : 'liquid-glass text-white hover:border-white/30'
+                  ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
+                  : hasPhoto
+                    ? 'liquid-glass text-white hover:border-white/30'
+                    : 'bg-white text-bg shadow-card hover:opacity-90'
               }`}
             >
               {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
@@ -370,7 +376,7 @@ function EventCard({ ev, i, isCarousel, onRsvp, onCancelRsvp }) {
             <button
               type="button"
               onClick={() => onCancelRsvp(ev)}
-              className="text-white/35 hover:text-white/60 text-[11.5px] font-medium transition-colors self-center"
+              className={`${ink35} ${hasPhoto ? 'hover:text-white/60' : 'hover:text-bg/60'} text-[11.5px] font-medium transition-colors self-center`}
             >
               ¿Ya te registraste? Cancelar mi registro
             </button>
@@ -540,16 +546,16 @@ export default function EventsPage() {
             <RevealList className="space-y-3">
               {faqs.map(faq => (
                 <RevealItem key={faq.ID} depth>
-                <Tilt max={3} glass="standard" className="liquid-glass rounded-[20px] overflow-hidden block">
+                <Tilt max={3} glass="standard" className="glass-light rounded-[20px] overflow-hidden block">
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
                     className="w-full px-6 py-5 text-left flex items-center justify-between group cursor-pointer"
                   >
-                    <span className="text-white font-semibold pr-4">{faq.question}</span>
+                    <span className="text-bg font-semibold pr-4">{faq.question}</span>
                     <motion.span
                       animate={{ rotate: openFaq === faq.ID ? 90 : 0 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                      className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0"
+                      className="w-9 h-9 rounded-full bg-bg/6 border border-bg/12 flex items-center justify-center text-bg shrink-0"
                     >
                       <Icon name="arrow" className="w-4 h-4" />
                     </motion.span>
@@ -562,7 +568,7 @@ export default function EventsPage() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <div className="px-6 pb-5 pt-0 text-white/60 text-[15px] leading-relaxed border-t border-white/5 mt-2">
+                        <div className="px-6 pb-5 pt-0 text-bg/60 text-[15px] leading-relaxed border-t border-bg/10 mt-2">
                           {faq.answer}
                         </div>
                       </motion.div>
