@@ -40,6 +40,7 @@ const PATHS = {
 
   /* ---------- Panel admin/líder/voluntario (migrados de Material Symbols) ---------- */
   dashboard:    <><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8" /><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8" /><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8" /><rect x="13" y="13" width="7.5" height="7.5" rx="1.8" /></>,
+  trending_up:  <><polyline points="3 17 9 11 13 15 21 7" /><polyline points="14 7 21 7 21 14" /></>,
   settings:     <><circle cx="12" cy="12" r="3.3" /><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6" /></>,
   view_carousel:<><rect x="2" y="6" width="4" height="12" rx="1" /><rect x="8" y="3.5" width="8" height="17" rx="1.5" /><rect x="18" y="6" width="4" height="12" rx="1" /></>,
   article:      <><rect x="4" y="3" width="16" height="18" rx="2" /><line x1="7.5" y1="8" x2="16.5" y2="8" /><line x1="7.5" y1="12" x2="16.5" y2="12" /><line x1="7.5" y1="16" x2="13" y2="16" /></>,

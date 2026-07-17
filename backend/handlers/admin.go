@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"casadelrey/backend/auth"
@@ -70,6 +71,82 @@ func (h *AdminHandler) GetKPIs(c echo.Context) error {
 		"total_blog_views": totalBlogViews,
 		"total_cell_reports": totalCellReports,
 	})
+}
+
+// trendPoint es un dia de la serie del trend chart del dashboard.
+type trendPoint struct {
+	Date            string  `json:"date"`
+	DonationsAmount float64 `json:"donations_amount"`
+	DonationsCount  int64   `json:"donations_count"`
+	NewUsers        int64   `json:"new_users"`
+}
+
+// GetKPIsTrend godoc
+// GET /api/v1/admin/kpis/trend?days=N  [Requiere auth + rol admin]
+// Serie diaria (donaciones + usuarios nuevos) de los ultimos N dias
+// (default 30, tope 365), con dias sin actividad en cero para que el
+// grafico no tenga huecos.
+func (h *AdminHandler) GetKPIsTrend(c echo.Context) error {
+	days, err := strconv.Atoi(c.QueryParam("days"))
+	if err != nil || days <= 0 {
+		days = 30
+	}
+	if days > 365 {
+		days = 365
+	}
+
+	since := time.Now().AddDate(0, 0, -(days - 1))
+	sinceDay := since.Format("2006-01-02")
+
+	type dailyDonation struct {
+		Day    string
+		Amount float64
+		Count  int64
+	}
+	var donationRows []dailyDonation
+	if err := h.DB.Model(&models.Donation{}).
+		Where("is_successful = ? AND created_at >= ?", true, sinceDay).
+		Select("TO_CHAR(created_at, 'YYYY-MM-DD') as day, COALESCE(SUM(amount),0) as amount, COUNT(*) as count").
+		Group("day").
+		Scan(&donationRows).Error; err != nil {
+		log.Printf("[Admin] Error al calcular tendencia de donaciones: %v", err)
+	}
+
+	type dailyUsers struct {
+		Day   string
+		Count int64
+	}
+	var userRows []dailyUsers
+	if err := h.DB.Model(&models.User{}).
+		Where("created_at >= ?", sinceDay).
+		Select("TO_CHAR(created_at, 'YYYY-MM-DD') as day, COUNT(*) as count").
+		Group("day").
+		Scan(&userRows).Error; err != nil {
+		log.Printf("[Admin] Error al calcular tendencia de usuarios: %v", err)
+	}
+
+	donationByDay := make(map[string]dailyDonation, len(donationRows))
+	for _, r := range donationRows {
+		donationByDay[r.Day] = r
+	}
+	usersByDay := make(map[string]int64, len(userRows))
+	for _, r := range userRows {
+		usersByDay[r.Day] = r.Count
+	}
+
+	series := make([]trendPoint, 0, days)
+	for i := 0; i < days; i++ {
+		day := since.AddDate(0, 0, i).Format("2006-01-02")
+		don := donationByDay[day]
+		series = append(series, trendPoint{
+			Date:            day,
+			DonationsAmount: don.Amount,
+			DonationsCount:  don.Count,
+			NewUsers:        usersByDay[day],
+		})
+	}
+
+	return c.JSON(http.StatusOK, series)
 }
 
 // GetDonations godoc

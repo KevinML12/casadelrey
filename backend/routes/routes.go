@@ -167,6 +167,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Dashboard y KPIs
 	adminGroup.GET("/kpis",               adminHandler.GetKPIs)
+	adminGroup.GET("/kpis/trend",         adminHandler.GetKPIsTrend)
 	adminGroup.GET("/donations",          adminHandler.GetDonations)
 	adminGroup.GET("/users",              adminHandler.GetUsers)
 	adminGroup.PUT("/users/:id/role",     adminHandler.UpdateUserRole)
