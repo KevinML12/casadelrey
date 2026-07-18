@@ -316,6 +316,12 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
     .map(s => s[0].toUpperCase() + s.slice(1))
     .join(' · ');
   const bentoSpan = GRID_SPANS[i % GRID_SPANS.length];
+  // La card destacada (2x2) es mucho mas alta que las demas -- si el
+  // contenido queda anclado abajo (como en las cards chicas), deja un
+  // tramo enorme de vidrio vacio arriba antes del texto, y a primera
+  // vista (o con scroll a mitad de card) se lee como una card rota/sin
+  // contenido. Centrado vertical solo para esta, sin tocar las demas.
+  const isFeaturedTall = bentoSpan.includes('row-span-2');
 
   // Tinta blanca siempre -- todas las cards son liquid-glass oscuro ahora.
   const ink        = 'text-white';
@@ -361,7 +367,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
       {/* Contenido (Liquid Glass Panel) */}
       <div className={hasPhoto
         ? 'absolute bottom-0 left-0 right-0 z-20 p-5'
-        : 'relative z-20 h-full flex flex-col justify-end p-5'
+        : `relative z-20 h-full flex flex-col ${isFeaturedTall ? 'justify-center' : 'justify-end'} p-5`
       }>
         <div className={`${hasPhoto ? 'liquid-glass bg-white/5 border border-white/10 backdrop-blur-2xl p-5' : ''} rounded-[24px] flex flex-col gap-4`}>
 
@@ -569,7 +575,7 @@ export default function EventsPage() {
         ) : (
           /* ── Cuadrícula de próximos eventos ── */
           <AnimatePresence>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-5 [grid-auto-flow:dense]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-6 [grid-auto-flow:dense]">
               {upcomingEvents.map((ev, i) => (
                 <EventCard key={ev.ID} ev={ev} i={i} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
               ))}
