@@ -3,20 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
-
-// Descripciones de cada departamento
-const DEPT_INFO = {
-  alabanza:               { label: 'Alabanza',               icon: 'mic',                desc: 'Lidera la adoración y la música en los servicios y células.' },
-  danza:                  { label: 'Danza',                  icon: 'directions_run',     desc: 'Expresa la adoración a través del movimiento en los servicios.' },
-  servidores:             { label: 'Servidores',             icon: 'waving_hand',        desc: 'Recibe a cada persona, cuida la recepción y la limpieza de la Iglesia.' },
-  protocolo:              { label: 'Protocolo',              icon: 'star',               desc: 'Atención VIP a políticos, pastores invitados y personas de alto nivel.' },
-  pancartas:              { label: 'Pancartas',              icon: 'flag',               desc: 'Porta y coordina las pancartas durante los días de culto.' },
-  maestros_ninos:         { label: 'Maestros de Niños',      icon: 'child_care',         desc: 'Enseña e inspira a los más pequeños con creatividad y amor.' },
-  tecnicos_audiovisuales: { label: 'Técnicos Audiovisuales', icon: 'spatial_audio',      desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.' },
-  multimedia:             { label: 'Multimedia',             icon: 'video_camera_front', desc: 'Diseño gráfico, video y redes sociales para la comunicación de la Iglesia.' },
-  oracion:                { label: 'Oración',                icon: 'self_improvement',   desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.' },
-  logistica:              { label: 'Logística',              icon: 'local_shipping',     desc: 'Coordina recursos, transporte y organización de eventos y servicios.' },
-};
+import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-12">
@@ -119,6 +106,11 @@ function NewGoalForm({ onSave, onCancel }) {
 
 export default function VolunteerDashboard() {
   const { user } = useAuth();
+  // Departamentos reales (DB, editable desde /admin/volunteer-areas) --
+  // antes este dashboard tenia su PROPIA copia hardcodeada (DEPT_INFO)
+  // con iconos y descripciones que podian desincronizarse de las que ve
+  // el publico.
+  const areas = useVolunteerAreas();
   const [volunteer, setVolunteer] = useState(null);
   const [leaders,   setLeaders]   = useState([]);
   const [goals,     setGoals]     = useState([]);
@@ -161,7 +153,8 @@ export default function VolunteerDashboard() {
     } catch { toast.error('Error al eliminar'); }
   };
 
-  const dept = volunteer?.department ? DEPT_INFO[volunteer.department] : null;
+  const deptArea = volunteer?.department ? areas.find(a => a.value === volunteer.department) : null;
+  const dept = deptArea ? { label: deptArea.title, icon: deptArea.icon, desc: deptArea.desc } : null;
 
   // "Tu líder": cruza el nombre del líder asignado con el directorio
   // público (/leaders, curado en /admin/leaders) para foto y contacto.

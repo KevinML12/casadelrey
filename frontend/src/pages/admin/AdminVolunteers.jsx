@@ -6,25 +6,13 @@ import Input from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
 import { Icon } from '../../components/ui/Glass';
+import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const STATUS_CHIP = {
   pendiente:      { label: 'Pendiente',      color: 'default' },
   asignado:       { label: 'Asignado',       color: 'primary' },
   coordinando:    { label: 'Coordinando',    color: 'secondary' },
   usuario_creado: { label: 'Usuario creado', color: 'tertiary' },
-};
-
-const DEPT_LABEL = {
-  alabanza:              'Alabanza',
-  danza:                 'Danza',
-  servidores:            'Servidores',
-  protocolo:             'Protocolo',
-  pancartas:             'Pancartas',
-  maestros_ninos:        'Maestros de Niños',
-  tecnicos_audiovisuales:'Técnicos AV',
-  multimedia:            'Multimedia',
-  oracion:               'Oración',
-  logistica:             'Logística',
 };
 
 const Spinner = () => (
@@ -54,6 +42,9 @@ function EmptyState({ isAdmin }) {
 export default function AdminVolunteers() {
   const { user }   = useAuth();
   const isAdmin    = user?.role === 'admin';
+  // Departamentos reales (DB, editable desde /admin/volunteer-areas) --
+  // antes esta lista tenia su PROPIA copia hardcodeada (DEPT_LABEL).
+  const areas      = useVolunteerAreas();
   const [volunteers,   setVolunteers]   = useState([]);
   const [leaders,      setLeaders]      = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -121,7 +112,7 @@ export default function AdminVolunteers() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {volunteers.map(v => {
             const chip = STATUS_CHIP[v.status] || STATUS_CHIP.pendiente;
-            const deptLabel = DEPT_LABEL[v.department] || v.department || v.area;
+            const deptLabel = areas.find(a => a.value === v.department)?.title || v.department || v.area;
             return (
               <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
