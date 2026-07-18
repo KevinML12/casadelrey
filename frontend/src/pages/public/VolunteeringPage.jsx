@@ -1,12 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
+import WindowStack from '../../components/ui/WindowStack';
 import apiClient from '../../lib/apiClient';
-import { useSitePhoto } from '../../lib/feed';
+import { useSitePhoto, useApi } from '../../lib/feed';
 import { VOLUNTEER_AREAS as AREAS } from '../../lib/volunteerAreas';
 import toast from 'react-hot-toast';
 
@@ -15,6 +16,10 @@ const PRESS = {
   whileTap: { scale: 0.96 },
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
+
+// Botón/CTA claro (bg-bg text-white) -- ya no hay GlassButton oscuro
+// en este flujo, todo el modal es glass-light.
+const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-[15px] font-bold focus-ring disabled:opacity-60 shadow-card hover:opacity-90';
 
 const STATS = [
   { n: '~90', label: 'Voluntarios sirviendo' },
@@ -32,17 +37,32 @@ const CATEGORIES = [
   { name: 'Oración y logística', values: ['oracion', 'logistica'] },
 ];
 
-function VolunteerForm({ preselected, onClearPreselected }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', department: preselected || '', message: '' });
+function ModalWrapper({ children, onClose }) {
+  return (
+    <motion.div
+      className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4"
+      onClick={onClose}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="glass-light w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-bg"
+        style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+        onClick={e => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function VolunteerForm({ department, onClose }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', department: department || '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
-
-  useEffect(() => {
-    if (preselected) {
-      setForm(p => ({ ...p, department: preselected }));
-      onClearPreselected?.();
-    }
-  }, [preselected]);
 
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -64,75 +84,90 @@ function VolunteerForm({ preselected, onClearPreselected }) {
 
   if (sent) {
     return (
-      <div className="text-center py-10">
-        <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-5">
-          <Icon name="check" className="w-6 h-6 text-bg" />
+      <div className="text-center py-6">
+        <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
+          <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
         </div>
-        <p className="text-[18px] font-bold text-bg">Inscripción recibida</p>
-        <p className="text-[14px] text-bg/55 mt-1.5">Nuestro equipo se pondrá en contacto contigo.</p>
+        <h3 className="text-[19px] text-bg font-bold mb-2">Inscripción recibida</h3>
+        <p className="text-[14px] text-bg/60">Nuestro equipo se pondrá en contacto contigo.</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
+          Listo
+        </button>
       </div>
     );
   }
 
   const selectedArea = AREAS.find(a => a.value === form.department);
 
-  // Formulario en tarjeta glass-light (blanca) -- .input-squircle es del
-  // publico oscuro, aca usamos .input-light (el mismo campo claro del
-  // panel admin, funciona igual de bien fuera de .admin-light).
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid sm:grid-cols-2 gap-4">
-        <label className="block">
-          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Nombre completo</span>
-          <input className="input-light" value={form.name} onChange={set('name')} required />
-        </label>
-        <label className="block">
-          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Correo electrónico</span>
-          <input type="email" className="input-light" value={form.email} onChange={set('email')} required />
-        </label>
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Aplicación</p>
+          <p className="text-[13.5px] text-bg/60 mt-0.5">{selectedArea ? selectedArea.title : 'Voluntariado'}</p>
+        </div>
+        <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
+          <Icon name="close" className="w-4 h-4 text-bg/60" />
+        </button>
       </div>
-      <label className="block">
-        <span className="block text-[13px] font-semibold text-bg/60 mb-2">Teléfono (opcional)</span>
-        <input type="tel" className="input-light" value={form.phone} onChange={set('phone')} />
-      </label>
 
-      <label className="block">
-        <span className="block text-[13px] font-semibold text-bg/60 mb-2">Departamento de interés</span>
-        <select
-          className="input-light w-full appearance-none cursor-pointer"
-          value={form.department}
-          onChange={set('department')}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <label className="block">
+            <span className="block text-[13px] font-semibold text-bg/60 mb-2">Nombre completo</span>
+            <input className="input-light" value={form.name} onChange={set('name')} required />
+          </label>
+          <label className="block">
+            <span className="block text-[13px] font-semibold text-bg/60 mb-2">Correo electrónico</span>
+            <input type="email" className="input-light" value={form.email} onChange={set('email')} required />
+          </label>
+        </div>
+        <label className="block">
+          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Teléfono (opcional)</span>
+          <input type="tel" className="input-light" value={form.phone} onChange={set('phone')} />
+        </label>
+
+        <label className="block">
+          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Departamento de interés</span>
+          <select
+            className="input-light w-full appearance-none cursor-pointer"
+            value={form.department}
+            onChange={set('department')}
+          >
+            <option value="">Selecciona un departamento</option>
+            {AREAS.map(a => <option key={a.value} value={a.value}>{a.title}</option>)}
+          </select>
+        </label>
+
+        <label className="block">
+          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Mensaje (opcional)</span>
+          <textarea
+            rows={3}
+            className="input-light w-full resize-none"
+            value={form.message}
+            onChange={set('message')}
+            placeholder="Cuéntanos por qué quieres servir..."
+          />
+        </label>
+
+        <motion.button
+          type="submit"
+          {...PRESS}
+          disabled={submitting}
+          className={btnPrimary}
         >
-          <option value="">Selecciona un departamento</option>
-          {AREAS.map(a => <option key={a.value} value={a.value}>{a.title}</option>)}
-        </select>
-      </label>
-
-      <label className="block">
-        <span className="block text-[13px] font-semibold text-bg/60 mb-2">Mensaje (opcional)</span>
-        <textarea
-          rows={3}
-          className="input-light w-full resize-none"
-          value={form.message}
-          onChange={set('message')}
-          placeholder="Cuéntanos por qué quieres servir..."
-        />
-      </label>
-
-      <motion.button
-        type="submit"
-        {...PRESS}
-        disabled={submitting}
-        className="w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-[15px] font-bold focus-ring disabled:opacity-60 shadow-card hover:opacity-90"
-      >
-        {submitting ? 'Enviando…' : selectedArea ? `Enviar inscripción a ${selectedArea.title}` : 'Enviar inscripción'}
-        {!submitting && <Icon name="arrow" className="w-4 h-4" stroke={2} />}
-      </motion.button>
-    </form>
+          {submitting ? 'Enviando…' : selectedArea ? `Enviar inscripción a ${selectedArea.title}` : 'Enviar inscripción'}
+          {!submitting && <Icon name="arrow" className="w-4 h-4" stroke={2} />}
+        </motion.button>
+      </form>
+    </>
   );
 }
 
-function AreaCard({ value, icon, title, desc, isSelected, onClick }) {
+// Una sola superficie: foto + degradado + texto directo encima, sin
+// panel anidado con su propio borde (el mismo ajuste que se hizo en
+// EventCard -- dos cajas separadas se leen como una card rota).
+function DepartmentCard({ value, icon, title, photo, onClick }) {
   return (
     <Tilt
       as="button"
@@ -140,38 +175,41 @@ function AreaCard({ value, icon, title, desc, isSelected, onClick }) {
       onClick={onClick}
       max={4}
       glass="standard"
-      className={`w-full h-full flex items-start gap-4 p-6 rounded-[20px] text-left glass-light transition-colors ${
-        isSelected ? 'ring-2 ring-bg' : 'hover:bg-bg/5'
-      }`}
+      className="liquid-shine relative overflow-hidden rounded-[20px] h-[170px] w-full text-left group border border-white/10"
     >
-      <div className={`grid place-items-center w-12 h-12 rounded-full shrink-0 transition-colors ${
-        isSelected ? 'bg-bg text-white' : 'bg-bg/8 text-bg/70 border border-bg/12'
-      }`}>
-        <Icon name={icon} className="w-5 h-5" />
+      <img
+        src={photo}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent" />
+      <div className="relative z-10 h-full flex flex-col justify-end p-4">
+        <div className="w-9 h-9 rounded-full liquid-glass flex items-center justify-center mb-2.5">
+          <Icon name={icon} className="w-4 h-4 text-white" />
+        </div>
+        <h3 className="text-[16px] font-bold text-white tracking-tight leading-tight">{title}</h3>
       </div>
-      <div className="min-w-0 flex-1">
-        <h3 className="text-[16.5px] font-bold text-bg tracking-tight mb-1">{title}</h3>
-        <p className="text-[13.5px] text-bg/50 leading-relaxed">{desc}</p>
-      </div>
-      {isSelected && (
-        <span className="w-6 h-6 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
-          <Icon name="check" className="w-3.5 h-3.5" stroke={2.4} />
-        </span>
-      )}
     </Tilt>
   );
 }
 
 export default function VolunteeringPage() {
-  const [selected, setSelected] = useState('');
-  const formRef = useRef(null);
+  const [openKey, setOpenKey] = useState(null);   // departamento abierto en el WindowStack
+  const [formDept, setFormDept] = useState(null);  // null = modal cerrado, '' = abierto sin preseleccion
   // Administrable desde /admin/site-photos (antes ruta hardcodeada — el
   // admin no podía cambiarla sin deploy). El local queda de fallback.
   const sectionImg = useSitePhoto('voluntariado_seccion', '/images/nosotros/servidores.jpg');
+  // Una sola llamada a /site-photos, la resolucion por departamento es
+  // JS plano (no un hook por item) -- 10 useSitePhoto en un .map violaria
+  // las reglas de hooks.
+  const sitePhotos = useApi('/site-photos') || {};
+  const areas = AREAS.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || a.photoFallback }));
 
-  const handleAreaClick = (value) => {
-    setSelected(value);
-    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  const windowItems = areas.map(a => ({ key: a.value, image: a.photo, title: a.title }));
+
+  const openForm = (value = '') => {
+    setOpenKey(null);
+    setFormDept(value);
   };
 
   return (
@@ -194,7 +232,14 @@ export default function VolunteeringPage() {
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
               ¿Dónde quieres servir?
             </h2>
-            <p className="mt-4 text-[15.5px] text-white/70">Toca un área para preseleccionarla en el formulario.</p>
+            <p className="mt-4 text-[15.5px] text-white/70">Toca un departamento para conocerlo mejor.</p>
+            <button
+              type="button"
+              onClick={() => openForm('')}
+              className="mt-3 text-[13.5px] font-semibold text-white/50 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
+            >
+              ¿No sabes cuál elegir? Aplica de todas formas
+            </button>
           </Reveal>
 
           <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto mb-14">
@@ -208,34 +253,65 @@ export default function VolunteeringPage() {
             ))}
           </RevealList>
 
-          <div className="space-y-10 mb-16">
+          <div className="space-y-10">
             {CATEGORIES.map(cat => (
               <div key={cat.name}>
                 <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
                 <RevealList className="grid sm:grid-cols-2 gap-4">
-                  {AREAS.filter(a => cat.values.includes(a.value)).map(area => (
+                  {areas.filter(a => cat.values.includes(a.value)).map(area => (
                     <RevealItem key={area.value}>
-                      <AreaCard {...area} isSelected={selected === area.value} onClick={() => handleAreaClick(area.value)} />
+                      <DepartmentCard {...area} onClick={() => setOpenKey(area.value)} />
                     </RevealItem>
                   ))}
                 </RevealList>
               </div>
             ))}
           </div>
-
-          <Reveal delay={0.1}>
-            <div ref={formRef} className="glass-light rounded-[28px] p-8 md:p-11 scroll-mt-24">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-bg/45">Aplicación</span>
-              <h3 className="text-[26px] font-bold text-bg tracking-tight mt-3 mb-2">¿Listo para servir?</h3>
-              <p className="text-[14.5px] text-bg/55 mb-8 leading-relaxed max-w-lg">
-                Completa el formulario y nuestro equipo se comunicará contigo para orientarte
-                en tu primer paso como voluntario.
-              </p>
-              <VolunteerForm preselected={selected} onClearPreselected={() => setSelected('')} />
-            </div>
-          </Reveal>
         </div>
       </section>
+
+      {/* Ventana de cristal por departamento -- foto, por que servir ahi,
+          y el boton que lleva al formulario. Con 10 items, las flechas/
+          dots de WindowStack ya se comportan como un carrusel entre
+          departamentos sin codigo extra. */}
+      <WindowStack
+        items={windowItems}
+        openKey={openKey}
+        onChange={setOpenKey}
+        height="min(70vh, 560px)"
+        renderContent={(it) => {
+          const a = areas.find(x => x.value === it.key);
+          if (!a) return null;
+          return (
+            <div className="flex flex-col gap-5">
+              <p className="text-white/70 text-[15px] leading-relaxed">{a.desc}</p>
+              <div className="liquid-glass rounded-[16px] p-5">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-white/40 mb-2">¿Por qué aquí?</p>
+                <p className="text-white/80 text-[14.5px] leading-relaxed">{a.why}</p>
+              </div>
+              <motion.button
+                {...PRESS}
+                onClick={() => openForm(a.value)}
+                className="w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-white text-bg px-6 py-4 text-[15px] font-bold shadow-card hover:opacity-90"
+              >
+                Aplicar a {a.title}
+                <Icon name="arrow" className="w-4 h-4" stroke={2} />
+              </motion.button>
+            </div>
+          );
+        }}
+      />
+
+      {/* Formulario -- ya no vive siempre visible al fondo de la pagina,
+          aparece como modal glass-light al presionar "Aplicar" (desde el
+          WindowStack o el link "aplica de todas formas"). */}
+      <AnimatePresence>
+        {formDept !== null && (
+          <ModalWrapper onClose={() => setFormDept(null)}>
+            <VolunteerForm department={formDept} onClose={() => setFormDept(null)} />
+          </ModalWrapper>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
