@@ -153,9 +153,16 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                     </div>
                   </div>
 
-                  {/* Cuerpo (solo la del frente es interactiva/scrollable) */}
+                  {/* Cuerpo (solo la del frente es interactiva/scrollable).
+                      justify-center: con poco contenido (ej. una categoria
+                      con 1 sola celula real, antes tenia varias de relleno)
+                      el cuerpo de altura fija dejaba un vacio enorme abajo,
+                      se leia como una ventana rota/a medio cargar. Con
+                      contenido que SI llena el alto (galerias, categorias
+                      con varias celulas) esto no cambia nada -- solo entra
+                      en juego cuando hay espacio de sobra. */}
                   {isFront && (
-                    <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                    <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-center">
                       {renderContent(it)}
                     </div>
                   )}
