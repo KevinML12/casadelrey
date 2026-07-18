@@ -38,9 +38,14 @@ func TestVolunteerRegister_SoloNombreSinEmail_Retorna400(t *testing.T) {
 }
 
 func TestVolunteerRegister_DepartamentoInvalido_Retorna400(t *testing.T) {
-	db, _, sqlDB := newMockDB(t)
+	db, mock, sqlDB := newMockDB(t)
 	defer sqlDB.Close()
 	h := handlers.NewVolunteerHandler(db)
+
+	// Los departamentos se validan contra VolunteerArea (DB, editable
+	// desde el admin) -- 0 filas con ese value+is_active = invalido.
+	mock.ExpectQuery(`SELECT count\(\*\) FROM "volunteer_areas"`).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(0))
 
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{
@@ -62,6 +67,8 @@ func TestVolunteerRegister_DepartamentoValido_Pasa(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewVolunteerHandler(db)
 
+	mock.ExpectQuery(`SELECT count\(\*\) FROM "volunteer_areas"`).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "volunteers"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
@@ -91,6 +98,30 @@ func TestVolunteerRegister_SinDepartamento_Pasa(t *testing.T) {
 
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{"name": "Laura", "email": "laura@test.com"},
+	})
+	require.NoError(t, h.Register(c))
+	assert.Equal(t, http.StatusCreated, rec.Code)
+}
+
+func TestVolunteerRegister_SinPreferencia_PasaSinConsultarDB(t *testing.T) {
+	// "sin_preferencia" es el valor especial del postulante que delega la
+	// eleccion al equipo (VolunteeringPage.jsx, NO_PREFERENCE) -- no es
+	// una fila real de VolunteerArea, no debe disparar consulta alguna.
+	db, mock, sqlDB := newMockDB(t)
+	defer sqlDB.Close()
+	h := handlers.NewVolunteerHandler(db)
+
+	mock.ExpectBegin()
+	mock.ExpectQuery(`INSERT INTO "volunteers"`).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(3))
+	mock.ExpectCommit()
+
+	c, rec := newCtx(t, ctxOpts{
+		body: map[string]interface{}{
+			"name":       "Luisa",
+			"email":      "luisa@test.com",
+			"department": "sin_preferencia",
+		},
 	})
 	require.NoError(t, h.Register(c))
 	assert.Equal(t, http.StatusCreated, rec.Code)

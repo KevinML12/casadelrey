@@ -1,7 +1,16 @@
+import { useApi } from './feed';
+
 // Los 10 departamentos reales donde sirven los ~90 voluntarios
 // (CONTEXTO_IGLESIA jul-2026). Única fuente de verdad: antes vivía
 // duplicado como array de strings en AboutPage.jsx y como objetos
 // {icon,title,desc} en VolunteeringPage.jsx — podían desincronizarse.
+//
+// Este array YA NO es la fuente de verdad del contenido -- eso vive en
+// VolunteerArea (DB, editable desde /admin/volunteer-areas). Ahora es
+// SOLO el fallback si la API falla/está vacía, y la fuente de
+// photoFallback (las fotos siguen resolviéndose aparte via site-photos,
+// ver VolunteeringPage.jsx). Usar useVolunteerAreas() de abajo, no este
+// array directo, salvo que de verdad necesites el fallback puro.
 //
 // photoFallback: foto REAL ya existente en el sitio (ninguna generada/
 // stock nueva), emparejada por afinidad temática -- alabanza/danza/niños
@@ -76,3 +85,27 @@ export const VOLUNTEER_AREAS = [
     why: 'Si eres organizado y te gusta que todo funcione bien detrás de cámaras, aquí eres clave.',
   },
 ];
+
+const DEFAULT_PHOTO_FALLBACK = '/images/nosotros/comunidad.jpg';
+
+// Hook: departamentos reales desde /volunteer-areas (admin-editable),
+// con VOLUNTEER_AREAS como fallback si la API aún no responde o está
+// vacía -- el slot nunca queda en blanco. El texto (title/desc/why/icon)
+// viene de la API cuando hay datos; photoFallback SIEMPRE sale del
+// array local (las fotos se administran aparte, en site-photos) y usa
+// un fallback genérico para departamentos nuevos que el admin cree y
+// que no tengan match en este array.
+export function useVolunteerAreas() {
+  const data = useApi('/volunteer-areas');
+  if (Array.isArray(data) && data.length > 0) {
+    return data.map(a => ({
+      value: a.value,
+      icon: a.icon || 'box',
+      title: a.title,
+      desc: a.description,
+      why: a.why,
+      photoFallback: VOLUNTEER_AREAS.find(f => f.value === a.value)?.photoFallback || DEFAULT_PHOTO_FALLBACK,
+    }));
+  }
+  return VOLUNTEER_AREAS;
+}

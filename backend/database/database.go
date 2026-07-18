@@ -84,6 +84,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			// Personas
 			&models.Leader{},           // directorio de líderes (foto + contacto)
 			&models.Volunteer{},
+			&models.VolunteerArea{},    // NUEVA — departamentos editables desde el admin
 			&models.Petition{},
 			&models.ConnectCard{}, // NUEVA — tarjeta de conexión para visitantes nuevos
 			// CMS

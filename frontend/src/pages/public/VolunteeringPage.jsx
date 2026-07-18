@@ -8,7 +8,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import WindowStack from '../../components/ui/WindowStack';
 import apiClient from '../../lib/apiClient';
 import { useSitePhoto, useApi } from '../../lib/feed';
-import { VOLUNTEER_AREAS as AREAS } from '../../lib/volunteerAreas';
+import { useVolunteerAreas } from '../../lib/volunteerAreas';
 import toast from 'react-hot-toast';
 
 const PRESS = {
@@ -74,8 +74,8 @@ function ModalWrapper({ children, onClose }) {
 // defecto) se muestra COMO DATO, no como un <select> abierto -- cambiar
 // de opinion es una accion explicita ("Cambiar") en vez de un desliz
 // accidental del mouse sobre un dropdown.
-function DepartmentLocked({ department, onRequestChange }) {
-  const area = AREAS.find(a => a.value === department);
+function DepartmentLocked({ department, areas, onRequestChange }) {
+  const area = areas.find(a => a.value === department);
   return (
     <div className="rounded-[14px] border border-bg/12 bg-bg/5 px-4 py-3.5 flex items-center justify-between gap-3">
       <div className="min-w-0">
@@ -89,7 +89,7 @@ function DepartmentLocked({ department, onRequestChange }) {
   );
 }
 
-function VolunteerForm({ department: initialDepartment, onClose }) {
+function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', department: initialDepartment || NO_PREFERENCE, message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -134,7 +134,7 @@ function VolunteerForm({ department: initialDepartment, onClose }) {
     } finally { setSubmitting(false); }
   };
 
-  const area = AREAS.find(a => a.value === form.department);
+  const area = areas.find(a => a.value === form.department);
 
   if (sent) {
     return (
@@ -208,7 +208,7 @@ function VolunteerForm({ department: initialDepartment, onClose }) {
         </label>
 
         {!changing ? (
-          <DepartmentLocked department={form.department} onRequestChange={requestChange} />
+          <DepartmentLocked department={form.department} areas={areas} onRequestChange={requestChange} />
         ) : (
           <div className="rounded-[14px] border border-bg/12 bg-bg/5 p-4 space-y-3">
             <p className="text-[13px] font-semibold text-bg/60">
@@ -221,7 +221,7 @@ function VolunteerForm({ department: initialDepartment, onClose }) {
             >
               <option value="">Selecciona una opción</option>
               <option value={NO_PREFERENCE}>{NO_PREFERENCE_LABEL}</option>
-              {AREAS.map(a => <option key={a.value} value={a.value}>{a.title}</option>)}
+              {areas.map(a => <option key={a.value} value={a.value}>{a.title}</option>)}
             </select>
             <div className="flex gap-2">
               <button type="button" disabled={!pendingChange} onClick={confirmChange} className={btnSmallPrimary}>
@@ -293,11 +293,23 @@ export default function VolunteeringPage() {
   // Administrable desde /admin/site-photos (antes ruta hardcodeada — el
   // admin no podía cambiarla sin deploy). El local queda de fallback.
   const sectionImg = useSitePhoto('voluntariado_seccion', '/images/nosotros/servidores.jpg');
-  // Una sola llamada a /site-photos, la resolucion por departamento es
-  // JS plano (no un hook por item) -- 10 useSitePhoto en un .map violaria
-  // las reglas de hooks.
+  // Departamentos reales desde /volunteer-areas (admin-editable), con
+  // fallback local si la API aun no responde. Una sola llamada a
+  // /site-photos, la resolucion de foto por departamento es JS plano (no
+  // un hook por item) -- 10 useSitePhoto en un .map violaria las reglas
+  // de hooks.
+  const liveAreas = useVolunteerAreas();
   const sitePhotos = useApi('/site-photos') || {};
-  const areas = AREAS.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || a.photoFallback }));
+  const areas = liveAreas.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || a.photoFallback }));
+
+  // Departamentos que el admin agregue y no encajen en ninguna de las 5
+  // categorias curadas (values fijos abajo) igual deben aparecer en
+  // algun lado -- "Otros" los recoge en vez de desaparecer en silencio.
+  const categorized = new Set(CATEGORIES.flatMap(c => c.values));
+  const leftover = areas.filter(a => !categorized.has(a.value));
+  const categoriesWithLeftover = leftover.length > 0
+    ? [...CATEGORIES, { name: 'Otros', values: leftover.map(a => a.value) }]
+    : CATEGORIES;
 
   const windowItems = areas.map(a => ({ key: a.value, image: a.photo, title: a.title }));
 
@@ -348,7 +360,7 @@ export default function VolunteeringPage() {
           </RevealList>
 
           <div className="space-y-10">
-            {CATEGORIES.map(cat => (
+            {categoriesWithLeftover.map(cat => (
               <div key={cat.name}>
                 <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
                 <RevealList className="grid sm:grid-cols-2 gap-4">
@@ -402,7 +414,7 @@ export default function VolunteeringPage() {
       <AnimatePresence>
         {formDept !== null && (
           <ModalWrapper onClose={() => setFormDept(null)}>
-            <VolunteerForm department={formDept} onClose={() => setFormDept(null)} />
+            <VolunteerForm department={formDept} areas={areas} onClose={() => setFormDept(null)} />
           </ModalWrapper>
         )}
       </AnimatePresence>

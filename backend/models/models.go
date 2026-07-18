@@ -224,6 +224,24 @@ type Volunteer struct {
 	Status           string `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|asignado|coordinando|usuario_creado
 }
 
+// VolunteerArea = los departamentos de voluntariado (Alabanza, Danza,
+// Servidores...) que se muestran en la pagina publica y se validan al
+// inscribirse. Antes vivian hardcodeados en el frontend (volunteerAreas.js)
+// -- ahora el admin los edita sin tocar codigo. El campo Value es la
+// llave estable que ya usan Volunteer.Department y las URLs de foto en
+// site_photos (voluntariado_<value>) -- no se debe reusar/reciclar tras
+// borrar uno.
+type VolunteerArea struct {
+	gorm.Model
+	Value       string `json:"value" gorm:"type:varchar(50);uniqueIndex;not null"` // alabanza, danza...
+	Icon        string `json:"icon" gorm:"type:varchar(30)"`                       // nombre del icono del set ya existente (Glass.jsx)
+	Title       string `json:"title" gorm:"type:varchar(100);not null"`
+	Description string `json:"description" gorm:"type:text"`
+	Why         string `json:"why" gorm:"type:text"` // "por que aqui" -- se muestra al abrir el departamento
+	SortOrder   int    `json:"sort_order" gorm:"default:0"`
+	IsActive    bool   `json:"is_active" gorm:"default:true"`
+}
+
 type SocialPost struct {
 	gorm.Model
 	Platform     string `json:"platform" gorm:"type:varchar(20);not null"` // facebook|instagram|youtube|tiktok

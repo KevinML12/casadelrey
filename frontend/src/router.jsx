@@ -48,6 +48,7 @@ const AdminGallery       = lazy(() => import('./pages/admin/AdminGallery'));
 const AdminFAQs          = lazy(() => import('./pages/admin/AdminFAQs'));
 const AdminLeaders       = lazy(() => import('./pages/admin/AdminLeaders'));
 const AdminCells         = lazy(() => import('./pages/admin/AdminCells'));
+const AdminVolunteerAreas = lazy(() => import('./pages/admin/AdminVolunteerAreas'));
 const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
 const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
 const AdminHero          = lazy(() => import('./pages/admin/AdminHero'));
@@ -100,6 +101,7 @@ export const router = createBrowserRouter([
       { path: 'faqs',            element: <Suspense fallback={<PageFallback />}><AdminFAQs /></Suspense> },
       { path: 'leaders',         element: <Suspense fallback={<PageFallback />}><AdminLeaders /></Suspense> },
       { path: 'cells',           element: <Suspense fallback={<PageFallback />}><AdminCells /></Suspense> },
+      { path: 'volunteer-areas', element: <Suspense fallback={<PageFallback />}><AdminVolunteerAreas /></Suspense> },
       { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
       { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
       { path: 'hero',            element: <Suspense fallback={<PageFallback />}><AdminHero /></Suspense> },

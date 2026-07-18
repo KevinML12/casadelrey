@@ -14,7 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// Departamentos válidos de voluntariado.
+// Departments queda de referencia para GetDepartments (endpoint viejo,
+// sin consumidores en el frontend hoy) -- la validacion real de Register
+// y la fuente de verdad de los departamentos es VolunteerArea (DB,
+// editable desde /admin/volunteer-areas). Ver volunteerArea.handler.go.
 var Departments = []string{
 	"alabanza",
 	"danza",
@@ -28,13 +31,11 @@ var Departments = []string{
 	"logistica",
 }
 
-var validDepartments = func() map[string]bool {
-	m := make(map[string]bool)
-	for _, d := range Departments {
-		m[d] = true
-	}
-	return m
-}()
+// NoPreferenceDepartment es el valor especial que manda el frontend
+// cuando el postulante no elige un departamento y prefiere que el
+// equipo lo recomiende (VolunteeringPage.jsx, NO_PREFERENCE). No es una
+// fila real de VolunteerArea -- se excluye de la validacion.
+const NoPreferenceDepartment = "sin_preferencia"
 
 // VolunteerHandler maneja inscripciones de voluntariado.
 type VolunteerHandler struct {
@@ -60,8 +61,16 @@ func (h *VolunteerHandler) Register(c echo.Context) error {
 	if req.Name == "" || req.Email == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nombre y email son requeridos."})
 	}
-	if req.Department != "" && !validDepartments[req.Department] {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Departamento no válido."})
+	// Los departamentos ahora se validan contra VolunteerArea (editable
+	// desde el admin), no contra el array hardcodeado -- "sin_preferencia"
+	// es el unico valor que NO es una fila real (ver VolunteeringPage.jsx,
+	// NO_PREFERENCE: el postulante delega la eleccion al equipo).
+	if req.Department != "" && req.Department != NoPreferenceDepartment {
+		var count int64
+		h.DB.Model(&models.VolunteerArea{}).Where("value = ? AND is_active = ?", req.Department, true).Count(&count)
+		if count == 0 {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Departamento no válido."})
+		}
 	}
 
 	v := models.Volunteer{

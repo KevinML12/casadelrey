@@ -27,6 +27,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminHandler         := handlers.NewAdminHandler(db)
 	profileHandler       := handlers.NewProfileHandler(db)
 	volunteerHandler     := handlers.NewVolunteerHandler(db)
+	volunteerAreaHandler := handlers.NewVolunteerAreaHandler(db)
 	boletaHandler        := handlers.NewBoletaHandler(db)
 	uploadHandler        := handlers.NewUploadHandler(store)
 	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
@@ -94,6 +95,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.POST("/volunteer/register",   volunteerHandler.Register)
 	api.GET("/volunteer/departments", volunteerHandler.GetDepartments)
 	api.GET("/volunteer/me",          volunteerHandler.GetMyInfo, authMW)
+	api.GET("/volunteer-areas",       volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong)
 
 	// Auth
 	authGroup := api.Group("/auth", authRateLimit)
@@ -216,6 +218,12 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.POST("/cells",      cellCategoryHandler.CreateCell)
 	adminGroup.PUT("/cells/:id",   cellCategoryHandler.UpdateCell)
 	adminGroup.DELETE("/cells/:id", cellCategoryHandler.DeleteCell)
+
+	// Departamentos de voluntariado — admin (antes hardcodeados en volunteerAreas.js)
+	adminGroup.GET("/volunteer-areas",       volunteerAreaHandler.GetAllVolunteerAreasAdmin)
+	adminGroup.POST("/volunteer-areas",      volunteerAreaHandler.CreateVolunteerArea)
+	adminGroup.PUT("/volunteer-areas/:id",   volunteerAreaHandler.UpdateVolunteerArea)
+	adminGroup.DELETE("/volunteer-areas/:id", volunteerAreaHandler.DeleteVolunteerArea)
 
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)

@@ -7,7 +7,7 @@ import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
-import { VOLUNTEER_AREAS } from '../../lib/volunteerAreas';
+import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const MotionLink = motion.create(Link);
 const PRESS = {
@@ -29,6 +29,7 @@ export default function AboutPage() {
   const servidoresImg = useSitePhoto('about_servidores', '/images/nosotros/servidores.jpg');
   const comunidadImg  = useSitePhoto('about_comunidad',  '/images/nosotros/comunidad.jpg');
   const lideresImg    = useSitePhoto('about_lideres',    '/images/nosotros/lideres.jpg');
+  const volunteerAreas = useVolunteerAreas();
 
   return (
     <main className="min-h-screen bg-bg text-white">
@@ -151,7 +152,7 @@ export default function AboutPage() {
             <div className="liquid-glass rounded-[24px] p-8 md:p-10">
               <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-5">Departamentos de voluntariado</p>
               <div className="flex flex-wrap gap-2.5">
-                {VOLUNTEER_AREAS.map(d => (
+                {volunteerAreas.map(d => (
                   <span key={d.value} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[13.5px] font-semibold text-white/80">
                     {d.title}
                   </span>
