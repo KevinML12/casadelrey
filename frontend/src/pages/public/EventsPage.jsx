@@ -364,12 +364,16 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
         </div>
       )}
 
-      {/* Contenido (Liquid Glass Panel) */}
+      {/* Contenido -- antes las cards con foto metian el texto en un
+          panel flotante CON su propio borde/blur (liquid-glass anidado),
+          lo que se leia como dos cajas separadas (foto arriba, panel
+          abajo) en vez de una sola card. Ahora el texto va directo
+          sobre el degradado, sin caja propia -- una sola superficie. */}
       <div className={hasPhoto
         ? 'absolute bottom-0 left-0 right-0 z-20 p-5'
         : `relative z-20 h-full flex flex-col ${isFeaturedTall ? 'justify-center' : 'justify-end'} p-5`
       }>
-        <div className={`${hasPhoto ? 'liquid-glass bg-white/5 border border-white/10 backdrop-blur-2xl p-5' : ''} rounded-[24px] flex flex-col gap-4`}>
+        <div className="rounded-[24px] flex flex-col gap-4">
 
           <div className="flex items-center gap-4 w-full min-w-0">
             {/* Fecha */}
