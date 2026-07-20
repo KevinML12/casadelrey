@@ -299,12 +299,12 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
 
 function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
   const nodeRef = useRef(null);
-  // Antes, sin cover_image, la card caia a glass-light (blanco/tinta navy) --
-  // mezclada con las cards CON foto (liquid-glass oscuro) en el mismo grid,
-  // se leian como dos estilos distintos sin motivo real (glass-light es
-  // para UN acento por pagina, no un material repetido). Ahora TODA card
-  // es liquid-glass -- con o sin foto -- y lo que de verdad se clasifica
-  // visualmente es gratis vs. pagado (badge), no si el admin subio flyer.
+  // Regla del sitio: cristal blanco (glass-light) para contenido real,
+  // cristal oscuro solo para chrome/navegacion. La card de evento ES el
+  // contenido, con o sin foto -- antes vivia en liquid-glass oscuro (una
+  // decision de una sesion anterior, para que las cards con/sin flyer no
+  // se leyeran como "dos estilos distintos"). Se mantiene esa misma idea
+  // de unificar TODAS las cards bajo un solo material, ahora glass-light.
   const hasPhoto = Boolean(ev.cover_image);
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
@@ -323,15 +323,15 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
   // contenido. Centrado vertical solo para esta, sin tocar las demas.
   const isFeaturedTall = bentoSpan.includes('row-span-2');
 
-  // Tinta blanca siempre -- todas las cards son liquid-glass oscuro ahora.
-  const ink        = 'text-white';
-  const ink80      = 'text-white/80';
-  const ink60      = 'text-white/60';
-  const ink50      = 'text-white/50';
-  const ink40      = 'text-white/40';
-  const ink35      = 'text-white/35';
-  const wellBg     = 'bg-white/5';
-  const wellBorder = 'border-white/10';
+  // Tinta navy siempre -- todas las cards son glass-light ahora.
+  const ink        = 'text-bg';
+  const ink80      = 'text-bg/80';
+  const ink60      = 'text-bg/60';
+  const ink50      = 'text-bg/50';
+  const ink40      = 'text-bg/40';
+  const ink35      = 'text-bg/35';
+  const wellBg     = 'bg-bg/5';
+  const wellBorder = 'border-bg/10';
 
   return (
     <motion.div
@@ -342,22 +342,22 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={{ transformPerspective: 1000 }}
-      className={`${bentoSpan} w-full h-full liquid-shine relative overflow-hidden rounded-[32px] group ${hasPhoto ? 'border border-white/10' : 'liquid-glass'} transition-shadow`}
+      className={`${bentoSpan} w-full h-full liquid-shine glass-light relative overflow-hidden rounded-[32px] group transition-shadow`}
     >
 
       {hasPhoto && (
         <>
           {/* Flyer de fondo */}
-          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
-          {/* Gradiente para leer el texto */}
-          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
+          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-85" />
+          {/* Gradiente claro para leer el texto navy encima */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/55 to-transparent opacity-100" />
         </>
       )}
 
       {/* Etiqueta de próximo evento si es el primero */}
       {i === 0 && (
         <div className="absolute top-6 left-6 z-20">
-          <span className="liquid-glass px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2">
+          <span className="bg-bg/90 px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2 backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
             Próximo evento
           </span>
@@ -406,6 +406,15 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
             </p>
           )}
 
+          {/* Descripción real del evento -- solo en la card destacada
+              (2x2), que tiene espacio de sobra; el dato ya existe en
+              /admin/events, antes nunca se mostraba en la vista pública. */}
+          {isFeaturedTall && ev.description && (
+            <p className={`${ink60} text-[13.5px] leading-relaxed line-clamp-2`}>
+              {ev.description}
+            </p>
+          )}
+
           <div className={`shrink-0 flex flex-col gap-3 w-full pt-3 border-t ${wellBorder}`}>
             {/* Gratis vs. pagado: la clasificación real de la card, siempre visible */}
             <div className="flex flex-wrap gap-2">
@@ -435,7 +444,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
               className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
                 ev.is_full
                   ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
-                  : 'liquid-glass text-white hover:border-white/30'
+                  : 'bg-bg text-white hover:opacity-90'
               }`}
             >
               {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
@@ -444,7 +453,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
             <button
               type="button"
               onClick={() => onCancelRsvp(ev)}
-              className={`${ink35} hover:text-white/60 text-[11.5px] font-medium transition-colors self-center`}
+              className={`${ink35} hover:text-bg/60 text-[11.5px] font-medium transition-colors self-center`}
             >
               ¿Ya te registraste? Cancelar mi registro
             </button>
@@ -470,16 +479,16 @@ function PastEventCard({ ev }) {
     .join(' · ');
 
   return (
-    <div className="liquid-glass rounded-[20px] p-4 flex items-center gap-4">
+    <div className="glass-light rounded-[20px] p-4 flex items-center gap-4 opacity-80">
       {dayNum && (
-        <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-xl bg-white/5 border border-white/10 w-12 h-12">
-          <div className="font-black leading-none text-white/70 text-[16px]">{dayNum}</div>
-          <div className="font-bold tracking-[1.5px] text-white/40 text-[7px]">{monthStr}</div>
+        <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-xl bg-bg/5 border border-bg/10 w-12 h-12">
+          <div className="font-black leading-none text-bg/70 text-[16px]">{dayNum}</div>
+          <div className="font-bold tracking-[1.5px] text-bg/40 text-[7px]">{monthStr}</div>
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <h4 className="font-bold text-white/70 text-[14.5px] tracking-tight line-clamp-1">{ev.title}</h4>
-        {details && <p className="text-white/40 text-[12px] truncate mt-0.5">{details}</p>}
+        <h4 className="font-bold text-bg/70 text-[14.5px] tracking-tight line-clamp-1">{ev.title}</h4>
+        {details && <p className="text-bg/40 text-[12px] truncate mt-0.5">{details}</p>}
       </div>
     </div>
   );

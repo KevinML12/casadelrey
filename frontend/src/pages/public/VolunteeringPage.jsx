@@ -269,19 +269,19 @@ function DepartmentCard({ value, icon, title, photo, onClick }) {
       onClick={onClick}
       max={4}
       glass="standard"
-      className="liquid-shine relative overflow-hidden rounded-[20px] h-[170px] w-full text-left group border border-white/10"
+      className="liquid-shine glass-light relative overflow-hidden rounded-[20px] h-[170px] w-full text-left group"
     >
       <img
         src={photo}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700"
+        className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/45 to-transparent" />
       <div className="relative z-10 h-full flex flex-col justify-end p-4">
-        <div className="w-9 h-9 rounded-full liquid-glass flex items-center justify-center mb-2.5">
+        <div className="w-9 h-9 rounded-full bg-bg/85 flex items-center justify-center mb-2.5">
           <Icon name={icon} className="w-4 h-4 text-white" />
         </div>
-        <h3 className="text-[16px] font-bold text-white tracking-tight leading-tight">{title}</h3>
+        <h3 className="text-[16px] font-bold text-bg tracking-tight leading-tight">{title}</h3>
       </div>
     </Tilt>
   );
@@ -351,9 +351,9 @@ export default function VolunteeringPage() {
           <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto mb-14">
             {STATS.map(s => (
               <RevealItem key={s.label}>
-                <div className="liquid-glass rounded-[18px] px-3 py-5 text-center h-full">
-                  <div className="text-[26px] sm:text-[30px] font-extrabold text-white tracking-tighter leading-none">{s.n}</div>
-                  <div className="mt-1.5 text-[11px] sm:text-[11.5px] font-semibold text-white/55 leading-tight">{s.label}</div>
+                <div className="glass-light rounded-[18px] px-3 py-5 text-center h-full">
+                  <div className="text-[26px] sm:text-[30px] font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
+                  <div className="mt-1.5 text-[11px] sm:text-[11.5px] font-semibold text-bg/55 leading-tight">{s.label}</div>
                 </div>
               </RevealItem>
             ))}
