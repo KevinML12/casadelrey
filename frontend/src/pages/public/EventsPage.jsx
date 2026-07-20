@@ -299,12 +299,11 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
 
 function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
   const nodeRef = useRef(null);
-  // Regla del sitio: cristal blanco (glass-light) para contenido real,
-  // cristal oscuro solo para chrome/navegacion. La card de evento ES el
-  // contenido, con o sin foto -- antes vivia en liquid-glass oscuro (una
-  // decision de una sesion anterior, para que las cards con/sin flyer no
-  // se leyeran como "dos estilos distintos"). Se mantiene esa misma idea
-  // de unificar TODAS las cards bajo un solo material, ahora glass-light.
+  // Regla del sitio: cristal blanco (glass-light) para contenido sin foto
+  // propia; cristal oscuro (liquid-glass) para cards que SI muestran una
+  // foto propia (el degradado claro deslavaba el flyer -- feedback real
+  // del usuario). La clasificacion real ya no es "con/sin foto" a ciegas:
+  // es foto->oscuro, sin foto->claro, aplicado consistente en todo el sitio.
   const hasPhoto = Boolean(ev.cover_image);
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
@@ -323,15 +322,17 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
   // contenido. Centrado vertical solo para esta, sin tocar las demas.
   const isFeaturedTall = bentoSpan.includes('row-span-2');
 
-  // Tinta navy siempre -- todas las cards son glass-light ahora.
-  const ink        = 'text-bg';
-  const ink80      = 'text-bg/80';
-  const ink60      = 'text-bg/60';
-  const ink50      = 'text-bg/50';
-  const ink40      = 'text-bg/40';
-  const ink35      = 'text-bg/35';
-  const wellBg     = 'bg-bg/5';
-  const wellBorder = 'border-bg/10';
+  // Tinta segun material: blanca sobre liquid-glass (con foto), navy
+  // sobre glass-light (sin foto).
+  const ink        = hasPhoto ? 'text-white'    : 'text-bg';
+  const ink80      = hasPhoto ? 'text-white/80' : 'text-bg/80';
+  const ink60      = hasPhoto ? 'text-white/60' : 'text-bg/60';
+  const ink50      = hasPhoto ? 'text-white/50' : 'text-bg/50';
+  const ink40      = hasPhoto ? 'text-white/40' : 'text-bg/40';
+  const ink35      = hasPhoto ? 'text-white/35' : 'text-bg/35';
+  const inkHover    = hasPhoto ? 'hover:text-white/60' : 'hover:text-bg/60';
+  const wellBg     = hasPhoto ? 'bg-white/5'  : 'bg-bg/5';
+  const wellBorder = hasPhoto ? 'border-white/10' : 'border-bg/10';
 
   return (
     <motion.div
@@ -342,15 +343,15 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={{ transformPerspective: 1000 }}
-      className={`${bentoSpan} w-full h-full liquid-shine glass-light relative overflow-hidden rounded-[32px] group transition-shadow`}
+      className={`${bentoSpan} w-full h-full liquid-shine ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow`}
     >
 
       {hasPhoto && (
         <>
           {/* Flyer de fondo */}
-          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-85" />
-          {/* Gradiente claro para leer el texto navy encima */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/55 to-transparent opacity-100" />
+          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
+          {/* Gradiente oscuro para leer el texto blanco encima, sin deslavar el flyer */}
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
         </>
       )}
 
@@ -444,7 +445,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
               className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
                 ev.is_full
                   ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
-                  : 'bg-bg text-white hover:opacity-90'
+                  : hasPhoto ? 'bg-white text-bg hover:opacity-90' : 'bg-bg text-white hover:opacity-90'
               }`}
             >
               {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
@@ -453,7 +454,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
             <button
               type="button"
               onClick={() => onCancelRsvp(ev)}
-              className={`${ink35} hover:text-bg/60 text-[11.5px] font-medium transition-colors self-center`}
+              className={`${ink35} ${inkHover} text-[11.5px] font-medium transition-colors self-center`}
             >
               ¿Ya te registraste? Cancelar mi registro
             </button>
