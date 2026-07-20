@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import DOMPurify from 'dompurify';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
@@ -186,7 +187,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
           </div>
           {preview ? (
             <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-bg/10 bg-bg/4 text-body-s leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: editor?.getHTML() || '' }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editor?.getHTML() || '') }} />
           ) : (
             <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-pri focus-within:ring-2 focus-within:ring-pri/15 transition-all">
               <EditorToolbar editor={editor} />
