@@ -340,13 +340,13 @@ export default function AdminBlog() {
                     )}
                     <button
                       onClick={() => { setEditing(post); setShowForm(false); }}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-bg hover:bg-bg/8 transition-all"
+                      className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-bg hover:bg-bg/8 transition-all"
                     >
                       <Icon name="edit" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>
                     <button
                       onClick={() => handleDelete(post.ID)}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-rose hover:bg-rose/8 transition-all"
+                      className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-rose hover:bg-rose/8 transition-all"
                     >
                       <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </button>

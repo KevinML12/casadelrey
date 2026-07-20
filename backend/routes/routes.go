@@ -208,10 +208,12 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.GET("/settings",          siteSettingHandler.GetAll)
 	adminGroup.PUT("/settings/:key",     siteSettingHandler.UpdateSetting)
 
-	// Categorías de células — admin edita la foto de cada tipo
-	adminGroup.GET("/cell-categories",      cellCategoryHandler.GetAllCellCategoriesAdmin)
-	adminGroup.POST("/cell-categories",     cellCategoryHandler.CreateCellCategory)
-	adminGroup.PUT("/cell-categories/:id",  cellCategoryHandler.UpdateCellCategoryImage)
+	// Categorías de células — CRUD completo (nombre/edad/descripción/foto/
+	// type_key/orden/activo), no solo la foto
+	adminGroup.GET("/cell-categories",       cellCategoryHandler.GetAllCellCategoriesAdmin)
+	adminGroup.POST("/cell-categories",      cellCategoryHandler.CreateCellCategory)
+	adminGroup.PUT("/cell-categories/:id",   cellCategoryHandler.UpdateCellCategory)
+	adminGroup.DELETE("/cell-categories/:id", cellCategoryHandler.DeleteCellCategory)
 
 	// Células individuales — admin (antes solo existían hardcodeadas en el frontend)
 	adminGroup.GET("/cells",       cellCategoryHandler.GetAllCellsAdmin)

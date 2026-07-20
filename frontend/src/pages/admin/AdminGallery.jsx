@@ -160,7 +160,7 @@ export default function AdminGallery() {
                   Oculta
                 </div>
               )}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100">
                 <IconButton onClick={() => handleToggle(p)} title={p.is_active ? 'Ocultar' : 'Mostrar'}
                   className="bg-bg/90 text-bg hover:bg-white w-8 h-8">
                   <Icon name={p.is_active ? 'visibility_off' : 'visibility'} className="w-[16px] h-[16px]" stroke={1.8} />

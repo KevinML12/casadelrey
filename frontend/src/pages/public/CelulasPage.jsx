@@ -75,6 +75,11 @@ const TYPE_TO_KEY = {
   ninos: 'ninos', niños: 'ninos',
 };
 
+// Foto genérica para una categoría creada desde el panel que aún no tiene
+// foto propia en /admin/site-photos (mismo fallback genérico que usan los
+// departamentos de voluntariado) -- nunca un hueco en blanco.
+const DEFAULT_CATEGORY_IMAGE = '/images/nosotros/comunidad.jpg';
+
 // COLLAGE base — recortes de tamaños/inclinaciones distintos
 const COLLAGE = [
   { span: 'col-span-2 row-span-2', rot: -2.4, y: 0 },
@@ -107,21 +112,46 @@ export default function CelulasPage() {
     return map;
   }, [apiLeaders]);
 
+  // Categorías 100% administrables (/admin/cell-categories): nombre, edad,
+  // descripción y type_key (a qué tipo estructural de célula pertenece)
+  // vienen de la API. GROUPS_FALLBACK SOLO se usa si el admin aún no ha
+  // creado ninguna categoría o la API falla -- nunca pisa datos reales.
   const groups = useMemo(() => {
-    const imageByName = {};
-    if (Array.isArray(apiCategories)) {
-      apiCategories.forEach(cat => { if (cat.image_url) imageByName[cat.name] = cat.image_url; });
-    }
-    const withImages = GROUPS_FALLBACK.map(g =>
-      imageByName[g.name] ? { ...g, image: imageByName[g.name] } : g
-    );
-    if (!Array.isArray(apiCells) || apiCells.length === 0) return withImages;
-    const byKey = {};
-    apiCells.forEach(c => {
-      const key = TYPE_TO_KEY[(c.type || '').toLowerCase()] || 'otros';
-      (byKey[key] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code, description: c.description });
+    const cats = Array.isArray(apiCategories) ? apiCategories.filter(c => c.is_active !== false) : [];
+    const cellsByType = {};
+    (Array.isArray(apiCells) ? apiCells : []).forEach(c => {
+      const t = (c.type || '').toLowerCase();
+      (cellsByType[t] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code, description: c.description });
     });
-    return withImages.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
+
+    if (cats.length === 0) {
+      const byKey = {};
+      Object.entries(cellsByType).forEach(([type, cells]) => {
+        const key = TYPE_TO_KEY[type] || 'otros';
+        byKey[key] = [...(byKey[key] || []), ...cells];
+      });
+      return GROUPS_FALLBACK.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
+    }
+
+    const base = cats.map(cat => ({
+      key: `cat-${cat.ID}`,
+      name: cat.name,
+      age: cat.age_group,
+      image: cat.image_url || DEFAULT_CATEGORY_IMAGE,
+      cells: cat.type_key ? (cellsByType[cat.type_key.toLowerCase()] || []) : [],
+    }));
+
+    // Células cuyo tipo no tiene ninguna categoría activa que lo reclame
+    // -- "Otros" las recoge en vez de desaparecer en silencio (mismo
+    // patrón de seguridad que usa VolunteeringPage con sus departamentos).
+    const claimedTypes = new Set(cats.filter(c => c.type_key).map(c => c.type_key.toLowerCase()));
+    const leftover = Object.entries(cellsByType)
+      .filter(([type]) => !claimedTypes.has(type))
+      .flatMap(([, cells]) => cells);
+
+    return leftover.length > 0
+      ? [...base, { key: 'otros', name: 'Otros', age: '', image: DEFAULT_CATEGORY_IMAGE, cells: leftover }]
+      : base;
   }, [apiCells, apiCategories]);
 
   // ?tipo=Adolescentes (desde el Home) abre directo esa ventana

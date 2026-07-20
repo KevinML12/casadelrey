@@ -40,6 +40,7 @@ const NAV_GROUPS = [
       { to: '/admin/users',         icon: 'manage_accounts',    label: 'Usuarios' },
       { to: '/admin/leaders',       icon: 'badge',              label: 'Líderes' },
       { to: '/admin/cells',         icon: 'groups',             label: 'Células' },
+      { to: '/admin/cell-categories', icon: 'category',          label: 'Categorías de células' },
       { to: '/admin/volunteers',    icon: 'group_add',          label: 'Voluntarios',  badge: 'pending_volunteers' },
       { to: '/admin/volunteer-areas', icon: 'dashboard',          label: 'Departamentos' },
       { to: '/admin/connect-cards', icon: 'contact_page',       label: 'Conéctate',    badge: 'pending_connect_cards' },

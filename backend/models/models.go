@@ -41,12 +41,21 @@ type Cell struct {
 }
 
 // CellCategory agrupa células por tipos (Adolescentes, Jóvenes, Varones, Mujeres, etc.)
+// para la vista pública de /celulas. Nombre/edad/descripción/foto/orden son
+// 100% administrables (crear, editar, borrar categorías) — TypeKey es la
+// única pieza fija: liga la categoría a uno de los 5 tipos estructurales de
+// Cell (hombres|mujeres|jovenes|prejus|ninos, el mismo enum que ya usan el
+// código de célula H/M/J/P/N y los reportes semanales) para saber qué
+// células le pertenecen. Una categoría sin TypeKey no auto-agrupa células
+// (útil para una categoría puramente informativa).
 type CellCategory struct {
 	gorm.Model
 	Name        string `json:"name" gorm:"type:varchar(100);not null;unique"` // e.g. "Adolescentes"
 	AgeGroup    string `json:"age_group" gorm:"type:varchar(50)"`             // e.g. "15 a 24 años"
 	Description string `json:"description" gorm:"type:text"`
 	ImageURL    string `json:"image_url" gorm:"type:varchar(500)"`
+	TypeKey     string `json:"type_key" gorm:"type:varchar(20)"` // hombres|mujeres|jovenes|prejus|ninos|""
+	SortOrder   int    `json:"sort_order" gorm:"default:0"`
 	IsActive    bool   `json:"is_active" gorm:"default:true"`
 }
 

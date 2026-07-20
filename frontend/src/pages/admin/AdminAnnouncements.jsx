@@ -187,7 +187,7 @@ export default function AdminAnnouncements() {
                 </div>
                 <p className="text-body-s text-bg/50 line-clamp-2">{a.content}</p>
               </div>
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+              <div className="flex items-center gap-1 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity shrink-0">
                 <IconButton onClick={() => { setEditing(a); setShowForm(true); }} title="Editar">
                   <Icon name="edit" className="w-[16px] h-[16px] text-bg/50" stroke={1.8} />
                 </IconButton>

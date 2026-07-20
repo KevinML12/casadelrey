@@ -344,13 +344,13 @@ export default function AdminEvents() {
                   </span>
                   <IconButton
                     onClick={(e) => { e.stopPropagation(); setEditing(ev); setShowForm(true); }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-bg/50 hover:text-bg hover:bg-bg/8"
+                    className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity text-bg/50 hover:text-bg hover:bg-bg/8"
                   >
                     <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
                   </IconButton>
                   <IconButton
                     onClick={(e) => { e.stopPropagation(); handleDelete(ev.ID); }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-bg/50 hover:text-rose hover:bg-rose/8"
+                    className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity text-bg/50 hover:text-rose hover:bg-rose/8"
                   >
                     <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
                   </IconButton>

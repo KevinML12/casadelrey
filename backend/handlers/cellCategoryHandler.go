@@ -23,7 +23,7 @@ func (h *CellCategoryHandler) GetCellCategories(c echo.Context) error {
 	var categories []models.CellCategory
 
 	// Solo devolvemos las categorías activas
-	if err := h.db.Where("is_active = ?", true).Find(&categories).Error; err != nil {
+	if err := h.db.Where("is_active = ?", true).Order("sort_order, name").Find(&categories).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener categorías de células"})
 	}
 
@@ -34,7 +34,7 @@ func (h *CellCategoryHandler) GetCellCategories(c echo.Context) error {
 // todas las categorías, incluidas las inactivas.
 func (h *CellCategoryHandler) GetAllCellCategoriesAdmin(c echo.Context) error {
 	var categories []models.CellCategory
-	if err := h.db.Order("name").Find(&categories).Error; err != nil {
+	if err := h.db.Order("sort_order, name").Find(&categories).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener categorías de células"})
 	}
 	return c.JSON(http.StatusOK, categories)
@@ -57,14 +57,13 @@ func (h *CellCategoryHandler) CreateCellCategory(c echo.Context) error {
 	return c.JSON(http.StatusCreated, cat)
 }
 
-type updateCellCategoryReq struct {
-	ImageURL string `json:"image_url"`
-}
-
-// UpdateCellCategoryImage PUT /api/v1/admin/cell-categories/:id — admin
-// reemplaza la foto de una categoría existente (sube vía /upload y
-// pega la URL resultante aquí).
-func (h *CellCategoryHandler) UpdateCellCategoryImage(c echo.Context) error {
+// UpdateCellCategory PUT /api/v1/admin/cell-categories/:id — admin edita
+// cualquier campo (nombre, grupo de edad, descripción, type_key, orden,
+// foto, activo/inactivo). Solo se sobrescriben los campos presentes en el
+// body -- así /admin/site-photos puede seguir mandando solo {image_url}
+// sin tocar el resto, y el nuevo panel de categorías manda el resto sin
+// tocar la foto.
+func (h *CellCategoryHandler) UpdateCellCategory(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ID inválido."})
@@ -75,16 +74,33 @@ func (h *CellCategoryHandler) UpdateCellCategoryImage(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Categoría no encontrada."})
 	}
 
-	var req updateCellCategoryReq
-	if err := c.Bind(&req); err != nil {
+	if err := c.Bind(&cat); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
+	if cat.Name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El nombre es obligatorio."})
+	}
 
-	cat.ImageURL = req.ImageURL
 	if err := h.db.Save(&cat).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar."})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar. ¿Ya existe ese nombre?"})
 	}
 	return c.JSON(http.StatusOK, cat)
+}
+
+// DeleteCellCategory DELETE /api/v1/admin/cell-categories/:id — soft-delete
+// (is_active=false), mismo patrón que Cell/VolunteerArea. Las células que
+// apuntaban a este type_key no se borran ni se reasignan -- si ninguna otra
+// categoría activa comparte su type_key, esas células caen en el bucket
+// "Otros" en la página pública en vez de desaparecer.
+func (h *CellCategoryHandler) DeleteCellCategory(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ID inválido."})
+	}
+	if err := h.db.Model(&models.CellCategory{}).Where("id = ?", id).Update("is_active", false).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar."})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "Categoría eliminada."})
 }
 
 // GetPublicCells GET /api/v1/cells — listado público de células activas.
