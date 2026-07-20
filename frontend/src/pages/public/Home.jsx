@@ -5,6 +5,8 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
 import { useApi, useBackdrops, groupAlbums, fetchOnce } from '../../lib/feed';
+import { useAuth } from '../../context/AuthContext';
+import { saludo } from '../../lib/greeting';
 
 // 3D — chunk aparte, solo se descarga si el dispositivo califica
 // (el campo de partículas global vive en App.jsx, vía StarField)
@@ -67,6 +69,7 @@ const LINE = {
 };
 
 function HeroCarousel({ onPlan }) {
+  const { user } = useAuth();
   const [slides, setSlides] = useState([SLIDE_FALLBACK]);
   const [idx, setIdx] = useState(0);
   // null = sin evento real que mostrar (la tarjeta oculta ese bloque);
@@ -185,6 +188,13 @@ function HeroCarousel({ onPlan }) {
   }, [slides.length]);
 
   const slide = slides[Math.min(idx, slides.length - 1)];
+  // Subtítulo del hero: si el admin no puso uno propio, saludo dinámico
+  // por hora del día (mismo lenguaje que "Buenos días, Pastor" del
+  // Dashboard) -- personalizado con el nombre si hay sesión iniciada.
+  // Los slides de evento ya traen su propio subtitle real (descripción),
+  // ese nunca se reemplaza.
+  const displaySubtitle = slide.subtitle
+    || (slide.type === 'hero' ? `${saludo()}${user?.name ? `, ${user.name.split(' ')[0]}` : ''}` : '');
   // Si el media remoto falla, la foto local sostiene el liquid glass
   const mediaFor = (s) => failed[s.media] ? LOCAL_MEDIA : (s.media || LOCAL_MEDIA);
   const markFailed = (url) => setFailed(f => ({ ...f, [url]: true }));
@@ -281,9 +291,9 @@ function HeroCarousel({ onPlan }) {
                     </span>
                   ))}
                 </h1>
-                {slide.subtitle && (
+                {displaySubtitle && (
                   <motion.p variants={RISE} className="mt-8 max-w-xl text-[17px] md:text-[20px] leading-relaxed text-white/80 font-medium">
-                    {slide.subtitle}
+                    {displaySubtitle}
                   </motion.p>
                 )}
                 {slide.schedule && (

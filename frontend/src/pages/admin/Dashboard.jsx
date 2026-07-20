@@ -7,6 +7,7 @@ import {
 import apiClient from '../../lib/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { downloadCsv } from '../../lib/exportCsv';
+import { saludo } from '../../lib/greeting';
 import Button from '../../components/ui/Button';
 import StatCard from '../../components/ui/StatCard';
 import { Icon } from '../../components/ui/Glass';
@@ -15,13 +16,6 @@ const METHOD_LABEL = {
   transferencia: 'Transferencia',
   presencial:    'En persona',
   tigo_money:    'Tigo Money', // histórico (método removido)
-};
-
-const saludo = () => {
-  const h = new Date().getHours();
-  if (h < 12) return 'Buenos días';
-  if (h < 19) return 'Buenas tardes';
-  return 'Buenas noches';
 };
 
 function SectionLabel({ icon, children }) {
