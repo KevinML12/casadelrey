@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
-import { useApi, useBackdrops, groupAlbums, fetchOnce } from '../../lib/feed';
+import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
 
@@ -1042,8 +1042,14 @@ function GalleryPreviewSection() {
 // COMPONENTE PRINCIPAL
 // ════════════════════════════════════════════════════════════════════
 export default function Home() {
-  // Fondos de sección curados desde la galería del admin (fallback local)
-  const backdrops = useBackdrops();
+  // Fondos de sección — mismo slot directo (AdminSitePhotos) que usa
+  // cada otro módulo del sitio, en vez del emparejamiento indirecto por
+  // palabra clave de álbum que tenía antes. El admin sube una foto y
+  // aparece, igual que en Blog/Galería/Células/Eventos.
+  const agendaBg    = useSitePhoto('home_agenda',    '/images/bg-eventos.jpg');
+  const celulasBg   = useSitePhoto('home_celulas',   '/images/bg-ministerios.jpg');
+  const mensajesBg  = useSitePhoto('home_mensajes',  '/images/bg-ensenanzas.jpg');
+  const ubicacionBg = useSitePhoto('home_ubicacion', '/images/bg-ubicacion.jpg');
   const navigate = useNavigate();
   // Fallback del CTA del hero (si un slide del backend trae un ctaUrl no
   // navegable): la acción de primer contacto es Conéctate, no un scroll.
@@ -1055,12 +1061,12 @@ export default function Home() {
           para todas las páginas públicas — aquí no hace falta montarlo */}
       <HeroCarousel onPlan={handlePlan} />
       <AnnouncementsBar />
-      <Agenda bg={backdrops.agenda} />
-      <CelulasSection bg={backdrops.celulas} />
-      <MensajesCarousel bg={backdrops.mensajes} />
+      <Agenda bg={agendaBg} />
+      <CelulasSection bg={celulasBg} />
+      <MensajesCarousel bg={mensajesBg} />
       <GalleryPreviewSection />
       <FeedSection />
-      <Ubicacion bg={backdrops.ubicacion} />
+      <Ubicacion bg={ubicacionBg} />
     </main>
   );
 }

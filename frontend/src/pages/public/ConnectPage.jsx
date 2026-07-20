@@ -27,7 +27,7 @@ const HOW_FOUND = [
 ];
 
 export default function ConnectPage() {
-  const heroImg = useSitePhoto('hero_celulas', '/images/bg-ministerios.jpg');
+  const heroImg = useSitePhoto('hero_conectate', '/images/bg-ministerios.jpg');
   const [form, setForm] = useState({ name: '', phone: '', email: '', category: '', how_found: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
