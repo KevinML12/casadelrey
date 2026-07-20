@@ -23,12 +23,6 @@ const PRESS = {
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
 
-const FIELD_STYLE = {
-  background: 'rgba(10,21,38,0.04)',
-  borderColor: 'rgba(10,21,38,0.12)',
-  color: '#0A1526',
-};
-
 function FieldShell({ label, error, children }) {
   return (
     <label className="block">
@@ -91,17 +85,17 @@ export default function PrayerForm({ compact = false }) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FieldShell label="Nombre *" error={errors.name}>
-            <input className="input-squircle w-full" style={FIELD_STYLE}
+            <input className="input-light"
               {...register('name', { required: 'El nombre es requerido' })} />
           </FieldShell>
           <FieldShell label="Correo electrónico" error={errors.email}>
-            <input type="email" className="input-squircle w-full" style={FIELD_STYLE}
+            <input type="email" className="input-light"
               {...register('email', { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Correo inválido' } })} />
           </FieldShell>
         </div>
 
         <FieldShell label="Categoría">
-          <select className="input-squircle w-full appearance-none cursor-pointer" style={FIELD_STYLE}
+          <select className="input-light appearance-none cursor-pointer"
             {...register('category')}>
             <option value="" className="text-bg">Selecciona una categoría</option>
             {CATEGORIES.map(c => (
@@ -111,12 +105,12 @@ export default function PrayerForm({ compact = false }) {
         </FieldShell>
 
         <FieldShell label="Asunto *" error={errors.subject}>
-          <input className="input-squircle w-full" style={FIELD_STYLE}
+          <input className="input-light"
             {...register('subject', { required: 'El asunto es requerido' })} />
         </FieldShell>
 
         <FieldShell label="Petición *" error={errors.message}>
-          <textarea rows={5} className="input-squircle w-full resize-none" style={FIELD_STYLE}
+          <textarea rows={5} className="input-light resize-none"
             {...register('message', { required: 'Escribe tu petición', minLength: { value: 10, message: 'Escribe un poco más' } })} />
         </FieldShell>
 

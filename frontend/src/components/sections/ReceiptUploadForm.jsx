@@ -6,7 +6,10 @@ import { Icon } from '../ui/Glass';
 
 const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'Agromercantil', 'Promerica', 'Citibank', 'Otro'];
 
-const fieldCls = 'w-full rounded-[14px] bg-bg/4 border border-bg/12 px-4 py-3 text-[15px] text-bg placeholder-bg/40 transition-all focus:outline-none focus:bg-bg/6 focus:border-bg/30';
+// .input-light: ver nota en ConnectPage.jsx -- opacidad baja (bg-bg/4)
+// no tapaba el fondo nativo oscuro que pinta el navegador con
+// color-scheme:dark activo.
+const fieldCls = 'input-light';
 const labelCls = 'block text-[13px] font-semibold text-bg/50 mb-1.5';
 
 const EMPTY = {

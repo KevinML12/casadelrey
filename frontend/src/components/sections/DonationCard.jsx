@@ -35,8 +35,10 @@ const PRESS = {
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
 
-const inputCls =
-  'w-full rounded-[14px] bg-bg/4 border border-bg/12 px-4 py-3 text-[15px] text-bg placeholder-bg/40 transition-all focus:outline-none focus:bg-bg/6 focus:border-bg/30';
+// .input-light (index.css): ver nota en ConnectPage.jsx -- bg-bg/4 no
+// tapaba el fondo nativo oscuro que el navegador pinta con
+// color-scheme:dark activo, el campo se veia gris oscuro solido.
+const inputCls = 'input-light';
 
 const labelCls = 'block text-[13px] font-semibold text-bg/50 mb-2';
 

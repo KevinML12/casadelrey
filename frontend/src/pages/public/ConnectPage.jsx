@@ -11,7 +11,13 @@ import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-bg/12 bg-bg/4 text-[14px] text-bg placeholder:text-bg/35 focus:outline-none focus:border-bg/40 focus:ring-2 focus:ring-bg/10 transition-all';
+// .input-light (index.css): fondo blanco 75% opaco -- suficiente para
+// tapar el fondo nativo OSCURO que el navegador pinta en inputs/selects
+// cuando color-scheme:dark esta activo en el <html> (todo el sitio
+// publico). Un bg-bg/4 (4% de opacidad) no lo tapa: el campo se ve
+// gris oscuro solido en vez de claro -- bug real encontrado por el
+// usuario en produccion.
+const fieldCls = 'input-light';
 
 const CATEGORIES = [
   { value: 'primera_vez',  label: 'Es mi primera vez',        icon: 'spark' },
