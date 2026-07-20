@@ -3,7 +3,7 @@
 # Compila el binario Go con todas las optimizaciones de tamaño activadas.
 # El binario resultante es estático (CGO_ENABLED=0) y no necesita libc.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # git es necesario para go mod download con dependencias de VCS
 RUN apk add --no-cache git
