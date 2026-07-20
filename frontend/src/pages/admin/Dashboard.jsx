@@ -75,7 +75,7 @@ function TrendChart({ data, loading }) {
   const avgDaily    = data.length ? totalAmount / data.length : 0;
 
   return (
-    <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 lg:col-span-2">
+    <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 lg:col-span-2 min-w-0">
       <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Icon name="trending_up" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
