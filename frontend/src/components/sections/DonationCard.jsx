@@ -36,9 +36,9 @@ const PRESS = {
 };
 
 const inputCls =
-  'w-full rounded-[14px] bg-white/5 border border-white/10 px-4 py-3 text-[15px] text-white placeholder-white/40 transition-all focus:outline-none focus:bg-white/10 focus:border-white/30';
+  'w-full rounded-[14px] bg-bg/4 border border-bg/12 px-4 py-3 text-[15px] text-bg placeholder-bg/40 transition-all focus:outline-none focus:bg-bg/6 focus:border-bg/30';
 
-const labelCls = 'block text-[13px] font-semibold text-white/50 mb-2';
+const labelCls = 'block text-[13px] font-semibold text-bg/50 mb-2';
 
 export default function DonationCard() {
   const [step,    setStep]    = useState(0);
@@ -149,33 +149,33 @@ export default function DonationCard() {
   // ── Success state ──────────────────────────────────────────────
   if (sent) {
     return (
-      <div className="liquid-glass liquid-shine rounded-[24px] p-8 text-center">
-        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-white/10 border border-white/15 flex items-center justify-center">
-          <Icon name="check" className="w-7 h-7 text-white" stroke={2.4} />
+      <div className="glass-light liquid-shine rounded-[24px] p-8 text-center">
+        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center">
+          <Icon name="check" className="w-7 h-7 text-bg" stroke={2.4} />
         </div>
-        <h3 className="display-mega text-white" style={{ fontSize: '1.7rem' }}>
+        <h3 className="display-mega text-bg" style={{ fontSize: '1.7rem' }}>
           ¡Gracias por sembrar!
         </h3>
         {isTransfer ? (
           <>
-            <p className="mt-3 text-[15px] text-white/70 leading-relaxed">
-              Recibimos tu donación de <strong className="text-white">Q{finalAmount}</strong> para <strong className="text-white">{purposeLabel}</strong>.
+            <p className="mt-3 text-[15px] text-bg/70 leading-relaxed">
+              Recibimos tu donación de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
             </p>
-            <p className="mt-1 text-[13.5px] text-white/50">
+            <p className="mt-1 text-[13.5px] text-bg/50">
               Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.
             </p>
           </>
         ) : (
           <>
-            <p className="mt-3 text-[15px] text-white/70 leading-relaxed">
-              Anotamos tu intención de <strong className="text-white">Q{finalAmount}</strong> para <strong className="text-white">{purposeLabel}</strong>.
+            <p className="mt-3 text-[15px] text-bg/70 leading-relaxed">
+              Anotamos tu intención de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
             </p>
-            <p className="mt-1 text-[13.5px] text-white/50">
+            <p className="mt-1 text-[13.5px] text-bg/50">
               Te esperamos este domingo. Un coordinador te recibe en la entrada.
             </p>
           </>
         )}
-        <motion.button {...PRESS} onClick={resetForm} className="mt-7 px-6 py-3.5 rounded-pill liquid-glass text-white font-bold text-[14px]">
+        <motion.button {...PRESS} onClick={resetForm} className="mt-7 px-6 py-3.5 rounded-pill glass-light-nested text-bg font-bold text-[14px]">
           Hacer otra donación
         </motion.button>
       </div>
@@ -203,7 +203,7 @@ export default function DonationCard() {
       type="button"
       onClick={next}
       disabled={!canContinue}
-      className="w-full mt-5 inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg font-bold text-[15px] disabled:opacity-40 focus-ring"
+      className="w-full mt-5 inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-[15px] disabled:opacity-40 focus-ring"
     >
       {children}
       <Icon name="arrow" className="w-4 h-4 rotate-90" stroke={2} />
@@ -219,8 +219,8 @@ export default function DonationCard() {
         return (
           <div
             key={def.label}
-            className={`liquid-glass liquid-shine rounded-[22px] overflow-hidden transition-all duration-500 ${
-              current ? 'border-white/25' : ''
+            className={`glass-light liquid-shine rounded-[22px] overflow-hidden transition-all duration-500 ${
+              current ? 'border-bg/25' : ''
             } ${i > step ? 'opacity-40' : ''}`}
           >
             {/* Encabezado del paso — colapsado muestra lo elegido */}
@@ -228,20 +228,20 @@ export default function DonationCard() {
               type="button"
               disabled={!done}
               onClick={() => done && setStep(i)}
-              className={`w-full flex items-center gap-3.5 px-5 py-4 text-left focus-ring ${done ? 'cursor-pointer hover:bg-white/5' : 'cursor-default'} transition-colors`}
+              className={`w-full flex items-center gap-3.5 px-5 py-4 text-left focus-ring ${done ? 'cursor-pointer hover:bg-bg/5' : 'cursor-default'} transition-colors`}
             >
               <span className={`grid place-items-center w-8 h-8 rounded-full text-[13px] font-extrabold shrink-0 transition-colors ${
-                current ? 'bg-white text-bg' : done ? 'bg-white/15 text-white' : 'bg-white/8 text-white/40'
+                current ? 'bg-bg text-white' : done ? 'bg-bg/12 text-bg' : 'bg-bg/6 text-bg/40'
               }`}>
                 {done ? <Icon name="check" className="w-4 h-4" stroke={2.6} /> : i + 1}
               </span>
-              <span className={`text-[15px] font-bold ${current || done ? 'text-white' : 'text-white/40'}`}>
+              <span className={`text-[15px] font-bold ${current || done ? 'text-bg' : 'text-bg/40'}`}>
                 {def.label}
               </span>
               {done && (
                 <>
-                  <span className="ml-auto text-[13.5px] font-semibold text-white/60 truncate">{summaries[i]}</span>
-                  <span className="text-[12px] font-bold text-white/40 shrink-0">Editar</span>
+                  <span className="ml-auto text-[13.5px] font-semibold text-bg/60 truncate">{summaries[i]}</span>
+                  <span className="text-[12px] font-bold text-bg/40 shrink-0">Editar</span>
                 </>
               )}
             </button>
@@ -258,7 +258,7 @@ export default function DonationCard() {
                   className="overflow-hidden"
                 >
                   <div className="px-5 pb-5">
-                    <p className="text-[14px] text-white/60 mb-4">{def.question}</p>
+                    <p className="text-[14px] text-bg/60 mb-4">{def.question}</p>
 
                     {/* ── Paso 1 · Monto ── */}
                     {i === 0 && (
@@ -275,7 +275,7 @@ export default function DonationCard() {
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => { setAmount(a); setCustom(''); }}
                                 className={`py-4 rounded-pill text-[17px] font-bold transition-colors focus-ring ${
-                                  active ? 'bg-white text-bg shadow-card' : 'liquid-btn'
+                                  active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
                                 }`}
                               >
                                 Q{a}
@@ -310,10 +310,10 @@ export default function DonationCard() {
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => setPurpose(p.value)}
                                 className={`flex items-center gap-2.5 rounded-pill px-5 py-3.5 text-[14px] font-bold transition-colors focus-ring ${
-                                  active ? 'bg-white text-bg shadow-card' : 'liquid-btn !text-white/75 hover:!text-white'
+                                  active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
                                 }`}
                               >
-                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-celeste' : 'bg-white/30'}`} />
+                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-celeste' : 'bg-bg/25'}`} />
                                 {p.label}
                               </motion.button>
                             );
@@ -338,19 +338,19 @@ export default function DonationCard() {
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => setMethod(m.value)}
                                 className={`w-full flex items-center gap-4 rounded-[16px] px-4 py-3.5 text-left transition-all border focus-ring ${
-                                  active ? 'bg-white/12 border-white/30' : 'bg-white/5 border-white/10 hover:border-white/20'
+                                  active ? 'bg-bg/8 border-bg/25' : 'bg-bg/4 border-bg/10 hover:border-bg/20'
                                 }`}
                               >
                                 <span className={`grid place-items-center w-10 h-10 rounded-full shrink-0 ${
-                                  active ? 'bg-white text-bg' : 'bg-white/10 text-white border border-white/15'
+                                  active ? 'bg-bg text-white' : 'bg-bg/8 text-bg border border-bg/12'
                                 }`}>
                                   <Icon name={m.icon} className="w-5 h-5" stroke={2} />
                                 </span>
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-[14.5px] font-bold text-white">{m.label}</div>
-                                  <div className="text-[12.5px] text-white/60 mt-0.5">{m.sub}</div>
+                                  <div className="text-[14.5px] font-bold text-bg">{m.label}</div>
+                                  <div className="text-[12.5px] text-bg/60 mt-0.5">{m.sub}</div>
                                 </div>
-                                {active && <Icon name="check" className="w-5 h-5 text-white shrink-0" stroke={2.4} />}
+                                {active && <Icon name="check" className="w-5 h-5 text-bg shrink-0" stroke={2.4} />}
                               </motion.button>
                             );
                           })}
@@ -358,35 +358,35 @@ export default function DonationCard() {
 
                         {isTransfer && (
                           <>
-                            <BankDetails />
+                            <BankDetails on="light" />
 
                             {receiptUrl ? (
-                              <div className="flex items-center gap-4 rounded-[14px] bg-white/5 border border-white/15 p-4">
-                                <img src={receiptUrl} alt="comprobante" className="h-16 w-16 object-cover rounded-[10px] border border-white/10" />
+                              <div className="flex items-center gap-4 rounded-[14px] bg-bg/4 border border-bg/12 p-4">
+                                <img src={receiptUrl} alt="comprobante" className="h-16 w-16 object-cover rounded-[10px] border border-bg/10" />
                                 <div className="flex-1 min-w-0">
-                                  <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-white">
+                                  <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-bg">
                                     <Icon name="check" className="w-4 h-4" stroke={2.4} />
                                     Comprobante cargado
                                   </p>
                                   <button
                                     type="button"
                                     onClick={() => setReceiptUrl('')}
-                                    className="block mt-1 text-[12.5px] font-semibold text-white/50 hover:text-white transition-colors"
+                                    className="block mt-1 text-[12.5px] font-semibold text-bg/50 hover:text-bg transition-colors"
                                   >
                                     Cambiar foto
                                   </button>
                                 </div>
                               </div>
                             ) : (
-                              <label className={`flex items-center gap-4 rounded-[16px] border-2 border-dashed border-white/15 bg-white/5 p-4 cursor-pointer transition-all ${uploading ? 'opacity-60' : 'hover:border-white/30 hover:bg-white/10'}`}>
-                                <span className="grid place-items-center w-11 h-11 rounded-full bg-white/10 text-white shrink-0">
+                              <label className={`flex items-center gap-4 rounded-[16px] border-2 border-dashed border-bg/15 bg-bg/4 p-4 cursor-pointer transition-all ${uploading ? 'opacity-60' : 'hover:border-bg/30 hover:bg-bg/8'}`}>
+                                <span className="grid place-items-center w-11 h-11 rounded-full bg-bg/8 text-bg shrink-0">
                                   <Icon name={uploading ? 'clock' : 'mail'} className={`w-5 h-5 ${uploading ? 'animate-spin' : ''}`} />
                                 </span>
                                 <div className="min-w-0">
-                                  <p className="text-[14px] font-bold text-white">
+                                  <p className="text-[14px] font-bold text-bg">
                                     {uploading ? 'Subiendo…' : 'Sube la foto de tu boleta *'}
                                   </p>
-                                  <p className="mt-0.5 text-[12px] text-white/50">JPG, PNG o PDF · máx. 10 MB</p>
+                                  <p className="mt-0.5 text-[12px] text-bg/50">JPG, PNG o PDF · máx. 10 MB</p>
                                 </div>
                                 <input type="file" accept="image/*,.pdf" className="hidden" onChange={handlePhoto} disabled={uploading} />
                               </label>
@@ -400,14 +400,14 @@ export default function DonationCard() {
                     {/* ── Paso 4 · Confirmar ── */}
                     {i === 3 && (
                       <div className="space-y-4">
-                        <div className="rounded-[16px] bg-white/10 p-5 flex justify-between items-center">
+                        <div className="rounded-[16px] bg-bg/6 p-5 flex justify-between items-center">
                           <div>
-                            <div className="text-[12px] font-semibold text-white/60">{purposeLabel} · {methodLabel}</div>
-                            <div className="text-[13px] text-white/70 mt-0.5">
+                            <div className="text-[12px] font-semibold text-bg/60">{purposeLabel} · {methodLabel}</div>
+                            <div className="text-[13px] text-bg/70 mt-0.5">
                               {isTransfer ? 'Con comprobante adjunto' : 'Entrega en persona'}
                             </div>
                           </div>
-                          <span className="display-mega text-white" style={{ fontSize: 34 }}>
+                          <span className="display-mega text-bg" style={{ fontSize: 34 }}>
                             Q{finalAmount}
                           </span>
                         </div>
@@ -440,13 +440,13 @@ export default function DonationCard() {
                           {...PRESS}
                           type="submit"
                           disabled={loading || uploading || !name.trim()}
-                          className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg font-bold text-[15px] disabled:opacity-40 focus-ring"
+                          className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-[15px] disabled:opacity-40 focus-ring"
                         >
                           {loading ? 'Procesando…' : isTransfer ? 'Enviar donación y comprobante' : 'Registrar donación'}
                           {!loading && <Icon name="check" className="w-4 h-4" stroke={2.4} />}
                         </motion.button>
 
-                        <p className="text-[12.5px] text-white/50">
+                        <p className="text-[12.5px] text-bg/50">
                           {isTransfer
                             ? 'Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.'
                             : 'Un coordinador te recibirá este domingo en la entrada.'}
