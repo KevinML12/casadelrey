@@ -35,7 +35,11 @@ export default function Splash() {
         // Fondo blanco: el mp4 es logo navy sobre blanco — así el video
         // se funde sin bordes y el fade-out revela el sitio navy
         <motion.div
-          className="fixed inset-0 z-[100] bg-white flex items-center justify-center"
+          // pointer-events-none: el splash no tiene nada clickeable adentro
+          // -- si por lo que sea el fade de salida se traba o tarda de más,
+          // el sitio de abajo sigue siendo usable en vez de quedar
+          // bloqueado por un overlay invisible/fantasma.
+          className="fixed inset-0 z-[100] bg-white flex items-center justify-center pointer-events-none"
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           aria-hidden
