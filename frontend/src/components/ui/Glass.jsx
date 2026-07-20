@@ -205,11 +205,18 @@ export function Badge({ children, icon, className = '', tone = 'celeste' }) {
 }
 
 /* ---------- Section eyebrow — pill de cristal: en liquid glass el
-   material ES el acento, nada de colores planos ---------- */
-export function Eyebrow({ children }) {
+   material ES el acento, nada de colores planos. `on="light"` para
+   cuando el eyebrow vive DENTRO de una superficie glass-light (blanca)
+   en vez de flotar sobre el canvas navy -- mismo pill, tinta invertida. */
+export function Eyebrow({ children, on = 'dark' }) {
+  const light = on === 'light';
   return (
-    <div className="inline-flex items-center gap-2.5 mb-4 px-4 py-1.5 rounded-full liquid-glass text-white/90 text-[12.5px] font-bold">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+    <div className={`inline-flex items-center gap-2.5 mb-4 px-4 py-1.5 rounded-full text-[12.5px] font-bold ${
+      light ? 'glass-light-nested text-bg/90' : 'liquid-glass text-white/90'
+    }`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${
+        light ? 'bg-bg/70 shadow-[0_0_8px_rgba(10,21,38,0.5)]' : 'bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.8)]'
+      }`} />
       {children}
     </div>
   );

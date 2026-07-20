@@ -46,13 +46,13 @@ export default function DonatePage() {
               <RevealList className="space-y-3">
                 {IMPACT.map(({ icon, title, desc }) => (
                   <RevealItem key={title}>
-                    <Tilt max={3} glass="standard" className="flex items-center gap-4 liquid-glass rounded-[20px] p-5">
-                      <span className="grid place-items-center w-12 h-12 rounded-full bg-white/10 border border-white/15 text-white shrink-0">
+                    <Tilt max={3} glass="standard" className="flex items-center gap-4 glass-light rounded-[20px] p-5">
+                      <span className="grid place-items-center w-12 h-12 rounded-full bg-bg/8 border border-bg/12 text-bg shrink-0">
                         <Icon name={icon} className="w-5 h-5" />
                       </span>
                       <div>
-                        <h3 className="text-[16px] font-bold tracking-tight text-white">{title}</h3>
-                        <p className="text-[14px] text-white/60 mt-0.5">{desc}</p>
+                        <h3 className="text-[16px] font-bold tracking-tight text-bg">{title}</h3>
+                        <p className="text-[14px] text-bg/60 mt-0.5">{desc}</p>
                       </div>
                     </Tilt>
                   </RevealItem>
@@ -61,13 +61,13 @@ export default function DonatePage() {
 
               {/* Versículo */}
               <Reveal delay={0.1}>
-                <div className="mt-6 liquid-glass rounded-[24px] p-8">
+                <div className="mt-6 glass-light rounded-[24px] p-8">
                   <blockquote>
-                    <p className="text-white leading-relaxed mb-4" style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)' }}>
+                    <p className="text-bg leading-relaxed mb-4" style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)' }}>
                       "El que siembra escasamente, también segará escasamente; y el que siembra
                       generosamente, generosamente también segará."
                     </p>
-                    <cite className="not-italic text-white/50 text-[13px] font-bold">
+                    <cite className="not-italic text-bg/50 text-[13px] font-bold">
                       2 Corintios 9:6
                     </cite>
                   </blockquote>

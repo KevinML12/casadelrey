@@ -216,23 +216,23 @@ export default function CelulasPage() {
                     onClick={() => setOpenKey(g.key)}
                     whileHover={{ rotate: 0, scale: 1.05, y: c.y - 6, zIndex: 30 }}
                     glass
-                    className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
+                    className="glass-light group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring"
                     style={{ rotate: c.rot, y: c.y, transformOrigin: 'center' }}
                   >
                     <img
                       src={g.image}
                       alt=""
-                      className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-45 group-hover:opacity-65 transition-all duration-700"
+                      className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-70 transition-all duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/45 to-bg/5" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/45 to-white/5" />
                     <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                      <span className="self-start bg-bg/85 text-white px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
                         {g.age}
                       </span>
-                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[28px] sm:text-[34px]' : 'text-[17px] sm:text-[19px]'}`}>
+                      <h3 className={`font-bold text-bg tracking-tight leading-none ${big ? 'text-[28px] sm:text-[34px]' : 'text-[17px] sm:text-[19px]'}`}>
                         {g.name}
                       </h3>
-                      <p className="text-[12.5px] text-white/60 font-medium mt-1.5">
+                      <p className="text-[12.5px] text-bg/60 font-medium mt-1.5">
                         {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'} · abrir
                       </p>
                     </div>
@@ -244,10 +244,10 @@ export default function CelulasPage() {
 
           {/* Contacto — sin exponer direcciones */}
           <Reveal delay={0.1} depth className="mt-14">
-            <Tilt max={3} glass className="liquid-glass rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
+            <Tilt max={3} glass className="glass-light rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
-                <h3 className="text-[22px] font-bold text-white">¿No sabes cuál es para ti?</h3>
-                <p className="text-[15px] text-white/70 mt-2 max-w-lg">
+                <h3 className="text-[22px] font-bold text-bg">¿No sabes cuál es para ti?</h3>
+                <p className="text-[15px] text-bg/70 mt-2 max-w-lg">
                   Escríbenos y te conectamos con el líder de la célula más cercana a ti.
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function CelulasPage() {
                 href="https://www.instagram.com/ig.casadelrey/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-white text-bg text-[14px] font-bold focus-ring shrink-0"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-bg text-white text-[14px] font-bold focus-ring shrink-0"
               >
                 <Icon name="instagram" className="w-4 h-4" />
                 Escríbenos
@@ -275,7 +275,7 @@ export default function CelulasPage() {
           if (!g) return null;
           return (
             <>
-              <p className="text-[13px] font-semibold text-white/55 mb-4">
+              <p className="text-[13px] font-semibold text-white/70 mb-4">
                 {g.cells.length} {g.cells.length === 1 ? 'célula activa' : 'células activas'}
               </p>
               <div className="flex flex-wrap gap-3">
@@ -300,34 +300,34 @@ export default function CelulasPage() {
                     transition={{ delay: 0.06 + i * 0.035 }}
                     whileHover={{ y: -3, scale: 1.02 }}
                     glass
-                    className="liquid-glass group rounded-[16px] p-4 flex flex-col gap-3 grow basis-[260px] focus-ring cursor-pointer"
+                    className="glass-light group rounded-[16px] p-4 flex flex-col gap-3 grow basis-[260px] focus-ring cursor-pointer"
                   >
                     <div className="flex items-center gap-3.5">
                       {dir?.photo_url ? (
                         <img src={dir.photo_url} alt={c.leader}
-                          className="w-10 h-10 rounded-full object-cover border border-white/20 shrink-0" />
+                          className="w-10 h-10 rounded-full object-cover border border-bg/15 shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center text-bg shrink-0">
                           <Icon name="users" className="w-5 h-5" />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-bold text-white leading-tight truncate">{c.name}</p>
-                        <p className="text-[12.5px] text-white/60 font-medium mt-0.5 truncate">
+                        <p className="text-[15px] font-bold text-bg leading-tight truncate">{c.name}</p>
+                        <p className="text-[12.5px] text-bg/60 font-medium mt-0.5 truncate">
                           {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
                         </p>
                       </div>
                       {c.zone && (
-                        <span className="shrink-0 bg-white/10 border border-white/15 text-white/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
+                        <span className="shrink-0 bg-bg/8 border border-bg/12 text-bg/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
                           {c.zone}
                         </span>
                       )}
-                      <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-white/45 group-hover:text-white group-hover:bg-white/12 transition-all">
+                      <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-bg/45 group-hover:text-bg group-hover:bg-bg/8 transition-all">
                         <Icon name="arrow" className="w-4 h-4" />
                       </span>
                     </div>
                     {c.description && (
-                      <p className="text-[13px] text-white/55 leading-relaxed line-clamp-2 pt-3 border-t border-white/10">
+                      <p className="text-[13px] text-bg/55 leading-relaxed line-clamp-2 pt-3 border-t border-bg/10">
                         {c.description}
                       </p>
                     )}

@@ -36,7 +36,7 @@ export default function PrayerPage() {
       <section className="relative py-16 md:py-24 overflow-hidden">
         <Halos variant="soft" />
         <Reveal className="relative z-10 max-w-3xl mx-auto px-6">
-          <Tilt max={3} glass="featured" className="liquid-glass rounded-[24px] p-7 md:p-10">
+          <Tilt max={3} glass="featured" className="glass-light rounded-[24px] p-7 md:p-10">
             <PrayerForm />
           </Tilt>
         </Reveal>

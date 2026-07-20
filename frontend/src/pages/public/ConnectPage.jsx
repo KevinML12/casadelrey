@@ -11,7 +11,7 @@ import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
 
-const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-white/15 bg-white/5 text-[14px] text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all';
+const fieldCls = 'w-full px-4 py-2.5 rounded-[14px] border border-bg/12 bg-bg/4 text-[14px] text-bg placeholder:text-bg/35 focus:outline-none focus:border-bg/40 focus:ring-2 focus:ring-bg/10 transition-all';
 
 const CATEGORIES = [
   { value: 'primera_vez',  label: 'Es mi primera vez',        icon: 'spark' },
@@ -71,21 +71,21 @@ export default function ConnectPage() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div className="liquid-glass rounded-[28px] p-7 md:p-9">
+          <div className="glass-light rounded-[28px] p-7 md:p-9">
             {done ? (
               <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-5">
-                  <Icon name="check" className="w-7 h-7 text-white" stroke={2} />
+                <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-5">
+                  <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
                 </div>
-                <h3 className="text-[20px] text-white font-bold mb-2">¡Gracias por registrarte!</h3>
-                <p className="text-[14px] text-white/60 max-w-sm mx-auto leading-relaxed">
+                <h3 className="text-[20px] text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
+                <p className="text-[14px] text-bg/60 max-w-sm mx-auto leading-relaxed">
                   Alguien de nuestro equipo te contactará pronto. Nos alegra que estés aquí.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-[12px] font-bold text-white/60 mb-1.5">
+                  <label className="block text-[12px] font-bold text-bg/60 mb-1.5">
                     Nombre <span className="text-rose">*</span>
                   </label>
                   <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
@@ -93,19 +93,19 @@ export default function ConnectPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[12px] font-bold text-white/60 mb-1.5">
+                    <label className="block text-[12px] font-bold text-bg/60 mb-1.5">
                       Teléfono <span className="text-rose">*</span>
                     </label>
                     <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" required />
                   </div>
                   <div>
-                    <label className="block text-[12px] font-bold text-white/60 mb-1.5">Correo</label>
+                    <label className="block text-[12px] font-bold text-bg/60 mb-1.5">Correo</label>
                     <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="Opcional" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-bold text-white/60 mb-2.5">
+                  <label className="block text-[12px] font-bold text-bg/60 mb-2.5">
                     ¿Qué te trae por aquí? <span className="text-rose">*</span>
                   </label>
                   <div className="flex flex-col gap-2">
@@ -116,8 +116,8 @@ export default function ConnectPage() {
                         onClick={() => setForm((p) => ({ ...p, category: c.value }))}
                         className={`flex items-center gap-3 px-4 py-3 rounded-[14px] border text-left transition-all ${
                           form.category === c.value
-                            ? 'bg-white/12 border-white/40 text-white'
-                            : 'bg-white/[0.03] border-white/10 text-white/65 hover:bg-white/[0.06]'
+                            ? 'bg-bg/10 border-bg/40 text-bg'
+                            : 'bg-bg/[0.03] border-bg/10 text-bg/65 hover:bg-bg/[0.06]'
                         }`}
                       >
                         <Icon name={c.icon} className="w-4 h-4 shrink-0" />
@@ -128,11 +128,11 @@ export default function ConnectPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-bold text-white/60 mb-1.5">¿Cómo nos conociste?</label>
+                  <label className="block text-[12px] font-bold text-bg/60 mb-1.5">¿Cómo nos conociste?</label>
                   <select value={form.how_found} onChange={set('how_found')} className={fieldCls}>
-                    <option value="" className="bg-bg">Selecciona una opción</option>
+                    <option value="">Selecciona una opción</option>
                     {HOW_FOUND.map((h) => (
-                      <option key={h.value} value={h.value} className="bg-bg">{h.label}</option>
+                      <option key={h.value} value={h.value}>{h.label}</option>
                     ))}
                   </select>
                 </div>
@@ -149,7 +149,7 @@ export default function ConnectPage() {
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
-                  className="w-full flex items-center justify-center gap-2 h-12 rounded-full liquid-glass text-white text-[15px] font-bold disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-bg text-white text-[15px] font-bold disabled:opacity-50"
                 >
                   {loading ? 'Enviando…' : (
                     <>

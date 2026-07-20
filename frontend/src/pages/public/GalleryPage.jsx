@@ -110,17 +110,17 @@ export default function GalleryPage() {
                       onClick={() => setOpenKey(a.name)}
                       whileHover={{ rotate: 0, scale: 1.05, y: -6, zIndex: 30 }}
                       glass
-                      className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
+                      className="glass-light group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring"
                       style={{ rotate: ROT[i % ROT.length], transformOrigin: 'center' }}
                     >
                       <img src={a.photos[0]?.url} alt="" loading="lazy"
-                        className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
+                        className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-80 transition-all duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/35 to-transparent" />
                       <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                        <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                        <span className="self-start bg-bg/85 text-white px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
                           {a.photos.length} fotos
                         </span>
-                        <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[24px] sm:text-[30px]' : 'text-[16px] sm:text-[18px]'}`}>
+                        <h3 className={`font-bold text-bg tracking-tight leading-none ${big ? 'text-[24px] sm:text-[30px]' : 'text-[16px] sm:text-[18px]'}`}>
                           {a.name}
                         </h3>
                       </div>

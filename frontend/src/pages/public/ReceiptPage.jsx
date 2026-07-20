@@ -25,31 +25,31 @@ export default function ReceiptPage() {
         <div className="relative z-10 max-w-2xl mx-auto px-6">
 
           {eventName && (
-            <Reveal className="mb-6 flex items-center gap-4 liquid-glass rounded-[20px] px-5 py-4">
-              <span className="grid place-items-center w-11 h-11 rounded-full bg-white/10 border border-white/15 text-white shrink-0">
+            <Reveal className="mb-6 flex items-center gap-4 glass-light rounded-[20px] px-5 py-4">
+              <span className="grid place-items-center w-11 h-11 rounded-full bg-bg/8 border border-bg/12 text-bg shrink-0">
                 <Icon name="calendar" className="w-5 h-5" />
               </span>
               <div>
-                <p className="text-[12px] font-bold text-white/50">Pago para</p>
-                <p className="text-[15px] font-bold text-white mt-0.5">{eventName}</p>
+                <p className="text-[12px] font-bold text-bg/50">Pago para</p>
+                <p className="text-[15px] font-bold text-bg mt-0.5">{eventName}</p>
               </div>
             </Reveal>
           )}
 
           {/* Datos bancarios */}
           <Reveal delay={0.05}>
-            <Tilt max={3} glass="featured" className="mb-6 liquid-glass rounded-[24px] p-7">
-              <Eyebrow>Datos para depósito</Eyebrow>
+            <Tilt max={3} glass="featured" className="mb-6 glass-light rounded-[24px] p-7">
+              <Eyebrow on="light">Datos para depósito</Eyebrow>
               <div className="mt-4">
-                <BankDetails />
+                <BankDetails on="light" />
               </div>
             </Tilt>
           </Reveal>
 
           {/* Formulario */}
           <Reveal delay={0.1}>
-            <div className="liquid-glass rounded-[24px] p-7 md:p-9">
-              <Eyebrow>Sube el comprobante</Eyebrow>
+            <div className="glass-light rounded-[24px] p-7 md:p-9">
+              <Eyebrow on="light">Sube el comprobante</Eyebrow>
               <div className="mt-4">
                 <ReceiptUploadForm
                   eventId={eventId}

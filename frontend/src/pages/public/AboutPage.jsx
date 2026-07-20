@@ -54,30 +54,30 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <Tilt max={4} glass="standard" className="liquid-glass rounded-[24px] p-8 md:p-10 h-full">
-                <div className="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
-                  <Icon name="crown" className="w-6 h-6 text-white" />
+              <Tilt max={4} glass="standard" className="glass-light rounded-[24px] p-8 md:p-10 h-full">
+                <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mb-6">
+                  <Icon name="crown" className="w-6 h-6 text-bg" />
                 </div>
-                <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
-                <h3 className="text-[24px] font-bold text-white tracking-tight leading-tight">
-                  José de León <span className="text-white/40 font-medium">(+)</span> y Desidería López
+                <p className="text-[13px] font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
+                <h3 className="text-[24px] font-bold text-bg tracking-tight leading-tight">
+                  José de León <span className="text-bg/40 font-medium">(+)</span> y Desidería López
                 </h3>
-                <p className="mt-4 text-[14.5px] text-white/60 leading-relaxed">
+                <p className="mt-4 text-[14.5px] text-bg/60 leading-relaxed">
                   Sembraron la visión original de Casa del Rey — los cimientos sobre los que la iglesia sigue edificando hoy.
                 </p>
               </Tilt>
             </RevealItem>
 
             <RevealItem>
-              <Tilt max={4} glass="featured" className="liquid-glass rounded-[24px] p-8 md:p-10 h-full">
-                <div className="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
-                  <Icon name="users" className="w-6 h-6 text-white" />
+              <Tilt max={4} glass="featured" className="glass-light rounded-[24px] p-8 md:p-10 h-full">
+                <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mb-6">
+                  <Icon name="users" className="w-6 h-6 text-bg" />
                 </div>
-                <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-2">Pastores de células</p>
-                <h3 className="text-[24px] font-bold text-white tracking-tight leading-tight">
+                <p className="text-[13px] font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores de células</p>
+                <h3 className="text-[24px] font-bold text-bg tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
                 </h3>
-                <p className="mt-4 text-[14.5px] text-white/60 leading-relaxed">
+                <p className="mt-4 text-[14.5px] text-bg/60 leading-relaxed">
                   Junto a un equipo pastoral, cubren las células de varones, prejuveniles y la red Mujeres de Palabra.
                 </p>
               </Tilt>
@@ -100,9 +100,9 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
-                <h3 className="text-[20px] font-bold text-white mb-4">Misión</h3>
-                <p className="text-[17px] md:text-[19px] text-white/75 leading-relaxed">
+              <Tilt max={3} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full">
+                <h3 className="text-[20px] font-bold text-bg mb-4">Misión</h3>
+                <p className="text-[17px] md:text-[19px] text-bg/75 leading-relaxed">
                   Somos una iglesia cristiana familiar, enfocada en cumplir la gran comisión de
                   Jesucristo: ir y hacer discípulos a las naciones, formando líderes capaces de
                   reproducir la obra de Dios.
@@ -110,9 +110,9 @@ export default function AboutPage() {
               </Tilt>
             </RevealItem>
             <RevealItem>
-              <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
-                <h3 className="text-[20px] font-bold text-white mb-4">Visión</h3>
-                <p className="text-[17px] md:text-[19px] text-white/75 leading-relaxed">
+              <Tilt max={3} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full">
+                <h3 className="text-[20px] font-bold text-bg mb-4">Visión</h3>
+                <p className="text-[17px] md:text-[19px] text-bg/75 leading-relaxed">
                   Ser una iglesia de restauración familiar, punta de lanza, que proclama la
                   verdad de la Palabra de Dios bajo el poder del Espíritu Santo.
                 </p>
@@ -140,27 +140,27 @@ export default function AboutPage() {
           <RevealList className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {STATS.map(s => (
               <RevealItem key={s.label}>
-                <Tilt max={3} glass="standard" className="liquid-glass rounded-[20px] p-6 md:p-8 text-center h-full">
-                  <div className="text-[36px] md:text-[44px] font-extrabold text-white tracking-tighter leading-none">{s.n}</div>
-                  <div className="mt-2 text-[13px] font-semibold text-white/60">{s.label}</div>
+                <Tilt max={3} glass="standard" className="glass-light rounded-[20px] p-6 md:p-8 text-center h-full">
+                  <div className="text-[36px] md:text-[44px] font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
+                  <div className="mt-2 text-[13px] font-semibold text-bg/60">{s.label}</div>
                 </Tilt>
               </RevealItem>
             ))}
           </RevealList>
 
           <Reveal delay={0.1}>
-            <div className="liquid-glass rounded-[24px] p-8 md:p-10">
-              <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-5">Departamentos de voluntariado</p>
+            <div className="glass-light rounded-[24px] p-8 md:p-10">
+              <p className="text-[13px] font-bold text-bg/50 uppercase tracking-tightish mb-5">Departamentos de voluntariado</p>
               <div className="flex flex-wrap gap-2.5">
                 {volunteerAreas.map(d => (
-                  <span key={d.value} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[13.5px] font-semibold text-white/80">
+                  <span key={d.value} className="px-4 py-2 rounded-full bg-bg/6 border border-bg/10 text-[13.5px] font-semibold text-bg/80">
                     {d.title}
                   </span>
                 ))}
               </div>
               <Link
                 to="/volunteering"
-                className="mt-7 inline-flex items-center gap-2.5 text-[14px] font-bold text-white hover:text-white/70 transition-colors"
+                className="mt-7 inline-flex items-center gap-2.5 text-[14px] font-bold text-bg hover:text-bg/70 transition-colors"
               >
                 Únete como voluntario
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -175,13 +175,13 @@ export default function AboutPage() {
         <ParallaxImg src={lideresImg} alt="" className="opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="liquid-glass rounded-[24px] p-9 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between">
+          <Reveal className="glass-light rounded-[24px] p-9 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between">
             <div>
-              <Eyebrow>Grupos pequeños</Eyebrow>
-              <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
+              <Eyebrow on="light">Grupos pequeños</Eyebrow>
+              <h2 className="display-mega text-bg mt-4" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
                 Encuentra tu célula.
               </h2>
-              <p className="mt-4 text-[15.5px] text-white/70 max-w-lg">
+              <p className="mt-4 text-[15.5px] text-bg/70 max-w-lg">
                 Adolescentes, jóvenes adultos, prejuveniles, varones y la red
                 Mujeres de Palabra — cada grupo se reúne en casas durante la semana.
               </p>
@@ -189,7 +189,7 @@ export default function AboutPage() {
             <MotionLink
               to="/celulas"
               {...PRESS}
-              className="shrink-0 inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-white text-bg text-[15px] font-bold focus-ring shadow-card"
+              className="shrink-0 inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-[15px] font-bold focus-ring shadow-card"
             >
               Ver células
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -202,12 +202,12 @@ export default function AboutPage() {
       <section className="relative py-16 md:py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
-            <Tilt max={4} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full">
-              <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
-                <Icon name="pin" className="w-5 h-5 text-white" />
+            <Tilt max={4} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full">
+              <div className="w-12 h-12 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mb-6">
+                <Icon name="pin" className="w-5 h-5 text-bg" />
               </div>
-              <h3 className="text-[20px] font-bold text-white mb-3">Visítanos</h3>
-              <p className="text-[15px] text-white/70 leading-relaxed mb-6">
+              <h3 className="text-[20px] font-bold text-bg mb-3">Visítanos</h3>
+              <p className="text-[15px] text-bg/70 leading-relaxed mb-6">
                 7ª. Calle 12-66 zona 4,<br />
                 carretera a las Ruinas de Zaculeu,<br />
                 Huehuetenango
@@ -216,7 +216,7 @@ export default function AboutPage() {
                 href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 text-[14px] font-bold text-white hover:text-white/70 transition-colors"
+                className="inline-flex items-center gap-2.5 text-[14px] font-bold text-bg hover:text-bg/70 transition-colors"
               >
                 Cómo llegar
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -225,12 +225,12 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal from="right" delay={0.08}>
-            <Tilt max={4} glass="standard" className="liquid-glass rounded-[24px] p-9 md:p-11 h-full flex flex-col justify-center">
-              <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-6">
-                <Icon name="music" className="w-5 h-5 text-white" />
+            <Tilt max={4} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full flex flex-col justify-center">
+              <div className="w-12 h-12 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mb-6">
+                <Icon name="music" className="w-5 h-5 text-bg" />
               </div>
-              <h3 className="text-[20px] font-bold text-white mb-3">Podcast Inusual Youth</h3>
-              <p className="text-[15px] text-white/70 leading-relaxed">
+              <h3 className="text-[20px] font-bold text-bg mb-3">Podcast Inusual Youth</h3>
+              <p className="text-[15px] text-bg/70 leading-relaxed">
                 92.9 FM Radio Stereo Cumbre<br />
                 Viernes · 3:00 PM
               </p>
