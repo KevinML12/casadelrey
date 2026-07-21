@@ -185,10 +185,17 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile sheet — cubre tablet y laptop angosto (< 1280px) */}
+        {/* Mobile sheet — cubre tablet y laptop angosto (< 1280px). Antes
+            max-h-[520px] fijo: con sesión iniciada se agregan 3 links más
+            (Panel Admin/Líder, Mi perfil, Cerrar sesión) y el contenido
+            real (613px medido con esos links) superaba el tope -- el
+            final del menú (Conéctate, a veces también Dar) quedaba
+            cortado e invisible sin que hubiera manera de hacer scroll.
+            Ahora la altura es relativa al viewport (nunca más grande que
+            la pantalla) con scroll interno si aun asi no entra todo. */}
         <div
-          className={`xl:hidden overflow-hidden transition-all duration-500 ease-spring ${
-            menuOpen ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
+          className={`xl:hidden transition-all duration-500 ease-spring ${
+            menuOpen ? 'max-h-[calc(100vh-96px)] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 overflow-hidden'
           }`}
         >
           <div className="px-2 pb-2 pt-1 flex flex-col gap-1">

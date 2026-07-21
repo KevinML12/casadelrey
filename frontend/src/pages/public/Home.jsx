@@ -486,7 +486,17 @@ function Agenda({ bg }) {
     apiClient.get('/events/')
       .then(res => {
         const list = Array.isArray(res.data) ? res.data : [];
-        setEvents(list.map(ev => {
+        // Fecha local (no UTC -- toISOString() se adelanta un dia cerca de
+        // medianoche en Guatemala, UTC-6), misma logica que EventsPage.jsx.
+        // Sin esto, un evento que ya paso se quedaba pegado como
+        // "Destacado" indefinidamente (bug real: is_featured nunca lo
+        // marca ningun admin -- no hay control en el panel -- asi que
+        // este siempre caia al primer evento de la lista, sin importar
+        // si ya habia ocurrido).
+        const now = new Date(); now.setHours(0, 0, 0, 0);
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const upcoming = list.filter(ev => !ev.date || ev.date >= todayStr);
+        setEvents(upcoming.map(ev => {
           const date = new Date(ev.date + 'T12:00:00');
           return {
             id: ev.ID,
@@ -495,7 +505,6 @@ function Agenda({ bg }) {
             title: ev.title,
             time: ev.time || 'Por definir',
             loc: ev.location,
-            isFeatured: ev.is_featured
           };
         }));
       })
@@ -504,8 +513,9 @@ function Agenda({ bg }) {
 
   if (events.length === 0) return null;
 
-  const featured = events.find(e => e.isFeatured) || events[0];
-  const others = events.filter(e => e.id !== featured.id).slice(0, 3);
+  // El mas proximo (el backend ya ordena ASC por fecha) es el destacado.
+  const featured = events[0];
+  const others = events.slice(1, 4);
 
   return (
     <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
