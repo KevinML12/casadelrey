@@ -49,7 +49,13 @@ export default function ReceiptPage() {
           {/* Formulario */}
           <Reveal delay={0.1}>
             <div className="glass-light rounded-[24px] p-7 md:p-9">
-              <Eyebrow on="light">Sube el comprobante</Eyebrow>
+              <div className="flex items-start justify-between gap-4 mb-1">
+                <Eyebrow on="light">Sube el comprobante</Eyebrow>
+                <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg/6 border border-bg/12 text-11 font-semibold text-bg/60">
+                  <Icon name="clock" className="w-3 h-3" />
+                  Verificación en 24-48h
+                </span>
+              </div>
               <div className="mt-4">
                 <ReceiptUploadForm
                   eventId={eventId}

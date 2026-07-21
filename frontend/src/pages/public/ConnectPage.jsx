@@ -32,6 +32,15 @@ const HOW_FOUND = [
   { value: 'otro',       label: 'Otro' },
 ];
 
+// Pasos reales del flujo (no ilustrativos): ConnectCard entra al panel
+// admin/líder, se asigna a un líder real y avanza de estado hasta el
+// contacto -- ver AdminConnectCards.jsx / LeaderConnectCards.jsx.
+const STEPS = [
+  { icon: 'spark', text: 'Llenas el formulario -- toma menos de 2 minutos' },
+  { icon: 'users', text: 'Un líder de nuestro equipo revisa tu información' },
+  { icon: 'heart', text: 'Te contactamos por WhatsApp o llamada para conocerte' },
+];
+
 export default function ConnectPage() {
   const heroImg = useSitePhoto('hero_conectate', '/images/bg-ministerios.jpg');
   const [form, setForm] = useState({ name: '', phone: '', email: '', category: '', how_found: '' });
@@ -74,6 +83,22 @@ export default function ConnectPage() {
             Cuéntanos un poco de ti — alguien de nuestro equipo te va a escribir
             para darte la bienvenida.
           </p>
+        </Reveal>
+
+        {/* Qué sigue -- el flujo real (ConnectCard -> panel -> líder
+            asignado), no un adorno; le da confianza a alguien que nunca
+            ha llenado este formulario antes. */}
+        <Reveal delay={0.06} className="mb-10">
+          <ol className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {STEPS.map((s, i) => (
+              <li key={s.text} className="glass-light rounded-[16px] p-4 flex items-start gap-3">
+                <span className="shrink-0 grid place-items-center w-7 h-7 rounded-full bg-bg/8 border border-bg/12 text-bg text-12 font-bold">
+                  {i + 1}
+                </span>
+                <p className="text-13 text-bg/75 leading-snug">{s.text}</p>
+              </li>
+            ))}
+          </ol>
         </Reveal>
 
         <Reveal delay={0.1}>
