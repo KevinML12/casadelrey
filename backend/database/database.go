@@ -54,8 +54,16 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		}
 
 		// Pool de conexiones: ajustar según la carga esperada del servidor.
+		// MaxOpenConns bajado de 100 a 40 -- el pooler gratis de Supabase
+		// (Supavisor/pgbouncer) para este proyecto soporta ~60 conexiones
+		// simultáneas; con 100 configurado aquí, un pico de tráfico real
+		// (varios requests concurrentes, cada uno con su propia conexión)
+		// podía agotar el límite real del lado de Supabase antes que el
+		// límite (falso) de este pool, dando errores intermitentes de
+		// "too many clients" en vez de una cola ordenada. 40 deja margen
+		// para otras conexiones (dashboard de Supabase, migraciones, etc).
 		sqlDB.SetMaxIdleConns(10)              // Conexiones inactivas en el pool
-		sqlDB.SetMaxOpenConns(100)             // Conexiones simultáneas máximas
+		sqlDB.SetMaxOpenConns(40)              // Conexiones simultáneas máximas
 		sqlDB.SetConnMaxLifetime(time.Hour)    // Tiempo máximo de vida de una conexión
 
 		// AutoMigrate crea o altera las tablas para que coincidan con los modelos.
