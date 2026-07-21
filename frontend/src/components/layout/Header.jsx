@@ -26,6 +26,17 @@ export default function Header() {
   const [hidden, setHidden] = useState(false);
   const dropRef = useRef(null);
 
+  // Alto del menu movil en PIXELES reales via window.innerHeight, no vh:
+  // 100vh tiene un bug de plataforma conocido en Safari movil real (no
+  // descuenta la barra de direcciones), asi que el sheet podia quedar
+  // mas alto que el viewport visible.
+  const [viewportH, setViewportH] = useState(() => (typeof window !== 'undefined' ? window.innerHeight : 800));
+  useEffect(() => {
+    const onResize = () => setViewportH(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   // El nav se esconde al bajar y reaparece al subir (con resorte)
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, 'change', (y) => {
@@ -195,8 +206,14 @@ export default function Header() {
             la pantalla) con scroll interno si aun asi no entra todo. */}
         <div
           className={`xl:hidden transition-all duration-500 ease-spring ${
-            menuOpen ? 'max-h-[calc(100vh-96px)] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 overflow-hidden'
+            menuOpen ? 'opacity-100 overflow-y-auto' : 'opacity-0 overflow-hidden'
           }`}
+          // max-height en pixeles reales (viewportH, de window.innerHeight)
+          // en vez de vh en CSS -- ver nota arriba sobre el bug de 100vh en
+          // Safari movil. Los dos estados via estilo inline (no mezclado
+          // con clase Tailwind) para que la transicion anime limpio entre
+          // dos valores numericos reales.
+          style={{ maxHeight: menuOpen ? `${viewportH - 96}px` : '0px' }}
         >
           <div className="px-2 pb-2 pt-1 flex flex-col gap-1">
             {NAV_LINKS.map(n => (
