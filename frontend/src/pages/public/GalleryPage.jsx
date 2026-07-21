@@ -76,7 +76,7 @@ export default function GalleryPage() {
             <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}>
               Galería
             </h1>
-            <p className="mt-6 text-[18px] text-white/70 max-w-2xl">
+            <p className="mt-6 text-18 text-white/70 max-w-2xl">
               Lo que Dios está haciendo en nuestra casa. Abre un álbum y recórrelo.
             </p>
           </Reveal>
@@ -117,10 +117,10 @@ export default function GalleryPage() {
                         className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
                       <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                        <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                        <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md">
                           {a.photos.length} fotos
                         </span>
-                        <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[24px] sm:text-[30px]' : 'text-[16px] sm:text-[18px]'}`}>
+                        <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-24 sm:text-30' : 'text-16 sm:text-18'}`}>
                           {a.name}
                         </h3>
                       </div>

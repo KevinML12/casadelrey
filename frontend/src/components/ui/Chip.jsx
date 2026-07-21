@@ -19,7 +19,7 @@ export default function Chip({ color = 'default', icon, children, className = ''
   return (
     <span
       className={`inline-flex items-center gap-1.5 h-7 px-3 rounded-full
-        text-[12px] font-semibold whitespace-nowrap select-none
+        text-12 font-semibold whitespace-nowrap select-none
         ${colorMap[color]} ${className}`}
       {...props}
     >
@@ -35,7 +35,7 @@ export function FilterChip({ selected, icon, count, children, className = '', ..
       type="button"
       className={
         'inline-flex items-center gap-1.5 h-8 px-4 rounded-full border ' +
-        'text-[13px] font-semibold whitespace-nowrap ' +
+        'text-13 font-semibold whitespace-nowrap ' +
         'cursor-pointer select-none transition-all duration-200 ' +
         (selected
           ? 'bg-bg text-white border-bg shadow-card '
@@ -48,7 +48,7 @@ export function FilterChip({ selected, icon, count, children, className = '', ..
       {!selected && icon && <Icon name={icon} className="w-3.5 h-3.5" stroke={1.8} />}
       <span>{children}</span>
       {count != null && (
-        <span className={`text-[11px] ml-0.5 ${selected ? 'opacity-70' : 'opacity-50'}`}>
+        <span className={`text-11 ml-0.5 ${selected ? 'opacity-70' : 'opacity-50'}`}>
           {count}
         </span>
       )}

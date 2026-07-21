@@ -22,7 +22,7 @@ function SectionLabel({ icon, children }) {
   return (
     <div className="flex items-center gap-2 mb-4">
       <Icon name={icon} className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
-      <p className="text-[12.5px] text-bg/45 font-semibold uppercase tracking-widest">{children}</p>
+      <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">{children}</p>
       <div className="flex-1 h-px bg-bg/10 ml-2" />
     </div>
   );
@@ -58,9 +58,9 @@ function TrendTooltip({ active, payload, label }) {
   const users = payload.find(p => p.dataKey === 'new_users')?.value ?? 0;
   return (
     <div className="glass-light rounded-[14px] px-3.5 py-2.5 shadow-card-lg">
-      <p className="text-[11px] text-bg/50 font-semibold uppercase tracking-widest mb-1">{fmtShortDate(label)}</p>
-      <p className="text-[13px] text-bg font-bold">Q{Number(amount).toFixed(0)} recaudado</p>
-      {users > 0 && <p className="text-[12px] text-bg/60 mt-0.5">{users} usuario{users !== 1 ? 's' : ''} nuevo{users !== 1 ? 's' : ''}</p>}
+      <p className="text-11 text-bg/50 font-semibold uppercase tracking-widest mb-1">{fmtShortDate(label)}</p>
+      <p className="text-13 text-bg font-bold">Q{Number(amount).toFixed(0)} recaudado</p>
+      {users > 0 && <p className="text-12 text-bg/60 mt-0.5">{users} usuario{users !== 1 ? 's' : ''} nuevo{users !== 1 ? 's' : ''}</p>}
     </div>
   );
 }
@@ -79,9 +79,9 @@ function TrendChart({ data, loading }) {
       <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Icon name="trending_up" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
-          <p className="text-[12.5px] text-bg/45 font-semibold uppercase tracking-widest">Tendencia · últimos 30 días</p>
+          <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Tendencia · últimos 30 días</p>
         </div>
-        <div className="flex items-center gap-4 text-[12.5px]">
+        <div className="flex items-center gap-4 text-13">
           <span className="text-bg/50">Total <strong className="text-bg font-bold">Q{totalAmount.toFixed(0)}</strong></span>
           <span className="text-bg/50">Promedio/día <strong className="text-bg font-bold">Q{avgDaily.toFixed(0)}</strong></span>
           <span className="text-bg/50">Usuarios nuevos <strong className="text-bg font-bold">{totalUsers}</strong></span>
@@ -142,7 +142,7 @@ function QuickActions({ notifs }) {
     <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 flex flex-col">
       <div className="flex items-center gap-2 mb-4">
         <Icon name="spark" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
-        <p className="text-[12.5px] text-bg/45 font-semibold uppercase tracking-widest">Accesos rápidos</p>
+        <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Accesos rápidos</p>
       </div>
       <div className="flex-1 flex flex-col gap-1">
         {QUICK_ACTIONS.map(({ to, icon, label, badgeKey }) => {
@@ -153,9 +153,9 @@ function QuickActions({ notifs }) {
               <div className="w-9 h-9 rounded-xl bg-bg/8 group-hover:bg-bg flex items-center justify-center shrink-0 transition-colors">
                 <Icon name={icon} className="w-[16px] h-[16px] text-bg group-hover:text-white transition-colors" stroke={1.8} />
               </div>
-              <span className="flex-1 text-[13.5px] text-bg font-semibold">{label}</span>
+              <span className="flex-1 text-14 text-bg font-semibold">{label}</span>
               {badge > 0 && (
-                <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-[10.5px] font-bold flex items-center justify-center px-1.5">
+                <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-11 font-bold flex items-center justify-center px-1.5">
                   {badge > 99 ? '99+' : badge}
                 </span>
               )}
@@ -197,13 +197,13 @@ export default function Dashboard() {
 
       {/* Saludo personalizado */}
       <div className="mb-8">
-        <p className="text-[13.5px] text-bg/45 capitalize">
+        <p className="text-14 text-bg/45 capitalize">
           {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
-        <h1 className="text-[26px] text-bg font-black leading-tight mt-0.5">
+        <h1 className="text-26 text-bg font-black leading-tight mt-0.5">
           {saludo()}, {(user?.name || 'bienvenido').split(' ')[0]}
         </h1>
-        <p className="text-[13.5px] text-bg/45 mt-1">Este es el resumen de la iglesia hoy.</p>
+        <p className="text-14 text-bg/45 mt-1">Este es el resumen de la iglesia hoy.</p>
       </div>
 
       {/* Alertas pendientes */}
@@ -212,17 +212,17 @@ export default function Dashboard() {
           <Icon name="notifications_active" className="w-5 h-5 text-rose" stroke={1.8} />
           <div className="flex-1 flex flex-wrap gap-4">
             {notifs.pending_cell_reports > 0 && (
-              <span className="text-[13.5px] text-bg/75 font-medium">
+              <span className="text-14 text-bg/75 font-medium">
                 <strong className="text-bg">{notifs.pending_cell_reports}</strong> reporte{notifs.pending_cell_reports !== 1 ? 's' : ''} de células pendiente{notifs.pending_cell_reports !== 1 ? 's' : ''}
               </span>
             )}
             {notifs.unread_petitions > 0 && (
-              <span className="text-[13.5px] text-bg/75 font-medium">
+              <span className="text-14 text-bg/75 font-medium">
                 <strong className="text-bg">{notifs.unread_petitions}</strong> petición{notifs.unread_petitions !== 1 ? 'es' : ''} sin leer
               </span>
             )}
             {notifs.pending_volunteers > 0 && (
-              <span className="text-[13.5px] text-bg/75 font-medium">
+              <span className="text-14 text-bg/75 font-medium">
                 <strong className="text-bg">{notifs.pending_volunteers}</strong> voluntario{notifs.pending_volunteers !== 1 ? 's' : ''} pendiente{notifs.pending_volunteers !== 1 ? 's' : ''}
               </span>
             )}
@@ -274,7 +274,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Icon name="payments" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
-          <p className="text-[12.5px] text-bg/45 font-semibold uppercase tracking-widest">Últimas donaciones</p>
+          <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Últimas donaciones</p>
         </div>
         <Button variant="tonal" size="sm" onClick={() => downloadCsv('/admin/export/donations', 'donaciones.csv')}>
           <Icon name="download" className="w-4 h-4" stroke={1.8} />
@@ -287,7 +287,7 @@ export default function Dashboard() {
             <div className="w-14 h-14 rounded-2xl bg-bg/6 flex items-center justify-center">
               <Icon name="payments" className="w-7 h-7" stroke={1.5} />
             </div>
-            <p className="text-[13.5px]">No hay donaciones registradas.</p>
+            <p className="text-14">No hay donaciones registradas.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -295,23 +295,23 @@ export default function Dashboard() {
               <thead>
                 <tr className="border-b border-bg/10">
                   {['#', 'Nombre', 'Destino', 'Monto', 'Método', 'Fecha'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 text-[11px] text-bg/45 uppercase tracking-widest">{h}</th>
+                    <th key={h} className="text-left px-5 py-3 text-11 text-bg/45 uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-bg/8">
                 {donations.slice(0, 15).map(d => (
                   <tr key={d.ID} className="hover:bg-bg/4 transition-colors">
-                    <td className="px-5 py-3.5 text-[11.5px] text-bg/40 font-mono">{d.ID}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-bg font-medium">{d.name}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-bg/55 capitalize">{d.donation_purpose || '—'}</td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-bg font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
+                    <td className="px-5 py-3.5 text-12 text-bg/40 font-mono">{d.ID}</td>
+                    <td className="px-5 py-3.5 text-14 text-bg font-medium">{d.name}</td>
+                    <td className="px-5 py-3.5 text-14 text-bg/55 capitalize">{d.donation_purpose || '—'}</td>
+                    <td className="px-5 py-3.5 text-14 text-bg font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
                     <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-bg/6 text-bg/60 text-[12px] font-medium">
+                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-bg/6 text-bg/60 text-12 font-medium">
                         {METHOD_LABEL[d.payment_method] || d.payment_method || '—'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-[13.5px] text-bg/50 whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-14 text-bg/50 whitespace-nowrap">
                       {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
                     </td>
                   </tr>

@@ -181,7 +181,7 @@ export default function CelulasPage() {
             <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}>
               Células
             </h1>
-            <p className="mt-6 text-[18px] text-white/70 max-w-2xl">
+            <p className="mt-6 text-18 text-white/70 max-w-2xl">
               Grupos que se reúnen en casas durante la semana. Toca un tipo para
               abrir su ventana — y salta entre ellas.
             </p>
@@ -226,13 +226,13 @@ export default function CelulasPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/45 to-bg/5" />
                     <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md">
+                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md">
                         {g.age}
                       </span>
-                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-[28px] sm:text-[34px]' : 'text-[17px] sm:text-[19px]'}`}>
+                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-28 sm:text-34' : 'text-17 sm:text-19'}`}>
                         {g.name}
                       </h3>
-                      <p className="text-[12.5px] text-white/60 font-medium mt-1.5">
+                      <p className="text-13 text-white/60 font-medium mt-1.5">
                         {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'} · abrir
                       </p>
                     </div>
@@ -246,8 +246,8 @@ export default function CelulasPage() {
           <Reveal delay={0.1} depth className="mt-14">
             <Tilt max={3} glass className="glass-light rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
-                <h3 className="text-[22px] font-bold text-bg">¿No sabes cuál es para ti?</h3>
-                <p className="text-[15px] text-bg/70 mt-2 max-w-lg">
+                <h3 className="text-22 font-bold text-bg">¿No sabes cuál es para ti?</h3>
+                <p className="text-15 text-bg/70 mt-2 max-w-lg">
                   Escríbenos y te conectamos con el líder de la célula más cercana a ti.
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function CelulasPage() {
                 href="https://www.instagram.com/ig.casadelrey/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-bg text-white text-[14px] font-bold focus-ring shrink-0"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-bg text-white text-14 font-bold focus-ring shrink-0"
               >
                 <Icon name="instagram" className="w-4 h-4" />
                 Escríbenos
@@ -275,7 +275,7 @@ export default function CelulasPage() {
           if (!g) return null;
           return (
             <>
-              <p className="text-[13px] font-semibold text-white/70 mb-4">
+              <p className="text-13 font-semibold text-white/70 mb-4">
                 {g.cells.length} {g.cells.length === 1 ? 'célula activa' : 'células activas'}
               </p>
               <div className="flex flex-wrap gap-3">
@@ -312,13 +312,13 @@ export default function CelulasPage() {
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-bold text-bg leading-tight truncate">{c.name}</p>
-                        <p className="text-[12.5px] text-bg/60 font-medium mt-0.5 truncate">
+                        <p className="text-15 font-bold text-bg leading-tight truncate">{c.name}</p>
+                        <p className="text-13 text-bg/60 font-medium mt-0.5 truncate">
                           {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
                         </p>
                       </div>
                       {c.zone && (
-                        <span className="shrink-0 bg-bg/8 border border-bg/12 text-bg/80 px-2.5 py-1 rounded-full text-[11.5px] font-semibold">
+                        <span className="shrink-0 bg-bg/8 border border-bg/12 text-bg/80 px-2.5 py-1 rounded-full text-12 font-semibold">
                           {c.zone}
                         </span>
                       )}
@@ -327,7 +327,7 @@ export default function CelulasPage() {
                       </span>
                     </div>
                     {c.description && (
-                      <p className="text-[13px] text-bg/55 leading-relaxed line-clamp-2 pt-3 border-t border-bg/10">
+                      <p className="text-13 text-bg/55 leading-relaxed line-clamp-2 pt-3 border-t border-bg/10">
                         {c.description}
                       </p>
                     )}

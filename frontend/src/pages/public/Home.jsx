@@ -274,7 +274,7 @@ function HeroCarousel({ onPlan }) {
                 animate="show"
                 exit="exit"
               >
-                <motion.div variants={RISE} className="mb-6 text-white/80 text-[15px] font-semibold">
+                <motion.div variants={RISE} className="mb-6 text-white/80 text-15 font-semibold">
                   {slide.label}
                 </motion.div>
                 <h1
@@ -292,12 +292,12 @@ function HeroCarousel({ onPlan }) {
                   ))}
                 </h1>
                 {displaySubtitle && (
-                  <motion.p variants={RISE} className="mt-8 max-w-xl text-[17px] md:text-[20px] leading-relaxed text-white/80 font-medium">
+                  <motion.p variants={RISE} className="mt-8 max-w-xl text-17 md:text-20 leading-relaxed text-white/80 font-medium">
                     {displaySubtitle}
                   </motion.p>
                 )}
                 {slide.schedule && (
-                  <motion.p variants={RISE} className="mt-4 text-[14px] font-semibold text-white/60">
+                  <motion.p variants={RISE} className="mt-4 text-14 font-semibold text-white/60">
                     {slide.schedule}
                   </motion.p>
                 )}
@@ -309,7 +309,7 @@ function HeroCarousel({ onPlan }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       {...PRESS}
-                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-[15px] font-bold focus-ring"
+                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
                       <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -318,7 +318,7 @@ function HeroCarousel({ onPlan }) {
                     <MotionLink
                       to={slide.ctaUrl}
                       {...PRESS}
-                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-[15px] font-bold focus-ring"
+                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
                       <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -327,7 +327,7 @@ function HeroCarousel({ onPlan }) {
                     <motion.button
                       onClick={onPlan}
                       {...PRESS}
-                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-[15px] font-bold focus-ring"
+                      className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
                       <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -395,18 +395,18 @@ function HeroCarousel({ onPlan }) {
                 reales) en vez de mostrar un evento de mentira. */}
             {nextEvent && (
               <>
-                <div className="text-[13px] font-semibold text-bg/60 mb-3">
+                <div className="text-13 font-semibold text-bg/60 mb-3">
                   {eventLabel}
                 </div>
                 <div className="flex items-center gap-4 text-bg">
                   <div className="text-center shrink-0">
-                    <div className="text-[44px] font-extrabold leading-none tracking-tighter">{nextEvent.day}</div>
-                    <div className="text-[11px] font-bold tracking-widest mt-1">{nextEvent.month}</div>
+                    <div className="text-44 font-extrabold leading-none tracking-tighter">{nextEvent.day}</div>
+                    <div className="text-11 font-bold tracking-widest mt-1">{nextEvent.month}</div>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[17px] font-bold leading-tight">{nextEvent.title}</p>
-                    <p className="mt-1 text-[13px] font-semibold text-bg/70">{nextEvent.time}</p>
-                    {nextEvent.loc && <p className="text-[13px] font-semibold text-bg/70">{nextEvent.loc}</p>}
+                    <p className="text-17 font-bold leading-tight">{nextEvent.title}</p>
+                    <p className="mt-1 text-13 font-semibold text-bg/70">{nextEvent.time}</p>
+                    {nextEvent.loc && <p className="text-13 font-semibold text-bg/70">{nextEvent.loc}</p>}
                   </div>
                 </div>
               </>
@@ -416,7 +416,7 @@ function HeroCarousel({ onPlan }) {
               <MotionLink
                 to="/conectate"
                 {...PRESS}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white text-bg px-5 py-3.5 text-[14px] font-bold focus-ring shadow-card"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white text-bg px-5 py-3.5 text-14 font-bold focus-ring shadow-card"
               >
                 Conéctate
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -424,7 +424,7 @@ function HeroCarousel({ onPlan }) {
               <MotionLink
                 to="/events"
                 {...PRESS}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-bg/10 text-bg px-5 py-3.5 text-[14px] font-bold focus-ring hover:bg-bg/15 transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-bg/10 text-bg px-5 py-3.5 text-14 font-bold focus-ring hover:bg-bg/15 transition-colors"
               >
                 <Icon name="calendar" className="w-4 h-4" />
                 Ver todos los eventos
@@ -462,8 +462,8 @@ function AnnouncementsBar() {
                 <Icon name="spark" className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[16px] font-bold text-white leading-tight">{a.title}</p>
-                <p className="text-[14px] text-white/70 mt-1 line-clamp-2">{a.content}</p>
+                <p className="text-16 font-bold text-white leading-tight">{a.title}</p>
+                <p className="text-14 text-white/70 mt-1 line-clamp-2">{a.content}</p>
               </div>
             </Tilt>
           </Reveal>
@@ -525,7 +525,7 @@ function Agenda({ bg }) {
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
         <div className="flex flex-col justify-center">
           <Reveal>
-            <div className="text-white/70 text-[14px] font-semibold mb-4">
+            <div className="text-white/70 text-14 font-semibold mb-4">
               Agenda mensual
             </div>
             <h2 className="display-mega text-white leading-[0.85] tracking-tighter mb-8" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}>
@@ -535,7 +535,7 @@ function Agenda({ bg }) {
           <MotionLink
             to="/events"
             {...PRESS}
-            className="mb-12 inline-flex items-center gap-3 self-start px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring"
+            className="mb-12 inline-flex items-center gap-3 self-start px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
           >
             Ver calendario completo
             <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -544,13 +544,13 @@ function Agenda({ bg }) {
           <Reveal delay={0.1}>
           <Tilt max={4} glass="featured" className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8">
             <div className="text-center shrink-0">
-              <div className="text-[72px] font-extrabold text-white leading-none tracking-tighter">{featured.day}</div>
-              <div className="text-[14px] font-bold text-white tracking-widest mt-2">{featured.month}</div>
+              <div className="text-72 font-extrabold text-white leading-none tracking-tighter">{featured.day}</div>
+              <div className="text-14 font-bold text-white tracking-widest mt-2">{featured.month}</div>
             </div>
             <div className="flex-1 w-full text-center md:text-left">
-              <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-[12px] font-semibold mb-3 inline-block">Destacado</span>
-              <h3 className="text-[28px] font-bold text-white tracking-tight mb-3">{featured.title}</h3>
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-[14px] text-white/60">
+              <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-12 font-semibold mb-3 inline-block">Destacado</span>
+              <h3 className="text-28 font-bold text-white tracking-tight mb-3">{featured.title}</h3>
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-14 text-white/60">
                 <span className="flex items-center gap-1.5"><Icon name="clock" className="w-4 h-4" /> {featured.time}</span>
                 <span className="flex items-center gap-1.5"><Icon name="pin" className="w-4 h-4" /> {featured.loc}</span>
               </div>
@@ -561,20 +561,20 @@ function Agenda({ bg }) {
 
         <Reveal from="right">
         <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-8 md:p-12 border border-white/10">
-          <div className="text-white/50 text-[14px] font-semibold mb-8">
+          <div className="text-white/50 text-14 font-semibold mb-8">
             También este mes
           </div>
           <RevealList className="space-y-4">
             {others.map((ev) => (
               <RevealItem key={ev.id} className="group rounded-[18px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
                 <div className="text-center sm:text-left shrink-0">
-                  <div className="text-[32px] font-extrabold text-white leading-none">{ev.day}</div>
-                  <div className="text-[10px] text-white font-bold tracking-widest mt-1">{ev.month}</div>
+                  <div className="text-32 font-extrabold text-white leading-none">{ev.day}</div>
+                  <div className="text-10 text-white font-bold tracking-widest mt-1">{ev.month}</div>
                 </div>
                 <div className="hidden sm:block w-px h-12 bg-white/10" />
                 <div className="flex-1 text-center sm:text-left">
-                  <h3 className="text-[18px] font-bold text-white mb-1">{ev.title}</h3>
-                  <div className="flex items-center justify-center sm:justify-start gap-4 text-[13px] text-white/50 font-medium">
+                  <h3 className="text-18 font-bold text-white mb-1">{ev.title}</h3>
+                  <div className="flex items-center justify-center sm:justify-start gap-4 text-13 text-white/50 font-medium">
                     <span className="flex items-center gap-1.5"><Icon name="clock" className="w-3.5 h-3.5" /> {ev.time}</span>
                   </div>
                 </div>
@@ -633,14 +633,14 @@ function CelulasSection({ bg }) {
           <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
             Células
           </h2>
-          <p className="mt-6 text-[18px] text-white/70 max-w-2xl mx-auto">
+          <p className="mt-6 text-18 text-white/70 max-w-2xl mx-auto">
             Grupos que se reúnen en casas durante la semana. Cada clasificación
             tiene sus propias células — entra y encuentra la tuya.
           </p>
           <MotionLink
             to="/celulas"
             {...PRESS}
-            className="mt-8 inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring"
+            className="mt-8 inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
           >
             Encuentra tu célula
             <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -684,11 +684,11 @@ function CelulasSection({ bg }) {
                   </div>
                   <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
                     <div>
-                      <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-[12px] font-semibold mb-4 inline-block backdrop-blur-md">
+                      <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-12 font-semibold mb-4 inline-block backdrop-blur-md">
                         {cat.age_group}
                       </span>
-                      <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-[40px]' : 'text-[24px]'}`}>{cat.name}</h3>
-                      <p className={`text-white/80 ${i === 0 ? 'text-[16px] max-w-sm' : 'text-[14px] max-w-xs'}`}>{cat.description}</p>
+                      <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-40' : 'text-24'}`}>{cat.name}</h3>
+                      <p className={`text-white/80 ${i === 0 ? 'text-16 max-w-sm' : 'text-14 max-w-xs'}`}>{cat.description}</p>
                     </div>
                   </div>
                 </Tilt>
@@ -750,7 +750,7 @@ function MensajesCarousel({ bg }) {
         <MotionLink
           to="/blog"
           {...PRESS}
-          className="inline-flex items-center gap-3 self-start md:self-auto px-6 py-3.5 rounded-pill liquid-glass text-white text-[14px] font-bold focus-ring shrink-0"
+          className="inline-flex items-center gap-3 self-start md:self-auto px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring shrink-0"
         >
           Ver todas las enseñanzas
           <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -781,8 +781,8 @@ function MensajesCarousel({ bg }) {
             </div>
 
             <div className="absolute bottom-0 left-0 p-8 w-full z-10">
-              <div className="text-[13px] font-semibold text-white/70 mb-2">{s.date}</div>
-              <h3 className="text-[20px] md:text-[24px] font-bold text-white leading-tight">{s.title}</h3>
+              <div className="text-13 font-semibold text-white/70 mb-2">{s.date}</div>
+              <h3 className="text-20 md:text-24 font-bold text-white leading-tight">{s.title}</h3>
             </div>
           </Tilt>
         ))}
@@ -868,7 +868,7 @@ function FeedSection() {
                   </div>
                   {p.caption && (
                     <div className="absolute bottom-0 inset-x-0 p-4">
-                      <p className="text-[13.5px] font-semibold text-white leading-snug line-clamp-2">{p.caption}</p>
+                      <p className="text-14 font-semibold text-white leading-snug line-clamp-2">{p.caption}</p>
                     </div>
                   )}
                 </Tilt>
@@ -904,7 +904,7 @@ function Ubicacion({ bg }) {
           <Reveal from="left">
           <Tilt max={3} glass="featured" className="rounded-[24px] liquid-glass p-10 md:p-14 h-full flex flex-col justify-between gap-10">
             <div>
-              <div className="flex items-center gap-3 text-white/60 text-[13px] font-bold mb-6">
+              <div className="flex items-center gap-3 text-white/60 text-13 font-bold mb-6">
                 <span className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <Icon name="pin" className="w-5 h-5 text-white" />
                 </span>
@@ -923,7 +923,7 @@ function Ubicacion({ bg }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 {...PRESS}
-                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-[14px] font-bold focus-ring shadow-card"
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card"
               >
                 Cómo llegar
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -949,14 +949,14 @@ function Ubicacion({ bg }) {
           <div className="flex flex-col gap-6">
             <Reveal from="right" delay={0.05}>
             <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10">
-              <h3 className="text-[26px] font-bold text-bg tracking-tight mb-3">¿Es tu primera vez?</h3>
-              <p className="text-[15px] text-bg/60 font-medium mb-7">
+              <h3 className="text-26 font-bold text-bg tracking-tight mb-3">¿Es tu primera vez?</h3>
+              <p className="text-15 text-bg/60 font-medium mb-7">
                 Queremos conocerte. Cuéntanos de ti y te recibimos desde el primer minuto.
               </p>
               <MotionLink
                 to="/conectate"
                 {...PRESS}
-                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-[14px] font-bold focus-ring shadow-card hover:opacity-90"
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card hover:opacity-90"
               >
                 <Icon name="spark" className="w-4 h-4" />
                 Conéctate
@@ -970,8 +970,8 @@ function Ubicacion({ bg }) {
                 <Icon name="music" className="w-6 h-6 text-bg" />
               </div>
               <div>
-                <p className="text-[17px] font-bold text-bg leading-tight">Podcast Inusual Youth</p>
-                <p className="text-[13.5px] text-bg/55 font-semibold mt-1">
+                <p className="text-17 font-bold text-bg leading-tight">Podcast Inusual Youth</p>
+                <p className="text-14 text-bg/55 font-semibold mt-1">
                   92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
                 </p>
               </div>
@@ -1030,9 +1030,9 @@ function GalleryPreviewSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
               <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
                 <div>
-                  <p className="text-white font-bold text-[18px] leading-tight line-clamp-1">{albumName}</p>
+                  <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>
                   {photos.length > 1 && (
-                    <p className="text-white/60 text-[12px] font-medium mt-1">{photos.length} fotos</p>
+                    <p className="text-white/60 text-12 font-medium mt-1">{photos.length} fotos</p>
                   )}
                 </div>
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0 backdrop-blur-md">

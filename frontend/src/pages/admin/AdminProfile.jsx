@@ -76,12 +76,12 @@ export default function AdminProfile() {
       {/* Identidad */}
       <div className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6 flex items-center gap-5">
         <div className="w-16 h-16 rounded-full bg-bg flex items-center justify-center shrink-0">
-          <span className="text-[26px] font-bold text-white">{initial}</span>
+          <span className="text-26 font-bold text-white">{initial}</span>
         </div>
         <div className="min-w-0">
-          <p className="text-[18px] font-bold text-bg leading-tight truncate">{user?.name || 'Sin nombre'}</p>
-          <p className="text-[13.5px] text-bg/50 truncate">{user?.email}</p>
-          <span className="inline-flex items-center gap-1.5 mt-2 bg-bg/8 text-bg/70 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold capitalize">
+          <p className="text-18 font-bold text-bg leading-tight truncate">{user?.name || 'Sin nombre'}</p>
+          <p className="text-14 text-bg/50 truncate">{user?.email}</p>
+          <span className="inline-flex items-center gap-1.5 mt-2 bg-bg/8 text-bg/70 px-2.5 py-0.5 rounded-full text-12 font-semibold capitalize">
             <span className="w-1.5 h-1.5 rounded-full bg-celeste" />
             {user?.role || 'usuario'} · cuenta activa
           </span>
@@ -90,7 +90,7 @@ export default function AdminProfile() {
 
       {/* Metas */}
       <div className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6">
-        <h2 className="text-[16px] font-bold text-bg tracking-tightish mb-5 flex items-center gap-2">
+        <h2 className="text-16 font-bold text-bg tracking-tightish mb-5 flex items-center gap-2">
           <Icon name="spark" className="w-5 h-5 text-celeste" stroke={1.8} />
           Mis metas
         </h2>
@@ -118,7 +118,7 @@ export default function AdminProfile() {
             <div className="w-5 h-5 rounded-full border-2 border-bg/12 border-t-celeste animate-spin" />
           </div>
         ) : goals.length === 0 ? (
-          <p className="text-[13.5px] text-bg/50 py-3">Aún no tienes metas. ¡Agrega una!</p>
+          <p className="text-14 text-bg/50 py-3">Aún no tienes metas. ¡Agrega una!</p>
         ) : (
           <div className="space-y-2.5">
             {goals.map(g => (
@@ -134,11 +134,11 @@ export default function AdminProfile() {
                   {g.completed && <Icon name="check" className="w-3.5 h-3.5" stroke={2.5} />}
                 </button>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[14px] font-medium text-bg ${g.completed ? 'line-through text-bg/45' : ''}`}>
+                  <p className={`text-14 font-medium text-bg ${g.completed ? 'line-through text-bg/45' : ''}`}>
                     {g.title}
                   </p>
                   {g.target_date && (
-                    <p className="text-[12px] text-bg/45 mt-0.5">Para: {g.target_date}</p>
+                    <p className="text-12 text-bg/45 mt-0.5">Para: {g.target_date}</p>
                   )}
                 </div>
                 <button onClick={() => deleteGoal(g.ID)} aria-label="Eliminar meta"

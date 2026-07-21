@@ -10,7 +10,7 @@ const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'A
 // no tapaba el fondo nativo oscuro que pinta el navegador con
 // color-scheme:dark activo.
 const fieldCls = 'input-light';
-const labelCls = 'block text-[13px] font-semibold text-bg/50 mb-1.5';
+const labelCls = 'block text-13 font-semibold text-bg/50 mb-1.5';
 
 const EMPTY = {
   payer_name: '', payer_email: '', payer_phone: '',
@@ -66,8 +66,8 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
       <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
         <Icon name="check" className="w-7 h-7 text-bg" stroke={2.4} />
       </div>
-      <h3 className="text-[20px] font-bold text-bg mb-2">¡Comprobante recibido!</h3>
-      <p className="text-[14px] text-bg/60">El equipo verificará tu pago en 24-48 horas y recibirás confirmación.</p>
+      <h3 className="text-20 font-bold text-bg mb-2">¡Comprobante recibido!</h3>
+      <p className="text-14 text-bg/60">El equipo verificará tu pago en 24-48 horas y recibirás confirmación.</p>
     </div>
   );
 
@@ -76,7 +76,7 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
 
       {/* Datos del pagador */}
       <div className="space-y-3">
-        <p className="text-[13px] font-semibold text-bg/50">Tus datos</p>
+        <p className="text-13 font-semibold text-bg/50">Tus datos</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Nombre completo *</label>
@@ -95,7 +95,7 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
 
       {/* Datos del pago */}
       <div className="space-y-3">
-        <p className="text-[13px] font-semibold text-bg/50">Datos del depósito</p>
+        <p className="text-13 font-semibold text-bg/50">Datos del depósito</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Monto depositado (Q) *</label>
@@ -117,17 +117,17 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
 
       {/* Foto del comprobante */}
       <div>
-        <p className="text-[13px] font-semibold text-bg/50 mb-3">Foto del comprobante</p>
+        <p className="text-13 font-semibold text-bg/50 mb-3">Foto del comprobante</p>
         {form.receipt_image_url ? (
           <div className="flex items-center gap-4 p-4 rounded-[16px] glass-light-nested">
             <img src={form.receipt_image_url} alt="comprobante" className="h-20 w-20 object-cover rounded-[10px] border border-bg/10" />
             <div className="flex-1">
-              <p className="text-[14px] text-bg font-bold flex items-center gap-1.5">
+              <p className="text-14 text-bg font-bold flex items-center gap-1.5">
                 <Icon name="check" className="w-4 h-4" stroke={2.4} />
                 Comprobante cargado
               </p>
               <button type="button" onClick={() => setForm(p => ({ ...p, receipt_image_url: '' }))}
-                className="text-[12.5px] font-semibold text-bg/50 hover:text-bg transition-colors mt-1">
+                className="text-13 font-semibold text-bg/50 hover:text-bg transition-colors mt-1">
                 Cambiar foto
               </button>
             </div>
@@ -138,8 +138,8 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
               <Icon name={uploading ? 'clock' : 'gift'} className={`w-6 h-6 ${uploading ? 'animate-spin' : ''}`} />
             </span>
             <div className="text-center">
-              <p className="text-[14.5px] font-bold text-bg">{uploading ? 'Subiendo…' : 'Toca para subir la foto'}</p>
-              <p className="text-[12px] text-bg/50 mt-0.5">JPG, PNG o PDF · máx. 10 MB</p>
+              <p className="text-15 font-bold text-bg">{uploading ? 'Subiendo…' : 'Toca para subir la foto'}</p>
+              <p className="text-12 text-bg/50 mt-0.5">JPG, PNG o PDF · máx. 10 MB</p>
             </div>
             <input type="file" accept="image/*,.pdf" className="hidden" onChange={handlePhoto} disabled={uploading} />
           </label>
@@ -152,7 +152,7 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         type="submit"
         disabled={submitting || uploading || !form.receipt_image_url}
-        className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-[15px] disabled:opacity-40"
+        className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40"
       >
         {submitting ? 'Enviando…' : 'Enviar comprobante'}
         {!submitting && <Icon name="arrow" className="w-4 h-4" stroke={2} />}

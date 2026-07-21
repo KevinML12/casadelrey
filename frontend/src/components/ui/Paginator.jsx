@@ -25,7 +25,7 @@ export default function Paginator({ meta, onPage }) {
       {pages_arr[0] > 1 && (
         <>
           <PageBtn num={1} active={page === 1} onClick={onPage} />
-          {pages_arr[0] > 2 && <span className="text-bg/40 text-[13px] px-1">…</span>}
+          {pages_arr[0] > 2 && <span className="text-bg/40 text-13 px-1">…</span>}
         </>
       )}
 
@@ -36,7 +36,7 @@ export default function Paginator({ meta, onPage }) {
       {pages_arr[pages_arr.length - 1] < pages && (
         <>
           {pages_arr[pages_arr.length - 1] < pages - 1 && (
-            <span className="text-bg/40 text-[13px] px-1">…</span>
+            <span className="text-bg/40 text-13 px-1">…</span>
           )}
           <PageBtn num={pages} active={page === pages} onClick={onPage} />
         </>
@@ -50,7 +50,7 @@ export default function Paginator({ meta, onPage }) {
         <Icon name="chevron_right" className="w-[18px] h-[18px]" stroke={2} />
       </IconButton>
 
-      <span className="text-[12px] text-bg/45 ml-2">
+      <span className="text-12 text-bg/45 ml-2">
         {meta.total} total
       </span>
     </div>
@@ -61,7 +61,7 @@ function PageBtn({ num, active, onClick }) {
   return (
     <button
       onClick={() => onClick(num)}
-      className={`w-9 h-9 rounded-full text-[13.5px] font-semibold transition-colors ${
+      className={`w-9 h-9 rounded-full text-14 font-semibold transition-colors ${
         active
           ? 'bg-celeste text-white'
           : 'text-bg/55 hover:bg-bg/6 hover:text-bg'

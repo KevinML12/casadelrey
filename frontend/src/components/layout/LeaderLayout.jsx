@@ -36,8 +36,8 @@ function SidebarContent({ onClose }) {
             <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="min-w-0">
-            <p className="text-[14.5px] font-extrabold tracking-tightish text-bg leading-tight">Casa del Rey</p>
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-bg/55 mt-0.5">Panel Líder</p>
+            <p className="text-15 font-extrabold tracking-tightish text-bg leading-tight">Casa del Rey</p>
+            <p className="text-10 font-extrabold uppercase tracking-widest text-bg/55 mt-0.5">Panel Líder</p>
           </div>
         </Link>
       </div>
@@ -52,7 +52,7 @@ function SidebarContent({ onClose }) {
               end={exact}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-2xl text-[13.5px] font-semibold tracking-tightish transition-all duration-300 ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-2xl text-14 font-semibold tracking-tightish transition-all duration-300 ${
                   isActive
                     ? 'bg-bg text-white shadow-card'
                     : 'text-bg/60 hover:text-bg hover:bg-bg/6'
@@ -62,7 +62,7 @@ function SidebarContent({ onClose }) {
               <Icon name={icon} className="w-[18px] h-[18px] shrink-0" stroke={1.8} />
               <span className="flex-1">{label}</span>
               {count > 0 && (
-                <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-[10.5px] font-bold flex items-center justify-center px-1.5">
+                <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-11 font-bold flex items-center justify-center px-1.5">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
@@ -73,25 +73,25 @@ function SidebarContent({ onClose }) {
 
       <div className="px-3 pb-4 pt-3 border-t border-bg/10 space-y-0.5">
         <div className="px-3 py-2.5 flex items-center gap-3">
-          <span className="grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-[13px] font-extrabold shadow-card shrink-0">
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-13 font-extrabold shadow-card shrink-0">
             {(user?.name || user?.email || '?')[0].toUpperCase()}
           </span>
           <div className="min-w-0">
-            <p className="text-[13px] font-bold text-bg truncate">{user?.name || 'Usuario'}</p>
-            <p className="text-[11.5px] text-bg/45 truncate">{user?.email}</p>
+            <p className="text-13 font-bold text-bg truncate">{user?.name || 'Usuario'}</p>
+            <p className="text-12 text-bg/45 truncate">{user?.email}</p>
           </div>
         </div>
         <Link
           to="/"
           onClick={onClose}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-[13.5px] font-semibold text-bg/60 hover:text-bg hover:bg-bg/6 transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-14 font-semibold text-bg/60 hover:text-bg hover:bg-bg/6 transition-colors"
         >
           <Icon name="public" className="w-[18px] h-[18px] shrink-0" stroke={1.8} />
           Ver sitio web
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-[13.5px] font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-14 font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
         >
           <Icon name="logout" className="w-[18px] h-[18px] shrink-0" stroke={1.8} />
           Cerrar sesión
@@ -122,7 +122,7 @@ export default function LeaderLayout() {
           >
             <Icon name="menu" className="w-[22px] h-[22px]" stroke={1.8} />
           </button>
-          <span className="text-[14.5px] text-bg font-extrabold tracking-tightish">Panel Líder</span>
+          <span className="text-15 text-bg font-extrabold tracking-tightish">Panel Líder</span>
         </div>
 
         <main className="flex-1 overflow-y-auto">

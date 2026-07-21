@@ -145,11 +145,11 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A1526] via-[#0A1526]/50 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-5 sm:p-6">
                       {it.badge && (
-                        <span className="bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold backdrop-blur-md">
+                        <span className="bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold backdrop-blur-md">
                           {it.badge}
                         </span>
                       )}
-                      <h2 className="text-[26px] sm:text-[32px] font-bold text-white tracking-tight mt-2 leading-none">{it.title}</h2>
+                      <h2 className="text-26 sm:text-32 font-bold text-white tracking-tight mt-2 leading-none">{it.title}</h2>
                     </div>
                   </div>
 

@@ -237,7 +237,7 @@ export default function AdminSocial() {
                 {/* Badge plataforma */}
                 <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm flex items-center gap-1">
                   <Icon name={plat?.icon} className="w-[12px] h-[12px] text-ink" stroke={1.8} />
-                  <span className="text-[10px] text-ink font-semibold uppercase tracking-wider">{plat?.label}</span>
+                  <span className="text-10 text-ink font-semibold uppercase tracking-wider">{plat?.label}</span>
                 </div>
                 {/* Hover overlay con acciones */}
                 <div className="absolute inset-0 bg-black/70 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">

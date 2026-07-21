@@ -43,8 +43,8 @@ export default function BankDetails({ on = 'dark' }) {
         {...(whatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
         className={`block rounded-[14px] ${dim} px-4 py-4 text-center transition-colors focus-ring ${light ? 'hover:bg-bg/10' : 'hover:bg-white/10'}`}
       >
-        <p className={`text-[14px] font-bold ${ink}`}>Escríbenos para coordinar tu depósito</p>
-        <p className={`text-[12.5px] mt-1 ${light ? 'text-bg/55' : 'text-white/55'}`}>Te compartimos los datos bancarios al momento</p>
+        <p className={`text-14 font-bold ${ink}`}>Escríbenos para coordinar tu depósito</p>
+        <p className={`text-13 mt-1 ${light ? 'text-bg/55' : 'text-white/55'}`}>Te compartimos los datos bancarios al momento</p>
       </a>
     );
   }
@@ -53,8 +53,8 @@ export default function BankDetails({ on = 'dark' }) {
     <div className="space-y-2">
       {rows.map(({ label, value }) => (
         <div key={label} className={`flex items-center justify-between rounded-[12px] ${dim} px-4 py-3`}>
-          <span className={`text-[12.5px] font-semibold ${inkMuted}`}>{label}</span>
-          <span className={`text-[14.5px] font-bold ${ink}`}>{value}</span>
+          <span className={`text-13 font-semibold ${inkMuted}`}>{label}</span>
+          <span className={`text-15 font-bold ${ink}`}>{value}</span>
         </div>
       ))}
     </div>

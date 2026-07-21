@@ -56,7 +56,7 @@ export default function SocialSection({ title = 'Nuestro feed', showDirectAccess
       {posts.length === 0 ? (
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="liquid-glass rounded-[24px] p-12 text-center">
-            <p className="text-[15px] text-white/60 font-medium">
+            <p className="text-15 text-white/60 font-medium">
               Aún no hay publicaciones vinculadas. Síguenos en redes para ver el contenido más reciente.
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function SocialSection({ title = 'Nuestro feed', showDirectAccess
                   </div>
                   {p.caption && (
                     <div className="absolute bottom-0 inset-x-0 p-4">
-                      <p className="text-[13.5px] font-semibold text-white leading-snug line-clamp-2">{p.caption}</p>
+                      <p className="text-14 font-semibold text-white leading-snug line-clamp-2">{p.caption}</p>
                     </div>
                   )}
                 </Tilt>

@@ -7,9 +7,9 @@
 
 const fieldBase = 'input-light';
 
-const labelCls  = 'block text-[12.5px] font-bold tracking-tightish text-bg/60 mb-2';
-const errorCls  = 'mt-1.5 text-[12.5px] font-medium text-rose';
-const helperCls = 'mt-1.5 text-[12.5px] text-bg/45';
+const labelCls  = 'block text-13 font-bold tracking-tightish text-bg/60 mb-2';
+const errorCls  = 'mt-1.5 text-13 font-medium text-rose';
+const helperCls = 'mt-1.5 text-13 text-bg/45';
 
 let uid = 0;
 const nextId = (prefix) => `${prefix}-${++uid}`;

@@ -36,10 +36,10 @@ export default function TTSPlayer({ content }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-[15px] font-semibold text-bg">
+          <p className="text-15 font-semibold text-bg">
             {isLoading ? 'Preparando…' : isPlaying ? 'Leyendo…' : isPaused ? 'Pausado' : isDone ? 'Completado' : 'Escuchar este post'}
           </p>
-          <p className="text-[12.5px] text-bg/50 mt-0.5">
+          <p className="text-13 text-bg/50 mt-0.5">
             {isActive ? `Voz en español · ${engineLabel}` : 'El post se leerá en voz alta'}
           </p>
         </div>
@@ -47,19 +47,19 @@ export default function TTSPlayer({ content }) {
         <div className="flex items-center gap-2 shrink-0">
           {(!isActive || isDone) && (
             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.94 }} onClick={play}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-bg text-white text-[13px] font-bold">
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-bg text-white text-13 font-bold">
               <Icon name="play" className="w-3.5 h-3.5" />
               {isDone ? 'Repetir' : 'Escuchar'}
             </motion.button>
           )}
           {isPlaying && (
-            <button onClick={pause} className="px-4 py-2 rounded-full bg-bg/8 text-bg text-[13px] font-semibold">
+            <button onClick={pause} className="px-4 py-2 rounded-full bg-bg/8 text-bg text-13 font-semibold">
               Pausar
             </button>
           )}
           {isPaused && (
             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.94 }} onClick={resume}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-bg text-white text-[13px] font-bold">
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-bg text-white text-13 font-bold">
               <Icon name="play" className="w-3.5 h-3.5" />
               Continuar
             </motion.button>

@@ -46,7 +46,7 @@ export default function Register() {
           <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)' }}>
             Obtener una cuenta.
           </h1>
-          <p className="mt-5 text-[16px] text-white/70">
+          <p className="mt-5 text-16 text-white/70">
             Son tres pasos — y el primero no es un formulario.
           </p>
         </Reveal>
@@ -57,17 +57,17 @@ export default function Register() {
             <RevealItem key={p.title} depth>
               <Tilt max={4} glass className="liquid-glass rounded-[20px] p-5 h-full">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <span className="grid place-items-center w-8 h-8 rounded-full bg-white text-bg text-[13px] font-extrabold shrink-0">
+                  <span className="grid place-items-center w-8 h-8 rounded-full bg-white text-bg text-13 font-extrabold shrink-0">
                     {i + 1}
                   </span>
                   <Icon name={p.icon} className="w-4 h-4 text-white/60" />
                 </div>
-                <h3 className="text-[15.5px] font-bold text-white leading-tight">{p.title}</h3>
-                <p className="mt-1.5 text-[13px] text-white/60 leading-relaxed">{p.desc}</p>
+                <h3 className="text-16 font-bold text-white leading-tight">{p.title}</h3>
+                <p className="mt-1.5 text-13 text-white/60 leading-relaxed">{p.desc}</p>
                 {p.cta && (
                   <Link
                     to={p.cta.to}
-                    className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-bold text-white hover:text-white/70 transition-colors"
+                    className="mt-3 inline-flex items-center gap-1.5 text-13 font-bold text-white hover:text-white/70 transition-colors"
                   >
                     {p.cta.label}
                     <Icon name="arrow" className="w-3.5 h-3.5" stroke={2.2} />

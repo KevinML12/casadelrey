@@ -37,11 +37,11 @@ export default function Footer() {
                 className="w-16 h-16 object-contain group-hover:scale-105 transition-transform duration-500"
               />
               <div>
-                <span className="block text-[20px] font-extrabold tracking-tightish text-white">Casa del Rey</span>
-                <span className="block text-[13px] text-white/50 font-medium">Iglesia cristiana · Huehuetenango</span>
+                <span className="block text-20 font-extrabold tracking-tightish text-white">Casa del Rey</span>
+                <span className="block text-13 text-white/50 font-medium">Iglesia cristiana · Huehuetenango</span>
               </div>
             </Link>
-            <p className="text-[13.5px] text-white/50 font-medium leading-relaxed max-w-xs">
+            <p className="text-14 text-white/50 font-medium leading-relaxed max-w-xs">
               Fundada por el Pastor José de León y Desidería López.
             </p>
             <div className="flex items-center gap-2.5">
@@ -62,11 +62,11 @@ export default function Footer() {
 
           {/* Navegación */}
           <div>
-            <p className="text-[13px] font-semibold text-white/40 mb-5">Explora</p>
+            <p className="text-13 font-semibold text-white/40 mb-5">Explora</p>
             <ul className="space-y-3">
               {NAV.map(n => (
                 <li key={n.id}>
-                  <Link to={n.id} className="text-[14.5px] font-semibold text-white/70 hover:text-white transition-colors">
+                  <Link to={n.id} className="text-15 font-semibold text-white/70 hover:text-white transition-colors">
                     {n.label}
                   </Link>
                 </li>
@@ -76,17 +76,17 @@ export default function Footer() {
 
           {/* Visítanos + podcast */}
           <div>
-            <p className="text-[13px] font-semibold text-white/40 mb-5">Visítanos</p>
+            <p className="text-13 font-semibold text-white/40 mb-5">Visítanos</p>
             <a
               href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 text-[14px] text-white/70 hover:text-white transition-colors font-medium leading-relaxed"
+              className="flex items-start gap-3 text-14 text-white/70 hover:text-white transition-colors font-medium leading-relaxed"
             >
               <Icon name="pin" className="w-4 h-4 mt-1 shrink-0" />
               <span>7ª. Calle 12-66 zona 4,<br />carretera a las Ruinas de Zaculeu,<br />Huehuetenango</span>
             </a>
-            <div className="flex items-start gap-3 mt-5 text-[14px] text-white/70 font-medium leading-relaxed">
+            <div className="flex items-start gap-3 mt-5 text-14 text-white/70 font-medium leading-relaxed">
               <Icon name="music" className="w-4 h-4 mt-1 shrink-0" />
               <span>
                 Podcast <span className="text-white font-bold">Inusual Youth</span><br />
@@ -98,7 +98,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="text-center text-white/40 text-[13px] font-medium border-t border-white/5 pt-8">
+        <div className="text-center text-white/40 text-13 font-medium border-t border-white/5 pt-8">
           <p>© {new Date().getFullYear()} Iglesia Cristiana Casa del Rey. Todos los derechos reservados.</p>
         </div>
       </div>

@@ -70,7 +70,7 @@ export default function ConnectPage() {
           <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 6vw, 3.6rem)' }}>
             Conéctate
           </h1>
-          <p className="mt-6 text-[16px] text-white/70">
+          <p className="mt-6 text-16 text-white/70">
             Cuéntanos un poco de ti — alguien de nuestro equipo te va a escribir
             para darte la bienvenida.
           </p>
@@ -83,15 +83,15 @@ export default function ConnectPage() {
                 <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-5">
                   <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
                 </div>
-                <h3 className="text-[20px] text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
-                <p className="text-[14px] text-bg/60 max-w-sm mx-auto leading-relaxed">
+                <h3 className="text-20 text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
+                <p className="text-14 text-bg/60 max-w-sm mx-auto leading-relaxed">
                   Alguien de nuestro equipo te contactará pronto. Nos alegra que estés aquí.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-[12px] font-bold text-bg/60 mb-1.5">
+                  <label className="block text-12 font-bold text-bg/60 mb-1.5">
                     Nombre <span className="text-rose">*</span>
                   </label>
                   <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
@@ -99,19 +99,19 @@ export default function ConnectPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[12px] font-bold text-bg/60 mb-1.5">
+                    <label className="block text-12 font-bold text-bg/60 mb-1.5">
                       Teléfono <span className="text-rose">*</span>
                     </label>
                     <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" required />
                   </div>
                   <div>
-                    <label className="block text-[12px] font-bold text-bg/60 mb-1.5">Correo</label>
+                    <label className="block text-12 font-bold text-bg/60 mb-1.5">Correo</label>
                     <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="Opcional" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-bold text-bg/60 mb-2.5">
+                  <label className="block text-12 font-bold text-bg/60 mb-2.5">
                     ¿Qué te trae por aquí? <span className="text-rose">*</span>
                   </label>
                   <div className="flex flex-col gap-2">
@@ -127,14 +127,14 @@ export default function ConnectPage() {
                         }`}
                       >
                         <Icon name={c.icon} className="w-4 h-4 shrink-0" />
-                        <span className="text-[14px] font-medium">{c.label}</span>
+                        <span className="text-14 font-medium">{c.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-bold text-bg/60 mb-1.5">¿Cómo nos conociste?</label>
+                  <label className="block text-12 font-bold text-bg/60 mb-1.5">¿Cómo nos conociste?</label>
                   <select value={form.how_found} onChange={set('how_found')} className={fieldCls}>
                     <option value="">Selecciona una opción</option>
                     {HOW_FOUND.map((h) => (
@@ -144,7 +144,7 @@ export default function ConnectPage() {
                 </div>
 
                 {error && (
-                  <p className="text-[13px] text-rose flex items-center gap-1.5">
+                  <p className="text-13 text-rose flex items-center gap-1.5">
                     <Icon name="spark" className="w-3.5 h-3.5" />
                     {error}
                   </p>
@@ -155,7 +155,7 @@ export default function ConnectPage() {
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
-                  className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-bg text-white text-[15px] font-bold disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-bg text-white text-15 font-bold disabled:opacity-50"
                 >
                   {loading ? 'Enviando…' : (
                     <>

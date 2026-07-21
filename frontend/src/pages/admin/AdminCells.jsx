@@ -167,7 +167,7 @@ export default function AdminCells() {
         <div className="space-y-3">
           {cells.map(cell => (
             <div key={cell.ID} className={`p-4 rounded-2xl border flex flex-col sm:flex-row gap-4 sm:items-center ${cell.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15 opacity-70'}`}>
-              <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0 font-mono font-bold text-[13px]">
+              <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0 font-mono font-bold text-13">
                 {cell.code}
               </div>
               <div className="flex-1 min-w-0">

@@ -38,7 +38,7 @@ export default function Login() {
       <div className="flex flex-col items-center text-center mb-8">
         <img src="/logo.png" alt="Casa del Rey" className="w-14 h-14 object-contain mb-5" />
         <h1 className="display-mega text-white" style={{ fontSize: '1.9rem' }}>Bienvenido de vuelta.</h1>
-        <p className="text-[15px] text-white/60 mt-2">Ingresa con tus credenciales para continuar.</p>
+        <p className="text-15 text-white/60 mt-2">Ingresa con tus credenciales para continuar.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +59,7 @@ export default function Login() {
           required
         />
         <div className="text-right">
-          <Link to="/forgot-password" className="text-[13.5px] font-semibold text-white/60 hover:text-white transition-colors">
+          <Link to="/forgot-password" className="text-14 font-semibold text-white/60 hover:text-white transition-colors">
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
@@ -69,14 +69,14 @@ export default function Login() {
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-[15px] font-bold disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-15 font-bold disabled:opacity-50"
         >
           {loading ? 'Ingresando…' : 'Ingresar'}
           {!loading && <Icon name="arrow" className="w-4 h-4" stroke={2} />}
         </motion.button>
       </form>
 
-      <div className="mt-8 pt-6 border-t border-white/10 text-center text-[14px] text-white/60">
+      <div className="mt-8 pt-6 border-t border-white/10 text-center text-14 text-white/60">
         ¿No tienes cuenta?{' '}
         <Link to="/register" className="font-bold text-white hover:text-white/70 transition-colors">
           Regístrate

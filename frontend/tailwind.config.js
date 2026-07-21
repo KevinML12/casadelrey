@@ -144,6 +144,22 @@ export default {
         'label-m':   ['0.75rem', { lineHeight: '1.3',  letterSpacing: '0.1em',   fontWeight: '600' }],
         'label-s':   ['0.6875rem',{ lineHeight: '1.3', letterSpacing: '0.15em',  fontWeight: '600' }],
         'mono':      ['0.6875rem',{ lineHeight: '1.3', letterSpacing: '0.2em',   fontWeight: '500' }],
+
+        // Escala del SITIO PÚBLICO (liquid glass) -- nombrada por su valor en
+        // px para no chocar/mezclarse con la escala M3 de arriba (esa es
+        // solo del panel admin, a propósito -- ver DISENO_LIQUID_GLASS.md).
+        // Reemplaza los ~316 usos sueltos de text-[Npx] del código: mismo
+        // número de token = mismo tamaño (sin line-height propio, para no
+        // cambiar el ritmo vertical heredado que ya existía). Consolida los
+        // pasos de medio píxel (10.5/11.5/12.5/13.5/14.5/15.5) al entero
+        // vecino más usado -- eran ruido, no jerarquía real.
+        '7':  '7px',  '9':  '9px',  '10': '10px', '11': '11px',
+        '12': '12px', '13': '13px', '14': '14px', '15': '15px',
+        '16': '16px', '17': '17px', '18': '18px', '19': '19px',
+        '20': '20px', '21': '21px', '22': '22px', '24': '24px',
+        '26': '26px', '28': '28px', '30': '30px', '32': '32px',
+        '34': '34px', '36': '36px', '38': '38px', '40': '40px',
+        '44': '44px', '72': '72px',
       },
 
       spacing: {

@@ -14,7 +14,7 @@ export default function BlogHero() {
         <h1 className="display-mega text-white mt-4 mb-4" style={{ fontSize: 'clamp(2.6rem, 7vw, 4.5rem)' }}>
           Blog
         </h1>
-        <p className="text-[17px] text-white/70 max-w-xl mx-auto">
+        <p className="text-17 text-white/70 max-w-xl mx-auto">
           Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual.
         </p>
       </Reveal>

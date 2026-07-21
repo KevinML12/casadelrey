@@ -30,9 +30,9 @@ const variants = {
 };
 
 const sizes = {
-  sm: 'text-[13px] px-3.5 py-1.5',
-  md: 'text-[14px] px-5 py-2.5',
-  lg: 'text-[15px] px-6 py-3.5',
+  sm: 'text-13 px-3.5 py-1.5',
+  md: 'text-14 px-5 py-2.5',
+  lg: 'text-15 px-6 py-3.5',
 };
 
 const Button = forwardRef(function Button(

@@ -88,12 +88,12 @@ export default function ProfilePage() {
           <Tilt max={3} glass className="liquid-glass rounded-[24px] p-7 md:p-8 mb-6">
             <div className="flex items-center gap-5">
               <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                <span className="text-[26px] font-bold text-white">{initial}</span>
+                <span className="text-26 font-bold text-white">{initial}</span>
               </div>
               <div className="min-w-0">
-                <p className="text-[20px] font-bold text-white leading-tight truncate">{user?.name || 'Sin nombre'}</p>
-                <p className="text-[14px] text-white/60 truncate">{user?.email}</p>
-                <span className="inline-flex items-center gap-1.5 mt-2 bg-white/10 border border-white/15 text-white/80 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold capitalize">
+                <p className="text-20 font-bold text-white leading-tight truncate">{user?.name || 'Sin nombre'}</p>
+                <p className="text-14 text-white/60 truncate">{user?.email}</p>
+                <span className="inline-flex items-center gap-1.5 mt-2 bg-white/10 border border-white/15 text-white/80 px-2.5 py-0.5 rounded-full text-12 font-semibold capitalize">
                   <span className="w-1.5 h-1.5 rounded-full bg-celeste" />
                   {user?.role || 'usuario'} · cuenta activa
                 </span>
@@ -105,7 +105,7 @@ export default function ProfilePage() {
         {/* Metas */}
         <Reveal delay={0.1}>
           <Tilt max={2} glass className="liquid-glass rounded-[24px] p-7 md:p-8">
-            <h2 className="text-[20px] font-bold text-white tracking-tight mb-5 flex items-center gap-2.5">
+            <h2 className="text-20 font-bold text-white tracking-tight mb-5 flex items-center gap-2.5">
               <Icon name="spark" className="w-5 h-5 text-celeste" />
               Mis metas
             </h2>
@@ -124,7 +124,7 @@ export default function ProfilePage() {
                 {...PRESS}
                 disabled={adding || !newTitle.trim()}
                 aria-label="Agregar meta"
-                className="w-11 h-11 rounded-full bg-white text-bg flex items-center justify-center text-[22px] font-bold focus-ring disabled:opacity-50 shrink-0"
+                className="w-11 h-11 rounded-full bg-white text-bg flex items-center justify-center text-22 font-bold focus-ring disabled:opacity-50 shrink-0"
               >
                 +
               </motion.button>
@@ -135,7 +135,7 @@ export default function ProfilePage() {
                 <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
               </div>
             ) : goals.length === 0 ? (
-              <p className="text-[14.5px] text-white/50 py-3">Aún no tienes metas. ¡Agrega una!</p>
+              <p className="text-15 text-white/50 py-3">Aún no tienes metas. ¡Agrega una!</p>
             ) : (
               <div className="space-y-2.5">
                 {goals.map(g => (
@@ -151,11 +151,11 @@ export default function ProfilePage() {
                       {g.completed && <Icon name="check" className="w-3.5 h-3.5" />}
                     </button>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-[14.5px] font-medium text-white ${g.completed ? 'line-through text-white/50' : ''}`}>
+                      <p className={`text-15 font-medium text-white ${g.completed ? 'line-through text-white/50' : ''}`}>
                         {g.title}
                       </p>
                       {g.target_date && (
-                        <p className="text-[12px] text-white/50 mt-0.5">Para: {g.target_date}</p>
+                        <p className="text-12 text-white/50 mt-0.5">Para: {g.target_date}</p>
                       )}
                     </div>
                     <button onClick={() => deleteGoal(g.ID)} aria-label="Eliminar meta"
@@ -174,14 +174,14 @@ export default function ProfilePage() {
             <motion.button
               type="button" {...PRESS}
               onClick={() => toast('Próximamente disponible')}
-              className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-6 py-3.5 text-[14px] font-bold focus-ring"
+              className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-6 py-3.5 text-14 font-bold focus-ring"
             >
               Editar perfil
             </motion.button>
             <motion.button
               type="button" {...PRESS}
               onClick={() => toast('Próximamente disponible')}
-              className="inline-flex items-center gap-2 rounded-pill liquid-glass border border-white/20 px-6 py-3.5 text-[14px] font-bold text-white focus-ring"
+              className="inline-flex items-center gap-2 rounded-pill liquid-glass border border-white/20 px-6 py-3.5 text-14 font-bold text-white focus-ring"
             >
               <Icon name="lock" className="w-4 h-4" />
               Cambiar contraseña

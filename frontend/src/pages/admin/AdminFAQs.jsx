@@ -139,13 +139,13 @@ export default function AdminFAQs() {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-title-s text-bg font-medium">{faq.question}</span>
                   {!faq.is_active && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-err/10 text-err px-2 py-0.5 rounded">
+                    <span className="text-10 font-bold uppercase tracking-wider bg-err/10 text-err px-2 py-0.5 rounded">
                       Inactiva
                     </span>
                   )}
                 </div>
                 <p className="text-body-m text-bg/50 line-clamp-3">{faq.answer}</p>
-                <div className="mt-3 flex items-center gap-4 text-[12px] text-bg/45 font-mono">
+                <div className="mt-3 flex items-center gap-4 text-12 text-bg/45 font-mono">
                   <span>Orden: {faq.sort_order}</span>
                 </div>
               </div>

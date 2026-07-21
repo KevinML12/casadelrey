@@ -197,7 +197,7 @@ export function Badge({ children, icon, className = '', tone = 'celeste' }) {
     ? 'bg-celeste-soft text-celeste-hov'
     : 'bg-bg-soft text-ink';
   return (
-    <span className={`inline-flex items-center gap-2 rounded-pill px-3.5 py-1.5 text-[12px] font-bold tracking-tightish ${styles} ${className}`}>
+    <span className={`inline-flex items-center gap-2 rounded-pill px-3.5 py-1.5 text-12 font-bold tracking-tightish ${styles} ${className}`}>
       {icon && <Icon name={icon} className="w-3.5 h-3.5" />}
       <span>{children}</span>
     </span>
@@ -211,7 +211,7 @@ export function Badge({ children, icon, className = '', tone = 'celeste' }) {
 export function Eyebrow({ children, on = 'dark' }) {
   const light = on === 'light';
   return (
-    <div className={`inline-flex items-center gap-2.5 mb-4 px-4 py-1.5 rounded-full text-[12.5px] font-bold ${
+    <div className={`inline-flex items-center gap-2.5 mb-4 px-4 py-1.5 rounded-full text-13 font-bold ${
       light ? 'glass-light-nested text-bg/90' : 'liquid-glass text-white/90'
     }`}>
       <span className={`w-1.5 h-1.5 rounded-full ${
@@ -235,11 +235,11 @@ export const GlassButton = forwardRef(function GlassButton(
   const base = 'group inline-flex items-center justify-center gap-2 rounded-pill font-bold tracking-tightish btn-spring select-none cursor-pointer focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
   const variants = {
     // Primario — pill blanco sobre navy (el CTA estándar del sitio)
-    primary: 'px-6 py-3.5 text-[15px] text-bg bg-white shadow-card hover:shadow-card-lg',
+    primary: 'px-6 py-3.5 text-15 text-bg bg-white shadow-card hover:shadow-card-lg',
     // Cristal — vidrio con borde, texto blanco
-    glass:   'px-6 py-3.5 text-[15px] text-white liquid-glass border border-white/20 hover:border-white/40',
+    glass:   'px-6 py-3.5 text-15 text-white liquid-glass border border-white/20 hover:border-white/40',
     // Ghost — mínimo
-    ghost:   'px-5 py-2.5 text-[14px] text-white/60 hover:text-white hover:bg-white/5',
+    ghost:   'px-5 py-2.5 text-14 text-white/60 hover:text-white hover:bg-white/5',
   };
   return (
     <As ref={ref} className={`${base} ${variants[variant] || variants.primary} ${className}`} {...props}>
@@ -262,9 +262,9 @@ const glassFieldStyle = {
 export function GlassField({ label, error, className = '', ...props }) {
   return (
     <label className="block text-left">
-      {label && <span className="block text-[13px] font-semibold text-white/60 mb-2">{label}</span>}
+      {label && <span className="block text-13 font-semibold text-white/60 mb-2">{label}</span>}
       <input className={`input-squircle ${className}`} style={glassFieldStyle} {...props} />
-      {error && <span className="block text-[12.5px] font-medium text-red-400 mt-1.5">{error}</span>}
+      {error && <span className="block text-13 font-medium text-red-400 mt-1.5">{error}</span>}
     </label>
   );
 }
@@ -274,7 +274,7 @@ export function Field({ label, type = 'text', name, value, onChange, error, plac
   const cls = `input-squircle ${error ? '!border-rose' : ''}`;
   return (
     <label className="block">
-      <span className="block mb-2 text-[12.5px] font-bold tracking-tightish text-ink-2">{label}</span>
+      <span className="block mb-2 text-13 font-bold tracking-tightish text-ink-2">{label}</span>
       {as === 'select' ? (
         <select name={name} value={value} onChange={onChange} className={`${cls} appearance-none cursor-pointer pr-10`} {...rest}>
           {children}
@@ -284,7 +284,7 @@ export function Field({ label, type = 'text', name, value, onChange, error, plac
       ) : (
         <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} className={cls} {...rest} />
       )}
-      {error && <span className="mt-1.5 block text-[12.5px] text-rose font-bold">{error}</span>}
+      {error && <span className="mt-1.5 block text-13 text-rose font-bold">{error}</span>}
     </label>
   );
 }

@@ -14,8 +14,8 @@ import { useSitePhoto } from '../../lib/feed';
 // el mismo campo claro del panel admin/VolunteeringPage, funciona igual
 // de bien aca. btnPrimary/btnGhost reemplazan a GlassButton (esa es
 // oscura/liquid-glass, pensada para el fondo navy del sitio publico).
-const btnPrimary = 'flex-1 justify-center inline-flex items-center gap-2 rounded-full bg-bg text-white text-[14px] font-bold px-5 py-3 shadow-card hover:opacity-90 disabled:opacity-50 transition-opacity';
-const btnGhost = 'inline-flex items-center justify-center gap-2 rounded-full text-bg/55 hover:text-bg hover:bg-bg/5 text-[14px] font-semibold px-5 py-3 transition-colors';
+const btnPrimary = 'flex-1 justify-center inline-flex items-center gap-2 rounded-full bg-bg text-white text-14 font-bold px-5 py-3 shadow-card hover:opacity-90 disabled:opacity-50 transition-opacity';
+const btnGhost = 'inline-flex items-center justify-center gap-2 rounded-full text-bg/55 hover:text-bg hover:bg-bg/5 text-14 font-semibold px-5 py-3 transition-colors';
 
 // Collage estilo Galería para la vista de cuadrícula: variedad de tamaños
 // para TODOS los eventos (no solo el primero), con [grid-auto-flow:dense]
@@ -43,8 +43,8 @@ function LightBankDetails() {
         className="flex items-center justify-between gap-3 rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4 hover:bg-bg/10 transition-colors focus-ring"
       >
         <div className="text-left min-w-0">
-          <p className="text-[14px] font-bold text-bg">Escríbenos para coordinar tu depósito</p>
-          <p className="text-[12.5px] text-bg/55 mt-1">Te compartimos los datos bancarios al momento</p>
+          <p className="text-14 font-bold text-bg">Escríbenos para coordinar tu depósito</p>
+          <p className="text-13 text-bg/55 mt-1">Te compartimos los datos bancarios al momento</p>
         </div>
         <Icon name="arrow" className="w-4 h-4 text-bg/35 shrink-0" stroke={2} />
       </a>
@@ -55,8 +55,8 @@ function LightBankDetails() {
     <div className="space-y-2">
       {rows.map(({ label, value }) => (
         <div key={label} className="flex items-center justify-between rounded-[12px] bg-bg/5 px-4 py-3 border border-bg/10">
-          <span className="text-[12.5px] font-semibold text-bg/60">{label}</span>
-          <span className="text-[14.5px] font-bold text-bg">{value}</span>
+          <span className="text-13 font-semibold text-bg/60">{label}</span>
+          <span className="text-15 font-bold text-bg">{value}</span>
         </div>
       ))}
     </div>
@@ -72,10 +72,10 @@ function PaymentBanner({ event }) {
   return (
     <div className="glass-light-nested rounded-[20px] p-5 space-y-4 mb-4">
       <div>
-        <p className="text-[11px] font-bold text-bg/50 uppercase tracking-widest mb-1.5">Evento con costo</p>
-        <p className="text-[30px] text-bg font-black leading-none tracking-tight">Q{Number(event.price_gtq).toFixed(2)}</p>
+        <p className="text-11 font-bold text-bg/50 uppercase tracking-widest mb-1.5">Evento con costo</p>
+        <p className="text-30 text-bg font-black leading-none tracking-tight">Q{Number(event.price_gtq).toFixed(2)}</p>
       </div>
-      <p className="text-[13.5px] text-bg/60 leading-relaxed">
+      <p className="text-14 text-bg/60 leading-relaxed">
         Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
       </p>
       {/* Datos bancarios administrables (nunca un número inventado) */}
@@ -83,7 +83,7 @@ function PaymentBanner({ event }) {
         <LightBankDetails />
       </div>
       {event.payment_deadline && (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose/10 border border-rose/20 text-rose text-[12px] font-bold w-fit">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose/10 border border-rose/20 text-rose text-12 font-bold w-fit">
           <Icon name="clock" className="w-3.5 h-3.5" />
           Fecha límite: {new Date(event.payment_deadline + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
         </span>
@@ -140,9 +140,9 @@ function RSVPModal({ event, onClose }) {
         <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
           <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
         </div>
-        <h3 className="text-[19px] text-bg font-bold mb-2">¡Registro confirmado!</h3>
-        <p className="text-[14px] text-bg/60">{successMsg}</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
+        <h3 className="text-19 text-bg font-bold mb-2">¡Registro confirmado!</h3>
+        <p className="text-14 text-bg/60">{successMsg}</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
           Listo
         </button>
       </div>
@@ -156,10 +156,10 @@ function RSVPModal({ event, onClose }) {
         <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
           <Icon name="clock" className="w-7 h-7 text-bg" />
         </div>
-        <h3 className="text-[19px] text-bg font-bold mb-2">Registro recibido</h3>
-        <p className="text-[14px] text-bg/60 mb-1">Tu comprobante está pendiente de verificación.</p>
-        <p className="text-[14px] text-bg/60">Recibirás confirmación cuando sea aprobado.</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
+        <h3 className="text-19 text-bg font-bold mb-2">Registro recibido</h3>
+        <p className="text-14 text-bg/60 mb-1">Tu comprobante está pendiente de verificación.</p>
+        <p className="text-14 text-bg/60">Recibirás confirmación cuando sea aprobado.</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
           Entendido
         </button>
       </div>
@@ -175,22 +175,22 @@ function RSVPModal({ event, onClose }) {
             <Icon name="book" className="w-5 h-5 text-rose" />
           </div>
           <div>
-            <h3 className="text-[16px] text-bg font-bold">Comprobante requerido</h3>
-            <p className="text-[13.5px] text-bg/60">Debes pagar antes de registrarte.</p>
+            <h3 className="text-16 text-bg font-bold">Comprobante requerido</h3>
+            <p className="text-14 text-bg/60">Debes pagar antes de registrarte.</p>
           </div>
         </div>
 
         <PaymentBanner event={event} />
-        <p className="text-[13.5px] text-bg/60">
+        <p className="text-14 text-bg/60">
           Después de depositar, sube la foto de tu comprobante. Una vez verificado, vuelve aquí para completar tu registro.
         </p>
         <button onClick={goToReceipt}
-          className="w-full flex items-center justify-center gap-2 h-11 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
+          className="w-full flex items-center justify-center gap-2 h-11 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
           <Icon name="arrow" className="w-4 h-4 -rotate-90" />
           Subir mi comprobante
         </button>
         <button onClick={() => setStep('form')}
-          className="w-full h-10 rounded-full border border-bg/15 text-[14px] text-bg/60 hover:text-bg hover:bg-bg/5 transition-colors">
+          className="w-full h-10 rounded-full border border-bg/15 text-14 text-bg/60 hover:text-bg hover:bg-bg/5 transition-colors">
           Ya lo subí, intentar de nuevo
         </button>
       </div>
@@ -201,8 +201,8 @@ function RSVPModal({ event, onClose }) {
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Confirmar asistencia</p>
-          <p className="text-[13.5px] text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
+          <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar asistencia</p>
+          <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
         </div>
         <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
           <Icon name="close" className="w-4 h-4 text-bg/60" />
@@ -211,30 +211,30 @@ function RSVPModal({ event, onClose }) {
       {event.requires_payment && <PaymentBanner event={event} />}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-[12px] font-bold text-bg/60 mb-1">Nombre <span className="text-rose">*</span></label>
+          <label className="block text-12 font-bold text-bg/60 mb-1">Nombre <span className="text-rose">*</span></label>
           <input value={form.name} onChange={set('name')} className="input-light" placeholder="Tu nombre completo" required />
         </div>
         <div>
-          <label className="block text-[12px] font-bold text-bg/60 mb-1">Correo <span className="text-rose">*</span></label>
+          <label className="block text-12 font-bold text-bg/60 mb-1">Correo <span className="text-rose">*</span></label>
           <input type="email" value={form.email} onChange={set('email')} className="input-light" placeholder="El mismo correo del comprobante" required />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[12px] font-bold text-bg/60 mb-1">Teléfono</label>
+            <label className="block text-12 font-bold text-bg/60 mb-1">Teléfono</label>
             <input value={form.phone} onChange={set('phone')} className="input-light" placeholder="+502 …" />
           </div>
           <div>
-            <label className="block text-[12px] font-bold text-bg/60 mb-1">Asistentes</label>
+            <label className="block text-12 font-bold text-bg/60 mb-1">Asistentes</label>
             <input type="number" min={1} max={event.spots_remaining ?? 20} value={form.attendee_count} onChange={set('attendee_count')} className="input-light" />
             {event.spots_remaining != null && (
-              <p className="text-[11px] text-bg/40 mt-1">
+              <p className="text-11 text-bg/40 mt-1">
                 {event.spots_remaining} cupo{event.spots_remaining === 1 ? '' : 's'} disponible{event.spots_remaining === 1 ? '' : 's'}
               </p>
             )}
           </div>
         </div>
         <div>
-          <label className="block text-[12px] font-bold text-bg/60 mb-1">Notas</label>
+          <label className="block text-12 font-bold text-bg/60 mb-1">Notas</label>
           <textarea rows={2} value={form.notes} onChange={set('notes')} className="input-light resize-none" placeholder="¿Algo que debamos saber?" />
         </div>
         <div className="flex gap-3 pt-2 border-t border-bg/10">
@@ -274,8 +274,8 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
     <ModalWrapper onClose={onClose}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Cancelar registro</p>
-          <p className="text-[13.5px] text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
+          <p className="text-12 text-bg font-bold uppercase tracking-wide">Cancelar registro</p>
+          <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
         </div>
         <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
           <Icon name="close" className="w-4 h-4 text-bg/60" />
@@ -283,7 +283,7 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
       </div>
       <form onSubmit={handleCancel} className="space-y-3">
         <div>
-          <label className="block text-[12px] font-bold text-bg/60 mb-1">Correo con el que te registraste</label>
+          <label className="block text-12 font-bold text-bg/60 mb-1">Correo con el que te registraste</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-light" placeholder="tu@correo.com" required autoFocus />
         </div>
         <div className="flex gap-3 pt-2 border-t border-bg/10">
@@ -358,7 +358,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
       {/* Etiqueta de próximo evento si es el primero */}
       {i === 0 && (
         <div className="absolute top-6 left-6 z-20">
-          <span className="bg-bg/90 px-4 py-1.5 rounded-full text-white text-[12px] font-bold flex items-center gap-2 backdrop-blur-md">
+          <span className="bg-bg/90 px-4 py-1.5 rounded-full text-white text-12 font-bold flex items-center gap-2 backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
             Próximo evento
           </span>
@@ -380,10 +380,10 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
             {/* Fecha */}
             {dayNum && (
               <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl ${wellBg} border ${wellBorder} shadow-inner w-[60px] h-[60px]`}>
-                <div className={`font-black leading-none ${ink} tracking-tighter text-[24px]`}>
+                <div className={`font-black leading-none ${ink} tracking-tighter text-24`}>
                   {dayNum}
                 </div>
-                <div className={`font-bold tracking-[2px] mt-1 ${ink50} text-[9px]`}>
+                <div className={`font-bold tracking-[2px] mt-1 ${ink50} text-9`}>
                   {monthStr}
                 </div>
               </div>
@@ -391,17 +391,17 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
 
             {/* Detalles */}
             <div className="min-w-0 flex-1">
-              <p className={`font-mono text-[10px] tracking-[1.5px] ${ink40} uppercase mb-1`}>
+              <p className={`font-mono text-10 tracking-[1.5px] ${ink40} uppercase mb-1`}>
                 {weekday}
               </p>
-              <h3 className={`font-bold tracking-tight ${ink} line-clamp-1 text-[20px] leading-tight`}>
+              <h3 className={`font-bold tracking-tight ${ink} line-clamp-1 text-20 leading-tight`}>
                 {ev.title}
               </h3>
             </div>
           </div>
 
           {details && (
-            <p className={`truncate ${ink60} flex items-center gap-1.5 text-[13px]`}>
+            <p className={`truncate ${ink60} flex items-center gap-1.5 text-13`}>
               <Icon name="pin" className={`w-3.5 h-3.5 ${ink40} shrink-0`} />
               {details}
             </p>
@@ -411,7 +411,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
               (2x2), que tiene espacio de sobra; el dato ya existe en
               /admin/events, antes nunca se mostraba en la vista pública. */}
           {isFeaturedTall && ev.description && (
-            <p className={`${ink60} text-[13.5px] leading-relaxed line-clamp-2`}>
+            <p className={`${ink60} text-14 leading-relaxed line-clamp-2`}>
               {ev.description}
             </p>
           )}
@@ -420,16 +420,16 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
             {/* Gratis vs. pagado: la clasificación real de la card, siempre visible */}
             <div className="flex flex-wrap gap-2">
               {ev.requires_payment ? (
-                <span className={`font-bold text-[12px] ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
+                <span className={`font-bold text-12 ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
                   Q{Number(ev.price_gtq).toFixed(0)}
                 </span>
               ) : (
-                <span className={`font-bold text-[12px] ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
+                <span className={`font-bold text-12 ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
                   Gratis
                 </span>
               )}
               {ev.spots_remaining != null && (
-                <span className={`font-bold text-[12px] flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
+                <span className={`font-bold text-12 flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
                   ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : `${ink80} ${wellBg} ${wellBorder}`
                 }`}>
                   {ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupo${ev.spots_remaining === 1 ? '' : 's'} disponible${ev.spots_remaining === 1 ? '' : 's'}`}
@@ -442,7 +442,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               onClick={() => !ev.is_full && onRsvp(ev)}
               disabled={ev.is_full}
-              className={`rounded-full text-[14px] font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
+              className={`rounded-full text-14 font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
                 ev.is_full
                   ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
                   : hasPhoto ? 'bg-white text-bg hover:opacity-90' : 'bg-bg text-white hover:opacity-90'
@@ -454,7 +454,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
             <button
               type="button"
               onClick={() => onCancelRsvp(ev)}
-              className={`${ink35} ${inkHover} text-[11.5px] font-medium transition-colors self-center`}
+              className={`${ink35} ${inkHover} text-12 font-medium transition-colors self-center`}
             >
               ¿Ya te registraste? Cancelar mi registro
             </button>
@@ -483,13 +483,13 @@ function PastEventCard({ ev }) {
     <div className="glass-light rounded-[20px] p-4 flex items-center gap-4 opacity-80">
       {dayNum && (
         <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-xl bg-bg/5 border border-bg/10 w-12 h-12">
-          <div className="font-black leading-none text-bg/70 text-[16px]">{dayNum}</div>
-          <div className="font-bold tracking-[1.5px] text-bg/40 text-[7px]">{monthStr}</div>
+          <div className="font-black leading-none text-bg/70 text-16">{dayNum}</div>
+          <div className="font-bold tracking-[1.5px] text-bg/40 text-7">{monthStr}</div>
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <h4 className="font-bold text-bg/70 text-[14.5px] tracking-tight line-clamp-1">{ev.title}</h4>
-        {details && <p className="text-bg/40 text-[12px] truncate mt-0.5">{details}</p>}
+        <h4 className="font-bold text-bg/70 text-15 tracking-tight line-clamp-1">{ev.title}</h4>
+        {details && <p className="text-bg/40 text-12 truncate mt-0.5">{details}</p>}
       </div>
     </div>
   );
@@ -564,7 +564,7 @@ export default function EventsPage() {
         <Reveal>
           <Eyebrow>Agenda</Eyebrow>
           <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
-          <p className="text-[18px] text-white/70 max-w-2xl mx-auto font-medium mb-2">
+          <p className="text-18 text-white/70 max-w-2xl mx-auto font-medium mb-2">
             Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
           </p>
         </Reveal>
@@ -574,17 +574,17 @@ export default function EventsPage() {
         {events.length === 0 ? (
           /* ── Empty state ── */
           <div className="py-32 flex flex-col items-center gap-5">
-            <p className="font-mono text-[11px] tracking-[2px] text-white/40 uppercase">Próximos eventos</p>
+            <p className="font-mono text-11 tracking-[2px] text-white/40 uppercase">Próximos eventos</p>
             <p className="font-bold leading-[1.05] tracking-[-0.02em] text-center whitespace-pre-line text-white/50"
               style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
               {'Sin eventos\npublicados aún.'}
             </p>
-            <p className="text-white/40 text-[16px]">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
+            <p className="text-white/40 text-16">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
           </div>
         ) : upcomingEvents.length === 0 ? (
           <div className="py-16 text-center">
-            <p className="text-white/50 font-bold text-[20px]">No hay próximos eventos por ahora.</p>
-            <p className="text-white/40 text-[15px] mt-2">Revisa los eventos pasados más abajo.</p>
+            <p className="text-white/50 font-bold text-20">No hay próximos eventos por ahora.</p>
+            <p className="text-white/40 text-15 mt-2">Revisa los eventos pasados más abajo.</p>
           </div>
         ) : (
           /* ── Cuadrícula de próximos eventos ── */
@@ -601,7 +601,7 @@ export default function EventsPage() {
         {pastEvents.length > 0 && (
           <div className="mt-16 pt-12 border-t border-white/5">
             <Reveal className="mb-6">
-              <p className="text-[13px] font-bold text-white/40 uppercase tracking-tightish">Eventos pasados</p>
+              <p className="text-13 font-bold text-white/40 uppercase tracking-tightish">Eventos pasados</p>
             </Reveal>
             <RevealList className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {pastEvents.map(ev => (
@@ -651,7 +651,7 @@ export default function EventsPage() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <div className="px-6 pb-5 pt-0 text-bg/60 text-[15px] leading-relaxed border-t border-bg/10 mt-2">
+                        <div className="px-6 pb-5 pt-0 text-bg/60 text-15 leading-relaxed border-t border-bg/10 mt-2">
                           {faq.answer}
                         </div>
                       </motion.div>

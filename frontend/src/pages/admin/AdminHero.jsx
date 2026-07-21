@@ -55,7 +55,7 @@ function HeroPreview({ data }) {
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center px-8 py-6">
         {data.label_top && (
-          <p className="text-white/80 text-[11px] font-semibold mb-2">
+          <p className="text-white/80 text-11 font-semibold mb-2">
             {data.label_top}
           </p>
         )}
@@ -77,10 +77,10 @@ function HeroPreview({ data }) {
           <p className="text-white/80 text-xs mt-3">{data.subtitle}</p>
         )}
         {schedule && (
-          <p className="text-white/60 text-[10px] font-semibold mt-1">{schedule}</p>
+          <p className="text-white/60 text-10 font-semibold mt-1">{schedule}</p>
         )}
         {data.cta_primary_text && (
-          <div className="mt-3 inline-flex w-fit items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass text-white text-[10px] font-bold">
+          <div className="mt-3 inline-flex w-fit items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass text-white text-10 font-bold">
             {data.cta_primary_text}
             <Icon name="arrow" className="w-3 h-3" stroke={2.2} />
           </div>

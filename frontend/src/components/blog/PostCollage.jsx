@@ -21,7 +21,7 @@ export default function PostCollage({ posts }) {
         <p className="font-bold leading-[1.05] tracking-tight text-white/50" style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
           Pronto, primeras palabras.
         </p>
-        <p className="text-white/40 text-[16px]">Estamos preparando contenido para ti.</p>
+        <p className="text-white/40 text-16">Estamos preparando contenido para ti.</p>
       </div>
     );
   }
@@ -75,17 +75,17 @@ export default function PostCollage({ posts }) {
                 )}
               </div>
               <div className="relative z-10 h-full p-5 sm:p-6 flex flex-col justify-end gap-2">
-                <span className={`self-start ${pillBg} ${ink90} px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md flex items-center gap-1.5`}>
+                <span className={`self-start ${pillBg} ${ink90} px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md flex items-center gap-1.5`}>
                   {category}
                   {isExternal && <Icon name="spark" className="w-3 h-3" />}
                 </span>
-                <p className={`font-bold leading-snug line-clamp-2 ${ink} ${big ? 'text-[24px] sm:text-[28px]' : 'text-[16px] sm:text-[18px]'}`}>
+                <p className={`font-bold leading-snug line-clamp-2 ${ink} ${big ? 'text-24 sm:text-28' : 'text-16 sm:text-18'}`}>
                   {p.title}
                 </p>
                 {big && excerpt && (
-                  <p className={`text-[14px] leading-relaxed line-clamp-2 ${ink70} max-w-md`}>{excerpt}</p>
+                  <p className={`text-14 leading-relaxed line-clamp-2 ${ink70} max-w-md`}>{excerpt}</p>
                 )}
-                <span className={`text-[13px] font-bold ${ink} mt-1 inline-flex items-center gap-1.5`}>
+                <span className={`text-13 font-bold ${ink} mt-1 inline-flex items-center gap-1.5`}>
                   {isExternal ? 'Ver' : 'Leer'}
                   <Icon name="arrow" className="w-3.5 h-3.5" />
                 </span>

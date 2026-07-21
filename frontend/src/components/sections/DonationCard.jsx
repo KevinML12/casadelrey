@@ -40,7 +40,7 @@ const PRESS = {
 // color-scheme:dark activo, el campo se veia gris oscuro solido.
 const inputCls = 'input-light';
 
-const labelCls = 'block text-[13px] font-semibold text-bg/50 mb-2';
+const labelCls = 'block text-13 font-semibold text-bg/50 mb-2';
 
 export default function DonationCard() {
   const [step,    setStep]    = useState(0);
@@ -160,24 +160,24 @@ export default function DonationCard() {
         </h3>
         {isTransfer ? (
           <>
-            <p className="mt-3 text-[15px] text-bg/70 leading-relaxed">
+            <p className="mt-3 text-15 text-bg/70 leading-relaxed">
               Recibimos tu donación de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
             </p>
-            <p className="mt-1 text-[13.5px] text-bg/50">
+            <p className="mt-1 text-14 text-bg/50">
               Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.
             </p>
           </>
         ) : (
           <>
-            <p className="mt-3 text-[15px] text-bg/70 leading-relaxed">
+            <p className="mt-3 text-15 text-bg/70 leading-relaxed">
               Anotamos tu intención de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
             </p>
-            <p className="mt-1 text-[13.5px] text-bg/50">
+            <p className="mt-1 text-14 text-bg/50">
               Te esperamos este domingo. Un coordinador te recibe en la entrada.
             </p>
           </>
         )}
-        <motion.button {...PRESS} onClick={resetForm} className="mt-7 px-6 py-3.5 rounded-pill glass-light-nested text-bg font-bold text-[14px]">
+        <motion.button {...PRESS} onClick={resetForm} className="mt-7 px-6 py-3.5 rounded-pill glass-light-nested text-bg font-bold text-14">
           Hacer otra donación
         </motion.button>
       </div>
@@ -205,7 +205,7 @@ export default function DonationCard() {
       type="button"
       onClick={next}
       disabled={!canContinue}
-      className="w-full mt-5 inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-[15px] disabled:opacity-40 focus-ring"
+      className="w-full mt-5 inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40 focus-ring"
     >
       {children}
       <Icon name="arrow" className="w-4 h-4 rotate-90" stroke={2} />
@@ -232,18 +232,18 @@ export default function DonationCard() {
               onClick={() => done && setStep(i)}
               className={`w-full flex items-center gap-3.5 px-5 py-4 text-left focus-ring ${done ? 'cursor-pointer hover:bg-bg/5' : 'cursor-default'} transition-colors`}
             >
-              <span className={`grid place-items-center w-8 h-8 rounded-full text-[13px] font-extrabold shrink-0 transition-colors ${
+              <span className={`grid place-items-center w-8 h-8 rounded-full text-13 font-extrabold shrink-0 transition-colors ${
                 current ? 'bg-bg text-white' : done ? 'bg-bg/12 text-bg' : 'bg-bg/6 text-bg/40'
               }`}>
                 {done ? <Icon name="check" className="w-4 h-4" stroke={2.6} /> : i + 1}
               </span>
-              <span className={`text-[15px] font-bold ${current || done ? 'text-bg' : 'text-bg/40'}`}>
+              <span className={`text-15 font-bold ${current || done ? 'text-bg' : 'text-bg/40'}`}>
                 {def.label}
               </span>
               {done && (
                 <>
-                  <span className="ml-auto text-[13.5px] font-semibold text-bg/60 truncate">{summaries[i]}</span>
-                  <span className="text-[12px] font-bold text-bg/40 shrink-0">Editar</span>
+                  <span className="ml-auto text-14 font-semibold text-bg/60 truncate">{summaries[i]}</span>
+                  <span className="text-12 font-bold text-bg/40 shrink-0">Editar</span>
                 </>
               )}
             </button>
@@ -260,7 +260,7 @@ export default function DonationCard() {
                   className="overflow-hidden"
                 >
                   <div className="px-5 pb-5">
-                    <p className="text-[14px] text-bg/60 mb-4">{def.question}</p>
+                    <p className="text-14 text-bg/60 mb-4">{def.question}</p>
 
                     {/* ── Paso 1 · Monto ── */}
                     {i === 0 && (
@@ -276,7 +276,7 @@ export default function DonationCard() {
                                 whileTap={{ scale: 0.95 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => { setAmount(a); setCustom(''); }}
-                                className={`py-4 rounded-pill text-[17px] font-bold transition-colors focus-ring ${
+                                className={`py-4 rounded-pill text-17 font-bold transition-colors focus-ring ${
                                   active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
                                 }`}
                               >
@@ -311,7 +311,7 @@ export default function DonationCard() {
                                 whileTap={{ scale: 0.97 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => setPurpose(p.value)}
-                                className={`flex items-center gap-2.5 rounded-pill px-5 py-3.5 text-[14px] font-bold transition-colors focus-ring ${
+                                className={`flex items-center gap-2.5 rounded-pill px-5 py-3.5 text-14 font-bold transition-colors focus-ring ${
                                   active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
                                 }`}
                               >
@@ -349,8 +349,8 @@ export default function DonationCard() {
                                   <Icon name={m.icon} className="w-5 h-5" stroke={2} />
                                 </span>
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-[14.5px] font-bold text-bg">{m.label}</div>
-                                  <div className="text-[12.5px] text-bg/60 mt-0.5">{m.sub}</div>
+                                  <div className="text-15 font-bold text-bg">{m.label}</div>
+                                  <div className="text-13 text-bg/60 mt-0.5">{m.sub}</div>
                                 </div>
                                 {active && <Icon name="check" className="w-5 h-5 text-bg shrink-0" stroke={2.4} />}
                               </motion.button>
@@ -366,14 +366,14 @@ export default function DonationCard() {
                               <div className="flex items-center gap-4 rounded-[14px] bg-bg/4 border border-bg/12 p-4">
                                 <img src={receiptUrl} alt="comprobante" className="h-16 w-16 object-cover rounded-[10px] border border-bg/10" />
                                 <div className="flex-1 min-w-0">
-                                  <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-bg">
+                                  <p className="inline-flex items-center gap-1.5 text-14 font-bold text-bg">
                                     <Icon name="check" className="w-4 h-4" stroke={2.4} />
                                     Comprobante cargado
                                   </p>
                                   <button
                                     type="button"
                                     onClick={() => setReceiptUrl('')}
-                                    className="block mt-1 text-[12.5px] font-semibold text-bg/50 hover:text-bg transition-colors"
+                                    className="block mt-1 text-13 font-semibold text-bg/50 hover:text-bg transition-colors"
                                   >
                                     Cambiar foto
                                   </button>
@@ -385,10 +385,10 @@ export default function DonationCard() {
                                   <Icon name={uploading ? 'clock' : 'mail'} className={`w-5 h-5 ${uploading ? 'animate-spin' : ''}`} />
                                 </span>
                                 <div className="min-w-0">
-                                  <p className="text-[14px] font-bold text-bg">
+                                  <p className="text-14 font-bold text-bg">
                                     {uploading ? 'Subiendo…' : 'Sube la foto de tu boleta *'}
                                   </p>
-                                  <p className="mt-0.5 text-[12px] text-bg/50">JPG, PNG o PDF · máx. 10 MB</p>
+                                  <p className="mt-0.5 text-12 text-bg/50">JPG, PNG o PDF · máx. 10 MB</p>
                                 </div>
                                 <input type="file" accept="image/*,.pdf" className="hidden" onChange={handlePhoto} disabled={uploading} />
                               </label>
@@ -404,8 +404,8 @@ export default function DonationCard() {
                       <div className="space-y-4">
                         <div className="rounded-[16px] bg-bg/6 p-5 flex justify-between items-center">
                           <div>
-                            <div className="text-[12px] font-semibold text-bg/60">{purposeLabel} · {methodLabel}</div>
-                            <div className="text-[13px] text-bg/70 mt-0.5">
+                            <div className="text-12 font-semibold text-bg/60">{purposeLabel} · {methodLabel}</div>
+                            <div className="text-13 text-bg/70 mt-0.5">
                               {isTransfer ? 'Con comprobante adjunto' : 'Entrega en persona'}
                             </div>
                           </div>
@@ -442,13 +442,13 @@ export default function DonationCard() {
                           {...PRESS}
                           type="submit"
                           disabled={loading || uploading || !name.trim()}
-                          className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-[15px] disabled:opacity-40 focus-ring"
+                          className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40 focus-ring"
                         >
                           {loading ? 'Procesando…' : isTransfer ? 'Enviar donación y comprobante' : 'Registrar donación'}
                           {!loading && <Icon name="check" className="w-4 h-4" stroke={2.4} />}
                         </motion.button>
 
-                        <p className="text-[12.5px] text-bg/50">
+                        <p className="text-13 text-bg/50">
                           {isTransfer
                             ? 'Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.'
                             : 'Un coordinador te recibirá este domingo en la entrada.'}

@@ -24,7 +24,7 @@ export default function PrayerPage() {
           {TRUST.map(({ icon, text }) => (
             <span
               key={text}
-              className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-[12.5px] font-semibold text-ink"
+              className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-13 font-semibold text-ink"
             >
               <Icon name={icon} className="w-3.5 h-3.5 text-celeste" />
               {text}

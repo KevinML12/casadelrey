@@ -19,10 +19,10 @@ const PRESS = {
 
 // Botón/CTA claro (bg-bg text-white) -- ya no hay GlassButton oscuro
 // en este flujo, todo el modal es glass-light.
-const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-[15px] font-bold focus-ring disabled:opacity-60 shadow-card hover:opacity-90';
-const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-[14px] font-semibold transition-colors';
-const btnSmallPrimary = 'px-4 py-2 rounded-full bg-bg text-white text-[13px] font-bold disabled:opacity-40 hover:opacity-90 transition-opacity';
-const btnSmallGhost = 'px-4 py-2 rounded-full text-bg/55 hover:text-bg hover:bg-bg/5 text-[13px] font-semibold transition-colors';
+const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring disabled:opacity-60 shadow-card hover:opacity-90';
+const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
+const btnSmallPrimary = 'px-4 py-2 rounded-full bg-bg text-white text-13 font-bold disabled:opacity-40 hover:opacity-90 transition-opacity';
+const btnSmallGhost = 'px-4 py-2 rounded-full text-bg/55 hover:text-bg hover:bg-bg/5 text-13 font-semibold transition-colors';
 
 // "Elige por mí" pero con un nombre que se lee bien en un formulario --
 // no es que no importe el departamento, es que el POSTULANTE no tiene
@@ -79,10 +79,10 @@ function DepartmentLocked({ department, areas, onRequestChange }) {
   return (
     <div className="rounded-[14px] border border-bg/12 bg-bg/5 px-4 py-3.5 flex items-center justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-bg/45 mb-1">Departamento</p>
-        <p className="text-[14.5px] font-bold text-bg truncate">{area ? area.title : NO_PREFERENCE_LABEL}</p>
+        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-1">Departamento</p>
+        <p className="text-15 font-bold text-bg truncate">{area ? area.title : NO_PREFERENCE_LABEL}</p>
       </div>
-      <button type="button" onClick={onRequestChange} className="shrink-0 text-[13px] font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
+      <button type="button" onClick={onRequestChange} className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
         Cambiar
       </button>
     </div>
@@ -142,9 +142,9 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
         <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
           <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
         </div>
-        <h3 className="text-[19px] text-bg font-bold mb-2">Inscripción recibida</h3>
-        <p className="text-[14px] text-bg/60">Nuestro equipo se pondrá en contacto contigo.</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-[14px] font-semibold shadow-card hover:opacity-90">
+        <h3 className="text-19 text-bg font-bold mb-2">Inscripción recibida</h3>
+        <p className="text-14 text-bg/60">Nuestro equipo se pondrá en contacto contigo.</p>
+        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
           Listo
         </button>
       </div>
@@ -159,12 +159,12 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           <button onClick={() => setConfirming(false)} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors shrink-0">
             <Icon name="arrow" className="w-4 h-4 text-bg/60 rotate-180" stroke={2} />
           </button>
-          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Confirmar aplicación</p>
+          <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar aplicación</p>
         </div>
-        <h3 className="text-[21px] font-bold text-bg tracking-tight mb-4">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
+        <h3 className="text-21 font-bold text-bg tracking-tight mb-4">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
         <div className="glass-light-nested rounded-[16px] p-5 mb-6">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
-          <p className="text-[14.5px] text-bg/75 leading-relaxed">{area ? area.why : NO_PREFERENCE_WHY}</p>
+          <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+          <p className="text-15 text-bg/75 leading-relaxed">{area ? area.why : NO_PREFERENCE_WHY}</p>
         </div>
         <div className="flex flex-col gap-2.5">
           <motion.button {...PRESS} onClick={confirmSubmit} disabled={submitting} className={btnPrimary}>
@@ -183,8 +183,8 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
     <>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-[12px] text-bg font-bold uppercase tracking-wide">Aplicación</p>
-          <p className="text-[13.5px] text-bg/60 mt-0.5">{area ? area.title : NO_PREFERENCE_LABEL}</p>
+          <p className="text-12 text-bg font-bold uppercase tracking-wide">Aplicación</p>
+          <p className="text-14 text-bg/60 mt-0.5">{area ? area.title : NO_PREFERENCE_LABEL}</p>
         </div>
         <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
           <Icon name="close" className="w-4 h-4 text-bg/60" />
@@ -194,16 +194,16 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
       <form onSubmit={reviewSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="block">
-            <span className="block text-[13px] font-semibold text-bg/60 mb-2">Nombre completo</span>
+            <span className="block text-13 font-semibold text-bg/60 mb-2">Nombre completo</span>
             <input className="input-light" value={form.name} onChange={set('name')} required />
           </label>
           <label className="block">
-            <span className="block text-[13px] font-semibold text-bg/60 mb-2">Correo electrónico</span>
+            <span className="block text-13 font-semibold text-bg/60 mb-2">Correo electrónico</span>
             <input type="email" className="input-light" value={form.email} onChange={set('email')} required />
           </label>
         </div>
         <label className="block">
-          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Teléfono (opcional)</span>
+          <span className="block text-13 font-semibold text-bg/60 mb-2">Teléfono (opcional)</span>
           <input type="tel" className="input-light" value={form.phone} onChange={set('phone')} />
         </label>
 
@@ -211,7 +211,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           <DepartmentLocked department={form.department} areas={areas} onRequestChange={requestChange} />
         ) : (
           <div className="rounded-[14px] border border-bg/12 bg-bg/5 p-4 space-y-3">
-            <p className="text-[13px] font-semibold text-bg/60">
+            <p className="text-13 font-semibold text-bg/60">
               ¿Seguro que quieres cambiar tu elección actual ({area ? area.title : NO_PREFERENCE_LABEL})?
             </p>
             <select
@@ -235,7 +235,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
         )}
 
         <label className="block">
-          <span className="block text-[13px] font-semibold text-bg/60 mb-2">Mensaje (opcional)</span>
+          <span className="block text-13 font-semibold text-bg/60 mb-2">Mensaje (opcional)</span>
           <textarea
             rows={3}
             className="input-light w-full resize-none"
@@ -281,7 +281,7 @@ function DepartmentCard({ value, icon, title, photo, onClick }) {
         <div className="w-9 h-9 rounded-full liquid-glass flex items-center justify-center mb-2.5">
           <Icon name={icon} className="w-4 h-4 text-white" />
         </div>
-        <h3 className="text-[16px] font-bold text-white tracking-tight leading-tight">{title}</h3>
+        <h3 className="text-16 font-bold text-white tracking-tight leading-tight">{title}</h3>
       </div>
     </Tilt>
   );
@@ -338,11 +338,11 @@ export default function VolunteeringPage() {
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
               ¿Dónde quieres servir?
             </h2>
-            <p className="mt-4 text-[15.5px] text-white/70">Toca un departamento para conocerlo mejor.</p>
+            <p className="mt-4 text-16 text-white/70">Toca un departamento para conocerlo mejor.</p>
             <button
               type="button"
               onClick={() => openForm('')}
-              className="mt-3 text-[13.5px] font-semibold text-white/50 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
+              className="mt-3 text-14 font-semibold text-white/50 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
             >
               ¿No sabes cuál elegir? Aplica de todas formas
             </button>
@@ -352,8 +352,8 @@ export default function VolunteeringPage() {
             {STATS.map(s => (
               <RevealItem key={s.label}>
                 <div className="glass-light rounded-[18px] px-3 py-5 text-center h-full">
-                  <div className="text-[26px] sm:text-[30px] font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
-                  <div className="mt-1.5 text-[11px] sm:text-[11.5px] font-semibold text-bg/55 leading-tight">{s.label}</div>
+                  <div className="text-26 sm:text-30 font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
+                  <div className="mt-1.5 text-11 sm:text-12 font-semibold text-bg/55 leading-tight">{s.label}</div>
                 </div>
               </RevealItem>
             ))}
@@ -362,7 +362,7 @@ export default function VolunteeringPage() {
           <div className="space-y-10">
             {categoriesWithLeftover.map(cat => (
               <div key={cat.name}>
-                <p className="text-[13px] font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
+                <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
                 <RevealList className="grid sm:grid-cols-2 gap-4">
                   {areas.filter(a => cat.values.includes(a.value)).map(area => (
                     <RevealItem key={area.value}>
@@ -390,15 +390,15 @@ export default function VolunteeringPage() {
           if (!a) return null;
           return (
             <div className="flex flex-col gap-5">
-              <p className="text-white/70 text-[15px] leading-relaxed">{a.desc}</p>
+              <p className="text-white/70 text-15 leading-relaxed">{a.desc}</p>
               <div className="liquid-glass rounded-[16px] p-5">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-white/40 mb-2">¿Por qué aquí?</p>
-                <p className="text-white/80 text-[14.5px] leading-relaxed">{a.why}</p>
+                <p className="text-11 font-bold uppercase tracking-widest text-white/40 mb-2">¿Por qué aquí?</p>
+                <p className="text-white/80 text-15 leading-relaxed">{a.why}</p>
               </div>
               <motion.button
                 {...PRESS}
                 onClick={() => openForm(a.value)}
-                className="w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-white text-bg px-6 py-4 text-[15px] font-bold shadow-card hover:opacity-90"
+                className="w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-white text-bg px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
               >
                 Aplicar a {a.title}
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />

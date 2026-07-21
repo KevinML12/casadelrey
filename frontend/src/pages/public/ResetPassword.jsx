@@ -31,8 +31,8 @@ export default function ResetPassword() {
         <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-5">
           <Icon name="lock" className="w-5 h-5 text-white" />
         </div>
-        <h1 className="text-[22px] font-bold text-white mb-1.5">Nueva contraseña</h1>
-        <p className="text-[15px] text-white/60">Elige una contraseña segura para tu cuenta.</p>
+        <h1 className="text-22 font-bold text-white mb-1.5">Nueva contraseña</h1>
+        <p className="text-15 text-white/60">Elige una contraseña segura para tu cuenta.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +59,7 @@ export default function ResetPassword() {
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-[15px] font-bold disabled:opacity-50 mt-2"
+          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-15 font-bold disabled:opacity-50 mt-2"
         >
           {loading ? 'Guardando…' : 'Guardar contraseña'}
         </motion.button>

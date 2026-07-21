@@ -78,7 +78,7 @@ export default function Header() {
             <span className="grid place-items-center w-10 h-10 rounded-md bg-bg transition-transform duration-400 ease-spring group-hover:scale-105">
               <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
             </span>
-            <span className="text-[15px] font-extrabold tracking-tightish text-bg">Casa del Rey</span>
+            <span className="text-15 font-extrabold tracking-tightish text-bg">Casa del Rey</span>
           </Link>
 
           {/* Desktop nav links — solo desde xl (1280px). Con 7 links (se
@@ -92,7 +92,7 @@ export default function Header() {
               <NavLink key={n.to} to={n.to} end={n.to === '/'}>
                 {({ isActive }) => (
                   <span
-                    className={`px-3.5 py-2 rounded-pill text-[13.5px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 ${
+                    className={`px-3.5 py-2 rounded-pill text-14 font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 ${
                       isActive
                         ? 'bg-white text-bg shadow-card'
                         : 'text-bg/70 hover:text-bg hover:bg-bg/5'
@@ -111,9 +111,9 @@ export default function Header() {
               <div className="relative hidden sm:block" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
-                  className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-[13px] hover:bg-bg/5 transition-all duration-300 focus-ring"
+                  className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-13 hover:bg-bg/5 transition-all duration-300 focus-ring"
                 >
-                  <span className="grid place-items-center w-7 h-7 rounded-full bg-bg text-white text-[12px] font-extrabold">
+                  <span className="grid place-items-center w-7 h-7 rounded-full bg-bg text-white text-12 font-extrabold">
                     {(user?.name || user?.email || '?')[0].toUpperCase()}
                   </span>
                   <span className="font-semibold text-bg">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>
@@ -125,14 +125,14 @@ export default function Header() {
                     style={{ animationDuration: '300ms' }}
                   >
                     <div className="px-3 py-2.5 border-b border-bg/10 mb-1">
-                      <p className="text-[13px] font-bold text-bg truncate">{user?.name || 'Usuario'}</p>
-                      <p className="text-[12px] text-bg/60 truncate">{user?.email}</p>
+                      <p className="text-13 font-bold text-bg truncate">{user?.name || 'Usuario'}</p>
+                      <p className="text-12 text-bg/60 truncate">{user?.email}</p>
                     </div>
                     {(isAdmin || user?.role === 'leader') && (
                       <Link
                         to={isAdmin ? '/admin' : '/leader'}
                         onClick={() => setDropOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[13.5px] font-medium text-bg hover:bg-bg/5 transition-colors"
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                       >
                         <Icon name="spark" className="w-4 h-4 text-bg" />
                         {isAdmin ? 'Panel Admin' : 'Panel Líder'}
@@ -141,14 +141,14 @@ export default function Header() {
                     <Link
                       to="/profile"
                       onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[13.5px] font-medium text-bg hover:bg-bg/5 transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                     >
                       <Icon name="user" className="w-4 h-4 text-bg" />
                       Mi perfil
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[13.5px] font-medium text-rose hover:bg-rose-soft transition-colors"
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-rose hover:bg-rose-soft transition-colors"
                     >
                       <Icon name="close" className="w-4 h-4" />
                       Cerrar sesión
@@ -163,7 +163,7 @@ export default function Header() {
             {!isAuthenticated && (
               <Link
                 to="/login"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-[14px] font-bold transition-all duration-300 focus-ring"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-300 focus-ring"
               >
                 <Icon name="user" className="w-4 h-4" />
                 Ingresar
@@ -172,7 +172,7 @@ export default function Header() {
 
             <Link
               to="/donate"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-[14px] font-bold transition-all duration-300 focus-ring"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-300 focus-ring"
             >
               <Icon name="heart" className="w-4 h-4" />
               Dar
@@ -180,7 +180,7 @@ export default function Header() {
 
             <Link
               to="/conectate"
-              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg text-white text-[14px] font-bold btn-spring focus-ring hover:bg-bg-soft"
+              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg text-white text-14 font-bold btn-spring focus-ring hover:bg-bg-soft"
             >
               Conéctate
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -219,7 +219,7 @@ export default function Header() {
             {NAV_LINKS.map(n => (
               <NavLink key={n.to} to={n.to} end={n.to === '/'} onClick={() => setMenuOpen(false)}>
                 {({ isActive }) => (
-                  <span className={`block px-4 py-3 rounded-md text-[15px] font-semibold transition-colors ${
+                  <span className={`block px-4 py-3 rounded-md text-15 font-semibold transition-colors ${
                     isActive ? 'bg-bg text-white' : 'text-bg hover:bg-bg/5'
                   }`}>
                     {n.label}
@@ -233,7 +233,7 @@ export default function Header() {
                 <Link
                   to="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="px-4 py-2.5 rounded-md text-[14px] font-medium text-bg hover:bg-bg/5 transition-colors"
+                  className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                 >
                   Ingresar
                 </Link>
@@ -244,7 +244,7 @@ export default function Header() {
                     <Link
                       to={isAdmin ? '/admin' : '/leader'}
                       onClick={() => setMenuOpen(false)}
-                      className="px-4 py-2.5 rounded-md text-[14px] font-medium text-bg hover:bg-bg/5 transition-colors"
+                      className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                     >
                       {isAdmin ? 'Panel Admin' : 'Panel Líder'}
                     </Link>
@@ -252,13 +252,13 @@ export default function Header() {
                   <Link
                     to="/profile"
                     onClick={() => setMenuOpen(false)}
-                    className="px-4 py-2.5 rounded-md text-[14px] font-medium text-bg hover:bg-bg/5 transition-colors"
+                    className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                   >
                     Mi perfil
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setMenuOpen(false); }}
-                    className="text-left px-4 py-2.5 rounded-md text-[14px] font-medium text-rose hover:bg-rose/10 transition-colors"
+                    className="text-left px-4 py-2.5 rounded-md text-14 font-medium text-rose hover:bg-rose/10 transition-colors"
                   >
                     Cerrar sesión
                   </button>
@@ -267,7 +267,7 @@ export default function Header() {
                 <Link
                   to="/donate"
                   onClick={() => setMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill text-bg text-[14.5px] font-bold hover:bg-bg/5 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill text-bg text-15 font-bold hover:bg-bg/5 transition-colors"
                 >
                   <Icon name="heart" className="w-4 h-4" />
                   Dar
@@ -275,7 +275,7 @@ export default function Header() {
                 <Link
                   to="/conectate"
                   onClick={() => setMenuOpen(false)}
-                  className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-[14.5px] font-bold btn-spring hover:bg-bg-soft"
+                  className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-15 font-bold btn-spring hover:bg-bg-soft"
                 >
                   Conéctate
                   <Icon name="arrow" className="w-4 h-4" stroke={2} />

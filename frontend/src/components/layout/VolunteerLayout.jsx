@@ -28,22 +28,22 @@ export default function VolunteerLayout() {
             <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
           <div className="hidden sm:block">
-            <p className="text-[14.5px] font-extrabold tracking-tightish text-bg leading-tight">Casa del Rey</p>
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-bg/55 mt-0.5">Voluntario</p>
+            <p className="text-15 font-extrabold tracking-tightish text-bg leading-tight">Casa del Rey</p>
+            <p className="text-10 font-extrabold uppercase tracking-widest text-bg/55 mt-0.5">Voluntario</p>
           </div>
         </Link>
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-[13.5px] text-bg font-bold leading-tight">{user?.name}</p>
-            <p className="text-[11.5px] text-bg/45">{user?.email}</p>
+            <p className="text-14 text-bg font-bold leading-tight">{user?.name}</p>
+            <p className="text-12 text-bg/45">{user?.email}</p>
           </div>
-          <span className="grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-[13px] font-extrabold shadow-card">
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-13 font-extrabold shadow-card">
             {initial}
           </span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-[13px] font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-13 font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
             title="Cerrar sesión"
           >
             <Icon name="logout" className="w-[18px] h-[18px]" stroke={1.8} />

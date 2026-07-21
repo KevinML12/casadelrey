@@ -51,8 +51,8 @@ export default function DonatePage() {
                         <Icon name={icon} className="w-5 h-5" />
                       </span>
                       <div>
-                        <h3 className="text-[16px] font-bold tracking-tight text-bg">{title}</h3>
-                        <p className="text-[14px] text-bg/60 mt-0.5">{desc}</p>
+                        <h3 className="text-16 font-bold tracking-tight text-bg">{title}</h3>
+                        <p className="text-14 text-bg/60 mt-0.5">{desc}</p>
                       </div>
                     </Tilt>
                   </RevealItem>
@@ -67,7 +67,7 @@ export default function DonatePage() {
                       "El que siembra escasamente, también segará escasamente; y el que siembra
                       generosamente, generosamente también segará."
                     </p>
-                    <cite className="not-italic text-bg/50 text-[13px] font-bold">
+                    <cite className="not-italic text-bg/50 text-13 font-bold">
                       2 Corintios 9:6
                     </cite>
                   </blockquote>

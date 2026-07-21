@@ -30,8 +30,8 @@ export default function ReceiptPage() {
                 <Icon name="calendar" className="w-5 h-5" />
               </span>
               <div>
-                <p className="text-[12px] font-bold text-bg/50">Pago para</p>
-                <p className="text-[15px] font-bold text-bg mt-0.5">{eventName}</p>
+                <p className="text-12 font-bold text-bg/50">Pago para</p>
+                <p className="text-15 font-bold text-bg mt-0.5">{eventName}</p>
               </div>
             </Reveal>
           )}

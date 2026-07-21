@@ -37,9 +37,9 @@ export default function StatCard({ icon, label, value, tint = 'pri', sub, varian
         <Icon name={icon} className="w-5 h-5 text-white" stroke={2} />
       </div>
       <div>
-        <p className={`text-[11px] uppercase tracking-widest mb-1 ${light ? 'text-bg/50' : 'text-white/40'}`}>{label}</p>
-        <p className={`text-[28px] font-black leading-tight ${light ? t.val : 'text-white'}`}>{value ?? '—'}</p>
-        {sub && <p className={`text-[11.5px] mt-0.5 ${light ? 'text-bg/45' : 'text-white/40'}`}>{sub}</p>}
+        <p className={`text-11 uppercase tracking-widest mb-1 ${light ? 'text-bg/50' : 'text-white/40'}`}>{label}</p>
+        <p className={`text-28 font-black leading-tight ${light ? t.val : 'text-white'}`}>{value ?? '—'}</p>
+        {sub && <p className={`text-12 mt-0.5 ${light ? 'text-bg/45' : 'text-white/40'}`}>{sub}</p>}
       </div>
     </div>
   );
