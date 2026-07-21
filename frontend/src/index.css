@@ -692,6 +692,19 @@ html.lenis, html.lenis body { height: auto; }
 .prose img { max-width: 100%; border-radius: var(--r-xl); margin: 2rem 0; }
 .prose strong { font-weight: 700; color: var(--ink); }
 
+/* .prose sobre glass-light (ArticleReader): las reglas de arriba leen
+   var(--ink)/--ink-2 (blanco/gris, pensadas para liquid-glass oscuro) --
+   redeclararlas a navy en este scope basta, .prose ya las usa todas. */
+.prose-light {
+  --ink:      var(--bg);
+  --ink-2:    rgba(10, 21, 38, 0.65);
+  --ink-3:    rgba(10, 21, 38, 0.4);
+  --ink-line: rgba(10, 21, 38, 0.14);
+  --ink-soft: rgba(10, 21, 38, 0.05);
+}
+.prose-light a { text-decoration-color: rgba(10, 21, 38, 0.4); }
+.prose-light a:hover { text-decoration-color: var(--bg); }
+
 /* ═══════════════════════════════════════════════════════════════════
    SCROLLBAR
 ═══════════════════════════════════════════════════════════════════ */

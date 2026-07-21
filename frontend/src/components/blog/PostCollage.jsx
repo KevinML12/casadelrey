@@ -36,6 +36,14 @@ export default function PostCollage({ posts }) {
         const excerpt = p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 110);
         const category = p.category || (isExternal ? 'Red social' : 'Enseñanza');
 
+        // Regla del sitio: cristal oscuro con foto propia (evita deslavarla),
+        // cristal blanco sin foto -- ver EventsPage.jsx EventCard.
+        const hasPhoto = Boolean(p.cover_image);
+        const ink    = hasPhoto ? 'text-white'    : 'text-bg';
+        const ink90  = hasPhoto ? 'text-white/90' : 'text-bg/90';
+        const ink70  = hasPhoto ? 'text-white/70' : 'text-bg/70';
+        const pillBg = hasPhoto ? 'bg-white/12 border-white/20' : 'bg-bg/8 border-bg/15';
+
         return (
           <motion.div
             key={p.ID}
@@ -55,29 +63,29 @@ export default function PostCollage({ posts }) {
                 : { to: `/blog/${p.slug}` })}
               whileHover={{ rotate: 0, scale: 1.04, y: -6, zIndex: 30 }}
               glass
-              className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10 block"
+              className={`${hasPhoto ? 'liquid-glass' : 'glass-light'} group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ${hasPhoto ? 'ring-white/10' : 'ring-bg/10'} block`}
               style={{ rotate: rot, transformOrigin: 'center' }}
             >
               <div className="absolute inset-0">
-                {p.cover_image ? (
-                  <img src={p.cover_image} alt={p.title} className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700" />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                {hasPhoto && (
+                  <>
+                    <img src={p.cover_image} alt={p.title} className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
+                  </>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
               </div>
               <div className="relative z-10 h-full p-5 sm:p-6 flex flex-col justify-end gap-2">
-                <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md flex items-center gap-1.5">
+                <span className={`self-start ${pillBg} ${ink90} px-2.5 py-0.5 rounded-full text-[11px] font-semibold mb-auto backdrop-blur-md flex items-center gap-1.5`}>
                   {category}
                   {isExternal && <Icon name="spark" className="w-3 h-3" />}
                 </span>
-                <p className={`font-bold leading-snug line-clamp-2 text-white ${big ? 'text-[24px] sm:text-[28px]' : 'text-[16px] sm:text-[18px]'}`}>
+                <p className={`font-bold leading-snug line-clamp-2 ${ink} ${big ? 'text-[24px] sm:text-[28px]' : 'text-[16px] sm:text-[18px]'}`}>
                   {p.title}
                 </p>
                 {big && excerpt && (
-                  <p className="text-[14px] leading-relaxed line-clamp-2 text-white/70 max-w-md">{excerpt}</p>
+                  <p className={`text-[14px] leading-relaxed line-clamp-2 ${ink70} max-w-md`}>{excerpt}</p>
                 )}
-                <span className="text-[13px] font-bold text-white mt-1 inline-flex items-center gap-1.5">
+                <span className={`text-[13px] font-bold ${ink} mt-1 inline-flex items-center gap-1.5`}>
                   {isExternal ? 'Ver' : 'Leer'}
                   <Icon name="arrow" className="w-3.5 h-3.5" />
                 </span>
