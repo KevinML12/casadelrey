@@ -74,8 +74,43 @@ func (h *CellCategoryHandler) UpdateCellCategory(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Categoría no encontrada."})
 	}
 
-	if err := c.Bind(&cat); err != nil {
+	// Bind sobre un struct aparte -- el update parcial (solo se tocan los
+	// campos presentes, ver comentario de la funcion) seguia siendo
+	// posible con punteros, pero sin el riesgo de c.Bind(&cat) directo:
+	// pisar ID/CreatedAt/DeletedAt via el body y que Save() actualizara
+	// otra fila en vez de la de :id.
+	var req struct {
+		Name        *string `json:"name"`
+		AgeGroup    *string `json:"age_group"`
+		Description *string `json:"description"`
+		ImageURL    *string `json:"image_url"`
+		TypeKey     *string `json:"type_key"`
+		SortOrder   *int    `json:"sort_order"`
+		IsActive    *bool   `json:"is_active"`
+	}
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+	}
+	if req.Name != nil {
+		cat.Name = *req.Name
+	}
+	if req.AgeGroup != nil {
+		cat.AgeGroup = *req.AgeGroup
+	}
+	if req.Description != nil {
+		cat.Description = *req.Description
+	}
+	if req.ImageURL != nil {
+		cat.ImageURL = *req.ImageURL
+	}
+	if req.TypeKey != nil {
+		cat.TypeKey = *req.TypeKey
+	}
+	if req.SortOrder != nil {
+		cat.SortOrder = *req.SortOrder
+	}
+	if req.IsActive != nil {
+		cat.IsActive = *req.IsActive
 	}
 	if cat.Name == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El nombre es obligatorio."})

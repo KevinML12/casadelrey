@@ -58,8 +58,31 @@ func (h *FAQHandler) UpdateFAQ(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Pregunta frecuente no encontrada"})
 	}
 
-	if err := c.Bind(&faq); err != nil {
+	// Bind sobre un struct aparte (no directo sobre el modelo ya cargado):
+	// c.Bind(&faq) dejaba pisar CUALQUIER campo con json tag, incluyendo
+	// ID/CreatedAt/DeletedAt de gorm.Model -- si el body traía un "ID"
+	// distinto (p.ej. el frontend manda el objeto completo con spread),
+	// el Save() de abajo actualizaba OTRA fila, no la de :id.
+	var req struct {
+		Question  *string `json:"question"`
+		Answer    *string `json:"answer"`
+		IsActive  *bool   `json:"is_active"`
+		SortOrder *int    `json:"sort_order"`
+	}
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos"})
+	}
+	if req.Question != nil {
+		faq.Question = *req.Question
+	}
+	if req.Answer != nil {
+		faq.Answer = *req.Answer
+	}
+	if req.IsActive != nil {
+		faq.IsActive = *req.IsActive
+	}
+	if req.SortOrder != nil {
+		faq.SortOrder = *req.SortOrder
 	}
 
 	if err := h.DB.Save(&faq).Error; err != nil {

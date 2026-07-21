@@ -2,8 +2,12 @@
 # STAGE 1 — Builder
 # Compila el binario Go con todas las optimizaciones de tamaño activadas.
 # El binario resultante es estático (CGO_ENABLED=0) y no necesita libc.
+# Version EXACTA (no "1.25-alpine" flotante): govulncheck detecto 15 CVEs de
+# stdlib (TLS/x509/html-template/net) parcheadas entre 1.25.3 y 1.25.12 --
+# un tag fijo hace el build reproducible; revisar y subir el patch de vez en
+# cuando (govulncheck ./... en backend/ lo confirma).
 # ─────────────────────────────────────────────────────────────────────────────
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25.12-alpine AS builder
 
 # git es necesario para go mod download con dependencias de VCS
 RUN apk add --no-cache git

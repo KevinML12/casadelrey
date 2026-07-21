@@ -127,10 +127,60 @@ func (h *EventHandler) UpdateEvent(c echo.Context) error {
 		})
 	}
 
-	if err := c.Bind(&event); err != nil {
+	// Bind sobre un struct aparte -- ver nota en faq.handler.go UpdateFAQ:
+	// c.Bind(&event) directo permitia pisar ID/CreatedAt/DeletedAt via el
+	// body (AdminEvents.jsx manda el form completo, que puede incluir el
+	// ID) y arriesgaba que Save() tocara otra fila en vez del :id pedido.
+	var req struct {
+		Title           *string  `json:"title"`
+		Date            *string  `json:"date"`
+		Time            *string  `json:"time"`
+		Location        *string  `json:"location"`
+		Description     *string  `json:"description"`
+		CoverImage      *string  `json:"cover_image"`
+		IsActive        *bool    `json:"is_active"`
+		RequiresPayment *bool    `json:"requires_payment"`
+		PriceGTQ        *float64 `json:"price_gtq"`
+		PaymentDeadline *string  `json:"payment_deadline"`
+		Capacity        *int     `json:"capacity"`
+	}
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Datos de entrada inválidos.",
 		})
+	}
+	if req.Title != nil {
+		event.Title = *req.Title
+	}
+	if req.Date != nil {
+		event.Date = *req.Date
+	}
+	if req.Time != nil {
+		event.Time = *req.Time
+	}
+	if req.Location != nil {
+		event.Location = *req.Location
+	}
+	if req.Description != nil {
+		event.Description = *req.Description
+	}
+	if req.CoverImage != nil {
+		event.CoverImage = *req.CoverImage
+	}
+	if req.IsActive != nil {
+		event.IsActive = *req.IsActive
+	}
+	if req.RequiresPayment != nil {
+		event.RequiresPayment = *req.RequiresPayment
+	}
+	if req.PriceGTQ != nil {
+		event.PriceGTQ = *req.PriceGTQ
+	}
+	if req.PaymentDeadline != nil {
+		event.PaymentDeadline = *req.PaymentDeadline
+	}
+	if req.Capacity != nil {
+		event.Capacity = *req.Capacity
 	}
 
 	if result := h.DB.Save(&event); result.Error != nil {

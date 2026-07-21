@@ -106,9 +106,45 @@ func (h *GalleryHandler) UpdatePhoto(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Foto no encontrada."})
 	}
 
-	if err := c.Bind(&photo); err != nil {
+	// Bind sobre un struct aparte -- ver nota en faq.handler.go UpdateFAQ:
+	// c.Bind(&photo) directo permitia pisar ID/CreatedAt/DeletedAt via el
+	// body (el panel manda {...photo, is_active: !photo.is_active}, que
+	// incluye el ID completo) y arriesgaba que Save() tocara otra fila.
+	// UploadedByID tampoco es editable -- se fija en CreatePhoto.
+	var req struct {
+		Title        *string `json:"title"`
+		Description  *string `json:"description"`
+		URL          *string `json:"url"`
+		ThumbnailURL *string `json:"thumbnail_url"`
+		EventID      *uint   `json:"event_id"`
+		IsActive     *bool   `json:"is_active"`
+		SortOrder    *int    `json:"sort_order"`
+	}
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
+	if req.Title != nil {
+		photo.Title = *req.Title
+	}
+	if req.Description != nil {
+		photo.Description = *req.Description
+	}
+	if req.URL != nil {
+		photo.URL = *req.URL
+	}
+	if req.ThumbnailURL != nil {
+		photo.ThumbnailURL = *req.ThumbnailURL
+	}
+	if req.EventID != nil {
+		photo.EventID = req.EventID
+	}
+	if req.IsActive != nil {
+		photo.IsActive = *req.IsActive
+	}
+	if req.SortOrder != nil {
+		photo.SortOrder = *req.SortOrder
+	}
+
 	h.DB.Save(&photo)
 	return c.JSON(http.StatusOK, photo)
 }

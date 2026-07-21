@@ -18,8 +18,13 @@ func TestRegisterRSVP_EventoNoEncontrado_Retorna404(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewRSVPHandler(db)
 
+	// RegisterRSVP envuelve todo en h.DB.Transaction (lock de fila contra
+	// sobre-inscripcion en el ultimo cupo, ver rsvp.handler.go) -- Begin/
+	// Commit son parte real de la secuencia, no ruido del mock.
+	mock.ExpectBegin()
 	mock.ExpectQuery(`SELECT .* FROM "events"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	mock.ExpectCommit()
 
 	c, rec := newCtx(t, ctxOpts{
 		body:   map[string]interface{}{"name": "Juan", "email": "j@test.com"},
@@ -50,12 +55,14 @@ func TestRegisterRSVP_EmailDuplicado_Retorna409(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewRSVPHandler(db)
 
+	mock.ExpectBegin()
 	// Evento encontrado
 	mock.ExpectQuery(`SELECT .* FROM "events"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "is_active"}).AddRow(1, "Culto", true))
 	// Registro existente para ese email
 	mock.ExpectQuery(`SELECT .* FROM "event_registrations"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "email"}).AddRow(5, "j@test.com"))
+	mock.ExpectCommit()
 
 	c, rec := newCtx(t, ctxOpts{
 		body:   map[string]interface{}{"name": "Juan", "email": "j@test.com"},
@@ -70,14 +77,14 @@ func TestRegisterRSVP_Completo_Retorna201(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewRSVPHandler(db)
 
+	mock.ExpectBegin()
 	// Evento activo
 	mock.ExpectQuery(`SELECT .* FROM "events"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "is_active"}).AddRow(1, "Culto", true))
 	// No hay registro previo
 	mock.ExpectQuery(`SELECT .* FROM "event_registrations"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
-	// Insert
-	mock.ExpectBegin()
+	// Insert -- misma transaccion, no una anidada
 	mock.ExpectQuery(`INSERT INTO "event_registrations"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(10))
 	mock.ExpectCommit()

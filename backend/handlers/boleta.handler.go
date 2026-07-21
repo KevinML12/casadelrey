@@ -116,11 +116,51 @@ func (h *BoletaHandler) UpdateBoleta(c echo.Context) error {
 		}
 	}
 
-	if err := c.Bind(&b); err != nil {
+	// Bind sobre un struct aparte -- ver nota en faq.handler.go UpdateFAQ:
+	// c.Bind(&b) directo permitia pisar ID/CreatedAt/DeletedAt (Save()
+	// pudo haber tocado OTRA fila) y ademas LeaderID/CellReportID/
+	// InviterUserID -- un LIDER (rol de menor confianza, no solo admin)
+	// habria podido reasignar su propia boleta a otro lider via el body.
+	// Esos 3 campos son estructurales (se fijan al crear), no editables.
+	var req struct {
+		Date         *string `json:"date"`
+		InviterName  *string `json:"inviter_name"`
+		InviterPhone *string `json:"inviter_phone"`
+		GuestName    *string `json:"guest_name"`
+		GuestPhone   *string `json:"guest_phone"`
+		Address      *string `json:"address"`
+		Category     *string `json:"category"`
+		Notes        *string `json:"notes"`
+	}
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
-	if b.Category != "" && !validCategories[b.Category] {
+	if req.Category != nil && *req.Category != "" && !validCategories[*req.Category] {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Categoría inválida."})
+	}
+	if req.Date != nil {
+		b.Date = *req.Date
+	}
+	if req.InviterName != nil {
+		b.InviterName = *req.InviterName
+	}
+	if req.InviterPhone != nil {
+		b.InviterPhone = *req.InviterPhone
+	}
+	if req.GuestName != nil {
+		b.GuestName = *req.GuestName
+	}
+	if req.GuestPhone != nil {
+		b.GuestPhone = *req.GuestPhone
+	}
+	if req.Address != nil {
+		b.Address = *req.Address
+	}
+	if req.Category != nil {
+		b.Category = *req.Category
+	}
+	if req.Notes != nil {
+		b.Notes = *req.Notes
 	}
 
 	h.DB.Save(&b)
