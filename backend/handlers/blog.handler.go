@@ -167,6 +167,9 @@ func (h *BlogHandler) CreatePost(c echo.Context) error {
 
 	h.DB.Preload("Author").First(&post, post.ID)
 
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "create", "post", post.ID, post.Title, c.RealIP())
+
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "Post creado exitosamente.",
 		"post":    post,
@@ -247,6 +250,10 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 
 	h.DB.Preload("Author").First(&post, post.ID)
 
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "update", "post", post.ID, post.Title, c.RealIP())
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Post actualizado exitosamente.",
 		"post":    post,
@@ -270,6 +277,10 @@ func (h *BlogHandler) DeletePost(c echo.Context) error {
 		log.Printf("[Blog] Error al eliminar post %d: %v", postID, result.Error)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar el post."})
 	}
+
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "delete", "post", post.ID, post.Title, c.RealIP())
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Post eliminado."})
 }

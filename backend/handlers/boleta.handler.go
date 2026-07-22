@@ -70,6 +70,10 @@ func (h *BoletaHandler) CreateBoleta(c echo.Context) error {
 	}
 
 	log.Printf("[Boleta] Registrada: %s — %s", b.GuestName, b.Category)
+
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, leaderID, userName, "create", "boleta", b.ID, b.GuestName+" ("+b.Category+")", c.RealIP())
+
 	return c.JSON(http.StatusCreated, b)
 }
 
@@ -164,14 +168,26 @@ func (h *BoletaHandler) UpdateBoleta(c echo.Context) error {
 	}
 
 	h.DB.Save(&b)
+
+	editorID, _ := c.Get("user_id").(uint)
+	editorName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, editorID, editorName, "update", "boleta", b.ID, b.GuestName+" ("+b.Category+")", c.RealIP())
+
 	return c.JSON(http.StatusOK, b)
 }
 
 // DeleteBoleta DELETE /api/v1/admin/boletas/:id — solo admin.
 func (h *BoletaHandler) DeleteBoleta(c echo.Context) error {
 	id := c.Param("id")
+	var b models.MemberBoleta
+	h.DB.First(&b, id)
 	if err := h.DB.Delete(&models.MemberBoleta{}, id).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar la boleta."})
 	}
+
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "delete", "boleta", b.ID, b.GuestName, c.RealIP())
+
 	return c.JSON(http.StatusOK, map[string]string{"message": "Boleta eliminada."})
 }

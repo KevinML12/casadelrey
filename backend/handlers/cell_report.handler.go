@@ -84,6 +84,9 @@ func (h *CellReportHandler) CreateCellReport(c echo.Context) error {
 	}
 
 	log.Printf("[CellReport] Reporte creado: %s (%s) — %s", r.CellName, r.CellCode, r.MeetingDate)
+
+	LogActivity(h.DB, userID, leaderName, "create", "cell_report", r.ID, r.CellName+" — "+r.MeetingDate, c.RealIP())
+
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "Reporte enviado, pendiente de aprobación.",
 		"id":      r.ID,
@@ -142,6 +145,9 @@ func (h *CellReportHandler) ApproveReport(c echo.Context) error {
 	r.ApprovedByID = &adminID
 	r.ApprovedAt = &now
 	h.DB.Save(&r)
+
+	adminName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, adminID, adminName, "approve", "cell_report", r.ID, r.CellName+" → "+req.Status, c.RealIP())
 
 	return c.JSON(http.StatusOK, r)
 }

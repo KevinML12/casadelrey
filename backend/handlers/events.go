@@ -106,6 +106,10 @@ func (h *EventHandler) CreateEvent(c echo.Context) error {
 		})
 	}
 
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "create", "event", event.ID, event.Title, c.RealIP())
+
 	return c.JSON(http.StatusCreated, event)
 }
 
@@ -189,6 +193,10 @@ func (h *EventHandler) UpdateEvent(c echo.Context) error {
 		})
 	}
 
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "update", "event", event.ID, event.Title, c.RealIP())
+
 	return c.JSON(http.StatusOK, event)
 }
 
@@ -203,11 +211,18 @@ func (h *EventHandler) DeleteEvent(c echo.Context) error {
 		})
 	}
 
+	var event models.Event
+	h.DB.First(&event, id)
+
 	if result := h.DB.Model(&models.Event{}).Where("id = ?", id).Update("is_active", false); result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "No se pudo eliminar el evento.",
 		})
 	}
+
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "delete", "event", uint(id), event.Title, c.RealIP())
 
 	return c.JSON(http.StatusOK, map[string]string{
 		"message": "Evento eliminado correctamente.",

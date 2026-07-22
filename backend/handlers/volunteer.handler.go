@@ -244,6 +244,10 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 	v.Status = "usuario_creado"
 	h.DB.Save(&v)
 
+	adminID, _ := c.Get("user_id").(uint)
+	adminName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, adminID, adminName, "approve", "volunteer", v.ID, v.Name, c.RealIP())
+
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "Usuario creado. Se envió correo de verificación.",
 		"user": map[string]interface{}{

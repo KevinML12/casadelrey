@@ -195,6 +195,12 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 	if result := h.DB.Model(&models.User{}).Where("id = ?", id).Update("role", req.Role); result.Error != nil || result.RowsAffected == 0 {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
 	}
+
+	adminID, _ := c.Get("user_id").(uint)
+	adminName, _ := c.Get("user_name").(string)
+	targetID, _ := strconv.ParseUint(id, 10, 32)
+	LogActivity(h.DB, adminID, adminName, "update", "user", uint(targetID), "Rol cambiado a "+req.Role, c.RealIP())
+
 	return c.JSON(http.StatusOK, map[string]string{"message": "Rol actualizado."})
 }
 

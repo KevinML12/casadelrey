@@ -95,6 +95,10 @@ func (h *GalleryHandler) CreatePhoto(c echo.Context) error {
 		log.Printf("[Gallery] Error al crear foto: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar la foto."})
 	}
+
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "create", "gallery", photo.ID, photo.Title, c.RealIP())
+
 	return c.JSON(http.StatusCreated, photo)
 }
 
@@ -146,14 +150,26 @@ func (h *GalleryHandler) UpdatePhoto(c echo.Context) error {
 	}
 
 	h.DB.Save(&photo)
+
+	editorID, _ := c.Get("user_id").(uint)
+	editorName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, editorID, editorName, "update", "gallery", photo.ID, photo.Title, c.RealIP())
+
 	return c.JSON(http.StatusOK, photo)
 }
 
 // DeletePhoto DELETE /api/v1/admin/gallery/:id — admin.
 func (h *GalleryHandler) DeletePhoto(c echo.Context) error {
 	id := c.Param("id")
+	var photo models.GalleryPhoto
+	h.DB.First(&photo, id)
 	if err := h.DB.Delete(&models.GalleryPhoto{}, id).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar la foto."})
 	}
+
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "delete", "gallery", photo.ID, photo.Title, c.RealIP())
+
 	return c.JSON(http.StatusOK, map[string]string{"message": "Foto eliminada."})
 }

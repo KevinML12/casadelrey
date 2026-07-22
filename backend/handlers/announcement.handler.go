@@ -108,6 +108,10 @@ func (h *AnnouncementHandler) CreateAnnouncement(c echo.Context) error {
 		log.Printf("[Announcement] Error al crear: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear el anuncio."})
 	}
+
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "create", "announcement", a.ID, a.Title, c.RealIP())
+
 	return c.JSON(http.StatusCreated, a)
 }
 
@@ -148,14 +152,26 @@ func (h *AnnouncementHandler) UpdateAnnouncement(c echo.Context) error {
 	}
 
 	h.DB.Save(&a)
+
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "update", "announcement", a.ID, a.Title, c.RealIP())
+
 	return c.JSON(http.StatusOK, a)
 }
 
 // DeleteAnnouncement DELETE /api/v1/admin/announcements/:id — admin.
 func (h *AnnouncementHandler) DeleteAnnouncement(c echo.Context) error {
 	id := c.Param("id")
+	var a models.Announcement
+	h.DB.First(&a, id)
 	if err := h.DB.Delete(&models.Announcement{}, id).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar."})
 	}
+
+	userID, _ := c.Get("user_id").(uint)
+	userName, _ := c.Get("user_name").(string)
+	LogActivity(h.DB, userID, userName, "delete", "announcement", a.ID, a.Title, c.RealIP())
+
 	return c.JSON(http.StatusOK, map[string]string{"message": "Anuncio eliminado."})
 }
