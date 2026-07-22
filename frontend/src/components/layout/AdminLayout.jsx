@@ -45,7 +45,7 @@ const NAV_GROUPS = [
       { to: '/admin/volunteer-areas', icon: 'dashboard',          label: 'Departamentos' },
       { to: '/admin/connect-cards', icon: 'contact_page',       label: 'Conéctate',    badge: 'pending_connect_cards' },
       { to: '/admin/petitions',     icon: 'volunteer_activism', label: 'Peticiones',   badge: 'unread_petitions' },
-      { to: '/admin/cell-reports',  icon: 'groups',             label: 'Células',      badge: 'pending_reports' },
+      { to: '/admin/cell-reports',  icon: 'groups',             label: 'Reportes de célula', badge: 'pending_reports' },
       { to: '/admin/boletas',       icon: 'person_add',         label: 'Nuevos' },
     ],
   },

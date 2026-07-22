@@ -168,26 +168,6 @@ export default function ProfilePage() {
             )}
           </Tilt>
         </Reveal>
-
-        <Reveal delay={0.15}>
-          <div className="flex flex-wrap gap-3 mt-8">
-            <motion.button
-              type="button" {...PRESS}
-              onClick={() => toast('Próximamente disponible')}
-              className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-6 py-3.5 text-14 font-bold focus-ring"
-            >
-              Editar perfil
-            </motion.button>
-            <motion.button
-              type="button" {...PRESS}
-              onClick={() => toast('Próximamente disponible')}
-              className="inline-flex items-center gap-2 rounded-pill liquid-glass border border-white/20 px-6 py-3.5 text-14 font-bold text-white focus-ring"
-            >
-              <Icon name="lock" className="w-4 h-4" />
-              Cambiar contraseña
-            </motion.button>
-          </div>
-        </Reveal>
       </div>
     </main>
   );
