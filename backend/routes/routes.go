@@ -337,5 +337,16 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	leaderGroup.GET("/kpis",            leaderDashHandler.GetLeaderKPIs)
 	leaderGroup.GET("/cell-directory",  leaderDashHandler.GetCellDirectory)
+
+	// Ficha propia del lider en el directorio publico -- antes solo un
+	// admin podia tocar foto/telefono/area de un lider desde /admin/leaders.
+	leaderGroup.GET("/my-directory-entry", leaderDirHandler.GetMine)
+	leaderGroup.PUT("/my-directory-entry", leaderDirHandler.UpdateMine)
+
+	// RSVPs de un evento, solo lectura -- un lider que ayuda a coordinar un
+	// evento (retiro de su celula, etc.) antes no tenia forma de ver quien
+	// se registro. Mismo handler que /admin/events/:id/rsvps, ruta propia
+	// (no la misma que la admin-only) para no chocar con esa registracion.
+	leaderGroup.GET("/events/:id/rsvps", rsvpHandler.GetEventRSVPs)
 	leaderGroup.GET("/notifications/counts", notificationHandler.GetCounts)
 }

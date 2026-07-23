@@ -369,6 +369,11 @@ type FAQ struct {
 // CONTEXTO_IGLESIA/panel, nunca esta tabla.
 type Leader struct {
 	gorm.Model
+	// UserID vincula la ficha publica con la cuenta real del lider (self-
+	// service, ver leader_directory.handler.go GetMine/UpdateMine) -- puede
+	// ser null: un admin puede curar entradas del directorio que no
+	// corresponden a ninguna cuenta con login (ej. un pastor externo).
+	UserID   *uint  `json:"user_id" gorm:"index"`
 	Name     string `json:"name" gorm:"type:varchar(100);not null"`
 	PhotoURL string `json:"photo_url" gorm:"type:varchar(500)"`
 	Phone    string `json:"phone" gorm:"type:varchar(30)"` // WhatsApp, formato 502XXXXXXXX
