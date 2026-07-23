@@ -161,8 +161,14 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	profileGroup.PUT("/goals/:id",    profileHandler.UpdateGoal)
 	profileGroup.DELETE("/goals/:id", profileHandler.DeleteGoal)
 
-	// Upload (requiere login)
-	uploadGroup := api.Group("/upload", authMW)
+	// Upload (admin o líder -- lideres lo usan para la foto de reporte de
+	// célula, CellReportForm.jsx. Antes solo exigia authMW: cualquier
+	// member/volunteer autenticado podia subir archivos a carpetas como
+	// hero/blog/lideres sin necesitarlo para nada real -- sin riesgo de
+	// defacement (nombre unico, hace falta el endpoint de asignacion
+	// aparte para que se vea en el sitio) pero si podia llenar el bucket
+	// de basura. adminOrLeaderMW cierra eso sin romper el flujo real.
+	uploadGroup := api.Group("/upload", authMW, adminOrLeaderMW)
 	uploadGroup.POST("", uploadHandler.UploadFile)
 
 	// ── Admin (requiere auth + rol admin) ─────────────────────────────────────────
