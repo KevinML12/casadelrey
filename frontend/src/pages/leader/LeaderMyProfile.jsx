@@ -58,7 +58,7 @@ export default function LeaderMyProfile() {
     try {
       await apiClient.put('/leader/my-directory-entry', {
         name: form.name, photo_url: form.photo_url, phone: form.phone,
-        email: form.email, area: form.area,
+        email: form.email, area: form.area, address: form.address,
       });
       toast.success('Ficha actualizada');
       load();
@@ -128,6 +128,11 @@ export default function LeaderMyProfile() {
           <div>
             <label className="block text-label-l text-bg/50 mb-1.5">Correo de contacto</label>
             <input type="email" value={form.email || ''} onChange={set('email')} className={fieldCls} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-label-l text-bg/50 mb-1.5">Dirección (privada, solo para admin/líderes)</label>
+            <input value={form.address || ''} onChange={set('address')} className={fieldCls} placeholder="Para que el equipo te ubique al asignar nuevos miembros cercanos" />
+            <p className="text-label-s text-bg/40 mt-1">Nunca se muestra en el sitio público.</p>
           </div>
         </div>
 

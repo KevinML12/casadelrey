@@ -13,7 +13,7 @@ import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
-const EMPTY = { name: '', area: '', phone: '', email: '', photo_url: '', is_active: true };
+const EMPTY = { name: '', area: '', phone: '', email: '', address: '', photo_url: '', is_active: true };
 
 function LeaderForm({ onSave, onCancel, initialData }) {
   const [form, setForm] = useState(initialData || EMPTY);
@@ -92,6 +92,10 @@ function LeaderForm({ onSave, onCancel, initialData }) {
         <div>
           <label className="block text-label-l text-bg/50 mb-1.5">Correo</label>
           <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="lider@casadelrey.org" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-label-l text-bg/50 mb-1.5">Dirección (privada, nunca pública)</label>
+          <input value={form.address} onChange={set('address')} className={fieldCls} placeholder="Para ubicar al líder al asignar nuevos miembros cercanos" />
         </div>
       </div>
 

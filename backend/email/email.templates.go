@@ -195,6 +195,119 @@ func GetPasswordResetTemplate(token string) string {
 `, resetURL, resetURL)
 }
 
+// GetReceiptVerifiedTemplate devuelve la plantilla HTML para cuando un
+// comprobante bancario fue APROBADO -- ver payment_receipt.handler.go Verify.
+func GetReceiptVerifiedTemplate(name string, amount float64) string {
+	return fmt.Sprintf(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante verificado — Casa del Rey</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #27AE60; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>¡Comprobante verificado!</h1></div>
+    <div class="content">
+        <h2>Hola, %s</h2>
+        <p>Confirmamos que tu comprobante por <strong>Q%.2f</strong> fue verificado correctamente. ¡Gracias!</p>
+    </div>
+    <div class="footer"><p>© 2026 Casa del Rey. Correo automático.</p></div>
+</body>
+</html>
+`, name, amount)
+}
+
+// GetReceiptRejectedTemplate devuelve la plantilla HTML para cuando un
+// comprobante bancario fue RECHAZADO -- ver payment_receipt.handler.go Verify.
+func GetReceiptRejectedTemplate(name string, amount float64, reason string) string {
+	reasonHTML := ""
+	if reason != "" {
+		reasonHTML = fmt.Sprintf(`<div class="warning"><strong>Motivo:</strong> %s</div>`, reason)
+	}
+	return fmt.Sprintf(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante rechazado — Casa del Rey</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #E74C3C; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .warning { background-color: #FFF3CD; border-left: 4px solid #FFC107; padding: 15px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>No pudimos verificar tu comprobante</h1></div>
+    <div class="content">
+        <h2>Hola, %s</h2>
+        <p>Tu comprobante por <strong>Q%.2f</strong> no pudo ser verificado.</p>
+        %s
+        <p>Por favor revisa los datos y sube el comprobante nuevamente, o contáctanos si crees que fue un error.</p>
+    </div>
+    <div class="footer"><p>© 2026 Casa del Rey. Correo automático.</p></div>
+</body>
+</html>
+`, name, amount, reasonHTML)
+}
+
+// GetWeeklyPetitionsDigestTemplate arma el correo semanal para los
+// intercesores (líderes y admins) con las peticiones de la semana en curso.
+func GetWeeklyPetitionsDigestTemplate(weekStart, weekEnd string, petitions []struct {
+	Name    string
+	Subject string
+	Message string
+}) string {
+	rows := ""
+	if len(petitions) == 0 {
+		rows = `<p style="color:#666;">No hubo peticiones esta semana.</p>`
+	}
+	for _, p := range petitions {
+		rows += fmt.Sprintf(`
+        <div style="background:#fff;border-left:4px solid #27AE60;padding:14px 16px;margin-bottom:10px;border-radius:6px;">
+            <p style="margin:0 0 4px;font-weight:bold;">%s <span style="font-weight:normal;color:#666;">· %s</span></p>
+            <p style="margin:0;color:#333;">%s</p>
+        </div>`, p.Name, p.Subject, p.Message)
+	}
+
+	return fmt.Sprintf(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peticiones de la semana — Casa del Rey</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #27AE60; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Peticiones de oración</h1>
+        <p style="margin:6px 0 0;">%s — %s</p>
+    </div>
+    <div class="content">
+        <p>Para orar e interceder esta semana:</p>
+        %s
+    </div>
+    <div class="footer"><p>© 2026 Casa del Rey. Correo automático semanal.</p></div>
+</body>
+</html>
+`, weekStart, weekEnd, rows)
+}
+
 // GetPetitionConfirmationTemplate devuelve la plantilla HTML de confirmación de petición
 func GetPetitionConfirmationTemplate(name string) string {
 	return fmt.Sprintf(`

@@ -13,12 +13,101 @@ import { Icon } from '../../components/ui/Glass';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
+function EditProfileForm({ user, onClose, onSaved }) {
+  const { login } = useAuth();
+  const [name,    setName]    = useState(user?.name || '');
+  const [email,   setEmail]   = useState(user?.email || '');
+  const [saving,  setSaving]  = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) { toast.error('El nombre no puede quedar vacío'); return; }
+    setSaving(true);
+    try {
+      const r = await apiClient.put('/profile', { name: name.trim(), email: email.trim() });
+      if (r.data?.token) login(r.data.token);
+      toast.success('Perfil actualizado');
+      onSaved?.();
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al actualizar el perfil');
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <form onSubmit={submit} className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6 space-y-4 animate-fade-in">
+      <h2 className="text-16 font-bold text-bg tracking-tightish">Editar perfil</h2>
+      <div>
+        <label className="block text-label-l text-bg/50 mb-1.5">Nombre</label>
+        <Input value={name} onChange={e => setName(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-label-l text-bg/50 mb-1.5">Correo</label>
+        <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+      </div>
+      <div className="flex gap-3 pt-1">
+        <Button type="submit" variant="filled" disabled={saving}>
+          {saving ? 'Guardando…' : 'Guardar'}
+        </Button>
+        <Button type="button" variant="outlined" onClick={onClose}>Cancelar</Button>
+      </div>
+    </form>
+  );
+}
+
+function ChangePasswordForm({ onClose }) {
+  const [current,  setCurrent]  = useState('');
+  const [next,     setNext]     = useState('');
+  const [confirm,  setConfirm]  = useState('');
+  const [saving,   setSaving]   = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (next.length < 6) { toast.error('La nueva contraseña debe tener mínimo 6 caracteres'); return; }
+    if (next !== confirm) { toast.error('Las contraseñas no coinciden'); return; }
+    setSaving(true);
+    try {
+      await apiClient.put('/profile/password', { current_password: current, new_password: next });
+      toast.success('Contraseña actualizada');
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al cambiar la contraseña');
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <form onSubmit={submit} className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6 space-y-4 animate-fade-in">
+      <h2 className="text-16 font-bold text-bg tracking-tightish">Cambiar contraseña</h2>
+      <div>
+        <label className="block text-label-l text-bg/50 mb-1.5">Contraseña actual</label>
+        <Input type="password" value={current} onChange={e => setCurrent(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-label-l text-bg/50 mb-1.5">Nueva contraseña</label>
+        <Input type="password" value={next} onChange={e => setNext(e.target.value)} required minLength={6} />
+      </div>
+      <div>
+        <label className="block text-label-l text-bg/50 mb-1.5">Confirmar nueva contraseña</label>
+        <Input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={6} />
+      </div>
+      <div className="flex gap-3 pt-1">
+        <Button type="submit" variant="filled" disabled={saving}>
+          {saving ? 'Guardando…' : 'Cambiar contraseña'}
+        </Button>
+        <Button type="button" variant="outlined" onClick={onClose}>Cancelar</Button>
+      </div>
+    </form>
+  );
+}
+
 export default function AdminProfile() {
   const { user } = useAuth();
   const [goals,    setGoals]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [newTitle, setNewTitle] = useState('');
   const [adding,   setAdding]   = useState(false);
+  const [editingProfile,  setEditingProfile]  = useState(false);
+  const [editingPassword, setEditingPassword] = useState(false);
 
   const loadGoals = () => {
     apiClient.get('/profile/goals')
@@ -88,6 +177,23 @@ export default function AdminProfile() {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-3 mb-6">
+        <Button variant="filled" onClick={() => { setEditingProfile(v => !v); setEditingPassword(false); }}>
+          {editingProfile ? 'Ocultar' : 'Editar perfil'}
+        </Button>
+        <Button variant="outlined" onClick={() => { setEditingPassword(v => !v); setEditingProfile(false); }}>
+          <Icon name="lock" className="w-4 h-4" stroke={1.8} />
+          {editingPassword ? 'Ocultar' : 'Cambiar contraseña'}
+        </Button>
+      </div>
+
+      {editingProfile && (
+        <EditProfileForm user={user} onClose={() => setEditingProfile(false)} />
+      )}
+      {editingPassword && (
+        <ChangePasswordForm onClose={() => setEditingPassword(false)} />
+      )}
+
       {/* Metas */}
       <div className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6">
         <h2 className="text-16 font-bold text-bg tracking-tightish mb-5 flex items-center gap-2">
@@ -149,16 +255,6 @@ export default function AdminProfile() {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="flex flex-wrap gap-3">
-        <Button variant="filled" onClick={() => toast('Próximamente disponible')}>
-          Editar perfil
-        </Button>
-        <Button variant="outlined" onClick={() => toast('Próximamente disponible')}>
-          <Icon name="lock" className="w-4 h-4" stroke={1.8} />
-          Cambiar contraseña
-        </Button>
       </div>
     </div>
   );

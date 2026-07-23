@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"casadelrey/backend/models"
@@ -9,6 +10,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
+
+// cellCodePattern valida el formato [Tipo][Número]: H1, M2, J3, P1, N2 --
+// mismo alfabeto que genera CellCodePicker.jsx (hombres/mujeres/jovenes/
+// prejuveniles/ninos).
+var cellCodePattern = regexp.MustCompile(`^[HMJPN][0-9]+$`)
 
 type CellCategoryHandler struct {
 	db *gorm.DB
@@ -192,6 +198,9 @@ func (h *CellCategoryHandler) CreateCell(c echo.Context) error {
 	if cell.Code == "" || cell.Name == "" || cell.Type == "" || cell.LeaderID == 0 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Código, nombre, tipo y líder son obligatorios."})
 	}
+	if !cellCodePattern.MatchString(cell.Code) {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El código debe tener el formato [H|M|J|P|N] seguido de un número, ej. H1, M2."})
+	}
 	cell.IsActive = true
 	if err := h.db.Create(&cell).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear. ¿Ya existe ese código?"})
@@ -224,6 +233,9 @@ func (h *CellCategoryHandler) UpdateCell(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
 	if req.Code != "" {
+		if !cellCodePattern.MatchString(req.Code) {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "El código debe tener el formato [H|M|J|P|N] seguido de un número, ej. H1, M2."})
+		}
 		cell.Code = req.Code
 	}
 	if req.Name != "" {

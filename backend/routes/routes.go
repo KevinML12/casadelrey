@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"log"
 	"net/http"
+	"time"
 
 	"casadelrey/backend/auth"
 	"casadelrey/backend/config"
@@ -156,6 +158,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Perfil y metas (usuario autenticado)
 	profileGroup := api.Group("/profile", authMW)
+	profileGroup.PUT("",              profileHandler.UpdateProfile)
+	profileGroup.PUT("/password",     profileHandler.ChangePassword)
 	profileGroup.GET("/goals",        profileHandler.GetGoals)
 	profileGroup.POST("/goals",       profileHandler.CreateGoal)
 	profileGroup.PUT("/goals/:id",    profileHandler.UpdateGoal)
@@ -307,6 +311,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// PDF semanal de peticiones (admin Y líder lo usan para distribuir a intercessores)
 	adminOrLeader.GET("/petitions/weekly", petitionHandler.GetWeeklyPetitions)
+	// Envío manual del correo semanal (además del disparo automático de main.go)
+	adminOrLeader.POST("/petitions/weekly/send", petitionHandler.SendWeeklyDigestNow)
 
 	// Usuarios
 	adminOrLeader.POST("/users", adminHandler.CreateUser)
@@ -349,4 +355,35 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// (no la misma que la admin-only) para no chocar con esa registracion.
 	leaderGroup.GET("/events/:id/rsvps", rsvpHandler.GetEventRSVPs)
 	leaderGroup.GET("/notifications/counts", notificationHandler.GetCounts)
+
+	// Envío automático semanal del correo de peticiones a los intercesores.
+	// Sigue vivo mientras el servidor esté arriba (fly.toml
+	// min_machines_running=1 mantiene al menos una máquina despierta) --
+	// para una iglesia de este tamaño un goroutine que se despierta una vez
+	// por semana es más simple que meter un scheduler/cron externo.
+	go scheduleWeeklyPetitionsDigest(petitionHandler)
+}
+
+// scheduleWeeklyPetitionsDigest duerme hasta el próximo lunes 07:00 (hora
+// del servidor), envía el digest, y repite semana tras semana. También se
+// puede disparar de inmediato desde el panel (POST /admin/petitions/weekly/send).
+func scheduleWeeklyPetitionsDigest(h *handlers.PetitionHandler) {
+	for {
+		next := nextWeekdayAt(time.Monday, 7, 0)
+		time.Sleep(time.Until(next))
+		if _, _, err := h.SendWeeklyDigest(); err != nil {
+			log.Printf("[Petition] Error en el envío automático semanal: %v", err)
+		}
+	}
+}
+
+// nextWeekdayAt calcula la próxima ocurrencia futura de un día+hora dados.
+func nextWeekdayAt(day time.Weekday, hour, min int) time.Time {
+	now := time.Now()
+	daysUntil := (int(day) - int(now.Weekday()) + 7) % 7
+	candidate := time.Date(now.Year(), now.Month(), now.Day()+daysUntil, hour, min, 0, 0, now.Location())
+	if !candidate.After(now) {
+		candidate = candidate.AddDate(0, 0, 7)
+	}
+	return candidate
 }

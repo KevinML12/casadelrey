@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"casadelrey/backend/email"
 	"casadelrey/backend/models"
 
 	"github.com/labstack/echo/v4"
@@ -140,6 +141,20 @@ func (h *PaymentReceiptHandler) Verify(c echo.Context) error {
 		h.DB.Model(&models.EventRegistration{}).
 			Where("receipt_id = ?", receipt.ID).
 			Update("payment_status", newPaymentStatus)
+	}
+
+	// Notificar al pagador -- la UI (AdminReceipts.jsx) le promete al admin
+	// que rechazar "notifica al pagador" y el formulario público le promete
+	// al donante que "recibirás confirmación"; sin este envío ninguna de las
+	// dos ocurría. Solo si dejó correo (el flujo es público, puede quedar vacío).
+	if receipt.PayerEmail != "" {
+		if req.Status == "verificado" {
+			email.SendEmailAsync(receipt.PayerEmail, "Comprobante verificado — Casa del Rey",
+				email.GetReceiptVerifiedTemplate(receipt.PayerName, receipt.Amount))
+		} else {
+			email.SendEmailAsync(receipt.PayerEmail, "Comprobante rechazado — Casa del Rey",
+				email.GetReceiptRejectedTemplate(receipt.PayerName, receipt.Amount, receipt.RejectionReason))
+		}
 	}
 
 	log.Printf("[Receipt] %s por admin %d — ID:%d", req.Status, adminID, receipt.ID)

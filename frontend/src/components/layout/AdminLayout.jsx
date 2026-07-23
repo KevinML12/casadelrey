@@ -52,7 +52,8 @@ const NAV_GROUPS = [
   {
     section: 'Finanzas',
     items: [
-      { to: '/admin/receipts', icon: 'receipt_long', label: 'Comprobantes', badge: 'pending_receipts' },
+      { to: '/admin/receipts',  icon: 'receipt_long', label: 'Comprobantes', badge: 'pending_receipts' },
+      { to: '/admin/donations', icon: 'payments',     label: 'Donaciones' },
     ],
   },
   {

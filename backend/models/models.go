@@ -379,5 +379,9 @@ type Leader struct {
 	Phone    string `json:"phone" gorm:"type:varchar(30)"` // WhatsApp, formato 502XXXXXXXX
 	Email    string `json:"email" gorm:"type:varchar(100)"`
 	Area     string `json:"area" gorm:"type:varchar(120)"` // "Célula Adolescentes", "Alabanza"...
+	// Address es PRIVADA -- para que admin/lideres ubiquen a un lider al
+	// asignarle un nuevo miembro cercano. NUNCA se expone en GetPublic
+	// (/api/v1/leaders, ver leader_directory.handler.go).
+	Address  string `json:"address" gorm:"type:varchar(255)"`
 	IsActive bool   `json:"is_active" gorm:"default:true"`
 }

@@ -23,13 +23,32 @@ func NewLeaderDirectoryHandler(db *gorm.DB) *LeaderDirectoryHandler {
 	return &LeaderDirectoryHandler{DB: db}
 }
 
+// publicLeader es lo único que un visitante anónimo ve de un líder --
+// PRIVACIDAD: Address NUNCA sale de aquí (es para uso interno de
+// admin/líder al ubicar a un nuevo miembro cerca de su célula).
+type publicLeader struct {
+	ID       uint   `json:"ID"`
+	Name     string `json:"name"`
+	PhotoURL string `json:"photo_url"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+	Area     string `json:"area"`
+}
+
 // GetPublic GET /api/v1/leaders — solo líderes activos, para el sitio público.
 func (h *LeaderDirectoryHandler) GetPublic(c echo.Context) error {
 	var leaders []models.Leader
 	if err := h.DB.Where("is_active = ?", true).Order("name ASC").Find(&leaders).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener el directorio."})
 	}
-	return c.JSON(http.StatusOK, leaders)
+	out := make([]publicLeader, 0, len(leaders))
+	for _, l := range leaders {
+		out = append(out, publicLeader{
+			ID: l.ID, Name: l.Name, PhotoURL: l.PhotoURL,
+			Phone: l.Phone, Email: l.Email, Area: l.Area,
+		})
+	}
+	return c.JSON(http.StatusOK, out)
 }
 
 // GetAll GET /api/v1/admin/leaders — todos (incluye inactivos), para el panel.
@@ -78,6 +97,7 @@ func (h *LeaderDirectoryHandler) Update(c echo.Context) error {
 		Phone    *string `json:"phone"`
 		Email    *string `json:"email"`
 		Area     *string `json:"area"`
+		Address  *string `json:"address"`
 		IsActive *bool   `json:"is_active"`
 	}
 	if err := c.Bind(&req); err != nil {
@@ -93,6 +113,7 @@ func (h *LeaderDirectoryHandler) Update(c echo.Context) error {
 	if req.Phone != nil    { leader.Phone = *req.Phone }
 	if req.Email != nil    { leader.Email = *req.Email }
 	if req.Area != nil     { leader.Area = *req.Area }
+	if req.Address != nil  { leader.Address = *req.Address }
 	if req.IsActive != nil { leader.IsActive = *req.IsActive }
 
 	if err := h.DB.Save(&leader).Error; err != nil {
@@ -153,6 +174,7 @@ func (h *LeaderDirectoryHandler) UpdateMine(c echo.Context) error {
 		Phone    *string `json:"phone"`
 		Email    *string `json:"email"`
 		Area     *string `json:"area"`
+		Address  *string `json:"address"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -167,6 +189,7 @@ func (h *LeaderDirectoryHandler) UpdateMine(c echo.Context) error {
 	if req.Phone != nil    { leader.Phone = *req.Phone }
 	if req.Email != nil    { leader.Email = *req.Email }
 	if req.Area != nil     { leader.Area = *req.Area }
+	if req.Address != nil  { leader.Address = *req.Address }
 
 	if err := h.DB.Save(&leader).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo actualizar."})

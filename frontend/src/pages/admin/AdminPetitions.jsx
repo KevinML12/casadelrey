@@ -95,6 +95,7 @@ export default function AdminPetitions() {
   const [petitions,   setPetitions]   = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [pdfLoading,  setPdfLoading]  = useState(false);
+  const [mailLoading, setMailLoading] = useState(false);
 
   const load = () =>
     apiClient.get('/admin/petitions')
@@ -119,6 +120,20 @@ export default function AdminPetitions() {
       printWeeklyPetitions(r.data);
     } catch { toast.error('Error al obtener peticiones de la semana'); }
     finally { setPdfLoading(false); }
+  };
+
+  // El envío automático corre solo cada lunes (ver scheduleWeeklyPetitionsDigest
+  // en routes.go); este botón dispara la misma lógica de inmediato, útil para
+  // reenviar o para probar que el correo está configurado.
+  const handleSendWeeklyEmail = async () => {
+    setMailLoading(true);
+    try {
+      const r = await apiClient.post('/admin/petitions/weekly/send');
+      const { recipients, count } = r.data || {};
+      toast.success(`Correo enviado a ${recipients ?? 0} intercesor${recipients === 1 ? '' : 'es'} (${count ?? 0} petición${count === 1 ? '' : 'es'})`);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al enviar el correo semanal');
+    } finally { setMailLoading(false); }
   };
 
   const unread = petitions.filter(p => !p.is_answered).length;
@@ -146,6 +161,10 @@ export default function AdminPetitions() {
           <Button variant="outlined" onClick={handleWeeklyPdf} disabled={pdfLoading}>
             <Icon name="print" className="w-[16px] h-[16px]" stroke={1.8} />
             {pdfLoading ? 'Cargando…' : 'PDF semanal'}
+          </Button>
+          <Button variant="outlined" onClick={handleSendWeeklyEmail} disabled={mailLoading}>
+            <Icon name="mail" className="w-[16px] h-[16px]" stroke={1.8} />
+            {mailLoading ? 'Enviando…' : 'Enviar por correo'}
           </Button>
         </div>
       </div>

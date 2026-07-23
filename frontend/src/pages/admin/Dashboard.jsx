@@ -6,7 +6,6 @@ import {
 } from 'recharts';
 import apiClient from '../../lib/apiClient';
 import { useAuth } from '../../context/AuthContext';
-import { downloadCsv } from '../../lib/exportCsv';
 import { saludo } from '../../lib/greeting';
 import Button from '../../components/ui/Button';
 import StatCard from '../../components/ui/StatCard';
@@ -276,10 +275,12 @@ export default function Dashboard() {
           <Icon name="payments" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
           <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Últimas donaciones</p>
         </div>
-        <Button variant="tonal" size="sm" onClick={() => downloadCsv('/admin/export/donations', 'donaciones.csv')}>
-          <Icon name="download" className="w-4 h-4" stroke={1.8} />
-          Exportar CSV
-        </Button>
+        <Link to="/admin/donations">
+          <Button variant="tonal" size="sm">
+            Ver todas
+            <Icon name="arrow" className="w-4 h-4" stroke={1.8} />
+          </Button>
+        </Link>
       </div>
       <div className="glass-light rounded-[24px] card-spring overflow-hidden">
         {loading ? <Spinner /> : donations.length === 0 ? (
