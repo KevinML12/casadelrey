@@ -20,9 +20,9 @@ import { useSitePhoto } from '../../lib/feed';
 const fieldCls = 'input-light';
 
 const CATEGORIES = [
-  { value: 'primera_vez',  label: 'Es mi primera vez',        icon: 'spark' },
-  { value: 'reconciliado', label: 'Vuelvo después de un tiempo', icon: 'heart' },
-  { value: 'busco_celula', label: 'Busco una célula',         icon: 'users' },
+  { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia', icon: 'spark' },
+  { value: 'reconciliado', label: 'Vuelvo después de un tiempo', helper: 'Ya fui parte antes',         icon: 'heart' },
+  { value: 'busco_celula', label: 'Busco una célula',            helper: 'Quiero unirme a un grupo',   icon: 'users' },
 ];
 
 const HOW_FOUND = [
@@ -87,15 +87,20 @@ export default function ConnectPage() {
 
         {/* Qué sigue -- el flujo real (ConnectCard -> panel -> líder
             asignado), no un adorno; le da confianza a alguien que nunca
-            ha llenado este formulario antes. */}
+            ha llenado este formulario antes. Los 3 pasos van conectados
+            por una línea (desktop) para que se lean como UN proceso, no
+            como 3 tarjetas sueltas sin relación entre sí. */}
         <Reveal delay={0.06} className="mb-10">
-          <ol className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <ol className="relative grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-0">
+            {/* Línea conectora entre los 3 pasos, solo desde sm (en una
+                sola fila) -- pasa por detrás de los círculos numerados. */}
+            <div className="hidden sm:block absolute top-[34px] left-[calc(16.66%+14px)] right-[calc(16.66%+14px)] h-px bg-bg/15" aria-hidden="true" />
             {STEPS.map((s, i) => (
-              <li key={s.text} className="glass-light rounded-[16px] p-4 flex items-start gap-3">
-                <span className="shrink-0 grid place-items-center w-7 h-7 rounded-full bg-bg/8 border border-bg/12 text-bg text-12 font-bold">
+              <li key={s.text} className="relative flex flex-col items-center text-center sm:px-3">
+                <span className="relative z-10 shrink-0 grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-14 font-bold shadow-card mb-3">
                   {i + 1}
                 </span>
-                <p className="text-13 text-bg/75 leading-snug">{s.text}</p>
+                <p className="text-13 text-white/70 leading-snug max-w-[15rem]">{s.text}</p>
               </li>
             ))}
           </ol>
@@ -114,58 +119,96 @@ export default function ConnectPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-7">
+                {/* La pregunta de "por qué" va primero -- es mas natural
+                    empezar una conversacion asi que con un formulario de
+                    campos; tambien es la que mas cambia el seguimiento que
+                    hace el lider, tiene sentido que sea lo primero que se
+                    decide. Tarjetas con icono en vez de una lista de
+                    botones finitos -- eso se leia como una version fea de
+                    un <select>. */}
                 <div>
-                  <label className="block text-12 font-bold text-bg/60 mb-1.5">
-                    Nombre <span className="text-rose">*</span>
-                  </label>
-                  <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-12 font-bold text-bg/60 mb-1.5">
-                      Teléfono <span className="text-rose">*</span>
-                    </label>
-                    <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" required />
-                  </div>
-                  <div>
-                    <label className="block text-12 font-bold text-bg/60 mb-1.5">Correo</label>
-                    <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="Opcional" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-12 font-bold text-bg/60 mb-2.5">
+                  <p className="text-12 font-bold text-bg/60 mb-3 uppercase tracking-wide">
                     ¿Qué te trae por aquí? <span className="text-rose">*</span>
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    {CATEGORIES.map((c) => (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => setForm((p) => ({ ...p, category: c.value }))}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-[14px] border text-left transition-all ${
-                          form.category === c.value
-                            ? 'bg-bg/10 border-bg/40 text-bg'
-                            : 'bg-bg/[0.03] border-bg/10 text-bg/65 hover:bg-bg/[0.06]'
-                        }`}
-                      >
-                        <Icon name={c.icon} className="w-4 h-4 shrink-0" />
-                        <span className="text-14 font-medium">{c.label}</span>
-                      </button>
-                    ))}
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {CATEGORIES.map((c) => {
+                      const selected = form.category === c.value;
+                      return (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => setForm((p) => ({ ...p, category: c.value }))}
+                          className={`relative flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[18px] border-2 transition-all ${
+                            selected
+                              ? 'bg-bg/10 border-bg shadow-card'
+                              : 'bg-bg/[0.03] border-bg/10 hover:border-bg/25 hover:bg-bg/[0.06]'
+                          }`}
+                        >
+                          {selected && (
+                            <span className="absolute top-2.5 right-2.5 grid place-items-center w-5 h-5 rounded-full bg-bg text-white">
+                              <Icon name="check" className="w-3 h-3" stroke={2.5} />
+                            </span>
+                          )}
+                          <span className={`grid place-items-center w-11 h-11 rounded-full border transition-colors ${
+                            selected ? 'bg-bg text-white border-bg' : 'bg-bg/8 text-bg/70 border-bg/12'
+                          }`}>
+                            <Icon name={c.icon} className="w-5 h-5" />
+                          </span>
+                          <span className={`text-14 font-bold ${selected ? 'text-bg' : 'text-bg/80'}`}>{c.label}</span>
+                          <span className="text-11 text-bg/50 leading-snug">{c.helper}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-12 font-bold text-bg/60 mb-1.5">¿Cómo nos conociste?</label>
-                  <select value={form.how_found} onChange={set('how_found')} className={fieldCls}>
-                    <option value="">Selecciona una opción</option>
-                    {HOW_FOUND.map((h) => (
-                      <option key={h.value} value={h.value}>{h.label}</option>
-                    ))}
-                  </select>
+                {/* Datos de contacto agrupados bajo su propio encabezado --
+                    separa visualmente "la decision" de "como te contactamos",
+                    en vez de que todo sea un solo bloque de campos. */}
+                <div className="pt-1 border-t border-bg/10">
+                  <p className="text-12 font-bold text-bg/60 mt-5 mb-3 uppercase tracking-wide">Tus datos</p>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-12 font-bold text-bg/60 mb-1.5">
+                        Nombre <span className="text-rose">*</span>
+                      </label>
+                      <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-12 font-bold text-bg/60 mb-1.5">
+                          Teléfono <span className="text-rose">*</span>
+                        </label>
+                        <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" required />
+                      </div>
+                      <div>
+                        <label className="block text-12 font-bold text-bg/60 mb-1.5">Correo</label>
+                        <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="Opcional" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-12 font-bold text-bg/60 mb-2">¿Cómo nos conociste?</label>
+                      <div className="flex flex-wrap gap-2">
+                        {HOW_FOUND.map((h) => (
+                          <button
+                            key={h.value}
+                            type="button"
+                            onClick={() => setForm((p) => ({ ...p, how_found: p.how_found === h.value ? '' : h.value }))}
+                            className={`px-3.5 py-2 rounded-full text-13 font-semibold border transition-colors ${
+                              form.how_found === h.value
+                                ? 'bg-bg text-white border-bg'
+                                : 'bg-bg/[0.03] text-bg/65 border-bg/12 hover:bg-bg/[0.06]'
+                            }`}
+                          >
+                            {h.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {error && (
