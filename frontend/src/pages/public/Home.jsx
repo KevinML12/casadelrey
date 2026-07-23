@@ -188,6 +188,18 @@ function HeroCarousel({ onPlan }) {
   }, [slides.length]);
 
   const slide = slides[Math.min(idx, slides.length - 1)];
+  // El titulo de un HERO lo redacta el admin como frase editorial corta
+  // ("SOMOS/CASA DEL REY"); el de un EVENTO es prosa normal (el titulo del
+  // evento tal cual, "Noche de Alabanza y Adoracion") -- al tamaño gigante
+  // de display (hasta 7.5rem) una frase larga envuelve en 3-4 lineas y la
+  // seccion (ahora de alto fijo, ver mas abajo) la corta. Achicar la fuente
+  // segun el largo real en vez de truncar el texto con "…".
+  const longestLine = Math.max(slide.l1?.length || 0, slide.l2?.length || 0);
+  const titleClamp = longestLine > 20
+    ? 'clamp(2rem, 4.5vw, 4rem)'
+    : longestLine > 12
+      ? 'clamp(2.4rem, 6vw, 5.5rem)'
+      : 'clamp(3rem, 8vw, 7.5rem)';
   // Subtítulo del hero: si el admin no puso uno propio, saludo dinámico
   // por hora del día (mismo lenguaje que "Buenos días, Pastor" del
   // Dashboard) -- personalizado con el nombre si hay sesión iniciada.
@@ -211,7 +223,7 @@ function HeroCarousel({ onPlan }) {
   const cardFade  = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section ref={heroRef} id="inicio" className="relative min-h-[100svh] overflow-hidden bg-bg">
+    <section ref={heroRef} id="inicio" className="relative h-[100svh] overflow-hidden bg-bg">
       {/* Carril horizontal REAL: cada slide es una ventana de 100vw que se
           navega deslizando (touch, trackpad, scrollbar) — no solo con los
           dots. El wrapper externo lleva el parallax de scroll de página
@@ -220,7 +232,12 @@ function HeroCarousel({ onPlan }) {
         <div
           ref={trackRef}
           className="h-full w-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          // touchAction: sin esto, el navegador a veces duda si un gesto de
+          // dedo debe hacer scroll horizontal aca o vertical en la pagina
+          // (mas aun con Lenis manejando el scroll suave de toda la pagina) y
+          // termina ignorando el swipe -- pan-x le dice explicitamente que
+          // ESTE elemento es quien maneja el paneo horizontal nativo.
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', touchAction: 'pan-x' }}
         >
           <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
           {slides.map((s, i) => {
@@ -258,7 +275,7 @@ function HeroCarousel({ onPlan }) {
         </Suspense>
       )}
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 min-h-[100svh] flex items-center pt-32 pb-24">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 h-full flex items-center pt-32 pb-24">
         <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-center w-full">
 
           {/* Texto editorial — izquierda. Cambia con cada slide del carrusel.
@@ -279,7 +296,7 @@ function HeroCarousel({ onPlan }) {
                 </motion.div>
                 <h1
                   className="display-mega text-white"
-                  style={{ fontSize: 'clamp(3rem, 8vw, 7.5rem)', lineHeight: '1' }}
+                  style={{ fontSize: titleClamp, lineHeight: '1' }}
                 >
                   {[slide.l1, slide.l2].filter(Boolean).map((line, li) => (
                     // pb/-mb: deja respirar los descendentes (g, j, p)
@@ -292,7 +309,7 @@ function HeroCarousel({ onPlan }) {
                   ))}
                 </h1>
                 {displaySubtitle && (
-                  <motion.p variants={RISE} className="mt-8 max-w-xl text-17 md:text-20 leading-relaxed text-white/80 font-medium">
+                  <motion.p variants={RISE} className="mt-8 max-w-xl text-17 md:text-20 leading-relaxed text-white/80 font-medium line-clamp-2">
                     {displaySubtitle}
                   </motion.p>
                 )}
