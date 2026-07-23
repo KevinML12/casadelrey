@@ -199,7 +199,13 @@ function HeroCarousel({ onPlan }) {
     ? 'clamp(2rem, 4.5vw, 4rem)'
     : longestLine > 12
       ? 'clamp(2.4rem, 6vw, 5.5rem)'
-      : 'clamp(3rem, 8vw, 7.5rem)';
+      // Bajado de 7.5rem a 6.5rem: con la seccion ahora de alto FIJO
+      // (h-[100svh], no min-height), el caso de titulo corto en 3 lineas
+      // + label + subtitle + boton + dots ya no tenia margen real en
+      // ventanas de navegador normales (no maximizadas/con mucho chrome) --
+      // el label de arriba se recortaba contra el nav. 6.5rem sigue siendo
+      // grande y dramatico, pero deja aire real.
+      : 'clamp(3rem, 7vw, 6.5rem)';
   // Subtítulo del hero: si el admin no puso uno propio, saludo dinámico
   // por hora del día (mismo lenguaje que "Buenos días, Pastor" del
   // Dashboard) -- personalizado con el nombre si hay sesión iniciada.
@@ -275,7 +281,7 @@ function HeroCarousel({ onPlan }) {
         </Suspense>
       )}
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 h-full flex items-center pt-32 pb-24">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 h-full flex items-center pt-28 pb-20">
         <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-center w-full">
 
           {/* Texto editorial — izquierda. Cambia con cada slide del carrusel.
