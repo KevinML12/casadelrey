@@ -13,6 +13,8 @@ const NAV = [
   { to: '/leader/boletas',           icon: 'person_add',   label: 'Nuevos' },
   { to: '/leader/volunteers',        icon: 'group_add',    label: 'Voluntarios',  badge: 'pending_volunteers' },
   { to: '/leader/cell-directory',    icon: 'contacts',     label: 'Directorio' },
+  { to: '/leader/events',            icon: 'calendar_month', label: 'Eventos' },
+  { to: '/leader/my-directory',      icon: 'badge',        label: 'Mi ficha' },
   { to: '/leader/profile',           icon: 'person',       label: 'Perfil' },
 ];
 

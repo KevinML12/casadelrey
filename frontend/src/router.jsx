@@ -72,6 +72,8 @@ const LeaderBoletas       = lazy(() => import('./pages/leader/LeaderBoletas'));
 const LeaderVolunteers    = lazy(() => import('./pages/leader/LeaderVolunteers'));
 const LeaderCellDirectory = lazy(() => import('./pages/leader/LeaderCellDirectory'));
 const LeaderConnectCards  = lazy(() => import('./pages/leader/LeaderConnectCards'));
+const LeaderEvents        = lazy(() => import('./pages/leader/LeaderEvents'));
+const LeaderMyProfile     = lazy(() => import('./pages/leader/LeaderMyProfile'));
 
 // Panel Voluntario — lazy
 import VolunteerLayout      from './components/layout/VolunteerLayout';
@@ -144,6 +146,8 @@ export const router = createBrowserRouter([
       { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><LeaderVolunteers /></Suspense> },
       { path: 'cell-directory',  element: <Suspense fallback={<PageFallback />}><LeaderCellDirectory /></Suspense> },
       { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><LeaderConnectCards /></Suspense> },
+      { path: 'events',          element: <Suspense fallback={<PageFallback />}><LeaderEvents /></Suspense> },
+      { path: 'my-directory',    element: <Suspense fallback={<PageFallback />}><LeaderMyProfile /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback />}><AdminProfile /></Suspense> },
     ],
   },
