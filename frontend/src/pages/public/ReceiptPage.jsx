@@ -10,6 +10,9 @@ export default function ReceiptPage() {
   const [params] = useSearchParams();
   const eventId   = params.get('event_id') ? Number(params.get('event_id')) : null;
   const eventName = params.get('event') || null;
+  // Monto total ya calculado (precio x asistentes) que RSVPModal manda --
+  // solo un default editable, el usuario confirma/ajusta antes de enviar.
+  const defaultAmount = params.get('amount') || '';
 
   return (
     <main className="min-h-screen bg-bg text-white">
@@ -60,6 +63,7 @@ export default function ReceiptPage() {
                 <ReceiptUploadForm
                   eventId={eventId}
                   purpose={eventId ? 'evento' : 'donacion'}
+                  defaultAmount={defaultAmount}
                 />
               </div>
             </div>

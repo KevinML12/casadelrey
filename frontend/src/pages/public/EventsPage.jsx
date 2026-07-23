@@ -68,12 +68,26 @@ function LightBankDetails() {
 // leia como una superficie mas sin jerarquia real. Ver index.css para
 // la regla: solo se sostiene con algo semi-opaco detras, que aca es el
 // propio ModalWrapper.
-function PaymentBanner({ event }) {
+// attendeeCount viene del formulario que la envuelve (form.attendee_count) --
+// antes este banner solo recibia `event` y mostraba price_gtq fijo, sin
+// importar cuantos asistentes se registraran (reportado por el usuario: Q250
+// no cambiaba al poner 2 asistentes). El precio por persona lo define el
+// admin; el total a pagar es ese precio x la cantidad de asistentes.
+function PaymentBanner({ event, attendeeCount = 1 }) {
+  const perPerson = Number(event.price_gtq) || 0;
+  const total = perPerson * (attendeeCount || 1);
   return (
     <div className="glass-light-nested rounded-[20px] p-5 space-y-4 mb-4">
       <div>
-        <p className="text-11 font-bold text-bg/50 uppercase tracking-widest mb-1.5">Evento con costo</p>
-        <p className="text-30 text-bg font-black leading-none tracking-tight">Q{Number(event.price_gtq).toFixed(2)}</p>
+        <p className="text-11 font-bold text-bg/50 uppercase tracking-widest mb-1.5">
+          Evento con costo · Q{perPerson.toFixed(2)} por persona
+        </p>
+        <p className="text-30 text-bg font-black leading-none tracking-tight flex items-baseline gap-2">
+          Q{total.toFixed(2)}
+          {attendeeCount > 1 && (
+            <span className="text-14 text-bg/50 font-semibold">({attendeeCount} asistentes)</span>
+          )}
+        </p>
       </div>
       <p className="text-14 text-bg/60 leading-relaxed">
         Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
@@ -130,7 +144,8 @@ function RSVPModal({ event, onClose }) {
 
   const goToReceipt = () => {
     onClose();
-    navigate(`/comprobante?event_id=${event.ID}&event=${encodeURIComponent(event.title)}`);
+    const total = (Number(event.price_gtq) || 0) * (form.attendee_count || 1);
+    navigate(`/comprobante?event_id=${event.ID}&event=${encodeURIComponent(event.title)}&amount=${total.toFixed(2)}`);
   };
 
   // ── Pantalla: éxito sin pago
@@ -180,7 +195,7 @@ function RSVPModal({ event, onClose }) {
           </div>
         </div>
 
-        <PaymentBanner event={event} />
+        <PaymentBanner event={event} attendeeCount={form.attendee_count} />
         <p className="text-14 text-bg/60">
           Después de depositar, sube la foto de tu comprobante. Una vez verificado, vuelve aquí para completar tu registro.
         </p>
@@ -208,7 +223,7 @@ function RSVPModal({ event, onClose }) {
           <Icon name="close" className="w-4 h-4 text-bg/60" />
         </button>
       </div>
-      {event.requires_payment && <PaymentBanner event={event} />}
+      {event.requires_payment && <PaymentBanner event={event} attendeeCount={form.attendee_count} />}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className="block text-12 font-bold text-bg/60 mb-1">Nombre <span className="text-rose">*</span></label>

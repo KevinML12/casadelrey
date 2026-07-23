@@ -18,8 +18,8 @@ const EMPTY = {
   receipt_image_url: '', purpose: 'donacion', event_id: null,
 };
 
-export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion', onSuccess }) {
-  const [form, setForm]       = useState({ ...EMPTY, event_id: eventId, purpose });
+export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion', defaultAmount = '', onSuccess }) {
+  const [form, setForm]       = useState({ ...EMPTY, event_id: eventId, purpose, amount: defaultAmount });
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent]       = useState(false);
