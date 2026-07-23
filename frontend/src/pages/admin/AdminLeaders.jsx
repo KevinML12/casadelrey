@@ -9,6 +9,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -25,8 +26,9 @@ function LeaderForm({ onSave, onCancel, initialData }) {
     if (!file) return;
     setUploading(true);
     try {
+      const compressed = await compressImageIfNeeded(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/upload?folder=lideres', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });

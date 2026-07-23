@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 import CellCodePicker, { parseCode } from '../ui/CellCodePicker';
 import { Icon } from '../ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -53,10 +54,11 @@ export default function CellReportForm({ onSuccess }) {
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const fd = new FormData();
-    fd.append('file', file);
     setUploading(true);
     try {
+      const compressed = await compressImageIfNeeded(file);
+      const fd = new FormData();
+      fd.append('file', compressed);
       const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       set('photo_url', res.data.url);
       toast.success('Foto subida');

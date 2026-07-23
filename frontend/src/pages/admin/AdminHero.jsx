@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 // Nota importante: el hero público (Home.jsx) NO tiene botón secundario —
 // solo lee cta_primary_text/cta_primary_url (como "ctaText"/"ctaUrl"). Los
@@ -102,8 +103,9 @@ function HeroForm({ initial, onSave, onCancel }) {
     if (!file) return;
     setUploading(true);
     try {
+      const compressed = await compressImageIfNeeded(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/upload?folder=hero', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(p => ({ ...p, background_image_url: res.data.url }));
       toast.success('Imagen subida');

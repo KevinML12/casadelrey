@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
   return (
@@ -53,8 +54,9 @@ export default function AdminSitePhotos() {
   useEffect(load, []);
 
   const uploadTo = async (file, folder) => {
+    const compressed = await compressImageIfNeeded(file);
     const fd = new FormData();
-    fd.append('file', file);
+    fd.append('file', compressed);
     const res = await apiClient.post(`/upload?folder=${folder}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
     return res.data.url;
   };

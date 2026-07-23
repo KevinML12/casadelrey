@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 function slugify(text) {
   return text
@@ -92,11 +93,16 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Solo se aceptan imágenes'); return; }
-    if (file.size > 5 * 1024 * 1024)    { toast.error('Máx 5 MB'); return; }
     setUploading(true);
     try {
+      // Comprime ANTES de validar el tamaño -- una foto real de celular
+      // (6-8MB tipico) antes se rechazaba de una por el limite de 5MB, sin
+      // darle chance a comprimirse primero. Tambien es la causa real de que
+      // la subida se sintiera "lenta": sin esto se sube el archivo entero.
+      const compressed = await compressImageIfNeeded(file);
+      if (compressed.size > 8 * 1024 * 1024) { toast.error('Imagen demasiado grande incluso comprimida (máx 8 MB)'); return; }
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(p => ({ ...p, cover_image: res.data.url }));
       toast.success('Imagen subida');

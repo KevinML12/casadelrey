@@ -5,6 +5,7 @@ import Input, { Textarea } from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
 import { Icon } from '../../components/ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const EMPTY = {
   title: '', date: '', time: '', location: '', description: '', cover_image: '',
@@ -22,11 +23,12 @@ function EventForm({ initial, onSave, onCancel, loading }) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Solo se aceptan imágenes'); return; }
-    if (file.size > 5 * 1024 * 1024)    { toast.error('Máx 5 MB'); return; }
     setUploading(true);
     try {
+      const compressed = await compressImageIfNeeded(file);
+      if (compressed.size > 8 * 1024 * 1024) { toast.error('Imagen demasiado grande incluso comprimida (máx 8 MB)'); return; }
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(p => ({ ...p, cover_image: res.data.url }));
       toast.success('Imagen subida');

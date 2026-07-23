@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../../components/ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
@@ -38,8 +39,9 @@ function Form({ initial, onSave, onCancel }) {
     if (!file) return;
     setUploading(true);
     try {
+      const compressed = await compressImageIfNeeded(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/upload?folder=social', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(p => ({ ...p, image_url: res.data.url }));
       toast.success('Imagen subida');

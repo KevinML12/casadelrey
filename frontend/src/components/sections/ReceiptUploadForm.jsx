@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../ui/Glass';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'Agromercantil', 'Promerica', 'Citibank', 'Otro'];
 
@@ -31,8 +32,11 @@ export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion'
     if (!file) return;
     setUploading(true);
     try {
+      // compressImageIfNeeded ignora PDFs (solo comprime image/*) -- este
+      // input acepta ambos, la boleta tal vez sea una foto de celular.
+      const compressed = await compressImageIfNeeded(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/receipts/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });

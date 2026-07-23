@@ -14,6 +14,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { Icon } from '../ui/Glass';
 import BankDetails from './BankDetails';
+import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const AMOUNTS  = [50, 100, 250, 500];
 const PURPOSES = [
@@ -69,8 +70,9 @@ export default function DonationCard() {
     if (!file) return;
     setUploading(true);
     try {
+      const compressed = await compressImageIfNeeded(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await apiClient.post('/receipts/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
