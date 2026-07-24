@@ -7,32 +7,35 @@ import (
 	"casadelrey/backend/config"
 )
 
-// Valores tomados 1:1 de frontend/tailwind.config.js e index.css (--bg,
-// --ink, --celeste, shadow-card, rounded-pill, .glass-light). Los clientes
-// de correo no ejecutan Tailwind ni backdrop-filter, así que estos MISMOS
+// Valores tomados 1:1 de frontend/tailwind.config.js e index.css --
+// específicamente el lenguaje del PANEL admin/líder (.admin-light,
+// bg-paper, Halos, Button.jsx variant="filled"), que es el que pidió el
+// usuario: canvas CLARO, no el navy del sitio público. Los clientes de
+// correo no ejecutan Tailwind ni backdrop-filter, así que estos MISMOS
 // valores se aplican como estilos inline -- el resultado visual es el que
-// ya tiene el sitio, no una interpretación aparte.
+// ya tiene el panel, no una interpretación aparte.
 const (
-	brandNavy    = "#0A1526" // --bg
+	brandNavy    = "#0A1526" // --bg / tinta
 	brandInk     = "#FFFFFF" // --ink
 	brandCeleste = "#3B82F6" // --celeste
+	brandPaper   = "#F2F5FA" // bg-paper -- canvas del panel admin/líder
 	brandLogoURL = "https://casadelreyhue.vercel.app/logo.png"
-	brandPhotoURL = "https://casadelreyhue.vercel.app/images/bg-hero.jpg"
 	emailFont    = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
 
 	// El "bisel" de vidrio real de .glass-light (index.css) -- luz superior
 	// izquierda, sombra tenue inferior derecha, hairline superior, realce
 	// inferior, y elevación externa. Sin backdrop-filter (no hay nada que
-	// desenfocar detrás en un correo) pero el relieve es el mismo.
+	// desenfocar detrás en un correo) pero el relieve es el mismo -- así
+	// se ven las cards del panel sobre su propio canvas claro.
 	glassCardShadow = "inset 1.5px 2px 4px rgba(255,255,255,0.85)," +
 		"inset -1.5px -1.5px 6px rgba(255,255,255,0.22)," +
 		"inset 0 1.5px 0 rgba(255,255,255,0.9)," +
-		"inset 0 -22px 36px -24px rgba(59,130,246,0.18)," +
-		"0 24px 60px -20px rgba(10,21,38,0.45)," +
-		"0 4px 12px rgba(10,21,38,0.12)"
+		"inset 0 -22px 36px -24px rgba(59,130,246,0.14)," +
+		"0 12px 32px -14px rgba(10,21,38,0.14)," +
+		"0 4px 12px rgba(10,21,38,0.06)"
 
 	// shadow-card de tailwind.config.js -- el mismo que usa el botón
-	// primario (GlassButton variant="primary") en el sitio público.
+	// "filled" (Button.jsx) del panel: navy relleno, texto blanco.
 	buttonShadow = "0 12px 36px -12px rgba(10,21,38,0.18),0 2px 6px rgba(10,21,38,0.08)"
 )
 
@@ -43,10 +46,12 @@ func baseURL() string {
 	return "https://casadelreyhue.org"
 }
 
-// emailShell envuelve el contenido en el mismo lenguaje visual del sitio:
-// canvas navy, foto de portada real, y la tarjeta .glass-light (blanco
-// escarchado con bisel + realce celeste inferior) como un solo bloque
-// continuo -- foto arriba, contenido abajo, mismas esquinas redondeadas.
+// emailShell envuelve el contenido en el lenguaje visual del PANEL
+// admin/líder (no el público): canvas claro bg-paper con halos celestes
+// suaves (Halos de Glass.jsx, monocromático a propósito -- el usuario ya
+// pidió antes eliminar los lavados multicolor), chip navy del logo, y la
+// tarjeta .glass-light (blanco escarchado con el mismo bisel real) para
+// el contenido.
 func emailShell(title, bodyHTML string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="es">
@@ -59,40 +64,27 @@ func emailShell(title, bodyHTML string) string {
 </head>
 <body style="margin:0;padding:0;background-color:%s;font-family:%s;">
 <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background-color:%s;">
-<tr><td align="center" style="padding:40px 20px;">
-<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+<tr><td align="center" style="padding:40px 20px;background-image:radial-gradient(circle at 12%% 8%%, rgba(59,130,246,0.12), transparent 42%%),radial-gradient(circle at 88%% 85%%, rgba(96,165,250,0.10), transparent 42%%);background-color:%s;">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
 
-<!-- Tarjeta de vidrio: foto + contenido como un solo bloque, bisel real de .glass-light -->
-<tr><td style="border-radius:24px;box-shadow:%s;overflow:hidden;">
-
-  <!-- Foto de portada real del sitio -->
-  <img src="%s" width="520" height="180" alt="Casa del Rey"
-       style="display:block;width:100%%;height:180px;object-fit:cover;background-color:%s;">
-
-  <!-- Logo, superpuesto al filo foto/tarjeta -->
-  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="margin-top:-28px;">
-  <tr><td align="center">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td
-      style="width:56px;height:56px;background-color:%s;border-radius:16px;box-shadow:0 8px 20px -6px rgba(10,21,38,0.5);" align="center" valign="middle">
-      <img src="%s" width="34" height="34" alt="" style="display:block;">
-    </td></tr></table>
-  </td></tr>
-  </table>
-
-  <!-- Contenido, sobre el vidrio blanco -->
-  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background-color:%s;">
-  <tr><td style="padding:20px 32px 36px;">
-    <div style="width:36px;height:4px;background-color:%s;border-radius:2px;margin-bottom:20px;"></div>
-    <div style="color:%s;font-family:%s;font-size:15px;line-height:1.65;">
-      %s
-    </div>
-  </td></tr>
-  </table>
-
+<!-- Chip navy del logo, igual al de los headers de página del panel -->
+<tr><td align="center" style="padding-bottom:22px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td
+    style="width:52px;height:52px;background-color:%s;border-radius:16px;box-shadow:%s;" align="center" valign="middle">
+    <img src="%s" width="30" height="30" alt="Casa del Rey" style="display:block;">
+  </td></tr></table>
 </td></tr>
 
-<tr><td align="center" style="padding-top:28px;">
-  <p style="margin:0;color:#ffffff99;font-family:%s;font-size:12px;line-height:1.6;">
+<!-- Tarjeta .glass-light: blanco escarchado, bisel real -->
+<tr><td style="background-color:%s;border-radius:24px;box-shadow:%s;padding:32px 30px;">
+  <div style="width:36px;height:4px;background-color:%s;border-radius:2px;margin-bottom:20px;"></div>
+  <div style="color:%s;font-family:%s;font-size:15px;line-height:1.65;">
+    %s
+  </div>
+</td></tr>
+
+<tr><td align="center" style="padding-top:24px;">
+  <p style="margin:0;color:rgba(10,21,38,0.45);font-family:%s;font-size:12px;line-height:1.6;">
     Casa del Rey · Huehuetenango<br>
     Correo automático, por favor no respondas a este mensaje.
   </p>
@@ -102,11 +94,9 @@ func emailShell(title, bodyHTML string) string {
 </td></tr>
 </table>
 </body>
-</html>`, title, brandNavy, emailFont, brandNavy,
-		glassCardShadow,
-		brandPhotoURL, brandNavy,
-		brandNavy, brandLogoURL,
-		brandInk,
+</html>`, title, brandPaper, emailFont, brandPaper, brandPaper,
+		brandNavy, buttonShadow, brandLogoURL,
+		brandInk, glassCardShadow,
 		brandCeleste,
 		brandNavy, emailFont, bodyHTML,
 		emailFont)
