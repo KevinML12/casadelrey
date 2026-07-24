@@ -14,7 +14,7 @@ type Config struct {
 	DatabaseURL string // Requerida: URL de conexión a PostgreSQL
 	JWTSecret   string // Requerida: clave secreta para firmar tokens JWT
 	ClientURL   string // URL del frontend (para CORS dinámico)
-	SendGridKey string // Clave de SendGrid (envío de emails)
+	BrevoKey    string // Clave API de Brevo (envío de emails transaccionales)
 	SupabaseURL string // URL de Supabase (si se usa como proveedor de auth)
 	SupabaseKey string // Clave de Supabase
 	Port        string // Puerto HTTP del servidor (default: 8080)
@@ -43,7 +43,7 @@ func Load() *Config {
 		DatabaseURL: os.Getenv("DATABASE_URL"),
 		JWTSecret:   os.Getenv("JWT_SECRET"),
 		ClientURL:   os.Getenv("CLIENT_URL"),
-		SendGridKey: os.Getenv("SENDGRID_API_KEY"),
+		BrevoKey:    os.Getenv("BREVO_API_KEY"),
 		SupabaseURL: os.Getenv("SUPABASE_URL"),
 		SupabaseKey: os.Getenv("SUPABASE_KEY"),
 		Port:        getEnvOrDefault("PORT", "8080"),
