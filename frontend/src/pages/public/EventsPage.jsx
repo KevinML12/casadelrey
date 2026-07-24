@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
@@ -9,6 +8,7 @@ import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
+import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
 
 // El modal de RSVP es glass-light (blanco/translucido) -- .input-light es
 // el mismo campo claro del panel admin/VolunteeringPage, funciona igual
@@ -107,10 +107,9 @@ function PaymentBanner({ event, attendeeCount = 1 }) {
 }
 
 function RSVPModal({ event, onClose }) {
-  const navigate = useNavigate();
   const [form, setForm]         = useState({ name: '', email: '', phone: '', attendee_count: 1, notes: '' });
   const [loading, setLoading]   = useState(false);
-  const [step, setStep]         = useState('form'); // form | success | need_payment | pending_payment
+  const [step, setStep]         = useState('form'); // form | success | need_payment | retry_failed | pending_payment
   const [successMsg, setSuccessMsg] = useState('');
 
   const set = k => e => setForm(p => ({
@@ -118,9 +117,14 @@ function RSVPModal({ event, onClose }) {
     [k]: e.target.type === 'number' ? parseInt(e.target.value) : e.target.value,
   }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.email) { toast.error('Nombre y correo son obligatorios'); return; }
+  // Intenta registrar el RSVP. Se llama desde el submit del formulario Y
+  // otra vez, sola, apenas se sube el comprobante (sin que el usuario
+  // vuelva a tocar nada) -- antes esto vivia solo en handleSubmit y el
+  // paso "need_payment" mandaba a /comprobante, una pagina aparte que no
+  // volvia a intentar el registro: el usuario subia su boleta y quedaba
+  // con un comprobante huerfano, sin RSVP real hasta que regresara a
+  // reintentar a mano.
+  const attemptRSVP = async () => {
     setLoading(true);
     try {
       const res = await apiClient.post(`/events/${event.ID}/rsvp`, form);
@@ -129,23 +133,32 @@ function RSVPModal({ event, onClose }) {
 
       setSuccessMsg(msg);
       setStep(payStatus === 'pendiente' ? 'pending_payment' : 'success');
+      return true;
     } catch (err) {
       const status = err.response?.status;
       if (status === 402) {
-        // No tiene boleta → mandar a subir comprobante
+        // No tiene boleta → mostrar el formulario de comprobante aquí mismo
         setStep('need_payment');
       } else {
         // 409 puede ser correo duplicado O cupo lleno/insuficiente — el
         // backend ya manda el mensaje exacto en cada caso.
         toast.error(err.response?.data?.error || 'Error al registrar');
       }
+      return false;
     } finally { setLoading(false); }
   };
 
-  const goToReceipt = () => {
-    onClose();
-    const total = (Number(event.price_gtq) || 0) * (form.attendee_count || 1);
-    navigate(`/comprobante?event_id=${event.ID}&event=${encodeURIComponent(event.title)}&amount=${total.toFixed(2)}`);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.email) { toast.error('Nombre y correo son obligatorios'); return; }
+    await attemptRSVP();
+  };
+
+  // El comprobante ya quedó creado (status "pendiente") -- reintentar el
+  // registro de inmediato, sin que el usuario tenga que hacer nada más.
+  const handleReceiptUploaded = async () => {
+    const ok = await attemptRSVP();
+    if (!ok) setStep('retry_failed');
   };
 
   // ── Pantalla: éxito sin pago
@@ -181,7 +194,9 @@ function RSVPModal({ event, onClose }) {
     </ModalWrapper>
   );
 
-  // ── Pantalla: necesita subir boleta primero
+  // ── Pantalla: necesita subir boleta -- el formulario de comprobante vive
+  // AQUÍ MISMO (ReceiptUploadForm embebido, no una página aparte); al
+  // terminar de subir, handleReceiptUploaded reintenta el registro solo.
   if (step === 'need_payment') return (
     <ModalWrapper onClose={onClose}>
       <div className="space-y-4">
@@ -196,17 +211,39 @@ function RSVPModal({ event, onClose }) {
         </div>
 
         <PaymentBanner event={event} attendeeCount={form.attendee_count} />
-        <p className="text-14 text-bg/60">
-          Después de depositar, sube la foto de tu comprobante. Una vez verificado, vuelve aquí para completar tu registro.
-        </p>
-        <button onClick={goToReceipt}
-          className="w-full flex items-center justify-center gap-2 h-11 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
-          <Icon name="arrow" className="w-4 h-4 -rotate-90" />
-          Subir mi comprobante
-        </button>
+
+        <ReceiptUploadForm
+          eventId={event.ID}
+          purpose="evento"
+          defaultAmount={((Number(event.price_gtq) || 0) * (form.attendee_count || 1)).toFixed(2)}
+          defaultName={form.name}
+          defaultEmail={form.email}
+          defaultPhone={form.phone}
+          onSuccess={handleReceiptUploaded}
+        />
+
         <button onClick={() => setStep('form')}
           className="w-full h-10 rounded-full border border-bg/15 text-14 text-bg/60 hover:text-bg hover:bg-bg/5 transition-colors">
-          Ya lo subí, intentar de nuevo
+          Volver
+        </button>
+      </div>
+    </ModalWrapper>
+  );
+
+  // ── Pantalla: el comprobante se subió pero el reintento de registro
+  // falló (ej. se cayó la red justo en ese momento) -- el comprobante YA
+  // quedó guardado, solo falta completar el registro con un toque.
+  if (step === 'retry_failed') return (
+    <ModalWrapper onClose={onClose}>
+      <div className="text-center py-6">
+        <div className="w-16 h-16 rounded-full bg-amber/15 border border-amber/25 flex items-center justify-center mx-auto mb-4">
+          <Icon name="clock" className="w-7 h-7 text-amber" />
+        </div>
+        <h3 className="text-19 text-bg font-bold mb-2">Comprobante guardado</h3>
+        <p className="text-14 text-bg/60 mb-5">No se pudo completar el registro automáticamente. Intenta de nuevo.</p>
+        <button onClick={attemptRSVP} disabled={loading}
+          className="w-full flex items-center justify-center gap-2 h-11 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90 disabled:opacity-50">
+          {loading ? 'Completando…' : 'Completar registro'}
         </button>
       </div>
     </ModalWrapper>

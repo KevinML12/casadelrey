@@ -97,6 +97,7 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 
 		// Si el evento requiere pago, validar que exista un comprobante verificado o pendiente
 		paymentStatus := "no_requerido"
+		var receiptID *uint
 		if event.RequiresPayment {
 			var receipt models.PaymentReceipt
 			err := tx.Where("payer_email = ? AND event_id = ? AND status IN ('pendiente','verificado')", req.Email, event.ID).
@@ -119,6 +120,12 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 			} else {
 				paymentStatus = "pendiente"
 			}
+			// Sin esto, PaymentReceiptHandler.Verify (Where("receipt_id = ?", ...))
+			// nunca encontraba a que registro actualizarle el payment_status al
+			// aprobar/rechazar -- el campo existia en el modelo pero nadie lo
+			// llenaba, asi que la inscripcion se quedaba en "pendiente" para
+			// siempre aunque el admin ya hubiera verificado el comprobante.
+			receiptID = &receipt.ID
 		}
 
 		reg := models.EventRegistration{
@@ -129,6 +136,7 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 			AttendeeCount: req.AttendeeCount,
 			Notes:         req.Notes,
 			PaymentStatus: paymentStatus,
+			ReceiptID:     receiptID,
 		}
 		if userID != 0 {
 			reg.UserID = &userID

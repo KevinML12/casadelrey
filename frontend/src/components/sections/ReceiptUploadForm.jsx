@@ -19,8 +19,18 @@ const EMPTY = {
   receipt_image_url: '', purpose: 'donacion', event_id: null,
 };
 
-export default function ReceiptUploadForm({ eventId = null, purpose = 'donacion', defaultAmount = '', onSuccess }) {
-  const [form, setForm]       = useState({ ...EMPTY, event_id: eventId, purpose, amount: defaultAmount });
+// defaultName/Email/Phone: cuando este formulario se embebe dentro de otro
+// (ej. RSVPModal de EventsPage.jsx) el usuario ya escribió esos datos --
+// evita que los vuelva a escribir. Vacíos por defecto, no rompe al
+// standalone de ReceiptPage.jsx que no los manda.
+export default function ReceiptUploadForm({
+  eventId = null, purpose = 'donacion', defaultAmount = '',
+  defaultName = '', defaultEmail = '', defaultPhone = '', onSuccess,
+}) {
+  const [form, setForm] = useState({
+    ...EMPTY, event_id: eventId, purpose, amount: defaultAmount,
+    payer_name: defaultName, payer_email: defaultEmail, payer_phone: defaultPhone,
+  });
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent]       = useState(false);
