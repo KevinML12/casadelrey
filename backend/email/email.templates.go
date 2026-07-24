@@ -7,17 +7,33 @@ import (
 	"casadelrey/backend/config"
 )
 
-// Paleta y logo compartidos con el sitio (frontend/src/index.css: --bg,
-// --ink, --celeste). Los clientes de correo no soportan backdrop-filter,
-// así que el material "liquid glass" se aproxima con una tarjeta blanca
-// sólida flotando sobre el fondo navy -- mismo efecto que .glass-light
-// en el sitio, sin el blur.
+// Valores tomados 1:1 de frontend/tailwind.config.js e index.css (--bg,
+// --ink, --celeste, shadow-card, rounded-pill, .glass-light). Los clientes
+// de correo no ejecutan Tailwind ni backdrop-filter, así que estos MISMOS
+// valores se aplican como estilos inline -- el resultado visual es el que
+// ya tiene el sitio, no una interpretación aparte.
 const (
-	brandNavy    = "#0A1526"
-	brandInk     = "#FFFFFF"
-	brandCeleste = "#3B82F6"
+	brandNavy    = "#0A1526" // --bg
+	brandInk     = "#FFFFFF" // --ink
+	brandCeleste = "#3B82F6" // --celeste
 	brandLogoURL = "https://casadelreyhue.vercel.app/logo.png"
+	brandPhotoURL = "https://casadelreyhue.vercel.app/images/bg-hero.jpg"
 	emailFont    = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+
+	// El "bisel" de vidrio real de .glass-light (index.css) -- luz superior
+	// izquierda, sombra tenue inferior derecha, hairline superior, realce
+	// inferior, y elevación externa. Sin backdrop-filter (no hay nada que
+	// desenfocar detrás en un correo) pero el relieve es el mismo.
+	glassCardShadow = "inset 1.5px 2px 4px rgba(255,255,255,0.85)," +
+		"inset -1.5px -1.5px 6px rgba(255,255,255,0.22)," +
+		"inset 0 1.5px 0 rgba(255,255,255,0.9)," +
+		"inset 0 -22px 36px -24px rgba(59,130,246,0.18)," +
+		"0 24px 60px -20px rgba(10,21,38,0.45)," +
+		"0 4px 12px rgba(10,21,38,0.12)"
+
+	// shadow-card de tailwind.config.js -- el mismo que usa el botón
+	// primario (GlassButton variant="primary") en el sitio público.
+	buttonShadow = "0 12px 36px -12px rgba(10,21,38,0.18),0 2px 6px rgba(10,21,38,0.08)"
 )
 
 func baseURL() string {
@@ -27,9 +43,10 @@ func baseURL() string {
 	return "https://casadelreyhue.org"
 }
 
-// emailShell envuelve el contenido de cada plantilla en el mismo marco
-// visual del sitio: canvas navy + tarjeta blanca centrada con esquinas
-// redondeadas + chip del logo arriba + pie de página uniforme.
+// emailShell envuelve el contenido en el mismo lenguaje visual del sitio:
+// canvas navy, foto de portada real, y la tarjeta .glass-light (blanco
+// escarchado con bisel + realce celeste inferior) como un solo bloque
+// continuo -- foto arriba, contenido abajo, mismas esquinas redondeadas.
 func emailShell(title, bodyHTML string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="es">
@@ -45,18 +62,33 @@ func emailShell(title, bodyHTML string) string {
 <tr><td align="center" style="padding:40px 20px;">
 <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
 
-<tr><td align="center" style="padding-bottom:24px;">
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td
-    style="width:56px;height:56px;background-color:%s;border-radius:16px;" align="center" valign="middle">
-    <img src="%s" width="34" height="34" alt="Casa del Rey" style="display:block;">
-  </td></tr></table>
-</td></tr>
+<!-- Tarjeta de vidrio: foto + contenido como un solo bloque, bisel real de .glass-light -->
+<tr><td style="border-radius:24px;box-shadow:%s;overflow:hidden;">
 
-<tr><td style="background-color:%s;border-radius:24px;padding:36px 32px;box-shadow:0 24px 50px -20px rgba(0,0,0,0.35);">
-  <div style="width:36px;height:4px;background-color:%s;border-radius:2px;margin-bottom:22px;"></div>
-  <div style="color:%s;font-family:%s;font-size:15px;line-height:1.65;">
-    %s
-  </div>
+  <!-- Foto de portada real del sitio -->
+  <img src="%s" width="520" height="180" alt="Casa del Rey"
+       style="display:block;width:100%%;height:180px;object-fit:cover;background-color:%s;">
+
+  <!-- Logo, superpuesto al filo foto/tarjeta -->
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="margin-top:-28px;">
+  <tr><td align="center">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td
+      style="width:56px;height:56px;background-color:%s;border-radius:16px;box-shadow:0 8px 20px -6px rgba(10,21,38,0.5);" align="center" valign="middle">
+      <img src="%s" width="34" height="34" alt="" style="display:block;">
+    </td></tr></table>
+  </td></tr>
+  </table>
+
+  <!-- Contenido, sobre el vidrio blanco -->
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background-color:%s;">
+  <tr><td style="padding:20px 32px 36px;">
+    <div style="width:36px;height:4px;background-color:%s;border-radius:2px;margin-bottom:20px;"></div>
+    <div style="color:%s;font-family:%s;font-size:15px;line-height:1.65;">
+      %s
+    </div>
+  </td></tr>
+  </table>
+
 </td></tr>
 
 <tr><td align="center" style="padding-top:28px;">
@@ -70,23 +102,32 @@ func emailShell(title, bodyHTML string) string {
 </td></tr>
 </table>
 </body>
-</html>`, title, brandNavy, emailFont, brandNavy, brandNavy, brandLogoURL, brandInk, brandCeleste, brandNavy, emailFont, bodyHTML, emailFont)
+</html>`, title, brandNavy, emailFont, brandNavy,
+		glassCardShadow,
+		brandPhotoURL, brandNavy,
+		brandNavy, brandLogoURL,
+		brandInk,
+		brandCeleste,
+		brandNavy, emailFont, bodyHTML,
+		emailFont)
 }
 
-// emailButton es el CTA de pill sapphire, igual al de los botones "filled"
-// del sitio (rounded-full, bg celeste, texto blanco, bold).
+// emailButton: el sitio público usa un pill BLANCO porque flota sobre
+// canvas navy (GlassButton primary); esta tarjeta de correo es blanca por
+// dentro, así que el pill de contraste real ahí es navy-sobre-blanco --
+// el mismo Button.jsx variant="filled" que usa el panel admin sobre sus
+// superficies claras. Mismo shadow-card, mismo rounded-full.
 func emailButton(label, url string) string {
 	return fmt.Sprintf(`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0;"><tr><td
-    style="background-color:%s;border-radius:999px;" align="center">
-    <a href="%s" style="display:inline-block;padding:14px 30px;color:#FFFFFF;text-decoration:none;font-family:%s;font-weight:700;font-size:15px;">%s</a>
-  </td></tr></table>`, brandCeleste, url, emailFont, label)
+    style="background-color:%s;border-radius:9999px;box-shadow:%s;" align="center">
+    <a href="%s" style="display:inline-block;padding:14px 30px;color:%s;text-decoration:none;font-family:%s;font-weight:700;font-size:15px;">%s</a>
+  </td></tr></table>`, brandNavy, buttonShadow, url, brandInk, emailFont, label)
 }
 
-// emailNote es el aviso secundario (expiración, motivo de rechazo, etc.) --
-// mismo tratamiento visual que los "chips" suaves del sitio.
+// emailNote es el aviso secundario (expiración, motivo de rechazo, etc.).
 func emailNote(text string) string {
-	return fmt.Sprintf(`<div style="background-color:%s0d;border-left:3px solid %s;border-radius:8px;padding:12px 16px;margin:18px 0;color:%s;font-family:%s;font-size:14px;">%s</div>`,
-		brandCeleste, brandCeleste, brandNavy, emailFont, text)
+	return fmt.Sprintf(`<div style="background-color:#3B82F60d;border-left:3px solid %s;border-radius:8px;padding:12px 16px;margin:18px 0;color:%s;font-family:%s;font-size:14px;">%s</div>`,
+		brandCeleste, brandNavy, emailFont, text)
 }
 
 func h1(text string) string {
