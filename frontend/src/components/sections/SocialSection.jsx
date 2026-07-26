@@ -8,18 +8,22 @@ import Reveal, { RevealList, RevealItem } from '../ui/Reveal';
 import Tilt from '../ui/Tilt';
 import { useApi } from '../../lib/feed';
 
-const PLATFORM_ICON = { instagram: 'instagram', youtube: 'youtube', facebook: 'heart', tiktok: 'music' };
+const PLATFORM_ICON = { instagram: 'instagram', youtube: 'youtube', facebook: 'facebook', tiktok: 'tiktok' };
 const FEED_SPAN = {
   small:  'col-span-1 row-span-1',
   medium: 'col-span-2 row-span-1',
   large:  'col-span-2 row-span-2',
 };
 
+// Handle real de cada cuenta -- antes solo mostraba el nombre de la red
+// (icono genérico + "Facebook") y no daba la sensación de conectar a una
+// cuenta real y verificable. Iconos: logos reales, no placeholders
+// (heart/music/spark) que no se parecían a la red que representaban.
 const NETWORKS = [
-  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  icon: 'heart' },
-  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', icon: 'instagram' },
-  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    icon: 'music' },
-  { href: 'https://x.com/pastorleoneli',                label: 'X',         icon: 'spark' },
+  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',     icon: 'instagram' },
+  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  handle: '/casadelreyhuehue',  icon: 'facebook' },
+  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    handle: '@leoneldeleongt',    icon: 'tiktok' },
+  { href: 'https://x.com/pastorleoneli',                label: 'X',         handle: '@pastorleoneli',     icon: 'x_logo' },
 ];
 
 export default function SocialSection({ title = 'Nuestro feed', showDirectAccess = true }) {
@@ -35,23 +39,29 @@ export default function SocialSection({ title = 'Nuestro feed', showDirectAccess
             {title}
           </h2>
         </div>
-        {showDirectAccess && (
-          <div className="flex gap-3 shrink-0">
+      </Reveal>
+
+      {showDirectAccess && (
+        <Reveal delay={0.05} className="relative z-10 max-w-6xl mx-auto px-6 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {NETWORKS.map(n => (
-              <a
-                key={n.label}
-                href={n.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white hover:scale-105 transition-transform focus-ring"
-                aria-label={n.label}
+              <Tilt key={n.label} as="a" max={4}
+                href={n.href} target="_blank" rel="noopener noreferrer"
+                className="group flex items-center gap-3.5 liquid-glass rounded-[18px] p-4 hover:border-white/25 transition-colors"
               >
-                <Icon name={n.icon} className="w-5 h-5" />
-              </a>
+                <span className="grid place-items-center w-14 h-14 rounded-[14px] bg-white/8 border border-white/12 text-white shrink-0">
+                  <Icon name={n.icon} className="w-7 h-7" stroke={1.4} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-15 font-bold text-white leading-tight">{n.label}</p>
+                  <p className="text-13 text-white/50 truncate">{n.handle}</p>
+                </div>
+                <Icon name="arrow" className="w-4 h-4 text-white/30 shrink-0 ml-auto -rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" stroke={2} />
+              </Tilt>
             ))}
           </div>
-        )}
-      </Reveal>
+        </Reveal>
+      )}
 
       {posts.length === 0 ? (
         <div className="relative z-10 max-w-6xl mx-auto px-6">

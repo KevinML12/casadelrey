@@ -15,11 +15,13 @@ const NAV = [
   { id: '/donate',       label: 'Dar' },
 ];
 
+// Iconos reales (antes heart/music/spark como relleno de Facebook/TikTok/X --
+// ver SocialSection.jsx, mismo fix).
 const SOCIAL = [
   { name: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/ig.casadelrey/' },
-  { name: 'heart',     label: 'Facebook',  href: 'https://www.facebook.com/casadelreyhuehue' },
-  { name: 'music',     label: 'TikTok',    href: 'https://www.tiktok.com/@leoneldeleongt' },
-  { name: 'spark',     label: 'X',         href: 'https://x.com/pastorleoneli' },
+  { name: 'facebook',  label: 'Facebook',  href: 'https://www.facebook.com/casadelreyhuehue' },
+  { name: 'tiktok',    label: 'TikTok',    href: 'https://www.tiktok.com/@leoneldeleongt' },
+  { name: 'x_logo',    label: 'X',         href: 'https://x.com/pastorleoneli' },
 ];
 
 export default function Footer() {

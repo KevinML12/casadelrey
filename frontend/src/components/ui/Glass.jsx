@@ -128,6 +128,12 @@ PATHS.spatial_audio = PATHS.headphones;
 PATHS.video_camera_front = PATHS.camera;
 PATHS.waving_hand = PATHS.spark;
 PATHS.play_circle = <><circle cx="12" cy="12" r="9" /><polygon points="10 8.3 16 12 10 15.7" fill="currentColor" stroke="none" /></>;
+// Logos reales de redes (antes Facebook/TikTok/X usaban heart/music/spark
+// como relleno -- se leía "genérico hecho con IA" porque ningún ícono se
+// parecía a la red real que representaba).
+PATHS.facebook = <><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><path d="M13.6 20v-7h2.1l.4-2.7h-2.5V8.6c0-.8.2-1.3 1.3-1.3h1.3V5c-.2 0-1-.1-1.9-.1-2 0-3.3 1.2-3.3 3.4v1.9H8.7V13H11v7h2.6Z" fill="currentColor" stroke="none" /></>;
+PATHS.tiktok = <><path d="M13.3 3v11.2a3.4 3.4 0 1 1-2.4-3.2" /><path d="M13.3 3.3c.4 2.8 2.2 4.6 4.6 4.9" /></>;
+PATHS.x_logo = <><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" /></>;
 PATHS.shield = <path d="M12 3 4.5 6v6c0 4.6 3.1 8.4 7.5 9.5 4.4-1.1 7.5-4.9 7.5-9.5V6Z" />;
 PATHS.star = <polygon points="12 3 14.7 9.2 21.5 9.9 16.4 14.4 17.9 21 12 17.5 6.1 21 7.6 14.4 2.5 9.9 9.3 9.2" />;
 PATHS.thumb_up = <><path d="M7 11v9H4.5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1H7Z" /><path d="M7 11l3.5-7a2 2 0 0 1 2 2v3.5H18a1.8 1.8 0 0 1 1.75 2.2l-1.4 6A2 2 0 0 1 16.4 20H9a2 2 0 0 1-2-2v-7Z" /></>;
