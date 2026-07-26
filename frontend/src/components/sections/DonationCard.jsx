@@ -15,15 +15,9 @@ import toast from 'react-hot-toast';
 import { Icon } from '../ui/Glass';
 import BankDetails from './BankDetails';
 import { compressImageIfNeeded } from '../../lib/compressImage';
+import { useDonationPurposes } from '../../lib/donationPurposes';
 
 const AMOUNTS  = [50, 100, 250, 500];
-const PURPOSES = [
-  { value: 'general',   label: 'Fondo General' },
-  { value: 'celulas',   label: 'Células' },
-  { value: 'misionero', label: 'Misiones' },
-  { value: 'jovenes',   label: 'Ministerio Joven' },
-  { value: 'edificio',  label: 'Edificio' },
-];
 
 const PAYMENT_METHODS = [
   { icon: 'spark', label: 'Transferencia bancaria', sub: 'Sube tu boleta y la verificamos', value: 'transferencia' },
@@ -47,6 +41,7 @@ export default function DonationCard() {
   const [step,    setStep]    = useState(0);
   const [amount,  setAmount]  = useState(100);
   const [custom,  setCustom]  = useState('');
+  const purposes = useDonationPurposes();
   const [purpose, setPurpose] = useState('general');
   const [method,  setMethod]  = useState('transferencia');
   const [name,    setName]    = useState('');
@@ -61,7 +56,7 @@ export default function DonationCard() {
   const [loading, setLoading] = useState(false);
 
   const finalAmount = custom ? parseFloat(custom) : amount;
-  const purposeLabel = PURPOSES.find(p => p.value === purpose)?.label || '';
+  const purposeLabel = purposes.find(p => p.value === purpose)?.title || '';
   const methodLabel  = PAYMENT_METHODS.find(m => m.value === method)?.label || '';
   const isTransfer = method === 'transferencia';
 
@@ -303,7 +298,7 @@ export default function DonationCard() {
                     {i === 1 && (
                       <div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {PURPOSES.map(p => {
+                          {purposes.map(p => {
                             const active = purpose === p.value;
                             return (
                               <motion.button
@@ -317,8 +312,8 @@ export default function DonationCard() {
                                   active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
                                 }`}
                               >
-                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-celeste' : 'bg-bg/25'}`} />
-                                {p.label}
+                                <Icon name={p.icon} className={`w-4 h-4 shrink-0 ${active ? 'text-celeste' : 'text-bg/40'}`} stroke={1.8} />
+                                {p.title}
                               </motion.button>
                             );
                           })}

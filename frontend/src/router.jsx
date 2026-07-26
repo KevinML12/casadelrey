@@ -50,6 +50,7 @@ const AdminLeaders       = lazy(() => import('./pages/admin/AdminLeaders'));
 const AdminCells         = lazy(() => import('./pages/admin/AdminCells'));
 const AdminCellCategories = lazy(() => import('./pages/admin/AdminCellCategories'));
 const AdminVolunteerAreas = lazy(() => import('./pages/admin/AdminVolunteerAreas'));
+const AdminDonationPurposes = lazy(() => import('./pages/admin/AdminDonationPurposes'));
 const AdminActivityLog   = lazy(() => import('./pages/admin/AdminActivityLog'));
 const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
 const AdminDonations     = lazy(() => import('./pages/admin/AdminDonations'));
@@ -107,6 +108,7 @@ export const router = createBrowserRouter([
       { path: 'cells',           element: <Suspense fallback={<PageFallback />}><AdminCells /></Suspense> },
       { path: 'cell-categories', element: <Suspense fallback={<PageFallback />}><AdminCellCategories /></Suspense> },
       { path: 'volunteer-areas', element: <Suspense fallback={<PageFallback />}><AdminVolunteerAreas /></Suspense> },
+      { path: 'donation-purposes', element: <Suspense fallback={<PageFallback />}><AdminDonationPurposes /></Suspense> },
       { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
       { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
       { path: 'donations',       element: <Suspense fallback={<PageFallback />}><AdminDonations /></Suspense> },

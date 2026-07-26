@@ -251,6 +251,20 @@ type VolunteerArea struct {
 	IsActive    bool   `json:"is_active" gorm:"default:true"`
 }
 
+// DonationPurpose reemplaza los dos arreglos hardcodeados que tenia el
+// frontend (IMPACT en DonatePage.jsx y PURPOSES en DonationCard.jsx --
+// mismo concepto, dos listas desincronizadas) por una sola fuente
+// administrable, mismo patron que VolunteerArea.
+type DonationPurpose struct {
+	gorm.Model
+	Value       string `json:"value" gorm:"type:varchar(50);uniqueIndex;not null"` // general, celulas... (va en donation_purpose)
+	Icon        string `json:"icon" gorm:"type:varchar(30)"`                       // nombre del icono del set (Glass.jsx)
+	Title       string `json:"title" gorm:"type:varchar(100);not null"`
+	Description string `json:"description" gorm:"type:text"`
+	SortOrder   int    `json:"sort_order" gorm:"default:0"`
+	IsActive    bool   `json:"is_active" gorm:"default:true"`
+}
+
 type SocialPost struct {
 	gorm.Model
 	Platform     string `json:"platform" gorm:"type:varchar(20);not null"` // facebook|instagram|youtube|tiktok

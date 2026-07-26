@@ -5,16 +5,15 @@ import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
-
-const IMPACT = [
-  { icon: 'users',     title: 'Células',   desc: 'Equipando líderes de casa en cada barrio' },
-  { icon: 'spark',     title: 'Misiones',  desc: 'Llevando el evangelio a otras regiones' },
-  { icon: 'book',      title: 'Educación', desc: 'Materiales y estudios bíblicos gratuitos' },
-  { icon: 'heart',     title: 'Familias',  desc: 'Apoyo integral a familias en necesidad' },
-];
+import { useDonationPurposes } from '../../lib/donationPurposes';
 
 export default function DonatePage() {
   const sectionImg = useSitePhoto('donar_seccion', '/images/bg-donar.jpg');
+  // Misma fuente admin-editable que el selector de "Destino" del acordeón
+  // (useDonationPurposes) -- antes esta vitrina tenía SU PROPIO arreglo
+  // (IMPACT) con 2 destinos que ni siquiera eran seleccionables de
+  // verdad (Educación/Familias). Ahora es una sola lista real.
+  const purposes = useDonationPurposes();
   return (
     <main className="min-h-screen bg-bg text-white relative overflow-hidden">
       <PageHero
@@ -44,15 +43,15 @@ export default function DonatePage() {
               </Reveal>
 
               <RevealList className="space-y-3">
-                {IMPACT.map(({ icon, title, desc }) => (
-                  <RevealItem key={title}>
+                {purposes.map(({ value, icon, title, description }) => (
+                  <RevealItem key={value}>
                     <Tilt max={3} glass="standard" className="flex items-center gap-4 glass-light rounded-[20px] p-5">
                       <span className="grid place-items-center w-12 h-12 rounded-full bg-bg/8 border border-bg/12 text-bg shrink-0">
                         <Icon name={icon} className="w-5 h-5" />
                       </span>
                       <div>
                         <h3 className="text-16 font-bold tracking-tight text-bg">{title}</h3>
-                        <p className="text-14 text-bg/60 mt-0.5">{desc}</p>
+                        <p className="text-14 text-bg/60 mt-0.5">{description}</p>
                       </div>
                     </Tilt>
                   </RevealItem>

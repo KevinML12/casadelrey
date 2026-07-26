@@ -30,6 +30,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	profileHandler       := handlers.NewProfileHandler(db)
 	volunteerHandler     := handlers.NewVolunteerHandler(db)
 	volunteerAreaHandler := handlers.NewVolunteerAreaHandler(db)
+	donationPurposeHandler := handlers.NewDonationPurposeHandler(db)
 	boletaHandler        := handlers.NewBoletaHandler(db)
 	uploadHandler        := handlers.NewUploadHandler(store)
 	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
@@ -98,6 +99,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.GET("/volunteer/departments", volunteerHandler.GetDepartments)
 	api.GET("/volunteer/me",          volunteerHandler.GetMyInfo, authMW)
 	api.GET("/volunteer-areas",       volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong)
+	api.GET("/donation-purposes",     donationPurposeHandler.GetPublicDonationPurposes, cacheLong)
 
 	// Auth
 	authGroup := api.Group("/auth", authRateLimit)
@@ -236,6 +238,12 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.POST("/volunteer-areas",      volunteerAreaHandler.CreateVolunteerArea)
 	adminGroup.PUT("/volunteer-areas/:id",   volunteerAreaHandler.UpdateVolunteerArea)
 	adminGroup.DELETE("/volunteer-areas/:id", volunteerAreaHandler.DeleteVolunteerArea)
+
+	// Destinos de donación — admin (antes hardcodeados en 2 arreglos del frontend)
+	adminGroup.GET("/donation-purposes",       donationPurposeHandler.GetAllDonationPurposesAdmin)
+	adminGroup.POST("/donation-purposes",      donationPurposeHandler.CreateDonationPurpose)
+	adminGroup.PUT("/donation-purposes/:id",   donationPurposeHandler.UpdateDonationPurpose)
+	adminGroup.DELETE("/donation-purposes/:id", donationPurposeHandler.DeleteDonationPurpose)
 
 	// Aprobación de reportes de células (solo admin)
 	adminGroup.PUT("/cell-reports/:id/approve", cellReportHandler.ApproveReport)
