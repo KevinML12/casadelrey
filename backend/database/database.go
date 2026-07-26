@@ -54,16 +54,17 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		}
 
 		// Pool de conexiones: ajustar según la carga esperada del servidor.
-		// MaxOpenConns bajado de 100 a 40 -- el pooler gratis de Supabase
-		// (Supavisor/pgbouncer) para este proyecto soporta ~60 conexiones
-		// simultáneas; con 100 configurado aquí, un pico de tráfico real
-		// (varios requests concurrentes, cada uno con su propia conexión)
-		// podía agotar el límite real del lado de Supabase antes que el
-		// límite (falso) de este pool, dando errores intermitentes de
-		// "too many clients" en vez de una cola ordenada. 40 deja margen
-		// para otras conexiones (dashboard de Supabase, migraciones, etc).
-		sqlDB.SetMaxIdleConns(10)              // Conexiones inactivas en el pool
-		sqlDB.SetMaxOpenConns(40)              // Conexiones simultáneas máximas
+		// CORRECCIÓN (jul-2026): el valor anterior (40) asumía que el pooler
+		// de Supabase soportaba ~60 conexiones -- FALSO, confirmado con el
+		// error real en logs de producción: "max clients reached in session
+		// mode - max clients are limited to pool_size: 15". Con 40 aquí, un
+		// pico de tráfico normal (varios requests concurrentes) agotaba el
+		// límite REAL de Supabase (15) mucho antes que el límite configurado
+		// en este pool, causando errores intermitentes reales en endpoints
+		// públicos (ej. GetEvents fallando con "failed to connect"). Bajado
+		// a 10 -- deja margen para el dashboard de Supabase y otras conexiones.
+		sqlDB.SetMaxIdleConns(5)               // Conexiones inactivas en el pool
+		sqlDB.SetMaxOpenConns(10)              // Conexiones simultáneas máximas
 		sqlDB.SetConnMaxLifetime(time.Hour)    // Tiempo máximo de vida de una conexión
 
 		// AutoMigrate crea o altera las tablas para que coincidan con los modelos.
@@ -89,6 +90,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			// Pagos
 			&models.PaymentReceipt{},   // NUEVA — verifica comprobantes bancarios
 			&models.Donation{},
+			&models.DonationPurpose{},  // NUEVA — destinos de donación editables desde el admin
 			// Personas
 			&models.Leader{},           // directorio de líderes (foto + contacto)
 			&models.Volunteer{},
