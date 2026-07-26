@@ -48,6 +48,9 @@ const CATEGORIES = [
   { name: 'Oración y logística', values: ['oracion', 'logistica'] },
 ];
 
+// Botón de cerrar fuera del div con overflow-y-auto -- mismo fix que
+// EventsPage.jsx ModalWrapper (reportado por el usuario: la X vivía
+// dentro del contenido scrolleable y desaparecía al hacer scroll).
 function ModalWrapper({ children, onClose }) {
   return (
     <motion.div
@@ -56,16 +59,27 @@ function ModalWrapper({ children, onClose }) {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
       <motion.div
-        className="glass-light w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-bg"
-        style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+        className="relative w-full max-w-md max-h-[90vh]"
         onClick={e => e.stopPropagation()}
-        data-lenis-prevent
         initial={{ opacity: 0, scale: 0.94, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96 }}
         transition={{ type: 'spring', stiffness: 340, damping: 28 }}
       >
-        {children}
+        <div
+          className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"
+          style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+          data-lenis-prevent
+        >
+          {children}
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Cerrar"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white border-2 border-celeste/50 shadow-card flex items-center justify-center text-celeste hover:border-celeste hover:bg-celeste hover:text-white transition-colors"
+        >
+          <Icon name="close" className="w-4 h-4" stroke={2.2} />
+        </button>
       </motion.div>
     </motion.div>
   );
@@ -182,14 +196,9 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-12 text-bg font-bold uppercase tracking-wide">Aplicación</p>
-          <p className="text-14 text-bg/60 mt-0.5">{area ? area.title : NO_PREFERENCE_LABEL}</p>
-        </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
-          <Icon name="close" className="w-4 h-4 text-bg/60" />
-        </button>
+      <div className="mb-4 pr-10">
+        <p className="text-12 text-bg font-bold uppercase tracking-wide">Aplicación</p>
+        <p className="text-14 text-bg/60 mt-0.5">{area ? area.title : NO_PREFERENCE_LABEL}</p>
       </div>
 
       <form onSubmit={reviewSubmit} className="space-y-4">

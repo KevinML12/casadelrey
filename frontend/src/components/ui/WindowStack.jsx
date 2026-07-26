@@ -102,12 +102,14 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
             onClick={close}
           />
 
-          {/* Cerrar */}
+          {/* Cerrar -- ya vivía fuera del contenido scrolleable (correcto);
+              solo se le agrega el acento celeste para que se note más,
+              a pedido del usuario (antes neutro blanco/vidrio). */}
           <motion.button
             onClick={close}
             whileHover={{ scale: 1.08, rotate: 90 }} whileTap={{ scale: 0.9 }}
             aria-label="Cerrar"
-            className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-white/80 hover:text-white"
+            className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full liquid-glass border-2 border-celeste/40 flex items-center justify-center text-white/80 hover:text-celeste hover:border-celeste/70"
           >
             <Icon name="close" className="w-5 h-5" />
           </motion.button>

@@ -298,14 +298,9 @@ function RSVPModal({ event, onClose }) {
 
   return (
     <ModalWrapper onClose={onClose}>
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar asistencia</p>
-          <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
-        </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
-          <Icon name="close" className="w-4 h-4 text-bg/60" />
-        </button>
+      <div className="mb-4 pr-10">
+        <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar asistencia</p>
+        <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
       </div>
       {event.requires_payment && <PaymentBanner event={event} attendeeCount={form.attendee_count} />}
       <form onSubmit={handleSubmit} className="space-y-3">
@@ -371,14 +366,9 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
 
   return (
     <ModalWrapper onClose={onClose}>
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-12 text-bg font-bold uppercase tracking-wide">Cancelar registro</p>
-          <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
-        </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors">
-          <Icon name="close" className="w-4 h-4 text-bg/60" />
-        </button>
+      <div className="mb-4 pr-10">
+        <p className="text-12 text-bg font-bold uppercase tracking-wide">Cancelar registro</p>
+        <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
       </div>
       <form onSubmit={handleCancel} className="space-y-3">
         <div>
@@ -594,16 +584,30 @@ function PastEventCard({ ev }) {
   );
 }
 
+// El botón de cerrar vive AQUÍ (fuera del div con overflow-y-auto), no
+// dentro de cada paso -- reportado por el usuario: al hacer scroll dentro
+// del modal, la X (que antes vivía en el header de cada paso, adentro del
+// contenido scrolleable) desaparecía de la vista. Ahora es parte del
+// "chrome" del modal, siempre visible sin importar el scroll, con un
+// acento celeste para que se note más que un botón neutro.
 function ModalWrapper({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div
-        className="glass-light w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-bg"
-        style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
-        onClick={e => e.stopPropagation()}
-        data-lenis-prevent
-      >
-        {children}
+      <div className="relative w-full max-w-md max-h-[90vh]" onClick={e => e.stopPropagation()}>
+        <div
+          className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"
+          style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+          data-lenis-prevent
+        >
+          {children}
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Cerrar"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white border-2 border-celeste/50 shadow-card flex items-center justify-center text-celeste hover:border-celeste hover:bg-celeste hover:text-white transition-colors"
+        >
+          <Icon name="close" className="w-4 h-4" stroke={2.2} />
+        </button>
       </div>
     </div>
   );
