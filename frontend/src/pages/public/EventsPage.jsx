@@ -125,6 +125,13 @@ function RSVPModal({ event, onClose }) {
   const [step, setStep]         = useState('form'); // form | success | need_payment | retry_failed | pending_payment
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Si el evento cobra pero el admin todavía no cargó una cuenta bancaria
+  // real (Settings), NO se debe ofrecer "sube tu comprobante" -- no hay a
+  // dónde depositar. La opción de subir comprobante queda condicionada a
+  // que exista un número de cuenta real, no solo a que el evento cobre.
+  const { hasAccount, whatsapp } = useBankInfo();
+  const paymentNotReady = event.requires_payment && !hasAccount;
+
   const set = k => e => setForm(p => ({
     ...p,
     [k]: e.target.type === 'number' ? parseInt(e.target.value) : e.target.value,
@@ -173,6 +180,33 @@ function RSVPModal({ event, onClose }) {
     const ok = await attemptRSVP();
     if (!ok) setStep('retry_failed');
   };
+
+  // ── Pantalla: el evento cobra pero no hay cuenta bancaria configurada --
+  // se bloquea ANTES de mostrar el formulario, no se llega ni a "sube tu
+  // comprobante" (no hay a dónde depositar).
+  if (paymentNotReady) return (
+    <ModalWrapper onClose={onClose}>
+      <div className="text-center py-6">
+        <div className="w-16 h-16 rounded-full bg-amber/15 border border-amber/25 flex items-center justify-center mx-auto mb-4">
+          <Icon name="clock" className="w-7 h-7 text-amber" />
+        </div>
+        <h3 className="text-19 text-bg font-bold mb-2">Registro no disponible aún</h3>
+        <p className="text-14 text-bg/60 mb-1">Este evento requiere pago, pero el equipo todavía no carga los datos de depósito.</p>
+        <p className="text-14 text-bg/60 mb-5">
+          {whatsapp ? 'Escríbenos por WhatsApp para coordinar tu registro mientras tanto.' : 'Vuelve a intentarlo más tarde o contáctanos por redes sociales.'}
+        </p>
+        {whatsapp && (
+          <a href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 px-6 h-11 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
+            Escríbenos por WhatsApp
+          </a>
+        )}
+        <button onClick={onClose} className="mt-3 w-full h-10 rounded-full border border-bg/15 text-14 text-bg/60 hover:text-bg hover:bg-bg/5 transition-colors">
+          Cerrar
+        </button>
+      </div>
+    </ModalWrapper>
+  );
 
   // ── Pantalla: éxito sin pago
   if (step === 'success') return (
@@ -567,6 +601,7 @@ function ModalWrapper({ children, onClose }) {
         className="glass-light w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-bg"
         style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
         onClick={e => e.stopPropagation()}
+        data-lenis-prevent
       >
         {children}
       </div>
