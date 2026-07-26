@@ -59,6 +59,7 @@ function ModalWrapper({ children, onClose }) {
         className="glass-light w-full max-w-md p-6 max-h-[90vh] overflow-y-auto rounded-[32px] text-bg"
         style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
         onClick={e => e.stopPropagation()}
+        data-lenis-prevent
         initial={{ opacity: 0, scale: 0.94, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96 }}

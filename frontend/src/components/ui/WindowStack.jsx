@@ -162,7 +162,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                       con varias celulas) esto no cambia nada -- solo entra
                       en juego cuando hay espacio de sobra. */}
                   {isFront && (
-                    <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-center">
+                    <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-center" data-lenis-prevent>
                       {renderContent(it)}
                     </div>
                   )}
