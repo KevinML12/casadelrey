@@ -31,23 +31,36 @@ const GRID_SPANS = [
 // Comprobante, paginas oscuras. Aca el modal es claro, asi que se
 // reusa solo el hook (useBankInfo) y se renderiza con tinta navy en
 // vez de tocar el componente compartido.
+// Sin cuenta bancaria configurada, el fallback compartido (BankDetails.jsx)
+// manda a /conectate con un <a> normal -- eso recarga TODA la página y
+// destruye el modal de inscripción a mitad de flujo (reportado por el
+// usuario: "no redirigirme, acá se arregla todo"). Aquí, dentro del RSVP,
+// nunca navega a ningún lado: si hay WhatsApp abre una pestaña nueva
+// (no pierde el modal detrás), y si tampoco hay eso, es solo texto.
 function LightBankDetails() {
   const { hasAccount, rows, whatsapp } = useBankInfo();
 
   if (!hasAccount) {
-    const href = whatsapp ? `https://wa.me/${whatsapp.replace(/\D/g, '')}` : '/conectate';
+    if (whatsapp) {
+      return (
+        <a
+          href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`}
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center justify-between gap-3 rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4 hover:bg-bg/10 transition-colors focus-ring"
+        >
+          <div className="text-left min-w-0">
+            <p className="text-14 font-bold text-bg">Escríbenos para coordinar tu depósito</p>
+            <p className="text-13 text-bg/55 mt-1">Te compartimos los datos bancarios por WhatsApp</p>
+          </div>
+          <Icon name="arrow" className="w-4 h-4 text-bg/35 shrink-0" stroke={2} />
+        </a>
+      );
+    }
     return (
-      <a
-        href={href}
-        {...(whatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className="flex items-center justify-between gap-3 rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4 hover:bg-bg/10 transition-colors focus-ring"
-      >
-        <div className="text-left min-w-0">
-          <p className="text-14 font-bold text-bg">Escríbenos para coordinar tu depósito</p>
-          <p className="text-13 text-bg/55 mt-1">Te compartimos los datos bancarios al momento</p>
-        </div>
-        <Icon name="arrow" className="w-4 h-4 text-bg/35 shrink-0" stroke={2} />
-      </a>
+      <div className="rounded-[14px] bg-bg/5 border border-bg/10 px-4 py-4">
+        <p className="text-14 font-bold text-bg">Coordinando los datos de depósito</p>
+        <p className="text-13 text-bg/55 mt-1">El equipo te los compartirá pronto. Puedes subir tu comprobante aquí en cuanto tengas el depósito hecho.</p>
+      </div>
     );
   }
 
