@@ -53,7 +53,7 @@ const CATEGORIES = [
 // todo el espacio y SIN inclinación. Con columns cada tarjeta ocupa su
 // alto natural y las columnas se acomodan solas, sin huecos que rellenar
 // a mano ni ángulos fijos.
-const HEIGHTS = ['h-64', 'h-52', 'h-72', 'h-60', 'h-80', 'h-56'];
+const HEIGHTS = ['h-[288px]', 'h-[240px]', 'h-[336px]', 'h-[272px]', 'h-[384px]', 'h-[256px]'];
 
 // Botón de cerrar fuera del div con overflow-y-auto -- mismo fix que
 // EventsPage.jsx ModalWrapper (reportado por el usuario: la X vivía
@@ -354,8 +354,8 @@ export default function VolunteeringPage() {
         <ParallaxImg src={sectionImg} alt="" className="opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/55 to-bg" />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <Reveal className="mb-10 text-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <Reveal className="mb-10 text-center max-w-2xl mx-auto">
             <Eyebrow>Departamentos</Eyebrow>
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
               ¿Dónde quieres servir?
@@ -387,7 +387,7 @@ export default function VolunteeringPage() {
               return (
                 <div key={cat.name}>
                   <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
-                  <div className="columns-2 sm:columns-3 gap-3 sm:gap-4">
+                  <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4">
                     {catAreas.map(area => {
                       const i = globalIndex[area.value];
                       // Categorías de un solo departamento (ej. "Niños y
@@ -404,7 +404,7 @@ export default function VolunteeringPage() {
                           viewport={{ once: true, margin: '-60px' }}
                           transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
                         >
-                          <DepartmentCard {...area} big={solo} height={solo ? 'h-56' : HEIGHTS[i % HEIGHTS.length]} onClick={() => setOpenKey(area.value)} />
+                          <DepartmentCard {...area} big={solo} height={solo ? 'h-[300px]' : HEIGHTS[i % HEIGHTS.length]} onClick={() => setOpenKey(area.value)} />
                         </motion.div>
                       );
                     })}
@@ -425,6 +425,7 @@ export default function VolunteeringPage() {
         openKey={openKey}
         onChange={setOpenKey}
         height="min(70vh, 560px)"
+        light
         renderContent={(it) => {
           const a = areas.find(x => x.value === it.key);
           if (!a) return null;
@@ -436,23 +437,23 @@ export default function VolunteeringPage() {
                   el "¿por qué aquí?" pasa a panel lateral en desktop. */}
               <div className="sm:col-span-3 flex flex-col gap-4">
                 {category && (
-                  <span className="self-start inline-flex items-center gap-1.5 bg-white/10 border border-white/15 text-white/70 px-3 py-1 rounded-full text-11 font-bold uppercase tracking-wide">
+                  <span className="self-start inline-flex items-center gap-1.5 bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-11 font-bold uppercase tracking-wide">
                     {category}
                   </span>
                 )}
-                <p className="text-white/70 text-15 leading-relaxed">{a.desc}</p>
+                <p className="text-bg/70 text-15 leading-relaxed">{a.desc}</p>
                 <motion.button
                   {...PRESS}
                   onClick={() => openForm(a.value)}
-                  className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-white text-bg px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
+                  className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
                 >
                   Aplicar a {a.title}
                   <Icon name="arrow" className="w-4 h-4" stroke={2} />
                 </motion.button>
               </div>
-              <div className="sm:col-span-2 liquid-glass rounded-[16px] p-5 h-fit">
-                <p className="text-11 font-bold uppercase tracking-widest text-white/40 mb-2">¿Por qué aquí?</p>
-                <p className="text-white/80 text-15 leading-relaxed">{a.why}</p>
+              <div className="sm:col-span-2 glass-light-nested rounded-[16px] p-5 h-fit">
+                <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+                <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
               </div>
             </div>
           );

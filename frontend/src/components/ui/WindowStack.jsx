@@ -36,7 +36,13 @@ const stackPose = (depth) => ({
   zIndex: 50 - depth,
 });
 
-export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80vh, 640px)' }) {
+// light: variante clara (.glass-light) para páginas donde la ventana de
+// detalle debe leerse como el resto del panel claro del sitio (ej.
+// Voluntariado) en vez del .liquid-glass oscuro/inmersivo por defecto
+// (Galería, Células). El banner con foto + degradado navy no cambia --
+// ya se lee bien en ambos casos porque el contraste lo da el degradado,
+// no el material de la ventana.
+export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80vh, 640px)', light = false }) {
   const overlayRef = useRef(null);
   const stack = useMemo(() => {
     if (!openKey) return [];
@@ -141,7 +147,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                   animate={stackPose(depth)}
                   transition={{ type: 'spring', stiffness: 260, damping: 30 }}
                   onClick={() => !isFront && onChange(it.key)}
-                  className={`absolute inset-0 liquid-glass rounded-[28px] overflow-hidden flex flex-col ${isFront ? '' : 'cursor-pointer'}`}
+                  className={`absolute inset-0 ${light ? 'glass-light' : 'liquid-glass'} rounded-[28px] overflow-hidden flex flex-col ${isFront ? '' : 'cursor-pointer'}`}
                   style={{ transformOrigin: 'top center', pointerEvents: depth > 3 ? 'none' : 'auto' }}
                 >
                   {/* Banner */}
