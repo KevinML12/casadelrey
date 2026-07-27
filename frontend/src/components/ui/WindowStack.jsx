@@ -7,7 +7,9 @@
 //  del fondo mientras hay ventana abierta.
 //
 //  props:
-//   items          [{ key, image, badge?, title }]  — pila + banner
+//   items          [{ key, image, images?, badge?, title }]  — pila + banner.
+//                  images (opcional, array) da carrusel en el banner del
+//                  frente; sin ella cae a `image` como foto única (compat).
 //   openKey        key abierta (o null = cerrado)
 //   onChange(key)  cambia la ventana activa; null cierra
 //   renderContent(item) → cuerpo (scrollable) de la ventana del frente
@@ -19,7 +21,7 @@
 //  `layout` que necesita layoutId (la imagen se quedaba pegada al tamaño
 //  chico de la card de origen). No reintroducir sin resolver ese conflicto.
 // ============================================================
-import { useMemo, useEffect, useCallback, useRef } from 'react';
+import { useMemo, useEffect, useCallback, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from './Glass';
 
@@ -50,6 +52,12 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
     if (idx < 0) return [];
     return [...items.slice(idx), ...items.slice(0, idx)]; // activo primero
   }, [openKey, items]);
+
+  // Carrusel de fotos DENTRO del banner del frente -- distinto de los
+  // dots de abajo (que saltan entre departamentos). Se reinicia a la
+  // primera foto cada vez que se abre un departamento distinto.
+  const [photoIdx, setPhotoIdx] = useState(0);
+  useEffect(() => { setPhotoIdx(0); }, [openKey]);
 
   const close = useCallback(() => onChange(null), [onChange]);
   const go = useCallback((dir) => {
@@ -141,6 +149,9 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
           <div className="relative w-full max-w-[780px]" style={{ height, perspective: 1400 }}>
             {stack.map((it, depth) => {
               const isFront = depth === 0;
+              const photos = it.images?.length ? it.images : (it.image ? [it.image] : []);
+              const idx = isFront ? photoIdx % photos.length : 0;
+              const showCarousel = isFront && photos.length > 1;
               return (
                 <motion.div
                   key={it.key}
@@ -150,10 +161,48 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                   className={`absolute inset-0 ${light ? 'glass-light' : 'liquid-glass'} rounded-[28px] overflow-hidden flex flex-col ${isFront ? '' : 'cursor-pointer'}`}
                   style={{ transformOrigin: 'top center', pointerEvents: depth > 3 ? 'none' : 'auto' }}
                 >
-                  {/* Banner */}
+                  {/* Banner -- carrusel si hay más de una foto (isFront) */}
                   <div className="relative h-32 sm:h-40 shrink-0">
-                    {it.image && <img src={it.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-70" />}
+                    {photos[idx] && (
+                      <AnimatePresence mode="wait">
+                        <motion.img
+                          key={idx}
+                          src={photos[idx]}
+                          alt=""
+                          initial={{ opacity: 0 }} animate={{ opacity: 0.7 }} exit={{ opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </AnimatePresence>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A1526] via-[#0A1526]/50 to-transparent" />
+                    {showCarousel && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setPhotoIdx(p => (p - 1 + photos.length) % photos.length); }}
+                          aria-label="Foto anterior"
+                          className="absolute inset-y-0 left-0 w-1/3 z-10 flex items-center justify-start pl-2 opacity-50 hover:opacity-100 transition-opacity"
+                        >
+                          <span className="w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                            <Icon name="arrow" className="w-3.5 h-3.5 text-white rotate-180" />
+                          </span>
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setPhotoIdx(p => (p + 1) % photos.length); }}
+                          aria-label="Foto siguiente"
+                          className="absolute inset-y-0 right-0 w-1/3 z-10 flex items-center justify-end pr-2 opacity-50 hover:opacity-100 transition-opacity"
+                        >
+                          <span className="w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                            <Icon name="arrow" className="w-3.5 h-3.5 text-white" />
+                          </span>
+                        </button>
+                        <div className="absolute top-3 right-3 z-10 flex gap-1">
+                          {photos.map((_, pIdx) => (
+                            <span key={pIdx} className={`h-1 rounded-full transition-all ${pIdx === idx ? 'w-4 bg-white' : 'w-1 bg-white/40'}`} />
+                          ))}
+                        </div>
+                      </>
+                    )}
                     <div className="absolute bottom-0 left-0 p-5 sm:p-6">
                       {it.badge && (
                         <span className="bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold backdrop-blur-md">

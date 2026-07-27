@@ -55,6 +55,74 @@ const CATEGORIES = [
 // a mano ni ángulos fijos.
 const HEIGHTS = ['h-[288px]', 'h-[240px]', 'h-[336px]', 'h-[272px]', 'h-[384px]', 'h-[256px]'];
 
+// Tags de interés por departamento (frontend-only, no vive en la DB --
+// son una capa de descubrimiento, no contenido administrable). Los
+// reusan tanto los chips de filtro como el quiz de abajo: 'frente'/
+// 'apoyo' son un eje aparte (visibilidad) que solo usa la pregunta 2
+// del quiz, no aparecen como chip de filtro.
+const DEPT_TAGS = {
+  alabanza: ['musica', 'frente'],
+  danza: ['musica', 'frente'],
+  servidores: ['personas', 'apoyo'],
+  protocolo: ['personas', 'frente'],
+  pancartas: ['personas', 'apoyo'],
+  maestros_ninos: ['ninos', 'frente'],
+  tecnicos_audiovisuales: ['tecnologia', 'apoyo'],
+  multimedia: ['tecnologia', 'apoyo'],
+  oracion: ['oracion', 'apoyo'],
+  logistica: ['organizacion', 'apoyo'],
+};
+
+const INTEREST_TAGS = [
+  { key: 'musica', label: 'Música y arte', icon: 'mic' },
+  { key: 'personas', label: 'Atender personas', icon: 'heart' },
+  { key: 'ninos', label: 'Niños', icon: 'book' },
+  { key: 'tecnologia', label: 'Tecnología', icon: 'headphones' },
+  { key: 'oracion', label: 'Oración', icon: 'pray' },
+  { key: 'organizacion', label: 'Organización', icon: 'box' },
+];
+
+const QUIZ_QUESTIONS = [
+  {
+    q: '¿Qué te describe mejor?',
+    options: [
+      { label: 'Me encanta la música y el arte', icon: 'mic', tags: ['musica'] },
+      { label: 'Disfruto servir y atender personas', icon: 'heart', tags: ['personas'] },
+      { label: 'Amo trabajar con niños', icon: 'book', tags: ['ninos'] },
+      { label: 'Se me da la tecnología', icon: 'headphones', tags: ['tecnologia'] },
+      { label: 'Prefiero orar y organizar', icon: 'pray', tags: ['oracion', 'organizacion'] },
+    ],
+  },
+  {
+    q: '¿Prefieres estar al frente o dar soporte detrás de cámara?',
+    options: [
+      { label: 'Al frente, visible', icon: 'spark', tags: ['frente'] },
+      { label: 'Detrás, dando soporte', icon: 'box', tags: ['apoyo'] },
+      { label: 'Cualquiera de los dos', icon: 'check', tags: [] },
+    ],
+  },
+];
+
+// Encuentra el departamento con más tags en común con lo que respondió
+// el usuario -- empate se resuelve por orden (el primero que alcanza el
+// score más alto), determinista, no aleatorio.
+function bestMatch(areas, selectedTags) {
+  let best = null, bestScore = -1;
+  for (const a of areas) {
+    const tags = DEPT_TAGS[a.value] || [];
+    const score = tags.filter(t => selectedTags.includes(t)).length;
+    if (score > bestScore) { bestScore = score; best = a; }
+  }
+  return best;
+}
+
+// Halo ambiental detrás del grid que cambia de color según la categoría
+// bajo el cursor -- 4 acentos ya existentes en la paleta (rose/amber/
+// emerald/celeste) más un violeta puntual solo para esto (no hay 5to
+// tono semántico en tailwind.config.js, y usarlo aquí no exige agregar
+// uno -- es un valor inline, no una clase).
+const CATEGORY_GLOW = ['#3B82F6', '#F43F5E', '#F59E0B', '#10B981', '#8B5CF6'];
+
 // Botón de cerrar fuera del div con overflow-y-auto -- mismo fix que
 // EventsPage.jsx ModalWrapper (reportado por el usuario: la X vivía
 // dentro del contenido scrolleable y desaparecía al hacer scroll).
@@ -300,9 +368,98 @@ function DepartmentCard({ title, desc, photo, big, height, onClick }) {
   );
 }
 
+// Quiz de 2 preguntas -- matchmaker rápido para quien no sabe cuál
+// departamento elegir (alternativa a hojear las 10 tarjetas). Vive en
+// su propio ModalWrapper-like porque necesita pasos internos (pregunta
+// 1 -> 2 -> resultado) que VolunteerForm no maneja.
+function QuizModal({ areas, onViewDetail, onApply }) {
+  const [step, setStep] = useState(0); // 0,1 = preguntas; 'result' = resultado
+  const [tags, setTags] = useState([]);
+  const [result, setResult] = useState(null);
+
+  const answer = (optionTags) => {
+    const nextTags = [...tags, ...optionTags];
+    if (step < QUIZ_QUESTIONS.length - 1) {
+      setTags(nextTags);
+      setStep(step + 1);
+    } else {
+      setTags(nextTags);
+      setResult(bestMatch(areas, nextTags));
+      setStep('result');
+    }
+  };
+
+  const restart = () => { setStep(0); setTags([]); setResult(null); };
+
+  if (step === 'result') {
+    return (
+      <div className="text-center">
+        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Tu lugar ideal es</p>
+        <h3 className="text-24 font-bold text-bg tracking-tight mb-4">{result ? result.title : 'Cualquier departamento'}</h3>
+        {result?.photo && (
+          <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
+            <img src={result.photo} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <p className="text-14 text-bg/65 leading-relaxed mb-6">{result ? result.why : NO_PREFERENCE_WHY}</p>
+        <div className="flex flex-col gap-2.5">
+          <motion.button {...PRESS} onClick={() => onApply(result?.value || '')} className={btnPrimary}>
+            Aplicar a {result ? result.title : 'este departamento'}
+            <Icon name="arrow" className="w-4 h-4" stroke={2} />
+          </motion.button>
+          {result && (
+            <button type="button" onClick={() => onViewDetail(result.value)} className={btnGhost}>
+              Ver detalle primero
+            </button>
+          )}
+          <button type="button" onClick={restart} className="text-13 font-semibold text-bg/45 hover:text-bg/70 transition-colors mt-1">
+            Volver a intentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const question = QUIZ_QUESTIONS[step];
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-5">
+        {QUIZ_QUESTIONS.map((_, i) => (
+          <span key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? 'bg-bg' : 'bg-bg/12'}`} />
+        ))}
+      </div>
+      <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta {step + 1} de {QUIZ_QUESTIONS.length}</p>
+      <h3 className="text-19 font-bold text-bg tracking-tight mb-5">{question.q}</h3>
+      <div className="flex flex-col gap-2.5">
+        {question.options.map(opt => (
+          <button
+            key={opt.label}
+            type="button"
+            onClick={() => answer(opt.tags)}
+            className="flex items-center gap-3 rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
+          >
+            <span className="w-9 h-9 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
+              <Icon name={opt.icon} className="w-4 h-4" stroke={2} />
+            </span>
+            <span className="text-14 font-semibold text-bg">{opt.label}</span>
+          </button>
+        ))}
+      </div>
+      {step > 0 && (
+        <button type="button" onClick={() => setStep(step - 1)} className="mt-4 text-13 font-semibold text-bg/45 hover:text-bg/70 transition-colors">
+          ← Pregunta anterior
+        </button>
+      )}
+    </>
+  );
+}
+
 export default function VolunteeringPage() {
   const [openKey, setOpenKey] = useState(null);   // departamento abierto en el WindowStack
   const [formDept, setFormDept] = useState(null);  // null = modal cerrado, '' = abierto sin preseleccion
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [activeTag, setActiveTag] = useState(null);   // chip de interés activo (filtra el grid) o null
+  const [hoverCategory, setHoverCategory] = useState(null); // categoría bajo el cursor -- colorea el halo ambiental
   // Administrable desde /admin/site-photos (antes ruta hardcodeada — el
   // admin no podía cambiarla sin deploy). El local queda de fallback.
   const sectionImg = useSitePhoto('voluntariado_seccion', '/images/nosotros/servidores.jpg');
@@ -324,7 +481,19 @@ export default function VolunteeringPage() {
     ? [...CATEGORIES, { name: 'Otros', values: leftover.map(a => a.value) }]
     : CATEGORIES;
 
-  const windowItems = areas.map(a => ({ key: a.value, image: a.photo, title: a.title }));
+  // images: segunda foto opcional (voluntariado_<value>_2, admin-editable
+  // en /admin/site-photos) para el carrusel del banner -- si no existe,
+  // el array queda con 1 sola foto y WindowStack cae a modo estático.
+  const windowItems = areas.map(a => ({
+    key: a.value,
+    image: a.photo,
+    images: [a.photo, sitePhotos[`voluntariado_${a.value}_2`]].filter(Boolean),
+    title: a.title,
+  }));
+
+  // Color del halo ambiental por categoría -- mismo orden que se pinta,
+  // así el índice coincide con CATEGORY_GLOW.
+  const categoryGlow = Object.fromEntries(categoriesWithLeftover.map((c, i) => [c.name, CATEGORY_GLOW[i % CATEGORY_GLOW.length]]));
 
   // Índice global (no por categoría) para que el patrón de tamaños/
   // inclinaciones del collage varíe de verdad a lo largo de las 10
@@ -353,6 +522,20 @@ export default function VolunteeringPage() {
       <section className="relative py-4 pb-24 overflow-hidden">
         <ParallaxImg src={sectionImg} alt="" className="opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/55 to-bg" />
+        {/* Halo ambiental -- cambia de color según la categoría bajo el
+            cursor, le da sensación de "vivo" al fondo sin tocar el grid.
+            CSS transition plano en vez de motion.div: el animate={{opacity}}
+            de framer-motion no se comprometía al inline style en pruebas
+            (se quedaba en el opacity por defecto del navegador) -- una
+            transición CSS normal es más simple y funciona igual de bien
+            para un fade tan directo. */}
+        <div
+          className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+          style={{
+            opacity: hoverCategory ? 0.5 : 0,
+            background: `radial-gradient(680px circle at 50% 20%, ${hoverCategory ? categoryGlow[hoverCategory] : '#3B82F6'}33, transparent 70%)`,
+          }}
+        />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-10 text-center max-w-2xl mx-auto">
@@ -361,13 +544,24 @@ export default function VolunteeringPage() {
               ¿Dónde quieres servir?
             </h2>
             <p className="mt-4 text-16 text-white/70">Toca un departamento para conocerlo mejor.</p>
-            <button
-              type="button"
-              onClick={() => openForm('')}
-              className="mt-3 text-14 font-semibold text-white/50 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
-            >
-              ¿No sabes cuál elegir? Aplica de todas formas
-            </button>
+            <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <motion.button
+                {...PRESS}
+                type="button"
+                onClick={() => setQuizOpen(true)}
+                className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
+              >
+                <Icon name="spark" className="w-4 h-4" stroke={2} />
+                Descubre tu lugar ideal
+              </motion.button>
+              <button
+                type="button"
+                onClick={() => openForm('')}
+                className="text-14 font-semibold text-white/50 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
+              >
+                O aplica sin preferencia
+              </button>
+            </div>
           </Reveal>
 
           <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto mb-14">
@@ -381,11 +575,36 @@ export default function VolunteeringPage() {
             ))}
           </RevealList>
 
+          {/* Chips de interés -- filtran el grid de abajo. Reusan los
+              mismos tags que puntúan el quiz, así los dos caminos
+              (explorar vs. que te recomienden) llevan a lo mismo. */}
+          <Reveal className="flex flex-wrap items-center justify-center gap-2 mb-10">
+            <button
+              type="button"
+              onClick={() => setActiveTag(null)}
+              className={`inline-flex items-center gap-1.5 rounded-pill px-3.5 py-2 text-13 font-semibold transition-colors ${!activeTag ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
+            >
+              Todos
+            </button>
+            {INTEREST_TAGS.map(t => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setActiveTag(cur => cur === t.key ? null : t.key)}
+                className={`inline-flex items-center gap-1.5 rounded-pill px-3.5 py-2 text-13 font-semibold transition-colors ${activeTag === t.key ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
+              >
+                <Icon name={t.icon} className="w-3.5 h-3.5" stroke={2} />
+                {t.label}
+              </button>
+            ))}
+          </Reveal>
+
           <div className="space-y-10">
             {categoriesWithLeftover.map(cat => {
-              const catAreas = areas.filter(a => cat.values.includes(a.value));
+              const catAreas = areas.filter(a => cat.values.includes(a.value) && (!activeTag || DEPT_TAGS[a.value]?.includes(activeTag)));
+              if (catAreas.length === 0) return null;
               return (
-                <div key={cat.name}>
+                <div key={cat.name} onMouseEnter={() => setHoverCategory(cat.name)} onMouseLeave={() => setHoverCategory(null)}>
                   <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
                   <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4">
                     {catAreas.map(area => {
@@ -412,6 +631,14 @@ export default function VolunteeringPage() {
                 </div>
               );
             })}
+            {activeTag && !areas.some(a => DEPT_TAGS[a.value]?.includes(activeTag)) && (
+              <div className="text-center py-10">
+                <p className="text-15 text-white/50 mb-3">Ningún departamento coincide con ese interés todavía.</p>
+                <button type="button" onClick={() => setActiveTag(null)} className="text-14 font-semibold text-white/70 hover:text-white underline underline-offset-4 decoration-white/20">
+                  Ver todos los departamentos
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -451,14 +678,38 @@ export default function VolunteeringPage() {
                   <Icon name="arrow" className="w-4 h-4" stroke={2} />
                 </motion.button>
               </div>
-              <div className="sm:col-span-2 glass-light-nested rounded-[16px] p-5 h-fit">
-                <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
-                <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
+              <div className="sm:col-span-2 flex flex-col gap-4">
+                <div className="glass-light-nested rounded-[16px] p-5 h-fit">
+                  <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+                  <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
+                </div>
+                {/* Testimonio real -- solo si el admin cargó uno de verdad
+                    (nunca se inventa una cita atribuida a alguien). */}
+                {a.testimonial && (
+                  <div className="glass-light-nested rounded-[16px] p-5 h-fit">
+                    <p className="text-bg/70 text-14 italic leading-relaxed">"{a.testimonial}"</p>
+                    {a.testimonialAuthor && <p className="text-bg/45 text-12 font-semibold mt-2">— {a.testimonialAuthor}</p>}
+                  </div>
+                )}
               </div>
             </div>
           );
         }}
       />
+
+      {/* Quiz/matchmaker -- alternativa a hojear las 10 tarjetas para
+          quien no sabe cuál departamento elegir. */}
+      <AnimatePresence>
+        {quizOpen && (
+          <ModalWrapper onClose={() => setQuizOpen(false)}>
+            <QuizModal
+              areas={areas}
+              onViewDetail={(value) => { setQuizOpen(false); setOpenKey(value); }}
+              onApply={(value) => { setQuizOpen(false); openForm(value); }}
+            />
+          </ModalWrapper>
+        )}
+      </AnimatePresence>
 
       {/* Formulario -- ya no vive siempre visible al fondo de la pagina,
           aparece como modal glass-light al presionar "Aplicar" (desde el

@@ -22,7 +22,7 @@ const ICON_OPTIONS = [
   'crown', 'gift', 'flag', 'camera', 'headphones', 'pray', 'box', 'pin', 'clock', 'calendar',
 ];
 
-const EMPTY = { value: '', icon: 'box', title: '', description: '', why: '', sort_order: 0 };
+const EMPTY = { value: '', icon: 'box', title: '', description: '', why: '', testimonial: '', testimonial_author: '', sort_order: 0 };
 
 function AreaForm({ onSave, onCancel, initialData }) {
   const [form, setForm] = useState(initialData || EMPTY);
@@ -89,6 +89,21 @@ function AreaForm({ onSave, onCancel, initialData }) {
         <label className="block text-label-l text-bg/50 mb-1.5">¿Por qué aquí? (se muestra al abrir el departamento)</label>
         <textarea value={form.why} onChange={set('why')} rows={2}
           className={fieldCls} placeholder="Por qué le conviene a alguien servir en este departamento..." />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-bg/10">
+        <div className="sm:col-span-2">
+          <label className="block text-label-l text-bg/50 mb-1.5">Testimonio (opcional)</label>
+          <textarea value={form.testimonial} onChange={set('testimonial')} rows={2}
+            className={fieldCls} placeholder="Cita textual de un voluntario real de este departamento -- déjalo vacío si aún no tienes una." />
+          <p className="text-label-s text-bg/40 mt-1">
+            Solo pon citas reales de personas reales que dieron su permiso -- no se muestra nada si lo dejas vacío.
+          </p>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-label-l text-bg/50 mb-1.5">Autor del testimonio</label>
+          <input value={form.testimonial_author} onChange={set('testimonial_author')} className={fieldCls} placeholder="ej. Ana López, voluntaria desde 2023" />
+        </div>
       </div>
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">

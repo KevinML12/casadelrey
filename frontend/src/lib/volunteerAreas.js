@@ -104,6 +104,8 @@ export function useVolunteerAreas() {
       title: a.title,
       desc: a.description,
       why: a.why,
+      testimonial: a.testimonial,
+      testimonialAuthor: a.testimonial_author,
       photoFallback: VOLUNTEER_AREAS.find(f => f.value === a.value)?.photoFallback || DEFAULT_PHOTO_FALLBACK,
     }));
   }
