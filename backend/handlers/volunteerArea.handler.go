@@ -71,13 +71,15 @@ func (h *VolunteerAreaHandler) UpdateVolunteerArea(c echo.Context) error {
 	}
 
 	var req struct {
-		Value       string `json:"value"`
-		Icon        string `json:"icon"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
-		Why         string `json:"why"`
-		SortOrder   *int   `json:"sort_order"`
-		IsActive    *bool  `json:"is_active"`
+		Value             string `json:"value"`
+		Icon              string `json:"icon"`
+		Title             string `json:"title"`
+		Description       string `json:"description"`
+		Why               string `json:"why"`
+		Testimonial       string `json:"testimonial"`
+		TestimonialAuthor string `json:"testimonial_author"`
+		SortOrder         *int   `json:"sort_order"`
+		IsActive          *bool  `json:"is_active"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -91,6 +93,8 @@ func (h *VolunteerAreaHandler) UpdateVolunteerArea(c echo.Context) error {
 	area.Icon = req.Icon
 	area.Description = req.Description
 	area.Why = req.Why
+	area.Testimonial = req.Testimonial
+	area.TestimonialAuthor = req.TestimonialAuthor
 	if req.SortOrder != nil {
 		area.SortOrder = *req.SortOrder
 	}

@@ -8,16 +8,16 @@ import (
 
 type User struct {
 	gorm.Model
-	Name                    string     `json:"name" gorm:"not null"`
-	Email                   string     `json:"email" gorm:"unique;not null"`
-	Password                string     `json:"-" gorm:"not null"`
-	Role                    string     `json:"role" gorm:"default:member"` // admin|leader|volunteer|member
-	Address                 string     `json:"address"`
-	Phone                   string     `json:"phone" gorm:"type:varchar(30)"`
+	Name     string `json:"name" gorm:"not null"`
+	Email    string `json:"email" gorm:"unique;not null"`
+	Password string `json:"-" gorm:"not null"`
+	Role     string `json:"role" gorm:"default:member"` // admin|leader|volunteer|member
+	Address  string `json:"address"`
+	Phone    string `json:"phone" gorm:"type:varchar(30)"`
 	// Célula — normalizada
-	CellID                  *uint      `json:"cell_id" gorm:"index"`      // FK → Cell (nuevo)
-	CellCode                string     `json:"cell_code"`                 // deprecar tras migración
-	CellType                string     `json:"cell_type"`                 // deprecar tras migración
+	CellID   *uint  `json:"cell_id" gorm:"index"` // FK → Cell (nuevo)
+	CellCode string `json:"cell_code"`            // deprecar tras migración
+	CellType string `json:"cell_type"`            // deprecar tras migración
 	// Auth
 	ResetToken              *string    `json:"-" gorm:"index"`
 	ResetTokenExpiry        *time.Time `json:"-"`
@@ -116,15 +116,15 @@ type Petition struct {
 // reporte de célula) — ver DB_SCHEMA.md "connect_cards".
 type ConnectCard struct {
 	gorm.Model
-	Name              string `json:"name" gorm:"type:varchar(100);not null"`
-	Phone             string `json:"phone" gorm:"type:varchar(30)"`
-	Email             string `json:"email" gorm:"type:varchar(100)"`
-	HowFound          string `json:"how_found" gorm:"type:varchar(30)"`          // invitacion|redes|publicidad|otro
-	Category          string `json:"category" gorm:"type:varchar(30);not null"` // primera_vez|reconciliado|busco_celula
-	LeaderAssignedID  *uint  `json:"leader_assigned_id" gorm:"index"`
-	LeaderAssigned    *User  `json:"leader_assigned,omitempty" gorm:"foreignKey:LeaderAssignedID"`
-	Status            string `json:"status" gorm:"type:varchar(20);default:'nuevo'"` // nuevo|contactado|integrado
-	Notes             string `json:"notes" gorm:"type:text"`
+	Name             string `json:"name" gorm:"type:varchar(100);not null"`
+	Phone            string `json:"phone" gorm:"type:varchar(30)"`
+	Email            string `json:"email" gorm:"type:varchar(100)"`
+	HowFound         string `json:"how_found" gorm:"type:varchar(30)"`         // invitacion|redes|publicidad|otro
+	Category         string `json:"category" gorm:"type:varchar(30);not null"` // primera_vez|reconciliado|busco_celula
+	LeaderAssignedID *uint  `json:"leader_assigned_id" gorm:"index"`
+	LeaderAssigned   *User  `json:"leader_assigned,omitempty" gorm:"foreignKey:LeaderAssignedID"`
+	Status           string `json:"status" gorm:"type:varchar(20);default:'nuevo'"` // nuevo|contactado|integrado
+	Notes            string `json:"notes" gorm:"type:text"`
 }
 
 type Donation struct {
@@ -145,28 +145,28 @@ type Donation struct {
 // PaymentReceipt verifica comprobantes bancarios para cobros de eventos y donaciones.
 type PaymentReceipt struct {
 	gorm.Model
-	PayerName        string     `json:"payer_name" gorm:"type:varchar(100);not null"`
-	PayerEmail       string     `json:"payer_email" gorm:"type:varchar(100)"`
-	PayerPhone       string     `json:"payer_phone" gorm:"type:varchar(30)"`
-	Amount           float64    `json:"amount" gorm:"type:decimal(10,2);not null"`
-	Currency         string     `json:"currency" gorm:"type:varchar(3);default:'GTQ'"`
-	BankName         string     `json:"bank_name" gorm:"type:varchar(100)"`     // Banrural|BAC|G&T|Industrial
-	ReferenceNumber  string     `json:"reference_number" gorm:"type:varchar(255)"`
-	ReceiptImageURL  string     `json:"receipt_image_url" gorm:"type:varchar(500)"` // Cloudflare R2
-	Purpose          string     `json:"purpose" gorm:"type:varchar(50)"`           // evento|donacion
-	EventID          *uint      `json:"event_id" gorm:"index"`
-	DonationID       *uint      `json:"donation_id" gorm:"index"`
-	Status           string     `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|verificado|rechazado
-	VerifiedByID     *uint      `json:"verified_by_id" gorm:"index"`
-	VerifiedAt       *time.Time `json:"verified_at"`
-	RejectionReason  string     `json:"rejection_reason" gorm:"type:varchar(255)"`
+	PayerName       string     `json:"payer_name" gorm:"type:varchar(100);not null"`
+	PayerEmail      string     `json:"payer_email" gorm:"type:varchar(100)"`
+	PayerPhone      string     `json:"payer_phone" gorm:"type:varchar(30)"`
+	Amount          float64    `json:"amount" gorm:"type:decimal(10,2);not null"`
+	Currency        string     `json:"currency" gorm:"type:varchar(3);default:'GTQ'"`
+	BankName        string     `json:"bank_name" gorm:"type:varchar(100)"` // Banrural|BAC|G&T|Industrial
+	ReferenceNumber string     `json:"reference_number" gorm:"type:varchar(255)"`
+	ReceiptImageURL string     `json:"receipt_image_url" gorm:"type:varchar(500)"` // Cloudflare R2
+	Purpose         string     `json:"purpose" gorm:"type:varchar(50)"`            // evento|donacion
+	EventID         *uint      `json:"event_id" gorm:"index"`
+	DonationID      *uint      `json:"donation_id" gorm:"index"`
+	Status          string     `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|verificado|rechazado
+	VerifiedByID    *uint      `json:"verified_by_id" gorm:"index"`
+	VerifiedAt      *time.Time `json:"verified_at"`
+	RejectionReason string     `json:"rejection_reason" gorm:"type:varchar(255)"`
 }
 
 type Event struct {
 	gorm.Model
 	Title           string  `json:"title" gorm:"type:varchar(255);not null"`
 	Date            string  `json:"date" gorm:"type:varchar(20)"`
-	Time            string  `json:"time" gorm:"type:varchar(10)"`   // "10:00"
+	Time            string  `json:"time" gorm:"type:varchar(10)"` // "10:00"
 	Location        string  `json:"location" gorm:"type:varchar(255)"`
 	Description     string  `json:"description" gorm:"type:text"`
 	CoverImage      string  `json:"cover_image" gorm:"type:varchar(500)"`
@@ -180,23 +180,23 @@ type Event struct {
 type CellReport struct {
 	gorm.Model
 	// Identificación
-	CellID      *uint  `json:"cell_id" gorm:"index"`                         // FK → Cell (nuevo)
+	CellID      *uint  `json:"cell_id" gorm:"index"` // FK → Cell (nuevo)
 	CellCode    string `json:"cell_code" gorm:"type:varchar(20)"`
 	CellName    string `json:"cell_name" gorm:"type:varchar(100);not null"`
 	CellType    string `json:"cell_type" gorm:"type:varchar(20)"`
 	MeetingDate string `json:"meeting_date" gorm:"type:varchar(20);not null"`
 	// Responsables
 	LeaderID   *uint  `json:"leader_id" gorm:"index"`
-	LeaderName string `json:"leader_name" gorm:"type:varchar(100)"`  // deprecar
-	PastorID   *uint  `json:"pastor_id" gorm:"index"`                // nuevo
-	PastorName string `json:"pastor_name" gorm:"type:varchar(100)"`  // deprecar
+	LeaderName string `json:"leader_name" gorm:"type:varchar(100)"` // deprecar
+	PastorID   *uint  `json:"pastor_id" gorm:"index"`               // nuevo
+	PastorName string `json:"pastor_name" gorm:"type:varchar(100)"` // deprecar
 	// Anfitrión
 	HostName  string `json:"host_name" gorm:"type:varchar(100)"`
 	HostPhone string `json:"host_phone" gorm:"type:varchar(30)"`
 	Address   string `json:"address" gorm:"type:varchar(255)"`
 	// Contenido
-	Topic  string `json:"topic" gorm:"type:varchar(255)"`
-	Notes  string `json:"notes" gorm:"type:text"`
+	Topic string `json:"topic" gorm:"type:varchar(255)"`
+	Notes string `json:"notes" gorm:"type:text"`
 	// Números
 	TotalAttendees int     `json:"total_attendees" gorm:"default:0"`
 	Converts       int     `json:"converts" gorm:"default:0"`
@@ -229,7 +229,7 @@ type Volunteer struct {
 	Department       string `json:"department" gorm:"type:varchar(50)"`
 	Message          string `json:"message" gorm:"type:text"`
 	AssignedLeaderID *uint  `json:"assigned_leader_id" gorm:"index"`
-	UserID           *uint  `json:"user_id" gorm:"index"` // FK al usuario creado
+	UserID           *uint  `json:"user_id" gorm:"index"`                             // FK al usuario creado
 	Status           string `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|asignado|coordinando|usuario_creado
 }
 
@@ -242,13 +242,15 @@ type Volunteer struct {
 // borrar uno.
 type VolunteerArea struct {
 	gorm.Model
-	Value       string `json:"value" gorm:"type:varchar(50);uniqueIndex;not null"` // alabanza, danza...
-	Icon        string `json:"icon" gorm:"type:varchar(30)"`                       // nombre del icono del set ya existente (Glass.jsx)
-	Title       string `json:"title" gorm:"type:varchar(100);not null"`
-	Description string `json:"description" gorm:"type:text"`
-	Why         string `json:"why" gorm:"type:text"` // "por que aqui" -- se muestra al abrir el departamento
-	SortOrder   int    `json:"sort_order" gorm:"default:0"`
-	IsActive    bool   `json:"is_active" gorm:"default:true"`
+	Value             string `json:"value" gorm:"type:varchar(50);uniqueIndex;not null"` // alabanza, danza...
+	Icon              string `json:"icon" gorm:"type:varchar(30)"`                       // nombre del icono del set ya existente (Glass.jsx)
+	Title             string `json:"title" gorm:"type:varchar(100);not null"`
+	Description       string `json:"description" gorm:"type:text"`
+	Why               string `json:"why" gorm:"type:text"`                        // "por que aqui" -- se muestra al abrir el departamento
+	Testimonial       string `json:"testimonial" gorm:"type:text"`                // cita real de un voluntario -- vacio por defecto, el admin la carga cuando la tenga (nunca se inventa)
+	TestimonialAuthor string `json:"testimonial_author" gorm:"type:varchar(100)"` // "Nombre, rol/tiempo sirviendo"
+	SortOrder         int    `json:"sort_order" gorm:"default:0"`
+	IsActive          bool   `json:"is_active" gorm:"default:true"`
 }
 
 // DonationPurpose reemplaza los dos arreglos hardcodeados que tenia el
@@ -270,7 +272,7 @@ type SocialPost struct {
 	Platform     string `json:"platform" gorm:"type:varchar(20);not null"` // facebook|instagram|youtube|tiktok
 	PostURL      string `json:"post_url" gorm:"type:varchar(500);not null"`
 	Caption      string `json:"caption" gorm:"type:varchar(500)"`
-	ImageURL     string `json:"image_url" gorm:"type:varchar(500)"`        // foto subida a R2
+	ImageURL     string `json:"image_url" gorm:"type:varchar(500)"`                     // foto subida a R2
 	FeaturedSize string `json:"featured_size" gorm:"type:varchar(20);default:'medium'"` // small|medium|large — grid editorial
 	IsActive     bool   `json:"is_active" gorm:"default:true"`
 	SortOrder    int    `json:"sort_order" gorm:"default:0"`
@@ -290,16 +292,16 @@ type Announcement struct {
 
 type EventRegistration struct {
 	gorm.Model
-	EventID         uint   `json:"event_id" gorm:"not null;index"`
-	Event           Event  `json:"event" gorm:"foreignKey:EventID"`
-	UserID          *uint  `json:"user_id" gorm:"index"`
-	Name            string `json:"name" gorm:"type:varchar(100);not null"`
-	Email           string `json:"email" gorm:"type:varchar(100);not null"`
-	Phone           string `json:"phone" gorm:"type:varchar(30)"`
-	AttendeeCount   int    `json:"attendee_count" gorm:"default:1"`
-	Notes           string `json:"notes" gorm:"type:text"`
-	PaymentStatus   string `json:"payment_status" gorm:"type:varchar(20);default:no_requerido"` // no_requerido|pendiente|verificado|rechazado
-	ReceiptID       *uint  `json:"receipt_id" gorm:"index"` // FK → PaymentReceipt
+	EventID       uint   `json:"event_id" gorm:"not null;index"`
+	Event         Event  `json:"event" gorm:"foreignKey:EventID"`
+	UserID        *uint  `json:"user_id" gorm:"index"`
+	Name          string `json:"name" gorm:"type:varchar(100);not null"`
+	Email         string `json:"email" gorm:"type:varchar(100);not null"`
+	Phone         string `json:"phone" gorm:"type:varchar(30)"`
+	AttendeeCount int    `json:"attendee_count" gorm:"default:1"`
+	Notes         string `json:"notes" gorm:"type:text"`
+	PaymentStatus string `json:"payment_status" gorm:"type:varchar(20);default:no_requerido"` // no_requerido|pendiente|verificado|rechazado
+	ReceiptID     *uint  `json:"receipt_id" gorm:"index"`                                     // FK → PaymentReceipt
 }
 
 type GalleryPhoto struct {
@@ -330,12 +332,12 @@ type ActivityLog struct {
 type HeroSetting struct {
 	gorm.Model
 	// Textos
-	LabelTop         string `json:"label_top" gorm:"type:varchar(120)"`     // "● IGLESIA CRISTIANA · HUEHUETENANGO"
-	TitleLine1       string `json:"title_line_1" gorm:"type:varchar(80)"`   // "LUZ PARA"
-	TitleLine2       string `json:"title_line_2" gorm:"type:varchar(80)"`   // "LAS NACIONES" (outline)
-	VerseReference   string `json:"verse_reference" gorm:"type:varchar(40)"` // "MATEO 5:14"
-	Subtitle         string `json:"subtitle" gorm:"type:varchar(200)"`      // "Empieza tu propósito aquí."
-	ScheduleText     string `json:"schedule_text" gorm:"type:varchar(200)"` // "Domingos · 10am · Zona 1, Huehuetenango"
+	LabelTop       string `json:"label_top" gorm:"type:varchar(120)"`      // "● IGLESIA CRISTIANA · HUEHUETENANGO"
+	TitleLine1     string `json:"title_line_1" gorm:"type:varchar(80)"`    // "LUZ PARA"
+	TitleLine2     string `json:"title_line_2" gorm:"type:varchar(80)"`    // "LAS NACIONES" (outline)
+	VerseReference string `json:"verse_reference" gorm:"type:varchar(40)"` // "MATEO 5:14"
+	Subtitle       string `json:"subtitle" gorm:"type:varchar(200)"`       // "Empieza tu propósito aquí."
+	ScheduleText   string `json:"schedule_text" gorm:"type:varchar(200)"`  // "Domingos · 10am · Zona 1, Huehuetenango"
 
 	// CTAs
 	CTAPrimaryText   string `json:"cta_primary_text" gorm:"type:varchar(60)"`
@@ -354,17 +356,17 @@ type HeroSetting struct {
 
 type MemberBoleta struct {
 	gorm.Model
-	Date           string `json:"date" gorm:"type:varchar(20);not null"`
-	InviterName    string `json:"inviter_name" gorm:"type:varchar(100)"`
-	InviterPhone   string `json:"inviter_phone" gorm:"type:varchar(30)"`
-	InviterUserID  *uint  `json:"inviter_user_id" gorm:"index"` // si el invitador es miembro
-	GuestName      string `json:"guest_name" gorm:"type:varchar(100);not null"`
-	GuestPhone     string `json:"guest_phone" gorm:"type:varchar(30)"`
-	Address        string `json:"address" gorm:"type:varchar(255)"`
-	Category       string `json:"category" gorm:"type:varchar(30);not null"` // reconciliado|convertido|nuevo
-	LeaderID       *uint  `json:"leader_id" gorm:"index"`
-	CellReportID   *uint  `json:"cell_report_id" gorm:"index"`
-	Notes          string `json:"notes" gorm:"type:text"`
+	Date          string `json:"date" gorm:"type:varchar(20);not null"`
+	InviterName   string `json:"inviter_name" gorm:"type:varchar(100)"`
+	InviterPhone  string `json:"inviter_phone" gorm:"type:varchar(30)"`
+	InviterUserID *uint  `json:"inviter_user_id" gorm:"index"` // si el invitador es miembro
+	GuestName     string `json:"guest_name" gorm:"type:varchar(100);not null"`
+	GuestPhone    string `json:"guest_phone" gorm:"type:varchar(30)"`
+	Address       string `json:"address" gorm:"type:varchar(255)"`
+	Category      string `json:"category" gorm:"type:varchar(30);not null"` // reconciliado|convertido|nuevo
+	LeaderID      *uint  `json:"leader_id" gorm:"index"`
+	CellReportID  *uint  `json:"cell_report_id" gorm:"index"`
+	Notes         string `json:"notes" gorm:"type:text"`
 }
 
 type FAQ struct {
