@@ -102,14 +102,17 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
             onClick={close}
           />
 
-          {/* Cerrar -- ya vivía fuera del contenido scrolleable (correcto);
-              solo se le agrega el acento celeste para que se note más,
-              a pedido del usuario (antes neutro blanco/vidrio). */}
+          {/* Cerrar -- ya vivía fuera del contenido scrolleable (correcto).
+              Acento: el usuario pidió navy en vez de celeste, "invertido" --
+              aquí el contexto es oscuro/inmersivo (liquid-glass sobre foto),
+              así que el relleno sólido que da contraste real es blanco con
+              tinta navy (mismo pill primario del sitio público), no navy
+              sobre navy que se perdería contra el fondo oscuro. */}
           <motion.button
             onClick={close}
             whileHover={{ scale: 1.08, rotate: 90 }} whileTap={{ scale: 0.9 }}
             aria-label="Cerrar"
-            className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full liquid-glass border-2 border-celeste/40 flex items-center justify-center text-white/80 hover:text-celeste hover:border-celeste/70"
+            className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full bg-white text-bg shadow-card flex items-center justify-center"
           >
             <Icon name="close" className="w-5 h-5" />
           </motion.button>

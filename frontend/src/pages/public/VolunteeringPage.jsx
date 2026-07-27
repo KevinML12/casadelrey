@@ -76,7 +76,7 @@ function ModalWrapper({ children, onClose }) {
         <button
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white border-2 border-celeste/50 shadow-card flex items-center justify-center text-celeste hover:border-celeste hover:bg-celeste hover:text-white transition-colors"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg text-white shadow-card flex items-center justify-center hover:opacity-85 transition-opacity"
         >
           <Icon name="close" className="w-4 h-4" stroke={2.2} />
         </button>
