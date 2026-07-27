@@ -48,6 +48,17 @@ const CATEGORIES = [
   { name: 'Oración y logística', values: ['oracion', 'logistica'] },
 ];
 
+// Collage de tamaños/inclinaciones variados -- mismo patrón ya probado en
+// GalleryPage.jsx (SPANS/ROT + grid-auto-flow:dense), adaptado a una
+// cuadrícula de 2 columnas: antes cada una de las 10 tarjetas tenía
+// EXACTAMENTE el mismo tamaño, se sentía repetitivo/genérico.
+const SPANS = [
+  'col-span-2 row-span-1', 'col-span-1 row-span-1',
+  'col-span-1 row-span-1', 'col-span-1 row-span-2',
+  'col-span-1 row-span-1', 'col-span-2 row-span-1',
+];
+const ROT = [-1.6, 1.4, -1.1, 1.8, -2, 1.2];
+
 // Botón de cerrar fuera del div con overflow-y-auto -- mismo fix que
 // EventsPage.jsx ModalWrapper (reportado por el usuario: la X vivía
 // dentro del contenido scrolleable y desaparecía al hacer scroll).
@@ -271,15 +282,21 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 // Una sola superficie: foto + degradado + texto directo encima, sin
 // panel anidado con su propio borde (el mismo ajuste que se hizo en
 // EventCard -- dos cajas separadas se leen como una card rota).
-function DepartmentCard({ value, icon, title, photo, onClick }) {
+// big: si la tarjeta ocupa 2 filas (más foto/aire) -- título más grande y
+// SÍ muestra el adelanto de descripción; en las angostas de 1 fila el
+// texto no cabría bien, se queda solo con el título (igual que Gallery
+// solo agranda el título en las grandes, no mete más contenido en las chicas).
+function DepartmentCard({ icon, title, desc, photo, big, rotate, onClick }) {
   return (
     <Tilt
       as="button"
       type="button"
       onClick={onClick}
       max={4}
+      whileHover={{ rotate: 0, scale: 1.03, y: -4 }}
       glass="standard"
-      className="liquid-shine relative overflow-hidden rounded-[20px] h-[170px] w-full text-left group border border-white/10"
+      className="liquid-shine relative overflow-hidden rounded-[20px] h-full w-full text-left group border border-white/10"
+      style={{ rotate, transformOrigin: 'center' }}
     >
       <img
         src={photo}
@@ -287,11 +304,12 @@ function DepartmentCard({ value, icon, title, photo, onClick }) {
         className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent" />
-      <div className="relative z-10 h-full flex flex-col justify-end p-4">
+      <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-5">
         <div className="w-9 h-9 rounded-full liquid-glass flex items-center justify-center mb-2.5">
           <Icon name={icon} className="w-4 h-4 text-white" />
         </div>
-        <h3 className="text-16 font-bold text-white tracking-tight leading-tight">{title}</h3>
+        <h3 className={`font-bold text-white tracking-tight leading-tight ${big ? 'text-20 sm:text-22' : 'text-16'}`}>{title}</h3>
+        {big && desc && <p className="text-13 text-white/60 mt-1.5 leading-snug line-clamp-2">{desc}</p>}
       </div>
     </Tilt>
   );
@@ -322,6 +340,15 @@ export default function VolunteeringPage() {
     : CATEGORIES;
 
   const windowItems = areas.map(a => ({ key: a.value, image: a.photo, title: a.title }));
+
+  // Índice global (no por categoría) para que el patrón de tamaños/
+  // inclinaciones del collage varíe de verdad a lo largo de las 10
+  // tarjetas, en vez de reiniciarse en cada categoría (donde 1-3 items
+  // casi nunca alcanzan a mostrar la variedad).
+  const globalIndex = Object.fromEntries(areas.map((a, i) => [a.value, i]));
+  // A qué categoría pertenece cada departamento -- se usa también en el
+  // chip de la ventana de detalle.
+  const categoryOf = value => categoriesWithLeftover.find(c => c.values.includes(value))?.name;
 
   const openForm = (value = '') => {
     setOpenKey(null);
@@ -370,18 +397,37 @@ export default function VolunteeringPage() {
           </RevealList>
 
           <div className="space-y-10">
-            {categoriesWithLeftover.map(cat => (
-              <div key={cat.name}>
-                <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
-                <RevealList className="grid sm:grid-cols-2 gap-4">
-                  {areas.filter(a => cat.values.includes(a.value)).map(area => (
-                    <RevealItem key={area.value}>
-                      <DepartmentCard {...area} onClick={() => setOpenKey(area.value)} />
-                    </RevealItem>
-                  ))}
-                </RevealList>
-              </div>
-            ))}
+            {categoriesWithLeftover.map(cat => {
+              const catAreas = areas.filter(a => cat.values.includes(a.value));
+              return (
+                <div key={cat.name}>
+                  <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
+                  <div className="grid grid-cols-2 auto-rows-[150px] sm:auto-rows-[165px] gap-3 sm:gap-4 [grid-auto-flow:dense]">
+                    {catAreas.map(area => {
+                      const i = globalIndex[area.value];
+                      // Categorías de un solo departamento (ej. "Niños y
+                      // enseñanza") siempre van a ancho completo -- una
+                      // tarjeta angosta y sola se vería como un error de layout.
+                      const span = catAreas.length === 1 ? 'col-span-2 row-span-1' : SPANS[i % SPANS.length];
+                      const big = span.includes('row-span-2') || span === 'col-span-2 row-span-1';
+                      return (
+                        <motion.div
+                          key={area.value}
+                          className={span}
+                          initial={{ opacity: 0, rotateX: 14, scale: 0.94 }}
+                          whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
+                          viewport={{ once: true, margin: '-60px' }}
+                          transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
+                          style={{ transformPerspective: 1000, transformOrigin: 'center' }}
+                        >
+                          <DepartmentCard {...area} big={big} rotate={ROT[i % ROT.length]} onClick={() => setOpenKey(area.value)} />
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -398,21 +444,32 @@ export default function VolunteeringPage() {
         renderContent={(it) => {
           const a = areas.find(x => x.value === it.key);
           if (!a) return null;
+          const category = categoryOf(a.value);
           return (
-            <div className="flex flex-col gap-5">
-              <p className="text-white/70 text-15 leading-relaxed">{a.desc}</p>
-              <div className="liquid-glass rounded-[16px] p-5">
+            <div className="grid sm:grid-cols-5 gap-5">
+              {/* Columna principal -- antes todo iba en una sola columna
+                  apilada y la ventana (780px de ancho) se sentía vacía;
+                  el "¿por qué aquí?" pasa a panel lateral en desktop. */}
+              <div className="sm:col-span-3 flex flex-col gap-4">
+                {category && (
+                  <span className="self-start inline-flex items-center gap-1.5 bg-white/10 border border-white/15 text-white/70 px-3 py-1 rounded-full text-11 font-bold uppercase tracking-wide">
+                    {category}
+                  </span>
+                )}
+                <p className="text-white/70 text-15 leading-relaxed">{a.desc}</p>
+                <motion.button
+                  {...PRESS}
+                  onClick={() => openForm(a.value)}
+                  className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-white text-bg px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
+                >
+                  Aplicar a {a.title}
+                  <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                </motion.button>
+              </div>
+              <div className="sm:col-span-2 liquid-glass rounded-[16px] p-5 h-fit">
                 <p className="text-11 font-bold uppercase tracking-widest text-white/40 mb-2">¿Por qué aquí?</p>
                 <p className="text-white/80 text-15 leading-relaxed">{a.why}</p>
               </div>
-              <motion.button
-                {...PRESS}
-                onClick={() => openForm(a.value)}
-                className="w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-white text-bg px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
-              >
-                Aplicar a {a.title}
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
-              </motion.button>
             </div>
           );
         }}
