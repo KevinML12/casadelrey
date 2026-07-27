@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import WindowStack from '../../components/ui/WindowStack';
 import apiClient from '../../lib/apiClient';
@@ -48,16 +47,13 @@ const CATEGORIES = [
   { name: 'Oración y logística', values: ['oracion', 'logistica'] },
 ];
 
-// Collage de tamaños/inclinaciones variados -- mismo patrón ya probado en
-// GalleryPage.jsx (SPANS/ROT + grid-auto-flow:dense), adaptado a una
-// cuadrícula de 2 columnas: antes cada una de las 10 tarjetas tenía
-// EXACTAMENTE el mismo tamaño, se sentía repetitivo/genérico.
-const SPANS = [
-  'col-span-2 row-span-1', 'col-span-1 row-span-1',
-  'col-span-1 row-span-1', 'col-span-1 row-span-2',
-  'col-span-1 row-span-1', 'col-span-2 row-span-1',
-];
-const ROT = [-1.6, 1.4, -1.1, 1.8, -2, 1.2];
+// Masonry tipo Pinterest (CSS columns, no grid-auto-flow): se probó el
+// collage con spans/rotate fijos de GalleryPage.jsx pero el usuario lo
+// vio "torcido" e incompleto -- pidió tarjetas más grandes que llenen
+// todo el espacio y SIN inclinación. Con columns cada tarjeta ocupa su
+// alto natural y las columnas se acomodan solas, sin huecos que rellenar
+// a mano ni ángulos fijos.
+const HEIGHTS = ['h-64', 'h-52', 'h-72', 'h-60', 'h-80', 'h-56'];
 
 // Botón de cerrar fuera del div con overflow-y-auto -- mismo fix que
 // EventsPage.jsx ModalWrapper (reportado por el usuario: la X vivía
@@ -279,39 +275,28 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   );
 }
 
-// Una sola superficie: foto + degradado + texto directo encima, sin
-// panel anidado con su propio borde (el mismo ajuste que se hizo en
-// EventCard -- dos cajas separadas se leen como una card rota).
-// big: si la tarjeta ocupa 2 filas (más foto/aire) -- título más grande y
-// SÍ muestra el adelanto de descripción; en las angostas de 1 fila el
-// texto no cabría bien, se queda solo con el título (igual que Gallery
-// solo agranda el título en las grandes, no mete más contenido en las chicas).
-function DepartmentCard({ icon, title, desc, photo, big, rotate, onClick }) {
+// Foto a toda vista (sin degradado ni ícono encima) + un chip flotante
+// "glass-light" (blanco escarchado, texto navy -- lo pidió el usuario en
+// vez del degradado navy que traía) con el título/descripción, igual
+// tratamiento que usan los modales claros del sitio. big: solo la tarjeta
+// "hero" de una categoría de un solo departamento -- título más grande.
+function DepartmentCard({ title, desc, photo, big, height, onClick }) {
   return (
-    <Tilt
-      as="button"
+    <button
       type="button"
       onClick={onClick}
-      max={4}
-      whileHover={{ rotate: 0, scale: 1.03, y: -4 }}
-      glass="standard"
-      className="liquid-shine relative overflow-hidden rounded-[20px] h-full w-full text-left group border border-white/10"
-      style={{ rotate, transformOrigin: 'center' }}
+      className={`group relative block w-full overflow-hidden rounded-[20px] text-left focus-ring transition-transform duration-300 hover:-translate-y-1 ${height}`}
     >
       <img
         src={photo}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent" />
-      <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-5">
-        <div className="w-9 h-9 rounded-full liquid-glass flex items-center justify-center mb-2.5">
-          <Icon name={icon} className="w-4 h-4 text-white" />
-        </div>
-        <h3 className={`font-bold text-white tracking-tight leading-tight ${big ? 'text-20 sm:text-22' : 'text-16'}`}>{title}</h3>
-        {big && desc && <p className="text-13 text-white/60 mt-1.5 leading-snug line-clamp-2">{desc}</p>}
+      <div className="absolute inset-x-3 bottom-3 glass-light rounded-[16px] px-4 py-3">
+        <h3 className={`font-bold text-bg tracking-tight leading-tight ${big ? 'text-19' : 'text-15'}`}>{title}</h3>
+        {desc && <p className="text-13 text-bg/60 mt-1 leading-snug line-clamp-2">{desc}</p>}
       </div>
-    </Tilt>
+    </button>
   );
 }
 
@@ -402,25 +387,24 @@ export default function VolunteeringPage() {
               return (
                 <div key={cat.name}>
                   <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
-                  <div className="grid grid-cols-2 auto-rows-[150px] sm:auto-rows-[165px] gap-3 sm:gap-4 [grid-auto-flow:dense]">
+                  <div className="columns-2 sm:columns-3 gap-3 sm:gap-4">
                     {catAreas.map(area => {
                       const i = globalIndex[area.value];
                       // Categorías de un solo departamento (ej. "Niños y
-                      // enseñanza") siempre van a ancho completo -- una
+                      // enseñanza") ocupan las columnas completas -- una
                       // tarjeta angosta y sola se vería como un error de layout.
-                      const span = catAreas.length === 1 ? 'col-span-2 row-span-1' : SPANS[i % SPANS.length];
-                      const big = span.includes('row-span-2') || span === 'col-span-2 row-span-1';
+                      const solo = catAreas.length === 1;
                       return (
                         <motion.div
                           key={area.value}
-                          className={span}
-                          initial={{ opacity: 0, rotateX: 14, scale: 0.94 }}
-                          whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
+                          className="break-inside-avoid mb-3 sm:mb-4"
+                          style={solo ? { columnSpan: 'all' } : undefined}
+                          initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                          whileInView={{ opacity: 1, y: 0, scale: 1 }}
                           viewport={{ once: true, margin: '-60px' }}
                           transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
-                          style={{ transformPerspective: 1000, transformOrigin: 'center' }}
                         >
-                          <DepartmentCard {...area} big={big} rotate={ROT[i % ROT.length]} onClick={() => setOpenKey(area.value)} />
+                          <DepartmentCard {...area} big={solo} height={solo ? 'h-56' : HEIGHTS[i % HEIGHTS.length]} onClick={() => setOpenKey(area.value)} />
                         </motion.div>
                       );
                     })}
