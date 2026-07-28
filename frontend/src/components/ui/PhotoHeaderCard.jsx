@@ -11,7 +11,7 @@
 import Tilt from './Tilt';
 import { Icon } from './Glass';
 
-export default function PhotoHeaderCard({ photo, icon, glass = 'standard', contentClassName = '', className = '', children }) {
+export default function PhotoHeaderCard({ photo, icon, glass = 'standard', contentClassName = '', className = '', objectPosition = 'center', children }) {
   return (
     <Tilt max={4} glass={glass} className={`group glass-light rounded-[24px] overflow-hidden h-full flex flex-col ${className}`}>
       <div className="relative h-40 md:h-44 shrink-0 overflow-hidden">
@@ -19,6 +19,7 @@ export default function PhotoHeaderCard({ photo, icon, glass = 'standard', conte
           <img
             src={photo}
             alt=""
+            style={{ objectPosition }}
             className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
           />
         )}

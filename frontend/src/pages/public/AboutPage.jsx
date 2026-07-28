@@ -65,19 +65,23 @@ export default function AboutPage() {
   // Fotos para las cards PhotoHeaderCard (franja ancha y corta) --
   // distintas de las de arriba: esas son fondo ambiente de sección (foto
   // completa, cualquier proporción sirve), pero un recorte de ~160px de
-  // alto necesita una foto realmente horizontal o se ve mal (la real de
-  // about_pastores, por ejemplo, es un retrato 900x1600 -- se vería
-  // recortada por los lados). Se revisaron las fotos reales ya subidas
-  // en la Galería (álbum "Liderazgo" = reunión de líderes, horizontal;
-  // "SABADOS" = jóvenes reunidos, para el podcast juvenil) y se
-  // priorizan por proporción antes que caer al fallback de sección.
+  // alto necesita una foto realmente horizontal o se ve mal.
+  //
+  // Fundadores y Pastores de células: el usuario entregó las fotos reales
+  // de las personas nombradas en cada card (antes eran fotos ambiente
+  // genéricas, no había retrato real de nadie). fundadores.jpg es
+  // retrato (960x1280, la pareja ocupa la mitad superior del encuadre --
+  // por eso objectPosition="top" en el card, si no el recorte corto los
+  // corta a la altura del pecho) -- pastores-celulas.jpg ya es horizontal
+  // (1800x1192) y no necesita ajuste. Comprimidas de sus originales
+  // (3.2MB, foto de cámara sin optimizar) a ~200KB c/u antes de subirlas.
   const gallery = useApi('/gallery/?limit=200');
   const galleryPhotos = gallery?.data || gallery;
   const albums = Array.isArray(galleryPhotos) && galleryPhotos.length > 0 ? groupAlbums(galleryPhotos) : {};
   const findPhoto = (album, titleStartsWith) =>
     (albums[album] || []).find(p => p.title?.startsWith(titleStartsWith))?.url;
-  const fundadoresCardImg       = findPhoto('Liderazgo', 'Liderazgo - 1') || pastoresImg;
-  const pastoresCelulasCardImg  = findPhoto('Liderazgo', 'Liderazgo - 5') || servidoresImg;
+  const fundadoresCardImg       = '/images/nosotros/fundadores.jpg';
+  const pastoresCelulasCardImg  = '/images/nosotros/pastores-celulas.jpg';
   const podcastCardImg          = findPhoto('SABADOS', 'SABADOS - Palis') || comunidadImg;
   const visitanosCardImg        = '/images/bg-ubicacion.jpg'; // misma foto real que ya usa Home.jsx para "Ubicación" -- horizontal, a diferencia de about_lideres (retrato)
   // Mismo patrón que VolunteeringPage.jsx: foto real por departamento
@@ -132,7 +136,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <PhotoHeaderCard photo={fundadoresCardImg} icon="crown" glass="standard">
+              <PhotoHeaderCard photo={fundadoresCardImg} icon="crown" glass="standard" objectPosition="center 15%">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   José de León <span className="text-bg/40 font-medium">(+)</span> y Desidería López
