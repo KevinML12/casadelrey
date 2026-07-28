@@ -10,7 +10,7 @@ import PhotoBentoTile from '../../components/ui/PhotoBentoTile';
 import PhotoHeaderCard from '../../components/ui/PhotoHeaderCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
-import { useSitePhoto, useApi } from '../../lib/feed';
+import { useSitePhoto, useApi, groupAlbums } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const MotionLink = motion.create(Link);
@@ -61,6 +61,25 @@ export default function AboutPage() {
   const servidoresImg = useSitePhoto('about_servidores', '/images/nosotros/servidores.jpg');
   const comunidadImg  = useSitePhoto('about_comunidad',  '/images/nosotros/comunidad.jpg');
   const lideresImg    = useSitePhoto('about_lideres',    '/images/nosotros/lideres.jpg');
+
+  // Fotos para las cards PhotoHeaderCard (franja ancha y corta) --
+  // distintas de las de arriba: esas son fondo ambiente de sección (foto
+  // completa, cualquier proporción sirve), pero un recorte de ~160px de
+  // alto necesita una foto realmente horizontal o se ve mal (la real de
+  // about_pastores, por ejemplo, es un retrato 900x1600 -- se vería
+  // recortada por los lados). Se revisaron las fotos reales ya subidas
+  // en la Galería (álbum "Liderazgo" = reunión de líderes, horizontal;
+  // "SABADOS" = jóvenes reunidos, para el podcast juvenil) y se
+  // priorizan por proporción antes que caer al fallback de sección.
+  const gallery = useApi('/gallery/?limit=200');
+  const galleryPhotos = gallery?.data || gallery;
+  const albums = Array.isArray(galleryPhotos) && galleryPhotos.length > 0 ? groupAlbums(galleryPhotos) : {};
+  const findPhoto = (album, titleStartsWith) =>
+    (albums[album] || []).find(p => p.title?.startsWith(titleStartsWith))?.url;
+  const fundadoresCardImg       = findPhoto('Liderazgo', 'Liderazgo - 1') || pastoresImg;
+  const pastoresCelulasCardImg  = findPhoto('Liderazgo', 'Liderazgo - 5') || servidoresImg;
+  const podcastCardImg          = findPhoto('SABADOS', 'SABADOS - Palis') || comunidadImg;
+  const visitanosCardImg        = '/images/bg-ubicacion.jpg'; // misma foto real que ya usa Home.jsx para "Ubicación" -- horizontal, a diferencia de about_lideres (retrato)
   // Mismo patrón que VolunteeringPage.jsx: foto real por departamento
   // (con fallback), más una segunda foto opcional (voluntariado_<value>_2)
   // que activa el carrusel en la ventana de detalle si el admin la sube.
@@ -113,7 +132,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <PhotoHeaderCard photo={pastoresImg} icon="crown" glass="standard">
+              <PhotoHeaderCard photo={fundadoresCardImg} icon="crown" glass="standard">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   José de León <span className="text-bg/40 font-medium">(+)</span> y Desidería López
@@ -125,7 +144,7 @@ export default function AboutPage() {
             </RevealItem>
 
             <RevealItem>
-              <PhotoHeaderCard photo={servidoresImg} icon="users" glass="featured">
+              <PhotoHeaderCard photo={pastoresCelulasCardImg} icon="users" glass="featured">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores de células</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
@@ -433,7 +452,7 @@ export default function AboutPage() {
       <section className="relative py-16 md:py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
-            <PhotoHeaderCard photo={lideresImg} icon="pin" glass="standard">
+            <PhotoHeaderCard photo={visitanosCardImg} icon="pin" glass="standard">
               <h3 className="text-20 font-bold text-bg mb-3">Visítanos</h3>
               <p className="text-15 text-bg/70 leading-relaxed mb-6">
                 7ª. Calle 12-66 zona 4,<br />
@@ -453,7 +472,7 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal from="right" delay={0.08}>
-            <PhotoHeaderCard photo={comunidadImg} icon="music" glass="standard" contentClassName="justify-center">
+            <PhotoHeaderCard photo={podcastCardImg} icon="music" glass="standard" contentClassName="justify-center">
               <h3 className="text-20 font-bold text-bg mb-3">Podcast Inusual Youth</h3>
               <p className="text-15 text-bg/70 leading-relaxed">
                 92.9 FM Radio Stereo Cumbre<br />
