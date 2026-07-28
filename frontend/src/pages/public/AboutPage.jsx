@@ -229,9 +229,13 @@ export default function AboutPage() {
                     viewport={{ once: true, margin: '-60px' }}
                     transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
                   >
-                    <button
+                    <Tilt
+                      as="button"
                       type="button"
                       onClick={() => setOpenKey(d.value)}
+                      max={5}
+                      glass
+                      whileHover={{ scale: 1.03, y: -4 }}
                       className="group relative block w-full h-full rounded-[18px] overflow-hidden text-left focus-ring"
                     >
                       <img
@@ -243,7 +247,7 @@ export default function AboutPage() {
                         <p className={`font-bold text-bg leading-tight line-clamp-2 ${big ? 'text-18' : 'text-13'}`}>{d.title}</p>
                         {big && <p className="text-12 text-bg/60 mt-1 leading-snug line-clamp-2">{d.desc}</p>}
                       </div>
-                    </button>
+                    </Tilt>
                   </motion.div>
                 );
               })}
@@ -302,6 +306,39 @@ export default function AboutPage() {
         }}
       />
 
+      {/* Separador -- aclara la diferencia entre los dos módulos antes de
+          seguir a Células. Se confunden fácil ("¿no es lo mismo?"): una
+          es el compromiso semanal de discipulado, la otra es servir en
+          un área puntual cuando se necesita. */}
+      <section className="relative py-12 md:py-16 border-t border-white/5">
+        <div className="max-w-4xl mx-auto px-6 grid sm:grid-cols-2 gap-8 sm:gap-10 sm:divide-x sm:divide-white/10">
+          <div className="flex items-start gap-4">
+            <span className="w-11 h-11 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white shrink-0">
+              <Icon name="spark" className="w-5 h-5" />
+            </span>
+            <div>
+              <p className="text-16 font-bold text-white">Voluntariado</p>
+              <p className="text-14 text-white/60 leading-relaxed mt-1.5">
+                Apoyas a la iglesia y a los líderes en un área puntual —
+                alabanza, niños, multimedia — cuando se requiere.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4 sm:pl-8">
+            <span className="w-11 h-11 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white shrink-0">
+              <Icon name="users" className="w-5 h-5" />
+            </span>
+            <div>
+              <p className="text-16 font-bold text-white">Células</p>
+              <p className="text-14 text-white/60 leading-relaxed mt-1.5">
+                Acompañas a tu líder en las reuniones periódicas de tu
+                grupo — el espacio donde creces en comunidad cada semana.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Células — acceso directo al módulo, misma filosofía que el
           bloque de voluntariado de arriba: bento de fotos reales +
           ventana de detalle en vez de una caja de solo texto. */}
@@ -338,9 +375,13 @@ export default function AboutPage() {
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
                 >
-                  <button
+                  <Tilt
+                    as="button"
                     type="button"
                     onClick={() => setOpenCellKey(cellKey(c, i))}
+                    max={5}
+                    glass
+                    whileHover={{ scale: 1.03, y: -4 }}
                     className="group relative block w-full h-full rounded-[18px] overflow-hidden text-left focus-ring"
                   >
                     <img
@@ -352,7 +393,7 @@ export default function AboutPage() {
                       <p className={`font-bold text-bg leading-tight line-clamp-2 ${big ? 'text-18' : 'text-13'}`}>{c.name}</p>
                       {big && c.description && <p className="text-12 text-bg/60 mt-1 leading-snug line-clamp-2">{c.description}</p>}
                     </div>
-                  </button>
+                  </Tilt>
                 </motion.div>
               );
             })}

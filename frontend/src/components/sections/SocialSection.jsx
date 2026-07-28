@@ -15,15 +15,16 @@ const FEED_SPAN = {
   large:  'col-span-2 row-span-2',
 };
 
-// Handle real de cada cuenta -- antes solo mostraba el nombre de la red
-// (icono genérico + "Facebook") y no daba la sensación de conectar a una
-// cuenta real y verificable. Iconos: logos reales, no placeholders
-// (heart/music/spark) que no se parecían a la red que representaban.
+// Handle real de cada cuenta + color de marca -- antes eran 4 pills
+// idénticas en liquid-glass gris, todas con el mismo peso visual (se
+// sentía "plantilla"). Ahora cada red es un tile con su propio color de
+// marca real, tamaños en bento (Instagram destacado como red principal)
+// en vez de 4 cajas iguales en fila.
 const NETWORKS = [
-  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',     icon: 'instagram' },
-  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  handle: '/casadelreyhuehue',  icon: 'facebook' },
-  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    handle: '@leoneldeleongt',    icon: 'tiktok' },
-  { href: 'https://x.com/pastorleoneli',                label: 'X',         handle: '@pastorleoneli',     icon: 'x_logo' },
+  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',    icon: 'instagram', accent: 'bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF]', span: 'col-span-2 row-span-2' },
+  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  handle: '/casadelreyhuehue', icon: 'facebook',  accent: 'bg-[#1877F2]', span: 'col-span-2 row-span-1' },
+  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    handle: '@leoneldeleongt',   icon: 'tiktok',    accent: 'bg-gradient-to-br from-[#25F4EE] via-[#000000] to-[#FE2C55]', span: 'col-span-1 row-span-1' },
+  { href: 'https://x.com/pastorleoneli',                label: 'X',         handle: '@pastorleoneli',    icon: 'x_logo',    accent: 'bg-[#0A0A0A]', span: 'col-span-1 row-span-1' },
 ];
 
 export default function SocialSection({ title = 'Nuestro feed', showDirectAccess = true }) {
@@ -43,35 +44,36 @@ export default function SocialSection({ title = 'Nuestro feed', showDirectAccess
 
       {showDirectAccess && (
         <Reveal delay={0.05} className="relative z-10 max-w-6xl mx-auto px-6 mb-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {NETWORKS.map(n => (
-              <Tilt key={n.label} as="a" max={4}
-                href={n.href} target="_blank" rel="noopener noreferrer"
-                className="group flex items-center gap-3.5 liquid-glass rounded-[18px] p-4 hover:border-white/25 transition-colors"
-              >
-                <span className="grid place-items-center w-14 h-14 rounded-[14px] bg-white/8 border border-white/12 text-white shrink-0">
-                  <Icon name={n.icon} className="w-7 h-7" stroke={1.4} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-15 font-bold text-white leading-tight">{n.label}</p>
-                  <p className="text-13 text-white/50 truncate">{n.handle}</p>
-                </div>
-                <Icon name="arrow" className="w-4 h-4 text-white/30 shrink-0 ml-auto -rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" stroke={2} />
-              </Tilt>
-            ))}
+          {/* Bento con el color real de cada marca -- Instagram destacada
+              (la red principal) en vez de 4 tiles idénticos. */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[110px] sm:auto-rows-[130px] gap-3 md:gap-4">
+            {NETWORKS.map(n => {
+              const big = n.span === 'col-span-2 row-span-2';
+              return (
+                <Tilt
+                  key={n.label}
+                  as="a"
+                  max={6}
+                  glass
+                  whileHover={{ scale: 1.03, y: -4 }}
+                  href={n.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`group relative flex flex-col justify-end overflow-hidden rounded-[18px] p-4 md:p-5 text-white ${n.accent} ${n.span}`}
+                >
+                  <div className="absolute inset-0 bg-black/15 group-hover:bg-black/0 transition-colors duration-300" />
+                  <Icon name={n.icon} className={`relative z-10 mb-2 ${big ? 'w-9 h-9' : 'w-6 h-6'}`} stroke={1.4} />
+                  <p className={`relative z-10 font-bold leading-tight ${big ? 'text-22' : 'text-14'}`}>{n.label}</p>
+                  <p className={`relative z-10 text-white/70 truncate ${big ? 'text-14 mt-1' : 'text-12'}`}>{n.handle}</p>
+                  <Icon name="arrow" className="relative z-10 w-4 h-4 text-white/60 absolute top-4 right-4 -rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" stroke={2} />
+                </Tilt>
+              );
+            })}
           </div>
         </Reveal>
       )}
 
-      {posts.length === 0 ? (
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="liquid-glass rounded-[24px] p-12 text-center">
-            <p className="text-15 text-white/60 font-medium">
-              Aún no hay publicaciones vinculadas. Síguenos en redes para ver el contenido más reciente.
-            </p>
-          </div>
-        </div>
-      ) : (
+      {posts.length > 0 && (
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <RevealList className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 auto-rows-[170px] md:auto-rows-[200px]">
             {posts.map(p => (
