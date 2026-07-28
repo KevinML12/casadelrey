@@ -7,6 +7,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import PhotoBentoTile from '../../components/ui/PhotoBentoTile';
+import PhotoHeaderCard from '../../components/ui/PhotoHeaderCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
 import { useSitePhoto, useApi } from '../../lib/feed';
@@ -53,24 +54,6 @@ const BENTO_SPANS = [
   'col-span-2 row-span-1',
   'col-span-1 row-span-1',
 ];
-
-// Insignia foto+ícono -- reemplaza el círculo de solo ícono en las cards
-// "Fundadores/Pastores/Visítanos/Podcast" (el usuario las señaló como
-// demasiado simples). Fotos ambiente reales de la congregación, ya
-// fetcheadas más abajo -- NO son retratos de las personas nombradas en
-// cada card (no hay fotos reales de ellas en el directorio de líderes
-// todavía, se verificó antes de hacer esto), por eso el ícono se queda
-// como identificador de qué representa la card, la foto es solo textura.
-function PhotoBadge({ photo, icon }) {
-  return (
-    <Tilt max={4} glass className="liquid-glass relative w-14 h-14 rounded-full overflow-hidden mb-6 shrink-0">
-      {photo && <img src={photo} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-      <div className="absolute inset-0 flex items-center justify-center bg-bg/35">
-        <Icon name={icon} className="w-6 h-6 text-white" />
-      </div>
-    </Tilt>
-  );
-}
 
 export default function AboutPage() {
   // Fotos administrables (AdminSitePhotos) con fallback local garantizado
@@ -130,8 +113,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <Tilt max={4} glass="standard" className="glass-light rounded-[24px] p-8 md:p-10 h-full">
-                <PhotoBadge photo={pastoresImg} icon="crown" />
+              <PhotoHeaderCard photo={pastoresImg} icon="crown" glass="standard">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   José de León <span className="text-bg/40 font-medium">(+)</span> y Desidería López
@@ -139,12 +121,11 @@ export default function AboutPage() {
                 <p className="mt-4 text-15 text-bg/60 leading-relaxed">
                   Sembraron la visión original de Casa del Rey — los cimientos sobre los que la iglesia sigue edificando hoy.
                 </p>
-              </Tilt>
+              </PhotoHeaderCard>
             </RevealItem>
 
             <RevealItem>
-              <Tilt max={4} glass="featured" className="glass-light rounded-[24px] p-8 md:p-10 h-full">
-                <PhotoBadge photo={servidoresImg} icon="users" />
+              <PhotoHeaderCard photo={servidoresImg} icon="users" glass="featured">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores de células</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
@@ -152,7 +133,7 @@ export default function AboutPage() {
                 <p className="mt-4 text-15 text-bg/60 leading-relaxed">
                   Junto a un equipo pastoral, cubren las células de varones, prejuveniles y la red Mujeres de Palabra.
                 </p>
-              </Tilt>
+              </PhotoHeaderCard>
             </RevealItem>
           </RevealList>
         </div>
@@ -452,8 +433,7 @@ export default function AboutPage() {
       <section className="relative py-16 md:py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
-            <Tilt max={4} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full">
-              <PhotoBadge photo={lideresImg} icon="pin" />
+            <PhotoHeaderCard photo={lideresImg} icon="pin" glass="standard">
               <h3 className="text-20 font-bold text-bg mb-3">Visítanos</h3>
               <p className="text-15 text-bg/70 leading-relaxed mb-6">
                 7ª. Calle 12-66 zona 4,<br />
@@ -469,18 +449,17 @@ export default function AboutPage() {
                 Cómo llegar
                 <Icon name="arrow" className="w-4 h-4" stroke={2} />
               </a>
-            </Tilt>
+            </PhotoHeaderCard>
           </Reveal>
 
           <Reveal from="right" delay={0.08}>
-            <Tilt max={4} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full flex flex-col justify-center">
-              <PhotoBadge photo={comunidadImg} icon="music" />
+            <PhotoHeaderCard photo={comunidadImg} icon="music" glass="standard" contentClassName="justify-center">
               <h3 className="text-20 font-bold text-bg mb-3">Podcast Inusual Youth</h3>
               <p className="text-15 text-bg/70 leading-relaxed">
                 92.9 FM Radio Stereo Cumbre<br />
                 Viernes · 3:00 PM
               </p>
-            </Tilt>
+            </PhotoHeaderCard>
           </Reveal>
         </div>
       </section>
