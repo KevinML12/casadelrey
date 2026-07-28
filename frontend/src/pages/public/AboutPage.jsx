@@ -38,6 +38,21 @@ const CELL_CATEGORIES_FALLBACK = [
 const DEFAULT_CELL_IMAGE = '/images/nosotros/comunidad.jpg';
 const cellKey = (c, i) => c.ID ? `cat-${c.ID}` : `cell-fallback-${i}`;
 
+// Bento: mezcla de tamaños real (hero 2x2, tiras 2x1, verticales 1x2,
+// cuadros 1x1) en vez de tarjetas uniformes -- mismo lenguaje que ya usa
+// GalleryPage.jsx (grid-auto-flow dense + spans variados). Sin caja
+// glass-light envolviendo el grid: las fotos ocupan todo el ancho de la
+// sección directo sobre el fondo -- Nosotros ya tenía demasiadas cajas
+// idénticas seguidas, esto rompe ese patrón a propósito.
+const BENTO_SPANS = [
+  'col-span-2 row-span-2',
+  'col-span-1 row-span-1',
+  'col-span-1 row-span-1',
+  'col-span-1 row-span-2',
+  'col-span-2 row-span-1',
+  'col-span-1 row-span-1',
+];
+
 export default function AboutPage() {
   // Fotos administrables (AdminSitePhotos) con fallback local garantizado
   const pastoresImg   = useSitePhoto('about_pastores',   '/images/nosotros/pastores.jpg');
@@ -191,47 +206,56 @@ export default function AboutPage() {
           </RevealList>
 
           <Reveal delay={0.1}>
-            <div className="glass-light rounded-[24px] p-8 md:p-10">
-              <div className="flex items-center justify-between gap-4 mb-5">
-                <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish">Departamentos de voluntariado</p>
-                <Link to="/volunteering" className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
-                  Ver todos
-                </Link>
-              </div>
-              {/* Tira de fotos reales en vez de pills de texto plano --
-                  toca una para abrir su ventana de detalle (mismo
-                  WindowStack de /volunteering, reusado tal cual). */}
-              <div
-                className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                data-lenis-prevent
-              >
-                {areas.map(d => (
-                  <button
-                    key={d.value}
-                    type="button"
-                    onClick={() => setOpenKey(d.value)}
-                    className="group relative shrink-0 w-28 h-36 sm:w-32 sm:h-40 rounded-[16px] overflow-hidden snap-start focus-ring"
-                  >
-                    <img
-                      src={d.photo}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-x-2 bottom-2 glass-light rounded-[10px] px-2.5 py-2">
-                      <p className="text-12 font-bold text-bg leading-tight line-clamp-2">{d.title}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <Link
-                to="/volunteering"
-                className="mt-7 inline-flex items-center gap-2.5 text-14 font-bold text-bg hover:text-bg/70 transition-colors"
-              >
-                Únete como voluntario
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <p className="text-13 font-bold text-white/50 uppercase tracking-tightish">Departamentos de voluntariado</p>
+              <Link to="/volunteering" className="shrink-0 text-13 font-semibold text-white/55 hover:text-white underline underline-offset-4 decoration-white/20">
+                Ver todos
               </Link>
             </div>
+
+            {/* Bento de fotos reales -- toca una para abrir su ventana
+                de detalle (mismo WindowStack de /volunteering, reusado
+                tal cual). El tile grande muestra también la descripción. */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[120px] sm:auto-rows-[140px] gap-3 sm:gap-4 [grid-auto-flow:dense] mb-7">
+              {areas.map((d, i) => {
+                const span = BENTO_SPANS[i % BENTO_SPANS.length];
+                const big = span === 'col-span-2 row-span-2';
+                return (
+                  <motion.div
+                    key={d.value}
+                    className={span}
+                    initial={{ opacity: 0, y: 18, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenKey(d.value)}
+                      className="group relative block w-full h-full rounded-[18px] overflow-hidden text-left focus-ring"
+                    >
+                      <img
+                        src={d.photo}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-x-3 bottom-3 glass-light rounded-[12px] px-3 py-2.5">
+                        <p className={`font-bold text-bg leading-tight line-clamp-2 ${big ? 'text-18' : 'text-13'}`}>{d.title}</p>
+                        {big && <p className="text-12 text-bg/60 mt-1 leading-snug line-clamp-2">{d.desc}</p>}
+                      </div>
+                    </button>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <Link
+              to="/volunteering"
+              className="inline-flex items-center gap-2.5 text-14 font-bold text-white hover:text-white/70 transition-colors"
+            >
+              Únete como voluntario
+              <Icon name="arrow" className="w-4 h-4" stroke={2} />
+            </Link>
           </Reveal>
         </div>
       </section>
@@ -279,60 +303,69 @@ export default function AboutPage() {
       />
 
       {/* Células — acceso directo al módulo, misma filosofía que el
-          bloque de voluntariado de arriba: fotos reales + ventana de
-          detalle en vez de una caja de solo texto. */}
+          bloque de voluntariado de arriba: bento de fotos reales +
+          ventana de detalle en vez de una caja de solo texto. */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
         <ParallaxImg src={lideresImg} alt="" className="opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="glass-light rounded-[24px] p-8 md:p-10">
-            <div className="flex items-center justify-between gap-4 mb-2">
-              <Eyebrow on="light">Grupos pequeños</Eyebrow>
-              <Link to="/celulas" className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
+          <Reveal className="mb-10">
+            <div className="flex items-center justify-between gap-4">
+              <Eyebrow>Grupos pequeños</Eyebrow>
+              <Link to="/celulas" className="shrink-0 text-13 font-semibold text-white/55 hover:text-white underline underline-offset-4 decoration-white/20">
                 Ver todas
               </Link>
             </div>
-            <h2 className="display-mega text-bg mt-2 mb-4" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
+            <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
               Encuentra tu célula.
             </h2>
-            <p className="text-16 text-bg/70 max-w-lg mb-6">
+            <p className="mt-4 text-16 text-white/70 max-w-lg">
               Adolescentes, jóvenes adultos, prejuveniles, varones y la red
               Mujeres de Palabra — cada grupo se reúne en casas durante la semana.
             </p>
-
-            <div
-              className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory mb-7"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              data-lenis-prevent
-            >
-              {cellCategories.map((c, i) => (
-                <button
-                  key={cellKey(c, i)}
-                  type="button"
-                  onClick={() => setOpenCellKey(cellKey(c, i))}
-                  className="group relative shrink-0 w-28 h-36 sm:w-32 sm:h-40 rounded-[16px] overflow-hidden snap-start focus-ring"
-                >
-                  <img
-                    src={c.image_url || DEFAULT_CELL_IMAGE}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-x-2 bottom-2 glass-light rounded-[10px] px-2.5 py-2">
-                    <p className="text-12 font-bold text-bg leading-tight line-clamp-2">{c.name}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <MotionLink
-              to="/celulas"
-              {...PRESS}
-              className="inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-15 font-bold focus-ring shadow-card"
-            >
-              Ver células
-              <Icon name="arrow" className="w-4 h-4" stroke={2} />
-            </MotionLink>
           </Reveal>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[120px] sm:auto-rows-[140px] gap-3 sm:gap-4 [grid-auto-flow:dense] mb-9">
+            {cellCategories.map((c, i) => {
+              const span = BENTO_SPANS[i % BENTO_SPANS.length];
+              const big = span === 'col-span-2 row-span-2';
+              return (
+                <motion.div
+                  key={cellKey(c, i)}
+                  className={span}
+                  initial={{ opacity: 0, y: 18, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenCellKey(cellKey(c, i))}
+                    className="group relative block w-full h-full rounded-[18px] overflow-hidden text-left focus-ring"
+                  >
+                    <img
+                      src={c.image_url || DEFAULT_CELL_IMAGE}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-x-3 bottom-3 glass-light rounded-[12px] px-3 py-2.5">
+                      <p className={`font-bold text-bg leading-tight line-clamp-2 ${big ? 'text-18' : 'text-13'}`}>{c.name}</p>
+                      {big && c.description && <p className="text-12 text-bg/60 mt-1 leading-snug line-clamp-2">{c.description}</p>}
+                    </div>
+                  </button>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <MotionLink
+            to="/celulas"
+            {...PRESS}
+            className="inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-15 font-bold focus-ring shadow-card"
+          >
+            Ver células
+            <Icon name="arrow" className="w-4 h-4" stroke={2} />
+          </MotionLink>
         </div>
       </section>
 
