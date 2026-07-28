@@ -309,32 +309,39 @@ export default function AboutPage() {
       {/* Separador -- aclara la diferencia entre los dos módulos antes de
           seguir a Células. Se confunden fácil ("¿no es lo mismo?"): una
           es el compromiso semanal de discipulado, la otra es servir en
-          un área puntual cuando se necesita. */}
-      <section className="relative py-12 md:py-16 border-t border-white/5">
-        <div className="max-w-4xl mx-auto px-6 grid sm:grid-cols-2 gap-8 sm:gap-10 sm:divide-x sm:divide-white/10">
-          <div className="flex items-start gap-4">
-            <span className="w-11 h-11 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white shrink-0">
-              <Icon name="spark" className="w-5 h-5" />
-            </span>
-            <div>
-              <p className="text-16 font-bold text-white">Voluntariado</p>
-              <p className="text-14 text-white/60 leading-relaxed mt-1.5">
-                Apoyas a la iglesia y a los líderes en un área puntual —
-                alabanza, niños, multimedia — cuando se requiere.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4 sm:pl-8">
-            <span className="w-11 h-11 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white shrink-0">
-              <Icon name="users" className="w-5 h-5" />
-            </span>
-            <div>
-              <p className="text-16 font-bold text-white">Células</p>
-              <p className="text-14 text-white/60 leading-relaxed mt-1.5">
-                Acompañas a tu líder en las reuniones periódicas de tu
-                grupo — el espacio donde creces en comunidad cada semana.
-              </p>
-            </div>
+          un área puntual cuando se necesita. Agrandado a pedido del
+          usuario -- la primera versión se sentía perdida en tanto
+          espacio oscuro alrededor. */}
+      <section className="relative py-20 md:py-28 border-t border-white/5">
+        <div className="max-w-5xl mx-auto px-6">
+          <Reveal className="text-center mb-12">
+            <Eyebrow>¿Cuál es para mí?</Eyebrow>
+          </Reveal>
+          <div className="grid sm:grid-cols-2 gap-10 sm:gap-14 sm:divide-x sm:divide-white/10">
+            <Reveal from="left" className="flex flex-col items-center sm:items-start text-center sm:text-left gap-5">
+              <span className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white shrink-0">
+                <Icon name="spark" className="w-8 h-8 md:w-9 md:h-9" />
+              </span>
+              <div>
+                <p className="text-24 md:text-28 font-bold text-white tracking-tight">Voluntariado</p>
+                <p className="text-16 md:text-17 text-white/60 leading-relaxed mt-3 max-w-sm">
+                  Apoyas a la iglesia y a los líderes en un área puntual —
+                  alabanza, niños, multimedia — cuando se requiere.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal from="right" delay={0.06} className="flex flex-col items-center sm:items-start text-center sm:text-left gap-5 sm:pl-14">
+              <span className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white shrink-0">
+                <Icon name="users" className="w-8 h-8 md:w-9 md:h-9" />
+              </span>
+              <div>
+                <p className="text-24 md:text-28 font-bold text-white tracking-tight">Células</p>
+                <p className="text-16 md:text-17 text-white/60 leading-relaxed mt-3 max-w-sm">
+                  Acompañas a tu líder en las reuniones periódicas de tu
+                  grupo — el espacio donde creces en comunidad cada semana.
+                </p>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
