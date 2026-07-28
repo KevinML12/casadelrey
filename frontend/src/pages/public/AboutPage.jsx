@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
@@ -6,7 +7,8 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
-import { useSitePhoto } from '../../lib/feed';
+import WindowStack from '../../components/ui/WindowStack';
+import { useSitePhoto, useApi } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const MotionLink = motion.create(Link);
@@ -29,7 +31,19 @@ export default function AboutPage() {
   const servidoresImg = useSitePhoto('about_servidores', '/images/nosotros/servidores.jpg');
   const comunidadImg  = useSitePhoto('about_comunidad',  '/images/nosotros/comunidad.jpg');
   const lideresImg    = useSitePhoto('about_lideres',    '/images/nosotros/lideres.jpg');
+  // Mismo patrón que VolunteeringPage.jsx: foto real por departamento
+  // (con fallback), más una segunda foto opcional (voluntariado_<value>_2)
+  // que activa el carrusel en la ventana de detalle si el admin la sube.
   const volunteerAreas = useVolunteerAreas();
+  const sitePhotos = useApi('/site-photos') || {};
+  const areas = volunteerAreas.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || a.photoFallback }));
+  const windowItems = areas.map(a => ({
+    key: a.value,
+    image: a.photo,
+    images: [a.photo, sitePhotos[`voluntariado_${a.value}_2`]].filter(Boolean),
+    title: a.title,
+  }));
+  const [openKey, setOpenKey] = useState(null);
 
   return (
     <main className="min-h-screen bg-bg text-white">
@@ -150,12 +164,36 @@ export default function AboutPage() {
 
           <Reveal delay={0.1}>
             <div className="glass-light rounded-[24px] p-8 md:p-10">
-              <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-5">Departamentos de voluntariado</p>
-              <div className="flex flex-wrap gap-2.5">
-                {volunteerAreas.map(d => (
-                  <span key={d.value} className="px-4 py-2 rounded-full bg-bg/6 border border-bg/10 text-14 font-semibold text-bg/80">
-                    {d.title}
-                  </span>
+              <div className="flex items-center justify-between gap-4 mb-5">
+                <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish">Departamentos de voluntariado</p>
+                <Link to="/volunteering" className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
+                  Ver todos
+                </Link>
+              </div>
+              {/* Tira de fotos reales en vez de pills de texto plano --
+                  toca una para abrir su ventana de detalle (mismo
+                  WindowStack de /volunteering, reusado tal cual). */}
+              <div
+                className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                data-lenis-prevent
+              >
+                {areas.map(d => (
+                  <button
+                    key={d.value}
+                    type="button"
+                    onClick={() => setOpenKey(d.value)}
+                    className="group relative shrink-0 w-28 h-36 sm:w-32 sm:h-40 rounded-[16px] overflow-hidden snap-start focus-ring"
+                  >
+                    <img
+                      src={d.photo}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-x-2 bottom-2 glass-light rounded-[10px] px-2.5 py-2">
+                      <p className="text-12 font-bold text-bg leading-tight line-clamp-2">{d.title}</p>
+                    </div>
+                  </button>
                 ))}
               </div>
               <Link
@@ -169,6 +207,48 @@ export default function AboutPage() {
           </Reveal>
         </div>
       </section>
+
+      {/* Ventana de detalle por departamento -- mismo WindowStack de
+          /volunteering (carrusel de fotos si hay una segunda foto, y el
+          testimonio real si el admin cargó uno), para no navegar fuera
+          de Nosotros solo para ver de qué se trata un departamento. */}
+      <WindowStack
+        items={windowItems}
+        openKey={openKey}
+        onChange={setOpenKey}
+        height="min(70vh, 560px)"
+        light
+        renderContent={(it) => {
+          const a = areas.find(x => x.value === it.key);
+          if (!a) return null;
+          return (
+            <div className="grid sm:grid-cols-5 gap-5">
+              <div className="sm:col-span-3 flex flex-col gap-4">
+                <p className="text-bg/70 text-15 leading-relaxed">{a.desc}</p>
+                <Link
+                  to="/volunteering"
+                  className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
+                >
+                  Aplicar a {a.title}
+                  <Icon name="arrow" className="w-4 h-4" stroke={2} />
+                </Link>
+              </div>
+              <div className="sm:col-span-2 flex flex-col gap-4">
+                <div className="glass-light-nested rounded-[16px] p-5 h-fit">
+                  <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+                  <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
+                </div>
+                {a.testimonial && (
+                  <div className="glass-light-nested rounded-[16px] p-5 h-fit">
+                    <p className="text-bg/70 text-14 italic leading-relaxed">"{a.testimonial}"</p>
+                    {a.testimonialAuthor && <p className="text-bg/45 text-12 font-semibold mt-2">— {a.testimonialAuthor}</p>}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }}
+      />
 
       {/* Células — acceso directo al módulo */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
