@@ -25,6 +25,19 @@ const STATS = [
   { n: '5', label: 'Tipos de célula' },
 ];
 
+// Mismo fallback (categorías estructurales reales, fotos reales) que ya
+// usa Home.jsx -- solo entra en juego si /cell-categories aún no tiene
+// nada o falla, nunca pisa datos reales del admin.
+const CELL_CATEGORIES_FALLBACK = [
+  { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: '/images/celulas/adolescentes.jpg' },
+  { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: '/images/celulas/jovenes.jpg' },
+  { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: '/images/celulas/prejuveniles.jpg' },
+  { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: '/images/celulas/varones.jpg' },
+  { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: '/images/celulas/mujeres.jpg' },
+];
+const DEFAULT_CELL_IMAGE = '/images/nosotros/comunidad.jpg';
+const cellKey = (c, i) => c.ID ? `cat-${c.ID}` : `cell-fallback-${i}`;
+
 export default function AboutPage() {
   // Fotos administrables (AdminSitePhotos) con fallback local garantizado
   const pastoresImg   = useSitePhoto('about_pastores',   '/images/nosotros/pastores.jpg');
@@ -44,6 +57,21 @@ export default function AboutPage() {
     title: a.title,
   }));
   const [openKey, setOpenKey] = useState(null);
+
+  // Misma filosofía para células: fotos reales de /cell-categories (el
+  // mismo admin-editable que ya usan Home.jsx y CelulasPage.jsx), tira
+  // horizontal + ventana de detalle en vez de la caja de texto plano.
+  const apiCellCategories = useApi('/cell-categories');
+  const cellCategories = Array.isArray(apiCellCategories) && apiCellCategories.length > 0
+    ? apiCellCategories.filter(c => c.is_active !== false)
+    : CELL_CATEGORIES_FALLBACK;
+  const cellWindowItems = cellCategories.map((c, i) => ({
+    key: cellKey(c, i),
+    image: c.image_url || DEFAULT_CELL_IMAGE,
+    badge: c.age_group,
+    title: c.name,
+  }));
+  const [openCellKey, setOpenCellKey] = useState(null);
 
   return (
     <main className="min-h-screen bg-bg text-white">
@@ -250,26 +278,56 @@ export default function AboutPage() {
         }}
       />
 
-      {/* Células — acceso directo al módulo */}
+      {/* Células — acceso directo al módulo, misma filosofía que el
+          bloque de voluntariado de arriba: fotos reales + ventana de
+          detalle en vez de una caja de solo texto. */}
       <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
         <ParallaxImg src={lideresImg} alt="" className="opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="glass-light rounded-[24px] p-9 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between">
-            <div>
+          <Reveal className="glass-light rounded-[24px] p-8 md:p-10">
+            <div className="flex items-center justify-between gap-4 mb-2">
               <Eyebrow on="light">Grupos pequeños</Eyebrow>
-              <h2 className="display-mega text-bg mt-4" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
-                Encuentra tu célula.
-              </h2>
-              <p className="mt-4 text-16 text-bg/70 max-w-lg">
-                Adolescentes, jóvenes adultos, prejuveniles, varones y la red
-                Mujeres de Palabra — cada grupo se reúne en casas durante la semana.
-              </p>
+              <Link to="/celulas" className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
+                Ver todas
+              </Link>
             </div>
+            <h2 className="display-mega text-bg mt-2 mb-4" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
+              Encuentra tu célula.
+            </h2>
+            <p className="text-16 text-bg/70 max-w-lg mb-6">
+              Adolescentes, jóvenes adultos, prejuveniles, varones y la red
+              Mujeres de Palabra — cada grupo se reúne en casas durante la semana.
+            </p>
+
+            <div
+              className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory mb-7"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              data-lenis-prevent
+            >
+              {cellCategories.map((c, i) => (
+                <button
+                  key={cellKey(c, i)}
+                  type="button"
+                  onClick={() => setOpenCellKey(cellKey(c, i))}
+                  className="group relative shrink-0 w-28 h-36 sm:w-32 sm:h-40 rounded-[16px] overflow-hidden snap-start focus-ring"
+                >
+                  <img
+                    src={c.image_url || DEFAULT_CELL_IMAGE}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-x-2 bottom-2 glass-light rounded-[10px] px-2.5 py-2">
+                    <p className="text-12 font-bold text-bg leading-tight line-clamp-2">{c.name}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
             <MotionLink
               to="/celulas"
               {...PRESS}
-              className="shrink-0 inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-15 font-bold focus-ring shadow-card"
+              className="inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-15 font-bold focus-ring shadow-card"
             >
               Ver células
               <Icon name="arrow" className="w-4 h-4" stroke={2} />
@@ -277,6 +335,40 @@ export default function AboutPage() {
           </Reveal>
         </div>
       </section>
+
+      {/* Ventana de detalle por categoría de célula -- preview rápido
+          (badge de edad + descripción) sin salir de Nosotros; el CTA
+          adentro lleva directo a /celulas?tipo=X, que ya sabe abrir esa
+          ventana ahí (mismo deep-link que usa Home.jsx). */}
+      <WindowStack
+        items={cellWindowItems}
+        openKey={openCellKey}
+        onChange={setOpenCellKey}
+        height="min(60vh, 460px)"
+        light
+        renderContent={(it) => {
+          const c = cellCategories.find((x, i) => cellKey(x, i) === it.key);
+          if (!c) return null;
+          return (
+            <div className="flex flex-col gap-4">
+              {c.age_group && (
+                <span className="self-start inline-flex items-center gap-1.5 bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-11 font-bold uppercase tracking-wide">
+                  {c.age_group}
+                </span>
+              )}
+              {c.description && <p className="text-bg/70 text-15 leading-relaxed">{c.description}</p>}
+              <MotionLink
+                {...PRESS}
+                to={`/celulas?tipo=${encodeURIComponent(c.name)}`}
+                className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
+              >
+                Ver células de {c.name}
+                <Icon name="arrow" className="w-4 h-4" stroke={2} />
+              </MotionLink>
+            </div>
+          );
+        }}
+      />
 
       {/* Ubicación + podcast */}
       <section className="relative py-16 md:py-24 border-t border-white/5">
