@@ -84,6 +84,12 @@ export default function AboutPage() {
   const pastoresCelulasCardImg  = '/images/nosotros/pastores-celulas.jpg';
   const podcastCardImg          = findPhoto('SABADOS', 'SABADOS - Palis') || comunidadImg;
   const visitanosCardImg        = '/images/bg-ubicacion.jpg'; // misma foto real que ya usa Home.jsx para "Ubicación" -- horizontal, a diferencia de about_lideres (retrato)
+  // Misión/Visión eran las únicas cards de toda la página sin ninguna
+  // foto -- el usuario lo señaló como falta de concordancia entre
+  // formatos. Mismo PhotoHeaderCard que el resto, con fotos reales de
+  // la Galería (horizontales, ya verificadas) en vez de dejarlas planas.
+  const misionCardImg           = findPhoto('CONFERENCIA UNA VEZ Y PARA SIEMPRE', 'CONFERENCIA UNA VEZ Y PARA SIEMPRE - FF92F933') || servidoresImg;
+  const visionCardImg           = findPhoto('Alabanza', 'Alabanza - 8') || servidoresImg;
   // Mismo patrón que VolunteeringPage.jsx: foto real por departamento
   // (con fallback), más una segunda foto opcional (voluntariado_<value>_2)
   // que activa el carrusel en la ventana de detalle si el admin la sube.
@@ -139,7 +145,7 @@ export default function AboutPage() {
               <PhotoHeaderCard photo={fundadoresCardImg} icon="crown" glass="standard" objectPosition="center 15%">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
-                  José de León <span className="text-bg/40 font-medium">(+)</span> y Desidería López
+                  José de León y Desidería López
                 </h3>
                 <p className="mt-4 text-15 text-bg/60 leading-relaxed">
                   Sembraron la visión original de Casa del Rey — los cimientos sobre los que la iglesia sigue edificando hoy.
@@ -149,7 +155,7 @@ export default function AboutPage() {
 
             <RevealItem>
               <PhotoHeaderCard photo={pastoresCelulasCardImg} icon="users" glass="featured">
-                <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores de células</p>
+                <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
                 </h3>
@@ -176,23 +182,23 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <Tilt max={3} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full">
-                <h3 className="text-20 font-bold text-bg mb-4">Misión</h3>
-                <p className="text-17 md:text-19 text-bg/75 leading-relaxed">
+              <PhotoHeaderCard photo={misionCardImg} icon="book" glass="standard">
+                <h3 className="text-20 font-bold text-bg mb-3">Misión</h3>
+                <p className="text-16 text-bg/70 leading-relaxed">
                   Somos una iglesia cristiana familiar, enfocada en cumplir la gran comisión de
                   Jesucristo: ir y hacer discípulos a las naciones, formando líderes capaces de
                   reproducir la obra de Dios.
                 </p>
-              </Tilt>
+              </PhotoHeaderCard>
             </RevealItem>
             <RevealItem>
-              <Tilt max={3} glass="standard" className="glass-light rounded-[24px] p-9 md:p-11 h-full">
-                <h3 className="text-20 font-bold text-bg mb-4">Visión</h3>
-                <p className="text-17 md:text-19 text-bg/75 leading-relaxed">
+              <PhotoHeaderCard photo={visionCardImg} icon="spark" glass="featured">
+                <h3 className="text-20 font-bold text-bg mb-3">Visión</h3>
+                <p className="text-16 text-bg/70 leading-relaxed">
                   Ser una iglesia de restauración familiar, punta de lanza, que proclama la
                   verdad de la Palabra de Dios bajo el poder del Espíritu Santo.
                 </p>
-              </Tilt>
+              </PhotoHeaderCard>
             </RevealItem>
           </RevealList>
         </div>
