@@ -14,13 +14,27 @@
 // ============================================================
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
-import Reveal from '../../components/ui/Reveal';
+import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
+import ModalWrapper from '../../components/ui/ModalWrapper';
 import Tilt from '../../components/ui/Tilt';
 import { useApi, useSitePhoto } from '../../lib/feed';
+
+const PRESS = {
+  whileHover: { scale: 1.03 },
+  whileTap: { scale: 0.96 },
+  transition: { type: 'spring', stiffness: 400, damping: 17 },
+};
+const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring shadow-card hover:opacity-90';
+const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
+
+// Mismo lenguaje que el glow de VolunteeringPage (halo ambiental por
+// categoría bajo el cursor) -- 4 acentos de la paleta + 1 violeta puntual
+// (no hay 5to tono semántico en tailwind.config.js, valor inline aquí).
+const CATEGORY_GLOW = ['#3B82F6', '#F43F5E', '#F59E0B', '#10B981', '#8B5CF6'];
 
 const GROUPS_FALLBACK = [
   {
@@ -95,6 +109,228 @@ const COLLAGE = [
 const norm = (s) =>
   (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 
+// Compartido entre la lista de células (dentro del WindowStack) y el
+// resultado del quiz -- antes vivía duplicado inline en el .map de la
+// lista, ahora es una sola fuente de verdad para el link de WhatsApp.
+function waHrefFor(cell, groupName, leaderByName) {
+  const dir = leaderByName[norm(cell.leader)];
+  const waText = encodeURIComponent(`Hola${dir ? ` ${cell.leader.split(' ')[0]}` : ''}, me interesa unirme a la célula "${cell.name}" (${groupName}, ${cell.zone}). ¿Me pueden dar más información?`);
+  return dir?.phone
+    ? `https://wa.me/${dir.phone.replace(/\D/g, '')}?text=${waText}`
+    : `https://wa.me/?text=${waText}`;
+}
+
+// Cuerpo de la ventana de una categoría -- componente propio (no una
+// función inline en renderContent) para que el filtro de zona tenga su
+// propio estado LOCAL: WindowStack solo monta este cuerpo mientras esa
+// categoría está al frente, así que el filtro se resetea solo cada vez
+// que se abre/reabre una ventana, sin lógica extra de reset.
+function CellCategoryDetail({ group, leaderByName }) {
+  const [zoneFilter, setZoneFilter] = useState(null);
+  const zones = [...new Set(group.cells.map(c => c.zone).filter(Boolean))];
+  const filtered = zoneFilter ? group.cells.filter(c => c.zone === zoneFilter) : group.cells;
+
+  return (
+    <>
+      <p className="text-13 font-semibold text-white/70 mb-4">
+        {group.cells.length} {group.cells.length === 1 ? 'célula activa' : 'células activas'}
+      </p>
+
+      {/* Chips de zona -- solo si hay más de una, filtrar una sola zona
+          no aporta nada. Mismo patrón que los chips de interés de
+          Voluntariado, pero el dato real filtrable aquí es la zona, no
+          hay un equivalente a "interés" en una célula. */}
+      {zones.length > 1 && (
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setZoneFilter(null)}
+            className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${!zoneFilter ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
+          >
+            Todas las zonas
+          </button>
+          {zones.map(z => (
+            <button
+              key={z}
+              type="button"
+              onClick={() => setZoneFilter(cur => cur === z ? null : z)}
+              className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${zoneFilter === z ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
+            >
+              <Icon name="pin" className="w-3.5 h-3.5" stroke={2} />
+              {z}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-3">
+        {filtered.map((c, i) => {
+          const dir = leaderByName[norm(c.leader)];
+          const href = waHrefFor(c, group.name, leaderByName);
+          return (
+            <Tilt
+              as="a"
+              key={`${c.name}-${i}`}
+              max={3}
+              href={href}
+              target="_blank" rel="noopener noreferrer"
+              aria-label={`Escribir al líder de la célula ${c.name}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.06 + i * 0.035 }}
+              whileHover={{ y: -3, scale: 1.02 }}
+              glass
+              className="glass-light group rounded-[16px] p-4 flex flex-col gap-3 grow basis-[260px] focus-ring cursor-pointer"
+            >
+              <div className="flex items-center gap-3.5">
+                {dir?.photo_url ? (
+                  <img src={dir.photo_url} alt={c.leader}
+                    className="w-10 h-10 rounded-full object-cover border border-bg/15 shrink-0" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center text-bg shrink-0">
+                    <Icon name="users" className="w-5 h-5" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-15 font-bold text-bg leading-tight truncate">{c.name}</p>
+                  <p className="text-13 text-bg/60 font-medium mt-0.5 truncate">
+                    {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
+                  </p>
+                </div>
+                {c.zone && (
+                  <span className="shrink-0 bg-bg/8 border border-bg/12 text-bg/80 px-2.5 py-1 rounded-full text-12 font-semibold">
+                    {c.zone}
+                  </span>
+                )}
+                <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-bg/45 group-hover:text-bg group-hover:bg-bg/8 transition-all">
+                  <Icon name="arrow" className="w-4 h-4" />
+                </span>
+              </div>
+              {c.description && (
+                <p className="text-13 text-bg/55 leading-relaxed line-clamp-2 pt-3 border-t border-bg/10">
+                  {c.description}
+                </p>
+              )}
+            </Tilt>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+// Quiz/matchmaker de 2 pasos -- a diferencia del de Voluntariado (10
+// departamentos planos), aquí la pregunta 1 (rango de edad/estado) ya
+// resuelve la categoría casi siempre a simple vista, así que el valor
+// real está en la pregunta 2 (zona): recomienda una CÉLULA ESPECÍFICA,
+// no solo la categoría. La pregunta 2 se salta sola si la categoría
+// elegida solo tiene una zona (o una sola célula) -- nada que filtrar.
+function CellQuizModal({ groups, leaderByName, onViewDetail }) {
+  const [step, setStep] = useState('category'); // 'category' | 'zone' | 'result'
+  const [category, setCategory] = useState(null);
+  const [zone, setZone] = useState(null);
+
+  const chooseCategory = (g) => {
+    setCategory(g);
+    const zones = [...new Set(g.cells.map(c => c.zone).filter(Boolean))];
+    setStep(zones.length > 1 ? 'zone' : 'result');
+  };
+  const chooseZone = (z) => { setZone(z); setStep('result'); };
+  const restart = () => { setStep('category'); setCategory(null); setZone(null); };
+
+  if (step === 'zone' && category) {
+    const zones = [...new Set(category.cells.map(c => c.zone).filter(Boolean))];
+    return (
+      <>
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={() => setStep('category')} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors shrink-0">
+            <Icon name="arrow" className="w-4 h-4 text-bg/60 rotate-180" stroke={2} />
+          </button>
+          <p className="text-12 text-bg font-bold uppercase tracking-wide">{category.name}</p>
+        </div>
+        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta 2 de 2</p>
+        <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿En qué zona estás?</h3>
+        <div className="flex flex-col gap-2.5">
+          {zones.map(z => (
+            <button
+              key={z}
+              type="button"
+              onClick={() => chooseZone(z)}
+              className="flex items-center gap-3 rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
+            >
+              <span className="w-9 h-9 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
+                <Icon name="pin" className="w-4 h-4" stroke={2} />
+              </span>
+              <span className="text-14 font-semibold text-bg">{z}</span>
+            </button>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  if (step === 'result' && category) {
+    const cell = zone ? category.cells.find(c => c.zone === zone) : category.cells[0];
+    const href = cell ? waHrefFor(cell, category.name, leaderByName) : null;
+    return (
+      <div className="text-center">
+        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Tu célula ideal es</p>
+        <h3 className="text-24 font-bold text-bg tracking-tight mb-1">{cell ? cell.name : category.name}</h3>
+        <p className="text-14 text-bg/55 mb-4">{category.name}{cell?.zone ? ` · ${cell.zone}` : ''}</p>
+        {category.image && (
+          <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
+            <img src={category.image} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        {cell && (
+          <p className="text-14 text-bg/65 leading-relaxed mb-6">
+            La lidera {cell.leader}. Escríbele por WhatsApp y te reciben en la próxima reunión.
+          </p>
+        )}
+        <div className="flex flex-col gap-2.5">
+          {href && (
+            <motion.a {...PRESS} href={href} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
+              Escribir por WhatsApp
+              <Icon name="arrow" className="w-4 h-4" stroke={2} />
+            </motion.a>
+          )}
+          <button type="button" onClick={() => onViewDetail(category.key)} className={btnGhost}>
+            Ver todas las de {category.name}
+          </button>
+          <button type="button" onClick={restart} className="text-13 font-semibold text-bg/45 hover:text-bg/70 transition-colors mt-1">
+            Volver a intentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta 1 de 2</p>
+      <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿Cuál te describe mejor?</h3>
+      <div className="flex flex-col gap-2.5">
+        {groups.filter(g => g.cells.length > 0).map(g => (
+          <button
+            key={g.key}
+            type="button"
+            onClick={() => chooseCategory(g)}
+            className="flex items-center gap-3 rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
+          >
+            <span className="w-9 h-9 rounded-full bg-bg text-white overflow-hidden flex items-center justify-center shrink-0">
+              {g.image ? <img src={g.image} alt="" className="w-full h-full object-cover" /> : <Icon name="users" className="w-4 h-4" stroke={2} />}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-14 font-semibold text-bg truncate">{g.name}</span>
+              {g.age && <span className="block text-12 text-bg/50 truncate">{g.age}</span>}
+            </span>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function CelulasPage() {
   const heroImg = useSitePhoto('hero_celulas', '/images/bg-ministerios.jpg');
   const [params] = useSearchParams();
@@ -105,6 +341,8 @@ export default function CelulasPage() {
   // card gana foto real y el botón escribe DIRECTO a su WhatsApp.
   const apiLeaders = useApi('/leaders');
   const [openKey, setOpenKey] = useState(null); // ventana abierta (o null)
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [hoverCategory, setHoverCategory] = useState(null); // key bajo el cursor -- colorea el halo ambiental
 
   const leaderByName = useMemo(() => {
     const map = {};
@@ -168,6 +406,26 @@ export default function CelulasPage() {
     [groups]
   );
 
+  // Color del halo ambiental por categoría -- mismo orden que se pinta.
+  const categoryGlow = useMemo(
+    () => Object.fromEntries(groups.map((g, i) => [g.key, CATEGORY_GLOW[i % CATEGORY_GLOW.length]])),
+    [groups]
+  );
+
+  // Stats reales (nada inventado) -- mismo trío que el de Voluntariado
+  // (~90 voluntarios / 10 departamentos / 20 líderes), adaptado a lo que
+  // sí describe a Células: cuántas hay, cuántos grupos por edad, en
+  // cuántas zonas distintas.
+  const stats = useMemo(() => {
+    const allCells = groups.flatMap(g => g.cells);
+    const zonesCount = new Set(allCells.map(c => c.zone).filter(Boolean)).size;
+    return [
+      { n: String(allCells.length), label: allCells.length === 1 ? 'Célula activa' : 'Células activas' },
+      { n: String(groups.length), label: 'Grupos por edad' },
+      { n: String(zonesCount), label: zonesCount === 1 ? 'Zona alcanzada' : 'Zonas alcanzadas' },
+    ];
+  }, [groups]);
+
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
       {/* Hero de fondo presente en toda la página */}
@@ -185,12 +443,47 @@ export default function CelulasPage() {
               Grupos que se reúnen en casas durante la semana. Toca un tipo para
               abrir su ventana — y salta entre ellas.
             </p>
+            <div className="mt-6">
+              <motion.button
+                {...PRESS}
+                type="button"
+                onClick={() => setQuizOpen(true)}
+                className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
+              >
+                <Icon name="spark" className="w-4 h-4" stroke={2} />
+                Descubre tu célula ideal
+              </motion.button>
+            </div>
           </Reveal>
+
+          <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mt-10">
+            {stats.map(s => (
+              <RevealItem key={s.label}>
+                <div className="glass-light rounded-[18px] px-3 py-5 text-center h-full">
+                  <div className="text-26 sm:text-30 font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
+                  <div className="mt-1.5 text-11 sm:text-12 font-semibold text-bg/55 leading-tight">{s.label}</div>
+                </div>
+              </RevealItem>
+            ))}
+          </RevealList>
         </section>
 
         {/* COLLAGE de tipos — cada recorte abre su ventana */}
-        <section className="max-w-6xl mx-auto px-6 pt-6 pb-28">
-          <div className="grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
+        <section className="relative max-w-6xl mx-auto px-6 pt-6 pb-28">
+          {/* Halo ambiental -- cambia de color según la categoría bajo el
+              cursor, mismo lenguaje que VolunteeringPage. Transición CSS
+              plana (no framer-motion animate): en Voluntariado el
+              animate={{opacity}} de motion.div no se comprometía al
+              inline style de forma confiable, una transición CSS normal
+              funciona igual de bien para un fade así de directo. */}
+          <div
+            className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+            style={{
+              opacity: hoverCategory ? 0.5 : 0,
+              background: `radial-gradient(680px circle at 50% 10%, ${hoverCategory ? categoryGlow[hoverCategory] : '#3B82F6'}33, transparent 70%)`,
+            }}
+          />
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
             {groups.map((g, i) => {
               const c = COLLAGE[i % COLLAGE.length];
               const big = c.span.includes('row-span-2');
@@ -214,6 +507,8 @@ export default function CelulasPage() {
                     max={4}
                     scrollMax={3}
                     onClick={() => setOpenKey(g.key)}
+                    onMouseEnter={() => setHoverCategory(g.key)}
+                    onMouseLeave={() => setHoverCategory(null)}
                     whileHover={{ rotate: 0, scale: 1.05, y: c.y - 6, zIndex: 30 }}
                     glass
                     className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
@@ -243,7 +538,7 @@ export default function CelulasPage() {
           </div>
 
           {/* Contacto — sin exponer direcciones */}
-          <Reveal delay={0.1} depth className="mt-14">
+          <Reveal delay={0.1} depth className="relative z-10 mt-14">
             <Tilt max={3} glass className="glass-light rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
                 <h3 className="text-22 font-bold text-bg">¿No sabes cuál es para ti?</h3>
@@ -273,72 +568,23 @@ export default function CelulasPage() {
         renderContent={(it) => {
           const g = groups.find(gr => gr.key === it.key);
           if (!g) return null;
-          return (
-            <>
-              <p className="text-13 font-semibold text-white/70 mb-4">
-                {g.cells.length} {g.cells.length === 1 ? 'célula activa' : 'células activas'}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {g.cells.map((c, i) => {
-                  // Si el líder está en el directorio: foto real + WhatsApp
-                  // directo a SU número (antes el wa.me iba sin destino).
-                  const dir = leaderByName[norm(c.leader)];
-                  const waText = encodeURIComponent(`Hola${dir ? ` ${c.leader.split(' ')[0]}` : ''}, me interesa unirme a la célula "${c.name}" (${g.name}, ${c.zone}). ¿Me pueden dar más información?`);
-                  const href = dir?.phone
-                    ? `https://wa.me/${dir.phone.replace(/\D/g, '')}?text=${waText}`
-                    : `https://wa.me/?text=${waText}`;
-                  return (
-                  <Tilt
-                    as="a"
-                    key={`${c.name}-${i}`}
-                    max={3}
-                    href={href}
-                    target="_blank" rel="noopener noreferrer"
-                    aria-label={`Escribir al líder de la célula ${c.name}`}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.06 + i * 0.035 }}
-                    whileHover={{ y: -3, scale: 1.02 }}
-                    glass
-                    className="glass-light group rounded-[16px] p-4 flex flex-col gap-3 grow basis-[260px] focus-ring cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      {dir?.photo_url ? (
-                        <img src={dir.photo_url} alt={c.leader}
-                          className="w-10 h-10 rounded-full object-cover border border-bg/15 shrink-0" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center text-bg shrink-0">
-                          <Icon name="users" className="w-5 h-5" />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-15 font-bold text-bg leading-tight truncate">{c.name}</p>
-                        <p className="text-13 text-bg/60 font-medium mt-0.5 truncate">
-                          {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
-                        </p>
-                      </div>
-                      {c.zone && (
-                        <span className="shrink-0 bg-bg/8 border border-bg/12 text-bg/80 px-2.5 py-1 rounded-full text-12 font-semibold">
-                          {c.zone}
-                        </span>
-                      )}
-                      <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-bg/45 group-hover:text-bg group-hover:bg-bg/8 transition-all">
-                        <Icon name="arrow" className="w-4 h-4" />
-                      </span>
-                    </div>
-                    {c.description && (
-                      <p className="text-13 text-bg/55 leading-relaxed line-clamp-2 pt-3 border-t border-bg/10">
-                        {c.description}
-                      </p>
-                    )}
-                  </Tilt>
-                  );
-                })}
-              </div>
-            </>
-          );
+          return <CellCategoryDetail group={g} leaderByName={leaderByName} />;
         }}
       />
+
+      {/* Quiz/matchmaker -- alternativa a hojear las 5 categorías para
+          quien no sabe cuál célula es la suya. */}
+      <AnimatePresence>
+        {quizOpen && (
+          <ModalWrapper onClose={() => setQuizOpen(false)}>
+            <CellQuizModal
+              groups={groups}
+              leaderByName={leaderByName}
+              onViewDetail={(key) => { setQuizOpen(false); setOpenKey(key); }}
+            />
+          </ModalWrapper>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

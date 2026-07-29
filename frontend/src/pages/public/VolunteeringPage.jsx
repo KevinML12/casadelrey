@@ -5,6 +5,7 @@ import ParallaxImg from '../../components/ui/ParallaxImg';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
 import WindowStack from '../../components/ui/WindowStack';
+import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
 import { useSitePhoto, useApi } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
@@ -122,43 +123,6 @@ function bestMatch(areas, selectedTags) {
 // tono semántico en tailwind.config.js, y usarlo aquí no exige agregar
 // uno -- es un valor inline, no una clase).
 const CATEGORY_GLOW = ['#3B82F6', '#F43F5E', '#F59E0B', '#10B981', '#8B5CF6'];
-
-// Botón de cerrar fuera del div con overflow-y-auto -- mismo fix que
-// EventsPage.jsx ModalWrapper (reportado por el usuario: la X vivía
-// dentro del contenido scrolleable y desaparecía al hacer scroll).
-function ModalWrapper({ children, onClose }) {
-  return (
-    <motion.div
-      className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4"
-      onClick={onClose}
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="relative w-full max-w-md max-h-[90vh]"
-        onClick={e => e.stopPropagation()}
-        initial={{ opacity: 0, scale: 0.94, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        transition={{ type: 'spring', stiffness: 340, damping: 28 }}
-      >
-        <div
-          className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"
-          style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
-          data-lenis-prevent
-        >
-          {children}
-        </div>
-        <button
-          onClick={onClose}
-          aria-label="Cerrar"
-          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg text-white shadow-card flex items-center justify-center hover:opacity-85 transition-opacity"
-        >
-          <Icon name="close" className="w-4 h-4" stroke={2.2} />
-        </button>
-      </motion.div>
-    </motion.div>
-  );
-}
 
 // Departamento ya elegido (por WindowStack, o "sin preferencia" por
 // defecto) se muestra COMO DATO, no como un <select> abierto -- cambiar
