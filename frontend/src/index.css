@@ -632,6 +632,18 @@ html.lenis, html.lenis body { height: auto; }
   .animate-hero-3   { animation: riseSpring 700ms var(--ease-spring) 320ms both; }
   .animate-hero-4   { animation: riseSpring 700ms var(--ease-spring) 460ms both; }
   .animate-hero-5   { animation: riseSpring 700ms var(--ease-spring) 600ms both; }
+
+  /* Resalta la card de evento tras un deep-link (Home → /events?id=).
+     Anillo azul (--celeste) con glow, no blanco -- un anillo blanco se
+     perdia contra las cards claras (glass-light). Pulsa 2 veces para que
+     sea imposible de perder aunque el usuario ya este mirando otra parte
+     de la pantalla al terminar el scroll. */
+  @keyframes eventHighlightPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.9), 0 0 0 0 rgba(59, 130, 246, 0.5); }
+    50%  { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.55), 0 0 70px 16px rgba(59, 130, 246, 0.45); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0), 0 0 0 0 rgba(59, 130, 246, 0); }
+  }
+  .event-highlight { animation: eventHighlightPulse 1.3s ease-out 2; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

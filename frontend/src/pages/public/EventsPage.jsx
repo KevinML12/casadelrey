@@ -397,7 +397,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
     if (!highlighted) return;
     nodeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setShowHighlight(true);
-    const t = setTimeout(() => setShowHighlight(false), 2200);
+    const t = setTimeout(() => setShowHighlight(false), 2600);
     return () => clearTimeout(t);
   }, [highlighted]);
   // Regla del sitio: cristal blanco (glass-light) para contenido sin foto
@@ -445,7 +445,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={{ transformPerspective: 1000 }}
-      className={`${bentoSpan} w-full h-full liquid-shine ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow ${showHighlight ? 'ring-4 ring-white shadow-[0_0_50px_rgba(255,255,255,0.6)]' : ''}`}
+      className={`${bentoSpan} w-full h-full liquid-shine ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow ${showHighlight ? 'event-highlight' : ''}`}
     >
 
       {hasPhoto && (
