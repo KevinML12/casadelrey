@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
@@ -386,8 +387,19 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
   );
 }
 
-function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
+function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
   const nodeRef = useRef(null);
+  // Card destacada por deep-link (viene de "Próximos eventos" en el
+  // Home, ?id=<ID>): anillo temporal que se desvanece solo -- confirma
+  // al usuario CUAL evento cargó sin dejar el resaltado pegado para siempre.
+  const [showHighlight, setShowHighlight] = useState(highlighted);
+  useEffect(() => {
+    if (!highlighted) return;
+    nodeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setShowHighlight(true);
+    const t = setTimeout(() => setShowHighlight(false), 2200);
+    return () => clearTimeout(t);
+  }, [highlighted]);
   // Regla del sitio: cristal blanco (glass-light) para contenido sin foto
   // propia; cristal oscuro (liquid-glass) para cards que SI muestran una
   // foto propia (el degradado claro deslavaba el flyer -- feedback real
@@ -426,13 +438,14 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp }) {
   return (
     <motion.div
       ref={nodeRef}
+      id={`event-${ev.ID}`}
       initial={{ opacity: 0, y: 20, rotateX: 10, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
       whileHover={{ scale: 1.03, zIndex: 20 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
       style={{ transformPerspective: 1000 }}
-      className={`${bentoSpan} w-full h-full liquid-shine ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow`}
+      className={`${bentoSpan} w-full h-full liquid-shine ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow ${showHighlight ? 'ring-4 ring-white shadow-[0_0_50px_rgba(255,255,255,0.6)]' : ''}`}
     >
 
       {hasPhoto && (
@@ -615,6 +628,8 @@ function ModalWrapper({ children, onClose }) {
 
 export default function EventsPage() {
   const heroImg = useSitePhoto('hero_eventos', '/images/bg-eventos.jpg');
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('id');
   const [events, setEvents] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -695,7 +710,7 @@ export default function EventsPage() {
           <AnimatePresence>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-6 [grid-auto-flow:dense]">
               {upcomingEvents.map((ev, i) => (
-                <EventCard key={ev.ID} ev={ev} i={i} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />
+                <EventCard key={ev.ID} ev={ev} i={i} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} highlighted={highlightId != null && String(ev.ID) === highlightId} />
               ))}
             </div>
           </AnimatePresence>

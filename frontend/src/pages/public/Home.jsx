@@ -566,7 +566,7 @@ function Agenda({ bg }) {
           </MotionLink>
           
           <Reveal delay={0.1}>
-          <Tilt max={4} glass="featured" className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8">
+          <Tilt as={Link} to={`/events?id=${featured.id}`} max={4} glass="featured" className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8 block">
             <div className="text-center shrink-0">
               <div className="text-72 font-extrabold text-white leading-none tracking-tighter">{featured.day}</div>
               <div className="text-14 font-bold text-white tracking-widest mt-2">{featured.month}</div>
@@ -590,21 +590,23 @@ function Agenda({ bg }) {
           </div>
           <RevealList className="space-y-4">
             {others.map((ev) => (
-              <RevealItem key={ev.id} className="group rounded-[18px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
-                <div className="text-center sm:text-left shrink-0">
-                  <div className="text-32 font-extrabold text-white leading-none">{ev.day}</div>
-                  <div className="text-10 text-white font-bold tracking-widest mt-1">{ev.month}</div>
-                </div>
-                <div className="hidden sm:block w-px h-12 bg-white/10" />
-                <div className="flex-1 text-center sm:text-left">
-                  <h3 className="text-18 font-bold text-white mb-1">{ev.title}</h3>
-                  <div className="flex items-center justify-center sm:justify-start gap-4 text-13 text-white/50 font-medium">
-                    <span className="flex items-center gap-1.5"><Icon name="clock" className="w-3.5 h-3.5" /> {ev.time}</span>
+              <RevealItem key={ev.id}>
+                <Link to={`/events?id=${ev.id}`} className="group rounded-[18px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
+                  <div className="text-center sm:text-left shrink-0">
+                    <div className="text-32 font-extrabold text-white leading-none">{ev.day}</div>
+                    <div className="text-10 text-white font-bold tracking-widest mt-1">{ev.month}</div>
                   </div>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0">
-                  <Icon name="arrow" className="w-4 h-4" />
-                </div>
+                  <div className="hidden sm:block w-px h-12 bg-white/10" />
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-18 font-bold text-white mb-1">{ev.title}</h3>
+                    <div className="flex items-center justify-center sm:justify-start gap-4 text-13 text-white/50 font-medium">
+                      <span className="flex items-center gap-1.5"><Icon name="clock" className="w-3.5 h-3.5" /> {ev.time}</span>
+                    </div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0">
+                    <Icon name="arrow" className="w-4 h-4" />
+                  </div>
+                </Link>
               </RevealItem>
             ))}
           </RevealList>
