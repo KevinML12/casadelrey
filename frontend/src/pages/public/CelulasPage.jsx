@@ -163,55 +163,43 @@ function CellCategoryDetail({ group, leaderByName }) {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3">
+      {/* Lista tipo directorio, no tarjetas con avatar -- de 16 células
+          reales solo 1 líder tiene foto en el directorio (/admin/leaders),
+          así que un círculo-avatar era casi siempre el mismo placeholder
+          gris repetido fila tras fila -- eso es justo lo que se siente
+          "de plantilla". Sin fingir una foto que no existe: tipografía
+          grande para el nombre, un separador fino entre filas, y el CTA
+          real (WhatsApp, en su verde de marca) como único elemento
+          circular -- ya no decorativo, siempre significa "abrir WhatsApp". */}
+      <div className="flex flex-col divide-y divide-white/10">
         {filtered.map((c, i) => {
-          const dir = leaderByName[norm(c.leader)];
           const href = waHrefFor(c, group.name, leaderByName);
           return (
-            <Tilt
-              as="a"
+            <motion.a
               key={`${c.name}-${i}`}
-              max={3}
               href={href}
               target="_blank" rel="noopener noreferrer"
               aria-label={`Escribir al líder de la célula ${c.name}`}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.06 + i * 0.035 }}
-              whileHover={{ y: -3, scale: 1.02 }}
-              glass
-              className="glass-light group rounded-[16px] p-4 flex flex-col gap-3 grow basis-[260px] focus-ring cursor-pointer"
+              transition={{ delay: 0.05 + i * 0.03 }}
+              className="group flex items-center gap-4 py-4 px-3 -mx-3 first:pt-0 last:pb-0 rounded-[12px] hover:bg-white/5 transition-colors focus-ring cursor-pointer"
             >
-              <div className="flex items-center gap-3.5">
-                {dir?.photo_url ? (
-                  <img src={dir.photo_url} alt={c.leader}
-                    className="w-10 h-10 rounded-full object-cover border border-bg/15 shrink-0" />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center text-bg shrink-0">
-                    <Icon name="users" className="w-5 h-5" />
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-15 font-bold text-bg leading-tight truncate">{c.name}</p>
-                  <p className="text-13 text-bg/60 font-medium mt-0.5 truncate">
-                    {c.leader}{dir?.phone ? ' · WhatsApp' : ''}
-                  </p>
-                </div>
-                {c.zone && (
-                  <span className="shrink-0 bg-bg/8 border border-bg/12 text-bg/80 px-2.5 py-1 rounded-full text-12 font-semibold">
-                    {c.zone}
-                  </span>
-                )}
-                <span className="shrink-0 w-8 h-8 -mr-1 rounded-full flex items-center justify-center text-bg/45 group-hover:text-bg group-hover:bg-bg/8 transition-all">
-                  <Icon name="arrow" className="w-4 h-4" />
-                </span>
-              </div>
-              {c.description && (
-                <p className="text-13 text-bg/55 leading-relaxed line-clamp-2 pt-3 border-t border-bg/10">
-                  {c.description}
+              <div className="min-w-0 flex-1">
+                <p className="text-17 font-bold text-white leading-tight truncate">{c.name}</p>
+                <p className="text-13 text-white/50 font-medium mt-1 truncate">
+                  {c.leader}{c.zone ? ` · ${c.zone}` : ''}
                 </p>
-              )}
-            </Tilt>
+                {c.description && (
+                  <p className="text-13 text-white/40 leading-relaxed line-clamp-2 mt-1.5">
+                    {c.description}
+                  </p>
+                )}
+              </div>
+              <span className="shrink-0 w-11 h-11 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] group-hover:bg-[#25D366] group-hover:text-white transition-colors">
+                <Icon name="chat" className="w-5 h-5" />
+              </span>
+            </motion.a>
           );
         })}
       </div>
@@ -250,18 +238,15 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
         </div>
         <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta 2 de 2</p>
         <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿En qué zona estás?</h3>
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-wrap gap-2">
           {zones.map(z => (
             <button
               key={z}
               type="button"
               onClick={() => chooseZone(z)}
-              className="flex items-center gap-3 rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
+              className="px-4 py-2.5 rounded-pill border border-bg/15 text-14 font-semibold text-bg hover:bg-bg hover:text-white hover:border-bg transition-colors"
             >
-              <span className="w-9 h-9 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
-                <Icon name="pin" className="w-4 h-4" stroke={2} />
-              </span>
-              <span className="text-14 font-semibold text-bg">{z}</span>
+              {z}
             </button>
           ))}
         </div>
@@ -309,21 +294,30 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
     <>
       <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta 1 de 2</p>
       <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿Cuál te describe mejor?</h3>
-      <div className="flex flex-col gap-2.5">
+      {/* Fichas con foto real -- mismo tratamiento que el collage de
+          categorías de la página (foto + degradado + nombre), no filas
+          genéricas de icono-en-círculo. Así el quiz se siente parte de
+          la página, no un widget de encuesta genérico pegado encima. */}
+      <div className="grid grid-cols-2 gap-3">
         {groups.filter(g => g.cells.length > 0).map(g => (
           <button
             key={g.key}
             type="button"
             onClick={() => chooseCategory(g)}
-            className="flex items-center gap-3 rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
+            className="group relative rounded-[16px] overflow-hidden aspect-[4/5] text-left focus-ring"
           >
-            <span className="w-9 h-9 rounded-full bg-bg text-white overflow-hidden flex items-center justify-center shrink-0">
-              {g.image ? <img src={g.image} alt="" className="w-full h-full object-cover" /> : <Icon name="users" className="w-4 h-4" stroke={2} />}
-            </span>
-            <span className="min-w-0">
-              <span className="block text-14 font-semibold text-bg truncate">{g.name}</span>
-              {g.age && <span className="block text-12 text-bg/50 truncate">{g.age}</span>}
-            </span>
+            {g.image && (
+              <img
+                src={g.image}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent" />
+            <div className="relative z-10 h-full flex flex-col justify-end p-3.5">
+              <p className="text-15 font-bold text-white leading-tight">{g.name}</p>
+              {g.age && <p className="text-11 text-white/65 mt-0.5">{g.age}</p>}
+            </div>
           </button>
         ))}
       </div>
