@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import SocialSection from '../../components/sections/SocialSection';
-import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import PhotoBentoTile from '../../components/ui/PhotoBentoTile';
@@ -122,7 +121,6 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-bg text-white">
       <PageHero
-        eyebrow="Nuestra historia"
         title="Somos Casa del Rey."
         subtitle="Una iglesia familiar en Huehuetenango, edificada célula por célula, generación tras generación."
         photoSlot="hero_nosotros"
@@ -136,8 +134,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12">
-            <Eyebrow>Identidad</Eyebrow>
-            <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
               Nuestra <span className="font-serif font-normal">historia</span>.
             </h2>
           </Reveal>
@@ -176,8 +173,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12">
-            <Eyebrow>Propósito</Eyebrow>
-            <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
               Lo que nos mueve.
             </h2>
           </Reveal>
@@ -212,8 +208,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/45 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-12 text-center">
-            <Eyebrow>Comunidad</Eyebrow>
-            <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
               Una familia que sirve.
             </h2>
             <p className="mt-6 text-17 text-white/70 max-w-2xl mx-auto">
@@ -328,7 +323,9 @@ export default function AboutPage() {
       <section className="relative py-20 md:py-28 border-t border-white/5">
         <div className="max-w-5xl mx-auto px-6">
           <Reveal className="text-center mb-12">
-            <Eyebrow>¿Cuál es para mí?</Eyebrow>
+            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
+              ¿Cuál es para mí?
+            </h2>
           </Reveal>
           <div className="grid sm:grid-cols-2 gap-10 sm:gap-14 sm:divide-x sm:divide-white/10">
             <Reveal from="left" className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
@@ -367,15 +364,14 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-10">
-            <div className="flex items-center justify-between gap-4">
-              <Eyebrow>Grupos pequeños</Eyebrow>
-              <Link to="/celulas" className="shrink-0 text-13 font-semibold text-white/55 hover:text-white underline underline-offset-4 decoration-white/20">
+            <div className="flex items-end justify-between gap-4">
+              <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+                Encuentra tu célula.
+              </h2>
+              <Link to="/celulas" className="shrink-0 mb-2 text-13 font-semibold text-white/55 hover:text-white underline underline-offset-4 decoration-white/20">
                 Ver todas
               </Link>
             </div>
-            <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
-              Encuentra tu célula.
-            </h2>
             <p className="mt-4 text-16 text-white/70 max-w-lg">
               Adolescentes, jóvenes adultos, prejuveniles, varones y la red
               Mujeres de Palabra — cada grupo se reúne en casas durante la semana.

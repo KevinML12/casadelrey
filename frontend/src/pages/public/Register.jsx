@@ -6,7 +6,7 @@
 //  familia" literal), administrable vía slot hero_registro.
 // ============================================================
 import { Link } from 'react-router-dom';
-import { Eyebrow, GlassButton } from '../../components/ui/Glass';
+import { GlassButton } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -39,8 +39,7 @@ export default function Register() {
 
       <div className="relative z-10 w-full max-w-2xl mx-auto px-6 text-center">
         <Reveal>
-          <Eyebrow>Únete a la familia</Eyebrow>
-          <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)' }}>
+          <h1 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)' }}>
             Obtener una cuenta.
           </h1>
           <p className="mt-5 text-16 text-white/70">

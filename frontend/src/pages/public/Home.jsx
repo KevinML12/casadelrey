@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
 import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
@@ -639,8 +638,7 @@ function CelulasSection({ bg }) {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <Reveal className="mb-16 text-center">
-          <Eyebrow>Comunidad</Eyebrow>
-          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
             Células
           </h2>
           <p className="mt-6 text-18 text-white/70 max-w-2xl mx-auto">
@@ -751,8 +749,7 @@ function MensajesCarousel({ bg }) {
 
       <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <Eyebrow>Últimas Prédicas</Eyebrow>
-          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
             Alimenta tu espíritu.
           </h2>
         </div>
@@ -815,8 +812,7 @@ function Ubicacion({ bg }) {
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Titular editorial del cierre */}
         <Reveal className="text-center mb-14">
-          <Eyebrow>Visítanos</Eyebrow>
-          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)' }}>
+          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)' }}>
             Te esperamos <span className="font-serif font-normal">en casa</span>.
           </h2>
         </Reveal>
@@ -921,8 +917,7 @@ function GalleryPreviewSection() {
 
       <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <Eyebrow>Galería</Eyebrow>
-          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
             Momentos <span className="text-white">vivos</span>.
           </h2>
         </div>

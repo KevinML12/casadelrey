@@ -1,6 +1,5 @@
 import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
-import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -17,7 +16,6 @@ export default function DonatePage() {
   return (
     <main className="min-h-screen bg-bg text-white relative overflow-hidden">
       <PageHero
-        eyebrow="Generosidad"
         title="Tu generosidad transforma."
         subtitle="Cada quetzal sembrado con fe produce fruto eterno."
         photoSlot="hero_donar"
@@ -36,8 +34,7 @@ export default function DonatePage() {
             {/* Destinos + versículo */}
             <div>
               <Reveal className="mb-8">
-                <Eyebrow>¿A dónde va tu donación?</Eyebrow>
-                <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
+                <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
                   Siembra con alegría.
                 </h2>
               </Reveal>
@@ -73,8 +70,7 @@ export default function DonatePage() {
                 cristal directamente sobre la foto (sin panel envolvente:
                 cristal anidado prohibido por la guía) */}
             <Reveal from="right" delay={0.05}>
-              <Eyebrow>Registra tu donación</Eyebrow>
-              <h2 className="display-mega text-white mt-4 mb-7" style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)' }}>
+              <h2 className="display-mega text-white mb-7" style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)' }}>
                 Sembrar es sumar.
               </h2>
               <DonationCard />

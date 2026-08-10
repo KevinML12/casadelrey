@@ -10,7 +10,6 @@
 //  un componente duplicado en dos páginas. Un solo componente, reusado
 //  tanto en Nosotros como en Home.
 // ============================================================
-import { Eyebrow } from '../ui/Glass';
 import Reveal from '../ui/Reveal';
 import Tilt from '../ui/Tilt';
 
@@ -26,8 +25,7 @@ export default function SocialSection({ title = 'Síguenos en redes' }) {
     <section className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
       <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <Eyebrow>Redes sociales</Eyebrow>
-          <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
             {title}
           </h2>
         </div>

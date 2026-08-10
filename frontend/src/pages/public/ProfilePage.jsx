@@ -69,7 +69,6 @@ export default function ProfilePage() {
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
       <PageHero
-        eyebrow="Tu espacio"
         title="Mi Perfil"
         photoSlot="hero_perfil"
         photoFallback="/images/bg-hero.jpg"

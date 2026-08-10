@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import { Eyebrow } from '../../components/ui/Glass';
 import Tilt from '../../components/ui/Tilt';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
@@ -478,7 +477,6 @@ export default function VolunteeringPage() {
   return (
     <main className="min-h-screen bg-bg text-white">
       <PageHero
-        eyebrow="Sirve con tus talentos"
         title="Voluntariado"
         subtitle="Cada persona tiene un lugar. Únete a los más de 90 voluntarios que ya sirven en 10 departamentos."
         photoSlot="hero_voluntariado"
@@ -505,8 +503,7 @@ export default function VolunteeringPage() {
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <Reveal className="mb-10 text-center max-w-2xl mx-auto">
-            <Eyebrow>Departamentos</Eyebrow>
-            <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
+            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
               ¿Dónde quieres servir?
             </h2>
             <p className="mt-4 text-16 text-white/70">Toca un departamento para conocerlo mejor.</p>

@@ -10,7 +10,7 @@ import { useSitePhoto } from '../../lib/feed';
 // detrás de la foto. Sin `photoSlot` se comporta como antes (solo halos) —
 // backward-compatible con cualquier caller que no haya migrado.
 //
-export default function PageHero({ eyebrow, title, subtitle, children, photoSlot, photoFallback }) {
+export default function PageHero({ title, subtitle, children, photoSlot, photoFallback }) {
   const photo = useSitePhoto(photoSlot || '', photoFallback || '');
   const hasPhoto = Boolean(photoSlot && photo);
 
@@ -28,11 +28,6 @@ export default function PageHero({ eyebrow, title, subtitle, children, photoSlot
         </>
       )}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center animate-rise">
-        {eyebrow && (
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 liquid-glass border border-white/20 mb-6">
-            <span className="text-white/80 text-11 font-bold uppercase tracking-widest">{eyebrow}</span>
-          </div>
-        )}
         <h1
           className="display-mega text-white"
           style={{ fontSize: 'clamp(2.6rem, 7vw, 5rem)' }}

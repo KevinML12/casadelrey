@@ -1,6 +1,6 @@
 // ============================================================
 //  Casa del Rey — Liquid Glass LIGHT primitives
-//  Icon · Halos · Badge · GlassButton · Eyebrow · Field · Surface
+//  Icon · Halos · Badge · GlassButton · Field · Surface
 //  Apple HIG · Lienzo blanco · Squircles · Spring physics
 // ============================================================
 
@@ -199,24 +199,6 @@ export function Badge({ children, className = '', tone = 'celeste' }) {
     <span className={`inline-flex items-center gap-2 rounded-pill px-3.5 py-1.5 text-12 font-bold tracking-tightish ${styles} ${className}`}>
       <span>{children}</span>
     </span>
-  );
-}
-
-/* ---------- Section eyebrow — pill de cristal: en liquid glass el
-   material ES el acento, nada de colores planos. `on="light"` para
-   cuando el eyebrow vive DENTRO de una superficie glass-light (blanca)
-   en vez de flotar sobre el canvas navy -- mismo pill, tinta invertida. */
-export function Eyebrow({ children, on = 'dark' }) {
-  const light = on === 'light';
-  return (
-    <div className={`inline-flex items-center gap-2.5 mb-4 px-4 py-1.5 rounded-full text-13 font-bold ${
-      light ? 'glass-light-nested text-bg/90' : 'liquid-glass text-white/90'
-    }`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${
-        light ? 'bg-bg/70 shadow-[0_0_8px_rgba(10,21,38,0.5)]' : 'bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.8)]'
-      }`} />
-      {children}
-    </div>
   );
 }
 

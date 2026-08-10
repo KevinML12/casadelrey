@@ -415,7 +415,6 @@ export default function CelulasPage() {
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
       <PageHero
-        eyebrow="Comunidad"
         title="Células"
         subtitle="Grupos que se reúnen en casas durante la semana. Toca un tipo para abrir su ventana — y salta entre ellas."
         photoSlot="hero_celulas"

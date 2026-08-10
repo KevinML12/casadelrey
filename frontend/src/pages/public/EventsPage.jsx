@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -646,8 +645,7 @@ export default function EventsPage() {
 
       <div className="relative z-10 pt-40 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
         <Reveal>
-          <Eyebrow>Agenda</Eyebrow>
-          <h1 className="display-mega text-white mb-4 mt-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
+          <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
           <p className="text-18 text-white/70 max-w-2xl mx-auto font-medium mb-2">
             Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
           </p>
@@ -705,8 +703,7 @@ export default function EventsPage() {
         {faqs.length > 0 && (
           <div className="max-w-3xl mx-auto">
             <Reveal className="text-center mb-10">
-              <Eyebrow>Ayuda</Eyebrow>
-              <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)' }}>Preguntas frecuentes</h2>
+              <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)' }}>Preguntas frecuentes</h2>
               <p className="text-white/60 mt-4 max-w-2xl mx-auto">Todo lo que necesitas saber antes de asistir a nuestros eventos.</p>
             </Reveal>
 
