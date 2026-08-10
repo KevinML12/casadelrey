@@ -10,11 +10,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import apiClient from '../../lib/apiClient';
-import ParallaxImg from '../../components/ui/ParallaxImg';
 import BlogHero from '../../components/blog/BlogHero';
 import PostCollage from '../../components/blog/PostCollage';
 import ArticleReader from '../../components/blog/ArticleReader';
-import { useSitePhoto } from '../../lib/feed';
 
 // Mismo fallback de categoría que PostCollage.jsx (p.category vacío no
 // debe ser un filtro fantasma "undefined").
@@ -31,7 +29,6 @@ function Loader() {
 }
 
 export default function BlogPage() {
-  const heroImg = useSitePhoto('hero_blog', '/images/bg-ensenanzas.jpg');
   const [posts, setPosts] = useState([]);
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -88,12 +85,10 @@ export default function BlogPage() {
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
-      {/* Hero de fondo presente en toda la página (administrable desde
-          /admin/site-photos, slot "hero_blog"; fallback local si no hay). */}
-      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
-
       <div className="relative z-10">
+        {/* Foto de fondo (admin-editable, slot "hero_blog") ahora vive
+            DENTRO de BlogHero -> PageHero, acotada al hero -- ya no se
+            extiende como capa de página completa detrás del listado. */}
         <BlogHero />
         <section className="max-w-6xl mx-auto px-6 pt-6 pb-28">
           {categories.length > 1 && (

@@ -1,23 +1,22 @@
 // ============================================================
-//  BlogHero — encabezado de texto del listado de Blog. El fondo de
-//  foto vive en BlogPage.jsx (mismo patrón que Células/Galería: un
-//  solo ParallaxImg cubriendo TODA la página, no solo esta sección).
+//  BlogHero — encabezado del listado de Blog. Envoltorio delgado sobre
+//  el PageHero compartido: antes reimplementaba a mano el mismo bloque
+//  (padding/eyebrow/h1/subtitle) que ya vive en components/layout/
+//  PageHero.jsx. Ahora es dueño de su propia foto (slot "hero_blog",
+//  mismo admin-editable que usaba BlogPage.jsx antes) en vez de
+//  depender de un ParallaxImg de página completa -- así el fondo queda
+//  acotado al hero, igual que el resto de páginas migradas a PageHero.
 // ============================================================
-import { Eyebrow } from '../ui/Glass';
-import Reveal from '../ui/Reveal';
+import PageHero from '../layout/PageHero';
 
 export default function BlogHero() {
   return (
-    <section className="pt-40 pb-8 max-w-6xl mx-auto px-6 text-center flex flex-col items-center">
-      <Reveal>
-        <Eyebrow>Enseñanzas</Eyebrow>
-        <h1 className="display-mega text-white mt-4 mb-4" style={{ fontSize: 'clamp(2.6rem, 7vw, 4.5rem)' }}>
-          Blog
-        </h1>
-        <p className="text-17 text-white/70 max-w-xl mx-auto">
-          Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual.
-        </p>
-      </Reveal>
-    </section>
+    <PageHero
+      eyebrow="Enseñanzas"
+      title="Blog"
+      subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual."
+      photoSlot="hero_blog"
+      photoFallback="/images/bg-ensenanzas.jpg"
+    />
   );
 }

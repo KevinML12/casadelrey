@@ -15,13 +15,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Icon } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import ParallaxImg from '../../components/ui/ParallaxImg';
+import PageHero from '../../components/layout/PageHero';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import Tilt from '../../components/ui/Tilt';
-import { useApi, useSitePhoto } from '../../lib/feed';
+import { useApi } from '../../lib/feed';
 
 const PRESS = {
   whileHover: { scale: 1.03 },
@@ -326,7 +326,6 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
 }
 
 export default function CelulasPage() {
-  const heroImg = useSitePhoto('hero_celulas', '/images/bg-ministerios.jpg');
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');
@@ -422,34 +421,26 @@ export default function CelulasPage() {
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
-      {/* Hero de fondo presente en toda la página */}
-      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
+      <PageHero
+        eyebrow="Comunidad"
+        title="Células"
+        subtitle="Grupos que se reúnen en casas durante la semana. Toca un tipo para abrir su ventana — y salta entre ellas."
+        photoSlot="hero_celulas"
+        photoFallback="/images/bg-ministerios.jpg"
+      >
+        <motion.button
+          {...PRESS}
+          type="button"
+          onClick={() => setQuizOpen(true)}
+          className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
+        >
+          <Icon name="spark" className="w-4 h-4" stroke={2} />
+          Descubre tu célula ideal
+        </motion.button>
+      </PageHero>
 
       <div className="relative z-10">
-        <section className="pt-40 pb-8 max-w-6xl mx-auto px-6">
-          <Reveal>
-            <Eyebrow>Comunidad</Eyebrow>
-            <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}>
-              Células
-            </h1>
-            <p className="mt-6 text-18 text-white/70 max-w-2xl">
-              Grupos que se reúnen en casas durante la semana. Toca un tipo para
-              abrir su ventana — y salta entre ellas.
-            </p>
-            <div className="mt-6">
-              <motion.button
-                {...PRESS}
-                type="button"
-                onClick={() => setQuizOpen(true)}
-                className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
-              >
-                <Icon name="spark" className="w-4 h-4" stroke={2} />
-                Descubre tu célula ideal
-              </motion.button>
-            </div>
-          </Reveal>
-
+        <section className="pb-8 max-w-6xl mx-auto px-6">
           <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mt-10">
             {stats.map(s => (
               <RevealItem key={s.label}>

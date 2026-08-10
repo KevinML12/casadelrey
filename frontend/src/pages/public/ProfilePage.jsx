@@ -9,11 +9,10 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Icon } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
-import ParallaxImg from '../../components/ui/ParallaxImg';
-import { useSitePhoto } from '../../lib/feed';
+import PageHero from '../../components/layout/PageHero';
 
 const PRESS = {
   whileHover: { scale: 1.02 },
@@ -23,7 +22,6 @@ const PRESS = {
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const heroImg = useSitePhoto('hero_perfil', '/images/bg-hero.jpg');
   const [goals,    setGoals]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [newTitle, setNewTitle] = useState('');
@@ -71,18 +69,14 @@ export default function ProfilePage() {
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
-      {/* Hero de fondo presente en toda la página */}
-      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
+      <PageHero
+        eyebrow="Tu espacio"
+        title="Mi Perfil"
+        photoSlot="hero_perfil"
+        photoFallback="/images/bg-hero.jpg"
+      />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-6 pt-40 pb-28">
-        <Reveal>
-          <Eyebrow>Tu espacio</Eyebrow>
-          <h1 className="display-mega text-white mt-4 mb-10" style={{ fontSize: 'clamp(2.6rem, 6vw, 4.5rem)' }}>
-            Mi Perfil
-          </h1>
-        </Reveal>
-
+      <div className="relative z-10 max-w-2xl mx-auto px-6 pb-28">
         {/* Identidad */}
         <Reveal delay={0.05}>
           <Tilt max={3} glass className="liquid-glass rounded-[24px] p-7 md:p-8 mb-6">

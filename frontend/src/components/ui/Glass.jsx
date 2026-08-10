@@ -256,12 +256,13 @@ const glassFieldStyle = {
   color: '#fff',
 };
 
-export function GlassField({ label, error, className = '', ...props }) {
+export function GlassField({ label, error, helperText, className = '', ...props }) {
   return (
     <label className="block text-left">
       {label && <span className="block text-13 font-semibold text-white/60 mb-2">{label}</span>}
       <input className={`input-squircle ${className}`} style={glassFieldStyle} {...props} />
-      {error && <span className="block text-13 font-medium text-red-400 mt-1.5">{error}</span>}
+      {error && <span className="block text-13 font-medium text-rose mt-1.5">{error}</span>}
+      {helperText && !error && <span className="block text-13 text-white/40 mt-1.5">{helperText}</span>}
     </label>
   );
 }

@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon, GlassField } from '../../components/ui/Glass';
+import { Icon, GlassField, GlassButton } from '../../components/ui/Glass';
 
 export default function ForgotPassword() {
   const [email, setEmail]         = useState('');
@@ -60,16 +59,14 @@ export default function ForgotPassword() {
               placeholder="tu@correo.com"
               required
             />
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            <GlassButton
               type="submit"
+              variant="primary"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-15 font-bold disabled:opacity-50"
+              className="w-full justify-center"
             >
               {loading ? 'Enviando…' : 'Enviar enlace'}
-            </motion.button>
+            </GlassButton>
           </form>
         </>
       )}

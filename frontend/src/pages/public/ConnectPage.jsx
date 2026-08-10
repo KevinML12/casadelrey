@@ -6,10 +6,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
-import { Icon, Eyebrow, FieldLight } from '../../components/ui/Glass';
+import { Icon, FieldLight } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
-import ParallaxImg from '../../components/ui/ParallaxImg';
-import { useSitePhoto } from '../../lib/feed';
+import PageHero from '../../components/layout/PageHero';
 
 const CATEGORIES = [
   { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia', icon: 'spark' },
@@ -34,7 +33,6 @@ const STEPS = [
 ];
 
 export default function ConnectPage() {
-  const heroImg = useSitePhoto('hero_conectate', '/images/bg-ministerios.jpg');
   const [form, setForm] = useState({ name: '', phone: '', email: '', category: '', how_found: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -62,21 +60,15 @@ export default function ConnectPage() {
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
-      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
+      <PageHero
+        eyebrow="Bienvenido"
+        title="Conéctate"
+        subtitle="Cuéntanos un poco de ti — alguien de nuestro equipo te va a escribir para darte la bienvenida."
+        photoSlot="hero_conectate"
+        photoFallback="/images/bg-ministerios.jpg"
+      />
 
-      <div className="relative z-10 pt-40 pb-24 px-6 max-w-xl mx-auto">
-        <Reveal className="text-center mb-10">
-          <Eyebrow>Bienvenido</Eyebrow>
-          <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.4rem, 6vw, 3.6rem)' }}>
-            Conéctate
-          </h1>
-          <p className="mt-6 text-16 text-white/70">
-            Cuéntanos un poco de ti — alguien de nuestro equipo te va a escribir
-            para darte la bienvenida.
-          </p>
-        </Reveal>
-
+      <div className="relative z-10 pb-24 px-6 max-w-xl mx-auto">
         {/* Qué sigue -- el flujo real (ConnectCard -> panel -> líder
             asignado), no un adorno; le da confianza a alguien que nunca
             ha llenado este formulario antes. Los 3 pasos van conectados

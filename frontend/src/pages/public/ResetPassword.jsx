@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon, GlassField } from '../../components/ui/Glass';
+import { Icon, GlassField, GlassButton } from '../../components/ui/Glass';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -53,16 +52,14 @@ export default function ResetPassword() {
           placeholder="••••••••"
           required
         />
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        <GlassButton
           type="submit"
+          variant="primary"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-15 font-bold disabled:opacity-50 mt-2"
+          className="w-full justify-center mt-2"
         >
           {loading ? 'Guardando…' : 'Guardar contraseña'}
-        </motion.button>
+        </GlassButton>
       </form>
     </AuthCard>
   );

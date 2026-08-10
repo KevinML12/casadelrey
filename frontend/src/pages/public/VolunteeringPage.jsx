@@ -4,6 +4,7 @@ import PageHero from '../../components/layout/PageHero';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import { Icon, Eyebrow } from '../../components/ui/Glass';
+import Tilt from '../../components/ui/Tilt';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
@@ -312,12 +313,22 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 // vez del degradado navy que traía) con el título/descripción, igual
 // tratamiento que usan los modales claros del sitio. big: solo la tarjeta
 // "hero" de una categoría de un solo departamento -- título más grande.
+// Tilt (NO rotación estática): se probó el collage con spans/rotate FIJOS
+// (ver comentario de HEIGHTS más arriba) y el usuario lo rechazó por verse
+// "torcido". Tilt es distinto -- la card queda perfectamente recta en
+// reposo, solo se inclina en 3D siguiendo al cursor/scroll (vuelve a
+// plano al soltar). Es la misma reactividad de cristal que Home/Células/
+// Galería, sin reintroducir el ángulo fijo que se pidió quitar.
 function DepartmentCard({ title, desc, photo, big, height, onClick }) {
   return (
-    <button
+    <Tilt
+      as="button"
       type="button"
       onClick={onClick}
-      className={`group relative block w-full overflow-hidden rounded-[20px] text-left focus-ring transition-transform duration-300 hover:-translate-y-1 ${height}`}
+      max={6}
+      glass
+      hoverScale={1.02}
+      className={`group relative block w-full overflow-hidden rounded-[20px] text-left focus-ring ${height}`}
     >
       <img
         src={photo}
@@ -328,7 +339,7 @@ function DepartmentCard({ title, desc, photo, big, height, onClick }) {
         <h3 className={`font-bold text-bg tracking-tight leading-tight ${big ? 'text-19' : 'text-15'}`}>{title}</h3>
         {desc && <p className="text-13 text-bg/60 mt-1 leading-snug line-clamp-2">{desc}</p>}
       </div>
-    </button>
+    </Tilt>
   );
 }
 

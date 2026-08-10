@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon, GlassField } from '../../components/ui/Glass';
+import { GlassField, GlassButton } from '../../components/ui/Glass';
 
 export default function Login() {
   const [email, setEmail]       = useState('');
@@ -63,17 +62,15 @@ export default function Login() {
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        <GlassButton
           type="submit"
+          variant="primary"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-white text-bg text-15 font-bold disabled:opacity-50"
+          icon={loading ? undefined : 'arrow'}
+          className="w-full justify-center"
         >
           {loading ? 'Ingresando…' : 'Ingresar'}
-          {!loading && <Icon name="arrow" className="w-4 h-4" stroke={2} />}
-        </motion.button>
+        </GlassButton>
       </form>
 
       <div className="mt-8 pt-6 border-t border-white/10 text-center text-14 text-white/60">

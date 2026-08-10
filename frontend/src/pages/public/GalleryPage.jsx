@@ -7,12 +7,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
-import { Eyebrow } from '../../components/ui/Glass';
-import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import ParallaxImg from '../../components/ui/ParallaxImg';
+import { RevealList, RevealItem } from '../../components/ui/Reveal';
+import PageHero from '../../components/layout/PageHero';
 import WindowStack from '../../components/ui/WindowStack';
 import Tilt from '../../components/ui/Tilt';
-import { useSitePhoto } from '../../lib/feed';
 
 // Collage: tamaños/inclinaciones variados que se repiten por índice.
 // grid-auto-flow: dense rellena los huecos → recortes sin espacios.
@@ -23,7 +21,6 @@ const SPANS = [
 const ROT = [-2.2, 1.8, -1.4, 2.4, -2.6, 1.2];
 
 export default function GalleryPage() {
-  const heroImg = useSitePhoto('hero_galeria', '/images/bg-galeria.jpg');
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openKey, setOpenKey] = useState(null);
@@ -65,23 +62,15 @@ export default function GalleryPage() {
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
-      {/* Hero de fondo presente en toda la página */}
-      <ParallaxImg src={heroImg} alt="" className="opacity-45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg pointer-events-none" />
+      <PageHero
+        eyebrow="Momentos vivos"
+        title="Galería"
+        subtitle="Lo que Dios está haciendo en nuestra casa. Abre un álbum y recórrelo."
+        photoSlot="hero_galeria"
+        photoFallback="/images/bg-galeria.jpg"
+      />
 
       <div className="relative z-10">
-        <section className="pt-40 pb-8 max-w-6xl mx-auto px-6">
-          <Reveal>
-            <Eyebrow>Momentos vivos</Eyebrow>
-            <h1 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}>
-              Galería
-            </h1>
-            <p className="mt-6 text-18 text-white/70 max-w-2xl">
-              Lo que Dios está haciendo en nuestra casa. Abre un álbum y recórrelo.
-            </p>
-          </Reveal>
-        </section>
-
         <section className="max-w-6xl mx-auto px-6 pt-6 pb-28">
           {albums.length === 0 ? (
             <div className="py-24 text-center">

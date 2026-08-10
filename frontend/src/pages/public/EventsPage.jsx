@@ -7,6 +7,7 @@ import { Icon, Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
+import ModalWrapper from '../../components/ui/ModalWrapper';
 import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
@@ -435,17 +436,24 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
   const wellBg     = hasPhoto ? 'bg-white/5'  : 'bg-bg/5';
   const wellBorder = hasPhoto ? 'border-white/10' : 'border-bg/10';
 
+  // Tilt reemplaza al motion.div plano: la card ahora se inclina en 3D
+  // siguiendo al cursor/scroll (mismo lenguaje reactivo que Home/Células/
+  // Galería) en vez de solo la rotación fija de entrada que tenía antes.
+  // Envuelta en un <div> simple (con el ref/id/bentoSpan) porque Tilt no
+  // es forwardRef -- scrollIntoView necesita ese ref para el deep-link
+  // desde Home, y el span del grid bento debe vivir en el elemento que
+  // Grid realmente mide.
   return (
-    <motion.div
-      ref={nodeRef}
-      id={`event-${ev.ID}`}
-      initial={{ opacity: 0, y: 20, rotateX: 10, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-      whileHover={{ scale: 1.03, zIndex: 20 }}
+    <div ref={nodeRef} id={`event-${ev.ID}`} className={`${bentoSpan} w-full h-full`}>
+    <Tilt
+      max={6}
+      hoverScale={1.02}
+      glass
+      initial={{ opacity: 0, y: 20, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-      style={{ transformPerspective: 1000 }}
-      className={`${bentoSpan} w-full h-full liquid-shine ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow ${showHighlight ? 'event-highlight' : ''}`}
+      className={`w-full h-full ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow ${showHighlight ? 'event-highlight' : ''}`}
     >
 
       {hasPhoto && (
@@ -565,7 +573,8 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
         </div>
       </div>
 
-    </motion.div>
+    </Tilt>
+    </div>
   );
 }
 
@@ -597,34 +606,12 @@ function PastEventCard({ ev }) {
   );
 }
 
-// El botón de cerrar vive AQUÍ (fuera del div con overflow-y-auto), no
-// dentro de cada paso -- reportado por el usuario: al hacer scroll dentro
-// del modal, la X (que antes vivía en el header de cada paso, adentro del
-// contenido scrolleable) desaparecía de la vista. Ahora es parte del
-// "chrome" del modal, siempre visible sin importar el scroll, con un
-// acento celeste para que se note más que un botón neutro.
-function ModalWrapper({ children, onClose }) {
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="relative w-full max-w-md max-h-[90vh]" onClick={e => e.stopPropagation()}>
-        <div
-          className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"
-          style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
-          data-lenis-prevent
-        >
-          {children}
-        </div>
-        <button
-          onClick={onClose}
-          aria-label="Cerrar"
-          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg text-white shadow-card flex items-center justify-center hover:opacity-85 transition-opacity"
-        >
-          <Icon name="close" className="w-4 h-4" stroke={2.2} />
-        </button>
-      </div>
-    </div>
-  );
-}
+// El ModalWrapper local que vivía acá se migró al compartido
+// (components/ui/ModalWrapper.jsx) en ago-2026 -- tenía el mismo fix del
+// botón cerrar (fuera del área con scroll, reportado en este archivo
+// primero), pero le faltaba animación de entrada/salida y usaba un
+// z-50 más bajo que el z-[200] que ya usan WindowStack/los demás modales
+// del sitio. El componente compartido ya trae ambas cosas resueltas.
 
 export default function EventsPage() {
   const heroImg = useSitePhoto('hero_eventos', '/images/bg-eventos.jpg');
