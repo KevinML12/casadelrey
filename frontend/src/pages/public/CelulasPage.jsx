@@ -303,7 +303,7 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
               <img
                 src={g.image}
                 alt=""
-                className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent" />
