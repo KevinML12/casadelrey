@@ -19,9 +19,8 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import Input, { Select, Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const TYPE_KEY_OPTIONS = [
   { value: '', label: 'Sin type key (no agrupa células automáticamente)' },
@@ -64,31 +63,25 @@ function CategoryForm({ onSave, onCancel, initialData }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Nombre <span className="text-err">*</span></label>
-          <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="ej. Adolescentes" required />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Grupo de edad</label>
-          <input value={form.age_group} onChange={set('age_group')} className={fieldCls} placeholder="ej. 15 a 24 años" />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Type key (qué células le pertenecen)</label>
-          <select value={form.type_key} onChange={set('type_key')} className={fieldCls}>
-            {TYPE_KEY_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Orden</label>
-          <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} />
-        </div>
+        <Input label="Nombre *" value={form.name} onChange={set('name')} placeholder="ej. Adolescentes" required />
+        <Input label="Grupo de edad" value={form.age_group} onChange={set('age_group')} placeholder="ej. 15 a 24 años" />
+        <Select
+          label="Type key (qué células le pertenecen)"
+          value={form.type_key}
+          onChange={set('type_key')}
+          options={TYPE_KEY_OPTIONS.filter(t => t.value !== '')}
+          placeholder="Sin type key (no agrupa células automáticamente)"
+        />
+        <Input type="number" label="Orden" value={form.sort_order} onChange={set('sort_order')} />
       </div>
 
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Descripción</label>
-        <textarea value={form.description} onChange={set('description')} rows={2}
-          className={fieldCls} placeholder="Qué hace especial a esta clasificación..." />
-      </div>
+      <Textarea
+        label="Descripción"
+        value={form.description}
+        onChange={set('description')}
+        rows={2}
+        placeholder="Qué hace especial a esta clasificación..."
+      />
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">

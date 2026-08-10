@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input, { Select } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const PLATFORMS = [
   { value: 'instagram', label: 'Instagram', icon: 'photo_camera' },
@@ -23,7 +22,7 @@ const EMPTY = { platform: 'instagram', post_url: '', caption: '', image_url: '',
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -79,10 +78,10 @@ function Form({ initial, onSave, onCancel }) {
           <div className="flex items-center gap-4">
             <img src={form.image_url} alt="post" className="w-24 h-24 rounded-xl object-cover border border-bg/10" />
             <button type="button" onClick={() => setForm(p => ({ ...p, image_url: '' }))}
-              className="text-label-m text-err hover:underline">Cambiar imagen</button>
+              className="text-label-m text-rose hover:underline">Cambiar imagen</button>
           </div>
         ) : (
-          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-pri transition-colors">
+          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-celeste transition-colors">
             <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
             <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del post'}</p>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
@@ -92,25 +91,14 @@ function Form({ initial, onSave, onCancel }) {
 
       {/* Plataforma + URL */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Plataforma *</label>
-          <select value={form.platform} onChange={set('platform')} className={fieldCls}>
-            {PLATFORMS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">URL del post *</label>
-          <input type="url" value={form.post_url} onChange={set('post_url')}
-            placeholder="https://instagram.com/p/..." className={fieldCls} required />
-        </div>
+        <Select label="Plataforma *" value={form.platform} onChange={set('platform')} options={PLATFORMS} />
+        <Input label="URL del post *" type="url" value={form.post_url} onChange={set('post_url')}
+          placeholder="https://instagram.com/p/..." required />
       </div>
 
       {/* Caption */}
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Caption (opcional)</label>
-        <input value={form.caption} onChange={set('caption')}
-          placeholder="Breve descripción que se muestra en hover" className={fieldCls} />
-      </div>
+      <Input label="Caption (opcional)" value={form.caption} onChange={set('caption')}
+        placeholder="Breve descripción que se muestra en hover" />
 
       {/* Tamaño en el grid */}
       <div>
@@ -135,13 +123,10 @@ function Form({ initial, onSave, onCancel }) {
 
       {/* Orden + activo */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Orden (menor = primero)</label>
-          <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} />
-        </div>
+        <Input label="Orden (menor = primero)" type="number" value={form.sort_order} onChange={set('sort_order')} />
         <label className="flex items-end gap-2 text-body-s text-bg cursor-pointer pb-2">
           <input type="checkbox" checked={form.is_active} onChange={set('is_active')}
-            className="rounded accent-pri w-4 h-4" />
+            className="rounded accent-celeste w-4 h-4" />
           Visible en el sitio
         </label>
       </div>
@@ -254,7 +239,7 @@ export default function AdminSocial() {
                       <Icon name="open_in_new" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </a>
                     <button onClick={() => remove(p.ID)}
-                      className="w-9 h-9 rounded-full bg-err/80 hover:bg-err flex items-center justify-center transition-colors">
+                      className="w-9 h-9 rounded-full bg-rose/80 hover:bg-rose flex items-center justify-center transition-colors">
                       <Icon name="delete" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
                     </button>
                   </div>

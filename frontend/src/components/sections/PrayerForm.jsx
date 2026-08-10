@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon } from '../ui/Glass';
+import { Icon, FieldLight } from '../ui/Glass';
 
 const CATEGORIES = [
   { value: 'salud',      label: 'Salud y Sanidad' },
@@ -22,16 +22,6 @@ const PRESS = {
   whileTap: { scale: 0.97 },
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
-
-function FieldShell({ label, error, children }) {
-  return (
-    <label className="block">
-      <span className="block text-13 font-semibold text-bg/60 mb-2">{label}</span>
-      {children}
-      {error && <span className="block text-13 font-medium text-red-600 mt-1.5">{error.message}</span>}
-    </label>
-  );
-}
 
 export default function PrayerForm({ compact = false }) {
   const [submitted, setSubmitted] = useState(false);
@@ -84,35 +74,24 @@ export default function PrayerForm({ compact = false }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldShell label="Nombre *" error={errors.name}>
-            <input className="input-light"
-              {...register('name', { required: 'El nombre es requerido' })} />
-          </FieldShell>
-          <FieldShell label="Correo electrónico" error={errors.email}>
-            <input type="email" className="input-light"
-              {...register('email', { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Correo inválido' } })} />
-          </FieldShell>
+          <FieldLight label="Nombre *" error={errors.name}
+            {...register('name', { required: 'El nombre es requerido' })} />
+          <FieldLight label="Correo electrónico" type="email" error={errors.email}
+            {...register('email', { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Correo inválido' } })} />
         </div>
 
-        <FieldShell label="Categoría">
-          <select className="input-light appearance-none cursor-pointer"
-            {...register('category')}>
-            <option value="" className="text-bg">Selecciona una categoría</option>
-            {CATEGORIES.map(c => (
-              <option key={c.value} value={c.value} className="text-bg">{c.label}</option>
-            ))}
-          </select>
-        </FieldShell>
+        <FieldLight as="select" label="Categoría" {...register('category')}>
+          <option value="">Selecciona una categoría</option>
+          {CATEGORIES.map(c => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </FieldLight>
 
-        <FieldShell label="Asunto *" error={errors.subject}>
-          <input className="input-light"
-            {...register('subject', { required: 'El asunto es requerido' })} />
-        </FieldShell>
+        <FieldLight label="Asunto *" error={errors.subject}
+          {...register('subject', { required: 'El asunto es requerido' })} />
 
-        <FieldShell label="Petición *" error={errors.message}>
-          <textarea rows={5} className="input-light resize-none"
-            {...register('message', { required: 'Escribe tu petición', minLength: { value: 10, message: 'Escribe un poco más' } })} />
-        </FieldShell>
+        <FieldLight as="textarea" rows={5} label="Petición *" error={errors.message}
+          {...register('message', { required: 'Escribe tu petición', minLength: { value: 10, message: 'Escribe un poco más' } })} />
 
         <div className="flex items-start gap-3 p-3.5 rounded-[14px] bg-bg/5 border border-bg/10">
           <Icon name="lock" className="w-4 h-4 text-bg/50 mt-0.5 shrink-0" />

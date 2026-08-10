@@ -9,9 +9,8 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import Input, { Select, Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 // Iconos de contenido disponibles (los mismos del set público en
 // Glass.jsx) -- no se listan los de uso exclusivo del panel (dashboard,
@@ -54,55 +53,58 @@ function AreaForm({ onSave, onCancel, initialData }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">
-            Value (clave estable) <span className="text-err">*</span>
-          </label>
-          <input value={form.value} onChange={set('value')} className={fieldCls} placeholder="ej. alabanza" required />
-          <p className="text-label-s text-bg/40 mt-1">
-            Sin espacios ni tildes -- esta es la clave que usan las inscripciones y la foto en /admin/site-photos. No la cambies si ya hay inscripciones con este departamento.
-          </p>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Título <span className="text-err">*</span></label>
-          <input value={form.title} onChange={set('title')} className={fieldCls} placeholder="ej. Alabanza" required />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Icono</label>
-          <select value={form.icon} onChange={set('icon')} className={fieldCls}>
-            {ICON_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Orden</label>
-          <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} />
-        </div>
+        <Input
+          label="Value (clave estable) *"
+          value={form.value}
+          onChange={set('value')}
+          placeholder="ej. alabanza"
+          required
+          helperText="Sin espacios ni tildes -- esta es la clave que usan las inscripciones y la foto en /admin/site-photos. No la cambies si ya hay inscripciones con este departamento."
+        />
+        <Input label="Título *" value={form.title} onChange={set('title')} placeholder="ej. Alabanza" required />
+        <Select
+          label="Icono"
+          value={form.icon}
+          onChange={set('icon')}
+          options={ICON_OPTIONS.map(i => ({ value: i, label: i }))}
+        />
+        <Input type="number" label="Orden" value={form.sort_order} onChange={set('sort_order')} />
       </div>
 
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Descripción</label>
-        <textarea value={form.description} onChange={set('description')} rows={2}
-          className={fieldCls} placeholder="Qué hace este departamento..." />
-      </div>
+      <Textarea
+        label="Descripción"
+        value={form.description}
+        onChange={set('description')}
+        rows={2}
+        placeholder="Qué hace este departamento..."
+      />
 
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">¿Por qué aquí? (se muestra al abrir el departamento)</label>
-        <textarea value={form.why} onChange={set('why')} rows={2}
-          className={fieldCls} placeholder="Por qué le conviene a alguien servir en este departamento..." />
-      </div>
+      <Textarea
+        label="¿Por qué aquí? (se muestra al abrir el departamento)"
+        value={form.why}
+        onChange={set('why')}
+        rows={2}
+        placeholder="Por qué le conviene a alguien servir en este departamento..."
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-bg/10">
         <div className="sm:col-span-2">
-          <label className="block text-label-l text-bg/50 mb-1.5">Testimonio (opcional)</label>
-          <textarea value={form.testimonial} onChange={set('testimonial')} rows={2}
-            className={fieldCls} placeholder="Cita textual de un voluntario real de este departamento -- déjalo vacío si aún no tienes una." />
-          <p className="text-label-s text-bg/40 mt-1">
-            Solo pon citas reales de personas reales que dieron su permiso -- no se muestra nada si lo dejas vacío.
-          </p>
+          <Textarea
+            label="Testimonio (opcional)"
+            value={form.testimonial}
+            onChange={set('testimonial')}
+            rows={2}
+            placeholder="Cita textual de un voluntario real de este departamento -- déjalo vacío si aún no tienes una."
+            helperText="Solo pon citas reales de personas reales que dieron su permiso -- no se muestra nada si lo dejas vacío."
+          />
         </div>
         <div className="sm:col-span-2">
-          <label className="block text-label-l text-bg/50 mb-1.5">Autor del testimonio</label>
-          <input value={form.testimonial_author} onChange={set('testimonial_author')} className={fieldCls} placeholder="ej. Ana López, voluntaria desde 2023" />
+          <Input
+            label="Autor del testimonio"
+            value={form.testimonial_author}
+            onChange={set('testimonial_author')}
+            placeholder="ej. Ana López, voluntaria desde 2023"
+          />
         </div>
       </div>
 

@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input, { Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-12">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -19,10 +20,10 @@ function GoalCard({ goal, onToggle, onDelete }) {
       <button
         onClick={() => onToggle(goal)}
         className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-          goal.completed ? 'bg-ter-con border-transparent' : 'border-bg/10 hover:border-pri'
+          goal.completed ? 'bg-celeste-soft border-transparent' : 'border-bg/10 hover:border-celeste'
         }`}
       >
-        {goal.completed && <Icon name="check" className="w-[14px] h-[14px] text-on-ter-con" stroke={1.8} />}
+        {goal.completed && <Icon name="check" className="w-[14px] h-[14px] text-celeste-hov" stroke={1.8} />}
       </button>
       <div className="flex-1 min-w-0">
         <p className={`text-body-m font-medium ${goal.completed ? 'line-through text-bg/50' : 'text-bg'}`}>
@@ -40,7 +41,7 @@ function GoalCard({ goal, onToggle, onDelete }) {
       </div>
       <button
         onClick={() => onDelete(goal.ID)}
-        className="text-bg/50 hover:text-err transition-colors shrink-0 mt-0.5"
+        className="text-bg/50 hover:text-rose transition-colors shrink-0 mt-0.5"
         title="Eliminar meta"
       >
         <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
@@ -52,7 +53,6 @@ function GoalCard({ goal, onToggle, onDelete }) {
 function NewGoalForm({ onSave, onCancel }) {
   const [form, setForm] = useState({ title: '', description: '', target_date: '' });
   const [loading, setLoading] = useState(false);
-  const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,26 +68,23 @@ function NewGoalForm({ onSave, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 p-4 rounded-2xl border border-bg/15 bg-bg/4">
-      <input
+      <Input
         value={form.title}
         onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
         placeholder="¿Cuál es tu meta?"
-        className={fieldCls}
         required
         autoFocus
       />
-      <textarea
+      <Textarea
         rows={2}
         value={form.description}
         onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
         placeholder="Descripción (opcional)"
-        className={`${fieldCls} resize-none`}
       />
-      <input
+      <Input
         type="date"
         value={form.target_date}
         onChange={e => setForm(p => ({ ...p, target_date: e.target.value }))}
-        className={fieldCls}
       />
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={loading}

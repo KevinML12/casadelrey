@@ -8,7 +8,7 @@ import DOMPurify from 'dompurify';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import Input, { Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
@@ -120,8 +120,6 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     onSave({ ...form, content: editor.getHTML() });
   };
 
-  const fieldCls = 'w-full px-3 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
-
   return (
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
@@ -140,9 +138,10 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         <div>
           <label className="block text-label-l text-bg/50 mb-1.5">Imagen de portada</label>
           <div className="flex gap-2">
-            <input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')}
-              className={`flex-1 ${fieldCls}`} />
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-pri/40 hover:text-bg'} text-bg/50`}>
+            <div className="flex-1 min-w-0">
+              <Input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')} />
+            </div>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-celeste/40 hover:text-bg'} text-bg/50`}>
               <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -160,20 +159,14 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         </div>
 
         <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">
-            Enlace a red social <span className="font-normal text-bg/40">(opcional — redirige al hacer clic)</span>
-          </label>
-          <input type="url" placeholder="https://facebook.com/..." value={form.redirect_url} onChange={set('redirect_url')}
-            className={fieldCls} />
+          <Input type="url" label={<>Enlace a red social <span className="font-normal text-bg/40">(opcional — redirige al hacer clic)</span></>}
+            placeholder="https://facebook.com/..." value={form.redirect_url} onChange={set('redirect_url')} />
         </div>
 
         <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">
-            Extracto <span className="font-normal">(resumen visible en la lista)</span>
-          </label>
-          <textarea rows={2} value={form.excerpt} onChange={set('excerpt')}
-            placeholder="Breve descripción del post…"
-            className={`${fieldCls} resize-none`} />
+          <Textarea rows={2} label={<>Extracto <span className="font-normal">(resumen visible en la lista)</span></>}
+            value={form.excerpt} onChange={set('excerpt')}
+            placeholder="Breve descripción del post…" />
         </div>
 
         <div>
@@ -195,7 +188,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-bg/10 bg-bg/4 text-body-s leading-relaxed"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editor?.getHTML() || '') }} />
           ) : (
-            <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-pri focus-within:ring-2 focus-within:ring-pri/15 transition-all">
+            <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-celeste focus-within:ring-2 focus-within:ring-celeste/15 transition-all">
               <EditorToolbar editor={editor} />
               <EditorContent editor={editor} />
             </div>
@@ -205,7 +198,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         <label className="flex items-center gap-2 text-body-s text-bg cursor-pointer select-none">
           <input type="checkbox" checked={form.status === 'published'}
             onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'published' : 'draft' }))}
-            className="rounded border-bg/10 accent-pri w-4 h-4" />
+            className="rounded border-bg/10 accent-celeste w-4 h-4" />
           Publicar inmediatamente
         </label>
 
@@ -226,7 +219,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -340,7 +333,7 @@ export default function AdminBlog() {
                       {post.status === 'published' ? 'Publicado' : 'Borrador'}
                     </span>
                     {post.redirect_url && (
-                      <span className="inline-flex items-center h-7 px-3 rounded-lg bg-sec-con text-on-sec-con text-label-m font-medium gap-1">
+                      <span className="inline-flex items-center h-7 px-3 rounded-lg bg-bg text-white text-label-m font-medium gap-1">
                         <Icon name="open_in_new" className="w-[12px] h-[12px]" stroke={1.8} />
                         Externo
                       </span>

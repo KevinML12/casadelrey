@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
-import Input from '../../components/ui/Input';
+import Input, { Select } from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
 import { Icon } from '../../components/ui/Glass';
@@ -17,7 +17,7 @@ const STATUS_CHIP = {
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -91,8 +91,8 @@ export default function AdminVolunteers() {
 
       {/* Page header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-          <Icon name="group_add" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
+        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+          <Icon name="group_add" className="w-[22px] h-[22px] text-white" stroke={1.8} />
         </div>
         <div>
           <h1 className="text-headline-s text-bg font-black leading-tight">Voluntarios</h1>
@@ -117,8 +117,8 @@ export default function AdminVolunteers() {
               <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
                 {/* Leading icon */}
-                <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon name="person" className="w-[18px] h-[18px] text-on-sec-con" stroke={1.8} />
+                <div className="w-10 h-10 rounded-xl bg-bg flex items-center justify-center shrink-0 mt-0.5">
+                  <Icon name="person" className="w-[18px] h-[18px] text-white" stroke={1.8} />
                 </div>
 
                 {/* Content */}
@@ -140,15 +140,16 @@ export default function AdminVolunteers() {
                 {/* Trailing actions */}
                 <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                   {isAdmin && v.status !== 'usuario_creado' && (
-                    <select
-                      className="text-label-m rounded-lg border border-bg/10 bg-bg/4 px-3 py-1.5 text-bg focus:outline-none focus:border-pri transition-colors"
-                      value={v.assigned_leader_id || ''}
-                      onChange={e => handleAssign(v.ID, e.target.value)}
-                      disabled={!!assigning}
-                    >
-                      <option value="">Sin asignar</option>
-                      {leaders.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                    </select>
+                    <div className="w-40">
+                      <Select
+                        value={v.assigned_leader_id || ''}
+                        onChange={e => handleAssign(v.ID, e.target.value)}
+                        disabled={!!assigning}
+                        options={leaders.map(l => ({ value: l.id, label: l.name }))}
+                        placeholder="Sin asignar"
+                        className="text-label-m"
+                      />
+                    </div>
                   )}
                   {v.status !== 'usuario_creado' && (
                     <Button variant="tonal" size="sm" onClick={() => setCreateModal(v.ID)}>
@@ -166,8 +167,7 @@ export default function AdminVolunteers() {
       {/* M3 Dialog — crear usuario */}
       {createModal && (
         <>
-          <div className="fixed inset-0 bg-scrim/50 z-40 animate-fade-in"
-            style={{ background: 'rgba(0,0,0,.5)' }}
+          <div className="fixed inset-0 bg-bg/40 z-40 animate-fade-in"
             onClick={() => { setCreateModal(null); setPassword(''); }} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="glass-light rounded-[28px] p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button, { IconButton } from '../../components/ui/Button';
+import Input, { Textarea } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Chip';
 import Paginator from '../../components/ui/Paginator';
 import { Icon } from '../../components/ui/Glass';
@@ -14,8 +15,6 @@ const TARGETS = [
 ];
 
 const EMPTY = { title: '', content: '', role_target: 'all', is_active: true, publish_now: true };
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 function AnnouncementForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(initial || EMPTY);
@@ -48,13 +47,11 @@ function AnnouncementForm({ initial, onSave, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Título <span className="text-err">*</span></label>
-        <input value={form.title} onChange={set('title')} className={fieldCls} placeholder="Título del anuncio" required />
+        <Input value={form.title} onChange={set('title')} label={<>Título <span className="text-rose">*</span></>} placeholder="Título del anuncio" required />
       </div>
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Contenido <span className="text-err">*</span></label>
-        <textarea rows={4} value={form.content} onChange={set('content')}
-          className={`${fieldCls} resize-none`} placeholder="Describe el anuncio…" required />
+        <Textarea rows={4} value={form.content} onChange={set('content')}
+          label={<>Contenido <span className="text-rose">*</span></>} placeholder="Describe el anuncio…" required />
       </div>
       <div>
         <label className="block text-label-l text-bg/50 mb-2">Visible para</label>
@@ -158,7 +155,7 @@ export default function AdminAnnouncements() {
       {/* List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
         </div>
       ) : items.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
@@ -192,7 +189,7 @@ export default function AdminAnnouncements() {
                   <Icon name="edit" className="w-[16px] h-[16px] text-bg/50" stroke={1.8} />
                 </IconButton>
                 <IconButton onClick={() => handleDelete(a.ID)} title="Eliminar"
-                  className="text-bg/50 hover:text-err hover:bg-err-con">
+                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
                   <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                 </IconButton>
               </div>

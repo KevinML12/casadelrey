@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input, { Textarea } from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import Paginator from '../../components/ui/Paginator';
 import { Icon } from '../../components/ui/Glass';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = { title: '', description: '', url: '', thumbnail_url: '', sort_order: 0, is_active: true };
 
@@ -29,30 +28,17 @@ function PhotoForm({ onSave, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">URL de la foto <span className="text-err">*</span></label>
-        <input value={form.url} onChange={set('url')} className={fieldCls} placeholder="https://…" required />
-      </div>
+      <Input
+        label={<>URL de la foto <span className="text-rose">*</span></>}
+        value={form.url} onChange={set('url')} placeholder="https://…" required
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Título</label>
-          <input value={form.title} onChange={set('title')} className={fieldCls} placeholder="Nombre de la foto" />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">URL miniatura</label>
-          <input value={form.thumbnail_url} onChange={set('thumbnail_url')} className={fieldCls} placeholder="https://… (opcional)" />
-        </div>
+        <Input label="Título" value={form.title} onChange={set('title')} placeholder="Nombre de la foto" />
+        <Input label="URL miniatura" value={form.thumbnail_url} onChange={set('thumbnail_url')} placeholder="https://… (opcional)" />
       </div>
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Descripción</label>
-        <textarea rows={2} value={form.description} onChange={set('description')}
-          className={`${fieldCls} resize-none`} placeholder="Descripción breve…" />
-      </div>
+      <Textarea label="Descripción" rows={2} value={form.description} onChange={set('description')} placeholder="Descripción breve…" />
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Orden</label>
-          <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} min={0} />
-        </div>
+        <Input label="Orden" type="number" value={form.sort_order} onChange={set('sort_order')} min={0} />
         <div className="flex items-end pb-1">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.is_active}
@@ -135,7 +121,7 @@ export default function AdminGallery() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
         </div>
       ) : photos.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
@@ -166,7 +152,7 @@ export default function AdminGallery() {
                   <Icon name={p.is_active ? 'visibility_off' : 'visibility'} className="w-[16px] h-[16px]" stroke={1.8} />
                 </IconButton>
                 <IconButton onClick={() => handleDelete(p.ID)} title="Eliminar"
-                  className="bg-err/90 text-ink hover:bg-err w-8 h-8">
+                  className="bg-rose/90 text-ink hover:bg-rose w-8 h-8">
                   <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                 </IconButton>
               </div>

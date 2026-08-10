@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
@@ -10,8 +11,6 @@ import { compressImageIfNeeded } from '../../lib/compressImage';
 // sitio — un admin los llenaba pensando que agregaban un segundo botón y
 // no pasaba nada. Se eliminan del formulario en vez de dejarlos ahí sin
 // función (bug real encontrado al comparar esta preview contra Home.jsx).
-
-const fieldCls = 'w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = {
   label_top: '', title_line_1: '', title_line_2: '', verse_reference: '',
@@ -141,42 +140,28 @@ function HeroForm({ initial, onSave, onCancel }) {
         <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Textos</p>
 
-          <Field label="Label superior" hint='Ej. "● IGLESIA CRISTIANA · HUEHUETENANGO"'>
-            <input value={form.label_top} onChange={set('label_top')} className={fieldCls} placeholder="● IGLESIA CRISTIANA · HUEHUETENANGO" />
-          </Field>
+          <Input label="Label superior" helperText='Ej. "● IGLESIA CRISTIANA · HUEHUETENANGO"'
+            value={form.label_top} onChange={set('label_top')} placeholder="● IGLESIA CRISTIANA · HUEHUETENANGO" />
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Título línea 1 *">
-              <input value={form.title_line_1} onChange={set('title_line_1')} className={fieldCls} placeholder="LUZ PARA" required />
-            </Field>
-            <Field label="Título línea 2" hint="Opcional">
-              <input value={form.title_line_2} onChange={set('title_line_2')} className={fieldCls} placeholder="LAS NACIONES" />
-            </Field>
+            <Input label="Título línea 1 *" value={form.title_line_1} onChange={set('title_line_1')} placeholder="LUZ PARA" required />
+            <Input label="Título línea 2" helperText="Opcional" value={form.title_line_2} onChange={set('title_line_2')} placeholder="LAS NACIONES" />
           </div>
 
-          <Field label="Versículo" hint="Se muestra junto al horario, ej. «Domingos 10am · MATEO 5:14»">
-            <input value={form.verse_reference} onChange={set('verse_reference')} className={fieldCls} placeholder="MATEO 5:14" />
-          </Field>
+          <Input label="Versículo" helperText="Se muestra junto al horario, ej. «Domingos 10am · MATEO 5:14»"
+            value={form.verse_reference} onChange={set('verse_reference')} placeholder="MATEO 5:14" />
 
-          <Field label="Subtítulo">
-            <input value={form.subtitle} onChange={set('subtitle')} className={fieldCls} placeholder="Empieza tu propósito aquí." />
-          </Field>
+          <Input label="Subtítulo" value={form.subtitle} onChange={set('subtitle')} placeholder="Empieza tu propósito aquí." />
 
-          <Field label="Horario / contexto">
-            <input value={form.schedule_text} onChange={set('schedule_text')} className={fieldCls} placeholder="Domingos · 10am · Zona 1, Huehuetenango" />
-          </Field>
+          <Input label="Horario / contexto" value={form.schedule_text} onChange={set('schedule_text')} placeholder="Domingos · 10am · Zona 1, Huehuetenango" />
         </div>
 
         {/* CTA — el hero público solo soporta UN botón */}
         <div className="glass-light rounded-[24px] card-spring space-y-3 p-5">
           <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">Botón</p>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Texto">
-              <input value={form.cta_primary_text} onChange={set('cta_primary_text')} className={fieldCls} placeholder="Ver próximos eventos" />
-            </Field>
-            <Field label="URL">
-              <input value={form.cta_primary_url} onChange={set('cta_primary_url')} className={fieldCls} placeholder="/events" />
-            </Field>
+            <Input label="Texto" value={form.cta_primary_text} onChange={set('cta_primary_text')} placeholder="Ver próximos eventos" />
+            <Input label="URL" value={form.cta_primary_url} onChange={set('cta_primary_url')} placeholder="/events" />
           </div>
         </div>
 
@@ -189,10 +174,10 @@ function HeroForm({ initial, onSave, onCancel }) {
               <div className="flex items-center gap-3">
                 <img src={form.background_image_url} alt="hero" className="w-20 h-20 rounded-xl object-cover border border-bg/10" />
                 <button type="button" onClick={() => setForm(p => ({ ...p, background_image_url: '' }))}
-                  className="text-label-m text-err hover:underline">Quitar imagen</button>
+                  className="text-label-m text-rose hover:underline">Quitar imagen</button>
               </div>
             ) : (
-              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-pri transition-colors">
+              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-celeste transition-colors">
                 <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
                 <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del hero'}</p>
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
@@ -207,7 +192,7 @@ function HeroForm({ initial, onSave, onCancel }) {
             <Field label={`Opacidad del overlay: ${form.overlay_opacity}%`}>
               <input type="range" min="0" max="100" value={form.overlay_opacity}
                 onChange={e => setForm(p => ({ ...p, overlay_opacity: parseInt(e.target.value) }))}
-                className="w-full h-10 accent-pri" />
+                className="w-full h-10 accent-celeste" />
             </Field>
           </div>
         </div>
@@ -308,7 +293,7 @@ export default function AdminHero() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
         </div>
       ) : heroes.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
@@ -352,7 +337,7 @@ export default function AdminHero() {
                     Editar
                   </button>
                   <button onClick={() => remove(h.ID)}
-                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m text-err hover:bg-err-con transition-colors">
+                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m text-rose hover:bg-rose-soft transition-colors">
                     <Icon name="delete" className="w-[14px] h-[14px]" stroke={1.8} />
                   </button>
                 </div>

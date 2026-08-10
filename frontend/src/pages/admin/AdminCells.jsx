@@ -8,10 +8,9 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import Input, { Select, Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 import { CELL_TYPES } from '../../components/ui/CellCodePicker';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = { code: '', name: '', type: '', description: '', leader_id: '', zone: '' };
 
@@ -45,39 +44,41 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Código <span className="text-err">*</span></label>
-          <input value={form.code} onChange={set('code')} className={fieldCls} placeholder="Ej. H1" required />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Nombre <span className="text-err">*</span></label>
-          <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Ej. Guerreros del Rey" required />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Tipo <span className="text-err">*</span></label>
-          <select value={form.type} onChange={set('type')} className={fieldCls} required>
-            <option value="">Selecciona un tipo…</option>
-            {CELL_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Líder <span className="text-err">*</span></label>
-          <select value={form.leader_id} onChange={set('leader_id')} className={fieldCls} required>
-            <option value="">Selecciona un líder…</option>
-            {leaders.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-          </select>
-        </div>
+        <Input label="Código *" value={form.code} onChange={set('code')} placeholder="Ej. H1" required />
+        <Input label="Nombre *" value={form.name} onChange={set('name')} placeholder="Ej. Guerreros del Rey" required />
+        <Select
+          label="Tipo *"
+          value={form.type}
+          onChange={set('type')}
+          options={CELL_TYPES}
+          placeholder="Selecciona un tipo…"
+          required
+        />
+        <Select
+          label="Líder *"
+          value={form.leader_id}
+          onChange={set('leader_id')}
+          options={leaders.map(l => ({ value: l.id, label: l.name }))}
+          placeholder="Selecciona un líder…"
+          required
+        />
         <div className="sm:col-span-2">
-          <label className="block text-label-l text-bg/50 mb-1.5">Zona (aproximada, sin dirección exacta)</label>
-          <input value={form.zone} onChange={set('zone')} className={fieldCls} placeholder="Ej. Zona 4" />
+          <Input
+            label="Zona (aproximada, sin dirección exacta)"
+            value={form.zone}
+            onChange={set('zone')}
+            placeholder="Ej. Zona 4"
+          />
         </div>
       </div>
 
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Descripción</label>
-        <textarea value={form.description} onChange={set('description')} rows={3}
-          className={fieldCls} placeholder="Qué hace especial a esta célula, a quién está dirigida…" />
-      </div>
+      <Textarea
+        label="Descripción"
+        value={form.description}
+        onChange={set('description')}
+        rows={3}
+        placeholder="Qué hace especial a esta célula, a quién está dirigida…"
+      />
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">

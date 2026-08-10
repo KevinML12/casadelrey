@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Button, { IconButton } from '../../components/ui/Button';
+import Input, { Select } from '../../components/ui/Input';
 import Chip, { FilterChip } from '../../components/ui/Chip';
 import CellCodePicker from '../../components/ui/CellCodePicker';
 import { Icon } from '../../components/ui/Glass';
@@ -41,9 +43,9 @@ function CellModal({ user, onClose, onSaved }) {
             <h3 className="text-title-l text-bg font-bold">Código de célula</h3>
             <p className="text-body-s text-bg/50 mt-0.5">{user.name}</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-bg/8 text-bg/50 transition-colors">
+          <IconButton onClick={onClose}>
             <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
-          </button>
+          </IconButton>
         </div>
 
         <CellCodePicker
@@ -53,17 +55,11 @@ function CellModal({ user, onClose, onSaved }) {
         />
 
         <div className="flex gap-3 mt-6 pt-4 border-t border-bg/10">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
+          <Button variant="filled" onClick={handleSave} disabled={saving} className="flex-1 justify-center">
             <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {saving ? 'Guardando…' : 'Guardar'}
-          </button>
-          <button onClick={onClose} className="px-4 h-10 rounded-xl text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
-            Cancelar
-          </button>
+          </Button>
+          <Button variant="text" onClick={onClose}>Cancelar</Button>
         </div>
       </div>
     </div>
@@ -86,25 +82,28 @@ function RoleSelect({ userId, currentRole, onUpdated }) {
   };
 
   return (
-    <select value={currentRole} onChange={change} disabled={saving}
-      className="text-label-m h-8 px-3 rounded-lg border border-bg/10 bg-transparent text-bg focus:outline-none focus:border-pri transition-colors cursor-pointer">
-      {ROLES.map(r => <option key={r} value={r}>{ROLE_CONFIG[r]?.label || r}</option>)}
-    </select>
+    <Select
+      value={currentRole}
+      onChange={change}
+      disabled={saving}
+      options={ROLES.map(r => ({ value: r, label: ROLE_CONFIG[r]?.label || r }))}
+      className="text-label-m"
+    />
   );
 }
 
 function UserAvatar({ name }) {
   const initials = (name || '?').split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() || '').join('');
   return (
-    <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0">
-      <span className="text-label-l text-on-sec-con font-bold">{initials || '?'}</span>
+    <div className="w-10 h-10 rounded-xl bg-bg flex items-center justify-center shrink-0">
+      <span className="text-label-l text-white font-bold">{initials || '?'}</span>
     </div>
   );
 }
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -165,8 +164,12 @@ export default function AdminUsers() {
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="flex-1 relative">
           <Icon name="search" className="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-bg/50 pointer-events-none" stroke={1.8} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nombre o correo…"
-            className="w-full pl-10 pr-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all" />
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar por nombre o correo…"
+            className="!pl-10"
+          />
         </div>
       </div>
 
@@ -230,7 +233,7 @@ export default function AdminUsers() {
                   {u.role === 'leader' && (
                     <button
                       onClick={() => setCellModal(u)}
-                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-pri hover:text-bg transition-colors font-mono"
+                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-celeste hover:text-bg transition-colors font-mono"
                       title="Editar código de célula"
                     >
                       <Icon name="tag" className="w-[14px] h-[14px]" stroke={1.8} />
@@ -239,7 +242,7 @@ export default function AdminUsers() {
                   )}
 
                   {/* Role selector */}
-                  <div className="shrink-0">
+                  <div className="shrink-0 w-40">
                     <RoleSelect userId={u.ID} currentRole={u.role} onUpdated={updateRole} />
                   </div>
 

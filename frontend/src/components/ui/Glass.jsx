@@ -285,3 +285,43 @@ export function Field({ label, type = 'text', name, value, onChange, error, plac
     </label>
   );
 }
+
+/* ---------- Form field, variante CLARA (formularios públicos sobre una
+   card .glass-light -- Donar, Oración, Conéctate, Comprobante) ----------
+   Antes esos 4 formularios pedían prestada `.input-light`, la clase del
+   panel admin (index.css la documenta como tal), cada uno reimplementando
+   su propio `fieldCls`/label local a mano -- funcionaba visualmente porque
+   la clase en sí es correcta para un fondo claro, pero mezclaba el
+   vocabulario del panel dentro del sitio público y dejó 4 copias casi
+   idénticas del mismo campo. `FieldLight` centraliza eso en un componente
+   propio del público (mismo patrón que `Field`, mismo `.input-light`) sin
+   pedir prestado `components/ui/Input.jsx` del admin.
+   Nota importante conservada de los comentarios que reemplaza: el fondo
+   NO puede bajarse a algo translúcido tipo `bg-bg/4` -- el navegador pinta
+   el fondo nativo de inputs/selects OSCURO cuando `color-scheme:dark` está
+   activo en el `<html>` (todo el sitio público lo tiene), y una opacidad
+   baja no lo tapa -- el campo se ve gris oscuro sólido en vez de claro.
+   Bug real encontrado en producción; `.input-light` (blanco ~75% opaco) es
+   lo mínimo que lo cubre de forma confiable. */
+export function FieldLight({ label, type = 'text', name, value, onChange, error, placeholder, as = 'input', children, ...rest }) {
+  const cls = `input-light ${error ? '!border-rose' : ''}`;
+  // error acepta string simple O el objeto {message} que devuelve
+  // react-hook-form (PrayerForm.jsx) -- mismo criterio que ya usa
+  // components/ui/Input.jsx del panel.
+  const errorMsg = typeof error === 'string' ? error : error?.message;
+  return (
+    <label className="block">
+      <span className="block mb-2 text-13 font-bold tracking-tightish text-bg/60">{label}</span>
+      {as === 'select' ? (
+        <select name={name} value={value} onChange={onChange} className={`${cls} appearance-none cursor-pointer pr-10`} {...rest}>
+          {children}
+        </select>
+      ) : as === 'textarea' ? (
+        <textarea name={name} value={value} onChange={onChange} placeholder={placeholder} rows={4} className={`${cls} resize-none`} {...rest} />
+      ) : (
+        <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} className={cls} {...rest} />
+      )}
+      {errorMsg && <span className="mt-1.5 block text-13 text-rose font-bold">{errorMsg}</span>}
+    </label>
+  );
+}

@@ -2,16 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon } from '../ui/Glass';
+import { Icon, FieldLight } from '../ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'Agromercantil', 'Promerica', 'Citibank', 'Otro'];
-
-// .input-light: ver nota en ConnectPage.jsx -- opacidad baja (bg-bg/4)
-// no tapaba el fondo nativo oscuro que pinta el navegador con
-// color-scheme:dark activo.
-const fieldCls = 'input-light';
-const labelCls = 'block text-13 font-semibold text-bg/50 mb-1.5';
 
 const EMPTY = {
   payer_name: '', payer_email: '', payer_phone: '',
@@ -92,41 +86,23 @@ export default function ReceiptUploadForm({
       <div className="space-y-3">
         <p className="text-13 font-semibold text-bg/50">Tus datos</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className={labelCls}>Nombre completo *</label>
-            <input value={form.payer_name} onChange={set('payer_name')} className={fieldCls} placeholder="Juan García" required />
-          </div>
-          <div>
-            <label className={labelCls}>Teléfono</label>
-            <input value={form.payer_phone} onChange={set('payer_phone')} className={fieldCls} placeholder="+502 5555 0000" />
-          </div>
+          <FieldLight label="Nombre completo *" value={form.payer_name} onChange={set('payer_name')} placeholder="Juan García" required />
+          <FieldLight label="Teléfono" value={form.payer_phone} onChange={set('payer_phone')} placeholder="+502 5555 0000" />
         </div>
-        <div>
-          <label className={labelCls}>Correo electrónico</label>
-          <input type="email" value={form.payer_email} onChange={set('payer_email')} className={fieldCls} placeholder="correo@email.com" />
-        </div>
+        <FieldLight label="Correo electrónico" type="email" value={form.payer_email} onChange={set('payer_email')} placeholder="correo@email.com" />
       </div>
 
       {/* Datos del pago */}
       <div className="space-y-3">
         <p className="text-13 font-semibold text-bg/50">Datos del depósito</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className={labelCls}>Monto depositado (Q) *</label>
-            <input type="number" min="1" step="0.01" value={form.amount} onChange={set('amount')} className={fieldCls} placeholder="0.00" required />
-          </div>
-          <div>
-            <label className={labelCls}>Banco</label>
-            <select value={form.bank_name} onChange={set('bank_name')} className={fieldCls}>
-              <option value="">Seleccionar banco…</option>
-              {BANKS.map(b => <option key={b} value={b}>{b}</option>)}
-            </select>
-          </div>
+          <FieldLight label="Monto depositado (Q) *" type="number" min="1" step="0.01" value={form.amount} onChange={set('amount')} placeholder="0.00" required />
+          <FieldLight as="select" label="Banco" value={form.bank_name} onChange={set('bank_name')}>
+            <option value="">Seleccionar banco…</option>
+            {BANKS.map(b => <option key={b} value={b}>{b}</option>)}
+          </FieldLight>
         </div>
-        <div>
-          <label className={labelCls}>Número de referencia / No. de boleta</label>
-          <input value={form.reference_number} onChange={set('reference_number')} className={fieldCls} placeholder="Ej. 202600123456" />
-        </div>
+        <FieldLight label="Número de referencia / No. de boleta" value={form.reference_number} onChange={set('reference_number')} placeholder="Ej. 202600123456" />
       </div>
 
       {/* Foto del comprobante */}

@@ -6,18 +6,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Icon, Eyebrow, FieldLight } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
-
-// .input-light (index.css): fondo blanco 75% opaco -- suficiente para
-// tapar el fondo nativo OSCURO que el navegador pinta en inputs/selects
-// cuando color-scheme:dark esta activo en el <html> (todo el sitio
-// publico). Un bg-bg/4 (4% de opacidad) no lo tapa: el campo se ve
-// gris oscuro solido en vez de claro -- bug real encontrado por el
-// usuario en produccion.
-const fieldCls = 'input-light';
 
 const CATEGORIES = [
   { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia', icon: 'spark' },
@@ -169,24 +161,11 @@ export default function ConnectPage() {
                 <div className="pt-1 border-t border-bg/10">
                   <p className="text-12 font-bold text-bg/60 mt-5 mb-3 uppercase tracking-wide">Tus datos</p>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-12 font-bold text-bg/60 mb-1.5">
-                        Nombre <span className="text-rose">*</span>
-                      </label>
-                      <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Tu nombre completo" required />
-                    </div>
+                    <FieldLight label="Nombre *" value={form.name} onChange={set('name')} placeholder="Tu nombre completo" required />
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-12 font-bold text-bg/60 mb-1.5">
-                          Teléfono <span className="text-rose">*</span>
-                        </label>
-                        <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="+502 …" required />
-                      </div>
-                      <div>
-                        <label className="block text-12 font-bold text-bg/60 mb-1.5">Correo</label>
-                        <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="Opcional" />
-                      </div>
+                      <FieldLight label="Teléfono *" value={form.phone} onChange={set('phone')} placeholder="+502 …" required />
+                      <FieldLight label="Correo" type="email" value={form.email} onChange={set('email')} placeholder="Opcional" />
                     </div>
 
                     <div>

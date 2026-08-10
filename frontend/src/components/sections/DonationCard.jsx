@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon } from '../ui/Glass';
+import { Icon, FieldLight } from '../ui/Glass';
 import BankDetails from './BankDetails';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 import { useDonationPurposes } from '../../lib/donationPurposes';
@@ -29,13 +29,6 @@ const PRESS = {
   whileTap: { scale: 0.96 },
   transition: { type: 'spring', stiffness: 400, damping: 17 },
 };
-
-// .input-light (index.css): ver nota en ConnectPage.jsx -- bg-bg/4 no
-// tapaba el fondo nativo oscuro que el navegador pinta con
-// color-scheme:dark activo, el campo se veia gris oscuro solido.
-const inputCls = 'input-light';
-
-const labelCls = 'block text-13 font-semibold text-bg/50 mb-2';
 
 export default function DonationCard() {
   const [step,    setStep]    = useState(0);
@@ -288,7 +281,7 @@ export default function DonationCard() {
                           placeholder="Otro monto (mínimo Q10)"
                           value={custom}
                           onChange={e => { setCustom(e.target.value); setAmount(null); }}
-                          className={inputCls}
+                          className="input-light"
                         />
                         <ContinueBtn />
                       </div>
@@ -412,26 +405,14 @@ export default function DonationCard() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <label className="block">
-                            <span className={labelCls}>Nombre *</span>
-                            <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Tu nombre" className={inputCls} />
-                          </label>
-                          <label className="block">
-                            <span className={labelCls}>Correo</span>
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Para confirmación" className={inputCls} />
-                          </label>
+                          <FieldLight label="Nombre *" type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Tu nombre" />
+                          <FieldLight label="Correo" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Para confirmación" />
                         </div>
 
                         {isTransfer && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <label className="block">
-                              <span className={labelCls}>Teléfono</span>
-                              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+502 …" className={inputCls} />
-                            </label>
-                            <label className="block">
-                              <span className={labelCls}>No. de boleta</span>
-                              <input type="text" value={referenceNumber} onChange={e => setReferenceNumber(e.target.value)} placeholder="Opcional" className={inputCls} />
-                            </label>
+                            <FieldLight label="Teléfono" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+502 …" />
+                            <FieldLight label="No. de boleta" type="text" value={referenceNumber} onChange={e => setReferenceNumber(e.target.value)} placeholder="Opcional" />
                           </div>
                         )}
 

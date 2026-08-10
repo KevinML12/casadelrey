@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input, { Textarea } from '../../components/ui/Input';
 import Button, { IconButton } from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Glass';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = { question: '', answer: '', sort_order: 0, is_active: true };
 
@@ -33,20 +32,10 @@ function FAQForm({ onSave, onCancel, initialData }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Pregunta <span className="text-err">*</span></label>
-        <input value={form.question} onChange={set('question')} className={fieldCls} placeholder="Ej. ¿A qué hora empieza?" required />
-      </div>
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Respuesta <span className="text-err">*</span></label>
-        <textarea rows={4} value={form.answer} onChange={set('answer')}
-          className={`${fieldCls} resize-none`} placeholder="Escribe la respuesta..." required />
-      </div>
+      <Input label="Pregunta *" value={form.question} onChange={set('question')} placeholder="Ej. ¿A qué hora empieza?" required />
+      <Textarea label="Respuesta *" rows={4} value={form.answer} onChange={set('answer')} placeholder="Escribe la respuesta..." required />
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Orden de aparición</label>
-          <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} min={0} />
-        </div>
+        <Input label="Orden de aparición" type="number" value={form.sort_order} onChange={set('sort_order')} min={0} />
         <div className="flex items-end pb-1">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.is_active}
@@ -139,7 +128,7 @@ export default function AdminFAQs() {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-title-s text-bg font-medium">{faq.question}</span>
                   {!faq.is_active && (
-                    <span className="text-10 font-bold uppercase tracking-wider bg-err/10 text-err px-2 py-0.5 rounded">
+                    <span className="text-10 font-bold uppercase tracking-wider bg-rose/10 text-rose px-2 py-0.5 rounded">
                       Inactiva
                     </span>
                   )}
@@ -155,7 +144,7 @@ export default function AdminFAQs() {
                   variant="text"
                   title={faq.is_active ? 'Ocultar' : 'Mostrar'}
                   onClick={() => handleToggle(faq)}
-                  className={!faq.is_active ? 'text-bg/50' : 'text-pri'}
+                  className={!faq.is_active ? 'text-bg/50' : 'text-celeste'}
                 >
                   <Icon name={faq.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
                 </IconButton>
@@ -170,7 +159,7 @@ export default function AdminFAQs() {
                   variant="text"
                   title="Eliminar"
                   onClick={() => handleDelete(faq.ID)}
-                  className="text-err hover:bg-err/10"
+                  className="text-rose hover:bg-rose/10"
                 >
                   <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
                 </IconButton>

@@ -9,11 +9,10 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 export default function LeaderMyProfile() {
   const [form,       setForm]       = useState(null);
@@ -70,7 +69,7 @@ export default function LeaderMyProfile() {
   if (loading || !form) {
     return (
       <div className="p-6 max-w-2xl mx-auto flex justify-center py-20">
-        <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+        <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
       </div>
     );
   }
@@ -113,26 +112,14 @@ export default function LeaderMyProfile() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-label-l text-bg/50 mb-1.5">Nombre <span className="text-err">*</span></label>
-            <input value={form.name || ''} onChange={set('name')} className={fieldCls} required />
-          </div>
-          <div>
-            <label className="block text-label-l text-bg/50 mb-1.5">Área / célula</label>
-            <input value={form.area || ''} onChange={set('area')} className={fieldCls} placeholder="Ej. Célula Adolescentes" />
-          </div>
-          <div>
-            <label className="block text-label-l text-bg/50 mb-1.5">WhatsApp (con 502)</label>
-            <input value={form.phone || ''} onChange={set('phone')} className={fieldCls} placeholder="502XXXXXXXX" />
-          </div>
-          <div>
-            <label className="block text-label-l text-bg/50 mb-1.5">Correo de contacto</label>
-            <input type="email" value={form.email || ''} onChange={set('email')} className={fieldCls} />
-          </div>
+          <Input label="Nombre *" value={form.name || ''} onChange={set('name')} required />
+          <Input label="Área / célula" value={form.area || ''} onChange={set('area')} placeholder="Ej. Célula Adolescentes" />
+          <Input label="WhatsApp (con 502)" value={form.phone || ''} onChange={set('phone')} placeholder="502XXXXXXXX" />
+          <Input label="Correo de contacto" type="email" value={form.email || ''} onChange={set('email')} />
           <div className="sm:col-span-2">
-            <label className="block text-label-l text-bg/50 mb-1.5">Dirección (privada, solo para admin/líderes)</label>
-            <input value={form.address || ''} onChange={set('address')} className={fieldCls} placeholder="Para que el equipo te ubique al asignar nuevos miembros cercanos" />
-            <p className="text-label-s text-bg/40 mt-1">Nunca se muestra en el sitio público.</p>
+            <Input label="Dirección (privada, solo para admin/líderes)" value={form.address || ''} onChange={set('address')}
+              placeholder="Para que el equipo te ubique al asignar nuevos miembros cercanos"
+              helperText="Nunca se muestra en el sitio público." />
           </div>
         </div>
 

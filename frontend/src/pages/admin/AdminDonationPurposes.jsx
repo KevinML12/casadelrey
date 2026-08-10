@@ -8,10 +8,9 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input, { Select, Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Glass';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 // Iconos de contenido disponibles (mismo set público de Glass.jsx).
 const ICON_OPTIONS = [
@@ -51,36 +50,25 @@ function PurposeForm({ onSave, onCancel, initialData }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">
-            Value (clave estable) <span className="text-err">*</span>
-          </label>
-          <input value={form.value} onChange={set('value')} className={fieldCls} placeholder="ej. general" required />
-          <p className="text-label-s text-bg/40 mt-1">
-            Sin espacios ni tildes -- es la clave que queda guardada en cada donación. No la cambies si ya hay donaciones con este destino.
-          </p>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Título <span className="text-err">*</span></label>
-          <input value={form.title} onChange={set('title')} className={fieldCls} placeholder="ej. Fondo General" required />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Icono</label>
-          <select value={form.icon} onChange={set('icon')} className={fieldCls}>
-            {ICON_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Orden</label>
-          <input type="number" value={form.sort_order} onChange={set('sort_order')} className={fieldCls} />
-        </div>
+        <Input
+          label={<>Value (clave estable) <span className="text-rose">*</span></>}
+          value={form.value} onChange={set('value')} placeholder="ej. general" required
+          helperText="Sin espacios ni tildes -- es la clave que queda guardada en cada donación. No la cambies si ya hay donaciones con este destino."
+        />
+        <Input
+          label={<>Título <span className="text-rose">*</span></>}
+          value={form.title} onChange={set('title')} placeholder="ej. Fondo General" required
+        />
+        <Select
+          label="Icono"
+          value={form.icon} onChange={set('icon')}
+          options={ICON_OPTIONS.map(i => ({ value: i, label: i }))}
+        />
+        <Input label="Orden" type="number" value={form.sort_order} onChange={set('sort_order')} />
       </div>
 
-      <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Descripción</label>
-        <textarea value={form.description} onChange={set('description')} rows={2}
-          className={fieldCls} placeholder="A qué se destina esta siembra..." />
-      </div>
+      <Textarea label="Descripción" value={form.description} onChange={set('description')} rows={2}
+        placeholder="A qué se destina esta siembra..." />
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">

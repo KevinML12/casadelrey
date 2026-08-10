@@ -7,11 +7,10 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 const EMPTY = { name: '', area: '', phone: '', email: '', address: '', photo_url: '', is_active: true };
 
@@ -77,25 +76,15 @@ function LeaderForm({ onSave, onCancel, initialData }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Nombre <span className="text-err">*</span></label>
-          <input value={form.name} onChange={set('name')} className={fieldCls} placeholder="Ej. Cristian de León" required />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Área / célula</label>
-          <input value={form.area} onChange={set('area')} className={fieldCls} placeholder="Ej. Célula Adolescentes, Alabanza" />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">WhatsApp (con 502)</label>
-          <input value={form.phone} onChange={set('phone')} className={fieldCls} placeholder="502XXXXXXXX" />
-        </div>
-        <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Correo</label>
-          <input type="email" value={form.email} onChange={set('email')} className={fieldCls} placeholder="lider@casadelrey.org" />
-        </div>
+        <Input
+          label={<>Nombre <span className="text-rose">*</span></>}
+          value={form.name} onChange={set('name')} placeholder="Ej. Cristian de León" required
+        />
+        <Input label="Área / célula" value={form.area} onChange={set('area')} placeholder="Ej. Célula Adolescentes, Alabanza" />
+        <Input label="WhatsApp (con 502)" value={form.phone} onChange={set('phone')} placeholder="502XXXXXXXX" />
+        <Input label="Correo" type="email" value={form.email} onChange={set('email')} placeholder="lider@casadelrey.org" />
         <div className="sm:col-span-2">
-          <label className="block text-label-l text-bg/50 mb-1.5">Dirección (privada, nunca pública)</label>
-          <input value={form.address} onChange={set('address')} className={fieldCls} placeholder="Para ubicar al líder al asignar nuevos miembros cercanos" />
+          <Input label="Dirección (privada, nunca pública)" value={form.address} onChange={set('address')} placeholder="Para ubicar al líder al asignar nuevos miembros cercanos" />
         </div>
       </div>
 
@@ -209,7 +198,7 @@ export default function AdminLeaders() {
                   <Icon name={l.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
                 </button>
                 <button onClick={() => handleDelete(l.ID)} title="Eliminar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-err transition-colors">
+                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-rose transition-colors">
                   <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
                 </button>
               </div>

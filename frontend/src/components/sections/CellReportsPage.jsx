@@ -15,7 +15,7 @@ const STATUS_CONFIG = {
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
   </div>
 );
 
@@ -90,8 +90,8 @@ export default function CellReportsPage() {
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-            <Icon name="groups" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="groups" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Reportes de Células</h1>
@@ -151,7 +151,7 @@ export default function CellReportsPage() {
       {stats?.by_cell?.length > 0 && (
         <div className="glass-light rounded-[24px] card-spring mb-8 overflow-hidden">
           <div className="px-5 py-4 border-b border-bg/10 flex items-center gap-2">
-            <Icon name="bar_chart" className="w-[18px] h-[18px] text-pri" stroke={1.8} />
+            <Icon name="bar_chart" className="w-[18px] h-[18px] text-celeste" stroke={1.8} />
             <h3 className="text-title-s text-bg font-semibold">Resumen por célula</h3>
           </div>
           <div className="overflow-x-auto">
@@ -208,8 +208,8 @@ export default function CellReportsPage() {
                   className="w-full text-left flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
                   {/* Leading: cell type indicator */}
-                  <div className="w-10 h-10 rounded-xl bg-sec-con flex items-center justify-center shrink-0 mt-0.5">
-                    <Icon name="groups" className="w-[18px] h-[18px] text-on-sec-con" stroke={1.8} />
+                  <div className="w-10 h-10 rounded-xl bg-bg flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon name="groups" className="w-[18px] h-[18px] text-white" stroke={1.8} />
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -306,7 +306,7 @@ export default function CellReportsPage() {
                           {approving === r.ID + 'aprobado' ? 'Aprobando…' : 'Aprobar'}
                         </Button>
                         <Button variant="outlined" onClick={() => approve(r.ID, 'rechazado')} disabled={!!approving}
-                          className="border-err text-err before:bg-err hover:before:opacity-[.08]">
+                          className="border-rose text-rose before:bg-rose hover:before:opacity-[.08]">
                           <Icon name="cancel" className="w-[16px] h-[16px]" stroke={1.8} />
                           {approving === r.ID + 'rechazado' ? 'Rechazando…' : 'Rechazar'}
                         </Button>

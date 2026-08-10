@@ -6,10 +6,9 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Glass';
-
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 
 // Pistas por llave para guiar al admin
 const HINTS = {
@@ -78,19 +77,17 @@ export default function AdminSettings() {
         <div className="space-y-4">
           {settings.map(s => (
             <div key={s.key} className="p-4 sm:p-5 rounded-2xl bg-bg/4 border border-bg/10">
-              <label className="block text-label-l text-bg/50 mb-1.5">
-                {s.label}
-                {s.using_default && s.value === '' && (
-                  <span className="ml-2 text-label-s text-amber">· sin configurar</span>
-                )}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  value={draft[s.key] ?? ''}
-                  onChange={e => setDraft(d => ({ ...d, [s.key]: e.target.value }))}
-                  className={fieldCls}
-                  placeholder={s.value || 'Escribe el valor…'}
-                />
+              <div className="flex gap-2 items-end">
+                <div className="flex-1 min-w-0">
+                  <Input
+                    label={<>{s.label}{s.using_default && s.value === '' && (
+                      <span className="ml-2 text-label-s text-amber">· sin configurar</span>
+                    )}</>}
+                    value={draft[s.key] ?? ''}
+                    onChange={e => setDraft(d => ({ ...d, [s.key]: e.target.value }))}
+                    placeholder={s.value || 'Escribe el valor…'}
+                  />
+                </div>
                 <Button
                   variant="filled"
                   onClick={() => save(s.key)}

@@ -11,6 +11,8 @@
  *   className {string}   — clases extra para el contenedor
  */
 
+import Input, { Select } from './Input';
+
 export const CELL_TYPES = [
   { value: 'hombres', label: 'Hombres',      prefix: 'H' },
   { value: 'mujeres', label: 'Mujeres',      prefix: 'M' },
@@ -36,9 +38,6 @@ export function buildCode(type, number) {
   return `${t.prefix}${number}`;
 }
 
-const selectCls = 'h-10 px-3 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all disabled:opacity-50 cursor-pointer';
-const inputCls  = 'w-20 h-10 px-3 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg text-center hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all disabled:opacity-50';
-
 export default function CellCodePicker({ cellCode, cellType, onChange, disabled = false, className = '' }) {
   const parsed   = parseCode(cellCode);
   const type     = cellType  || parsed.type   || '';
@@ -60,23 +59,28 @@ export default function CellCodePicker({ cellCode, cellType, onChange, disabled 
   return (
     <div className={`flex items-center gap-2 flex-wrap ${className}`}>
       {/* Selector de tipo */}
-      <select value={type} onChange={handleType} disabled={disabled} className={selectCls}>
-        <option value="">Tipo de célula…</option>
-        {CELL_TYPES.map(t => (
-          <option key={t.value} value={t.value}>{t.label} ({t.prefix}X)</option>
-        ))}
-      </select>
+      <div className="w-48">
+        <Select
+          value={type}
+          onChange={handleType}
+          disabled={disabled}
+          placeholder="Tipo de célula…"
+          options={CELL_TYPES.map(t => ({ value: t.value, label: `${t.label} (${t.prefix}X)` }))}
+        />
+      </div>
 
       {/* Número */}
-      <input
-        type="text"
-        inputMode="numeric"
-        value={number}
-        onChange={handleNum}
-        placeholder="Nº"
-        disabled={disabled || !type}
-        className={inputCls}
-      />
+      <div className="w-20">
+        <Input
+          type="text"
+          inputMode="numeric"
+          value={number}
+          onChange={handleNum}
+          placeholder="Nº"
+          disabled={disabled || !type}
+          className="text-center"
+        />
+      </div>
 
       {/* Preview del código generado */}
       {preview ? (

@@ -3,6 +3,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Button, { IconButton } from '../../components/ui/Button';
+import Input, { Textarea } from '../../components/ui/Input';
 import Chip, { FilterChip } from '../../components/ui/Chip';
 import { Icon } from '../../components/ui/Glass';
 
@@ -14,13 +15,12 @@ const CATEGORIES = [
 
 const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.value, c]));
 
-const fieldCls = 'w-full px-4 py-2.5 rounded border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 hover:border-bg/20 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all';
 const EMPTY = { date: '', inviter_name: '', inviter_phone: '', guest_name: '', guest_phone: '', address: '', category: 'nuevo', notes: '' };
 
 function FieldLabel({ children, required }) {
   return (
     <label className="block text-label-l text-bg/50 mb-1.5">
-      {children}{required && <span className="text-err ml-0.5">*</span>}
+      {children}{required && <span className="text-rose ml-0.5">*</span>}
     </label>
   );
 }
@@ -65,8 +65,7 @@ function BoletaForm({ onSave, onCancel }) {
       {/* Fecha + Categoría */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <FieldLabel required>Fecha</FieldLabel>
-          <input type="date" value={form.date} onChange={set('date')} className={fieldCls} required />
+          <Input type="date" label={<>Fecha<span className="text-rose ml-0.5">*</span></>} value={form.date} onChange={set('date')} required />
         </div>
         <div>
           <FieldLabel required>Categoría</FieldLabel>
@@ -86,12 +85,10 @@ function BoletaForm({ onSave, onCancel }) {
         <SectionHeader icon="person">Quien invitó</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <FieldLabel>Nombre</FieldLabel>
-            <input value={form.inviter_name} onChange={set('inviter_name')} className={fieldCls} placeholder="Nombre del invitador" />
+            <Input label="Nombre" value={form.inviter_name} onChange={set('inviter_name')} placeholder="Nombre del invitador" />
           </div>
           <div>
-            <FieldLabel>Teléfono</FieldLabel>
-            <input value={form.inviter_phone} onChange={set('inviter_phone')} className={fieldCls} placeholder="+502 5555 0000" />
+            <Input label="Teléfono" value={form.inviter_phone} onChange={set('inviter_phone')} placeholder="+502 5555 0000" />
           </div>
         </div>
       </div>
@@ -101,25 +98,20 @@ function BoletaForm({ onSave, onCancel }) {
         <SectionHeader icon="person_add">Invitado</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <FieldLabel required>Nombre</FieldLabel>
-            <input value={form.guest_name} onChange={set('guest_name')} className={fieldCls} placeholder="Nombre del invitado" required />
+            <Input label={<>Nombre<span className="text-rose ml-0.5">*</span></>} value={form.guest_name} onChange={set('guest_name')} placeholder="Nombre del invitado" required />
           </div>
           <div>
-            <FieldLabel>Teléfono</FieldLabel>
-            <input value={form.guest_phone} onChange={set('guest_phone')} className={fieldCls} placeholder="+502 5555 0000" />
+            <Input label="Teléfono" value={form.guest_phone} onChange={set('guest_phone')} placeholder="+502 5555 0000" />
           </div>
         </div>
         <div>
-          <FieldLabel>Dirección</FieldLabel>
-          <input value={form.address} onChange={set('address')} className={fieldCls} placeholder="Zona, colonia, municipio…" />
+          <Input label="Dirección" value={form.address} onChange={set('address')} placeholder="Zona, colonia, municipio…" />
         </div>
       </div>
 
       {/* Notas */}
       <div>
-        <FieldLabel>Notas</FieldLabel>
-        <textarea rows={2} value={form.notes} onChange={set('notes')}
-          className={`${fieldCls} resize-none`} placeholder="Observaciones adicionales…" />
+        <Textarea rows={2} label="Notas" value={form.notes} onChange={set('notes')} placeholder="Observaciones adicionales…" />
       </div>
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
@@ -174,8 +166,8 @@ export default function AdminBoletas() {
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-            <Icon name="person_add" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="person_add" className="w-[22px] h-[22px] text-white" stroke={1.8} />
           </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Boletas de Nuevos</h1>
@@ -217,7 +209,7 @@ export default function AdminBoletas() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
         </div>
       ) : boletas.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
@@ -283,7 +275,7 @@ export default function AdminBoletas() {
                   </p>
                   {isAdmin && (
                     <IconButton onClick={() => deleteBoleta(b.ID)} title="Eliminar"
-                      className="text-bg/50 hover:text-err hover:bg-err-con transition-all">
+                      className="text-bg/50 hover:text-rose hover:bg-rose/8 transition-all">
                       <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
                     </IconButton>
                   )}
