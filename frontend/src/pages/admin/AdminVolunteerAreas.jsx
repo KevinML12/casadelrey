@@ -9,18 +9,9 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
-import Input, { Select, Textarea } from '../../components/ui/Input';
+import Input, { Textarea } from '../../components/ui/Input';
 
-// Iconos de contenido disponibles (los mismos del set público en
-// Glass.jsx) -- no se listan los de uso exclusivo del panel (dashboard,
-// settings, etc.), solo los que tienen sentido como icono de un
-// departamento de servicio.
-const ICON_OPTIONS = [
-  'mic', 'spark', 'heart', 'book', 'users', 'music', 'chat', 'mail', 'phone',
-  'crown', 'gift', 'flag', 'camera', 'headphones', 'pray', 'box', 'pin', 'clock', 'calendar',
-];
-
-const EMPTY = { value: '', icon: 'box', title: '', description: '', why: '', testimonial: '', testimonial_author: '', sort_order: 0 };
+const EMPTY = { value: '', title: '', description: '', why: '', testimonial: '', testimonial_author: '', sort_order: 0 };
 
 function AreaForm({ onSave, onCancel, initialData }) {
   const [form, setForm] = useState(initialData || EMPTY);
@@ -61,12 +52,6 @@ function AreaForm({ onSave, onCancel, initialData }) {
           helperText="Sin espacios ni tildes -- esta es la clave que usan las inscripciones y la foto en /admin/site-photos. No la cambies si ya hay inscripciones con este departamento."
         />
         <Input label="Título *" value={form.title} onChange={set('title')} placeholder="ej. Alabanza" required />
-        <Select
-          label="Icono"
-          value={form.icon}
-          onChange={set('icon')}
-          options={ICON_OPTIONS.map(i => ({ value: i, label: i }))}
-        />
         <Input type="number" label="Orden" value={form.sort_order} onChange={set('sort_order')} />
       </div>
 

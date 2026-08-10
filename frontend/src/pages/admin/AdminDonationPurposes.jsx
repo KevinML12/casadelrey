@@ -8,17 +8,10 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Input, { Select, Textarea } from '../../components/ui/Input';
+import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
 
-// Iconos de contenido disponibles (mismo set público de Glass.jsx).
-const ICON_OPTIONS = [
-  'church', 'users', 'public', 'star', 'account_balance', 'heart', 'book',
-  'gift', 'pray', 'crown', 'flag', 'spark', 'box',
-];
-
-const EMPTY = { value: '', icon: 'church', title: '', description: '', sort_order: 0 };
+const EMPTY = { value: '', title: '', description: '', sort_order: 0 };
 
 function PurposeForm({ onSave, onCancel, initialData }) {
   const [form, setForm] = useState(initialData || EMPTY);
@@ -58,11 +51,6 @@ function PurposeForm({ onSave, onCancel, initialData }) {
         <Input
           label={<>Título <span className="text-rose">*</span></>}
           value={form.title} onChange={set('title')} placeholder="ej. Fondo General" required
-        />
-        <Select
-          label="Icono"
-          value={form.icon} onChange={set('icon')}
-          options={ICON_OPTIONS.map(i => ({ value: i, label: i }))}
         />
         <Input label="Orden" type="number" value={form.sort_order} onChange={set('sort_order')} />
       </div>
@@ -152,9 +140,6 @@ export default function AdminDonationPurposes() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {purposes.map(p => (
             <div key={p.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${p.is_active ? '' : 'opacity-60'}`}>
-              <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0">
-                <Icon name={p.icon || 'church'} className="w-5 h-5" stroke={1.8} />
-              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-0.5">
                   <p className="text-title-s text-bg font-medium">{p.title}</p>
