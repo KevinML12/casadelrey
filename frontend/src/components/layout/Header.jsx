@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { Icon } from '../ui/Glass';
 
 // Espeja las secciones reales del sitio (mismo orden que el Footer).
 // "Dar" no va aquí: es el CTA de la derecha cuando hay sesión.
@@ -134,7 +133,6 @@ export default function Header() {
                         onClick={() => setDropOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                       >
-                        <Icon name="spark" className="w-4 h-4 text-bg" />
                         {isAdmin ? 'Panel Admin' : 'Panel Líder'}
                       </Link>
                     )}
@@ -143,14 +141,12 @@ export default function Header() {
                       onClick={() => setDropOpen(false)}
                       className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                     >
-                      <Icon name="user" className="w-4 h-4 text-bg" />
                       Mi perfil
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-rose hover:bg-rose-soft transition-colors"
                     >
-                      <Icon name="close" className="w-4 h-4" />
                       Cerrar sesión
                     </button>
                   </div>
@@ -165,7 +161,6 @@ export default function Header() {
                 to="/login"
                 className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-300 focus-ring"
               >
-                <Icon name="user" className="w-4 h-4" />
                 Ingresar
               </Link>
             )}
@@ -174,7 +169,6 @@ export default function Header() {
               to="/donate"
               className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-300 focus-ring"
             >
-              <Icon name="heart" className="w-4 h-4" />
               Dar
             </Link>
 
@@ -183,15 +177,14 @@ export default function Header() {
               className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg text-white text-14 font-bold btn-spring focus-ring hover:bg-bg-soft"
             >
               Conéctate
-              <Icon name="arrow" className="w-4 h-4" stroke={2} />
             </Link>
 
             <button
               onClick={() => setMenuOpen(o => !o)}
-              className="xl:hidden grid place-items-center w-10 h-10 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring"
+              className="xl:hidden grid place-items-center h-10 px-4 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring text-14 font-bold"
               aria-label="Menú"
             >
-              <Icon name={menuOpen ? 'close' : 'menu'} />
+              {menuOpen ? 'Cerrar' : 'Menú'}
             </button>
           </div>
         </div>
@@ -269,7 +262,6 @@ export default function Header() {
                   onClick={() => setMenuOpen(false)}
                   className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill text-bg text-15 font-bold hover:bg-bg/5 transition-colors"
                 >
-                  <Icon name="heart" className="w-4 h-4" />
                   Dar
                 </Link>
                 <Link
@@ -278,7 +270,6 @@ export default function Header() {
                   className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-15 font-bold btn-spring hover:bg-bg-soft"
                 >
                   Conéctate
-                  <Icon name="arrow" className="w-4 h-4" stroke={2} />
                 </Link>
             </div>
           </div>

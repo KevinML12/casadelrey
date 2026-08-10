@@ -1,5 +1,4 @@
-import { IconButton } from './Button';
-import { Icon } from './Glass';
+import Button from './Button';
 
 export default function Paginator({ meta, onPage }) {
   if (!meta || meta.pages <= 1) return null;
@@ -13,14 +12,10 @@ export default function Paginator({ meta, onPage }) {
   }
 
   return (
-    <div className="flex items-center justify-center gap-1 py-4">
-      <IconButton
-        disabled={page <= 1}
-        onClick={() => onPage(page - 1)}
-        className="disabled:opacity-30"
-      >
-        <Icon name="chevron_left" className="w-[18px] h-[18px]" stroke={2} />
-      </IconButton>
+    <div className="flex items-center justify-center gap-1 py-4 flex-wrap">
+      <Button variant="text" size="sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>
+        Anterior
+      </Button>
 
       {pages_arr[0] > 1 && (
         <>
@@ -42,13 +37,9 @@ export default function Paginator({ meta, onPage }) {
         </>
       )}
 
-      <IconButton
-        disabled={page >= pages}
-        onClick={() => onPage(page + 1)}
-        className="disabled:opacity-30"
-      >
-        <Icon name="chevron_right" className="w-[18px] h-[18px]" stroke={2} />
-      </IconButton>
+      <Button variant="text" size="sm" disabled={page >= pages} onClick={() => onPage(page + 1)}>
+        Siguiente
+      </Button>
 
       <span className="text-12 text-bg/45 ml-2">
         {meta.total} total

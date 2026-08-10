@@ -3,7 +3,7 @@ import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import toast from 'react-hot-toast';
-import { Icon, Halos } from '../ui/Glass';
+import { Halos } from '../ui/Glass';
 import useGlassSpecular from '../../hooks/useGlassSpecular';
 
 // Nav agrupado por área — un listado plano de 20 ítems se leía como una
@@ -105,7 +105,7 @@ function SidebarContent({ onClose }) {
               </p>
             )}
             <div className="space-y-0.5">
-              {group.items.map(({ to, icon, label, exact, badge }) => {
+              {group.items.map(({ to, label, exact, badge }) => {
                 const count = badge ? (notifCounts[badge] || 0) : 0;
                 return (
                   <NavLink
@@ -121,7 +121,6 @@ function SidebarContent({ onClose }) {
                       }`
                     }
                   >
-                    <Icon name={icon} className="w-[18px] h-[18px] shrink-0" stroke={1.8} />
                     <span className="flex-1">{label}</span>
                     {count > 0 && (
                       <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-11 font-bold flex items-center justify-center px-1.5">
@@ -152,14 +151,12 @@ function SidebarContent({ onClose }) {
           onClick={onClose}
           className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-14 font-semibold text-bg/60 hover:text-bg hover:bg-bg/6 transition-colors"
         >
-          <Icon name="public" className="w-[18px] h-[18px] shrink-0" stroke={1.8} />
           Ver sitio web
         </Link>
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-14 font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
         >
-          <Icon name="logout" className="w-[18px] h-[18px] shrink-0" stroke={1.8} />
           Cerrar sesión
         </button>
       </div>
@@ -186,10 +183,9 @@ export default function AdminLayout() {
         <div className="md:hidden h-14 border-b border-bg/10 glass-light rounded-none flex items-center px-4 gap-3 shrink-0">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="text-bg/60 hover:text-bg transition-colors"
-            aria-label="Abrir menú"
+            className="text-bg/60 hover:text-bg transition-colors text-14 font-bold"
           >
-            <Icon name="menu" className="w-[22px] h-[22px]" stroke={1.8} />
+            Menú
           </button>
           <span className="text-15 text-bg font-extrabold tracking-tightish">Panel Admin</span>
         </div>
@@ -208,10 +204,10 @@ export default function AdminLayout() {
             <div className="absolute top-6 right-6 z-10">
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-8 h-8 rounded-full bg-bg/10 text-bg/70 hover:text-bg flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-bg/10 text-bg/70 hover:text-bg flex items-center justify-center transition-colors text-16 leading-none"
                 aria-label="Cerrar menú"
               >
-                <Icon name="close" className="w-4 h-4" stroke={2} />
+                ×
               </button>
             </div>
             <SidebarContent onClose={() => setDrawerOpen(false)} />

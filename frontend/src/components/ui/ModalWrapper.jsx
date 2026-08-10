@@ -5,7 +5,6 @@
 //  overflow-y-auto desaparecía al hacer scroll dentro del modal.
 // ============================================================
 import { motion } from 'framer-motion';
-import { Icon } from './Glass';
 
 export default function ModalWrapper({ children, onClose }) {
   return (
@@ -31,9 +30,9 @@ export default function ModalWrapper({ children, onClose }) {
         <button
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg text-white shadow-card flex items-center justify-center hover:opacity-85 transition-opacity"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg text-white shadow-card flex items-center justify-center hover:opacity-85 transition-opacity text-18 leading-none"
         >
-          <Icon name="close" className="w-4 h-4" stroke={2.2} />
+          ×
         </button>
       </motion.div>
     </motion.div>

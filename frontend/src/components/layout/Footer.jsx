@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Icon } from '../ui/Glass';
 
 // Solo datos CONFIRMADOS (CONTEXTO_IGLESIA jul-2026): dirección real,
 // redes oficiales, podcast y fundadores. Nada inventado — teléfono,
@@ -15,13 +14,14 @@ const NAV = [
   { id: '/donate',       label: 'Dar' },
 ];
 
-// Iconos reales (antes heart/music/spark como relleno de Facebook/TikTok/X --
-// ver SocialSection.jsx, mismo fix).
+// Sin logo/ícono de plataforma a propósito (ago-2026) -- el nombre de la
+// red como texto identifica igual de bien a dónde lleva cada link, sin
+// pictogramas.
 const SOCIAL = [
-  { name: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/ig.casadelrey/' },
-  { name: 'facebook',  label: 'Facebook',  href: 'https://www.facebook.com/casadelreyhuehue' },
-  { name: 'tiktok',    label: 'TikTok',    href: 'https://www.tiktok.com/@leoneldeleongt' },
-  { name: 'x_logo',    label: 'X',         href: 'https://x.com/pastorleoneli' },
+  { label: 'Instagram', href: 'https://www.instagram.com/ig.casadelrey/' },
+  { label: 'Facebook',  href: 'https://www.facebook.com/casadelreyhuehue' },
+  { label: 'TikTok',    href: 'https://www.tiktok.com/@leoneldeleongt' },
+  { label: 'X',         href: 'https://x.com/pastorleoneli' },
 ];
 
 export default function Footer() {
@@ -46,17 +46,16 @@ export default function Footer() {
             <p className="text-14 text-white/50 font-medium leading-relaxed max-w-xs">
               Fundada por el Pastor José de León y Desidería López.
             </p>
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               {SOCIAL.map(s => (
                 <a
                   key={s.label}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="grid place-items-center w-11 h-11 rounded-full liquid-glass text-white/60 hover:text-white transition-all duration-300 hover:scale-110"
-                  aria-label={s.label}
+                  className="px-4 py-2 rounded-full liquid-glass text-13 font-bold text-white/70 hover:text-white transition-all duration-300"
                 >
-                  <Icon name={s.name} className="w-5 h-5" />
+                  {s.label}
                 </a>
               ))}
             </div>
@@ -85,11 +84,9 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="flex items-start gap-3 text-14 text-white/70 hover:text-white transition-colors font-medium leading-relaxed"
             >
-              <Icon name="pin" className="w-4 h-4 mt-1 shrink-0" />
               <span>7ª. Calle 12-66 zona 4,<br />carretera a las Ruinas de Zaculeu,<br />Huehuetenango</span>
             </a>
             <div className="flex items-start gap-3 mt-5 text-14 text-white/70 font-medium leading-relaxed">
-              <Icon name="music" className="w-4 h-4 mt-1 shrink-0" />
               <span>
                 Podcast <span className="text-white font-bold">Inusual Youth</span><br />
                 92.9 FM Radio Stereo Cumbre<br />

@@ -1,12 +1,12 @@
 /**
  * Chips del panel — MODO CLARO estilo Apple (tinta navy sobre blanco).
  * Pastillas con tinte suave del color semántico, exclusivas del panel.
+ * Sin íconos a propósito (ago-2026) -- el color+texto ya distingue el
+ * estado/selección, `icon` se ignora si algún caller viejo aún lo pasa.
  *
  * Chip (default):  assist / status — etiqueta no interactiva
- * FilterChip:      filtro interactivo, estado seleccionado + check
+ * FilterChip:      filtro interactivo, estado seleccionado (sin check)
  */
-import { Icon } from './Glass';
-
 const colorMap = {
   default:   'bg-bg/6 border border-bg/12 text-bg/70',
   primary:   'bg-celeste/12 border border-celeste/25 text-celeste',
@@ -15,7 +15,7 @@ const colorMap = {
   error:     'bg-rose/10 border border-rose/25 text-rose',
 };
 
-export default function Chip({ color = 'default', icon, children, className = '', ...props }) {
+export default function Chip({ color = 'default', children, className = '', ...props }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 h-7 px-3 rounded-full
@@ -23,13 +23,12 @@ export default function Chip({ color = 'default', icon, children, className = ''
         ${colorMap[color]} ${className}`}
       {...props}
     >
-      {icon && <Icon name={icon} className="w-3.5 h-3.5" stroke={1.8} />}
       {children}
     </span>
   );
 }
 
-export function FilterChip({ selected, icon, count, children, className = '', ...props }) {
+export function FilterChip({ selected, count, children, className = '', ...props }) {
   return (
     <button
       type="button"
@@ -44,8 +43,6 @@ export function FilterChip({ selected, icon, count, children, className = '', ..
       }
       {...props}
     >
-      {selected && <Icon name="check" className="w-3.5 h-3.5" stroke={2.2} />}
-      {!selected && icon && <Icon name={icon} className="w-3.5 h-3.5" stroke={1.8} />}
       <span>{children}</span>
       {count != null && (
         <span className={`text-11 ml-0.5 ${selected ? 'opacity-70' : 'opacity-50'}`}>

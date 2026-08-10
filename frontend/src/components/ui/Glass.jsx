@@ -188,14 +188,15 @@ export function Halos({ variant = 'hero' }) {
   );
 }
 
-/* ---------- Pill badge (chip) — sapphire tint ---------- */
-export function Badge({ children, icon, className = '', tone = 'celeste' }) {
+/* ---------- Pill badge (chip) — sapphire tint. Sin ícono a propósito
+   (ago-2026) -- solo texto, `icon` se ignora si algún caller viejo aún
+   lo pasa. ---------- */
+export function Badge({ children, className = '', tone = 'celeste' }) {
   const styles = tone === 'celeste'
     ? 'bg-celeste-soft text-celeste-hov'
     : 'bg-bg-soft text-ink';
   return (
     <span className={`inline-flex items-center gap-2 rounded-pill px-3.5 py-1.5 text-12 font-bold tracking-tightish ${styles} ${className}`}>
-      {icon && <Icon name={icon} className="w-3.5 h-3.5" />}
       <span>{children}</span>
     </span>
   );
@@ -225,8 +226,13 @@ export function Eyebrow({ children, on = 'dark' }) {
    el material ES el acento, nada de colores planos. El primario del
    sitio es el pill BLANCO (como en el hero/Login), el secundario es
    cristal con borde. */
+// Sin íconos a propósito (pedido del usuario, ago-2026): el botón es solo
+// texto -- ni siquiera la flechita que se deslizaba al hover. La prop
+// `icon` se conserva en la firma por compatibilidad con callers viejos
+// (si alguno todavía la pasa, se ignora en silencio) pero ya no renderiza
+// nada; no queda ningún <Icon> en el componente.
 export const GlassButton = forwardRef(function GlassButton(
-  { children, variant = 'primary', icon, className = '', as: As = 'button', ...props },
+  { children, variant = 'primary', className = '', as: As = 'button', ...props },
   ref,
 ) {
   const base = 'group inline-flex items-center justify-center gap-2 rounded-pill font-bold tracking-tightish btn-spring select-none cursor-pointer focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
@@ -241,7 +247,6 @@ export const GlassButton = forwardRef(function GlassButton(
   return (
     <As ref={ref} className={`${base} ${variants[variant] || variants.primary} ${className}`} {...props}>
       {children}
-      {icon && <Icon name={icon} className="w-[18px] h-[18px] transition-transform duration-300 group-hover:translate-x-0.5" stroke={2} />}
     </As>
   );
 });

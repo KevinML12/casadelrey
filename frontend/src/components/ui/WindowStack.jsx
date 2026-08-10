@@ -23,7 +23,6 @@
 // ============================================================
 import { useMemo, useEffect, useCallback, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Icon } from './Glass';
 
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -126,24 +125,14 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
             onClick={close}
             whileHover={{ scale: 1.08, rotate: 90 }} whileTap={{ scale: 0.9 }}
             aria-label="Cerrar"
-            className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full bg-white text-bg shadow-card flex items-center justify-center"
+            className="absolute top-6 right-6 z-[120] w-11 h-11 rounded-full bg-white text-bg shadow-card flex items-center justify-center text-22 leading-none"
           >
-            <Icon name="close" className="w-5 h-5" />
+            ×
           </motion.button>
 
-          {/* Flechas laterales (desktop) */}
-          {items.length > 1 && (
-            <>
-              <button onClick={() => go(-1)} aria-label="Anterior"
-                className="hidden md:flex absolute left-6 z-[120] w-11 h-11 rounded-full liquid-glass items-center justify-center text-white/70 hover:text-white">
-                <Icon name="arrow" className="w-5 h-5 rotate-180" />
-              </button>
-              <button onClick={() => go(1)} aria-label="Siguiente"
-                className="hidden md:flex absolute right-6 z-[120] w-11 h-11 rounded-full liquid-glass items-center justify-center text-white/70 hover:text-white">
-                <Icon name="arrow" className="w-5 h-5" />
-              </button>
-            </>
-          )}
+          {/* Navegación entre ítems: los dots de abajo (siempre visibles,
+              saltan a cualquiera) y las flechas ←→ del teclado ya cubren
+              esto por completo, así que no hace falta un botón aparte. */}
 
           {/* Pila de ventanas */}
           <div className="relative w-full max-w-[780px]" style={{ height, perspective: 1400 }}>
@@ -177,31 +166,19 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A1526] via-[#0A1526]/50 to-transparent" />
                     {showCarousel && (
-                      <>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setPhotoIdx(p => (p - 1 + photos.length) % photos.length); }}
-                          aria-label="Foto anterior"
-                          className="absolute inset-y-0 left-0 w-1/3 z-10 flex items-center justify-start pl-2 opacity-50 hover:opacity-100 transition-opacity"
-                        >
-                          <span className="w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
-                            <Icon name="arrow" className="w-3.5 h-3.5 text-white rotate-180" />
-                          </span>
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setPhotoIdx(p => (p + 1) % photos.length); }}
-                          aria-label="Foto siguiente"
-                          className="absolute inset-y-0 right-0 w-1/3 z-10 flex items-center justify-end pr-2 opacity-50 hover:opacity-100 transition-opacity"
-                        >
-                          <span className="w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
-                            <Icon name="arrow" className="w-3.5 h-3.5 text-white" />
-                          </span>
-                        </button>
-                        <div className="absolute top-3 right-3 z-10 flex gap-1">
-                          {photos.map((_, pIdx) => (
-                            <span key={pIdx} className={`h-1 rounded-full transition-all ${pIdx === idx ? 'w-4 bg-white' : 'w-1 bg-white/40'}`} />
-                          ))}
-                        </div>
-                      </>
+                      // Sin flechas: son controles chicos de carrusel dentro
+                      // del banner, los dots ya bastan como única navegación
+                      // (ahora clicables, antes eran solo indicador pasivo).
+                      <div className="absolute top-3 right-3 z-10 flex gap-1">
+                        {photos.map((_, pIdx) => (
+                          <button
+                            key={pIdx}
+                            onClick={(e) => { e.stopPropagation(); setPhotoIdx(pIdx); }}
+                            aria-label={`Foto ${pIdx + 1}`}
+                            className={`h-1 rounded-full transition-all ${pIdx === idx ? 'w-4 bg-white' : 'w-1 bg-white/40'}`}
+                          />
+                        ))}
+                      </div>
                     )}
                     <div className="absolute bottom-0 left-0 p-5 sm:p-6">
                       {it.badge && (

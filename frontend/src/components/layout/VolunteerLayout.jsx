@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Icon, Halos } from '../ui/Glass';
+import { Halos } from '../ui/Glass';
 import useGlassSpecular from '../../hooks/useGlassSpecular';
 
 export default function VolunteerLayout() {
@@ -44,10 +44,8 @@ export default function VolunteerLayout() {
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-13 font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
-            title="Cerrar sesión"
           >
-            <Icon name="logout" className="w-[18px] h-[18px]" stroke={1.8} />
-            <span className="hidden sm:block">Salir</span>
+            Salir
           </button>
         </div>
       </header>
