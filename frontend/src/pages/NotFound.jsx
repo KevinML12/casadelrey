@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import Reveal from '../components/ui/Reveal';
-import { Icon } from '../components/ui/Glass';
 
 export default function NotFound() {
   return (
@@ -9,8 +8,7 @@ export default function NotFound() {
         <p className="display-mega text-white/20" style={{ fontSize: '4.5rem' }}>404</p>
         <h1 className="text-22 font-bold text-white mt-2 mb-2">Página no encontrada</h1>
         <p className="text-15 text-white/60 mb-8">La página que buscas no existe o fue movida.</p>
-        <Link to="/" className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-white text-bg font-bold text-14">
-          <Icon name="arrow" className="w-4 h-4 rotate-180" />
+        <Link to="/" className="inline-flex items-center px-6 py-3.5 rounded-pill bg-white text-bg font-bold text-14">
           Volver al inicio
         </Link>
       </Reveal>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import SocialSection from '../../components/sections/SocialSection';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import PhotoBentoTile from '../../components/ui/PhotoBentoTile';
@@ -144,7 +144,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <PhotoHeaderCard photo={fundadoresCardImg} icon="crown" glass="standard" objectPosition="center 15%">
+              <PhotoHeaderCard photo={fundadoresCardImg} glass="standard" objectPosition="center 15%">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   José de León y Desidería López
@@ -156,7 +156,7 @@ export default function AboutPage() {
             </RevealItem>
 
             <RevealItem>
-              <PhotoHeaderCard photo={pastoresCelulasCardImg} icon="users" glass="featured">
+              <PhotoHeaderCard photo={pastoresCelulasCardImg} glass="featured">
                 <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores</p>
                 <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
@@ -184,7 +184,7 @@ export default function AboutPage() {
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
-              <PhotoHeaderCard photo={misionCardImg} icon="book" glass="standard">
+              <PhotoHeaderCard photo={misionCardImg} glass="standard">
                 <h3 className="text-20 font-bold text-bg mb-3">Misión</h3>
                 <p className="text-16 text-bg/70 leading-relaxed">
                   Somos una iglesia cristiana familiar, enfocada en cumplir la gran comisión de
@@ -194,7 +194,7 @@ export default function AboutPage() {
               </PhotoHeaderCard>
             </RevealItem>
             <RevealItem>
-              <PhotoHeaderCard photo={visionCardImg} icon="spark" glass="featured">
+              <PhotoHeaderCard photo={visionCardImg} glass="featured">
                 <h3 className="text-20 font-bold text-bg mb-3">Visión</h3>
                 <p className="text-16 text-bg/70 leading-relaxed">
                   Ser una iglesia de restauración familiar, punta de lanza, que proclama la
@@ -273,7 +273,6 @@ export default function AboutPage() {
               className="inline-flex items-center gap-2.5 text-14 font-bold text-white hover:text-white/70 transition-colors"
             >
               Únete como voluntario
-              <Icon name="arrow" className="w-4 h-4" stroke={2} />
             </Link>
           </Reveal>
         </div>
@@ -301,7 +300,6 @@ export default function AboutPage() {
                   className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
                 >
                   Aplicar a {a.title}
-                  <Icon name="arrow" className="w-4 h-4" stroke={2} />
                 </Link>
               </div>
               <div className="sm:col-span-2 flex flex-col gap-4">
@@ -336,9 +334,6 @@ export default function AboutPage() {
             <Reveal from="left" className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
               <Tilt max={5} glass className="liquid-glass shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[20px] overflow-hidden">
                 {areas[0]?.photo && <img src={areas[0].photo} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-                <span className="absolute bottom-1.5 right-1.5 w-8 h-8 rounded-full bg-bg/70 backdrop-blur-md border border-white/20 flex items-center justify-center text-white">
-                  <Icon name="spark" className="w-4 h-4" />
-                </span>
               </Tilt>
               <div>
                 <p className="text-24 md:text-28 font-bold text-white tracking-tight">Voluntariado</p>
@@ -351,9 +346,6 @@ export default function AboutPage() {
             <Reveal from="right" delay={0.06} className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6 sm:pl-14">
               <Tilt max={5} glass className="liquid-glass shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[20px] overflow-hidden">
                 {cellCategories[0]?.image_url && <img src={cellCategories[0].image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-                <span className="absolute bottom-1.5 right-1.5 w-8 h-8 rounded-full bg-bg/70 backdrop-blur-md border border-white/20 flex items-center justify-center text-white">
-                  <Icon name="users" className="w-4 h-4" />
-                </span>
               </Tilt>
               <div>
                 <p className="text-24 md:text-28 font-bold text-white tracking-tight">Células</p>
@@ -421,7 +413,6 @@ export default function AboutPage() {
             className="inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-15 font-bold focus-ring shadow-card"
           >
             Ver células
-            <Icon name="arrow" className="w-4 h-4" stroke={2} />
           </MotionLink>
         </div>
       </section>
@@ -453,7 +444,6 @@ export default function AboutPage() {
                 className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
               >
                 Ver células de {c.name}
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
               </MotionLink>
             </div>
           );
@@ -464,7 +454,7 @@ export default function AboutPage() {
       <section className="relative py-16 md:py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
-            <PhotoHeaderCard photo={visitanosCardImg} icon="pin" glass="standard">
+            <PhotoHeaderCard photo={visitanosCardImg} glass="standard">
               <h3 className="text-20 font-bold text-bg mb-3">Visítanos</h3>
               <p className="text-15 text-bg/70 leading-relaxed mb-6">
                 7ª. Calle 12-66 zona 4,<br />
@@ -478,13 +468,12 @@ export default function AboutPage() {
                 className="inline-flex items-center gap-2.5 text-14 font-bold text-bg hover:text-bg/70 transition-colors"
               >
                 Cómo llegar
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
               </a>
             </PhotoHeaderCard>
           </Reveal>
 
           <Reveal from="right" delay={0.08}>
-            <PhotoHeaderCard photo={podcastCardImg} icon="music" glass="standard" contentClassName="justify-center">
+            <PhotoHeaderCard photo={podcastCardImg} glass="standard" contentClassName="justify-center">
               <h3 className="text-20 font-bold text-bg mb-3">Podcast Inusual Youth</h3>
               <p className="text-15 text-bg/70 leading-relaxed">
                 92.9 FM Radio Stereo Cumbre<br />

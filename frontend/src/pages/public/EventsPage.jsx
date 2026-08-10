@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -54,7 +54,6 @@ function LightBankDetails() {
             <p className="text-14 font-bold text-bg">Escríbenos para coordinar tu depósito</p>
             <p className="text-13 text-bg/55 mt-1">Te compartimos los datos bancarios por WhatsApp</p>
           </div>
-          <Icon name="arrow" className="w-4 h-4 text-bg/35 shrink-0" stroke={2} />
         </a>
       );
     }
@@ -112,8 +111,7 @@ function PaymentBanner({ event, attendeeCount = 1 }) {
         <LightBankDetails />
       </div>
       {event.payment_deadline && (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose/10 border border-rose/20 text-rose text-12 font-bold w-fit">
-          <Icon name="clock" className="w-3.5 h-3.5" />
+        <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-rose/10 border border-rose/20 text-rose text-12 font-bold w-fit">
           Fecha límite: {new Date(event.payment_deadline + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
         </span>
       )}
@@ -189,9 +187,6 @@ function RSVPModal({ event, onClose }) {
   if (paymentNotReady) return (
     <ModalWrapper onClose={onClose}>
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-amber/15 border border-amber/25 flex items-center justify-center mx-auto mb-4">
-          <Icon name="clock" className="w-7 h-7 text-amber" />
-        </div>
         <h3 className="text-19 text-bg font-bold mb-2">Registro no disponible aún</h3>
         <p className="text-14 text-bg/60 mb-1">Este evento requiere pago, pero el equipo todavía no carga los datos de depósito.</p>
         <p className="text-14 text-bg/60 mb-5">
@@ -214,9 +209,6 @@ function RSVPModal({ event, onClose }) {
   if (step === 'success') return (
     <ModalWrapper onClose={onClose}>
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
-          <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
-        </div>
         <h3 className="text-19 text-bg font-bold mb-2">¡Registro confirmado!</h3>
         <p className="text-14 text-bg/60">{successMsg}</p>
         <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
@@ -230,9 +222,6 @@ function RSVPModal({ event, onClose }) {
   if (step === 'pending_payment') return (
     <ModalWrapper onClose={onClose}>
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
-          <Icon name="clock" className="w-7 h-7 text-bg" />
-        </div>
         <h3 className="text-19 text-bg font-bold mb-2">Registro recibido</h3>
         <p className="text-14 text-bg/60 mb-1">Tu comprobante está pendiente de verificación.</p>
         <p className="text-14 text-bg/60">Recibirás confirmación cuando sea aprobado.</p>
@@ -249,14 +238,9 @@ function RSVPModal({ event, onClose }) {
   if (step === 'need_payment') return (
     <ModalWrapper onClose={onClose}>
       <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-[14px] bg-rose/15 border border-rose/25 flex items-center justify-center shrink-0">
-            <Icon name="book" className="w-5 h-5 text-rose" />
-          </div>
-          <div>
-            <h3 className="text-16 text-bg font-bold">Comprobante requerido</h3>
-            <p className="text-14 text-bg/60">Debes pagar antes de registrarte.</p>
-          </div>
+        <div>
+          <h3 className="text-16 text-bg font-bold">Comprobante requerido</h3>
+          <p className="text-14 text-bg/60">Debes pagar antes de registrarte.</p>
         </div>
 
         <PaymentBanner event={event} attendeeCount={form.attendee_count} />
@@ -285,9 +269,6 @@ function RSVPModal({ event, onClose }) {
   if (step === 'retry_failed') return (
     <ModalWrapper onClose={onClose}>
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-amber/15 border border-amber/25 flex items-center justify-center mx-auto mb-4">
-          <Icon name="clock" className="w-7 h-7 text-amber" />
-        </div>
         <h3 className="text-19 text-bg font-bold mb-2">Comprobante guardado</h3>
         <p className="text-14 text-bg/60 mb-5">No se pudo completar el registro automáticamente. Intenta de nuevo.</p>
         <button onClick={attemptRSVP} disabled={loading}
@@ -335,7 +316,6 @@ function RSVPModal({ event, onClose }) {
         </div>
         <div className="flex gap-3 pt-2 border-t border-bg/10">
           <button type="submit" disabled={loading} className={btnPrimary}>
-            <Icon name="check" className="w-4 h-4" stroke={2} />
             {loading ? 'Verificando…' : event.requires_payment ? 'Verificar y registrar' : 'Confirmar asistencia'}
           </button>
           <button type="button" onClick={onClose} className={btnGhost}>Cancelar</button>
@@ -511,8 +491,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
           </div>
 
           {details && (
-            <p className={`truncate ${ink60} flex items-center gap-1.5 text-13`}>
-              <Icon name="pin" className={`w-3.5 h-3.5 ${ink40} shrink-0`} />
+            <p className={`truncate ${ink60} text-13`}>
               {details}
             </p>
           )}
@@ -559,7 +538,6 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
               }`}
             >
               {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-              {!ev.is_full && <Icon name="arrow" className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" stroke={2} />}
             </motion.button>
             <button
               type="button"
@@ -742,11 +720,11 @@ export default function EventsPage() {
                   >
                     <span className="text-bg font-semibold pr-4">{faq.question}</span>
                     <motion.span
-                      animate={{ rotate: openFaq === faq.ID ? 90 : 0 }}
+                      animate={{ rotate: openFaq === faq.ID ? 45 : 0 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                      className="w-9 h-9 rounded-full bg-bg/6 border border-bg/12 flex items-center justify-center text-bg shrink-0"
+                      className="w-9 h-9 rounded-full bg-bg/6 border border-bg/12 flex items-center justify-center text-bg shrink-0 text-18 font-bold leading-none select-none"
                     >
-                      <Icon name="arrow" className="w-4 h-4" />
+                      +
                     </motion.span>
                   </button>
                   <AnimatePresence>

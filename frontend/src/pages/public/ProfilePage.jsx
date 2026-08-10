@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
-import { Icon } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import PageHero from '../../components/layout/PageHero';
@@ -99,8 +98,7 @@ export default function ProfilePage() {
         {/* Metas */}
         <Reveal delay={0.1}>
           <Tilt max={2} glass className="liquid-glass rounded-[24px] p-7 md:p-8">
-            <h2 className="text-20 font-bold text-white tracking-tight mb-5 flex items-center gap-2.5">
-              <Icon name="spark" className="w-5 h-5 text-celeste" />
+            <h2 className="text-20 font-bold text-white tracking-tight mb-5">
               Mis metas
             </h2>
 
@@ -138,12 +136,10 @@ export default function ProfilePage() {
                     <button
                       onClick={() => toggleGoal(g)}
                       aria-label={g.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors focus-ring ${
+                      className={`w-6 h-6 rounded-full border-2 shrink-0 transition-colors focus-ring ${
                         g.completed ? 'bg-celeste border-celeste text-white' : 'border-white/30 hover:border-white/60'
                       }`}
-                    >
-                      {g.completed && <Icon name="check" className="w-3.5 h-3.5" />}
-                    </button>
+                    />
                     <div className="flex-1 min-w-0">
                       <p className={`text-15 font-medium text-white ${g.completed ? 'line-through text-white/50' : ''}`}>
                         {g.title}
@@ -153,8 +149,8 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <button onClick={() => deleteGoal(g.ID)} aria-label="Eliminar meta"
-                      className="text-white/40 hover:text-white p-1 shrink-0 transition-colors focus-ring rounded-full">
-                      <Icon name="close" className="w-4 h-4" />
+                      className="w-6 h-6 flex items-center justify-center text-white/40 hover:text-white shrink-0 transition-colors focus-ring rounded-full text-16 leading-none">
+                      ×
                     </button>
                   </div>
                 ))}

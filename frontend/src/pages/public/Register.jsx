@@ -6,7 +6,7 @@
 //  familia" literal), administrable vía slot hero_registro.
 // ============================================================
 import { Link } from 'react-router-dom';
-import { Icon, Eyebrow, GlassButton } from '../../components/ui/Glass';
+import { Eyebrow, GlassButton } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -14,19 +14,16 @@ import { useSitePhoto } from '../../lib/feed';
 
 const PASOS = [
   {
-    icon: 'users',
     title: 'Habla con tu líder',
     desc: 'Tu líder de célula o el equipo de la iglesia piden tu acceso.',
     // El directorio de líderes vive en Células: foto + WhatsApp directo
     cta: { label: 'Comunícate', to: '/celulas' },
   },
   {
-    icon: 'spark',
     title: 'Te crean la cuenta',
     desc: 'Un líder o administrador la crea con tu correo.',
   },
   {
-    icon: 'user',
     title: 'Ingresa y listo',
     desc: 'Entras con tu correo y encuentras tu espacio.',
   },
@@ -60,17 +57,15 @@ export default function Register() {
                   <span className="grid place-items-center w-8 h-8 rounded-full bg-white text-bg text-13 font-extrabold shrink-0">
                     {i + 1}
                   </span>
-                  <Icon name={p.icon} className="w-4 h-4 text-white/60" />
                 </div>
                 <h3 className="text-16 font-bold text-white leading-tight">{p.title}</h3>
                 <p className="mt-1.5 text-13 text-white/60 leading-relaxed">{p.desc}</p>
                 {p.cta && (
                   <Link
                     to={p.cta.to}
-                    className="mt-3 inline-flex items-center gap-1.5 text-13 font-bold text-white hover:text-white/70 transition-colors"
+                    className="mt-3 inline-flex items-center text-13 font-bold text-white hover:text-white/70 transition-colors"
                   >
                     {p.cta.label}
-                    <Icon name="arrow" className="w-3.5 h-3.5" stroke={2.2} />
                   </Link>
                 )}
               </Tilt>

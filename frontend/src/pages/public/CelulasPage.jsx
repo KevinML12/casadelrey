@@ -15,7 +15,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Icon } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import WindowStack from '../../components/ui/WindowStack';
@@ -156,7 +155,6 @@ function CellCategoryDetail({ group, leaderByName }) {
               onClick={() => setZoneFilter(cur => cur === z ? null : z)}
               className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${zoneFilter === z ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
             >
-              <Icon name="pin" className="w-3.5 h-3.5" stroke={2} />
               {z}
             </button>
           ))}
@@ -168,9 +166,8 @@ function CellCategoryDetail({ group, leaderByName }) {
           así que un círculo-avatar era casi siempre el mismo placeholder
           gris repetido fila tras fila -- eso es justo lo que se siente
           "de plantilla". Sin fingir una foto que no existe: tipografía
-          grande para el nombre, un separador fino entre filas, y el CTA
-          real (WhatsApp, en su verde de marca) como único elemento
-          circular -- ya no decorativo, siempre significa "abrir WhatsApp". */}
+          grande para el nombre, un separador fino entre filas; toda la
+          fila es el link de WhatsApp (aria-label lo deja explícito). */}
       <div className="flex flex-col divide-y divide-white/10">
         {filtered.map((c, i) => {
           const href = waHrefFor(c, group.name, leaderByName);
@@ -196,9 +193,6 @@ function CellCategoryDetail({ group, leaderByName }) {
                   </p>
                 )}
               </div>
-              <span className="shrink-0 w-11 h-11 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] group-hover:bg-[#25D366] group-hover:text-white transition-colors">
-                <Icon name="chat" className="w-5 h-5" />
-              </span>
             </motion.a>
           );
         })}
@@ -231,8 +225,8 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
     return (
       <>
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => setStep('category')} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors shrink-0">
-            <Icon name="arrow" className="w-4 h-4 text-bg/60 rotate-180" stroke={2} />
+          <button onClick={() => setStep('category')} className="text-12 font-bold text-bg/60 hover:text-bg transition-colors shrink-0">
+            Atrás
           </button>
           <p className="text-12 text-bg font-bold uppercase tracking-wide">{category.name}</p>
         </div>
@@ -276,7 +270,6 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
           {href && (
             <motion.a {...PRESS} href={href} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
               Escribir por WhatsApp
-              <Icon name="arrow" className="w-4 h-4" stroke={2} />
             </motion.a>
           )}
           <button type="button" onClick={() => onViewDetail(category.key)} className={btnGhost}>
@@ -434,7 +427,6 @@ export default function CelulasPage() {
           onClick={() => setQuizOpen(true)}
           className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
         >
-          <Icon name="spark" className="w-4 h-4" stroke={2} />
           Descubre tu célula ideal
         </motion.button>
       </PageHero>
@@ -537,7 +529,6 @@ export default function CelulasPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-bg text-white text-14 font-bold focus-ring shrink-0"
               >
-                <Icon name="instagram" className="w-4 h-4" />
                 Escríbenos
               </a>
             </Tilt>

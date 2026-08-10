@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import PageHero from '../../components/layout/PageHero';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import BankDetails from '../../components/sections/BankDetails';
@@ -28,14 +28,9 @@ export default function ReceiptPage() {
         <div className="relative z-10 max-w-2xl mx-auto px-6">
 
           {eventName && (
-            <Reveal className="mb-6 flex items-center gap-4 glass-light rounded-[20px] px-5 py-4">
-              <span className="grid place-items-center w-11 h-11 rounded-full bg-bg/8 border border-bg/12 text-bg shrink-0">
-                <Icon name="calendar" className="w-5 h-5" />
-              </span>
-              <div>
-                <p className="text-12 font-bold text-bg/50">Pago para</p>
-                <p className="text-15 font-bold text-bg mt-0.5">{eventName}</p>
-              </div>
+            <Reveal className="mb-6 glass-light rounded-[20px] px-5 py-4">
+              <p className="text-12 font-bold text-bg/50">Pago para</p>
+              <p className="text-15 font-bold text-bg mt-0.5">{eventName}</p>
             </Reveal>
           )}
 
@@ -54,8 +49,7 @@ export default function ReceiptPage() {
             <div className="glass-light rounded-[24px] p-7 md:p-9">
               <div className="flex items-start justify-between gap-4 mb-1">
                 <Eyebrow on="light">Sube el comprobante</Eyebrow>
-                <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg/6 border border-bg/12 text-11 font-semibold text-bg/60">
-                  <Icon name="clock" className="w-3 h-3" />
+                <span className="shrink-0 inline-flex items-center px-3 py-1 rounded-full bg-bg/6 border border-bg/12 text-11 font-semibold text-bg/60">
                   Verificación en 24-48h
                 </span>
               </div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Tilt from '../../components/ui/Tilt';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
@@ -194,10 +194,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   if (sent) {
     return (
       <div className="text-center py-6">
-        <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
-          <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
-        </div>
-        <h3 className="text-19 text-bg font-bold mb-2">Inscripción recibida</h3>
+        <h3 className="text-22 text-bg font-bold mb-2">Inscripción recibida</h3>
         <p className="text-14 text-bg/60">Nuestro equipo se pondrá en contacto contigo.</p>
         <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
           Listo
@@ -211,8 +208,8 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
     return (
       <>
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => setConfirming(false)} className="w-9 h-9 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center hover:bg-bg/15 transition-colors shrink-0">
-            <Icon name="arrow" className="w-4 h-4 text-bg/60 rotate-180" stroke={2} />
+          <button onClick={() => setConfirming(false)} className="text-12 font-bold text-bg/60 hover:text-bg transition-colors shrink-0">
+            Atrás
           </button>
           <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar aplicación</p>
         </div>
@@ -224,7 +221,6 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
         <div className="flex flex-col gap-2.5">
           <motion.button {...PRESS} onClick={confirmSubmit} disabled={submitting} className={btnPrimary}>
             {submitting ? 'Enviando…' : 'Confirmar aplicación'}
-            {!submitting && <Icon name="check" className="w-4 h-4" stroke={2} />}
           </motion.button>
           <button type="button" onClick={() => setConfirming(false)} disabled={submitting} className={btnGhost}>
             Volver a editar
@@ -301,7 +297,6 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           className={btnPrimary}
         >
           Continuar
-          <Icon name="arrow" className="w-4 h-4" stroke={2} />
         </motion.button>
       </form>
     </>
@@ -380,7 +375,6 @@ function QuizModal({ areas, onViewDetail, onApply }) {
         <div className="flex flex-col gap-2.5">
           <motion.button {...PRESS} onClick={() => onApply(result?.value || '')} className={btnPrimary}>
             Aplicar a {result ? result.title : 'este departamento'}
-            <Icon name="arrow" className="w-4 h-4" stroke={2} />
           </motion.button>
           {result && (
             <button type="button" onClick={() => onViewDetail(result.value)} className={btnGhost}>
@@ -411,11 +405,8 @@ function QuizModal({ areas, onViewDetail, onApply }) {
             key={opt.label}
             type="button"
             onClick={() => answer(opt.tags)}
-            className="flex items-center gap-3 rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
+            className="rounded-[14px] border border-bg/12 bg-bg/4 px-4 py-3.5 text-left hover:bg-bg/8 hover:border-bg/20 transition-colors"
           >
-            <span className="w-9 h-9 rounded-full bg-bg text-white flex items-center justify-center shrink-0">
-              <Icon name={opt.icon} className="w-4 h-4" stroke={2} />
-            </span>
             <span className="text-14 font-semibold text-bg">{opt.label}</span>
           </button>
         ))}
@@ -526,7 +517,6 @@ export default function VolunteeringPage() {
                 onClick={() => setQuizOpen(true)}
                 className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
               >
-                <Icon name="spark" className="w-4 h-4" stroke={2} />
                 Descubre tu lugar ideal
               </motion.button>
               <button
@@ -568,7 +558,6 @@ export default function VolunteeringPage() {
                 onClick={() => setActiveTag(cur => cur === t.key ? null : t.key)}
                 className={`inline-flex items-center gap-1.5 rounded-pill px-3.5 py-2 text-13 font-semibold transition-colors ${activeTag === t.key ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
               >
-                <Icon name={t.icon} className="w-3.5 h-3.5" stroke={2} />
                 {t.label}
               </button>
             ))}
@@ -650,7 +639,6 @@ export default function VolunteeringPage() {
                   className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
                 >
                   Aplicar a {a.title}
-                  <Icon name="arrow" className="w-4 h-4" stroke={2} />
                 </motion.button>
               </div>
               <div className="sm:col-span-2 flex flex-col gap-4">

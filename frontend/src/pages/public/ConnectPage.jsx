@@ -6,14 +6,14 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
-import { Icon, FieldLight } from '../../components/ui/Glass';
+import { FieldLight } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 
 const CATEGORIES = [
-  { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia', icon: 'spark' },
-  { value: 'reconciliado', label: 'Vuelvo después de un tiempo', helper: 'Ya fui parte antes',         icon: 'heart' },
-  { value: 'busco_celula', label: 'Busco una célula',            helper: 'Quiero unirme a un grupo',   icon: 'users' },
+  { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia' },
+  { value: 'reconciliado', label: 'Vuelvo después de un tiempo', helper: 'Ya fui parte antes' },
+  { value: 'busco_celula', label: 'Busco una célula',            helper: 'Quiero unirme a un grupo' },
 ];
 
 const HOW_FOUND = [
@@ -27,9 +27,9 @@ const HOW_FOUND = [
 // admin/líder, se asigna a un líder real y avanza de estado hasta el
 // contacto -- ver AdminConnectCards.jsx / LeaderConnectCards.jsx.
 const STEPS = [
-  { icon: 'spark', text: 'Llenas el formulario -- toma menos de 2 minutos' },
-  { icon: 'users', text: 'Un líder de nuestro equipo revisa tu información' },
-  { icon: 'heart', text: 'Te contactamos por WhatsApp o llamada para conocerte' },
+  { text: 'Llenas el formulario -- toma menos de 2 minutos' },
+  { text: 'Un líder de nuestro equipo revisa tu información' },
+  { text: 'Te contactamos por WhatsApp o llamada para conocerte' },
 ];
 
 export default function ConnectPage() {
@@ -94,10 +94,7 @@ export default function ConnectPage() {
           <div className="glass-light rounded-[28px] p-7 md:p-9">
             {done ? (
               <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-5">
-                  <Icon name="check" className="w-7 h-7 text-bg" stroke={2} />
-                </div>
-                <h3 className="text-20 text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
+                <h3 className="text-24 text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
                 <p className="text-14 text-bg/60 max-w-sm mx-auto leading-relaxed">
                   Alguien de nuestro equipo te contactará pronto. Nos alegra que estés aquí.
                 </p>
@@ -108,9 +105,8 @@ export default function ConnectPage() {
                     empezar una conversacion asi que con un formulario de
                     campos; tambien es la que mas cambia el seguimiento que
                     hace el lider, tiene sentido que sea lo primero que se
-                    decide. Tarjetas con icono en vez de una lista de
-                    botones finitos -- eso se leia como una version fea de
-                    un <select>. */}
+                    decide. Tarjetas en vez de una lista de botones finitos
+                    -- eso se leia como una version fea de un <select>. */}
                 <div>
                   <p className="text-12 font-bold text-bg/60 mb-3 uppercase tracking-wide">
                     ¿Qué te trae por aquí? <span className="text-rose">*</span>
@@ -123,22 +119,12 @@ export default function ConnectPage() {
                           key={c.value}
                           type="button"
                           onClick={() => setForm((p) => ({ ...p, category: c.value }))}
-                          className={`relative flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[18px] border-2 transition-all ${
+                          className={`flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[18px] border-2 transition-all ${
                             selected
                               ? 'bg-bg/10 border-bg shadow-card'
                               : 'bg-bg/[0.03] border-bg/10 hover:border-bg/25 hover:bg-bg/[0.06]'
                           }`}
                         >
-                          {selected && (
-                            <span className="absolute top-2.5 right-2.5 grid place-items-center w-5 h-5 rounded-full bg-bg text-white">
-                              <Icon name="check" className="w-3 h-3" stroke={2.5} />
-                            </span>
-                          )}
-                          <span className={`grid place-items-center w-11 h-11 rounded-full border transition-colors ${
-                            selected ? 'bg-bg text-white border-bg' : 'bg-bg/8 text-bg/70 border-bg/12'
-                          }`}>
-                            <Icon name={c.icon} className="w-5 h-5" />
-                          </span>
                           <span className={`text-14 font-bold ${selected ? 'text-bg' : 'text-bg/80'}`}>{c.label}</span>
                           <span className="text-11 text-bg/50 leading-snug">{c.helper}</span>
                         </button>
@@ -183,8 +169,7 @@ export default function ConnectPage() {
                 </div>
 
                 {error && (
-                  <p className="text-13 text-rose flex items-center gap-1.5">
-                    <Icon name="spark" className="w-3.5 h-3.5" />
+                  <p className="text-13 text-rose">
                     {error}
                   </p>
                 )}
@@ -196,12 +181,7 @@ export default function ConnectPage() {
                   whileTap={{ scale: 0.97 }}
                   className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-bg text-white text-15 font-bold disabled:opacity-50"
                 >
-                  {loading ? 'Enviando…' : (
-                    <>
-                      Enviar
-                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
-                    </>
-                  )}
+                  {loading ? 'Enviando…' : 'Enviar'}
                 </motion.button>
               </form>
             )}

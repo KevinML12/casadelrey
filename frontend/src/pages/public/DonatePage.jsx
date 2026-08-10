@@ -1,6 +1,6 @@
 import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
@@ -43,16 +43,11 @@ export default function DonatePage() {
               </Reveal>
 
               <RevealList className="space-y-3">
-                {purposes.map(({ value, icon, title, description }) => (
+                {purposes.map(({ value, title, description }) => (
                   <RevealItem key={value}>
-                    <Tilt max={3} glass="standard" className="flex items-center gap-4 glass-light rounded-[20px] p-5">
-                      <span className="grid place-items-center w-12 h-12 rounded-full bg-bg/8 border border-bg/12 text-bg shrink-0">
-                        <Icon name={icon} className="w-5 h-5" />
-                      </span>
-                      <div>
-                        <h3 className="text-16 font-bold tracking-tight text-bg">{title}</h3>
-                        <p className="text-14 text-bg/60 mt-0.5">{description}</p>
-                      </div>
+                    <Tilt max={3} glass="standard" className="glass-light rounded-[20px] p-5">
+                      <h3 className="text-16 font-bold tracking-tight text-bg">{title}</h3>
+                      <p className="text-14 text-bg/60 mt-0.5">{description}</p>
                     </Tilt>
                   </RevealItem>
                 ))}

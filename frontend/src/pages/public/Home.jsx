@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Icon, Eyebrow } from '../../components/ui/Glass';
+import { Eyebrow } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
 import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
@@ -336,7 +336,6 @@ function HeroCarousel({ onPlan }) {
                       className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
-                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
                     </motion.a>
                   ) : slide.ctaUrl?.startsWith('/') ? (
                     <MotionLink
@@ -345,7 +344,6 @@ function HeroCarousel({ onPlan }) {
                       className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
-                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
                     </MotionLink>
                   ) : (
                     <motion.button
@@ -354,7 +352,6 @@ function HeroCarousel({ onPlan }) {
                       className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
-                      <Icon name="arrow" className="w-4 h-4" stroke={2} />
                     </motion.button>
                   )}
                 </motion.div>
@@ -363,7 +360,7 @@ function HeroCarousel({ onPlan }) {
             </AnimatePresence>
             </div>
 
-            {/* Dots + flechas — saltar a cualquier slide, o deslizar/hacer
+            {/* Dots + anterior/siguiente — saltar a cualquier slide, o deslizar/hacer
                 scroll horizontal directo sobre las fotos (touch, trackpad) */}
             {slides.length > 1 && (
               <div className="mt-10 flex items-center gap-4">
@@ -381,22 +378,20 @@ function HeroCarousel({ onPlan }) {
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
                   <motion.button
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.94 }}
                     onClick={() => goTo((idx - 1 + slides.length) % slides.length)}
-                    aria-label="Slide anterior"
-                    className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
+                    className="px-4 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white text-12 font-bold"
                   >
-                    <Icon name="arrow" className="w-3.5 h-3.5 rotate-180" />
+                    Anterior
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.94 }}
                     onClick={() => goTo((idx + 1) % slides.length)}
-                    aria-label="Siguiente slide"
-                    className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white"
+                    className="px-4 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white text-12 font-bold"
                   >
-                    <Icon name="arrow" className="w-3.5 h-3.5" />
+                    Siguiente
                   </motion.button>
                 </div>
               </div>
@@ -443,14 +438,12 @@ function HeroCarousel({ onPlan }) {
                 className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white text-bg px-5 py-3.5 text-14 font-bold focus-ring shadow-card"
               >
                 Conéctate
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
               </MotionLink>
               <MotionLink
                 to="/events"
                 {...PRESS}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-bg/10 text-bg px-5 py-3.5 text-14 font-bold focus-ring hover:bg-bg/15 transition-colors"
               >
-                <Icon name="calendar" className="w-4 h-4" />
                 Ver todos los eventos
               </MotionLink>
             </div>
@@ -481,14 +474,9 @@ function AnnouncementsBar() {
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-4">
         {list.map((a, i) => (
           <Reveal key={a.ID} delay={i * 0.08}>
-            <Tilt max={3} glass="standard" className="liquid-glass rounded-[18px] px-6 py-5 flex items-start md:items-center gap-5">
-              <div className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                <Icon name="spark" className="w-5 h-5 text-white" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-16 font-bold text-white leading-tight">{a.title}</p>
-                <p className="text-14 text-white/70 mt-1 line-clamp-2">{a.content}</p>
-              </div>
+            <Tilt max={3} glass="standard" className="liquid-glass rounded-[18px] px-6 py-5">
+              <p className="text-16 font-bold text-white leading-tight">{a.title}</p>
+              <p className="text-14 text-white/70 mt-1 line-clamp-2">{a.content}</p>
             </Tilt>
           </Reveal>
         ))}
@@ -562,7 +550,6 @@ function Agenda({ bg }) {
             className="mb-12 inline-flex items-center gap-3 self-start px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
           >
             Ver calendario completo
-            <Icon name="arrow" className="w-4 h-4" stroke={2} />
           </MotionLink>
           
           <Reveal delay={0.1}>
@@ -575,8 +562,8 @@ function Agenda({ bg }) {
               <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-12 font-semibold mb-3 inline-block">Destacado</span>
               <h3 className="text-28 font-bold text-white tracking-tight mb-3">{featured.title}</h3>
               <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-14 text-white/60">
-                <span className="flex items-center gap-1.5"><Icon name="clock" className="w-4 h-4" /> {featured.time}</span>
-                <span className="flex items-center gap-1.5"><Icon name="pin" className="w-4 h-4" /> {featured.loc}</span>
+                <span>{featured.time}</span>
+                <span>{featured.loc}</span>
               </div>
             </div>
           </Tilt>
@@ -600,11 +587,8 @@ function Agenda({ bg }) {
                   <div className="flex-1 text-center sm:text-left">
                     <h3 className="text-18 font-bold text-white mb-1">{ev.title}</h3>
                     <div className="flex items-center justify-center sm:justify-start gap-4 text-13 text-white/50 font-medium">
-                      <span className="flex items-center gap-1.5"><Icon name="clock" className="w-3.5 h-3.5" /> {ev.time}</span>
+                      <span>{ev.time}</span>
                     </div>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0">
-                    <Icon name="arrow" className="w-4 h-4" />
                   </div>
                 </Link>
               </RevealItem>
@@ -669,7 +653,6 @@ function CelulasSection({ bg }) {
             className="mt-8 inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
           >
             Encuentra tu célula
-            <Icon name="arrow" className="w-4 h-4" stroke={2} />
           </MotionLink>
         </Reveal>
 
@@ -779,7 +762,6 @@ function MensajesCarousel({ bg }) {
           className="inline-flex items-center gap-3 self-start md:self-auto px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring shrink-0"
         >
           Ver todas las enseñanzas
-          <Icon name="arrow" className="w-4 h-4" stroke={2} />
         </MotionLink>
       </Reveal>
 
@@ -799,12 +781,6 @@ function MensajesCarousel({ bg }) {
           >
             <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
             <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
-            
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full liquid-glass flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform duration-500 shadow-xl">
-                <Icon name="play" className="w-6 h-6 text-white ml-1" />
-              </div>
-            </div>
 
             <div className="absolute bottom-0 left-0 p-8 w-full z-10">
               <div className="text-13 font-semibold text-white/70 mb-2">{s.date}</div>
@@ -850,10 +826,7 @@ function Ubicacion({ bg }) {
           <Reveal from="left">
           <Tilt max={3} glass="featured" className="rounded-[24px] liquid-glass p-10 md:p-14 h-full flex flex-col justify-between gap-10">
             <div>
-              <div className="flex items-center gap-3 text-white/60 text-13 font-bold mb-6">
-                <span className="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <Icon name="pin" className="w-5 h-5 text-white" />
-                </span>
+              <div className="text-white/60 text-13 font-bold mb-6">
                 Huehuetenango, Guatemala
               </div>
               <p className="display-mega text-white leading-[1.15]" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.6rem)' }}>
@@ -872,7 +845,6 @@ function Ubicacion({ bg }) {
                 className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card"
               >
                 Cómo llegar
-                <Icon name="arrow" className="w-4 h-4" stroke={2} />
               </motion.a>
               {NETWORKS.map(n => (
                 <motion.a
@@ -881,10 +853,9 @@ function Ubicacion({ bg }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   {...PRESS}
-                  aria-label={n.label}
-                  className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-white focus-ring"
+                  className="inline-flex items-center px-5 h-12 rounded-full liquid-glass text-white text-14 font-bold focus-ring"
                 >
-                  <Icon name={n.icon} className="w-5 h-5" />
+                  {n.label}
                 </motion.a>
               ))}
             </div>
@@ -904,23 +875,17 @@ function Ubicacion({ bg }) {
                 {...PRESS}
                 className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card hover:opacity-90"
               >
-                <Icon name="spark" className="w-4 h-4" />
                 Conéctate
               </MotionLink>
             </Tilt>
             </Reveal>
 
             <Reveal from="right" delay={0.12}>
-            <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10 flex items-center gap-5">
-              <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/15 flex items-center justify-center shrink-0">
-                <Icon name="music" className="w-6 h-6 text-bg" />
-              </div>
-              <div>
-                <p className="text-17 font-bold text-bg leading-tight">Podcast Inusual Youth</p>
-                <p className="text-14 text-bg/55 font-semibold mt-1">
-                  92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
-                </p>
-              </div>
+            <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10">
+              <p className="text-17 font-bold text-bg leading-tight">Podcast Inusual Youth</p>
+              <p className="text-14 text-bg/55 font-semibold mt-1">
+                92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
+              </p>
             </Tilt>
             </Reveal>
           </div>
@@ -963,7 +928,6 @@ function GalleryPreviewSection() {
         </div>
         <MotionLink to="/gallery" {...PRESS} className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-full liquid-glass text-white font-bold hover:bg-white/10 transition-colors border border-white/20 shrink-0">
           Explorar Galería
-          <Icon name="arrow" className="w-4 h-4" />
         </MotionLink>
       </Reveal>
 
@@ -974,16 +938,11 @@ function GalleryPreviewSection() {
             <Tilt as={Link} to="/gallery" max={6} glass="standard" className="group relative rounded-[18px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
               <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
-              <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
-                <div>
-                  <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>
-                  {photos.length > 1 && (
-                    <p className="text-white/60 text-12 font-medium mt-1">{photos.length} fotos</p>
-                  )}
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/20 transition-all shrink-0 backdrop-blur-md">
-                  <Icon name="arrow" className="w-3 h-3" />
-                </div>
+              <div className="absolute bottom-5 inset-x-5">
+                <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>
+                {photos.length > 1 && (
+                  <p className="text-white/60 text-12 font-medium mt-1">{photos.length} fotos</p>
+                )}
               </div>
             </Tilt>
             </RevealItem>

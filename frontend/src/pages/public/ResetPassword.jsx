@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon, GlassField, GlassButton } from '../../components/ui/Glass';
+import { GlassField, GlassButton } from '../../components/ui/Glass';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -27,9 +27,6 @@ export default function ResetPassword() {
   return (
     <AuthCard>
       <div className="mb-8">
-        <div className="w-12 h-12 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-5">
-          <Icon name="lock" className="w-5 h-5 text-white" />
-        </div>
         <h1 className="text-22 font-bold text-white mb-1.5">Nueva contraseña</h1>
         <p className="text-15 text-white/60">Elige una contraseña segura para tu cuenta.</p>
       </div>
