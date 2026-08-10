@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon, FieldLight } from '../ui/Glass';
+import { FieldLight } from '../ui/Glass';
 import BankDetails from './BankDetails';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 import { useDonationPurposes } from '../../lib/donationPurposes';
@@ -20,8 +20,8 @@ import { useDonationPurposes } from '../../lib/donationPurposes';
 const AMOUNTS  = [50, 100, 250, 500];
 
 const PAYMENT_METHODS = [
-  { icon: 'spark', label: 'Transferencia bancaria', sub: 'Sube tu boleta y la verificamos', value: 'transferencia' },
-  { icon: 'heart', label: 'En persona',             sub: 'Te recibimos un domingo',        value: 'presencial' },
+  { label: 'Transferencia bancaria', sub: 'Sube tu boleta y la verificamos', value: 'transferencia' },
+  { label: 'En persona',             sub: 'Te recibimos un domingo',        value: 'presencial' },
 ];
 
 const PRESS = {
@@ -142,9 +142,6 @@ export default function DonationCard() {
   if (sent) {
     return (
       <div className="glass-light liquid-shine rounded-[24px] p-8 text-center">
-        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center">
-          <Icon name="check" className="w-7 h-7 text-bg" stroke={2.4} />
-        </div>
         <h3 className="display-mega text-bg" style={{ fontSize: '1.7rem' }}>
           ¡Gracias por sembrar!
         </h3>
@@ -198,7 +195,6 @@ export default function DonationCard() {
       className="w-full mt-5 inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40 focus-ring"
     >
       {children}
-      <Icon name="arrow" className="w-4 h-4 rotate-90" stroke={2} />
     </motion.button>
   );
 
@@ -223,9 +219,9 @@ export default function DonationCard() {
               className={`w-full flex items-center gap-3.5 px-5 py-4 text-left focus-ring ${done ? 'cursor-pointer hover:bg-bg/5' : 'cursor-default'} transition-colors`}
             >
               <span className={`grid place-items-center w-8 h-8 rounded-full text-13 font-extrabold shrink-0 transition-colors ${
-                current ? 'bg-bg text-white' : done ? 'bg-bg/12 text-bg' : 'bg-bg/6 text-bg/40'
+                current ? 'bg-bg text-white' : done ? 'bg-bg/70 text-white' : 'bg-bg/6 text-bg/40'
               }`}>
-                {done ? <Icon name="check" className="w-4 h-4" stroke={2.6} /> : i + 1}
+                {i + 1}
               </span>
               <span className={`text-15 font-bold ${current || done ? 'text-bg' : 'text-bg/40'}`}>
                 {def.label}
@@ -301,11 +297,10 @@ export default function DonationCard() {
                                 whileTap={{ scale: 0.97 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => setPurpose(p.value)}
-                                className={`flex items-center gap-2.5 rounded-pill px-5 py-3.5 text-14 font-bold transition-colors focus-ring ${
+                                className={`rounded-pill px-5 py-3.5 text-14 font-bold transition-colors focus-ring ${
                                   active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
                                 }`}
                               >
-                                <Icon name={p.icon} className={`w-4 h-4 shrink-0 ${active ? 'text-celeste' : 'text-bg/40'}`} stroke={1.8} />
                                 {p.title}
                               </motion.button>
                             );
@@ -329,20 +324,14 @@ export default function DonationCard() {
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 onClick={() => setMethod(m.value)}
-                                className={`w-full flex items-center gap-4 rounded-[16px] px-4 py-3.5 text-left transition-all border focus-ring ${
+                                className={`w-full flex items-center rounded-[16px] px-4 py-3.5 text-left transition-all border focus-ring ${
                                   active ? 'bg-bg/8 border-bg/25' : 'bg-bg/4 border-bg/10 hover:border-bg/20'
                                 }`}
                               >
-                                <span className={`grid place-items-center w-10 h-10 rounded-full shrink-0 ${
-                                  active ? 'bg-bg text-white' : 'bg-bg/8 text-bg border border-bg/12'
-                                }`}>
-                                  <Icon name={m.icon} className="w-5 h-5" stroke={2} />
-                                </span>
                                 <div className="min-w-0 flex-1">
                                   <div className="text-15 font-bold text-bg">{m.label}</div>
                                   <div className="text-13 text-bg/60 mt-0.5">{m.sub}</div>
                                 </div>
-                                {active && <Icon name="check" className="w-5 h-5 text-bg shrink-0" stroke={2.4} />}
                               </motion.button>
                             );
                           })}
@@ -356,8 +345,7 @@ export default function DonationCard() {
                               <div className="flex items-center gap-4 rounded-[14px] bg-bg/4 border border-bg/12 p-4">
                                 <img src={receiptUrl} alt="comprobante" className="h-16 w-16 object-cover rounded-[10px] border border-bg/10" />
                                 <div className="flex-1 min-w-0">
-                                  <p className="inline-flex items-center gap-1.5 text-14 font-bold text-bg">
-                                    <Icon name="check" className="w-4 h-4" stroke={2.4} />
+                                  <p className="text-14 font-bold text-bg">
                                     Comprobante cargado
                                   </p>
                                   <button
@@ -370,10 +358,7 @@ export default function DonationCard() {
                                 </div>
                               </div>
                             ) : (
-                              <label className={`flex items-center gap-4 rounded-[16px] border-2 border-dashed border-bg/15 bg-bg/4 p-4 cursor-pointer transition-all ${uploading ? 'opacity-60' : 'hover:border-bg/30 hover:bg-bg/8'}`}>
-                                <span className="grid place-items-center w-11 h-11 rounded-full bg-bg/8 text-bg shrink-0">
-                                  <Icon name={uploading ? 'clock' : 'mail'} className={`w-5 h-5 ${uploading ? 'animate-spin' : ''}`} />
-                                </span>
+                              <label className={`flex items-center rounded-[16px] border-2 border-dashed border-bg/15 bg-bg/4 p-4 cursor-pointer transition-all ${uploading ? 'opacity-60' : 'hover:border-bg/30 hover:bg-bg/8'}`}>
                                 <div className="min-w-0">
                                   <p className="text-14 font-bold text-bg">
                                     {uploading ? 'Subiendo…' : 'Sube la foto de tu boleta *'}
@@ -423,7 +408,6 @@ export default function DonationCard() {
                           className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40 focus-ring"
                         >
                           {loading ? 'Procesando…' : isTransfer ? 'Enviar donación y comprobante' : 'Registrar donación'}
-                          {!loading && <Icon name="check" className="w-4 h-4" stroke={2.4} />}
                         </motion.button>
 
                         <p className="text-13 text-bg/50">

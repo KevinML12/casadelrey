@@ -11,17 +11,16 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { Icon } from '../ui/Glass';
 import Reveal from '../ui/Reveal';
 import TTSPlayer from './TTSPlayer';
 
 function getSocialPlatform(url = '') {
   if (!url) return null;
-  if (url.includes('instagram.com')) return { label: 'Instagram', icon: 'instagram' };
-  if (url.includes('facebook.com'))  return { label: 'Facebook', icon: 'heart' };
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return { label: 'YouTube', icon: 'youtube' };
-  if (url.includes('tiktok.com'))    return { label: 'TikTok', icon: 'music' };
-  return { label: 'Ver publicación', icon: 'spark' };
+  if (url.includes('instagram.com')) return 'Instagram';
+  if (url.includes('facebook.com'))  return 'Facebook';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
+  if (url.includes('tiktok.com'))    return 'TikTok';
+  return 'Ver publicación';
 }
 
 export default function ArticleReader({ post }) {
@@ -47,14 +46,12 @@ export default function ArticleReader({ post }) {
 
       <div className="relative z-10 max-w-2xl mx-auto px-6 -mt-24 pb-32">
         <Reveal>
-          <Link to="/blog" className="inline-flex items-center gap-2 text-14 font-semibold text-white/60 hover:text-white mb-6 transition-colors">
-            <Icon name="arrow" className="w-4 h-4 rotate-180" />
+          <Link to="/blog" className="inline-block text-14 font-semibold text-white/60 hover:text-white mb-6 transition-colors">
             Volver al blog
           </Link>
 
           <div className="glass-light rounded-[28px] p-7 md:p-10">
-            <p className="text-13 text-bg/50 flex items-center gap-2 mb-4">
-              <Icon name="calendar" className="w-3.5 h-3.5" />
+            <p className="text-13 text-bg/50 mb-4">
               {post.CreatedAt ? new Date(post.CreatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
             </p>
             <h1 className="text-30 md:text-38 font-bold text-bg leading-tight mb-6 tracking-tight">{post.title}</h1>
@@ -64,16 +61,10 @@ export default function ArticleReader({ post }) {
                 href={post.redirect_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 glass-light-nested rounded-[20px] p-5 mb-8 group"
+                className="block glass-light-nested rounded-[20px] p-5 mb-8"
               >
-                <div className="w-11 h-11 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center shrink-0">
-                  <Icon name={social.icon} className="w-5 h-5 text-bg" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-15 font-bold text-bg">Ver en {social.label}</p>
-                  <p className="text-13 text-bg/50 truncate">{post.redirect_url}</p>
-                </div>
-                <Icon name="arrow" className="w-4 h-4 text-bg/40 group-hover:text-bg transition-colors shrink-0" />
+                <p className="text-15 font-bold text-bg">Ver en {social}</p>
+                <p className="text-13 text-bg/50 truncate">{post.redirect_url}</p>
               </a>
             )}
 

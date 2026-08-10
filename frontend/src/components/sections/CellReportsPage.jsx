@@ -5,7 +5,6 @@ import { useAuth } from '../../context/AuthContext';
 import CellReportForm from './CellReportForm';
 import Button from '../ui/Button';
 import Chip, { FilterChip } from '../ui/Chip';
-import { Icon } from '../ui/Glass';
 
 const STATUS_CONFIG = {
   pendiente: { label: 'Pendiente', color: 'default',   icon: 'schedule' },
@@ -19,20 +18,17 @@ const Spinner = () => (
   </div>
 );
 
-function MiniStat({ icon, label, value, tint = 'pri' }) {
+function MiniStat({ label, value, tint = 'pri' }) {
   const tintMap = {
-    pri: 'bg-bg text-white',
-    sec: 'bg-emerald text-white',
-    ter: 'bg-celeste text-white',
+    pri: 'text-bg',
+    sec: 'text-emerald',
+    ter: 'text-celeste',
   };
   return (
     <div className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tintMap[tint]}`}>
-        <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
-      </div>
       <div>
         <p className="text-label-s text-bg/50 uppercase tracking-widest">{label}</p>
-        <p className="text-headline-s text-bg font-black">{value}</p>
+        <p className={`text-headline-s font-black ${tintMap[tint]}`}>{value}</p>
       </div>
     </div>
   );
@@ -90,9 +86,6 @@ export default function CellReportsPage() {
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="groups" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Reportes de Células</h1>
             <p className="text-body-s text-bg/50 mt-0.5">
@@ -105,7 +98,6 @@ export default function CellReportsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-            <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nuevo reporte'}
           </Button>
         </div>
@@ -121,11 +113,11 @@ export default function CellReportsPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <MiniStat icon="article"   label="Reportes"      value={stats.total_reports ?? 0}    tint="pri" />
-          <MiniStat icon="groups"    label="Asistentes"    value={stats.total_attendees ?? 0}   tint="sec" />
-          <MiniStat icon="church"    label="Convertidos"   value={stats.total_converts ?? 0}    tint="ter" />
-          <MiniStat icon="favorite"  label="Reconciliados" value={stats.total_reconciled ?? 0}  tint="pri" />
-          <MiniStat icon="savings"   label="Ofrenda"       value={`Q${(stats.total_offering ?? 0).toFixed(0)}`} tint="sec" />
+          <MiniStat label="Reportes"      value={stats.total_reports ?? 0}    tint="pri" />
+          <MiniStat label="Asistentes"    value={stats.total_attendees ?? 0}   tint="sec" />
+          <MiniStat label="Convertidos"   value={stats.total_converts ?? 0}    tint="ter" />
+          <MiniStat label="Reconciliados" value={stats.total_reconciled ?? 0}  tint="pri" />
+          <MiniStat label="Ofrenda"       value={`Q${(stats.total_offering ?? 0).toFixed(0)}`} tint="sec" />
         </div>
       )}
 
@@ -150,8 +142,7 @@ export default function CellReportsPage() {
       {/* Resumen por célula */}
       {stats?.by_cell?.length > 0 && (
         <div className="glass-light rounded-[24px] card-spring mb-8 overflow-hidden">
-          <div className="px-5 py-4 border-b border-bg/10 flex items-center gap-2">
-            <Icon name="bar_chart" className="w-[18px] h-[18px] text-celeste" stroke={1.8} />
+          <div className="px-5 py-4 border-b border-bg/10">
             <h3 className="text-title-s text-bg font-semibold">Resumen por célula</h3>
           </div>
           <div className="overflow-x-auto">
@@ -185,9 +176,6 @@ export default function CellReportsPage() {
       {/* Lista de reportes */}
       {loading ? <Spinner /> : reports.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="inbox" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin reportes</p>
             <p className="text-body-s text-bg/50 mt-1">
@@ -207,11 +195,6 @@ export default function CellReportsPage() {
                 <button onClick={() => setExpanded(open ? null : r.ID)}
                   className="w-full text-left flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
-                  {/* Leading: cell type indicator */}
-                  <div className="w-10 h-10 rounded-xl bg-bg flex items-center justify-center shrink-0 mt-0.5">
-                    <Icon name="groups" className="w-[18px] h-[18px] text-white" stroke={1.8} />
-                  </div>
-
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       {r.cell_code && (
@@ -222,30 +205,25 @@ export default function CellReportsPage() {
                     </div>
                     <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-bg/50">
                       {isAdmin && r.leader_name && (
-                        <span className="flex items-center gap-1">
-                          <Icon name="person" className="w-[13px] h-[13px]" stroke={1.8} />{r.leader_name}
-                        </span>
+                        <span>{r.leader_name}</span>
                       )}
-                      <span className="flex items-center gap-1">
-                        <Icon name="calendar_today" className="w-[13px] h-[13px]" stroke={1.8} />
+                      <span>
                         {r.meeting_date ? new Date(r.meeting_date + 'T12:00').toLocaleDateString('es-ES', {
                           day: '2-digit', month: 'short', year: 'numeric'
                         }) : '—'}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="groups" className="w-[13px] h-[13px]" stroke={1.8} />
-                        {r.total_attendees ?? 0} asist.
-                      </span>
+                      <span>{r.total_attendees ?? 0} asist.</span>
                       {((r.converts ?? 0) + (r.reconciled ?? 0)) > 0 && (
-                        <span className="flex items-center gap-1 text-bg font-medium">
-                          <Icon name="person_add" className="w-[13px] h-[13px]" stroke={1.8} />
+                        <span className="text-bg font-medium">
                           {(r.converts || 0) + (r.reconciled || 0)} nuevos
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <Icon name="expand_more" className={`w-[20px] h-[20px] text-bg/50 shrink-0 mt-1 transition-transform ${open ? 'rotate-180' : ''}`} stroke={1.8} />
+                  <span className="text-13 font-semibold text-bg/50 shrink-0 mt-1 whitespace-nowrap">
+                    {open ? 'Ver menos' : 'Ver más'}
+                  </span>
                 </button>
 
                 {/* Detalle expandido */}
@@ -255,18 +233,15 @@ export default function CellReportsPage() {
                     {/* Números */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { icon: 'groups',      label: 'Asistentes',   value: r.total_attendees ?? 0, tint: 'bg-bg text-white' },
-                        { icon: 'church',      label: 'Convertidos',  value: r.converts ?? 0,        tint: 'bg-emerald text-white' },
-                        { icon: 'favorite',    label: 'Reconciliados', value: r.reconciled ?? 0,     tint: 'bg-celeste text-white' },
-                        { icon: 'savings',     label: 'Ofrenda',      value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'bg-bg text-white' },
-                      ].map(({ icon, label, value, tint }) => (
+                        { label: 'Asistentes',    value: r.total_attendees ?? 0, tint: 'text-bg' },
+                        { label: 'Convertidos',   value: r.converts ?? 0,        tint: 'text-emerald' },
+                        { label: 'Reconciliados', value: r.reconciled ?? 0,      tint: 'text-celeste' },
+                        { label: 'Ofrenda',       value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'text-bg' },
+                      ].map(({ label, value, tint }) => (
                         <div key={label} className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tint}`}>
-                            <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
-                          </div>
                           <div>
                             <p className="text-label-s text-bg/50 uppercase tracking-widest">{label}</p>
-                            <p className="text-headline-s text-bg font-black">{value}</p>
+                            <p className={`text-headline-s font-black ${tint}`}>{value}</p>
                           </div>
                         </div>
                       ))}
@@ -302,12 +277,10 @@ export default function CellReportsPage() {
                     {isAdmin && r.status === 'pendiente' && (
                       <div className="flex gap-3 pt-2">
                         <Button variant="filled" onClick={() => approve(r.ID, 'aprobado')} disabled={!!approving}>
-                          <Icon name="check_circle" className="w-[16px] h-[16px]" stroke={1.8} />
                           {approving === r.ID + 'aprobado' ? 'Aprobando…' : 'Aprobar'}
                         </Button>
                         <Button variant="outlined" onClick={() => approve(r.ID, 'rechazado')} disabled={!!approving}
                           className="border-rose text-rose before:bg-rose hover:before:opacity-[.08]">
-                          <Icon name="cancel" className="w-[16px] h-[16px]" stroke={1.8} />
                           {approving === r.ID + 'rechazado' ? 'Rechazando…' : 'Rechazar'}
                         </Button>
                       </div>

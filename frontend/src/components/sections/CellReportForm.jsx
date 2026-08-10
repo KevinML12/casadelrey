@@ -5,7 +5,6 @@ import { useAuth } from '../../context/AuthContext';
 import Input, { Textarea } from '../ui/Input';
 import Button from '../ui/Button';
 import CellCodePicker, { parseCode } from '../ui/CellCodePicker';
-import { Icon } from '../ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const Field = ({ label, children, required }) => (
@@ -89,9 +88,6 @@ export default function CellReportForm({ onSuccess }) {
   if (submitted) {
     return (
       <div className="flex flex-col items-center text-center py-12 animate-fade-in">
-        <div className="w-16 h-16 rounded-full bg-celeste-soft flex items-center justify-center mb-5">
-          <Icon name="check_circle" className="w-[32px] h-[32px] text-celeste-hov" stroke={1.8} />
-        </div>
         <h3 className="text-title-l text-bg font-bold mb-2">¡Reporte enviado!</h3>
         <p className="text-body-m text-bg/50 mb-6">Pendiente de aprobación pastoral.</p>
         <Button variant="outlined" onClick={() => { setSubmitted(false); setForm({ ...EMPTY, leader_name: user?.role === 'leader' ? (user?.name || '') : '' }); }}>
@@ -159,8 +155,7 @@ export default function CellReportForm({ onSuccess }) {
           <NumField label="Reconciliados" name="reconciled" value={form.reconciled} onChange={set} />
           <Input label="Ofrenda (Q)" type="number" min="0" step="0.01" value={form.offering} onChange={e => set('offering', e.target.value)} placeholder="0.00" />
         </div>
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-bg">
-          <Icon name="person_add" className="w-[18px] h-[18px] text-white" stroke={1.8} />
+        <div className="px-4 py-3 rounded-xl bg-bg">
           <span className="text-body-s text-white">
             Nuevos total: <strong>{(parseInt(form.converts, 10) || 0) + (parseInt(form.reconciled, 10) || 0)}</strong>
             <span className="text-white/60 ml-2">({form.converts || 0} conv. + {form.reconciled || 0} rec.)</span>
@@ -174,7 +169,6 @@ export default function CellReportForm({ onSuccess }) {
         <Field label="Foto de la reunión">
           <div className="flex items-center gap-3">
             <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-celeste/40 hover:text-bg'} text-bg/50`}>
-              <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : form.photo_url ? 'Cambiar foto' : 'Subir foto'}
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
             </label>
@@ -186,10 +180,7 @@ export default function CellReportForm({ onSuccess }) {
       </div>
 
       <Button type="submit" variant="filled" size="lg" className="w-full justify-center" disabled={loading}>
-        {loading
-          ? <><Icon name="hourglass_empty" className="w-[18px] h-[18px]" stroke={1.8} />Enviando…</>
-          : <><Icon name="groups" className="w-[18px] h-[18px]" stroke={1.8} />Enviar Reporte</>
-        }
+        {loading ? 'Enviando…' : 'Enviar Reporte'}
       </Button>
     </form>
   );

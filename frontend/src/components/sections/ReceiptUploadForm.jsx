@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon, FieldLight } from '../ui/Glass';
+import { FieldLight } from '../ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'Agromercantil', 'Promerica', 'Citibank', 'Otro'];
@@ -71,9 +71,6 @@ export default function ReceiptUploadForm({
 
   if (sent) return (
     <div className="text-center py-10">
-      <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center mx-auto mb-4">
-        <Icon name="check" className="w-7 h-7 text-bg" stroke={2.4} />
-      </div>
       <h3 className="text-20 font-bold text-bg mb-2">¡Comprobante recibido!</h3>
       <p className="text-14 text-bg/60">El equipo verificará tu pago en 24-48 horas y recibirás confirmación.</p>
     </div>
@@ -112,8 +109,7 @@ export default function ReceiptUploadForm({
           <div className="flex items-center gap-4 p-4 rounded-[16px] glass-light-nested">
             <img src={form.receipt_image_url} alt="comprobante" className="h-20 w-20 object-cover rounded-[10px] border border-bg/10" />
             <div className="flex-1">
-              <p className="text-14 text-bg font-bold flex items-center gap-1.5">
-                <Icon name="check" className="w-4 h-4" stroke={2.4} />
+              <p className="text-14 text-bg font-bold">
                 Comprobante cargado
               </p>
               <button type="button" onClick={() => setForm(p => ({ ...p, receipt_image_url: '' }))}
@@ -124,9 +120,6 @@ export default function ReceiptUploadForm({
           </div>
         ) : (
           <label className={`flex flex-col items-center justify-center gap-3 p-8 rounded-[16px] border-2 border-dashed border-bg/15 bg-bg/4 cursor-pointer transition-all ${uploading ? 'opacity-60' : 'hover:border-bg/30 hover:bg-bg/8'}`}>
-            <span className="grid place-items-center w-12 h-12 rounded-full bg-bg/8 text-bg">
-              <Icon name={uploading ? 'clock' : 'gift'} className={`w-6 h-6 ${uploading ? 'animate-spin' : ''}`} />
-            </span>
             <div className="text-center">
               <p className="text-15 font-bold text-bg">{uploading ? 'Subiendo…' : 'Toca para subir la foto'}</p>
               <p className="text-12 text-bg/50 mt-0.5">JPG, PNG o PDF · máx. 10 MB</p>
@@ -145,7 +138,6 @@ export default function ReceiptUploadForm({
         className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40"
       >
         {submitting ? 'Enviando…' : 'Enviar comprobante'}
-        {!submitting && <Icon name="arrow" className="w-4 h-4" stroke={2} />}
       </motion.button>
     </form>
   );

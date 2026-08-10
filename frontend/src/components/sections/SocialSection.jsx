@@ -10,15 +10,15 @@
 //  un componente duplicado en dos páginas. Un solo componente, reusado
 //  tanto en Nosotros como en Home.
 // ============================================================
-import { Icon, Eyebrow } from '../ui/Glass';
+import { Eyebrow } from '../ui/Glass';
 import Reveal from '../ui/Reveal';
 import Tilt from '../ui/Tilt';
 
 const NETWORKS = [
-  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',    icon: 'instagram', span: 'col-span-2 row-span-2' },
-  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  handle: '/casadelreyhuehue', icon: 'facebook',  span: 'col-span-2 row-span-1' },
-  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    handle: '@leoneldeleongt',   icon: 'tiktok',    span: 'col-span-1 row-span-1' },
-  { href: 'https://x.com/pastorleoneli',                label: 'X',         handle: '@pastorleoneli',    icon: 'x_logo',    span: 'col-span-1 row-span-1' },
+  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',    span: 'col-span-2 row-span-2' },
+  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  handle: '/casadelreyhuehue', span: 'col-span-2 row-span-1' },
+  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    handle: '@leoneldeleongt',   span: 'col-span-1 row-span-1' },
+  { href: 'https://x.com/pastorleoneli',                label: 'X',         handle: '@pastorleoneli',    span: 'col-span-1 row-span-1' },
 ];
 
 export default function SocialSection({ title = 'Síguenos en redes' }) {
@@ -50,12 +50,10 @@ export default function SocialSection({ title = 'Síguenos en redes' }) {
                 href={n.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`glass-light group relative flex flex-col justify-end p-4 md:p-6 text-bg rounded-[18px] ${n.span}`}
+                className={`glass-light relative flex flex-col justify-end p-4 md:p-6 text-bg rounded-[18px] ${n.span}`}
               >
-                <Icon name={n.icon} className={`relative z-10 mb-2.5 ${big ? 'w-10 h-10' : 'w-6 h-6'}`} stroke={1.4} />
                 <p className={`relative z-10 font-extrabold leading-none tracking-tight ${big ? 'text-32 md:text-40' : 'text-17'}`}>{n.label}</p>
                 <p className={`relative z-10 text-bg/60 truncate ${big ? 'text-15 mt-2' : 'text-12 mt-1'}`}>{n.handle}</p>
-                <Icon name="arrow" className="relative z-10 w-4 h-4 text-bg/40 absolute top-4 right-4 -rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" stroke={2} />
               </Tilt>
             );
           })}

@@ -31,9 +31,11 @@ export default function TTSPlayer({ content }) {
   return (
     <div className="glass-light-nested rounded-[20px] overflow-hidden">
       <div className="flex items-center gap-4 px-5 py-4">
-        <div className="w-12 h-12 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center shrink-0">
-          <Icon name={isLoading ? 'spark' : 'music'} className={`w-5 h-5 text-bg ${isLoading ? 'animate-spin' : ''}`} />
-        </div>
+        {isLoading && (
+          <div className="w-12 h-12 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center shrink-0">
+            <Icon name="spark" className="w-5 h-5 text-bg animate-spin" />
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <p className="text-15 font-semibold text-bg">
@@ -47,8 +49,7 @@ export default function TTSPlayer({ content }) {
         <div className="flex items-center gap-2 shrink-0">
           {(!isActive || isDone) && (
             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.94 }} onClick={play}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-bg text-white text-13 font-bold">
-              <Icon name="play" className="w-3.5 h-3.5" />
+              className="px-4 py-2 rounded-full bg-bg text-white text-13 font-bold">
               {isDone ? 'Repetir' : 'Escuchar'}
             </motion.button>
           )}
@@ -59,14 +60,13 @@ export default function TTSPlayer({ content }) {
           )}
           {isPaused && (
             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.94 }} onClick={resume}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-bg text-white text-13 font-bold">
-              <Icon name="play" className="w-3.5 h-3.5" />
+              className="px-4 py-2 rounded-full bg-bg text-white text-13 font-bold">
               Continuar
             </motion.button>
           )}
           {isActive && (
-            <button onClick={stop} title="Detener" className="w-9 h-9 rounded-full bg-bg/8 flex items-center justify-center text-bg/70">
-              <Icon name="close" className="w-3.5 h-3.5" />
+            <button onClick={stop} className="px-4 py-2 rounded-full bg-bg/8 text-bg/70 text-13 font-semibold">
+              Detener
             </button>
           )}
         </div>
