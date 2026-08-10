@@ -93,7 +93,7 @@ export default function LeaderMyProfile() {
         {form.is_active ? 'Visible en el sitio' : 'Pendiente de revisión por un admin'}
       </span>
 
-      <form onSubmit={handleSubmit} className="space-y-4 p-5 sm:p-6 rounded-2xl bg-bg/4 border border-bg/10">
+      <form onSubmit={handleSubmit} className="space-y-4 glass-light rounded-[24px] card-spring p-5 sm:p-6">
         <div className="flex items-center gap-4">
           {form.photo_url ? (
             <img src={form.photo_url} alt={form.name} className="w-16 h-16 rounded-full object-cover border border-bg/10" />

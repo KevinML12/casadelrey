@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button from '../../components/ui/Button';
+import Button, { IconButton } from '../../components/ui/Button';
 import Input, { Select, Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 
@@ -153,14 +153,19 @@ export default function AdminVolunteerAreas() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-title-l text-bg mb-1">Voluntariado — Departamentos</h1>
-          <p className="text-body-m text-bg/50">
-            Los departamentos que se muestran en la página pública de Voluntariado. La foto de
-            cada uno se sube aparte, en Fotos del sitio (busca "Voluntariado").
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="dashboard" className="w-[22px] h-[22px] text-white" stroke={1.8} />
+          </div>
+          <div>
+            <h1 className="text-headline-s text-bg font-black leading-tight">Voluntariado — Departamentos</h1>
+            <p className="text-body-m text-bg/50 mt-0.5">
+              Los departamentos que se muestran en la página pública de Voluntariado. La foto de
+              cada uno se sube aparte, en Fotos del sitio (busca "Voluntariado").
+            </p>
+          </div>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
           <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
@@ -169,7 +174,7 @@ export default function AdminVolunteerAreas() {
       </div>
 
       {showForm && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-bg/4 border border-bg/10">
+        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
           <h2 className="text-title-m mb-4">{editing ? 'Editar departamento' : 'Nuevo departamento'}</h2>
           <AreaForm
             initialData={editing}
@@ -180,15 +185,20 @@ export default function AdminVolunteerAreas() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-bg/50">Cargando...</div>
+        <div className="flex items-center justify-center py-16">
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        </div>
       ) : areas.length === 0 ? (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-bg/10 text-bg/50">
-          Aún no hay departamentos registrados. Agrégalos con "Nuevo departamento".
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
+            <Icon name="dashboard" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
+          </div>
+          <p className="text-body-l text-bg font-medium">Sin departamentos todavía</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {areas.map(area => (
-            <div key={area.ID} className={`p-4 rounded-2xl border flex flex-col sm:flex-row gap-4 sm:items-center ${area.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15 opacity-70'}`}>
+            <div key={area.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${area.is_active ? '' : 'opacity-60'}`}>
               <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0">
                 <Icon name={area.icon || 'box'} className="w-5 h-5" stroke={1.8} />
               </div>
@@ -203,18 +213,16 @@ export default function AdminVolunteerAreas() {
                 )}
               </div>
               <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
-                <button onClick={() => { setEditing(area); setShowForm(true); }} title="Editar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
+                <IconButton onClick={() => { setEditing(area); setShowForm(true); }} title="Editar">
                   <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                </button>
-                <button onClick={() => handleToggle(area)} title={area.is_active ? 'Ocultar' : 'Mostrar'}
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
+                </IconButton>
+                <IconButton onClick={() => handleToggle(area)} title={area.is_active ? 'Ocultar' : 'Mostrar'}>
                   <Icon name={area.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
-                </button>
-                <button onClick={() => handleDelete(area.ID)} title="Eliminar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-rose transition-colors">
+                </IconButton>
+                <IconButton onClick={() => handleDelete(area.ID)} title="Eliminar"
+                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
                   <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                </button>
+                </IconButton>
               </div>
             </div>
           ))}

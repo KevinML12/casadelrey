@@ -51,11 +51,16 @@ export default function AdminSettings() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-title-l text-bg mb-1">Configuración</h1>
-        <p className="text-body-m text-bg/50">
-          Datos bancarios y de contacto del sitio. Se actualizan al instante, sin publicar de nuevo.
-        </p>
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+          <Icon name="settings" className="w-[22px] h-[22px] text-white" stroke={1.8} />
+        </div>
+        <div>
+          <h1 className="text-title-l text-bg mb-1">Configuración</h1>
+          <p className="text-body-m text-bg/50">
+            Datos bancarios y de contacto del sitio. Se actualizan al instante, sin publicar de nuevo.
+          </p>
+        </div>
       </div>
 
       {accountMissing && (
@@ -72,11 +77,13 @@ export default function AdminSettings() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-bg/50">Cargando...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {settings.map(s => (
-            <div key={s.key} className="p-4 sm:p-5 rounded-2xl bg-bg/4 border border-bg/10">
+            <div key={s.key} className="p-4 sm:p-5 hover:bg-bg/6 transition-colors">
               <div className="flex gap-2 items-end">
                 <div className="flex-1 min-w-0">
                   <Input

@@ -1,8 +1,9 @@
 // ============================================================
 //  AdminLeaders — directorio de líderes (foto + contacto), NO
 //  estático: alimenta el apartado "comunícate con tu líder" en
-//  Células (público) y en el dashboard de voluntarios. Sistema de
-//  diseño MD3 del panel admin (a propósito, no glass-light).
+//  Células (público) y en el dashboard de voluntarios. Usa el
+//  mismo sistema glass-light del resto del panel admin (ver
+//  docs/DISENO_LIQUID_GLASS_ADMIN.md).
 // ============================================================
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
@@ -142,12 +143,17 @@ export default function AdminLeaders() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-title-l text-bg mb-1">Directorio de líderes</h1>
-          <p className="text-body-m text-bg/50">
-            Foto y contacto de cada líder. Aparecen en Células (público) y en el
-            dashboard de los voluntarios para que puedan comunicarse.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="contact_page" className="w-[22px] h-[22px] text-white" stroke={1.8} />
+          </div>
+          <div>
+            <h1 className="text-title-l text-bg mb-1">Directorio de líderes</h1>
+            <p className="text-body-m text-bg/50">
+              Foto y contacto de cada líder. Aparecen en Células (público) y en el
+              dashboard de los voluntarios para que puedan comunicarse.
+            </p>
+          </div>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
           <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
@@ -156,7 +162,7 @@ export default function AdminLeaders() {
       </div>
 
       {showForm && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-bg/4 border border-bg/10">
+        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
           <h2 className="text-title-m mb-4">{editing ? 'Editar líder' : 'Agregar líder'}</h2>
           <LeaderForm
             initialData={editing}
@@ -167,15 +173,21 @@ export default function AdminLeaders() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-bg/50">Cargando...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        </div>
       ) : leaders.length === 0 ? (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-bg/10 text-bg/50">
-          Aún no hay líderes en el directorio. Agrégalos con "Nuevo líder".
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
+            <Icon name="contact_page" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
+          </div>
+          <p className="text-body-l text-bg font-medium">Aún no hay líderes en el directorio</p>
+          <p className="text-body-s text-bg/50">Agrégalos con el botón "Nuevo líder".</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {leaders.map(l => (
-            <div key={l.ID} className={`p-4 rounded-2xl border flex gap-4 items-center ${l.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15 opacity-70'}`}>
+            <div key={l.ID} className={`glass-light rounded-[20px] card-spring p-4 flex gap-4 items-center ${l.is_active ? '' : 'opacity-60'}`}>
               {l.photo_url ? (
                 <img src={l.photo_url} alt={l.name} className="w-14 h-14 rounded-full object-cover border border-bg/10 shrink-0" />
               ) : (

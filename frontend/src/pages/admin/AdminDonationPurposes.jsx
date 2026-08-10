@@ -117,12 +117,17 @@ export default function AdminDonationPurposes() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-title-l text-bg mb-1">Donaciones — Destinos</h1>
-          <p className="text-body-m text-bg/50">
-            A dónde puede dirigir su siembra un donante -- se muestran en /donate, tanto en el
-            selector de "Destino" como en las tarjetas de "¿A dónde va tu donación?".
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="account_balance" className="w-[22px] h-[22px] text-white" stroke={1.8} />
+          </div>
+          <div>
+            <h1 className="text-title-l text-bg mb-1">Donaciones — Destinos</h1>
+            <p className="text-body-m text-bg/50">
+              A dónde puede dirigir su siembra un donante -- se muestran en /donate, tanto en el
+              selector de "Destino" como en las tarjetas de "¿A dónde va tu donación?".
+            </p>
+          </div>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
           <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
@@ -131,7 +136,7 @@ export default function AdminDonationPurposes() {
       </div>
 
       {showForm && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-bg/4 border border-bg/10">
+        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
           <h2 className="text-title-m mb-4">{editing ? 'Editar destino' : 'Nuevo destino'}</h2>
           <PurposeForm
             initialData={editing}
@@ -142,15 +147,21 @@ export default function AdminDonationPurposes() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-bg/50">Cargando...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        </div>
       ) : purposes.length === 0 ? (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-bg/10 text-bg/50">
-          Aún no hay destinos registrados. Agrégalos con "Nuevo destino".
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
+            <Icon name="account_balance" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
+          </div>
+          <p className="text-body-l text-bg font-medium">Aún no hay destinos registrados</p>
+          <p className="text-body-s text-bg/50">Agrégalos con el botón "Nuevo destino".</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {purposes.map(p => (
-            <div key={p.ID} className={`p-4 rounded-2xl border flex flex-col sm:flex-row gap-4 sm:items-center ${p.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15 opacity-70'}`}>
+            <div key={p.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${p.is_active ? '' : 'opacity-60'}`}>
               <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0">
                 <Icon name={p.icon || 'church'} className="w-5 h-5" stroke={1.8} />
               </div>

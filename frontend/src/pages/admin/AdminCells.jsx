@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button from '../../components/ui/Button';
+import Button, { IconButton } from '../../components/ui/Button';
 import Input, { Select, Textarea } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Glass';
 import { CELL_TYPES } from '../../components/ui/CellCodePicker';
@@ -131,14 +131,19 @@ export default function AdminCells() {
   const typeLabel = (value) => CELL_TYPES.find(t => t.value === value)?.label || value;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-title-l text-bg mb-1">Células</h1>
-          <p className="text-body-m text-bg/50">
-            Cada célula individual (código, líder, descripción) que se muestra en la
-            página pública de Células al abrir un tipo.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="groups" className="w-[22px] h-[22px] text-white" stroke={1.8} />
+          </div>
+          <div>
+            <h1 className="text-headline-s text-bg font-black leading-tight">Células</h1>
+            <p className="text-body-m text-bg/50 mt-0.5">
+              Cada célula individual (código, líder, descripción) que se muestra en la
+              página pública de Células al abrir un tipo.
+            </p>
+          </div>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
           <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
@@ -147,7 +152,7 @@ export default function AdminCells() {
       </div>
 
       {showForm && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-bg/4 border border-bg/10">
+        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
           <h2 className="text-title-m mb-4">{editing ? 'Editar célula' : 'Nueva célula'}</h2>
           <CellForm
             initialData={editing}
@@ -159,15 +164,20 @@ export default function AdminCells() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-bg/50">Cargando...</div>
+        <div className="flex items-center justify-center py-16">
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        </div>
       ) : cells.length === 0 ? (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-bg/10 text-bg/50">
-          Aún no hay células registradas. Agrégalas con "Nueva célula".
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
+            <Icon name="groups" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
+          </div>
+          <p className="text-body-l text-bg font-medium">Sin células todavía</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {cells.map(cell => (
-            <div key={cell.ID} className={`p-4 rounded-2xl border flex flex-col sm:flex-row gap-4 sm:items-center ${cell.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15 opacity-70'}`}>
+            <div key={cell.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${cell.is_active ? '' : 'opacity-60'}`}>
               <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0 font-mono font-bold text-13">
                 {cell.code}
               </div>
@@ -183,18 +193,16 @@ export default function AdminCells() {
                 )}
               </div>
               <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
-                <button onClick={() => { setEditing({ ...cell, leader_id: cell.leader_id }); setShowForm(true); }} title="Editar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
+                <IconButton onClick={() => { setEditing({ ...cell, leader_id: cell.leader_id }); setShowForm(true); }} title="Editar">
                   <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                </button>
-                <button onClick={() => handleToggle(cell)} title={cell.is_active ? 'Ocultar' : 'Mostrar'}
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
+                </IconButton>
+                <IconButton onClick={() => handleToggle(cell)} title={cell.is_active ? 'Ocultar' : 'Mostrar'}>
                   <Icon name={cell.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
-                </button>
-                <button onClick={() => handleDelete(cell.ID)} title="Eliminar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-rose transition-colors">
+                </IconButton>
+                <IconButton onClick={() => handleDelete(cell.ID)} title="Eliminar"
+                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
                   <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                </button>
+                </IconButton>
               </div>
             </div>
           ))}

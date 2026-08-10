@@ -92,9 +92,14 @@ export default function AdminFAQs() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-title-l text-bg mb-1">Preguntas Frecuentes (FAQs)</h1>
-          <p className="text-body-m text-bg/50">Gestiona las preguntas comunes que aparecen en la página de Eventos.</p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
+            <Icon name="help_center" className="w-[22px] h-[22px] text-white" stroke={1.8} />
+          </div>
+          <div>
+            <h1 className="text-title-l text-bg mb-1">Preguntas Frecuentes (FAQs)</h1>
+            <p className="text-body-m text-bg/50">Gestiona las preguntas comunes que aparecen en la página de Eventos.</p>
+          </div>
         </div>
         <Button variant="filled" onClick={() => { setEditingFaq(null); setShowForm(!showForm); }}>
           <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
@@ -103,7 +108,7 @@ export default function AdminFAQs() {
       </div>
 
       {showForm && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-bg/4 border border-bg/10">
+        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
           <h2 className="text-title-m mb-4">{editingFaq ? 'Editar FAQ' : 'Agregar FAQ'}</h2>
           <FAQForm 
             initialData={editingFaq} 
@@ -114,16 +119,20 @@ export default function AdminFAQs() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-bg/50">Cargando...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        </div>
       ) : faqs.length === 0 ? (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-bg/10 text-bg/50">
-          No hay FAQs agregadas.
+        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
+            <Icon name="help_center" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
+          </div>
+          <p className="text-body-l text-bg font-medium">No hay FAQs agregadas</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {faqs.map(faq => (
-            <div key={faq.ID} className={`p-4 sm:p-5 rounded-2xl border ${faq.is_active ? 'bg-bg/4 border-bg/10' : 'bg-bg/8 border-bg/15'} flex flex-col sm:flex-row gap-4 items-start`}>
-              
+            <div key={faq.ID} className={`p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start hover:bg-bg/6 transition-colors ${faq.is_active ? '' : 'opacity-60'}`}>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-title-s text-bg font-medium">{faq.question}</span>

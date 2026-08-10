@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
+import Button, { IconButton } from '../../components/ui/Button';
+import StatCard from '../../components/ui/StatCard';
 import { Icon } from '../../components/ui/Glass';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
@@ -14,9 +16,7 @@ const Spinner = () => (
 
 function GoalCard({ goal, onToggle, onDelete }) {
   return (
-    <div className={`flex items-start gap-4 p-4 rounded-2xl border transition-colors ${
-      goal.completed ? 'border-bg/10 bg-bg/6 opacity-60' : 'border-bg/10 bg-bg/4 hover:bg-bg/6'
-    }`}>
+    <div className={`flex items-start gap-4 p-4 transition-colors ${goal.completed ? 'opacity-60' : 'hover:bg-bg/6'}`}>
       <button
         onClick={() => onToggle(goal)}
         className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
@@ -39,13 +39,9 @@ function GoalCard({ goal, onToggle, onDelete }) {
           </p>
         )}
       </div>
-      <button
-        onClick={() => onDelete(goal.ID)}
-        className="text-bg/50 hover:text-rose transition-colors shrink-0 mt-0.5"
-        title="Eliminar meta"
-      >
+      <IconButton variant="text" onClick={() => onDelete(goal.ID)} title="Eliminar meta" className="shrink-0 hover:text-rose">
         <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-      </button>
+      </IconButton>
     </div>
   );
 }
@@ -67,7 +63,7 @@ function NewGoalForm({ onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 p-4 rounded-2xl border border-bg/15 bg-bg/4">
+    <form onSubmit={handleSubmit} className="glass-light rounded-[24px] card-spring space-y-3 p-4">
       <Input
         value={form.title}
         onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -87,15 +83,11 @@ function NewGoalForm({ onSave, onCancel }) {
         onChange={e => setForm(p => ({ ...p, target_date: e.target.value }))}
       />
       <div className="flex gap-2 pt-1">
-        <button type="submit" disabled={loading}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+        <Button type="submit" variant="filled" disabled={loading}>
           <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Guardar'}
-        </button>
-        <button type="button" onClick={onCancel}
-          className="px-4 py-2 rounded-xl text-label-l text-bg/50 hover:text-bg hover:bg-bg/8 transition-colors">
-          Cancelar
-        </button>
+        </Button>
+        <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>
   );
@@ -188,7 +180,7 @@ export default function VolunteerDashboard() {
 
       {/* Tu líder — comunicación directa (directorio /admin/leaders) */}
       {volunteer?.assigned_leader_name ? (
-        <section className="rounded-2xl border border-bg/10 bg-bg/4 p-5">
+        <section className="glass-light rounded-[24px] card-spring p-5">
           <p className="text-label-s text-bg/50 uppercase tracking-widest mb-3">Tu líder</p>
           <div className="flex items-center gap-4">
             {myLeader?.photo_url ? (
@@ -238,33 +230,18 @@ export default function VolunteerDashboard() {
 
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-bg/10 bg-bg/4 p-4">
-          <div className="w-8 h-8 rounded-lg bg-bg flex items-center justify-center mb-3">
-            <Icon name="task_alt" className="w-[16px] h-[16px] text-white" stroke={1.8} />
-          </div>
-          <p className="text-label-s text-bg/50 uppercase tracking-widest">Pendientes</p>
-          <p className="text-headline-m text-bg font-black">{pending}</p>
-        </div>
-        <div className="rounded-2xl border border-bg/10 bg-bg/4 p-4">
-          <div className="w-8 h-8 rounded-lg bg-emerald flex items-center justify-center mb-3">
-            <Icon name="check_circle" className="w-[16px] h-[16px] text-white" stroke={1.8} />
-          </div>
-          <p className="text-label-s text-bg/50 uppercase tracking-widest">Completadas</p>
-          <p className="text-headline-m text-bg font-black">{completed}</p>
-        </div>
+        <StatCard icon="task_alt" label="Pendientes" value={pending} tint="pri" />
+        <StatCard icon="check_circle" label="Completadas" value={completed} tint="ok" />
       </div>
 
       {/* Mis metas */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-title-l text-bg font-bold">Mis metas</h2>
-          <button
-            onClick={() => setShowForm(s => !s)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity"
-          >
+          <Button variant="filled" size="sm" onClick={() => setShowForm(s => !s)}>
             <Icon name={showForm ? 'close' : 'add'} className="w-[16px] h-[16px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nueva meta'}
-          </button>
+          </Button>
         </div>
 
         {showForm && (
@@ -286,7 +263,7 @@ export default function VolunteerDashboard() {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
             {/* Pendientes primero */}
             {goals.filter(g => !g.completed).map(g => (
               <GoalCard key={g.ID} goal={g} onToggle={toggleGoal} onDelete={deleteGoal} />
