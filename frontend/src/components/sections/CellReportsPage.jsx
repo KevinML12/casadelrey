@@ -245,7 +245,7 @@ export default function CellReportsPage() {
                     </div>
                   </div>
 
-                  <Icon name={open ? 'expand_less' : 'expand_more'} className="w-[20px] h-[20px] text-bg/50 shrink-0 mt-1" stroke={1.8} />
+                  <Icon name="expand_more" className={`w-[20px] h-[20px] text-bg/50 shrink-0 mt-1 transition-transform ${open ? 'rotate-180' : ''}`} stroke={1.8} />
                 </button>
 
                 {/* Detalle expandido */}

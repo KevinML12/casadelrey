@@ -151,26 +151,29 @@ export default function AdminFAQs() {
               </div>
 
               <div className="flex shrink-0 gap-1 self-end sm:self-center">
-                <IconButton 
-                  icon={faq.is_active ? 'visibility' : 'visibility_off'} 
-                  variant="text" 
+                <IconButton
+                  variant="text"
                   title={faq.is_active ? 'Ocultar' : 'Mostrar'}
-                  onClick={() => handleToggle(faq)} 
+                  onClick={() => handleToggle(faq)}
                   className={!faq.is_active ? 'text-bg/50' : 'text-pri'}
-                />
-                <IconButton 
-                  icon="edit" 
-                  variant="text" 
+                >
+                  <Icon name={faq.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
+                </IconButton>
+                <IconButton
+                  variant="text"
                   title="Editar"
-                  onClick={() => { setEditingFaq(faq); setShowForm(true); window.scrollTo(0, 0); }} 
-                />
-                <IconButton 
-                  icon="delete" 
-                  variant="text" 
+                  onClick={() => { setEditingFaq(faq); setShowForm(true); window.scrollTo(0, 0); }}
+                >
+                  <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
+                </IconButton>
+                <IconButton
+                  variant="text"
                   title="Eliminar"
-                  onClick={() => handleDelete(faq.ID)} 
-                  className="text-err hover:bg-err/10" 
-                />
+                  onClick={() => handleDelete(faq.ID)}
+                  className="text-err hover:bg-err/10"
+                >
+                  <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
+                </IconButton>
               </div>
 
             </div>

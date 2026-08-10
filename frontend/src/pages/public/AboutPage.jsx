@@ -125,6 +125,8 @@ export default function AboutPage() {
         eyebrow="Nuestra historia"
         title="Somos Casa del Rey."
         subtitle="Una iglesia familiar en Huehuetenango, edificada célula por célula, generación tras generación."
+        photoSlot="hero_nosotros"
+        photoFallback="/images/nosotros/comunidad.jpg"
       />
 
       {/* Fundadores + estructura actual — fotografía real de la congregación

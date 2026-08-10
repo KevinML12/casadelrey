@@ -169,21 +169,21 @@ export default function VolunteerDashboard() {
     <div className="max-w-2xl mx-auto px-6 py-10 space-y-8">
 
       {/* Bienvenida */}
-      <div className="rounded-2xl overflow-hidden border border-bg/10">
-        <div className="px-6 py-5" style={{ background: '#060D24' }}>
-          <p className="text-label-m mb-1" style={{ color: 'rgba(255,255,255,.5)' }}>Bienvenido,</p>
-          <h1 className="text-headline-s text-ink font-black leading-tight">{user?.name}</h1>
+      <div className="glass-light rounded-[24px] card-spring overflow-hidden">
+        <div className="px-6 py-5">
+          <p className="text-label-m text-bg/50 mb-1">Bienvenido,</p>
+          <h1 className="text-headline-s text-bg font-black leading-tight">{user?.name}</h1>
           {dept && (
             <div className="flex items-center gap-2 mt-3">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,.12)' }}>
-                <Icon name={dept.icon} className="w-[16px] h-[16px] text-ink" stroke={1.8} />
+              <div className="w-7 h-7 rounded-lg bg-bg flex items-center justify-center">
+                <Icon name={dept.icon} className="w-[16px] h-[16px] text-white" stroke={1.8} />
               </div>
-              <span className="text-label-l text-ink font-medium">{dept.label}</span>
+              <span className="text-label-l text-bg font-medium">{dept.label}</span>
             </div>
           )}
         </div>
         {dept && (
-          <div className="glass-light rounded-[24px] card-spring px-6 py-4 border-t">
+          <div className="px-6 py-4 border-t border-bg/10">
             <p className="text-body-s text-bg/50 leading-relaxed">{dept.desc}</p>
           </div>
         )}

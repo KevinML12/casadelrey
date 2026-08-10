@@ -54,8 +54,8 @@ export default function LeaderVolunteers() {
 
       {loading ? <Spinner /> : volunteers.length === 0 ? (
         <div className="glass-light rounded-[20px] card-spring text-center py-16">
-          <div className="leading-icon mx-auto mb-3">
-            <Icon name="groups" className="w-[28px] h-[28px]" stroke={1.8} />
+          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center mx-auto mb-3">
+            <Icon name="groups" className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
           </div>
           <p className="text-body-s text-bg/50">No tienes voluntarios asignados.</p>
         </div>
