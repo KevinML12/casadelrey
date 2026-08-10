@@ -28,16 +28,19 @@ ventanas**:
    como "plantilla/IA"). El cristal reacciona al cursor (brillo especular +
    tilt 3D) y a la navegación. Todo respeta `prefers-reduced-motion`.
 
-### Un solo sistema de diseño (desde jul-2026)
+### Un solo sistema de diseño, dos variantes de luz (desde jul-2026)
 
-Antes el admin era Material Design 3 a propósito. **Ya no** — desde el
-commit `e60203d` el panel Admin/Líder/Voluntario usa el mismo material
-Liquid Glass que esta guía describe (mismos tokens, mismas clases
-`.liquid-glass`/`.card-spring`, mismo set de íconos SVG de `Glass.jsx`).
-La diferencia es de **patrones**, no de material: el admin no usa `Tilt`,
-`WindowStack` ni el collage desordenado (es un panel de datos denso, no una
-vitrina editorial), y no tiene fotos de fondo (usa halos ambientales fijos
-en vez de `ParallaxImg`). Ver la guía dedicada: `DISENO_LIQUID_GLASS_ADMIN.md`.
+Antes el admin era Material Design 3, y por un tiempo después pasó por el
+mismo material OSCURO (`.liquid-glass`) que describe este documento. Desde
+jul-2026 el panel Admin/Líder/Voluntario usa una variante **CLARA** del mismo
+lenguaje: canvas `bg-paper` (no navy), cards `.glass-light` (no
+`.liquid-glass`), tinta navy sobre blanco (no blanco sobre navy) — mismos
+radios, mismo motion, mismo set de íconos SVG de `Glass.jsx`, pero invertido
+en luz. La diferencia no es solo de **patrones** (el admin no usa `Tilt`,
+`WindowStack` ni el collage desordenado — es un panel de datos denso, no una
+vitrina editorial — y no tiene fotos de fondo, usa halos ambientales fijos en
+vez de `ParallaxImg`), sino también de **qué clase de cristal usa**. Ver la
+guía dedicada y autocontenida: `DISENO_LIQUID_GLASS_ADMIN.md`.
 
 ---
 

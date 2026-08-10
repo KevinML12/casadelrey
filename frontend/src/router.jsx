@@ -25,10 +25,16 @@ import NotFound         from './pages/NotFound';
 const DonatePage     = lazy(() => import('./pages/public/DonatePage'));
 const PaymentSuccess = lazy(() => import('./pages/public/PaymentSuccess'));
 
-function PageFallback() {
+// `panel`: el sitio público es Liquid Glass oscuro (bg-surf); el panel
+// admin/líder/voluntario es modo claro estilo Apple (bg-paper) desde
+// jul-2026 (ver ProtectedRoute.jsx, que ya distinguía esto para su propio
+// loading state). Antes esta pantalla de carga era SIEMPRE oscura, así
+// que cada navegación lazy dentro del panel mostraba un destello
+// oscuro→claro antes de revelar la página real.
+function PageFallback({ panel = false }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surf">
-      <div className="w-7 h-7 rounded-full border-2 border-outline-var border-t-pri animate-spin" />
+    <div className={`min-h-screen flex items-center justify-center ${panel ? 'bg-paper' : 'bg-surf'}`}>
+      <div className={`w-7 h-7 rounded-full border-2 border-t-pri animate-spin ${panel ? 'border-bg/12' : 'border-outline-var'}`} />
     </div>
   );
 }
@@ -92,31 +98,31 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true,             element: <Suspense fallback={<PageFallback />}><AdminIndex /></Suspense> },
-      { path: 'users',           element: <Suspense fallback={<PageFallback />}><AdminUsers /></Suspense> },
-      { path: 'blog',            element: <Suspense fallback={<PageFallback />}><AdminBlog /></Suspense> },
-      { path: 'events',          element: <Suspense fallback={<PageFallback />}><AdminEvents /></Suspense> },
-      { path: 'petitions',       element: <Suspense fallback={<PageFallback />}><AdminPetitions /></Suspense> },
-      { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><AdminVolunteers /></Suspense> },
-      { path: 'cell-reports',    element: <Suspense fallback={<PageFallback />}><AdminCellReports /></Suspense> },
-      { path: 'boletas',         element: <Suspense fallback={<PageFallback />}><AdminBoletas /></Suspense> },
-      { path: 'social',          element: <Suspense fallback={<PageFallback />}><AdminSocial /></Suspense> },
-      { path: 'announcements',   element: <Suspense fallback={<PageFallback />}><AdminAnnouncements /></Suspense> },
-      { path: 'gallery',         element: <Suspense fallback={<PageFallback />}><AdminGallery /></Suspense> },
-      { path: 'faqs',            element: <Suspense fallback={<PageFallback />}><AdminFAQs /></Suspense> },
-      { path: 'leaders',         element: <Suspense fallback={<PageFallback />}><AdminLeaders /></Suspense> },
-      { path: 'cells',           element: <Suspense fallback={<PageFallback />}><AdminCells /></Suspense> },
-      { path: 'cell-categories', element: <Suspense fallback={<PageFallback />}><AdminCellCategories /></Suspense> },
-      { path: 'volunteer-areas', element: <Suspense fallback={<PageFallback />}><AdminVolunteerAreas /></Suspense> },
-      { path: 'donation-purposes', element: <Suspense fallback={<PageFallback />}><AdminDonationPurposes /></Suspense> },
-      { path: 'activity-log',    element: <Suspense fallback={<PageFallback />}><AdminActivityLog /></Suspense> },
-      { path: 'receipts',        element: <Suspense fallback={<PageFallback />}><AdminReceipts /></Suspense> },
-      { path: 'donations',       element: <Suspense fallback={<PageFallback />}><AdminDonations /></Suspense> },
-      { path: 'hero',            element: <Suspense fallback={<PageFallback />}><AdminHero /></Suspense> },
-      { path: 'site-photos',     element: <Suspense fallback={<PageFallback />}><AdminSitePhotos /></Suspense> },
-      { path: 'settings',        element: <Suspense fallback={<PageFallback />}><AdminSettings /></Suspense> },
-      { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><AdminConnectCards /></Suspense> },
-      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><AdminProfile /></Suspense> },
+      { index: true,             element: <Suspense fallback={<PageFallback panel />}><AdminIndex /></Suspense> },
+      { path: 'users',           element: <Suspense fallback={<PageFallback panel />}><AdminUsers /></Suspense> },
+      { path: 'blog',            element: <Suspense fallback={<PageFallback panel />}><AdminBlog /></Suspense> },
+      { path: 'events',          element: <Suspense fallback={<PageFallback panel />}><AdminEvents /></Suspense> },
+      { path: 'petitions',       element: <Suspense fallback={<PageFallback panel />}><AdminPetitions /></Suspense> },
+      { path: 'volunteers',      element: <Suspense fallback={<PageFallback panel />}><AdminVolunteers /></Suspense> },
+      { path: 'cell-reports',    element: <Suspense fallback={<PageFallback panel />}><AdminCellReports /></Suspense> },
+      { path: 'boletas',         element: <Suspense fallback={<PageFallback panel />}><AdminBoletas /></Suspense> },
+      { path: 'social',          element: <Suspense fallback={<PageFallback panel />}><AdminSocial /></Suspense> },
+      { path: 'announcements',   element: <Suspense fallback={<PageFallback panel />}><AdminAnnouncements /></Suspense> },
+      { path: 'gallery',         element: <Suspense fallback={<PageFallback panel />}><AdminGallery /></Suspense> },
+      { path: 'faqs',            element: <Suspense fallback={<PageFallback panel />}><AdminFAQs /></Suspense> },
+      { path: 'leaders',         element: <Suspense fallback={<PageFallback panel />}><AdminLeaders /></Suspense> },
+      { path: 'cells',           element: <Suspense fallback={<PageFallback panel />}><AdminCells /></Suspense> },
+      { path: 'cell-categories', element: <Suspense fallback={<PageFallback panel />}><AdminCellCategories /></Suspense> },
+      { path: 'volunteer-areas', element: <Suspense fallback={<PageFallback panel />}><AdminVolunteerAreas /></Suspense> },
+      { path: 'donation-purposes', element: <Suspense fallback={<PageFallback panel />}><AdminDonationPurposes /></Suspense> },
+      { path: 'activity-log',    element: <Suspense fallback={<PageFallback panel />}><AdminActivityLog /></Suspense> },
+      { path: 'receipts',        element: <Suspense fallback={<PageFallback panel />}><AdminReceipts /></Suspense> },
+      { path: 'donations',       element: <Suspense fallback={<PageFallback panel />}><AdminDonations /></Suspense> },
+      { path: 'hero',            element: <Suspense fallback={<PageFallback panel />}><AdminHero /></Suspense> },
+      { path: 'site-photos',     element: <Suspense fallback={<PageFallback panel />}><AdminSitePhotos /></Suspense> },
+      { path: 'settings',        element: <Suspense fallback={<PageFallback panel />}><AdminSettings /></Suspense> },
+      { path: 'connect-cards',   element: <Suspense fallback={<PageFallback panel />}><AdminConnectCards /></Suspense> },
+      { path: 'profile',         element: <Suspense fallback={<PageFallback panel />}><AdminProfile /></Suspense> },
     ],
   },
 
@@ -131,7 +137,7 @@ export const router = createBrowserRouter([
     children: [
       // Sin index, /volunteer renderizaba un Outlet vacío (página en blanco).
       { index: true, element: <Navigate to="dashboard" replace /> },
-      { path: 'dashboard', element: <Suspense fallback={<PageFallback />}><VolunteerDashboard /></Suspense> },
+      { path: 'dashboard', element: <Suspense fallback={<PageFallback panel />}><VolunteerDashboard /></Suspense> },
     ],
   },
 
@@ -144,15 +150,15 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true,             element: <Suspense fallback={<PageFallback />}><LeaderIndex /></Suspense> },
-      { path: 'reports',         element: <Suspense fallback={<PageFallback />}><LeaderReports /></Suspense> },
-      { path: 'boletas',         element: <Suspense fallback={<PageFallback />}><LeaderBoletas /></Suspense> },
-      { path: 'volunteers',      element: <Suspense fallback={<PageFallback />}><LeaderVolunteers /></Suspense> },
-      { path: 'cell-directory',  element: <Suspense fallback={<PageFallback />}><LeaderCellDirectory /></Suspense> },
-      { path: 'connect-cards',   element: <Suspense fallback={<PageFallback />}><LeaderConnectCards /></Suspense> },
-      { path: 'events',          element: <Suspense fallback={<PageFallback />}><LeaderEvents /></Suspense> },
-      { path: 'my-directory',    element: <Suspense fallback={<PageFallback />}><LeaderMyProfile /></Suspense> },
-      { path: 'profile',         element: <Suspense fallback={<PageFallback />}><AdminProfile /></Suspense> },
+      { index: true,             element: <Suspense fallback={<PageFallback panel />}><LeaderIndex /></Suspense> },
+      { path: 'reports',         element: <Suspense fallback={<PageFallback panel />}><LeaderReports /></Suspense> },
+      { path: 'boletas',         element: <Suspense fallback={<PageFallback panel />}><LeaderBoletas /></Suspense> },
+      { path: 'volunteers',      element: <Suspense fallback={<PageFallback panel />}><LeaderVolunteers /></Suspense> },
+      { path: 'cell-directory',  element: <Suspense fallback={<PageFallback panel />}><LeaderCellDirectory /></Suspense> },
+      { path: 'connect-cards',   element: <Suspense fallback={<PageFallback panel />}><LeaderConnectCards /></Suspense> },
+      { path: 'events',          element: <Suspense fallback={<PageFallback panel />}><LeaderEvents /></Suspense> },
+      { path: 'my-directory',    element: <Suspense fallback={<PageFallback panel />}><LeaderMyProfile /></Suspense> },
+      { path: 'profile',         element: <Suspense fallback={<PageFallback panel />}><AdminProfile /></Suspense> },
     ],
   },
 

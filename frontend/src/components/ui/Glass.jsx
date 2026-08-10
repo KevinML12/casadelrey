@@ -188,15 +188,6 @@ export function Halos({ variant = 'hero' }) {
   );
 }
 
-/* ---------- Squircle white card with whisper shadow ---------- */
-export function Surface({ as: As = 'div', className = '', children, ...rest }) {
-  return (
-    <As className={`bg-bg border border-ink-soft shadow-card rounded-card ${className}`} {...rest}>
-      {children}
-    </As>
-  );
-}
-
 /* ---------- Pill badge (chip) — sapphire tint ---------- */
 export function Badge({ children, icon, className = '', tone = 'celeste' }) {
   const styles = tone === 'celeste'

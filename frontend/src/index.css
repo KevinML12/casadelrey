@@ -203,15 +203,6 @@ html.lenis, html.lenis body { height: auto; }
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
 
-  /* Cristal flotante (cards elevadas, modales) — más opaco, sombra mayor */
-  .glass-strong {
-    background: rgba(255, 255, 255, 0.08);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-            backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
   /* Glass para el Navbar flotante — cristal claro escarchado (mockup Frame 1):
      blanco translúcido con tinta navy encima. Al scroll sube la opacidad
      para mantener legibilidad sobre cualquier contenido. */
@@ -228,32 +219,25 @@ html.lenis, html.lenis body { height: auto; }
     background: rgba(255, 255, 255, 0.8);
   }
 
-  /* Highlight interno tipo Liquid (top edge bright) */
-  .glass-sheen { position: relative; }
-  .glass-sheen::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-
   /* ── LIQUID GLASS — MATERIALES (Apple HIG) ──
-     Dos variantes, misma regla de cuándo usar cada una en TODO el sitio
-     (público y admin):
-     · .liquid-glass  → el material por defecto. Elementos sobre el canvas
-                        navy, sobre fotos oscuras, o sobre los halos
-                        ambientales del panel admin. Texto blanco.
-     · .glass-light   → cristal CLARO escarchado, texto navy. Se reserva
-                        para UN acento por página — nunca material
-                        dominante. Regla: si hay foto de fondo (público),
-                        va sobre la foto; si no hay foto (admin), va sobre
-                        el halo más brillante de la sección. El modelado de
-                        luz (gradiente diagonal + bisel asimétrico, igual
-                        que .liquid-glass) es lo que lo hace leer como
-                        vidrio real y no como una caja blanca lechosa —
-                        NUNCA bajar a un rgba() plano sin gradiente.
+     Dos variantes, con reglas DISTINTAS según el área (ver
+     docs/DISENO_LIQUID_GLASS.md y docs/DISENO_LIQUID_GLASS_ADMIN.md):
+     · .liquid-glass  → material del SITIO PÚBLICO (oscuro). Elementos sobre
+                        el canvas navy o sobre fotos oscuras. Texto blanco.
+                        En el panel admin/líder/voluntario ya NO se usa (ese
+                        panel es claro desde jul-2026) — si aparece ahí, es
+                        un resto de una versión anterior, cámbialo a
+                        .glass-light.
+     · .glass-light   → cristal CLARO escarchado, texto navy. En el SITIO
+                        PÚBLICO se reserva para UN acento por página — nunca
+                        material dominante, va sobre una foto clara. En el
+                        PANEL ADMIN/LÍDER/VOLUNTARIO es al revés: es EL
+                        material dominante de toda card (no hay fotos, va
+                        sobre los halos ambientales de cada layout). El
+                        modelado de luz (gradiente diagonal + bisel
+                        asimétrico, igual que .liquid-glass) es lo que lo
+                        hace leer como vidrio real y no como una caja blanca
+                        lechosa — NUNCA bajar a un rgba() plano sin gradiente.
      Ambos con lensing de borde: highlight superior + hairline inferior,
      que es lo que da la lectura de "vidrio curvo" del material de Apple. */
 
@@ -372,21 +356,6 @@ html.lenis, html.lenis body { height: auto; }
       0 14px 30px -14px rgba(10, 21, 38, 0.22);
   }
 
-  /* .liquid-btn: Botones secundarios estilo cristal. */
-  .liquid-btn {
-    background: rgba(255, 255, 255, 0.1);
-    -webkit-backdrop-filter: blur(20px);
-            backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    color: white;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .liquid-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
   /* Brillo especular interactivo — sigue al cursor vía --spec-x/--spec-y
      (seteadas con pointermove/touchmove, ver useGlassSpecular.js).
      Modelo de una gota de agua real fotografiada: NO es un solo punto de
@@ -465,13 +434,6 @@ html.lenis, html.lenis body { height: auto; }
     will-change: transform;
   }
 
-  /* Surface sólida elevada (no translúcida) */
-  .surface {
-    background: var(--bg);
-    border: 1px solid var(--ink-soft);
-    box-shadow: var(--sh-card);
-  }
-
   /* Pill button base — squircle 12, spring interaction */
   .btn-spring {
     transition: transform 0.4s var(--ease-spring),
@@ -503,8 +465,8 @@ html.lenis, html.lenis body { height: auto; }
      tiene una discontinuidad donde la recta toca el arco; el squircle la
      elimina y el borde se ve "líquido". Fallback silencioso al radio normal. */
   @supports (corner-shape: squircle) {
-    .liquid-glass, .glass-light, .glass-nav, .glass, .glass-strong,
-    .surface, .card-spring, .input-squircle {
+    .liquid-glass, .glass-light, .glass-nav, .glass,
+    .card-spring, .input-squircle {
       corner-shape: squircle;
     }
   }
@@ -650,7 +612,7 @@ html.lenis, html.lenis body { height: auto; }
    ACCESIBILIDAD — fallbacks del material (Apple siempre los incluye)
 ═══════════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-transparency: reduce) {
-  .glass, .glass-strong, .liquid-glass, .liquid-btn {
+  .glass, .liquid-glass {
     -webkit-backdrop-filter: none;
             backdrop-filter: none;
     background: rgba(15, 25, 43, 0.97);

@@ -24,7 +24,6 @@ export default function ModalWrapper({ children, onClose }) {
       >
         <div
           className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"
-          style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
           data-lenis-prevent
         >
           {children}

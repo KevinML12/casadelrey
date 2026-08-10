@@ -1,6 +1,15 @@
 # Design Spec — Casa del Rey
 > Referencia completa para diseño de UI/UX · Mayo 2026
 
+> **OBSOLETO — no usar como referencia de diseño.** Este documento describe un
+> sistema anterior (Material Design 3, paleta azul marino `#0D1B4B`, íconos
+> Material Symbols) reemplazado en julio de 2026 por **Liquid Glass**. El
+> sistema vigente está documentado en
+> [`docs/DISENO_LIQUID_GLASS.md`](docs/DISENO_LIQUID_GLASS.md) (sitio público)
+> y [`docs/DISENO_LIQUID_GLASS_ADMIN.md`](docs/DISENO_LIQUID_GLASS_ADMIN.md)
+> (panel admin/líder/voluntario). Este archivo se conserva solo como
+> referencia histórica del pedido original de mayo 2026.
+
 ---
 
 ## Índice

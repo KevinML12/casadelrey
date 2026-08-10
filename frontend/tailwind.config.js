@@ -70,15 +70,6 @@ export default {
         'inv-surf':    '#FFFFFF',
         'inv-on-surf': '#0A1526',
         'inv-pri':     'var(--celeste)',
-
-        // ── DARK ALIASES preservados (algunas páginas todavía los usan) ─
-        // Mapean a tokens light para no romper visual mientras migramos.
-        'abyss':       '#FFFFFF',
-        'abyss2':      '#FAFBFD',
-        'electric':    '#60A5FA',
-        'navy':        '#0A1526',
-        'navy-mid':    '#1E293B',
-        'cream':       '#FAFBFD',
       },
 
       fontFamily: {

@@ -2,6 +2,15 @@
 > Qué hace cada pantalla, qué muestra, qué acciones tiene.
 > Sin colores ni tipografía — eso se define aparte.
 
+> **OBSOLETO — no usar como referencia de diseño.** Este documento acompañaba a
+> `DESIGN_SPEC.md` (Material Design 3, mayo 2026), reemplazado en julio de 2026
+> por **Liquid Glass**. El sistema vigente está documentado en
+> [`docs/DISENO_LIQUID_GLASS.md`](docs/DISENO_LIQUID_GLASS.md) (sitio público)
+> y [`docs/DISENO_LIQUID_GLASS_ADMIN.md`](docs/DISENO_LIQUID_GLASS_ADMIN.md)
+> (panel admin/líder/voluntario). La lógica de pantallas (qué muestra cada
+> una, qué acciones tiene) sigue siendo mayormente válida como inventario de
+> funcionalidad — lo obsoleto es cualquier detalle visual/de componentes.
+
 ---
 
 ## Índice
