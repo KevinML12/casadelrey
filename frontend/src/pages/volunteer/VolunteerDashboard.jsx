@@ -3,9 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import StatCard from '../../components/ui/StatCard';
-import { Icon } from '../../components/ui/Glass';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const Spinner = () => (
@@ -22,9 +21,7 @@ function GoalCard({ goal, onToggle, onDelete }) {
         className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
           goal.completed ? 'bg-celeste-soft border-transparent' : 'border-bg/10 hover:border-celeste'
         }`}
-      >
-        {goal.completed && <Icon name="check" className="w-[14px] h-[14px] text-celeste-hov" stroke={1.8} />}
-      </button>
+      />
       <div className="flex-1 min-w-0">
         <p className={`text-body-m font-medium ${goal.completed ? 'line-through text-bg/50' : 'text-bg'}`}>
           {goal.title}
@@ -33,15 +30,17 @@ function GoalCard({ goal, onToggle, onDelete }) {
           <p className="text-body-s text-bg/50 mt-1 leading-relaxed">{goal.description}</p>
         )}
         {goal.target_date && (
-          <p className="text-label-s text-bg/50 mt-2 flex items-center gap-1">
-            <Icon name="event" className="w-[12px] h-[12px]" stroke={1.8} />
+          <p className="text-label-s text-bg/50 mt-2">
             {new Date(goal.target_date + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
           </p>
         )}
       </div>
-      <IconButton variant="text" onClick={() => onDelete(goal.ID)} title="Eliminar meta" className="shrink-0 hover:text-rose">
-        <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-      </IconButton>
+      <button
+        onClick={() => onDelete(goal.ID)}
+        className="shrink-0 text-13 font-semibold text-bg/55 hover:text-rose transition-colors"
+      >
+        Eliminar
+      </button>
     </div>
   );
 }
@@ -84,7 +83,6 @@ function NewGoalForm({ onSave, onCancel }) {
       />
       <div className="flex gap-2 pt-1">
         <Button type="submit" variant="filled" disabled={loading}>
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Guardar'}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -143,7 +141,7 @@ export default function VolunteerDashboard() {
   };
 
   const deptArea = volunteer?.department ? areas.find(a => a.value === volunteer.department) : null;
-  const dept = deptArea ? { label: deptArea.title, icon: deptArea.icon, desc: deptArea.desc } : null;
+  const dept = deptArea ? { label: deptArea.title, desc: deptArea.desc } : null;
 
   // "Tu líder": cruza el nombre del líder asignado con el directorio
   // público (/leaders, curado en /admin/leaders) para foto y contacto.
@@ -164,9 +162,6 @@ export default function VolunteerDashboard() {
           <h1 className="text-headline-s text-bg font-black leading-tight">{user?.name}</h1>
           {dept && (
             <div className="flex items-center gap-2 mt-3">
-              <div className="w-7 h-7 rounded-lg bg-bg flex items-center justify-center">
-                <Icon name={dept.icon} className="w-[16px] h-[16px] text-white" stroke={1.8} />
-              </div>
               <span className="text-label-l text-bg font-medium">{dept.label}</span>
             </div>
           )}
@@ -187,8 +182,8 @@ export default function VolunteerDashboard() {
               <img src={myLeader.photo_url} alt={volunteer.assigned_leader_name}
                 className="w-14 h-14 rounded-full object-cover border border-bg/10 shrink-0" />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/10 grid place-items-center shrink-0">
-                <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
+              <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/10 grid place-items-center shrink-0 text-title-m font-bold text-bg/50">
+                {(volunteer.assigned_leader_name || '?')[0].toUpperCase()}
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -202,14 +197,13 @@ export default function VolunteerDashboard() {
                   target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity"
                 >
-                  <Icon name="chat" className="w-[16px] h-[16px]" stroke={1.8} />
                   WhatsApp
                 </a>
               )}
               {myLeader?.email && (
                 <a href={`mailto:${myLeader.email}`} title={myLeader.email}
-                  className="grid place-items-center w-9 h-9 rounded-full border border-bg/10 text-bg/50 hover:text-bg hover:border-bg/20 transition-colors">
-                  <Icon name="mail" className="w-[16px] h-[16px]" stroke={1.8} />
+                  className="flex items-center px-4 py-2 rounded-full border border-bg/10 text-bg/50 text-label-m font-semibold hover:text-bg hover:border-bg/20 transition-colors truncate max-w-[160px]">
+                  {myLeader.email}
                 </a>
               )}
             </div>
@@ -239,7 +233,6 @@ export default function VolunteerDashboard() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-title-l text-bg font-bold">Mis metas</h2>
           <Button variant="filled" size="sm" onClick={() => setShowForm(s => !s)}>
-            <Icon name={showForm ? 'close' : 'add'} className="w-[16px] h-[16px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nueva meta'}
           </Button>
         </div>
@@ -255,7 +248,6 @@ export default function VolunteerDashboard() {
 
         {loading ? <Spinner /> : goals.length === 0 ? (
           <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-12 text-bg/50 gap-3">
-            <Icon name="task_alt" className="w-[40px] h-[40px]" stroke={1.8} />
             <p className="text-body-m">Aún no tienes metas registradas.</p>
             <button onClick={() => setShowForm(true)}
               className="text-label-m text-bg hover:underline font-medium">

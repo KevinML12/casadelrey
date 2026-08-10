@@ -3,7 +3,6 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
 
 const STATUS_CHIP = {
   pendiente:      { label: 'Pendiente',      cls: 'bg-bg/8 text-bg/50' },
@@ -54,9 +53,6 @@ export default function LeaderVolunteers() {
 
       {loading ? <Spinner /> : volunteers.length === 0 ? (
         <div className="glass-light rounded-[20px] card-spring text-center py-16">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center mx-auto mb-3">
-            <Icon name="groups" className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-s text-bg/50">No tienes voluntarios asignados.</p>
         </div>
       ) : (
@@ -83,7 +79,6 @@ export default function LeaderVolunteers() {
                       onClick={() => setCreateModal(v.ID)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg text-white text-label-m font-medium hover:opacity-90 transition-opacity shrink-0"
                     >
-                      <Icon name="person_add" className="w-[14px] h-[14px]" stroke={1.8} />
                       Crear usuario
                     </button>
                   )}

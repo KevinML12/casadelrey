@@ -11,7 +11,6 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 export default function LeaderMyProfile() {
@@ -77,9 +76,6 @@ export default function LeaderMyProfile() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-4 mb-2">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="badge" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
         <div>
           <h1 className="text-headline-s text-bg font-black leading-tight">Mi ficha de directorio</h1>
           <p className="text-body-s text-bg/50 mt-0.5">Lo que ven de ti en Células y el dashboard de voluntarios.</p>
@@ -89,7 +85,6 @@ export default function LeaderMyProfile() {
       <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-label-m font-medium mb-6 ${
         form.is_active ? 'bg-emerald text-white' : 'bg-bg/8 text-bg/60'
       }`}>
-        <Icon name={form.is_active ? 'visibility' : 'schedule'} className="w-[14px] h-[14px]" stroke={1.8} />
         {form.is_active ? 'Visible en el sitio' : 'Pendiente de revisión por un admin'}
       </span>
 
@@ -98,13 +93,12 @@ export default function LeaderMyProfile() {
           {form.photo_url ? (
             <img src={form.photo_url} alt={form.name} className="w-16 h-16 rounded-full object-cover border border-bg/10" />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/10 grid place-items-center">
-              <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
+            <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/10 grid place-items-center text-body-l font-bold text-bg/50">
+              {(form.name || '?')[0].toUpperCase()}
             </div>
           )}
           <label className="cursor-pointer">
             <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-bg/10 text-body-s text-bg hover:border-bg/20 transition-colors">
-              <Icon name="photo_camera" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : form.photo_url ? 'Cambiar foto' : 'Subir foto'}
             </span>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
@@ -125,7 +119,6 @@ export default function LeaderMyProfile() {
 
         <div className="flex pt-2 border-t border-bg/10">
           <Button type="submit" variant="filled" disabled={saving || uploading} className="justify-center">
-            <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {saving ? 'Guardando…' : 'Guardar cambios'}
           </Button>
         </div>

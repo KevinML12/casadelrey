@@ -6,7 +6,6 @@
 // ============================================================
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
-import { Icon } from '../../components/ui/Glass';
 import Chip from '../../components/ui/Chip';
 
 const Spinner = () => (
@@ -65,9 +64,6 @@ function EventRSVPs({ eventId }) {
       <div className="bg-bg/4 border border-bg/10 rounded-xl overflow-hidden divide-y divide-bg/8">
         {rsvps.map(r => (
           <div key={r.ID} className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-bg flex items-center justify-center shrink-0">
-              <Icon name="person" className="w-[14px] h-[14px] text-white" stroke={1.8} />
-            </div>
             <div className="flex-1 min-w-0">
               <p className="text-body-s text-bg font-medium">{r.name}</p>
               <p className="text-label-s text-bg/50">{r.email}{r.phone ? ` · ${r.phone}` : ''}</p>
@@ -95,9 +91,6 @@ export default function LeaderEvents() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="calendar_month" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
         <div>
           <h1 className="text-headline-s text-bg font-black leading-tight">Eventos</h1>
           <p className="text-body-s text-bg/50 mt-0.5">Consulta quién se registró — crear o editar eventos lo hace un admin.</p>
@@ -106,9 +99,6 @@ export default function LeaderEvents() {
 
       {loading ? <Spinner /> : events.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="calendar_month" className="w-[32px] h-[32px]" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin eventos programados.</p>
         </div>
       ) : (
@@ -124,18 +114,14 @@ export default function LeaderEvents() {
                   <p className="text-body-l text-bg font-medium mb-1">{ev.title}</p>
                   <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-bg/50">
                     {ev.date && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="calendar_today" className="w-[14px] h-[14px]" stroke={1.8} />
+                      <span>
                         {new Date(ev.date + 'T12:00:00').toLocaleDateString('es-ES', {
                           weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
                         })}
                       </span>
                     )}
                     {ev.location && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="location_on" className="w-[14px] h-[14px]" stroke={1.8} />
-                        {ev.location}
-                      </span>
+                      <span>{ev.location}</span>
                     )}
                   </div>
                   {ev.capacity > 0 && (
@@ -144,8 +130,8 @@ export default function LeaderEvents() {
                     </Chip>
                   )}
                 </div>
-                <span className="text-bg/40 shrink-0" style={{ transition: 'transform .2s', transform: expanded === ev.ID ? 'rotate(180deg)' : '' }}>
-                  <Icon name="expand_more" className="w-[18px] h-[18px]" stroke={1.8} />
+                <span className="text-13 font-semibold text-bg/50 shrink-0 mt-1 whitespace-nowrap">
+                  {expanded === ev.ID ? 'Ver menos' : 'Ver más'}
                 </span>
               </div>
               {expanded === ev.ID && <EventRSVPs eventId={ev.ID} />}
