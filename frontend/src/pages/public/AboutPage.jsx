@@ -145,11 +145,11 @@ export default function AboutPage() {
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
               <PhotoHeaderCard photo={fundadoresCardImg} glass="standard" objectPosition="center 15%">
-                <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores fundadores</p>
-                <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
+                <p className="text-13 font-bold text-white/60 uppercase tracking-tightish mb-2">Pastores fundadores</p>
+                <h3 className="text-24 font-bold text-white tracking-tight leading-tight">
                   José de León y Desidería López
                 </h3>
-                <p className="mt-4 text-15 text-bg/60 leading-relaxed">
+                <p className="mt-4 text-15 text-white/70 leading-relaxed">
                   Sembraron la visión original de Casa del Rey — los cimientos sobre los que la iglesia sigue edificando hoy.
                 </p>
               </PhotoHeaderCard>
@@ -157,11 +157,11 @@ export default function AboutPage() {
 
             <RevealItem>
               <PhotoHeaderCard photo={pastoresCelulasCardImg} glass="featured">
-                <p className="text-13 font-bold text-bg/50 uppercase tracking-tightish mb-2">Pastores</p>
-                <h3 className="text-24 font-bold text-bg tracking-tight leading-tight">
+                <p className="text-13 font-bold text-white/60 uppercase tracking-tightish mb-2">Pastores</p>
+                <h3 className="text-24 font-bold text-white tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
                 </h3>
-                <p className="mt-4 text-15 text-bg/60 leading-relaxed">
+                <p className="mt-4 text-15 text-white/70 leading-relaxed">
                   Junto a un equipo pastoral, cubren las células de varones, prejuveniles y la red Mujeres de Palabra.
                 </p>
               </PhotoHeaderCard>
@@ -185,8 +185,8 @@ export default function AboutPage() {
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
               <PhotoHeaderCard photo={misionCardImg} glass="standard">
-                <h3 className="text-20 font-bold text-bg mb-3">Misión</h3>
-                <p className="text-16 text-bg/70 leading-relaxed">
+                <h3 className="text-20 font-bold text-white mb-3">Misión</h3>
+                <p className="text-16 text-white/75 leading-relaxed">
                   Somos una iglesia cristiana familiar, enfocada en cumplir la gran comisión de
                   Jesucristo: ir y hacer discípulos a las naciones, formando líderes capaces de
                   reproducir la obra de Dios.
@@ -195,8 +195,8 @@ export default function AboutPage() {
             </RevealItem>
             <RevealItem>
               <PhotoHeaderCard photo={visionCardImg} glass="featured">
-                <h3 className="text-20 font-bold text-bg mb-3">Visión</h3>
-                <p className="text-16 text-bg/70 leading-relaxed">
+                <h3 className="text-20 font-bold text-white mb-3">Visión</h3>
+                <p className="text-16 text-white/75 leading-relaxed">
                   Ser una iglesia de restauración familiar, punta de lanza, que proclama la
                   verdad de la Palabra de Dios bajo el poder del Espíritu Santo.
                 </p>
@@ -455,8 +455,8 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
             <PhotoHeaderCard photo={visitanosCardImg} glass="standard">
-              <h3 className="text-20 font-bold text-bg mb-3">Visítanos</h3>
-              <p className="text-15 text-bg/70 leading-relaxed mb-6">
+              <h3 className="text-20 font-bold text-white mb-3">Visítanos</h3>
+              <p className="text-15 text-white/75 leading-relaxed mb-6">
                 7ª. Calle 12-66 zona 4,<br />
                 carretera a las Ruinas de Zaculeu,<br />
                 Huehuetenango
@@ -465,7 +465,7 @@ export default function AboutPage() {
                 href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 text-14 font-bold text-bg hover:text-bg/70 transition-colors"
+                className="inline-flex items-center gap-2.5 text-14 font-bold text-white hover:text-white/70 transition-colors"
               >
                 Cómo llegar
               </a>
@@ -473,9 +473,9 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal from="right" delay={0.08}>
-            <PhotoHeaderCard photo={podcastCardImg} glass="standard" contentClassName="justify-center">
-              <h3 className="text-20 font-bold text-bg mb-3">Podcast Inusual Youth</h3>
-              <p className="text-15 text-bg/70 leading-relaxed">
+            <PhotoHeaderCard photo={podcastCardImg} glass="standard">
+              <h3 className="text-20 font-bold text-white mb-3">Podcast Inusual Youth</h3>
+              <p className="text-15 text-white/75 leading-relaxed">
                 92.9 FM Radio Stereo Cumbre<br />
                 Viernes · 3:00 PM
               </p>
