@@ -817,7 +817,7 @@ function Ubicacion({ bg }) {
         <Reveal className="text-center mb-14">
           <Eyebrow>Visítanos</Eyebrow>
           <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)' }}>
-            Te esperamos en casa.
+            Te esperamos <span className="font-serif font-normal">en casa</span>.
           </h2>
         </Reveal>
 

@@ -138,7 +138,7 @@ export default function AboutPage() {
           <Reveal className="mb-12">
             <Eyebrow>Identidad</Eyebrow>
             <h2 className="display-mega text-white mt-4" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
-              Nuestra historia.
+              Nuestra <span className="font-serif font-normal">historia</span>.
             </h2>
           </Reveal>
 
