@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
-import { IconButton } from '../../components/ui/Button';
 import Chip, { FilterChip } from '../../components/ui/Chip';
-import { Icon } from '../../components/ui/Glass';
 
 const CATEGORIES = {
   primera_vez:  { label: 'Primera vez',    color: 'secondary' },
@@ -73,26 +71,21 @@ export default function AdminConnectCards() {
 
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="contact_page" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Conéctate</h1>
-            <p className="text-body-s text-bg/50 mt-0.5">
-              {total} registros · {counts.nuevo || 0} sin contactar · {counts.contactado || 0} en seguimiento · {counts.integrado || 0} integrados
-            </p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black leading-tight">Conéctate</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">
+            {total} registros · {counts.nuevo || 0} sin contactar · {counts.contactado || 0} en seguimiento · {counts.integrado || 0} integrados
+          </p>
         </div>
       </div>
 
       {/* Filter chips */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        <FilterChip selected={statusFilter === ''} onClick={() => setStatusFilter('')} icon="apps">
+        <FilterChip selected={statusFilter === ''} onClick={() => setStatusFilter('')}>
           Todas
         </FilterChip>
         {STATUS_FLOW.map(s => (
-          <FilterChip key={s} selected={statusFilter === s} icon="circle"
+          <FilterChip key={s} selected={statusFilter === s}
             count={counts[s] || 0} onClick={() => setStatusFilter(s)}>
             {STATUS_LABEL[s]}
           </FilterChip>
@@ -106,9 +99,6 @@ export default function AdminConnectCards() {
         </div>
       ) : cards.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="contact_page" className="w-[32px] h-[32px]" stroke={1.8} />
-          </div>
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin tarjetas</p>
             <p className="text-body-s text-bg/50 mt-1">
@@ -124,10 +114,6 @@ export default function AdminConnectCards() {
             return (
               <div key={card.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
-                <div className="w-10 h-10 rounded-xl bg-bg/8 flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon name="person" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
-                </div>
-
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-body-l text-bg font-medium">{card.name}</span>
@@ -135,22 +121,9 @@ export default function AdminConnectCards() {
                     <Chip color={STATUS_COLOR[card.status]}>{STATUS_LABEL[card.status]}</Chip>
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-bg/50">
-                    {card.phone && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="phone" className="w-[14px] h-[14px]" stroke={1.8} />{card.phone}
-                      </span>
-                    )}
-                    {card.email && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="mail" className="w-[14px] h-[14px]" stroke={1.8} />{card.email}
-                      </span>
-                    )}
-                    {card.how_found && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="campaign" className="w-[14px] h-[14px]" stroke={1.8} />
-                        {HOW_FOUND[card.how_found] || card.how_found}
-                      </span>
-                    )}
+                    {card.phone && <span>{card.phone}</span>}
+                    {card.email && <span>{card.email}</span>}
+                    {card.how_found && <span>{HOW_FOUND[card.how_found] || card.how_found}</span>}
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap mt-3">
@@ -183,10 +156,9 @@ export default function AdminConnectCards() {
                     {card.CreatedAt ? new Date(card.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
                   </p>
                   {isAdmin && (
-                    <IconButton onClick={() => deleteCard(card.ID)} title="Eliminar"
-                      className="text-bg/50 hover:text-err hover:bg-err-con transition-all">
-                      <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-                    </IconButton>
+                    <button onClick={() => deleteCard(card.ID)} className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors">
+                      Eliminar
+                    </button>
                   )}
                 </div>
               </div>

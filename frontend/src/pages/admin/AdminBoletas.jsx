@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Input, { Textarea } from '../../components/ui/Input';
 import Chip, { FilterChip } from '../../components/ui/Chip';
-import { Icon } from '../../components/ui/Glass';
 
 const CATEGORIES = [
   { value: 'convertido',   label: 'Convertido',   color: 'tertiary',  icon: 'church' },
@@ -25,14 +24,9 @@ function FieldLabel({ children, required }) {
   );
 }
 
-function SectionHeader({ icon, children }) {
+function SectionHeader({ children }) {
   return (
-    <div className="flex items-center gap-2 mb-4">
-      <div className="w-7 h-7 rounded-lg bg-bg flex items-center justify-center">
-        <Icon name={icon} className="w-[14px] h-[14px] text-white" stroke={1.8} />
-      </div>
-      <p className="text-label-l text-bg font-semibold">{children}</p>
-    </div>
+    <p className="text-label-l text-bg font-semibold mb-4">{children}</p>
   );
 }
 
@@ -82,7 +76,7 @@ function BoletaForm({ onSave, onCancel }) {
 
       {/* Quien invitó */}
       <div className="space-y-3">
-        <SectionHeader icon="person">Quien invitó</SectionHeader>
+        <SectionHeader>Quien invitó</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Input label="Nombre" value={form.inviter_name} onChange={set('inviter_name')} placeholder="Nombre del invitador" />
@@ -95,7 +89,7 @@ function BoletaForm({ onSave, onCancel }) {
 
       {/* Invitado */}
       <div className="space-y-3">
-        <SectionHeader icon="person_add">Invitado</SectionHeader>
+        <SectionHeader>Invitado</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Input label={<>Nombre<span className="text-rose ml-0.5">*</span></>} value={form.guest_name} onChange={set('guest_name')} placeholder="Nombre del invitado" required />
@@ -116,7 +110,6 @@ function BoletaForm({ onSave, onCancel }) {
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Guardar boleta'}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -166,9 +159,6 @@ export default function AdminBoletas() {
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="person_add" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Boletas de Nuevos</h1>
             <p className="text-body-s text-bg/50 mt-0.5">
@@ -178,7 +168,6 @@ export default function AdminBoletas() {
         </div>
         <div className="flex gap-2">
           <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-            <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
             {showForm ? 'Cancelar' : 'Nueva boleta'}
           </Button>
         </div>
@@ -213,9 +202,6 @@ export default function AdminBoletas() {
         </div>
       ) : boletas.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="person_add" className="w-[32px] h-[32px]" stroke={1.8} />
-          </div>
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin boletas</p>
             <p className="text-body-s text-bg/50 mt-1">
@@ -230,12 +216,6 @@ export default function AdminBoletas() {
             return (
               <div key={b.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
 
-                {/* Leading icon — mismo mapeo de color que el Chip de la categoria */}
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5
-                  ${cat ? (cat.color === 'secondary' ? 'bg-bg' : 'bg-celeste') : 'bg-bg/8'}`}>
-                  <Icon name={cat?.icon || 'person'} className={`w-[18px] h-[18px] ${cat ? 'text-white' : 'text-bg/50'}`} stroke={1.8} />
-                </div>
-
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -244,18 +224,13 @@ export default function AdminBoletas() {
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-bg/50">
                     {b.guest_phone && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="phone" className="w-[14px] h-[14px]" stroke={1.8} />{b.guest_phone}
-                      </span>
+                      <span>{b.guest_phone}</span>
                     )}
                     {b.address && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="location_on" className="w-[14px] h-[14px]" stroke={1.8} />{b.address}
-                      </span>
+                      <span>{b.address}</span>
                     )}
                     {b.inviter_name && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="person" className="w-[14px] h-[14px]" stroke={1.8} />
+                      <span>
                         Invitado por <strong className="text-bg ml-1">{b.inviter_name}</strong>
                         {b.inviter_phone && ` · ${b.inviter_phone}`}
                       </span>
@@ -274,10 +249,10 @@ export default function AdminBoletas() {
                     {b.date ? new Date(b.date + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
                   </p>
                   {isAdmin && (
-                    <IconButton onClick={() => deleteBoleta(b.ID)} title="Eliminar"
-                      className="text-bg/50 hover:text-rose hover:bg-rose/8 transition-all">
-                      <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-                    </IconButton>
+                    <button onClick={() => deleteBoleta(b.ID)}
+                      className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors">
+                      Eliminar
+                    </button>
                   )}
                 </div>
               </div>

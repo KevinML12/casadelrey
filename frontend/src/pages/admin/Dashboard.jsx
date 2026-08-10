@@ -9,7 +9,6 @@ import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
 import Button from '../../components/ui/Button';
 import StatCard from '../../components/ui/StatCard';
-import { Icon } from '../../components/ui/Glass';
 
 const METHOD_LABEL = {
   transferencia: 'Transferencia',
@@ -17,10 +16,9 @@ const METHOD_LABEL = {
   tigo_money:    'Tigo Money', // histórico (método removido)
 };
 
-function SectionLabel({ icon, children }) {
+function SectionLabel({ children }) {
   return (
     <div className="flex items-center gap-2 mb-4">
-      <Icon name={icon} className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
       <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">{children}</p>
       <div className="flex-1 h-px bg-bg/10 ml-2" />
     </div>
@@ -31,10 +29,10 @@ function SectionLabel({ icon, children }) {
 // grande en vez de una grilla pareja de cajas sueltas. .glass-light (no
 // .glass-nav — esa es la clase del navbar público y NUNCA recibe el brillo
 // al cursor, useGlassSpecular.js solo escucha .liquid-glass/.glass-light).
-function SectionContainer({ icon, label, children }) {
+function SectionContainer({ label, children }) {
   return (
     <div className="glass-light rounded-[32px] card-spring p-6 md:p-7 mb-8">
-      <SectionLabel icon={icon}>{label}</SectionLabel>
+      <SectionLabel>{label}</SectionLabel>
       {children}
     </div>
   );
@@ -77,7 +75,6 @@ function TrendChart({ data, loading }) {
     <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 lg:col-span-2 min-w-0">
       <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <Icon name="trending_up" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
           <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Tendencia · últimos 30 días</p>
         </div>
         <div className="flex items-center gap-4 text-13">
@@ -127,10 +124,10 @@ function TrendChart({ data, loading }) {
 }
 
 const QUICK_ACTIONS = [
-  { to: '/admin/events',    icon: 'calendar_month',      label: 'Nuevo evento' },
-  { to: '/admin/blog',      icon: 'article',              label: 'Nuevo post' },
-  { to: '/admin/receipts',  icon: 'receipt_long',         label: 'Comprobantes', badgeKey: 'pending_receipts' },
-  { to: '/admin/petitions', icon: 'volunteer_activism',   label: 'Peticiones',   badgeKey: 'unread_petitions' },
+  { to: '/admin/events',    label: 'Nuevo evento' },
+  { to: '/admin/blog',      label: 'Nuevo post' },
+  { to: '/admin/receipts',  label: 'Comprobantes', badgeKey: 'pending_receipts' },
+  { to: '/admin/petitions', label: 'Peticiones',   badgeKey: 'unread_petitions' },
 ];
 
 // Companero del trend chart en el bento del dashboard — el "objeto" visual
@@ -139,26 +136,21 @@ const QUICK_ACTIONS = [
 function QuickActions({ notifs }) {
   return (
     <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 flex flex-col">
-      <div className="flex items-center gap-2 mb-4">
-        <Icon name="spark" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
+      <div className="mb-4">
         <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Accesos rápidos</p>
       </div>
       <div className="flex-1 flex flex-col gap-1">
-        {QUICK_ACTIONS.map(({ to, icon, label, badgeKey }) => {
+        {QUICK_ACTIONS.map(({ to, label, badgeKey }) => {
           const badge = badgeKey ? (notifs?.[badgeKey] || 0) : 0;
           return (
             <Link key={to} to={to}
               className="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-bg/6 transition-colors group">
-              <div className="w-9 h-9 rounded-xl bg-bg/8 group-hover:bg-bg flex items-center justify-center shrink-0 transition-colors">
-                <Icon name={icon} className="w-[16px] h-[16px] text-bg group-hover:text-white transition-colors" stroke={1.8} />
-              </div>
               <span className="flex-1 text-14 text-bg font-semibold">{label}</span>
               {badge > 0 && (
                 <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-11 font-bold flex items-center justify-center px-1.5">
                   {badge > 99 ? '99+' : badge}
                 </span>
               )}
-              <Icon name="arrow" className="w-[14px] h-[14px] text-bg/25 group-hover:text-bg/50 transition-colors" stroke={1.8} />
             </Link>
           );
         })}
@@ -208,7 +200,6 @@ export default function Dashboard() {
       {/* Alertas pendientes */}
       {!loading && notifs && (notifs.pending_cell_reports > 0 || notifs.unread_petitions > 0 || notifs.pending_volunteers > 0) && (
         <div className="mb-8 glass-light rounded-[24px] p-4 flex flex-wrap gap-4 items-center border border-rose/30">
-          <Icon name="notifications_active" className="w-5 h-5 text-rose" stroke={1.8} />
           <div className="flex-1 flex flex-wrap gap-4">
             {notifs.pending_cell_reports > 0 && (
               <span className="text-14 text-bg/75 font-medium">
@@ -237,7 +228,7 @@ export default function Dashboard() {
 
       {/* General KPIs — agrupados en UNA card contenedora grande, las
           StatCard blancas flotan encima */}
-      <SectionContainer icon="bar_chart" label="General">
+      <SectionContainer label="General">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard nested icon="person"           label="Usuarios"        tint="pri"
             value={loading ? '…' : kpis?.total_users ?? 0} />
@@ -255,7 +246,7 @@ export default function Dashboard() {
       </SectionContainer>
 
       {/* Cell KPIs */}
-      <SectionContainer icon="church" label="Almas ganadas">
+      <SectionContainer label="Almas ganadas">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard nested icon="person_add"       label="Convertidos"     tint="ter"
             value={loading ? '…' : cellStats?.total_converts ?? 0}
@@ -272,22 +263,17 @@ export default function Dashboard() {
       {/* Últimas donaciones */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Icon name="payments" className="w-[18px] h-[18px] text-bg/45" stroke={1.8} />
           <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Últimas donaciones</p>
         </div>
         <Link to="/admin/donations">
           <Button variant="tonal" size="sm">
             Ver todas
-            <Icon name="arrow" className="w-4 h-4" stroke={1.8} />
           </Button>
         </Link>
       </div>
       <div className="glass-light rounded-[24px] card-spring overflow-hidden">
         {loading ? <Spinner /> : donations.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-bg/45 gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-bg/6 flex items-center justify-center">
-              <Icon name="payments" className="w-7 h-7" stroke={1.5} />
-            </div>
             <p className="text-14">No hay donaciones registradas.</p>
           </div>
         ) : (

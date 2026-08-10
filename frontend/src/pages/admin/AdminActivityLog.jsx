@@ -2,17 +2,16 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import Paginator from '../../components/ui/Paginator';
 import { FilterChip } from '../../components/ui/Chip';
-import { Icon } from '../../components/ui/Glass';
 
 const ACTIONS = ['create', 'update', 'delete', 'approve', 'login'];
 const RESOURCES = ['user', 'post', 'event', 'boleta', 'cell_report', 'volunteer', 'announcement', 'gallery'];
 
 const ACTION_COLORS = {
-  create:  { bg: 'bg-emerald', text: 'text-white', icon: 'add_circle' },
-  update:  { bg: 'bg-bg',      text: 'text-white', icon: 'edit' },
-  delete:  { bg: 'bg-rose',    text: 'text-white', icon: 'delete' },
-  approve: { bg: 'bg-amber',   text: 'text-white', icon: 'check_circle' },
-  login:   { bg: 'bg-bg/8',    text: 'text-bg',    icon: 'login' },
+  create:  'bg-emerald',
+  update:  'bg-bg',
+  delete:  'bg-rose',
+  approve: 'bg-amber',
+  login:   'bg-bg/8',
 };
 
 function fmtDate(d) {
@@ -47,14 +46,9 @@ export default function AdminActivityLog() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="history" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
-        <div>
-          <h1 className="text-headline-s text-bg font-black leading-tight">Historial de Actividad</h1>
-          <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} eventos registrados</p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-headline-s text-bg font-black leading-tight">Historial de Actividad</h1>
+        <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} eventos registrados</p>
       </div>
 
       {/* Filters */}
@@ -62,7 +56,7 @@ export default function AdminActivityLog() {
         <div>
           <p className="text-label-s text-bg/50 mb-2 uppercase tracking-widest">Acción</p>
           <div className="flex gap-2 flex-wrap">
-            <FilterChip selected={actionF === ''} onClick={() => setActionF('')} icon="apps">Todas</FilterChip>
+            <FilterChip selected={actionF === ''} onClick={() => setActionF('')}>Todas</FilterChip>
             {ACTIONS.map(a => (
               <FilterChip key={a} selected={actionF === a} onClick={() => setActionF(a)}>
                 {a}
@@ -73,7 +67,7 @@ export default function AdminActivityLog() {
         <div>
           <p className="text-label-s text-bg/50 mb-2 uppercase tracking-widest">Recurso</p>
           <div className="flex gap-2 flex-wrap">
-            <FilterChip selected={resourceF === ''} onClick={() => setResourceF('')} icon="apps">Todos</FilterChip>
+            <FilterChip selected={resourceF === ''} onClick={() => setResourceF('')}>Todos</FilterChip>
             {RESOURCES.map(r => (
               <FilterChip key={r} selected={resourceF === r} onClick={() => setResourceF(r)}>
                 {r}
@@ -90,20 +84,15 @@ export default function AdminActivityLog() {
         </div>
       ) : logs.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="history" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin actividad registrada</p>
         </div>
       ) : (
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {logs.map(log => {
-            const style = ACTION_COLORS[log.action] || ACTION_COLORS.login;
+            const bg = ACTION_COLORS[log.action] || ACTION_COLORS.login;
             return (
               <div key={log.ID} className="flex items-start gap-4 p-4 hover:bg-bg/8 transition-colors">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${style.bg}`}>
-                  <Icon name={style.icon} className={`w-[16px] h-[16px] ${style.text}`} stroke={1.8} />
-                </div>
+                <div className={`w-9 h-9 rounded-xl shrink-0 mt-0.5 ${bg}`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-0.5">
                     <span className="text-body-s text-bg font-medium">{log.user_name || `User #${log.user_id}`}</span>

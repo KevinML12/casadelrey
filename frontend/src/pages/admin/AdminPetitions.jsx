@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip from '../../components/ui/Chip';
-import Button, { IconButton } from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
+import Button from '../../components/ui/Button';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
@@ -14,9 +13,6 @@ const Spinner = () => (
 function EmptyState() {
   return (
     <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
-      <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-        <Icon name="inbox" className="w-[32px] h-[32px]" stroke={1.8} />
-      </div>
       <div className="text-center">
         <p className="text-body-l text-bg font-medium">Sin peticiones</p>
         <p className="text-body-s text-bg/50 mt-1">Las peticiones de oración aparecerán aquí.</p>
@@ -143,27 +139,20 @@ export default function AdminPetitions() {
 
       {/* Page header */}
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="volunteer_activism" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Peticiones</h1>
-            <p className="text-body-s text-bg/50 mt-0.5">
-              {unread > 0
-                ? <><span className="text-bg font-semibold">{unread}</span> sin responder</>
-                : 'Todas respondidas'}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black leading-tight">Peticiones</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">
+            {unread > 0
+              ? <><span className="text-bg font-semibold">{unread}</span> sin responder</>
+              : 'Todas respondidas'}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           {unread > 0 && <Chip color="primary">{unread} nueva{unread > 1 ? 's' : ''}</Chip>}
           <Button variant="outlined" onClick={handleWeeklyPdf} disabled={pdfLoading}>
-            <Icon name="print" className="w-[16px] h-[16px]" stroke={1.8} />
             {pdfLoading ? 'Cargando…' : 'PDF semanal'}
           </Button>
           <Button variant="outlined" onClick={handleSendWeeklyEmail} disabled={mailLoading}>
-            <Icon name="mail" className="w-[16px] h-[16px]" stroke={1.8} />
             {mailLoading ? 'Enviando…' : 'Enviar por correo'}
           </Button>
         </div>
@@ -181,15 +170,6 @@ export default function AdminPetitions() {
                 p.is_answered ? 'opacity-60' : 'hover:bg-bg/8'
               }`}
             >
-              {/* Leading icon */}
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                p.is_answered ? 'bg-bg/8' : 'bg-ter-con'
-              }`}>
-                <Icon name={p.is_answered ? 'mark_email_read' : 'volunteer_activism'}
-                  className={`w-[18px] h-[18px] ${p.is_answered ? 'text-bg/50' : 'text-on-ter-con'}`}
-                  stroke={1.8} />
-              </div>
-
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -218,14 +198,12 @@ export default function AdminPetitions() {
 
               {/* Trailing action */}
               {!p.is_answered && (
-                <IconButton
-                  variant="tonal"
+                <button
                   onClick={() => markRead(p.ID)}
-                  title="Marcar como respondida"
-                  className="shrink-0 mt-0.5"
+                  className="shrink-0 mt-0.5 text-13 font-semibold text-bg/55 hover:text-bg transition-colors"
                 >
-                  <Icon name="check" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
+                  Marcar como respondida
+                </button>
               )}
             </div>
           ))}

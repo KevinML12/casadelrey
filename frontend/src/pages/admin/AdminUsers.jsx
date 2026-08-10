@@ -5,7 +5,6 @@ import Button, { IconButton } from '../../components/ui/Button';
 import Input, { Select } from '../../components/ui/Input';
 import Chip, { FilterChip } from '../../components/ui/Chip';
 import CellCodePicker from '../../components/ui/CellCodePicker';
-import { Icon } from '../../components/ui/Glass';
 
 const ROLES = ['member', 'leader', 'volunteer', 'admin'];
 
@@ -43,8 +42,8 @@ function CellModal({ user, onClose, onSaved }) {
             <h3 className="text-title-l text-bg font-bold">Código de célula</h3>
             <p className="text-body-s text-bg/50 mt-0.5">{user.name}</p>
           </div>
-          <IconButton onClick={onClose}>
-            <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
+          <IconButton onClick={onClose} className="text-20 leading-none" aria-label="Cerrar">
+            ×
           </IconButton>
         </div>
 
@@ -56,7 +55,6 @@ function CellModal({ user, onClose, onSaved }) {
 
         <div className="flex gap-3 mt-6 pt-4 border-t border-bg/10">
           <Button variant="filled" onClick={handleSave} disabled={saving} className="flex-1 justify-center">
-            <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {saving ? 'Guardando…' : 'Guardar'}
           </Button>
           <Button variant="text" onClick={onClose}>Cancelar</Button>
@@ -150,25 +148,18 @@ export default function AdminUsers() {
       )}
 
       {/* Page header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="manage_accounts" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
-        <div>
-          <h1 className="text-headline-s text-bg font-black leading-tight">Usuarios</h1>
-          <p className="text-body-s text-bg/50 mt-0.5">{users.length} personas registradas</p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-headline-s text-bg font-black leading-tight">Usuarios</h1>
+        <p className="text-body-s text-bg/50 mt-0.5">{users.length} personas registradas</p>
       </div>
 
       {/* Barra de búsqueda */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <div className="flex-1 relative">
-          <Icon name="search" className="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-bg/50 pointer-events-none" stroke={1.8} />
+        <div className="flex-1">
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre o correo…"
-            className="!pl-10"
           />
         </div>
       </div>
@@ -194,9 +185,6 @@ export default function AdminUsers() {
       <div className="glass-light rounded-[24px] card-spring overflow-hidden">
         {loading ? <Spinner /> : filtered.length === 0 ? (
           <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
-            <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-              <Icon name="person_search" className="w-[32px] h-[32px]" stroke={1.8} />
-            </div>
             <div className="text-center">
               <p className="text-body-l text-bg font-medium">Sin resultados</p>
               <p className="text-body-s text-bg/50 mt-1">
@@ -236,7 +224,6 @@ export default function AdminUsers() {
                       className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-celeste hover:text-bg transition-colors font-mono"
                       title="Editar código de célula"
                     >
-                      <Icon name="tag" className="w-[14px] h-[14px]" stroke={1.8} />
                       {u.cell_code || 'Sin código'}
                     </button>
                   )}

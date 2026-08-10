@@ -8,9 +8,8 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Input, { Select, Textarea } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
 
 // Iconos de contenido disponibles (los mismos del set público en
 // Glass.jsx) -- no se listan los de uso exclusivo del panel (dashboard,
@@ -110,7 +109,6 @@ function AreaForm({ onSave, onCancel, initialData }) {
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Crear departamento')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -155,20 +153,14 @@ export default function AdminVolunteerAreas() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="dashboard" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Voluntariado — Departamentos</h1>
-            <p className="text-body-m text-bg/50 mt-0.5">
-              Los departamentos que se muestran en la página pública de Voluntariado. La foto de
-              cada uno se sube aparte, en Fotos del sitio (busca "Voluntariado").
-            </p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black leading-tight">Voluntariado — Departamentos</h1>
+          <p className="text-body-m text-bg/50 mt-0.5">
+            Los departamentos que se muestran en la página pública de Voluntariado. La foto de
+            cada uno se sube aparte, en Fotos del sitio (busca "Voluntariado").
+          </p>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nuevo departamento'}
         </Button>
       </div>
@@ -190,18 +182,12 @@ export default function AdminVolunteerAreas() {
         </div>
       ) : areas.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="dashboard" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin departamentos todavía</p>
         </div>
       ) : (
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {areas.map(area => (
             <div key={area.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${area.is_active ? '' : 'opacity-60'}`}>
-              <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0">
-                <Icon name={area.icon || 'box'} className="w-5 h-5" stroke={1.8} />
-              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-0.5">
                   <p className="text-title-s text-bg font-medium">{area.title}</p>
@@ -212,17 +198,18 @@ export default function AdminVolunteerAreas() {
                   <p className="text-label-s text-bg/45 mt-1 line-clamp-2">¿Por qué aquí? {area.why}</p>
                 )}
               </div>
-              <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
-                <IconButton onClick={() => { setEditing(area); setShowForm(true); }} title="Editar">
-                  <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleToggle(area)} title={area.is_active ? 'Ocultar' : 'Mostrar'}>
-                  <Icon name={area.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(area.ID)} title="Eliminar"
-                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
-                  <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
+              <div className="flex items-center gap-3 text-13 font-semibold shrink-0 self-end sm:self-center">
+                <button onClick={() => { setEditing(area); setShowForm(true); }} className="text-bg/55 hover:text-bg transition-colors">
+                  Editar
+                </button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleToggle(area)} className="text-bg/55 hover:text-bg transition-colors">
+                  {area.is_active ? 'Ocultar' : 'Mostrar'}
+                </button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleDelete(area.ID)} className="text-bg/55 hover:text-rose transition-colors">
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}

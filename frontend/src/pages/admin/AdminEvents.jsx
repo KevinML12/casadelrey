@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const EMPTY = {
@@ -47,9 +46,9 @@ function EventForm({ initial, onSave, onCancel, loading }) {
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
         <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">{initial?.ID ? 'Editar evento' : 'Nuevo evento'}</p>
-        <IconButton onClick={onCancel}>
-          <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
-        </IconButton>
+        <button onClick={onCancel} className="text-20 leading-none text-bg/50 hover:text-bg transition-colors" aria-label="Cerrar">
+          ×
+        </button>
       </div>
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -72,7 +71,6 @@ function EventForm({ initial, onSave, onCancel, loading }) {
               <Input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')} />
             </div>
             <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-celeste/40 hover:text-bg'} text-bg/50`}>
-              <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
             </label>
@@ -81,8 +79,8 @@ function EventForm({ initial, onSave, onCancel, loading }) {
             <div className="mt-2 relative">
               <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-bg/10" />
               <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center hover:bg-black/70">
-                <Icon name="close" className="w-[14px] h-[14px]" stroke={1.8} />
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center text-14 leading-none hover:bg-black/70" aria-label="Quitar imagen">
+                ×
               </button>
             </div>
           )}
@@ -104,7 +102,6 @@ function EventForm({ initial, onSave, onCancel, loading }) {
 
         <div className="flex gap-3 pt-2 border-t border-bg/10">
           <Button variant="filled" onClick={handleSubmit} disabled={loading || !form.title || uploading}>
-            <Icon name="check" className="w-[16px] h-[16px]" stroke={1.8} />
             {loading ? 'Guardando…' : initial?.ID ? 'Guardar cambios' : 'Guardar evento'}
           </Button>
           <Button variant="text" onClick={onCancel}>Cancelar</Button>
@@ -187,21 +184,18 @@ function EventRSVPs({ eventId, onChanged }) {
       <div className="bg-bg/4 border border-bg/10 rounded-xl overflow-hidden divide-y divide-bg/8">
         {rsvps.map(r => (
           <div key={r.ID} className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-bg flex items-center justify-center shrink-0">
-              <Icon name="person" className="w-[14px] h-[14px] text-white" stroke={1.8} />
-            </div>
             <div className="flex-1 min-w-0">
               <p className="text-body-s text-bg font-medium">{r.name}</p>
               <p className="text-label-s text-bg/50">{r.email}{r.phone ? ` · ${r.phone}` : ''}</p>
             </div>
             <Chip color="secondary">{r.attendee_count || 1} {r.attendee_count === 1 ? 'pers.' : 'pers.'}</Chip>
-            <IconButton
+            <button
               onClick={() => handleCancel(r)}
               disabled={removing === r.ID}
-              className="shrink-0 text-bg/40 hover:text-rose hover:bg-rose/8"
+              className="shrink-0 text-13 font-semibold text-bg/55 hover:text-rose transition-colors disabled:opacity-40 disabled:pointer-events-none"
             >
-              <Icon name="close" className="w-[16px] h-[16px]" stroke={1.8} />
-            </IconButton>
+              Cancelar
+            </button>
           </div>
         ))}
       </div>
@@ -265,18 +259,12 @@ export default function AdminEvents() {
 
       {/* Page header */}
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="calendar_month" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Eventos</h1>
-            <p className="text-body-s text-bg/50 mt-0.5">{events.length} evento{events.length !== 1 ? 's' : ''} programado{events.length !== 1 ? 's' : ''}</p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black leading-tight">Eventos</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">{events.length} evento{events.length !== 1 ? 's' : ''} programado{events.length !== 1 ? 's' : ''}</p>
         </div>
         {!showForm && (
           <Button variant="filled" onClick={() => { setEditing(null); setShowForm(true); }}>
-            <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nuevo evento
           </Button>
         )}
@@ -289,9 +277,6 @@ export default function AdminEvents() {
 
       {loading ? <Spinner /> : events.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="calendar_month" className="w-[32px] h-[32px]" stroke={1.8} />
-          </div>
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin eventos</p>
             <p className="text-body-s text-bg/50 mt-1">Crea el primero con el botón de arriba.</p>
@@ -314,18 +299,14 @@ export default function AdminEvents() {
                   <p className="text-body-l text-bg font-medium mb-1">{ev.title}</p>
                   <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-bg/50">
                     {ev.date && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="calendar_today" className="w-[14px] h-[14px]" stroke={1.8} />
+                      <span>
                         {new Date(ev.date + 'T12:00:00').toLocaleDateString('es-ES', {
                           weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
                         })}
                       </span>
                     )}
                     {ev.location && (
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="location_on" className="w-[14px] h-[14px]" stroke={1.8} />
-                        {ev.location}
-                      </span>
+                      <span>{ev.location}</span>
                     )}
                   </div>
                   {ev.description && (
@@ -339,22 +320,20 @@ export default function AdminEvents() {
                 </div>
 
                 {/* Trailing */}
-                <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-bg/40" style={{ transition: 'transform .2s', transform: expanded === ev.ID ? 'rotate(180deg)' : '' }}>
-                    <Icon name="expand_more" className="w-[18px] h-[18px]" stroke={1.8} />
-                  </span>
-                  <IconButton
+                <div className="flex items-center gap-3 text-13 font-semibold shrink-0 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity">
+                  <button
                     onClick={(e) => { e.stopPropagation(); setEditing(ev); setShowForm(true); }}
-                    className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity text-bg/50 hover:text-bg hover:bg-bg/8"
+                    className="text-bg/55 hover:text-bg transition-colors"
                   >
-                    <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                  </IconButton>
-                  <IconButton
+                    Editar
+                  </button>
+                  <span className="text-bg/20">·</span>
+                  <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(ev.ID); }}
-                    className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity text-bg/50 hover:text-rose hover:bg-rose/8"
+                    className="text-bg/55 hover:text-rose transition-colors"
                   >
-                    <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                  </IconButton>
+                    Eliminar
+                  </button>
                 </div>
               </div>
 

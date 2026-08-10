@@ -2,18 +2,11 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip, { FilterChip } from '../../components/ui/Chip';
-import { IconButton } from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
 
 const STATUS = {
-  pendiente:  { label: 'Pendiente',  color: 'default',  icon: 'schedule' },
-  verificado: { label: 'Verificado', color: 'tertiary', icon: 'check_circle' },
-  rechazado:  { label: 'Rechazado', color: 'error',    icon: 'cancel' },
-};
-
-const BANKS_ICONS = {
-  'Banrural': 'account_balance', 'BAC Credomatic': 'account_balance',
-  'G&T Continental': 'account_balance', 'Industrial': 'account_balance',
+  pendiente:  { label: 'Pendiente',  color: 'default' },
+  verificado: { label: 'Verificado', color: 'tertiary' },
+  rechazado:  { label: 'Rechazado', color: 'error' },
 };
 
 function RevertSection({ receipt, onDone, onClose }) {
@@ -35,22 +28,17 @@ function RevertSection({ receipt, onDone, onClose }) {
   if (!confirm) return (
     <button onClick={() => setConfirm(true)}
       className="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-bg/10 text-label-l text-bg/50 hover:bg-bg/8 transition-colors">
-      <Icon name="undo" className="w-[16px] h-[16px]" stroke={1.8} />
       Revertir a pendiente
     </button>
   );
 
   return (
     <div className="glass-light rounded-[24px] card-spring p-4 space-y-3 animate-fade-in">
-      <p className="text-body-s text-bg font-semibold flex items-center gap-2">
-        <Icon name="undo" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
-        ¿Revertir este comprobante a pendiente?
-      </p>
+      <p className="text-body-s text-bg font-semibold">¿Revertir este comprobante a pendiente?</p>
       <p className="text-body-s text-bg/50">Volverá a aparecer en la cola de verificación y deberás revisarlo nuevamente.</p>
       <div className="flex gap-2">
         <button onClick={revert} disabled={loading}
           className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
-          <Icon name="undo" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Revirtiendo…' : 'Sí, revertir'}
         </button>
         <button onClick={() => setConfirm(false)}
@@ -100,8 +88,8 @@ function VerifyModal({ receipt, onClose, onDone }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-bg/10">
           <h3 className="text-title-l text-bg font-bold">Verificar comprobante</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-bg/8 text-bg/50 transition-colors">
-            <Icon name="close" className="w-[18px] h-[18px]" stroke={1.8} />
+          <button onClick={onClose} className="text-13 font-semibold text-bg/55 hover:text-bg transition-colors">
+            Cerrar
           </button>
         </div>
 
@@ -147,7 +135,6 @@ function VerifyModal({ receipt, onClose, onDone }) {
                         ? s === 'verificado' ? 'bg-ter-con text-on-ter-con' : 'bg-err-con text-err'
                         : 'border border-bg/10 text-bg/50 hover:bg-bg/8'
                     }`}>
-                    <Icon name={s === 'verificado' ? 'check_circle' : 'cancel'} className="w-[16px] h-[16px]" stroke={1.8} />
                     {s === 'verificado' ? 'Aprobar' : 'Rechazar'}
                   </button>
                 ))}
@@ -161,7 +148,6 @@ function VerifyModal({ receipt, onClose, onDone }) {
                 className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl text-label-l font-semibold transition-opacity disabled:opacity-50 ${
                   status === 'rechazado' ? 'bg-err text-ink hover:opacity-90' : 'bg-bg text-white hover:opacity-90'
                 }`}>
-                <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
                 {loading ? 'Guardando…' : status === 'rechazado' ? 'Rechazar comprobante' : 'Aprobar comprobante'}
               </button>
             </>
@@ -170,10 +156,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
           {/* Doble confirmación de rechazo */}
           {confirmStep && (
             <div className="rounded-2xl border-2 border-err bg-err-con/20 p-4 space-y-3 animate-fade-in">
-              <div className="flex items-center gap-2">
-                <Icon name="warning" className="w-[22px] h-[22px] text-err" stroke={1.8} />
-                <p className="text-body-s text-bg font-semibold">¿Confirmas el rechazo?</p>
-              </div>
+              <p className="text-body-s text-bg font-semibold">¿Confirmas el rechazo?</p>
               <p className="text-body-s text-bg/50">
                 Esta acción notifica al pagador que su comprobante fue rechazado.
                 Puedes revertirla después si cometiste un error.
@@ -182,7 +165,6 @@ function VerifyModal({ receipt, onClose, onDone }) {
               <div className="flex gap-2">
                 <button onClick={submit} disabled={loading}
                   className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-err text-ink text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
-                  <Icon name="cancel" className="w-[16px] h-[16px]" stroke={1.8} />
                   {loading ? 'Rechazando…' : 'Sí, rechazar'}
                 </button>
                 <button onClick={() => setConfirmStep(false)}
@@ -230,27 +212,22 @@ export default function AdminReceipts() {
 
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-sec-con flex items-center justify-center shrink-0">
-            <Icon name="receipt_long" className="w-[22px] h-[22px] text-on-sec-con" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black">Comprobantes</h1>
-            <p className="text-body-s text-bg/50 mt-0.5">
-              {pending > 0
-                ? <><span className="text-bg font-semibold">{pending}</span> pendiente{pending > 1 ? 's' : ''} de verificar</>
-                : 'Todos verificados'}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black">Comprobantes</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">
+            {pending > 0
+              ? <><span className="text-bg font-semibold">{pending}</span> pendiente{pending > 1 ? 's' : ''} de verificar</>
+              : 'Todos verificados'}
+          </p>
         </div>
       </div>
 
       {/* Filtros */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        <FilterChip selected={filter === ''} icon="apps" onClick={() => setFilter('')}>Todos</FilterChip>
-        <FilterChip selected={filter === 'pendiente'}  icon="schedule"     count={counts.pendiente}  onClick={() => setFilter('pendiente')}>Pendientes</FilterChip>
-        <FilterChip selected={filter === 'verificado'} icon="check_circle" count={counts.verificado} onClick={() => setFilter('verificado')}>Verificados</FilterChip>
-        <FilterChip selected={filter === 'rechazado'}  icon="cancel"       count={counts.rechazado}  onClick={() => setFilter('rechazado')}>Rechazados</FilterChip>
+        <FilterChip selected={filter === ''} onClick={() => setFilter('')}>Todos</FilterChip>
+        <FilterChip selected={filter === 'pendiente'}  count={counts.pendiente}  onClick={() => setFilter('pendiente')}>Pendientes</FilterChip>
+        <FilterChip selected={filter === 'verificado'} count={counts.verificado} onClick={() => setFilter('verificado')}>Verificados</FilterChip>
+        <FilterChip selected={filter === 'rechazado'}  count={counts.rechazado}  onClick={() => setFilter('rechazado')}>Rechazados</FilterChip>
       </div>
 
       {/* Lista */}
@@ -260,7 +237,6 @@ export default function AdminReceipts() {
         </div>
       ) : receipts.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <Icon name="receipt_long" className="w-[48px] h-[48px]" stroke={1.8} />
           <p className="text-body-l text-bg font-medium">Sin comprobantes</p>
           <p className="text-body-s">Los comprobantes enviados por los usuarios aparecerán aquí.</p>
         </div>
@@ -277,23 +253,21 @@ export default function AdminReceipts() {
                     className="w-14 h-14 rounded-xl object-cover border border-bg/10 shrink-0 cursor-pointer"
                     onClick={() => setSelected(r)} />
                 ) : (
-                  <div className="w-14 h-14 rounded-xl bg-bg/8 flex items-center justify-center shrink-0">
-                    <Icon name="receipt_long" className="w-[24px] h-[24px] text-bg/50" stroke={1.8} />
-                  </div>
+                  <div className="w-14 h-14 rounded-xl bg-bg/8 shrink-0" />
                 )}
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-body-l text-bg font-medium">{r.payer_name}</span>
-                    <Chip color={st.color} icon={st.icon}>{st.label}</Chip>
+                    <Chip color={st.color}>{st.label}</Chip>
                     <span className="text-label-l text-bg font-bold">Q{Number(r.amount).toFixed(2)}</span>
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-body-s text-bg/50">
-                    {r.bank_name && <span className="flex items-center gap-1"><Icon name="account_balance" className="w-[13px] h-[13px]" stroke={1.8} />{r.bank_name}</span>}
-                    {r.reference_number && <span className="flex items-center gap-1"><Icon name="tag" className="w-[13px] h-[13px]" stroke={1.8} />{r.reference_number}</span>}
-                    {r.payer_phone && <span className="flex items-center gap-1"><Icon name="phone" className="w-[13px] h-[13px]" stroke={1.8} />{r.payer_phone}</span>}
-                    {r.purpose && <span className="flex items-center gap-1"><Icon name="info" className="w-[13px] h-[13px]" stroke={1.8} />{r.purpose}</span>}
+                    {r.bank_name && <span>{r.bank_name}</span>}
+                    {r.reference_number && <span>{r.reference_number}</span>}
+                    {r.payer_phone && <span>{r.payer_phone}</span>}
+                    {r.purpose && <span>{r.purpose}</span>}
                   </div>
                   {r.rejection_reason && (
                     <p className="text-label-s text-err mt-1.5">Rechazo: {r.rejection_reason}</p>
@@ -308,14 +282,13 @@ export default function AdminReceipts() {
                   {r.status === 'pendiente' && (
                     <button onClick={() => setSelected(r)}
                       className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity">
-                      <Icon name="verified" className="w-[14px] h-[14px]" stroke={1.8} />
                       Verificar
                     </button>
                   )}
                   {r.status !== 'pendiente' && (
-                    <IconButton onClick={() => setSelected(r)} title="Ver detalle" className="text-bg/50 hover:text-bg">
-                      <Icon name="visibility" className="w-[16px] h-[16px]" stroke={1.8} />
-                    </IconButton>
+                    <button onClick={() => setSelected(r)} className="text-13 font-semibold text-bg/55 hover:text-bg transition-colors">
+                      Ver detalle
+                    </button>
                   )}
                 </div>
               </div>

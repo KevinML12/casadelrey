@@ -9,7 +9,6 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import Input, { Textarea } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 function slugify(text) {
@@ -24,14 +23,14 @@ function slugify(text) {
 function EditorToolbar({ editor }) {
   if (!editor) return null;
 
-  const btn = (active, onClick, icon, title) => (
+  const btn = (active, onClick, label) => (
     <button
-      type="button" onClick={onClick} title={title}
-      className={`p-1.5 rounded-md transition-colors ${
+      type="button" onClick={onClick}
+      className={`px-2 py-1 rounded-md text-12 font-semibold transition-colors ${
         active ? 'bg-bg text-white' : 'text-bg/50 hover:bg-bg/8 hover:text-bg'
       }`}
     >
-      <Icon name={icon} className="w-[16px] h-[16px]" stroke={1.8} />
+      {label}
     </button>
   );
 
@@ -42,18 +41,18 @@ function EditorToolbar({ editor }) {
 
   return (
     <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-bg/10 bg-bg/4 rounded-t-lg">
-      {btn(editor.isActive('bold'),            () => editor.chain().focus().toggleBold().run(),           'format_bold',        'Negrita')}
-      {btn(editor.isActive('italic'),          () => editor.chain().focus().toggleItalic().run(),         'format_italic',      'Cursiva')}
+      {btn(editor.isActive('bold'),            () => editor.chain().focus().toggleBold().run(),           'Negrita')}
+      {btn(editor.isActive('italic'),          () => editor.chain().focus().toggleItalic().run(),         'Cursiva')}
       <div className="w-px h-4 bg-bg/10 mx-1" />
-      {btn(editor.isActive('heading', {level:2}), () => editor.chain().focus().toggleHeading({level:2}).run(), 'title', 'Título H2')}
-      {btn(editor.isActive('bulletList'),      () => editor.chain().focus().toggleBulletList().run(),     'format_list_bulleted', 'Lista')}
-      {btn(editor.isActive('orderedList'),     () => editor.chain().focus().toggleOrderedList().run(),    'format_list_numbered', 'Numerada')}
+      {btn(editor.isActive('heading', {level:2}), () => editor.chain().focus().toggleHeading({level:2}).run(), 'Título H2')}
+      {btn(editor.isActive('bulletList'),      () => editor.chain().focus().toggleBulletList().run(),     'Lista')}
+      {btn(editor.isActive('orderedList'),     () => editor.chain().focus().toggleOrderedList().run(),    'Numerada')}
       <div className="w-px h-4 bg-bg/10 mx-1" />
-      {btn(editor.isActive('link'),            addLink,                                                   'link',               'Enlace')}
-      {btn(false,                              () => editor.chain().focus().undo().run(),                  'undo',               'Deshacer')}
-      {btn(false,                              () => editor.chain().focus().redo().run(),                  'redo',               'Rehacer')}
+      {btn(editor.isActive('link'),            addLink,                                                   'Enlace')}
+      {btn(false,                              () => editor.chain().focus().undo().run(),                  'Deshacer')}
+      {btn(false,                              () => editor.chain().focus().redo().run(),                  'Rehacer')}
       <div className="w-px h-4 bg-bg/10 mx-1" />
-      {btn(editor.isActive('blockquote'),      () => editor.chain().focus().toggleBlockquote().run(),     'format_quote',       'Cita')}
+      {btn(editor.isActive('blockquote'),      () => editor.chain().focus().toggleBlockquote().run(),     'Cita')}
     </div>
   );
 }
@@ -124,8 +123,8 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
         <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
-        <button onClick={onCancel} className="text-bg/50 hover:text-bg transition-colors">
-          <Icon name="close" className="w-[20px] h-[20px]" stroke={1.8} />
+        <button onClick={onCancel} className="text-20 leading-none text-bg/50 hover:text-bg transition-colors" aria-label="Cerrar">
+          ×
         </button>
       </div>
 
@@ -142,7 +141,6 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
               <Input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')} />
             </div>
             <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-celeste/40 hover:text-bg'} text-bg/50`}>
-              <Icon name="image" className="w-[16px] h-[16px]" stroke={1.8} />
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
             </label>
@@ -151,8 +149,8 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <div className="mt-2 relative">
               <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-bg/10" />
               <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center hover:bg-black/70">
-                <Icon name="close" className="w-[14px] h-[14px]" stroke={1.8} />
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center text-14 leading-none hover:bg-black/70" aria-label="Quitar imagen">
+                ×
               </button>
             </div>
           )}
@@ -174,12 +172,11 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <label className="text-label-l text-bg/50">Contenido <span className="font-normal text-bg/40">(opcional si hay enlace)</span></label>
             <div className="flex items-center gap-3">
               <button type="button" onClick={insertContentImage}
-                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-bg transition-colors">
-                <Icon name="image" className="w-[14px] h-[14px]" stroke={1.8} /> Insertar imagen
+                className="text-label-s text-bg/50 hover:text-bg transition-colors">
+                Insertar imagen
               </button>
               <button type="button" onClick={() => setPreview(p => !p)}
-                className="flex items-center gap-1 text-label-s text-bg/50 hover:text-bg transition-colors">
-                <Icon name={preview ? 'edit' : 'preview'} className="w-[14px] h-[14px]" stroke={1.8} />
+                className="text-label-s text-bg/50 hover:text-bg transition-colors">
                 {preview ? 'Editor' : 'Preview'}
               </button>
             </div>
@@ -204,11 +201,9 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
         <div className="flex gap-2 pt-1 border-t border-bg/10">
           <Button size="sm" variant="filled" onClick={handleSave} disabled={loading}>
-            <Icon name="check" className="w-[14px] h-[14px]" stroke={1.8} />
             {loading ? 'Guardando…' : 'Guardar'}
           </Button>
           <Button size="sm" variant="text" onClick={onCancel}>
-            <Icon name="close" className="w-[14px] h-[14px]" stroke={1.8} />
             Cancelar
           </Button>
         </div>
@@ -270,18 +265,12 @@ export default function AdminBlog() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="article" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Blog</h1>
-            <p className="text-body-s text-bg/50 mt-0.5">{posts.length} publicaciones</p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black leading-tight">Blog</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">{posts.length} publicaciones</p>
         </div>
         {!showForm && !editing && (
           <Button variant="filled" onClick={() => setShowForm(true)}>
-            <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nuevo post
           </Button>
         )}
@@ -295,9 +284,6 @@ export default function AdminBlog() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
-              <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-                <Icon name="article" className="w-[32px] h-[32px]" stroke={1.8} />
-              </div>
               <div className="text-center">
                 <p className="text-body-l text-bg font-medium">Sin posts</p>
                 <p className="text-body-s text-bg/50 mt-1">Crea el primero con el botón de arriba.</p>
@@ -315,9 +301,7 @@ export default function AdminBlog() {
                   {post.cover_image ? (
                     <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-bg/10" />
                   ) : (
-                    <div className="w-12 h-10 rounded-lg bg-bg/8 border border-bg/10 flex items-center justify-center shrink-0">
-                      <Icon name="article" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
-                    </div>
+                    <div className="w-12 h-10 rounded-lg bg-bg/8 border border-bg/10 shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-body-m text-bg font-medium truncate">{post.title}</p>
@@ -333,23 +317,25 @@ export default function AdminBlog() {
                       {post.status === 'published' ? 'Publicado' : 'Borrador'}
                     </span>
                     {post.redirect_url && (
-                      <span className="inline-flex items-center h-7 px-3 rounded-lg bg-bg text-white text-label-m font-medium gap-1">
-                        <Icon name="open_in_new" className="w-[12px] h-[12px]" stroke={1.8} />
+                      <span className="inline-flex items-center h-7 px-3 rounded-lg bg-bg text-white text-label-m font-medium">
                         Externo
                       </span>
                     )}
-                    <button
-                      onClick={() => { setEditing(post); setShowForm(false); }}
-                      className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-bg hover:bg-bg/8 transition-all"
-                    >
-                      <Icon name="edit" className="w-[16px] h-[16px]" stroke={1.8} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(post.ID)}
-                      className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 w-8 h-8 rounded-full flex items-center justify-center text-bg/50 hover:text-rose hover:bg-rose/8 transition-all"
-                    >
-                      <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-                    </button>
+                    <div className="flex items-center gap-3 text-13 font-semibold opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => { setEditing(post); setShowForm(false); }}
+                        className="text-bg/55 hover:text-bg transition-colors"
+                      >
+                        Editar
+                      </button>
+                      <span className="text-bg/20">·</span>
+                      <button
+                        onClick={() => handleDelete(post.ID)}
+                        className="text-bg/55 hover:text-rose transition-colors"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

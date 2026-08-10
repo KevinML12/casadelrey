@@ -18,9 +18,8 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Input, { Select, Textarea } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
 
 const TYPE_KEY_OPTIONS = [
   { value: '', label: 'Sin type key (no agrupa células automáticamente)' },
@@ -85,7 +84,6 @@ function CategoryForm({ onSave, onCancel, initialData }) {
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Crear categoría')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -133,9 +131,6 @@ export default function AdminCellCategories() {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="tag" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Categorías de células</h1>
             <p className="text-body-m text-bg/50 mt-0.5">
@@ -145,7 +140,6 @@ export default function AdminCellCategories() {
           </div>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nueva categoría'}
         </Button>
       </div>
@@ -167,9 +161,6 @@ export default function AdminCellCategories() {
         </div>
       ) : categories.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="tag" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin categorías todavía</p>
         </div>
       ) : (
@@ -184,17 +175,15 @@ export default function AdminCellCategories() {
                 </div>
                 {cat.description && <p className="text-body-s text-bg/50">{cat.description}</p>}
               </div>
-              <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
-                <IconButton onClick={() => { setEditing(cat); setShowForm(true); }} title="Editar">
-                  <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleToggle(cat)} title={cat.is_active ? 'Ocultar' : 'Mostrar'}>
-                  <Icon name={cat.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(cat.ID)} title="Eliminar"
-                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
-                  <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
+              <div className="flex items-center gap-3 text-13 font-semibold shrink-0 self-end sm:self-center">
+                <button onClick={() => { setEditing(cat); setShowForm(true); }}
+                  className="text-bg/55 hover:text-bg transition-colors">Editar</button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleToggle(cat)} className="text-bg/55 hover:text-bg transition-colors">
+                  {cat.is_active ? 'Ocultar' : 'Mostrar'}
+                </button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleDelete(cat.ID)} className="text-bg/55 hover:text-rose transition-colors">Eliminar</button>
               </div>
             </div>
           ))}

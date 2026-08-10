@@ -8,7 +8,6 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
 
 // Pistas por llave para guiar al admin
 const HINTS = {
@@ -51,28 +50,20 @@ export default function AdminSettings() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="settings" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
-        <div>
-          <h1 className="text-title-l text-bg mb-1">Configuración</h1>
-          <p className="text-body-m text-bg/50">
-            Datos bancarios y de contacto del sitio. Se actualizan al instante, sin publicar de nuevo.
-          </p>
-        </div>
+      <div>
+        <h1 className="text-title-l text-bg mb-1">Configuración</h1>
+        <p className="text-body-m text-bg/50">
+          Datos bancarios y de contacto del sitio. Se actualizan al instante, sin publicar de nuevo.
+        </p>
       </div>
 
       {accountMissing && (
-        <div className="flex items-start gap-3 p-4 rounded-2xl border border-amber/40 bg-amber/10">
-          <Icon name="account_balance" className="w-[20px] h-[20px] text-amber mt-0.5" stroke={1.8} />
-          <div>
-            <p className="text-title-s text-bg font-semibold">Falta la cuenta bancaria real</p>
-            <p className="text-body-s text-bg/50 mt-0.5">
-              Mientras esté vacía, las páginas de Dar y Comprobante NO muestran ningún número —
-              invitan a coordinar el depósito por contacto. Pon la cuenta real abajo.
-            </p>
-          </div>
+        <div className="p-4 rounded-2xl border border-amber/40 bg-amber/10">
+          <p className="text-title-s text-bg font-semibold">Falta la cuenta bancaria real</p>
+          <p className="text-body-s text-bg/50 mt-0.5">
+            Mientras esté vacía, las páginas de Dar y Comprobante NO muestran ningún número —
+            invitan a coordinar el depósito por contacto. Pon la cuenta real abajo.
+          </p>
         </div>
       )}
 

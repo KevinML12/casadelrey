@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Paginator from '../../components/ui/Paginator';
-import { Icon } from '../../components/ui/Glass';
 
 const EMPTY = { title: '', description: '', url: '', thumbnail_url: '', sort_order: 0, is_active: true };
 
@@ -50,7 +49,6 @@ function PhotoForm({ onSave, onCancel }) {
       </div>
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : 'Agregar foto'}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -98,16 +96,12 @@ export default function AdminGallery() {
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="photo_library" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Galería</h1>
             <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} foto{meta?.total !== 1 ? 's' : ''}</p>
           </div>
         </div>
         <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-          <Icon name={showForm ? 'close' : 'add_photo_alternate'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Agregar foto'}
         </Button>
       </div>
@@ -125,9 +119,6 @@ export default function AdminGallery() {
         </div>
       ) : photos.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="photo_library" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin fotos</p>
           <p className="text-body-s text-bg/50">Agrega la primera foto con el botón de arriba.</p>
         </div>
@@ -147,14 +138,14 @@ export default function AdminGallery() {
                 </div>
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100">
-                <IconButton onClick={() => handleToggle(p)} title={p.is_active ? 'Ocultar' : 'Mostrar'}
-                  className="bg-bg/90 text-bg hover:bg-white w-8 h-8">
-                  <Icon name={p.is_active ? 'visibility_off' : 'visibility'} className="w-[16px] h-[16px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(p.ID)} title="Eliminar"
-                  className="bg-rose/90 text-ink hover:bg-rose w-8 h-8">
-                  <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-                </IconButton>
+                <button onClick={() => handleToggle(p)}
+                  className="px-3 h-8 rounded-full bg-bg/90 text-bg text-12 font-semibold hover:bg-white transition-colors">
+                  {p.is_active ? 'Ocultar' : 'Mostrar'}
+                </button>
+                <button onClick={() => handleDelete(p.ID)}
+                  className="px-3 h-8 rounded-full bg-rose/90 text-ink text-12 font-semibold hover:bg-rose transition-colors">
+                  Eliminar
+                </button>
               </div>
               {p.title && (
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">

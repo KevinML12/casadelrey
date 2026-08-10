@@ -10,7 +10,6 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const EMPTY = { name: '', area: '', phone: '', email: '', address: '', photo_url: '', is_active: true };
@@ -63,13 +62,10 @@ function LeaderForm({ onSave, onCancel, initialData }) {
         {form.photo_url ? (
           <img src={form.photo_url} alt={form.name} className="w-16 h-16 rounded-full object-cover border border-bg/10" />
         ) : (
-          <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/10 grid place-items-center">
-            <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
-          </div>
+          <div className="w-16 h-16 rounded-full bg-bg/8 border border-bg/10" />
         )}
         <label className="cursor-pointer">
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-bg/10 text-body-s text-bg hover:border-bg/20 transition-colors">
-            <Icon name="photo_camera" className="w-[16px] h-[16px]" stroke={1.8} />
             {uploading ? 'Subiendo…' : form.photo_url ? 'Cambiar foto' : 'Subir foto'}
           </span>
           <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
@@ -98,7 +94,6 @@ function LeaderForm({ onSave, onCancel, initialData }) {
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading || uploading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Agregar líder')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -143,20 +138,14 @@ export default function AdminLeaders() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="contact_page" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-title-l text-bg mb-1">Directorio de líderes</h1>
-            <p className="text-body-m text-bg/50">
-              Foto y contacto de cada líder. Aparecen en Células (público) y en el
-              dashboard de los voluntarios para que puedan comunicarse.
-            </p>
-          </div>
+        <div>
+          <h1 className="text-title-l text-bg mb-1">Directorio de líderes</h1>
+          <p className="text-body-m text-bg/50">
+            Foto y contacto de cada líder. Aparecen en Células (público) y en el
+            dashboard de los voluntarios para que puedan comunicarse.
+          </p>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nuevo líder'}
         </Button>
       </div>
@@ -178,9 +167,6 @@ export default function AdminLeaders() {
         </div>
       ) : leaders.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="contact_page" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Aún no hay líderes en el directorio</p>
           <p className="text-body-s text-bg/50">Agrégalos con el botón "Nuevo líder".</p>
         </div>
@@ -191,27 +177,22 @@ export default function AdminLeaders() {
               {l.photo_url ? (
                 <img src={l.photo_url} alt={l.name} className="w-14 h-14 rounded-full object-cover border border-bg/10 shrink-0" />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/10 grid place-items-center shrink-0">
-                  <Icon name="person" className="w-[20px] h-[20px] text-bg/50" stroke={1.8} />
-                </div>
+                <div className="w-14 h-14 rounded-full bg-bg/8 border border-bg/10 shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-title-s text-bg font-medium truncate">{l.name}</p>
                 {l.area  && <p className="text-body-s text-bg/50 truncate">{l.area}</p>}
                 {l.phone && <p className="text-label-s text-bg/50 mt-0.5">{l.phone}</p>}
               </div>
-              <div className="flex flex-col gap-1 shrink-0">
-                <button onClick={() => { setEditing(l); setShowForm(true); }} title="Editar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
-                  <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
+              <div className="flex flex-col items-end gap-1.5 shrink-0 text-13 font-semibold">
+                <button onClick={() => { setEditing(l); setShowForm(true); }} className="text-bg/55 hover:text-bg transition-colors">
+                  Editar
                 </button>
-                <button onClick={() => handleToggle(l)} title={l.is_active ? 'Ocultar' : 'Mostrar'}
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-bg transition-colors">
-                  <Icon name={l.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
+                <button onClick={() => handleToggle(l)} className="text-bg/55 hover:text-bg transition-colors">
+                  {l.is_active ? 'Ocultar' : 'Mostrar'}
                 </button>
-                <button onClick={() => handleDelete(l.ID)} title="Eliminar"
-                  className="p-1.5 rounded-full hover:bg-bg/8 text-bg/50 hover:text-rose transition-colors">
-                  <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
+                <button onClick={() => handleDelete(l.ID)} className="text-bg/55 hover:text-rose transition-colors">
+                  Eliminar
                 </button>
               </div>
             </div>

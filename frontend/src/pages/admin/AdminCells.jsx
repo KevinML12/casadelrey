@@ -7,9 +7,8 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Input, { Select, Textarea } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
 import { CELL_TYPES } from '../../components/ui/CellCodePicker';
 
 const EMPTY = { code: '', name: '', type: '', description: '', leader_id: '', zone: '' };
@@ -82,7 +81,6 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Crear célula')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -134,9 +132,6 @@ export default function AdminCells() {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="groups" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
           <div>
             <h1 className="text-headline-s text-bg font-black leading-tight">Células</h1>
             <p className="text-body-m text-bg/50 mt-0.5">
@@ -146,7 +141,6 @@ export default function AdminCells() {
           </div>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nueva célula'}
         </Button>
       </div>
@@ -169,9 +163,6 @@ export default function AdminCells() {
         </div>
       ) : cells.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="groups" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin células todavía</p>
         </div>
       ) : (
@@ -192,17 +183,15 @@ export default function AdminCells() {
                   <p className="text-label-s text-bg/45 mt-1 line-clamp-2">{cell.description}</p>
                 )}
               </div>
-              <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
-                <IconButton onClick={() => { setEditing({ ...cell, leader_id: cell.leader_id }); setShowForm(true); }} title="Editar">
-                  <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleToggle(cell)} title={cell.is_active ? 'Ocultar' : 'Mostrar'}>
-                  <Icon name={cell.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(cell.ID)} title="Eliminar"
-                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
-                  <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
+              <div className="flex items-center gap-3 text-13 font-semibold shrink-0 self-end sm:self-center">
+                <button onClick={() => { setEditing({ ...cell, leader_id: cell.leader_id }); setShowForm(true); }}
+                  className="text-bg/55 hover:text-bg transition-colors">Editar</button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleToggle(cell)} className="text-bg/55 hover:text-bg transition-colors">
+                  {cell.is_active ? 'Ocultar' : 'Mostrar'}
+                </button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleDelete(cell.ID)} className="text-bg/55 hover:text-rose transition-colors">Eliminar</button>
               </div>
             </div>
           ))}

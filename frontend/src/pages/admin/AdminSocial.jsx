@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Select } from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 const PLATFORMS = [
@@ -82,7 +81,6 @@ function Form({ initial, onSave, onCancel }) {
           </div>
         ) : (
           <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-celeste transition-colors">
-            <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
             <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del post'}</p>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
           </label>
@@ -134,7 +132,6 @@ function Form({ initial, onSave, onCancel }) {
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <button type="submit" disabled={loading}
           className="flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : initial?.ID ? 'Actualizar' : 'Agregar'}
         </button>
         <button type="button" onClick={onCancel}
@@ -175,7 +172,6 @@ export default function AdminSocial() {
       <div className="flex items-start justify-between mb-2 gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3">
-            <Icon name="share" className="w-[26px] h-[26px] text-bg" stroke={1.8} />
             <h1 className="text-headline-s text-bg font-black">Galería desde redes</h1>
           </div>
           <p className="text-body-s text-bg/50 mt-1 max-w-xl">
@@ -186,7 +182,6 @@ export default function AdminSocial() {
         {!editing && (
           <button onClick={() => setEditing({})}
             className="flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity">
-            <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
             Nueva publicación
           </button>
         )}
@@ -200,7 +195,6 @@ export default function AdminSocial() {
 
       {loading ? <Spinner /> : posts.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring mt-6 flex flex-col items-center py-20 gap-4 text-bg/50">
-          <Icon name="photo_library" className="w-[48px] h-[48px]" stroke={1.8} />
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin publicaciones</p>
             <p className="text-body-s mt-1">Vincula tu primer post para que aparezca en la home.</p>
@@ -218,29 +212,28 @@ export default function AdminSocial() {
                   <img src={p.image_url} alt={p.caption} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-bg/8 flex items-center justify-center">
-                    <Icon name="broken_image" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
+                    <span className="text-11 text-bg/50 font-medium">Sin imagen</span>
                   </div>
                 )}
                 {/* Badge plataforma */}
-                <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm flex items-center gap-1">
-                  <Icon name={plat?.icon} className="w-[12px] h-[12px] text-ink" stroke={1.8} />
+                <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm">
                   <span className="text-10 text-ink font-semibold uppercase tracking-wider">{plat?.label}</span>
                 </div>
                 {/* Hover overlay con acciones */}
-                <div className="absolute inset-0 bg-black/70 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                <div className="absolute inset-0 bg-black/70 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-3">
                   {p.caption && <p className="text-label-s text-ink text-center line-clamp-2">{p.caption}</p>}
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <button onClick={() => setEditing(p)}
-                      className="w-9 h-9 rounded-full bg-bg/20 hover:bg-bg/30 flex items-center justify-center transition-colors">
-                      <Icon name="edit" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
+                      className="px-3 h-8 rounded-full bg-bg/20 hover:bg-bg/30 text-ink text-12 font-semibold transition-colors">
+                      Editar
                     </button>
                     <a href={p.post_url} target="_blank" rel="noopener noreferrer"
-                      className="w-9 h-9 rounded-full bg-bg/20 hover:bg-bg/30 flex items-center justify-center transition-colors">
-                      <Icon name="open_in_new" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
+                      className="flex items-center px-3 h-8 rounded-full bg-bg/20 hover:bg-bg/30 text-ink text-12 font-semibold transition-colors">
+                      Ver post
                     </a>
                     <button onClick={() => remove(p.ID)}
-                      className="w-9 h-9 rounded-full bg-rose/80 hover:bg-rose flex items-center justify-center transition-colors">
-                      <Icon name="delete" className="w-[16px] h-[16px] text-ink" stroke={1.8} />
+                      className="px-3 h-8 rounded-full bg-rose/80 hover:bg-rose text-ink text-12 font-semibold transition-colors">
+                      Eliminar
                     </button>
                   </div>
                 </div>

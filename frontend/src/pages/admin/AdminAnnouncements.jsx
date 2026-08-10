@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Input, { Textarea } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Chip';
 import Paginator from '../../components/ui/Paginator';
-import { Icon } from '../../components/ui/Glass';
 
 const TARGETS = [
   { value: 'all',    label: 'Todos',     icon: 'public' },
@@ -80,7 +79,6 @@ function AnnouncementForm({ initial, onSave, onCancel }) {
       </div>
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : initial?.ID ? 'Actualizar' : 'Crear anuncio'}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -123,17 +121,11 @@ export default function AdminAnnouncements() {
 
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="campaign" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Anuncios</h1>
-            <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} anuncio{meta?.total !== 1 ? 's' : ''}</p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black leading-tight">Anuncios</h1>
+          <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} anuncio{meta?.total !== 1 ? 's' : ''}</p>
         </div>
         <Button variant="filled" onClick={() => { setEditing(null); setShowForm(s => !s); }}>
-          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nuevo anuncio'}
         </Button>
       </div>
@@ -159,9 +151,6 @@ export default function AdminAnnouncements() {
         </div>
       ) : items.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="campaign" className="w-[32px] h-[32px]" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">Sin anuncios</p>
           <p className="text-body-s text-bg/50">Crea el primero con el botón de arriba.</p>
         </div>
@@ -169,9 +158,6 @@ export default function AdminAnnouncements() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {items.map(a => (
             <div key={a.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors group">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${a.is_active ? 'bg-bg' : 'bg-bg/8'}`}>
-                <Icon name="campaign" className={`w-[18px] h-[18px] ${a.is_active ? 'text-white' : 'text-bg/50'}`} stroke={1.8} />
-              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="text-body-l text-bg font-medium">{a.title}</span>
@@ -184,14 +170,14 @@ export default function AdminAnnouncements() {
                 </div>
                 <p className="text-body-s text-bg/50 line-clamp-2">{a.content}</p>
               </div>
-              <div className="flex items-center gap-1 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity shrink-0">
-                <IconButton onClick={() => { setEditing(a); setShowForm(true); }} title="Editar">
-                  <Icon name="edit" className="w-[16px] h-[16px] text-bg/50" stroke={1.8} />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(a.ID)} title="Eliminar"
-                  className="text-bg/50 hover:text-rose hover:bg-rose/8">
-                  <Icon name="delete" className="w-[16px] h-[16px]" stroke={1.8} />
-                </IconButton>
+              <div className="flex items-center gap-3 text-13 font-semibold opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity shrink-0">
+                <button onClick={() => { setEditing(a); setShowForm(true); }} className="text-bg/55 hover:text-bg transition-colors">
+                  Editar
+                </button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleDelete(a.ID)} className="text-bg/55 hover:text-rose transition-colors">
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}

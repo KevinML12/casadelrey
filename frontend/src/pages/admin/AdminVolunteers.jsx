@@ -3,9 +3,8 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import Input, { Select } from '../../components/ui/Input';
-import Button, { IconButton } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
-import { Icon } from '../../components/ui/Glass';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const STATUS_CHIP = {
@@ -24,9 +23,6 @@ const Spinner = () => (
 function EmptyState({ isAdmin }) {
   return (
     <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
-      <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-        <Icon name="group_add" className="w-[32px] h-[32px]" stroke={1.8} />
-      </div>
       <div className="text-center">
         <p className="text-body-l text-bg font-medium">Sin voluntarios</p>
         <p className="text-body-s text-bg/50 mt-1">
@@ -90,18 +86,13 @@ export default function AdminVolunteers() {
     <div className="p-6 max-w-4xl mx-auto">
 
       {/* Page header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="group_add" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
-        <div>
-          <h1 className="text-headline-s text-bg font-black leading-tight">Voluntarios</h1>
-          <p className="text-body-s text-bg/50 mt-0.5">
-            {isAdmin
-              ? 'Inscripciones de interés. Asigna a un líder y crea usuarios.'
-              : 'Voluntarios asignados a ti.'}
-          </p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-headline-s text-bg font-black leading-tight">Voluntarios</h1>
+        <p className="text-body-s text-bg/50 mt-0.5">
+          {isAdmin
+            ? 'Inscripciones de interés. Asigna a un líder y crea usuarios.'
+            : 'Voluntarios asignados a ti.'}
+        </p>
       </div>
 
       {loading ? <Spinner /> : volunteers.length === 0 ? (
@@ -115,11 +106,6 @@ export default function AdminVolunteers() {
             const deptLabel = areas.find(a => a.value === v.department)?.title || v.department || v.area;
             return (
               <div key={v.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
-
-                {/* Leading icon */}
-                <div className="w-10 h-10 rounded-xl bg-bg flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon name="person" className="w-[18px] h-[18px] text-white" stroke={1.8} />
-                </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
@@ -153,7 +139,6 @@ export default function AdminVolunteers() {
                   )}
                   {v.status !== 'usuario_creado' && (
                     <Button variant="tonal" size="sm" onClick={() => setCreateModal(v.ID)}>
-                      <Icon name="person_add" className="w-[16px] h-[16px]" stroke={1.8} />
                       Crear usuario
                     </Button>
                   )}
@@ -172,11 +157,6 @@ export default function AdminVolunteers() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="glass-light rounded-[28px] p-6 w-full max-w-sm shadow-elev-5 animate-fade-in"
               onClick={e => e.stopPropagation()}>
-
-              {/* Dialog icon */}
-              <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center mx-auto mb-4">
-                <Icon name="person_add" className="w-[24px] h-[24px] text-white" stroke={1.8} />
-              </div>
 
               <h3 className="text-headline-s text-bg font-black text-center mb-2">Crear usuario</h3>
               <p className="text-body-m text-bg/50 text-center mb-6 leading-relaxed">

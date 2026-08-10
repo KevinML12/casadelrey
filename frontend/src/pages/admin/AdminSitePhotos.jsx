@@ -7,7 +7,6 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
@@ -16,9 +15,7 @@ function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
       <div className="bg-bg/8 rounded-[20px] w-20 h-20 overflow-hidden shrink-0">
         {imageUrl
           ? <img src={imageUrl} alt="" className="w-full h-full object-cover" />
-          : <div className="w-full h-full flex items-center justify-center text-bg/50">
-              <Icon name="image" className="w-[26px] h-[26px]" stroke={1.8} />
-            </div>
+          : <div className="w-full h-full" />
         }
       </div>
       <div className="flex-1 min-w-0">

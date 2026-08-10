@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
-import { Icon } from '../../components/ui/Glass';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
@@ -152,14 +151,9 @@ export default function AdminProfile() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-          <Icon name="person" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-        </div>
-        <div>
-          <h1 className="text-headline-s text-bg font-black leading-tight">Mi Perfil</h1>
-          <p className="text-body-s text-bg/50 mt-0.5">Tu cuenta y tus metas</p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-headline-s text-bg font-black leading-tight">Mi Perfil</h1>
+        <p className="text-body-s text-bg/50 mt-0.5">Tu cuenta y tus metas</p>
       </div>
 
       {/* Identidad */}
@@ -182,7 +176,6 @@ export default function AdminProfile() {
           {editingProfile ? 'Ocultar' : 'Editar perfil'}
         </Button>
         <Button variant="outlined" onClick={() => { setEditingPassword(v => !v); setEditingProfile(false); }}>
-          <Icon name="lock" className="w-4 h-4" stroke={1.8} />
           {editingPassword ? 'Ocultar' : 'Cambiar contraseña'}
         </Button>
       </div>
@@ -196,10 +189,7 @@ export default function AdminProfile() {
 
       {/* Metas */}
       <div className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6">
-        <h2 className="text-16 font-bold text-bg tracking-tightish mb-5 flex items-center gap-2">
-          <Icon name="spark" className="w-5 h-5 text-celeste" stroke={1.8} />
-          Mis metas
-        </h2>
+        <h2 className="text-16 font-bold text-bg tracking-tightish mb-5">Mis metas</h2>
 
         <form onSubmit={addGoal} className="flex gap-2.5 mb-5">
           <Input
@@ -212,10 +202,9 @@ export default function AdminProfile() {
             type="submit"
             variant="filled"
             disabled={adding || !newTitle.trim()}
-            aria-label="Agregar meta"
             className="shrink-0"
           >
-            {adding ? '…' : <Icon name="add" className="w-4 h-4" stroke={2} />}
+            {adding ? '…' : 'Agregar'}
           </Button>
         </form>
 
@@ -233,12 +222,10 @@ export default function AdminProfile() {
                 <button
                   onClick={() => toggleGoal(g)}
                   aria-label={g.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors focus-ring ${
-                    g.completed ? 'bg-celeste border-celeste text-white' : 'border-bg/25 hover:border-bg/50'
+                  className={`w-6 h-6 rounded-full border-2 shrink-0 transition-colors focus-ring ${
+                    g.completed ? 'bg-celeste border-celeste' : 'border-bg/25 hover:border-bg/50'
                   }`}
-                >
-                  {g.completed && <Icon name="check" className="w-3.5 h-3.5" stroke={2.5} />}
-                </button>
+                />
                 <div className="flex-1 min-w-0">
                   <p className={`text-14 font-medium text-bg ${g.completed ? 'line-through text-bg/45' : ''}`}>
                     {g.title}
@@ -247,9 +234,9 @@ export default function AdminProfile() {
                     <p className="text-12 text-bg/45 mt-0.5">Para: {g.target_date}</p>
                   )}
                 </div>
-                <button onClick={() => deleteGoal(g.ID)} aria-label="Eliminar meta"
-                  className="text-bg/40 hover:text-bg p-1 shrink-0 transition-colors focus-ring rounded-full">
-                  <Icon name="close" className="w-4 h-4" stroke={1.8} />
+                <button onClick={() => deleteGoal(g.ID)}
+                  className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors shrink-0">
+                  Eliminar
                 </button>
               </div>
             ))}

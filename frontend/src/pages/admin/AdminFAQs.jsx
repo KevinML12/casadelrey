@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
-import Button, { IconButton } from '../../components/ui/Button';
-import { Icon } from '../../components/ui/Glass';
+import Button from '../../components/ui/Button';
 
 const EMPTY = { question: '', answer: '', sort_order: 0, is_active: true };
 
@@ -47,7 +46,6 @@ function FAQForm({ onSave, onCancel, initialData }) {
       </div>
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Agregar FAQ')}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
@@ -92,17 +90,11 @@ export default function AdminFAQs() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="help_center" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-title-l text-bg mb-1">Preguntas Frecuentes (FAQs)</h1>
-            <p className="text-body-m text-bg/50">Gestiona las preguntas comunes que aparecen en la página de Eventos.</p>
-          </div>
+        <div>
+          <h1 className="text-title-l text-bg mb-1">Preguntas Frecuentes (FAQs)</h1>
+          <p className="text-body-m text-bg/50">Gestiona las preguntas comunes que aparecen en la página de Eventos.</p>
         </div>
         <Button variant="filled" onClick={() => { setEditingFaq(null); setShowForm(!showForm); }}>
-          <Icon name={showForm ? 'close' : 'add'} className="w-[18px] h-[18px]" stroke={1.8} />
           {showForm ? 'Cancelar' : 'Nueva FAQ'}
         </Button>
       </div>
@@ -124,9 +116,6 @@ export default function AdminFAQs() {
         </div>
       ) : faqs.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <div className="w-16 h-16 rounded-[28px] bg-bg/8 flex items-center justify-center">
-            <Icon name="help_center" className="w-[32px] h-[32px] text-bg/50" stroke={1.8} />
-          </div>
           <p className="text-body-l text-bg font-medium">No hay FAQs agregadas</p>
         </div>
       ) : (
@@ -148,30 +137,21 @@ export default function AdminFAQs() {
                 </div>
               </div>
 
-              <div className="flex shrink-0 gap-1 self-end sm:self-center">
-                <IconButton
-                  variant="text"
-                  title={faq.is_active ? 'Ocultar' : 'Mostrar'}
-                  onClick={() => handleToggle(faq)}
-                  className={!faq.is_active ? 'text-bg/50' : 'text-celeste'}
-                >
-                  <Icon name={faq.is_active ? 'visibility' : 'visibility_off'} className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton
-                  variant="text"
-                  title="Editar"
+              <div className="flex items-center gap-3 self-end sm:self-center shrink-0 text-13 font-semibold">
+                <button onClick={() => handleToggle(faq)} className="text-bg/55 hover:text-bg transition-colors">
+                  {faq.is_active ? 'Ocultar' : 'Mostrar'}
+                </button>
+                <span className="text-bg/20">·</span>
+                <button
                   onClick={() => { setEditingFaq(faq); setShowForm(true); window.scrollTo(0, 0); }}
+                  className="text-bg/55 hover:text-bg transition-colors"
                 >
-                  <Icon name="edit" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
-                <IconButton
-                  variant="text"
-                  title="Eliminar"
-                  onClick={() => handleDelete(faq.ID)}
-                  className="text-rose hover:bg-rose/10"
-                >
-                  <Icon name="delete" className="w-[18px] h-[18px]" stroke={1.8} />
-                </IconButton>
+                  Editar
+                </button>
+                <span className="text-bg/20">·</span>
+                <button onClick={() => handleDelete(faq.ID)} className="text-bg/55 hover:text-rose transition-colors">
+                  Eliminar
+                </button>
               </div>
 
             </div>

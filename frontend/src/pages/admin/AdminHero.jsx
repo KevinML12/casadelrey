@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
-import { Icon } from '../../components/ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 
 // Nota importante: el hero público (Home.jsx) NO tiene botón secundario —
@@ -82,7 +81,6 @@ function HeroPreview({ data }) {
         {data.cta_primary_text && (
           <div className="mt-3 inline-flex w-fit items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass text-white text-10 font-bold">
             {data.cta_primary_text}
-            <Icon name="arrow" className="w-3 h-3" stroke={2.2} />
           </div>
         )}
       </div>
@@ -178,7 +176,6 @@ function HeroForm({ initial, onSave, onCancel }) {
               </div>
             ) : (
               <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-celeste transition-colors">
-                <Icon name={uploading ? 'hourglass_empty' : 'add_photo_alternate'} className="w-[28px] h-[28px] text-bg/50" stroke={1.8} />
                 <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del hero'}</p>
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
               </label>
@@ -200,7 +197,6 @@ function HeroForm({ initial, onSave, onCancel }) {
         <div className="flex gap-3">
           <button type="submit" disabled={loading}
             className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-            <Icon name="save" className="w-[16px] h-[16px]" stroke={1.8} />
             {loading ? 'Guardando…' : initial?.ID ? 'Guardar cambios' : 'Crear hero'}
           </button>
           <button type="button" onClick={onCancel}
@@ -258,8 +254,8 @@ export default function AdminHero() {
     return (
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
-          <button onClick={() => setEditing(null)} className="w-9 h-9 rounded-full hover:bg-bg/8 flex items-center justify-center transition-colors">
-            <Icon name="arrow_back" className="w-[18px] h-[18px] text-bg/50" stroke={1.8} />
+          <button onClick={() => setEditing(null)} className="text-13 font-semibold text-bg/55 hover:text-bg transition-colors">
+            Volver
           </button>
           <div>
             <h1 className="text-headline-s text-bg font-black">{editing?.ID ? 'Editar hero' : 'Nuevo hero'}</h1>
@@ -275,18 +271,12 @@ export default function AdminHero() {
     <div className="p-6 max-w-5xl mx-auto">
 
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-bg flex items-center justify-center shrink-0">
-            <Icon name="view_carousel" className="w-[22px] h-[22px] text-white" stroke={1.8} />
-          </div>
-          <div>
-            <h1 className="text-headline-s text-bg font-black">Hero del sitio</h1>
-            <p className="text-body-s text-bg/50">Controla lo que ven los visitantes al entrar</p>
-          </div>
+        <div>
+          <h1 className="text-headline-s text-bg font-black">Hero del sitio</h1>
+          <p className="text-body-s text-bg/50">Controla lo que ven los visitantes al entrar</p>
         </div>
         <button onClick={() => setEditing(EMPTY)}
           className="flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 transition-opacity">
-          <Icon name="add" className="w-[18px] h-[18px]" stroke={1.8} />
           Nuevo hero
         </button>
       </div>
@@ -297,14 +287,12 @@ export default function AdminHero() {
         </div>
       ) : heroes.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <Icon name="view_carousel" className="w-[48px] h-[48px]" stroke={1.8} />
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin heroes guardados</p>
             <p className="text-body-s mt-1">El sitio usa el hero por defecto. Crea uno para personalizarlo.</p>
           </div>
           <button onClick={() => setEditing(EMPTY)}
             className="mt-2 flex items-center gap-2 h-10 px-4 rounded-xl bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity">
-            <Icon name="add" className="w-[16px] h-[16px]" stroke={1.8} />
             Crear el primer hero
           </button>
         </div>
@@ -317,8 +305,7 @@ export default function AdminHero() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-title-s text-bg font-bold">{h.title_line_1} {h.title_line_2}</h3>
                   {h.is_active && (
-                    <span className="px-2 py-0.5 rounded-full bg-bg text-white text-label-s font-semibold flex items-center gap-1">
-                      <Icon name="check_circle" className="w-[12px] h-[12px]" stroke={1.8} />
+                    <span className="px-2 py-0.5 rounded-full bg-bg text-white text-label-s font-semibold">
                       Activo en sitio
                     </span>
                   )}
@@ -327,18 +314,16 @@ export default function AdminHero() {
                   {!h.is_active && (
                     <button onClick={() => activate(h.ID)}
                       className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-bg text-white text-label-m font-semibold hover:opacity-90 transition-opacity">
-                      <Icon name="publish" className="w-[14px] h-[14px]" stroke={1.8} />
                       Activar
                     </button>
                   )}
                   <button onClick={() => setEditing(h)}
                     className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:bg-bg/8 transition-colors">
-                    <Icon name="edit" className="w-[14px] h-[14px]" stroke={1.8} />
                     Editar
                   </button>
                   <button onClick={() => remove(h.ID)}
                     className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-label-m text-rose hover:bg-rose-soft transition-colors">
-                    <Icon name="delete" className="w-[14px] h-[14px]" stroke={1.8} />
+                    Eliminar
                   </button>
                 </div>
               </div>
