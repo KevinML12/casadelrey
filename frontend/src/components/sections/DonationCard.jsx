@@ -175,7 +175,7 @@ export default function DonationCard() {
   const summaries = [
     `Q${finalAmount || '—'}`,
     purposeLabel,
-    `${methodLabel}${isTransfer && receiptUrl ? ' · boleta ✓' : ''}`,
+    `${methodLabel}${isTransfer && receiptUrl ? ' · con boleta' : ''}`,
     '',
   ];
 
