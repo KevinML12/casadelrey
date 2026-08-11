@@ -25,6 +25,8 @@ import ModalWrapper from '../../components/ui/ModalWrapper';
 import Tilt from '../../components/ui/Tilt';
 import { useApi } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
+import apiClient from '../../lib/apiClient';
+import toast from 'react-hot-toast';
 
 const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring shadow-card hover:opacity-90';
 const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
@@ -88,55 +90,37 @@ const zonaCanonica = (z) => {
 const zonasDe = (cells) =>
   [...new Set(cells.map(c => zonaCanonica(c.zone)).filter(Boolean))];
 
-// Compartido entre la lista de células (dentro del WindowStack) y el
-// resultado del quiz -- antes vivía duplicado inline en el .map de la
-// lista, ahora es una sola fuente de verdad para el link de WhatsApp.
-//
-// Devuelve null cuando el líder no tiene teléfono en /admin/leaders.
-// Antes caía a `https://wa.me/?text=...` (sin número): eso abre WhatsApp
-// con un selector de contactos VACÍO. Hoy ninguno de los 16 líderes está
-// en el directorio, así que las 16 filas prometían un contacto que no
-// existe y la iglesia ni se enteraba del intento. Con null, quien llama
-// decide: fila informativa en vez de link roto. El día que el dueño
-// cargue los números, las filas reviven solas sin tocar código.
-function waHrefFor(cell, groupName, leaderByName) {
-  const phone = (leaderByName[norm(cell.leader)]?.phone || '').replace(/\D/g, '');
-  if (!phone) return null;
-  const nombre = (cell.leader || '').split(' ')[0];
-  const contexto = [groupName, cell.zone].filter(Boolean).join(', ');
-  const waText = encodeURIComponent(
-    `Hola${nombre ? ` ${nombre}` : ''}, me interesa unirme a la célula "${cell.name}"${contexto ? ` (${contexto})` : ''}. ¿Me pueden dar más información?`
-  );
-  return `https://wa.me/${phone}?text=${waText}`;
-}
+// NOTA (ago-2026): aquí vivía waHrefFor, que armaba el enlace de WhatsApp
+// al líder de cada célula. Se fue entero junto con el fetch de /leaders y
+// el mapa leaderByName: ninguno de los 16 líderes está en ese directorio,
+// así que los 16 enlaces abrían WhatsApp con un selector de contactos
+// VACÍO. Y aun con los teléfonos cargados el modelo era malo -- el
+// intento moría en el chat de una persona y la iglesia nunca se enteraba
+// de que alguien quiso entrar. Ahora la fila abre CellJoinForm, que
+// registra la solicitud y la deja en el panel del líder y del admin.
 
 // Una fila de célula, compartida por la ventana (tono oscuro sobre
 // .liquid-glass) y el resultado del quiz (tono claro sobre ModalWrapper).
-// Es <a> SOLO si hay teléfono real; si no, es un <div> informativo con la
-// misma tipografía y el mismo divide-y, pero sin href, sin aria-label de
-// acción, sin cursor-pointer y sin hover -- nada que prometa un clic que
-// no lleva a ningún lado.
-function CellRow({ cell, groupName, leaderByName, index = 0, tone = 'dark' }) {
-  const href = waHrefFor(cell, groupName, leaderByName);
+//
+// Es un BOTÓN que abre la solicitud de ingreso (ago-2026). Antes era un
+// enlace a WhatsApp construido con el teléfono del líder, y eso tenía dos
+// problemas: el directorio de líderes está vacío, así que los 16 enlaces
+// abrían WhatsApp sin destinatario; y aunque hubiera teléfonos, la
+// iglesia nunca se enteraba de que alguien había querido entrar -- el
+// intento se perdía en el chat de una persona. Ahora la solicitud queda
+// registrada y aterriza en el panel del líder de ESA célula.
+function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
   const dark = tone === 'dark';
-  const Comp = href ? motion.a : motion.div;
-  const linkProps = href
-    ? {
-        href,
-        target: '_blank',
-        rel: 'noopener noreferrer',
-        'aria-label': `Escribir por WhatsApp al líder de la célula ${cell.name}`,
-      }
-    : {};
-
   return (
-    <Comp
-      {...linkProps}
+    <motion.button
+      type="button"
+      onClick={() => onSolicitar(cell)}
+      aria-label={`Quiero unirme a la célula ${cell.name}`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 + index * 0.03 }}
-      className={`flex items-center gap-4 py-4 px-3 -mx-3 first:pt-0 last:pb-0 rounded-[12px] transition-colors ${
-        href ? `cursor-pointer focus-ring ${dark ? 'hover:bg-white/5' : 'hover:bg-bg/5'}` : ''
+      className={`w-full text-left flex items-center gap-4 py-4 px-3 -mx-3 first:pt-0 last:pb-0 rounded-[12px] transition-colors focus-ring ${
+        dark ? 'hover:bg-white/5' : 'hover:bg-bg/5'
       }`}
     >
       <div className="min-w-0 flex-1">
@@ -152,7 +136,107 @@ function CellRow({ cell, groupName, leaderByName, index = 0, tone = 'dark' }) {
           </p>
         )}
       </div>
-    </Comp>
+      <span className={`shrink-0 text-13 font-bold ${dark ? 'text-white/70' : 'text-bg/60'}`}>
+        Unirme
+      </span>
+    </motion.button>
+  );
+}
+
+// Solicitud de ingreso a UNA célula concreta. Vive DENTRO de la ventana
+// que ya está abierta (o del modal del quiz), como un paso más: abrir un
+// segundo modal encima del primero sería una trampa de foco y de scroll.
+//
+// Manda al MISMO endpoint público que /conectate (POST /connect-cards),
+// con category 'busco_celula' y el cell_id. El backend valida la célula y
+// auto-asigna la tarjeta al líder de esa célula, así que entra directo en
+// su panel y en el del admin, sin que nadie la reparta a mano.
+function CellJoinForm({ cell, onBack, tone = 'dark' }) {
+  const dark = tone === 'dark';
+  const [form, setForm] = useState({ name: '', phone: '', email: '' });
+  const [enviando, setEnviando] = useState(false);
+  const [listo, setListo] = useState(false);
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  const enviar = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim()) {
+      toast.error('Necesitamos tu nombre y un teléfono para contactarte.');
+      return;
+    }
+    setEnviando(true);
+    try {
+      await apiClient.post('/connect-cards', {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        category: 'busco_celula',
+        cell_id: cell.id,
+      });
+      setListo(true);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'No se pudo enviar. Inténtalo de nuevo.');
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  if (listo) {
+    return (
+      <div className="text-center py-6">
+        <h3 className={`text-22 font-bold mb-2 ${dark ? 'text-white' : 'text-bg'}`}>Solicitud enviada</h3>
+        <p className={`text-15 leading-relaxed ${dark ? 'text-white/65' : 'text-bg/60'}`}>
+          {cell.leader
+            ? `Le avisamos a ${cell.leader.split(' ')[0]}, que lidera ${cell.name}. Te contactan pronto.`
+            : `Le avisamos al equipo de ${cell.name}. Te contactan pronto.`}
+        </p>
+      </div>
+    );
+  }
+
+  const input = `w-full rounded-[12px] px-4 py-3 text-15 outline-none transition-colors ${
+    dark
+      ? 'bg-white/8 border border-white/15 text-white placeholder:text-white/35 focus:border-white/35'
+      : 'bg-bg/5 border border-bg/12 text-bg placeholder:text-bg/35 focus:border-bg/30'
+  }`;
+
+  return (
+    <form onSubmit={enviar} className="text-left">
+      <button
+        type="button"
+        onClick={onBack}
+        className={`text-13 font-semibold mb-4 underline underline-offset-4 ${dark ? 'text-white/55 hover:text-white decoration-white/25' : 'text-bg/55 hover:text-bg decoration-bg/25'}`}
+      >
+        Volver a la lista
+      </button>
+
+      <p className={`text-13 font-semibold mb-1 ${dark ? 'text-white/55' : 'text-bg/55'}`}>Quiero unirme a</p>
+      <h3 className={`text-20 font-bold leading-tight mb-1 ${dark ? 'text-white' : 'text-bg'}`}>{cell.name}</h3>
+      <p className={`text-13 mb-5 ${dark ? 'text-white/50' : 'text-bg/55'}`}>
+        {cell.leader}{cell.zone ? ` · ${cell.zone}` : ''}
+      </p>
+
+      <div className="flex flex-col gap-3">
+        <input className={input} value={form.name} onChange={set('name')} placeholder="Tu nombre *" required autoFocus />
+        <input className={input} value={form.phone} onChange={set('phone')} placeholder="Tu teléfono o WhatsApp *" required />
+        <input className={input} type="email" value={form.email} onChange={set('email')} placeholder="Correo (opcional)" />
+      </div>
+
+      <motion.button
+        {...PRESS_PRIMARY}
+        type="submit"
+        disabled={enviando}
+        className={`w-full mt-4 inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-15 font-bold focus-ring disabled:opacity-50 ${
+          dark ? 'bg-white text-bg' : 'bg-bg text-white'
+        }`}
+      >
+        {enviando ? 'Enviando…' : 'Enviar solicitud'}
+      </motion.button>
+
+      <p className={`text-12 mt-3 leading-relaxed ${dark ? 'text-white/40' : 'text-bg/45'}`}>
+        Tus datos llegan al líder de la célula y al equipo de la iglesia. No se publican en ningún lado.
+      </p>
+    </form>
   );
 }
 
@@ -161,12 +245,20 @@ function CellRow({ cell, groupName, leaderByName, index = 0, tone = 'dark' }) {
 // propio estado LOCAL: WindowStack solo monta este cuerpo mientras esa
 // categoría está al frente, así que el filtro se resetea solo cada vez
 // que se abre/reabre una ventana, sin lógica extra de reset.
-function CellCategoryDetail({ group, leaderByName }) {
+function CellCategoryDetail({ group }) {
   const [zoneFilter, setZoneFilter] = useState(null);
+  // Célula para la que se está llenando la solicitud. La ventana ya es un
+  // modal, así que el formulario REEMPLAZA su cuerpo en vez de abrir otro
+  // modal encima (foco y scroll anidados son una trampa).
+  const [solicitando, setSolicitando] = useState(null);
   const zones = zonasDe(group.cells);
   const filtered = zoneFilter
     ? group.cells.filter(c => zonaCanonica(c.zone) === zoneFilter)
     : group.cells;
+
+  if (solicitando) {
+    return <CellJoinForm cell={solicitando} onBack={() => setSolicitando(null)} />;
+  }
 
   return (
     <>
@@ -217,33 +309,25 @@ function CellCategoryDetail({ group, leaderByName }) {
           así que un círculo-avatar era casi siempre el mismo placeholder
           gris repetido fila tras fila -- eso es justo lo que se siente
           "de plantilla". Sin fingir una foto que no existe: tipografía
-          grande para el nombre, un separador fino entre filas. La fila es
-          el link de WhatsApp solo cuando hay teléfono real (ver CellRow). */}
+          grande para el nombre, un separador fino entre filas. Cada fila
+          abre la solicitud de ingreso a ESA célula. */}
       <div className="flex flex-col divide-y divide-white/10">
         {filtered.map((c, i) => (
           <CellRow
             key={`${c.name}-${i}`}
             cell={c}
-            groupName={group.name}
-            leaderByName={leaderByName}
+            onSolicitar={setSolicitando}
             index={i}
           />
         ))}
       </div>
 
-      {/* Salida de la ventana. Mientras /admin/leaders no tenga los
-          teléfonos de los líderes, NINGUNA fila es clicable y el visitante
-          se quedaría sin forma de continuar. /conectate es el formulario de
-          contacto REAL del sitio (los envíos caen en /admin/connect-cards),
-          así que la iglesia sí se entera del intento. No se inventa aquí
-          ningún teléfono ni correo: el único teléfono en la API
-          (settings.contact_whatsapp) está documentado en el panel como
-          respaldo de DONACIONES, no como contacto general. */}
+      {/* Salida para quien no se decide por una célula concreta: el
+          formulario general del sitio, que cae en la misma bandeja
+          (/admin/connect-cards) pero sin célula asignada. */}
       <div className="mt-6 pt-5 border-t border-white/10">
         <p className="text-13 text-white/55 leading-relaxed mb-3">
-          {filtered.some(c => waHrefFor(c, group.name, leaderByName))
-            ? '¿Prefieres que te contactemos nosotros? Déjanos tus datos.'
-            : 'Déjanos tus datos y te conectamos con el líder de la célula más cercana a ti.'}
+          ¿No sabes cuál elegir? Déjanos tus datos y te ubicamos en la más cercana a ti.
         </p>
         <Link
           to="/conectate"
@@ -262,7 +346,10 @@ function CellCategoryDetail({ group, leaderByName }) {
 // real está en la pregunta 2 (zona): recomienda una CÉLULA ESPECÍFICA,
 // no solo la categoría. La pregunta 2 se salta sola si la categoría
 // elegida solo tiene una zona (o una sola célula) -- nada que filtrar.
-function CellQuizModal({ groups, leaderByName, onViewDetail }) {
+function CellQuizModal({ groups, onViewDetail }) {
+  // Mismo paso de solicitud que la ventana, en tono claro: el modal del
+  // quiz es la superficie clara del sitio.
+  const [solicitando, setSolicitando] = useState(null);
   const [step, setStep] = useState('category'); // 'category' | 'zone' | 'result'
   const [category, setCategory] = useState(null);
   const [zone, setZone] = useState(null);
@@ -276,6 +363,12 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
   };
   const chooseZone = (z) => { setZone(z); setStep('result'); };
   const restart = () => { setStep('category'); setCategory(null); setZone(null); };
+
+  // La solicitud gana a cualquier paso del quiz: es la acción final, y
+  // volver la devuelve al resultado donde estaba.
+  if (solicitando) {
+    return <CellJoinForm cell={solicitando} onBack={() => setSolicitando(null)} tone="light" />;
+  }
 
   if (step === 'zone' && category) {
     const zones = zonasDe(category.cells);
@@ -348,8 +441,7 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
             <CellRow
               key={`${c.name}-${i}`}
               cell={c}
-              groupName={category.name}
-              leaderByName={leaderByName}
+              onSolicitar={setSolicitando}
               index={i}
               tone="light"
             />
@@ -424,19 +516,10 @@ export default function CelulasPage() {
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');
-  // Directorio de líderes (foto + WhatsApp) — curado por el admin en
-  // /admin/leaders. Si el líder de una célula está en el directorio, su
-  // card gana foto real y el botón escribe DIRECTO a su WhatsApp.
-  const apiLeaders = useApi('/leaders');
   const [openKey, setOpenKey] = useState(null); // ventana abierta (o null)
   const [quizOpen, setQuizOpen] = useState(false);
   const [hoverCategory, setHoverCategory] = useState(null); // key bajo el cursor -- colorea el halo ambiental
 
-  const leaderByName = useMemo(() => {
-    const map = {};
-    (Array.isArray(apiLeaders) ? apiLeaders : []).forEach(l => { map[norm(l.name)] = l; });
-    return map;
-  }, [apiLeaders]);
 
   // Categorías 100% administrables (/admin/cell-categories): nombre, edad,
   // descripción y type_key (a qué tipo estructural de célula pertenece)
@@ -667,7 +750,7 @@ export default function CelulasPage() {
         renderContent={(it) => {
           const g = groups.find(gr => gr.key === it.key);
           if (!g) return null;
-          return <CellCategoryDetail group={g} leaderByName={leaderByName} />;
+          return <CellCategoryDetail group={g} />;
         }}
       />
 
@@ -678,7 +761,6 @@ export default function CelulasPage() {
           <ModalWrapper onClose={() => setQuizOpen(false)}>
             <CellQuizModal
               groups={groups}
-              leaderByName={leaderByName}
               onViewDetail={(key) => { setQuizOpen(false); setOpenKey(key); }}
             />
           </ModalWrapper>

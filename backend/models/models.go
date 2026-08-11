@@ -125,6 +125,22 @@ type ConnectCard struct {
 	LeaderAssigned   *User  `json:"leader_assigned,omitempty" gorm:"foreignKey:LeaderAssignedID"`
 	Status           string `json:"status" gorm:"type:varchar(20);default:'nuevo'"` // nuevo|contactado|integrado
 	Notes            string `json:"notes" gorm:"type:text"`
+
+	// CellID: la célula CONCRETA que la persona pidió desde /celulas
+	// (ago-2026). Antes esa página no registraba nada: cada fila era un
+	// enlace de WhatsApp al líder, así que si alguien quería entrar a
+	// "Wild Youth", la iglesia no se enteraba nunca -- y encima el enlace
+	// abría sin destinatario porque el directorio de líderes está vacío.
+	// Ahora la solicitud entra por el mismo canal que el resto de
+	// visitantes (POST /connect-cards), queda en la base y aparece en el
+	// panel del líder y en el del admin para coordinar.
+	//
+	// Es opcional a propósito: una tarjeta de /conectate no pide célula.
+	// Cuando viene, el handler usa Cell.LeaderID para rellenar
+	// LeaderAssignedID solo, así la solicitud aterriza directo en el panel
+	// del líder que la va a atender, sin que un admin tenga que repartirla.
+	CellID *uint `json:"cell_id" gorm:"index"`
+	Cell   *Cell `json:"cell,omitempty" gorm:"foreignKey:CellID"`
 }
 
 type Donation struct {

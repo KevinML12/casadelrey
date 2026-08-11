@@ -35,6 +35,7 @@ func (h *ConnectCardHandler) Create(c echo.Context) error {
 		Email    string `json:"email"`
 		HowFound string `json:"how_found"`
 		Category string `json:"category"`
+		CellID   *uint  `json:"cell_id"` // solo cuando viene de /celulas
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -53,6 +54,32 @@ func (h *ConnectCardHandler) Create(c echo.Context) error {
 		Name: req.Name, Phone: req.Phone, Email: req.Email,
 		HowFound: req.HowFound, Category: req.Category, Status: "nuevo",
 	}
+
+	// Solicitud dirigida a una célula concreta (viene de /celulas): se
+	// valida que exista y esté activa, y se auto-asigna a SU líder. Ese
+	// auto-asignado es el punto del cambio -- sin él la solicitud caería
+	// en la bandeja general y un admin tendría que repartirla a mano,
+	// justo el trabajo que el visitante ya resolvió al elegir la célula.
+	//
+	// El cell_id NO se confía tal cual: llega de un formulario público.
+	// Si apunta a una célula inexistente o desactivada se ignora en vez
+	// de rechazar el envío -- la persona escribió sus datos de verdad y
+	// perderlos por un id viejo (una célula que el admin borró mientras
+	// la pestaña estaba abierta) sería el peor final posible. La tarjeta
+	// entra igual como "busco_celula" y el equipo la ubica.
+	if req.CellID != nil {
+		var cell models.Cell
+		if err := h.DB.Select("id", "leader_id", "is_active").First(&cell, *req.CellID).Error; err == nil && cell.IsActive {
+			card.CellID = req.CellID
+			if cell.LeaderID != 0 {
+				leaderID := cell.LeaderID
+				card.LeaderAssignedID = &leaderID
+			}
+		} else {
+			log.Printf("[ConnectCard] cell_id %d ignorado (inexistente o inactiva)", *req.CellID)
+		}
+	}
+
 	if err := h.DB.Create(&card).Error; err != nil {
 		log.Printf("[ConnectCard] Error al guardar: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo guardar. Inténtalo de nuevo."})
@@ -69,7 +96,7 @@ func (h *ConnectCardHandler) Create(c echo.Context) error {
 func (h *ConnectCardHandler) GetAll(c echo.Context) error {
 	page, limit := parsePage(c)
 
-	q := h.DB.Model(&models.ConnectCard{}).Preload("LeaderAssigned")
+	q := h.DB.Model(&models.ConnectCard{}).Preload("LeaderAssigned").Preload("Cell")
 	if status := c.QueryParam("status"); status != "" {
 		q = q.Where("status = ?", status)
 	}
@@ -124,7 +151,7 @@ func (h *ConnectCardHandler) Update(c echo.Context) error {
 	if err := h.DB.Save(&card).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo actualizar."})
 	}
-	h.DB.Preload("LeaderAssigned").First(&card, card.ID)
+	h.DB.Preload("LeaderAssigned").Preload("Cell").First(&card, card.ID)
 	return c.JSON(http.StatusOK, card)
 }
 

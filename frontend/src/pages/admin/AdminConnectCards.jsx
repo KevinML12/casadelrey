@@ -126,6 +126,19 @@ export default function AdminConnectCards() {
                     {card.how_found && <span>{HOW_FOUND[card.how_found] || card.how_found}</span>}
                   </div>
 
+                  {/* La célula que la persona pidió desde /celulas. Es el
+                      dato que decide la conversación -- sin él, "Busca
+                      célula" obliga a volver a preguntarle a alguien que
+                      YA eligió. Estas solicitudes llegan con el líder de
+                      esa célula ya asignado (lo hace el backend), así que
+                      normalmente el select de arriba ya viene resuelto. */}
+                  {card.cell && (
+                    <p className="text-body-s text-bg mt-1.5">
+                      Pidió entrar a <strong className="font-semibold">{card.cell.name}</strong>
+                      {card.cell.zone ? ` · ${card.cell.zone}` : ''}
+                    </p>
+                  )}
+
                   <div className="flex items-center gap-2 flex-wrap mt-3">
                     {isAdmin && (
                       <select
