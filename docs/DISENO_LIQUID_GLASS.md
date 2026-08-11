@@ -50,11 +50,54 @@ guía dedicada y autocontenida: `DISENO_LIQUID_GLASS_ADMIN.md`.
 |---|---|---|
 | `--bg` | `#0A1526` (navy) | Canvas base |
 | `--ink` | `#FFFFFF` | Texto |
-| `--celeste` | `#3B82F6` / `#7FA9F0` | Acento (con moderación) |
-| Tipografía | **Arimo** (`public/fonts/Arimo.woff2`, variable 400-700) | Todo. Clon libre de Helvetica (Apache, sin problema de licencia). NO pasa de 700. |
-| Radios | 16-28px | Cards; nada muy redondeado |
+| `--acento` | `#E8823C` | Acento **único**. Cuatro trabajos, ninguno más (ver abajo) |
+| `--rose` / `--amber` / `--emerald` | — | **Solo** estados de formulario (error/aviso/éxito). Nunca decorativos |
+| Tipografía | **Arimo** (`public/fonts/Arimo.woff2`, variable 400-700) | Todo. Clon libre de Helvetica (Apache). NO pasa de 700 |
+| Display | `text-d1` / `text-d2` / `text-d3` | Los **únicos** tres tamaños de titular |
+| Radios | 22px (card) / 28px (panel) | Cards y contenedores; nada muy redondeado |
 
-Colores en JSX vía clases Tailwind (`bg-bg`, `text-white`, `text-celeste`).
+Colores en JSX vía clases Tailwind (`bg-bg`, `text-white`, `text-acento`).
+
+### El acento es uno solo, y viene de las fotos
+
+`#E8823C` es la luz cálida de escenario muestreada de las fotos reales de la
+iglesia (los píxeles cálidos de `bg-ubicacion.jpg` promedian `#925D38`,
+`albums/alabanza.jpg` `#A38B69`, `bg-hero.jpg` `#B18768`). Contraste 6.70:1
+contra el canvas navy, en ambas direcciones.
+
+**Tiene cuatro trabajos y ninguno más**: link activo del header, borde de la
+cita bíblica, halo de hover de las cards de categoría, y el número de día del
+evento destacado. **El CTA primario sigue siendo blanco sobre navy** (18:1) —
+el acento no se convierte en color de botón.
+
+> ⚠️ Nota histórica (ago-2026). Hasta este cambio la paleta era
+> `--celeste #3B82F6` + `--rose #F43F5E` + `--amber #F59E0B` +
+> `--emerald #10B981`, y el halo de hover de Células/Voluntariado era un
+> arreglo de cinco colores asignado por índice de array. Se verificó
+> programáticamente que **los cinco eran exactamente la rampa 500 de Tailwind
+> sin tocar** (blue-500, rose-500, amber-500, emerald-500, violet-500), y que
+> `--ink-2`/`--ink-3` eran slate-400/slate-600. Nadie elige cinco colores y
+> aterriza en el stop 500 cinco veces seguidas: era el default del starter, no
+> una decisión — y es lo primero que delata a un sitio generado. Si vuelves a
+> necesitar un color, **no lo saques de la paleta de Tailwind**: muéstrealo de
+> una foto real de la iglesia.
+
+### La escala de display es cerrada
+
+`text-d1` (hero de página) · `text-d2` (titular de sección) · `text-d3` (dato
+editorial / cierre). Traen tamaño, `line-height`, `letter-spacing` y peso ya
+horneados en `tailwind.config.js`.
+
+**Prohibido `style={{ fontSize: 'clamp(...)' }}` en JSX.** Antes la clase
+`.display-mega` definía peso y tracking pero no tamaño, así que sus 24 usos lo
+resolvían cada uno por su cuenta: 16 valores de `clamp()` distintos, y cuatro
+secciones de Nosotros repetían el mismo carácter por carácter mientras otras
+inventaban el suyo. Cada sección decidía sin memoria de lo que se decidió dos
+archivos atrás — que es literalmente cómo trabaja un generador.
+
+Y **nada de `font-extrabold`/`font-black`**: Arimo topa en 700, así que pintan
+el mismo trazo que `font-bold` fingiendo una jerarquía que la pantalla nunca
+cumple.
 
 ---
 
@@ -74,6 +117,37 @@ Colores en JSX vía clases Tailwind (`bg-bg`, `text-white`, `text-celeste`).
 
 Regla: monocromático y sobrio. El material ES el acento — evita rellenar de
 colores planos o badges de más ("look IA").
+
+### Scrims: tres, con nombre
+
+Las capas oscuras que van **sobre** una foto para que el texto encima se lea.
+Definidas en `index.css`, y no hay más:
+
+- **`.scrim-hero`** — titular centrado sobre la foto (óvalo oscuro al centro,
+  desvanecido al canvas abajo; la foto respira en los bordes).
+- **`.scrim-card`** — texto anclado al tercio inferior.
+- **`.scrim-band`** — texto a un lado, foto entera visible al otro.
+
+**Dos reglas que van juntas:**
+
+1. **Ninguna imagen lleva `opacity-` menor a 100.** El contraste lo pone el
+   scrim, que solo oscurece donde hay texto.
+2. **Prohibido escribir `bg-gradient-to-* from-bg via-bg/N` a mano.**
+
+> ⚠️ Nota histórica (ago-2026). Antes esto eran **25 gradientes inline
+> distintos** haciendo lo mismo con el número puesto al azar — cuatro secciones
+> consecutivas de Nosotros tenían cuatro valores medios diferentes. Y encima
+> del scrim, la foto llevaba `opacity-45`, así que llegaba al visitante entre
+> el **14% y el 33%** de su color real: las caras de la congregación, lo único
+> irrepetible que tiene este sitio, se leían como una textura gris azulada
+> indistinguible de un stock.
+
+### Máximo dos fotos ambientales por página
+
+Si una sección no puede justificar por qué su foto es **contenido** y no
+ambiente, la foto se borra y la sección queda sobre navy limpio. El contraste
+entre "sección con foto entera" y "sección sin foto" es lo que crea ritmo:
+cuando el 100% de las secciones tiene foto al 45%, ninguna foto significa nada.
 
 ⚠️ Se intentó una versión con refracción REAL en WebGL (three.js,
 `MeshTransmissionMaterial`) — se descartó por completo tras varias rondas
@@ -115,10 +189,41 @@ vidrio del sitio es 100% CSS. No reintroducir WebGL para esto.
 
 - **El header es lo único NO transparente** (fondo sólido, blur alto). Todo lo
   demás es cristal.
-- **Nada de tipografía > 700** (Arimo no da más; los `.display-mega` en 800 se
-  ven en 700, es correcto).
+- **Nada de tipografía > 700** (Arimo no da más). No declares
+  `font-extrabold`/`font-black`: pintan igual que `font-bold`.
 - **Sin animaciones en loop** (ni sweeps, ni blobs). Movimiento = reacción a
   cursor/scroll/navegación.
+- **CERO iconos, emojis, pictogramas o glifos.** Es identidad del dueño, no una
+  preferencia de temporada: "la atención está sobre las fotos, el liquid glass
+  y su estilo tan sofisticado y minimalista". Aplica a TODO el proyecto, panel
+  admin incluido, y a los datos editables por el admin. Única excepción viva:
+  el spinner de carga (feedback de movimiento, no pictograma). Hay tests que
+  fallan si reaparecen — ver `e2e/design-rules.spec.js`.
+- **CERO eyebrows.** Nada de etiquetas de categoría encima de los titulares —
+  ni el pill de cristal con punto (ya borrado), ni su fórmula tipográfica
+  disfrazada (micro-mayúsculas con tracking sobre el título). El titular se
+  sostiene solo: "la idea es que todos los módulos se sientan orgánicos y se
+  sobreentiendan".
+- **Las fotos van a color, siempre.** Nada de `grayscale` ni filtros que
+  apaguen una foto.
+- **Tilt solo donde hay navegación**: `<Tilt>` únicamente si el nodo es
+  navegable (`as={Link}`/`as="a"`/`as="button"`/`onClick`) y mide ≥ ~200px.
+  Cuando todo se inclina, la inclinación deja de predecir nada — llegaron a
+  haber 30 Tilt de los cuales 19 no se podían clickear.
+- **El titular de sección nunca se revela.** Es el ancla estable contra la que
+  llega el contenido; si también entra animado, no hay punto fijo y el scroll
+  se siente gelatinoso. Nada above-the-fold se anima al entrar.
+- **Un solo vocabulario de movimiento**: `src/lib/motion.js`. Tres presses
+  según el ROL del botón (`PRESS_PRIMARY`/`PRESS_SECONDARY`/`PRESS_MICRO`), no
+  según el archivo. Prohibido declarar un `const PRESS` local — llegó a estar
+  duplicado en 7 archivos con la amplitud variando por archivo, de modo que un
+  CTA primario y un chip de redes vecinos tenían física idéntica.
+- **Un titular es un dato que solo esta iglesia puede decir.** Test antes de
+  aprobar cualquier titular: si sigue siendo cierto cambiando "Casa del Rey"
+  por cualquier otra iglesia, no es un titular — es relleno. Llegó a haber 15
+  de 15 frases con 2-4 palabras y punto final ("Alimenta tu espíritu.",
+  "Siembra con alegría.", "Momentos vivos."): eso no es criterio, es una firma
+  estadística. El dato específico va en la talla grande.
 - **Fotos**: siempre reales, de la iglesia, nunca stock/placeholder.
 - **Privacidad**: nunca direcciones exactas de células en público (solo
   nombre · líder · zona). Ver `docs/CONTEXTO_IGLESIA.md`.
@@ -195,6 +300,21 @@ si el test pasa, es porque el flujo real funciona, no porque se simuló.
 - `playwright.config.js` — apunta a `https://casadelreyhue.vercel.app` por
   defecto; `PW_BASE_URL` para apuntar a `localhost` si se levanta el dev
   server aparte.
+- **`e2e/design-rules.spec.js`** — blinda las reglas de identidad visual
+  (cero iconos/emojis, cero eyebrows, fotos a color, un `h1` por página) contra
+  regresión. Son las decisiones que es más fácil deshacer sin darse cuenta al
+  agregar una sección nueva. Corre en dos capas: **DOM** (lo que el visitante
+  ve, por ruta) y **fuente** (regex sobre todo `src/`, para cubrir también las
+  páginas que no están en la lista de rutas). Las reglas de fuente ignoran
+  comentarios a propósito: este repo documenta su historial en comentarios
+  largos que mencionan justamente los patrones vigilados.
+  Si un test de aquí falla, la pregunta correcta **no** es "cómo lo silencio"
+  sino "¿el dueño cambió de opinión sobre esta regla?".
+- Para revisar el sitio en local **con contenido real**, crea
+  `frontend/.env.local` con `VITE_API_URL=https://casa-del-rey-mvp.fly.dev`.
+  Sin eso, `VITE_API_URL` cae a `http://localhost:8080` y —con el backend Go
+  apagado— cada página se renderiza con sus datos de respaldo: una vista
+  engañosa para juzgar diseño.
 - `e2e/fixtures/auth.js` — login real por UI (nunca atajos de API). Lee
   credenciales de env vars, **nunca hardcodeadas**.
 - Credenciales van en `frontend/.env.e2e.local` (gitignored por el patrón
@@ -231,10 +351,17 @@ si el test pasa, es porque el flujo real funciona, no porque se simuló.
 
 ## 11. Cómo construir un módulo público nuevo
 
-1. `<main relative overflow-hidden>` + hero `ParallaxImg` vía `useSitePhoto` + gradiente.
-2. Encabezado: `<Eyebrow>` + `<h1 className="display-mega">`.
+1. `<main relative overflow-hidden>` + `<PageHero>` (que ya trae foto vía
+   `useSitePhoto` + `.scrim-hero`). Elige `align="left"` si la página es
+   narrativa, `align="center"` si es de acción — el mismo hero centrado en
+   todas hace que el visitante llegue a 9 pantallas que abren igual.
+2. Encabezado: **solo** `<h1 className="text-d1">`. Sin eyebrow, sin etiqueta,
+   sin pill. El titular dice algo que solo esta iglesia puede decir.
 3. Contenido en **collage** (spans/inclinaciones variados), cards con
-   `.liquid-glass .liquid-shine` y `<Tilt>`.
+   `.liquid-glass .liquid-shine` y `<Tilt>` — pero solo si la card es
+   navegable (ver Reglas firmes). Lo que es una **lista** se compone como
+   lista (`divide-y divide-white/10` sobre el canvas), no como pila de cards:
+   cuando todo es una card, la card deja de ser una decisión.
 4. Al entrar a un ítem → **`<WindowStack>`** con su galería; los demás ítems
    apilados detrás. Si es contenido de lectura larga/compartible → ruta
    propia en su lugar (ver sección 4).
