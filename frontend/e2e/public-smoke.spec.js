@@ -59,4 +59,46 @@ test.describe('Sitio público — smoke', () => {
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0, { timeout: 10_000 });
   });
+
+  test('cada célula ofrece una salida real: "Unirme" abre la solicitud', async ({ page }) => {
+    // Esto blinda el arreglo de ago-2026. Antes cada fila era un enlace a
+    // WhatsApp construido con el teléfono del líder, y como el directorio
+    // /leaders está vacío, las 16 abrían WhatsApp SIN destinatario: el
+    // visitante recorría toda la página y terminaba en un selector de
+    // contactos en blanco, sin que la iglesia se enterara del intento.
+    // Ahora la fila abre un formulario que registra la solicitud y la
+    // manda al panel del líder de esa célula.
+    //
+    // NO se envía el formulario a propósito: la suite corre también contra
+    // producción (ver playwright.config.js) y un submit dejaría una
+    // solicitud falsa en la bandeja real del equipo. Se valida el camino
+    // hasta dejarlo listo para enviar, igual que hace donate.spec.js.
+    await page.goto('/celulas');
+    const card = page.locator('button.liquid-glass').first();
+    await card.waitFor({ state: 'visible', timeout: 15_000 });
+    await card.click();
+
+    const dialog = page.locator('[role="dialog"][aria-modal="true"]');
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+
+    // Ninguna fila puede volver a ser un enlace de WhatsApp sin número.
+    const waSinNumero = await dialog.locator('a[href^="https://wa.me/?"]').count();
+    expect(waSinNumero, 'reapareció un enlace de WhatsApp sin destinatario').toBe(0);
+
+    const unirme = dialog.getByRole('button', { name: /quiero unirme a/i }).first();
+    await expect(unirme, 'las células deben ofrecer una acción de contacto').toBeVisible({ timeout: 10_000 });
+    await unirme.click();
+
+    // El formulario vive DENTRO de la misma ventana, no en un modal nuevo
+    // encima (foco y scroll anidados). Sigue habiendo un solo dialog.
+    await expect(page.locator('[role="dialog"][aria-modal="true"]')).toHaveCount(1);
+    await expect(dialog.getByText(/quiero unirme a/i)).toBeVisible();
+    await expect(dialog.getByPlaceholder(/tu nombre/i)).toBeVisible();
+    await expect(dialog.getByPlaceholder(/tel[eé]fono|whatsapp/i)).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /enviar solicitud/i })).toBeVisible();
+
+    // Y se puede volver sin perder la ventana.
+    await dialog.getByRole('button', { name: /volver a la lista/i }).click();
+    await expect(unirme).toBeVisible();
+  });
 });
