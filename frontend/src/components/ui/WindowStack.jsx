@@ -57,7 +57,17 @@ const stackPose = (depth) => ({
 // (Galería, Células). El banner con foto + degradado navy no cambia --
 // ya se lee bien en ambos casos porque el contraste lo da el degradado,
 // no el material de la ventana.
-export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80vh, 640px)', light = false }) {
+// `sobrepuesto` / `onCerrarSobrepuesto`: una SEGUNDA capa que se pone
+// encima de la ventana del frente sin cerrarla -- la ficha de un ítem
+// concreto dentro de la categoría que ya está abierta. Es el mismo
+// lenguaje de la pila, un nivel más adentro: la ventana de abajo no
+// desaparece, se queda asomando y se le nota que quedó atrás.
+//
+// Vive DENTRO de este overlay a propósito, en vez de montar un segundo
+// [role=dialog]: dos diálogos anidados pelean por el foco y por el
+// bloqueo de scroll. Aquí hay un solo diálogo y dos superficies, y el
+// Escape cierra primero la de encima.
+export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80vh, 640px)', light = false, sobrepuesto = null, onCerrarSobrepuesto }) {
   const overlayRef = useRef(null);
   // Quien pidió menos movimiento recibe la pila ya armada, sin el vuelo de
   // entrada: solo un fundido. La jerarquía de capas no se pierde, porque
@@ -92,7 +102,17 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
     overlayRef.current?.querySelector(FOCUSABLE)?.focus();
 
     const onKey = (e) => {
-      if (e.key === 'Escape') close();
+      // Escape cierra de arriba hacia abajo: primero la capa sobrepuesta,
+      // y solo cuando ya no hay, la ventana. Cerrarlo todo de un golpe
+      // haría perder el contexto al que la persona quiere volver.
+      if (e.key === 'Escape') {
+        if (sobrepuesto) onCerrarSobrepuesto?.();
+        else close();
+      }
+      // Las flechas saltan entre ventanas de la pila. Con una ficha
+      // abierta encima no aplican: saltar de categoría por debajo de ella
+      // dejaría la ficha hablando de otra cosa.
+      else if (sobrepuesto) return;
       else if (e.key === 'ArrowRight') go(1);
       else if (e.key === 'ArrowLeft') go(-1);
       else if (e.key === 'Tab') {
@@ -112,7 +132,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
       document.body.style.overflow = prev;
       prevFocus?.focus?.();
     };
-  }, [openKey, close, go]);
+  }, [openKey, close, go, sobrepuesto, onCerrarSobrepuesto]);
 
   return (
     <AnimatePresence>
@@ -264,6 +284,41 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
               );
             })}
           </div>
+
+          {/* ── Capa sobrepuesta: la ficha de un ítem concreto ──────────
+              Llega desde abajo y se posa ENCIMA de la ventana, que se
+              queda visible detrás y ligeramente empujada -- se le nota
+              que quedó atrás sin desaparecer. Es la misma gramática de la
+              pila, un nivel más adentro.
+
+              Tocar fuera la cierra, igual que el backdrop cierra la
+              ventana: en una pila de capas, "afuera" siempre significa
+              "un nivel atrás". */}
+          <AnimatePresence>
+            {sobrepuesto && (
+              <>
+                <motion.div
+                  className="absolute inset-0 z-[110] bg-bg/45"
+                  style={{ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={() => onCerrarSobrepuesto?.()}
+                />
+                <motion.div
+                  className={`absolute z-[115] w-full max-w-[560px] left-1/2 -translate-x-1/2 ${light ? 'glass-light' : 'liquid-glass'} liquid-shine rounded-[28px] overflow-hidden flex flex-col`}
+                  style={{ maxHeight: 'min(78vh, 620px)' }}
+                  initial={reducido ? { opacity: 0 } : { opacity: 0, y: 40, scale: 0.96 }}
+                  animate={reducido ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                  exit={reducido ? { opacity: 0 } : { opacity: 0, y: 28, scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                >
+                  <div className="overflow-y-auto p-5 sm:p-7" data-lenis-prevent>
+                    {sobrepuesto}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
           {/* Dots */}
           {/* El punto sigue midiendo 6px porque visualmente es lo correcto,

@@ -5,12 +5,12 @@
 //  y se salta entre ellos. Lenguaje de diseño: docs/DISENO_LIQUID_GLASS.md
 // ============================================================
 import { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import { RevealList, RevealItem } from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import WindowStack from '../../components/ui/WindowStack';
 import Tilt from '../../components/ui/Tilt';
+import { Dock, DockItem } from '../../components/ui/Dock';
 
 // Collage: tamaños/inclinaciones variados que se repiten por índice.
 // grid-auto-flow: dense rellena los huecos → recortes sin espacios.
@@ -85,19 +85,14 @@ export default function GalleryPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
+            // Dock: la grilla de álbumes son hermanos -- la magnificación
+            // por proximidad hace que el grupo responda como una
+            // superficie, no como cards sueltas.
+            <Dock className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
               {albums.map((a, i) => {
                 const big = SPANS[i % SPANS.length].includes('row-span-2');
                 return (
-                  <motion.div
-                    key={a.name}
-                    className={SPANS[i % SPANS.length]}
-                    initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
-                    whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
-                    viewport={{ once: true, margin: '-60px' }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
-                    style={{ transformPerspective: 1000, transformOrigin: 'center' }}
-                  >
+                  <DockItem key={a.name} className={SPANS[i % SPANS.length]} style={{ transformPerspective: 1000, transformOrigin: 'center' }}>
                     <Tilt
                       as="button"
                       max={4}
@@ -125,10 +120,10 @@ export default function GalleryPage() {
                         </h3>
                       </div>
                     </Tilt>
-                  </motion.div>
+                  </DockItem>
                 );
               })}
-            </div>
+            </Dock>
           )}
         </section>
       </div>

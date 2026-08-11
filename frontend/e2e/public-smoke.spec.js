@@ -85,14 +85,23 @@ test.describe('Sitio público — smoke', () => {
     const waSinNumero = await dialog.locator('a[href^="https://wa.me/?"]').count();
     expect(waSinNumero, 'reapareció un enlace de WhatsApp sin destinatario').toBe(0);
 
-    const unirme = dialog.getByRole('button', { name: /quiero unirme a/i }).first();
-    await expect(unirme, 'las células deben ofrecer una acción de contacto').toBeVisible({ timeout: 10_000 });
-    await unirme.click();
+    // Tocar una célula abre su FICHA en una capa encima de la ventana:
+    // horarios, líder, qué esperar. La ventana de la categoría se queda
+    // detrás, no se cierra.
+    const fila = dialog.getByRole('button', { name: /^ver la célula /i }).first();
+    await expect(fila, 'las células deben ofrecer una acción de contacto').toBeVisible({ timeout: 10_000 });
+    await fila.click();
+    await expect(dialog.getByRole('button', { name: /volver a la lista/i })).toBeVisible();
 
-    // El formulario vive DENTRO de la misma ventana, no en un modal nuevo
-    // encima (foco y scroll anidados). Sigue habiendo un solo dialog.
+    // Sigue habiendo UN solo dialog: la capa vive dentro del overlay que
+    // ya existe, no en un segundo [role=dialog]. Dos diálogos anidados
+    // pelean por el foco y por el bloqueo de scroll.
     await expect(page.locator('[role="dialog"][aria-modal="true"]')).toHaveCount(1);
-    await expect(dialog.getByText(/quiero unirme a/i)).toBeVisible();
+
+    // Desde la ficha, el CTA grande abre la solicitud.
+    const unirme = dialog.getByRole('button', { name: /^quiero unirme a /i }).first();
+    await expect(unirme).toBeVisible();
+    await unirme.click();
 
     // Campos con etiqueta, mismo patrón que la aplicación de Voluntariado.
     await dialog.getByLabel(/tu nombre/i).fill('Prueba E2E');

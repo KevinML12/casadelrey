@@ -25,6 +25,7 @@ import ModalWrapper from '../../components/ui/ModalWrapper';
 import Tilt from '../../components/ui/Tilt';
 import { useApi } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
+import { Dock, DockItem } from '../../components/ui/Dock';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 
@@ -102,7 +103,8 @@ const zonasDe = (cells) =>
 // Una fila de célula, compartida por la ventana (tono oscuro sobre
 // .liquid-glass) y el resultado del quiz (tono claro sobre ModalWrapper).
 //
-// Es un BOTÓN que abre la solicitud de ingreso (ago-2026). Antes era un
+// Es un BOTÓN que abre la FICHA de la célula en la capa sobrepuesta
+// (ago-2026) -- antes abría el formulario directo. Antes de eso era un
 // enlace a WhatsApp construido con el teléfono del líder, y eso tenía dos
 // problemas: el directorio de líderes está vacío, así que los 16 enlaces
 // abrían WhatsApp sin destinatario; y aunque hubiera teléfonos, la
@@ -115,7 +117,7 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
     <motion.button
       type="button"
       onClick={() => onSolicitar(cell)}
-      aria-label={`Quiero unirme a la célula ${cell.name}`}
+      aria-label={`Ver la célula ${cell.name}`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 + index * 0.03 }}
@@ -389,25 +391,92 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
   );
 }
 
+
+// Ficha de UNA célula, en la capa que se pone encima de la ventana de su
+// categoría. Reúne todo lo que el líder y el admin pueden editar desde
+// sus paneles: día, hora, zona, descripción y qué esperar en una reunión.
+//
+// Cada dato se pinta SOLO si existe. Con "nada estático" como regla del
+// proyecto, un renglón que dijera "Horario: por confirmar" sería una
+// promesa que nadie hizo -- mejor que la ficha sea corta y cierta.
+function CellDetailCard({ cell, onUnirme, onCerrar }) {
+  const datos = [
+    (cell.day || cell.time) && { k: 'Se reúnen', v: [cell.day, cell.time].filter(Boolean).join(' · ') },
+    cell.zone && { k: 'Dónde', v: cell.zone },
+    cell.leader && { k: 'Líder', v: cell.leader },
+  ].filter(Boolean);
+
+  return (
+    <div className="text-left">
+      <button
+        type="button"
+        onClick={onCerrar}
+        className="text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/25 mb-4"
+      >
+        Volver a la lista
+      </button>
+
+      <h3 className="text-d3 text-bg">{cell.name}</h3>
+
+      {datos.length > 0 && (
+        <dl className="mt-5 divide-y divide-bg/10">
+          {datos.map(d => (
+            <div key={d.k} className="flex items-baseline justify-between gap-6 py-3">
+              <dt className="text-13 font-semibold text-bg/55 shrink-0">{d.k}</dt>
+              <dd className="text-15 font-bold text-bg text-right">{d.v}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {cell.description && (
+        <p className="text-15 text-bg/70 leading-relaxed mt-5">{cell.description}</p>
+      )}
+
+      {cell.what_to_expect && (
+        <div className="glass-light-nested rounded-[16px] p-5 mt-5">
+          <p className="text-13 font-semibold text-bg/55 mb-2">Qué esperar</p>
+          <p className="text-15 text-bg/75 leading-relaxed">{cell.what_to_expect}</p>
+        </div>
+      )}
+
+      {/* Si el líder todavía no llenó nada, la ficha quedaría en el
+          nombre solo. Se dice qué falta en vez de fingir contenido, y el
+          botón de abajo sigue siendo una salida real. */}
+      {datos.length === 0 && !cell.description && !cell.what_to_expect && (
+        <p className="text-15 text-bg/55 leading-relaxed mt-5">
+          Esta célula todavía no publicó sus horarios. Déjanos tus datos y su
+          líder te cuenta cuándo y dónde se reúnen.
+        </p>
+      )}
+
+      {/* El CTA es lo más grande de la ficha, no un enlace más: es la
+          única acción de toda la pantalla. */}
+      <DockItem className="mt-7 block">
+        <motion.button
+          {...PRESS_PRIMARY}
+          type="button"
+          onClick={onUnirme}
+          className="w-full inline-flex items-center justify-center rounded-pill bg-bg text-white px-6 py-4 text-16 font-bold focus-ring shadow-card hover:opacity-95"
+        >
+          Quiero unirme a {cell.name}
+        </motion.button>
+      </DockItem>
+    </div>
+  );
+}
+
 // Cuerpo de la ventana de una categoría -- componente propio (no una
 // función inline en renderContent) para que el filtro de zona tenga su
 // propio estado LOCAL: WindowStack solo monta este cuerpo mientras esa
 // categoría está al frente, así que el filtro se resetea solo cada vez
 // que se abre/reabre una ventana, sin lógica extra de reset.
-function CellCategoryDetail({ group }) {
+function CellCategoryDetail({ group, onAbrirCelula }) {
   const [zoneFilter, setZoneFilter] = useState(null);
-  // Célula para la que se está llenando la solicitud. La ventana ya es un
-  // modal, así que el formulario REEMPLAZA su cuerpo en vez de abrir otro
-  // modal encima (foco y scroll anidados son una trampa).
-  const [solicitando, setSolicitando] = useState(null);
   const zones = zonasDe(group.cells);
   const filtered = zoneFilter
     ? group.cells.filter(c => zonaCanonica(c.zone) === zoneFilter)
     : group.cells;
-
-  if (solicitando) {
-    return <CellJoinForm cell={solicitando} cells={group.cells} onBack={() => setSolicitando(null)} tone="light" />;
-  }
 
   return (
     <>
@@ -460,17 +529,13 @@ function CellCategoryDetail({ group }) {
           "de plantilla". Sin fingir una foto que no existe: tipografía
           grande para el nombre, un separador fino entre filas. Cada fila
           abre la solicitud de ingreso a ESA célula. */}
-      <div className="flex flex-col divide-y divide-bg/10">
+      <Dock className="flex flex-col divide-y divide-bg/10">
         {filtered.map((c, i) => (
-          <CellRow
-            key={`${c.name}-${i}`}
-            cell={c}
-            onSolicitar={setSolicitando}
-            index={i}
-            tone="light"
-          />
+          <DockItem key={`${c.name}-${i}`}>
+            <CellRow cell={c} onSolicitar={onAbrirCelula} index={i} tone="light" />
+          </DockItem>
         ))}
-      </div>
+      </Dock>
 
       {/* Salida para quien no se decide por una célula concreta: el
           formulario general del sitio, que cae en la misma bandeja
@@ -667,6 +732,18 @@ export default function CelulasPage() {
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');
   const [openKey, setOpenKey] = useState(null); // ventana abierta (o null)
+  // Capa sobrepuesta: la ficha de UNA célula, encima de la ventana de su
+  // categoría. `solicitando` la convierte en el formulario sin cerrarla,
+  // así que el recorrido entero (categoría -> célula -> solicitud) ocurre
+  // en capas que se van poniendo una sobre otra, sin perder de vista de
+  // dónde vino cada una.
+  const [celulaAbierta, setCelulaAbierta] = useState(null);
+  const [solicitando, setSolicitando] = useState(false);
+  const abrirCelula = (cell) => { setCelulaAbierta(cell); setSolicitando(false); };
+  const cerrarCelula = () => { setCelulaAbierta(null); setSolicitando(false); };
+  // Al cambiar de categoría la ficha deja de tener sentido: habla de una
+  // célula que ya no está en la lista de abajo.
+  useEffect(() => { cerrarCelula(); }, [openKey]);
   const [quizOpen, setQuizOpen] = useState(false);
   const [hoverCategory, setHoverCategory] = useState(null); // key bajo el cursor -- colorea el halo ambiental
 
@@ -800,7 +877,11 @@ export default function CelulasPage() {
               background: `radial-gradient(680px circle at 50% 10%, ${GLOW}33, transparent 70%)`,
             }}
           />
-          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
+          {/* Dock: el collage es una fila de hermanos, que es exactamente
+              para lo que existe la magnificación por proximidad -- la
+              tarjeta bajo el cursor crece y sus vecinas la acompañan un
+              poco, así que el grupo entero responde como una superficie. */}
+          <Dock className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
             {groups.map((g, i) => {
               const c = COLLAGE[i % COLLAGE.length];
               const big = c.span.includes('row-span-2');
@@ -810,13 +891,9 @@ export default function CelulasPage() {
                 // que la profundidad de aparición vive en un nodo aparte —
                 // si compartieran la misma propiedad, una de las dos se
                 // pisaría en silencio.
-                <motion.div
+                <DockItem
                   key={g.key}
                   className={c.span}
-                  initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
-                  whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 16, delay: i * 0.06 }}
                   style={{ transformPerspective: 1000, transformOrigin: 'center' }}
                 >
                   <Tilt
@@ -859,10 +936,10 @@ export default function CelulasPage() {
                       </p>
                     </div>
                   </Tilt>
-                </motion.div>
+                </DockItem>
               );
             })}
-          </div>
+          </Dock>
 
           {/* Contacto — sin exponer direcciones */}
           <Reveal delay={0.1} depth className="relative z-10 mt-14">
@@ -903,10 +980,27 @@ export default function CelulasPage() {
         items={windowItems}
         openKey={openKey}
         onChange={setOpenKey}
+        onCerrarSobrepuesto={cerrarCelula}
+        sobrepuesto={celulaAbierta && (
+          solicitando ? (
+            <CellJoinForm
+              cell={celulaAbierta}
+              cells={groups.find(g => g.key === openKey)?.cells || []}
+              onBack={() => setSolicitando(false)}
+              tone="light"
+            />
+          ) : (
+            <CellDetailCard
+              cell={celulaAbierta}
+              onUnirme={() => setSolicitando(true)}
+              onCerrar={cerrarCelula}
+            />
+          )
+        )}
         renderContent={(it) => {
           const g = groups.find(gr => gr.key === it.key);
           if (!g) return null;
-          return <CellCategoryDetail group={g} />;
+          return <CellCategoryDetail group={g} onAbrirCelula={abrirCelula} />;
         }}
       />
 
