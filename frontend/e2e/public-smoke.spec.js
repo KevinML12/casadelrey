@@ -93,11 +93,22 @@ test.describe('Sitio público — smoke', () => {
     // encima (foco y scroll anidados). Sigue habiendo un solo dialog.
     await expect(page.locator('[role="dialog"][aria-modal="true"]')).toHaveCount(1);
     await expect(dialog.getByText(/quiero unirme a/i)).toBeVisible();
-    await expect(dialog.getByPlaceholder(/tu nombre/i)).toBeVisible();
-    await expect(dialog.getByPlaceholder(/tel[eé]fono|whatsapp/i)).toBeVisible();
-    await expect(dialog.getByRole('button', { name: /enviar solicitud/i })).toBeVisible();
 
-    // Y se puede volver sin perder la ventana.
+    // Campos con etiqueta, mismo patrón que la aplicación de Voluntariado.
+    await dialog.getByLabel(/tu nombre/i).fill('Prueba E2E');
+    await dialog.getByLabel(/tel[eé]fono o whatsapp/i).fill('50200000000');
+
+    // "Continuar" NO envía: lleva al paso que muestra a QUIÉN le va a
+    // llegar la solicitud. Ese paso es el punto del diseño — cada célula
+    // tiene su propio líder y es él quien la recibe.
+    await dialog.getByRole('button', { name: /^continuar$/i }).click();
+    await expect(dialog.getByText(/qui[eé]n te va a contactar/i)).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /confirmar solicitud/i })).toBeVisible();
+
+    // Hasta aquí llega el test: confirmar dispararía el POST y dejaría una
+    // solicitud falsa en la bandeja real del equipo cuando la suite corre
+    // contra producción. Se vuelve sin perder la ventana.
+    await dialog.getByRole('button', { name: /volver a editar/i }).click();
     await dialog.getByRole('button', { name: /volver a la lista/i }).click();
     await expect(unirme).toBeVisible();
   });

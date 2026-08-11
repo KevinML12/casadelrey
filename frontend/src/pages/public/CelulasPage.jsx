@@ -151,86 +151,214 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
 // con category 'busco_celula' y el cell_id. El backend valida la célula y
 // auto-asigna la tarjeta al líder de esa célula, así que entra directo en
 // su panel y en el del admin, sin que nadie la reparta a mano.
-function CellJoinForm({ cell, onBack, tone = 'dark' }) {
+function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) {
   const dark = tone === 'dark';
-  const [form, setForm] = useState({ name: '', phone: '', email: '' });
+  const [cell, setCell] = useState(cellInicial);
+  const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
   const [enviando, setEnviando] = useState(false);
   const [listo, setListo] = useState(false);
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+  // Cambiar de célula es una acción EXPLÍCITA, igual que en Voluntariado:
+  // se abre el selector, se elige, y recién ahí se confirma. Cerrarlo sin
+  // confirmar deja la célula original intacta. La persona ya eligió una al
+  // tocar su fila; que un desliz del mouse sobre un dropdown se la cambie
+  // sin avisar sería peor que no dejarla cambiar.
+  const [cambiando, setCambiando] = useState(false);
+  const [pendiente, setPendiente] = useState('');
+  // Enviar tampoco dispara el POST directo: primero muestra a QUIÉN le va
+  // a llegar. Ese es el dato que importa aquí -- cada célula tiene su
+  // propio líder y es él quien va a recibir la solicitud.
+  const [confirmando, setConfirmando] = useState(false);
 
-  const enviar = async (e) => {
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+  const otras = cells.filter(c => c.id !== cell.id);
+
+  const revisar = (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       toast.error('Necesitamos tu nombre y un teléfono para contactarte.');
       return;
     }
+    setConfirmando(true);
+  };
+
+  const enviar = async () => {
     setEnviando(true);
     try {
       await apiClient.post('/connect-cards', {
         name: form.name.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
+        message: form.message.trim(),
         category: 'busco_celula',
         cell_id: cell.id,
       });
       setListo(true);
     } catch (err) {
       toast.error(err.response?.data?.error || 'No se pudo enviar. Inténtalo de nuevo.');
+      setConfirmando(false);
     } finally {
       setEnviando(false);
     }
   };
 
+  const titulo = dark ? 'text-white' : 'text-bg';
+  const suave = dark ? 'text-white/55' : 'text-bg/55';
+  const tenue = dark ? 'text-white/70' : 'text-bg/70';
+  const campo = `w-full rounded-[12px] px-4 py-3 text-15 outline-none transition-colors ${
+    dark
+      ? 'bg-white/8 border border-white/15 text-white placeholder:text-white/30 focus:border-white/35'
+      : 'bg-bg/5 border border-bg/12 text-bg placeholder:text-bg/30 focus:border-bg/30'
+  }`;
+  const btnPpal = `w-full inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-15 font-bold focus-ring disabled:opacity-50 ${
+    dark ? 'bg-white text-bg' : 'bg-bg text-white'
+  }`;
+  const btnSec = `w-full inline-flex items-center justify-center rounded-pill px-6 py-3 text-14 font-semibold transition-colors ${
+    dark ? 'text-white/55 hover:text-white hover:bg-white/5' : 'text-bg/55 hover:text-bg hover:bg-bg/5'
+  }`;
+
   if (listo) {
     return (
       <div className="text-center py-6">
-        <h3 className={`text-22 font-bold mb-2 ${dark ? 'text-white' : 'text-bg'}`}>Solicitud enviada</h3>
-        <p className={`text-15 leading-relaxed ${dark ? 'text-white/65' : 'text-bg/60'}`}>
+        <h3 className={`text-22 font-bold mb-2 ${titulo}`}>Solicitud enviada</h3>
+        <p className={`text-15 leading-relaxed ${tenue}`}>
           {cell.leader
             ? `Le avisamos a ${cell.leader.split(' ')[0]}, que lidera ${cell.name}. Te contactan pronto.`
             : `Le avisamos al equipo de ${cell.name}. Te contactan pronto.`}
         </p>
+        <button type="button" onClick={onBack} className={`${btnSec} mt-5`}>Listo</button>
       </div>
     );
   }
 
-  const input = `w-full rounded-[12px] px-4 py-3 text-15 outline-none transition-colors ${
-    dark
-      ? 'bg-white/8 border border-white/15 text-white placeholder:text-white/35 focus:border-white/35'
-      : 'bg-bg/5 border border-bg/12 text-bg placeholder:text-bg/35 focus:border-bg/30'
-  }`;
+  // ── Confirmar: con el líder que la va a recibir a la vista ──────────
+  if (confirmando) {
+    return (
+      <div className="text-left">
+        <button
+          type="button"
+          onClick={() => setConfirmando(false)}
+          className={`text-13 font-semibold mb-4 underline underline-offset-4 ${suave} ${dark ? 'decoration-white/25 hover:text-white' : 'decoration-bg/25 hover:text-bg'}`}
+        >
+          Atrás
+        </button>
+        <p className={`text-13 font-semibold mb-1 ${suave}`}>Confirmar solicitud</p>
+        <h3 className={`text-21 font-bold tracking-tight mb-4 ${titulo}`}>{cell.name}</h3>
+
+        <div className={`rounded-[16px] p-5 mb-6 ${dark ? 'bg-white/6 border border-white/10' : 'glass-light-nested'}`}>
+          <p className={`text-13 font-semibold mb-2 ${suave}`}>¿Quién te va a contactar?</p>
+          <p className={`text-15 leading-relaxed ${tenue}`}>
+            {cell.leader
+              ? `${cell.leader}, que lidera esta célula.`
+              : 'El equipo de la iglesia, que te pondrá en contacto con el líder.'}
+            {cell.zone ? ` Se reúnen en ${cell.zone}.` : ''}
+          </p>
+          {cell.description && (
+            <p className={`text-14 leading-relaxed mt-2 ${dark ? 'text-white/50' : 'text-bg/55'}`}>{cell.description}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <motion.button {...PRESS_PRIMARY} type="button" onClick={enviar} disabled={enviando} className={btnPpal}>
+            {enviando ? 'Enviando…' : 'Confirmar solicitud'}
+          </motion.button>
+          <button type="button" onClick={() => setConfirmando(false)} disabled={enviando} className={btnSec}>
+            Volver a editar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={enviar} className="text-left">
+    <form onSubmit={revisar} className="text-left">
       <button
         type="button"
         onClick={onBack}
-        className={`text-13 font-semibold mb-4 underline underline-offset-4 ${dark ? 'text-white/55 hover:text-white decoration-white/25' : 'text-bg/55 hover:text-bg decoration-bg/25'}`}
+        className={`text-13 font-semibold mb-4 underline underline-offset-4 ${suave} ${dark ? 'decoration-white/25 hover:text-white' : 'decoration-bg/25 hover:text-bg'}`}
       >
         Volver a la lista
       </button>
 
-      <p className={`text-13 font-semibold mb-1 ${dark ? 'text-white/55' : 'text-bg/55'}`}>Quiero unirme a</p>
-      <h3 className={`text-20 font-bold leading-tight mb-1 ${dark ? 'text-white' : 'text-bg'}`}>{cell.name}</h3>
-      <p className={`text-13 mb-5 ${dark ? 'text-white/50' : 'text-bg/55'}`}>
-        {cell.leader}{cell.zone ? ` · ${cell.zone}` : ''}
-      </p>
+      <p className={`text-13 font-semibold ${suave}`}>Quiero unirme a</p>
+      <h3 className={`text-20 font-bold leading-tight mb-5 ${titulo}`}>{cell.name}</h3>
 
-      <div className="flex flex-col gap-3">
-        <input className={input} value={form.name} onChange={set('name')} placeholder="Tu nombre *" required autoFocus />
-        <input className={input} value={form.phone} onChange={set('phone')} placeholder="Tu teléfono o WhatsApp *" required />
-        <input className={input} type="email" value={form.email} onChange={set('email')} placeholder="Correo (opcional)" />
+      <div className="space-y-4">
+        <label className="block">
+          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Tu nombre <span className="text-rose">*</span></span>
+          <input className={campo} value={form.name} onChange={set('name')} required />
+        </label>
+        <label className="block">
+          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Teléfono o WhatsApp <span className="text-rose">*</span></span>
+          <input className={campo} type="tel" value={form.phone} onChange={set('phone')} required />
+        </label>
+        <label className="block">
+          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Correo (opcional)</span>
+          <input className={campo} type="email" value={form.email} onChange={set('email')} />
+        </label>
+        <label className="block">
+          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Cuéntanos algo de ti (opcional)</span>
+          <textarea
+            className={`${campo} resize-none`}
+            rows={3}
+            value={form.message}
+            onChange={set('message')}
+            placeholder="Tu edad, en qué horarios puedes, lo que quieras que sepan…"
+          />
+        </label>
+
+        {/* La célula elegida se muestra como DATO con un "Cambiar"
+            explícito, no como un select abierto -- mismo patrón que el
+            departamento en Voluntariado. */}
+        {!cambiando ? (
+          otras.length > 0 && (
+            <div className={`rounded-[14px] px-4 py-3.5 flex items-center justify-between gap-3 ${dark ? 'border border-white/12 bg-white/5' : 'border border-bg/12 bg-bg/5'}`}>
+              <div className="min-w-0">
+                <p className={`text-13 font-semibold mb-1 ${suave}`}>Célula</p>
+                <p className={`text-15 font-bold truncate ${titulo}`}>{cell.name}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setPendiente(String(cell.id)); setCambiando(true); }}
+                className={`shrink-0 text-13 font-semibold underline underline-offset-4 ${suave} ${dark ? 'decoration-white/25 hover:text-white' : 'decoration-bg/25 hover:text-bg'}`}
+              >
+                Cambiar
+              </button>
+            </div>
+          )
+        ) : (
+          <div className={`rounded-[14px] p-4 space-y-3 ${dark ? 'border border-white/12 bg-white/5' : 'border border-bg/12 bg-bg/5'}`}>
+            <p className={`text-13 font-semibold ${suave}`}>¿Cambiar tu elección ({cell.name})?</p>
+            <select
+              className={`${campo} appearance-none cursor-pointer`}
+              value={pendiente}
+              onChange={e => setPendiente(e.target.value)}
+            >
+              {cells.map(c => (
+                <option key={c.id} value={c.id}>{c.name}{c.zone ? ` — ${c.zone}` : ''}</option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const elegida = cells.find(c => String(c.id) === pendiente);
+                  if (elegida) setCell(elegida);
+                  setCambiando(false);
+                }}
+                className={`flex-1 rounded-pill px-4 py-2.5 text-13 font-bold ${dark ? 'bg-white text-bg' : 'bg-bg text-white'}`}
+              >
+                Confirmar cambio
+              </button>
+              <button type="button" onClick={() => setCambiando(false)} className={`flex-1 rounded-pill px-4 py-2.5 text-13 font-semibold ${suave}`}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      <motion.button
-        {...PRESS_PRIMARY}
-        type="submit"
-        disabled={enviando}
-        className={`w-full mt-4 inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-15 font-bold focus-ring disabled:opacity-50 ${
-          dark ? 'bg-white text-bg' : 'bg-bg text-white'
-        }`}
-      >
-        {enviando ? 'Enviando…' : 'Enviar solicitud'}
+      <motion.button {...PRESS_PRIMARY} type="submit" className={`${btnPpal} mt-5`}>
+        Continuar
       </motion.button>
 
       <p className={`text-12 mt-3 leading-relaxed ${dark ? 'text-white/40' : 'text-bg/45'}`}>
@@ -257,7 +385,7 @@ function CellCategoryDetail({ group }) {
     : group.cells;
 
   if (solicitando) {
-    return <CellJoinForm cell={solicitando} onBack={() => setSolicitando(null)} />;
+    return <CellJoinForm cell={solicitando} cells={group.cells} onBack={() => setSolicitando(null)} />;
   }
 
   return (
@@ -367,7 +495,7 @@ function CellQuizModal({ groups, onViewDetail }) {
   // La solicitud gana a cualquier paso del quiz: es la acción final, y
   // volver la devuelve al resultado donde estaba.
   if (solicitando) {
-    return <CellJoinForm cell={solicitando} onBack={() => setSolicitando(null)} tone="light" />;
+    return <CellJoinForm cell={solicitando} cells={category?.cells || []} onBack={() => setSolicitando(null)} tone="light" />;
   }
 
   if (step === 'zone' && category) {

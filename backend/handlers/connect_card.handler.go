@@ -36,6 +36,7 @@ func (h *ConnectCardHandler) Create(c echo.Context) error {
 		HowFound string `json:"how_found"`
 		Category string `json:"category"`
 		CellID   *uint  `json:"cell_id"` // solo cuando viene de /celulas
+		Message  string `json:"message"` // lo que escribió la persona
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -53,6 +54,7 @@ func (h *ConnectCardHandler) Create(c echo.Context) error {
 	card := models.ConnectCard{
 		Name: req.Name, Phone: req.Phone, Email: req.Email,
 		HowFound: req.HowFound, Category: req.Category, Status: "nuevo",
+		Message:  req.Message,
 	}
 
 	// Solicitud dirigida a una célula concreta (viene de /celulas): se

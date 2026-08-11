@@ -124,7 +124,15 @@ type ConnectCard struct {
 	LeaderAssignedID *uint  `json:"leader_assigned_id" gorm:"index"`
 	LeaderAssigned   *User  `json:"leader_assigned,omitempty" gorm:"foreignKey:LeaderAssignedID"`
 	Status           string `json:"status" gorm:"type:varchar(20);default:'nuevo'"` // nuevo|contactado|integrado
-	Notes            string `json:"notes" gorm:"type:text"`
+	Notes            string `json:"notes" gorm:"type:text"`                         // notas INTERNAS del equipo (las escribe el panel)
+
+	// Message: lo que escribió LA PERSONA al registrarse. Va aparte de
+	// Notes a propósito -- Notes es el cuaderno del equipo y el panel lo
+	// sobrescribe al hacer seguimiento, así que meter ahí las palabras del
+	// visitante sería perderlas en el primer edit. Una solicitud que dice
+	// "tengo 22, trabajo de día, ¿hay alguna que se reúna de noche?" vale
+	// diez veces más que una que solo trae un nombre.
+	Message string `json:"message" gorm:"type:text"`
 
 	// CellID: la célula CONCRETA que la persona pidió desde /celulas
 	// (ago-2026). Antes esa página no registraba nada: cada fila era un

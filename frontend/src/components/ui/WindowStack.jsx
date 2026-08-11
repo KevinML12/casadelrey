@@ -241,9 +241,23 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                       contenido que SI llena el alto (galerias, categorias
                       con varias celulas) esto no cambia nada -- solo entra
                       en juego cuando hay espacio de sobra. */}
+                  {/* `m-auto` en el hijo, NO `justify-center` en el
+                      contenedor. Los dos centran cuando sobra espacio,
+                      pero `justify-content: center` con overflow recorta el
+                      contenido por ARRIBA y lo deja inalcanzable: el
+                      scroll no llega ahí. Con contenido corto (una
+                      categoría de una sola célula) daba igual, pero al
+                      meter el formulario de solicitud —más alto que la
+                      ventana— su encabezado y el botón "Volver a la lista"
+                      quedaron en top:-433px, fuera de la pantalla y sin
+                      forma de subir. `margin: auto` centra igual cuando hay
+                      hueco y colapsa a 0 cuando no, así que el bloque
+                      arranca arriba y scrollea normal. */}
                   {isFront && (
-                    <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-center" data-lenis-prevent>
-                      {renderContent(it)}
+                    <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col" data-lenis-prevent>
+                      <div className="m-auto w-full">
+                        {renderContent(it)}
+                      </div>
                     </div>
                   )}
                 </motion.div>

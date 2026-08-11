@@ -139,6 +139,17 @@ export default function AdminConnectCards() {
                     </p>
                   )}
 
+                  {/* Lo que escribió la persona. Va aparte de las notas
+                      internas del equipo: aquello es el cuaderno de
+                      seguimiento y se sobrescribe, esto son sus palabras y
+                      normalmente traen el dato que decide la conversación
+                      ("trabajo de día, ¿hay alguna de noche?"). */}
+                  {card.message && (
+                    <p className="text-body-s text-bg/70 mt-1.5 italic leading-relaxed">
+                      “{card.message}”
+                    </p>
+                  )}
+
                   <div className="flex items-center gap-2 flex-wrap mt-3">
                     {isAdmin && (
                       <select
