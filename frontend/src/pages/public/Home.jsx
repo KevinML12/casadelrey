@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
@@ -12,10 +12,6 @@ import { saludo } from '../../lib/greeting';
 // blanco del hero y a los chips de redes del pie de Ubicación.
 import { EASE_OUT, EASE_IN, PRESS_PRIMARY, PRESS_SECONDARY, PRESS_MICRO } from '../../lib/motion';
 
-// 3D — chunk aparte, solo se descarga si el dispositivo califica
-// (el campo de partículas global vive en App.jsx, vía StarField)
-const GlobeHero = lazy(() => import('../../components/three/GlobeHero'));
-import use3D from '../../components/three/use3D';
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import SocialSection from '../../components/sections/SocialSection';
@@ -76,8 +72,6 @@ function HeroCarousel({ onPlan }) {
   const [nextEvent, setNextEvent] = useState(null);
   const [eventLabel, setEventLabel] = useState('Próximo evento');
   const [failed, setFailed] = useState({});
-  // El globo 3D solo en desktop con mouse y sin reduced-motion
-  const show3D = use3D();
   // Carril horizontal real: las fotos viven aquí, se navegan con
   // swipe/scroll/trackpad — no solo con los dots. El texto (abajo)
   // se mantiene fijo y solo cambia de contenido según qué slide
@@ -288,14 +282,6 @@ function HeroCarousel({ onPlan }) {
           sitio, así que el hero y la Agenda por fin oscurecen igual. */}
       <div className="scrim-band" />
 
-      {/* Globo 3D — "Luz para las Naciones" girando detrás del contenido */}
-      {show3D && (
-        <Suspense fallback={null}>
-          <div className="absolute z-[5] top-[6%] right-[-14%] w-[780px] h-[780px] mix-blend-screen opacity-70 pointer-events-none">
-            <GlobeHero />
-          </div>
-        </Suspense>
-      )}
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 h-full flex items-center pt-28 pb-20">
         <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-center w-full">
