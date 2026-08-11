@@ -38,6 +38,25 @@ type Cell struct {
 	Zone        string `json:"zone" gorm:"type:varchar(80)"` // zona/sector aproximado — lo ÚNICO de ubicación que va público
 	IsActive    bool   `json:"is_active" gorm:"default:true"`
 	Leader      User   `json:"leader" gorm:"foreignKey:LeaderID"`
+
+	// ── Lo que un visitante pregunta antes de presentarse (ago-2026) ──
+	// La página pública tenía collage, ventanas de cristal, filtro por
+	// zona y quiz, y no contestaba lo único que hace falta para ir un
+	// martes: CUÁNDO. Estos campos los edita el admin y también el propio
+	// líder desde su panel (PUT /leader/my-cell) -- es él quien sabe si
+	// esta semana cambió la hora, y obligarlo a pedírselo a un admin es
+	// justo lo que hace que un dato así se quede viejo.
+	//
+	// Day/Time son texto libre a propósito: "Martes", "Cada 15 días",
+	// "Sábados alternos" son respuestas reales que un enum no admite, y
+	// el costo de un dato mal escrito es mucho menor que el de no poder
+	// escribirlo.
+	Day  string `json:"day" gorm:"type:varchar(40)"`  // "Martes", "Cada 15 días"…
+	Time string `json:"time" gorm:"type:varchar(30)"` // "7:00 PM"
+
+	// WhatToExpect: qué pasa en una reunión. Es la pregunta silenciosa de
+	// quien nunca ha ido a una casa ajena a orar con desconocidos.
+	WhatToExpect string `json:"what_to_expect" gorm:"type:text"`
 }
 
 // CellCategory agrupa células por tipos (Adolescentes, Jóvenes, Varones, Mujeres, etc.)

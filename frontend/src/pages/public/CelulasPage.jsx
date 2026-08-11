@@ -124,10 +124,21 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
       }`}
     >
       <div className="min-w-0 flex-1">
-        <p className={`text-17 font-bold leading-tight truncate ${dark ? 'text-white' : 'text-bg'}`}>
+        <p className={`text-17 font-bold leading-tight ${dark ? 'text-white' : 'text-bg'}`}>
           {cell.name}
         </p>
-        <p className={`text-13 font-medium mt-1 truncate ${dark ? 'text-white/50' : 'text-bg/55'}`}>
+
+        {/* CUÁNDO primero: es la pregunta que decide si alguien puede ir,
+            y hasta ago-2026 el sitio no la contestaba en ningún lado. Si
+            el líder todavía no cargó el horario, no se finge: la línea
+            simplemente no existe. */}
+        {(cell.day || cell.time) && (
+          <p className={`text-14 font-semibold mt-1 ${dark ? 'text-white/85' : 'text-bg/80'}`}>
+            {[cell.day, cell.time].filter(Boolean).join(' · ')}
+          </p>
+        )}
+
+        <p className={`text-13 font-medium mt-1 ${dark ? 'text-white/50' : 'text-bg/55'}`}>
           {cell.leader}{cell.zone ? ` · ${cell.zone}` : ''}
         </p>
         {cell.description && (
@@ -252,6 +263,16 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
               : 'El equipo de la iglesia, que te pondrá en contacto con el líder.'}
             {cell.zone ? ` Se reúnen en ${cell.zone}.` : ''}
           </p>
+          {(cell.day || cell.time) && (
+            <p className={`text-15 font-semibold mt-2 ${tenue}`}>
+              Se reúnen {[cell.day, cell.time].filter(Boolean).join(' a las ')}.
+            </p>
+          )}
+          {cell.what_to_expect && (
+            <p className={`text-14 leading-relaxed mt-3 ${dark ? 'text-white/55' : 'text-bg/60'}`}>
+              {cell.what_to_expect}
+            </p>
+          )}
           {cell.description && (
             <p className={`text-14 leading-relaxed mt-2 ${dark ? 'text-white/50' : 'text-bg/55'}`}>{cell.description}</p>
           )}
@@ -385,7 +406,7 @@ function CellCategoryDetail({ group }) {
     : group.cells;
 
   if (solicitando) {
-    return <CellJoinForm cell={solicitando} cells={group.cells} onBack={() => setSolicitando(null)} />;
+    return <CellJoinForm cell={solicitando} cells={group.cells} onBack={() => setSolicitando(null)} tone="light" />;
   }
 
   return (
@@ -397,10 +418,10 @@ function CellCategoryDetail({ group }) {
           leía era "4 células activas". En el collage NO va: las tarjetas ya
           llevan nombre + edad + conteo. */}
       {group.description && (
-        <p className="text-15 text-white/70 leading-relaxed mb-5">{group.description}</p>
+        <p className="text-15 text-bg/70 leading-relaxed mb-5">{group.description}</p>
       )}
 
-      <p className="text-13 font-semibold text-white/70 mb-4">
+      <p className="text-13 font-semibold text-bg/55 mb-4">
         {group.cells.length} {group.cells.length === 1 ? 'célula activa' : 'células activas'}
       </p>
 
@@ -415,7 +436,7 @@ function CellCategoryDetail({ group }) {
           <button
             type="button"
             onClick={() => setZoneFilter(null)}
-            className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${!zoneFilter ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
+            className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${!zoneFilter ? 'bg-bg text-white' : 'bg-bg/6 text-bg/60 hover:bg-bg/12 hover:text-bg'}`}
           >
             Todas las zonas
           </button>
@@ -424,7 +445,7 @@ function CellCategoryDetail({ group }) {
               key={z}
               type="button"
               onClick={() => setZoneFilter(cur => cur === z ? null : z)}
-              className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${zoneFilter === z ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
+              className={`inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-12 font-semibold transition-colors ${zoneFilter === z ? 'bg-bg text-white' : 'bg-bg/6 text-bg/60 hover:bg-bg/12 hover:text-bg'}`}
             >
               {z}
             </button>
@@ -439,13 +460,14 @@ function CellCategoryDetail({ group }) {
           "de plantilla". Sin fingir una foto que no existe: tipografía
           grande para el nombre, un separador fino entre filas. Cada fila
           abre la solicitud de ingreso a ESA célula. */}
-      <div className="flex flex-col divide-y divide-white/10">
+      <div className="flex flex-col divide-y divide-bg/10">
         {filtered.map((c, i) => (
           <CellRow
             key={`${c.name}-${i}`}
             cell={c}
             onSolicitar={setSolicitando}
             index={i}
+            tone="light"
           />
         ))}
       </div>
@@ -453,13 +475,13 @@ function CellCategoryDetail({ group }) {
       {/* Salida para quien no se decide por una célula concreta: el
           formulario general del sitio, que cae en la misma bandeja
           (/admin/connect-cards) pero sin célula asignada. */}
-      <div className="mt-6 pt-5 border-t border-white/10">
-        <p className="text-13 text-white/55 leading-relaxed mb-3">
+      <div className="mt-6 pt-5 border-t border-bg/10">
+        <p className="text-13 text-bg/55 leading-relaxed mb-3">
           ¿No sabes cuál elegir? Déjanos tus datos y te ubicamos en la más cercana a ti.
         </p>
         <Link
           to="/conectate"
-          className="inline-flex items-center justify-center rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold focus-ring hover:opacity-90 transition-opacity"
+          className="inline-flex items-center justify-center rounded-pill bg-bg text-white px-5 py-3 text-14 font-bold focus-ring hover:opacity-90 transition-opacity"
         >
           Conéctate
         </Link>
@@ -871,7 +893,13 @@ export default function CelulasPage() {
       </div>
 
       {/* ═══════ VENTANAS SOBREPUESTAS ═══════ */}
+      {/* light: cristal BLANCO. La ventana de una célula es una FICHA que
+          se lee (día, hora, qué esperar, el directorio) y luego un
+          formulario -- texto navy sobre blanco aguanta esa densidad mucho
+          mejor que blanco sobre cristal oscuro, que es material de
+          vitrina. Es la misma decisión que ya tomaba Voluntariado. */}
       <WindowStack
+        light
         items={windowItems}
         openKey={openKey}
         onChange={setOpenKey}

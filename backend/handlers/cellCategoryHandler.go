@@ -153,23 +153,36 @@ func (h *CellCategoryHandler) GetPublicCells(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener células"})
 	}
 
+	// El ID va publico a proposito (ago-2026): sin el, el formulario de
+	// "quiero unirme" no puede decir a QUE celula se refiere, y la
+	// solicitud llegaba al panel sin celula y sin lider asignado. No es
+	// dato sensible -- es la misma llave que ya viaja en cualquier URL de
+	// admin -- y sin el la pagina publica no puede enlazar con nada.
 	type publicCell struct {
-		Code        string `json:"code"`
-		Name        string `json:"name"`
-		Type        string `json:"type"`
-		Description string `json:"description"`
-		Leader      string `json:"leader"`
-		Zone        string `json:"zone"`
+		ID           uint   `json:"id"`
+		Code         string `json:"code"`
+		Name         string `json:"name"`
+		Type         string `json:"type"`
+		Description  string `json:"description"`
+		Leader       string `json:"leader"`
+		Zone         string `json:"zone"`
+		Day          string `json:"day"`
+		Time         string `json:"time"`
+		WhatToExpect string `json:"what_to_expect"`
 	}
 	out := make([]publicCell, 0, len(cells))
 	for _, cl := range cells {
 		out = append(out, publicCell{
-			Code:        cl.Code,
-			Name:        cl.Name,
-			Type:        cl.Type,
-			Description: cl.Description,
-			Leader:      cl.Leader.Name,
-			Zone:        cl.Zone,
+			ID:           cl.ID,
+			Code:         cl.Code,
+			Name:         cl.Name,
+			Type:         cl.Type,
+			Description:  cl.Description,
+			Leader:       cl.Leader.Name,
+			Zone:         cl.Zone,
+			Day:          cl.Day,
+			Time:         cl.Time,
+			WhatToExpect: cl.WhatToExpect,
 		})
 	}
 	return c.JSON(http.StatusOK, out)
@@ -228,6 +241,10 @@ func (h *CellCategoryHandler) UpdateCell(c echo.Context) error {
 		LeaderID    uint   `json:"leader_id"`
 		Zone        string `json:"zone"`
 		IsActive    *bool  `json:"is_active"`
+
+		Day          *string `json:"day"`
+		Time         *string `json:"time"`
+		WhatToExpect *string `json:"what_to_expect"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -252,6 +269,18 @@ func (h *CellCategoryHandler) UpdateCell(c echo.Context) error {
 	if req.IsActive != nil {
 		cell.IsActive = *req.IsActive
 	}
+	// Punteros, no strings: estos tres los edita tambien el lider desde su
+	// panel, que manda solo lo suyo. Con string plano, un PUT que no los
+	// incluyera los habria borrado en silencio.
+	if req.Day != nil {
+		cell.Day = *req.Day
+	}
+	if req.Time != nil {
+		cell.Time = *req.Time
+	}
+	if req.WhatToExpect != nil {
+		cell.WhatToExpect = *req.WhatToExpect
+	}
 
 	if err := h.db.Save(&cell).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar."})
@@ -270,4 +299,70 @@ func (h *CellCategoryHandler) DeleteCell(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Célula eliminada."})
+}
+
+// ── La célula del propio líder ──────────────────────────────────────────
+// El día, la hora y el "qué esperar" los sabe el líder, no un admin: si
+// esta semana la reunión se movió, él es quien se entera primero.
+// Obligarlo a pedirle el cambio a un admin es exactamente lo que hace que
+// un dato así se quede viejo y el sitio publique una hora que ya no es.
+//
+// Alcance deliberadamente estrecho: el líder toca SOLO lo suyo y solo los
+// campos de la reunión. Nombre, código, tipo, zona, líder asignado y
+// is_active siguen siendo de admin -- son estructura de la iglesia, no
+// operación semanal de un grupo.
+
+// GetMyCell GET /api/v1/leader/my-cell
+func (h *CellCategoryHandler) GetMyCell(c echo.Context) error {
+	uid, ok := c.Get("user_id").(uint)
+	if !ok || uid == 0 {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Sesión inválida."})
+	}
+	var cell models.Cell
+	if err := h.db.Preload("Leader").Where("leader_id = ?", uid).First(&cell).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Todavía no tienes una célula asignada. Un administrador te la asigna desde el panel."})
+	}
+	return c.JSON(http.StatusOK, cell)
+}
+
+// UpdateMyCell PUT /api/v1/leader/my-cell
+func (h *CellCategoryHandler) UpdateMyCell(c echo.Context) error {
+	uid, ok := c.Get("user_id").(uint)
+	if !ok || uid == 0 {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Sesión inválida."})
+	}
+	// Se busca POR leader_id, no por un :id del body: así un líder no
+	// puede editar la célula de otro ni aunque mande su ID a mano.
+	var cell models.Cell
+	if err := h.db.Where("leader_id = ?", uid).First(&cell).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Todavía no tienes una célula asignada."})
+	}
+
+	var req struct {
+		Day          *string `json:"day"`
+		Time         *string `json:"time"`
+		Description  *string `json:"description"`
+		WhatToExpect *string `json:"what_to_expect"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+	}
+	if req.Day != nil {
+		cell.Day = *req.Day
+	}
+	if req.Time != nil {
+		cell.Time = *req.Time
+	}
+	if req.Description != nil {
+		cell.Description = *req.Description
+	}
+	if req.WhatToExpect != nil {
+		cell.WhatToExpect = *req.WhatToExpect
+	}
+
+	if err := h.db.Save(&cell).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo guardar."})
+	}
+	h.db.Preload("Leader").First(&cell, cell.ID)
+	return c.JSON(http.StatusOK, cell)
 }

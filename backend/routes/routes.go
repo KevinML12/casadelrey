@@ -351,6 +351,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	leaderGroup.GET("/kpis",            leaderDashHandler.GetLeaderKPIs)
 	leaderGroup.GET("/cell-directory",  leaderDashHandler.GetCellDirectory)
+	// Su propia celula: el lider edita dia/hora/descripcion/que esperar.
+	// El handler busca POR leader_id, no por un :id del body, asi que no
+	// puede tocar la de otro ni mandando el ID a mano.
+	leaderGroup.GET("/my-cell", cellCategoryHandler.GetMyCell)
+	leaderGroup.PUT("/my-cell", cellCategoryHandler.UpdateMyCell)
 
 	// Ficha propia del lider en el directorio publico -- antes solo un
 	// admin podia tocar foto/telefono/area de un lider desde /admin/leaders.

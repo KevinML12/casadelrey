@@ -14,6 +14,9 @@ const NAV = [
   { to: '/leader/volunteers',        icon: 'group_add',    label: 'Voluntarios',  badge: 'pending_volunteers' },
   { to: '/leader/cell-directory',    icon: 'contacts',     label: 'Directorio' },
   { to: '/leader/events',            icon: 'calendar_month', label: 'Eventos' },
+  // Sin `icon`: los de arriba lo conservan como dato muerto del barrido
+  // anti-iconos (ya no se renderiza ninguno). No se replica en los nuevos.
+  { to: '/leader/my-cell', label: 'Mi célula' },
   { to: '/leader/my-directory',      icon: 'badge',        label: 'Mi ficha' },
   { to: '/leader/profile',           icon: 'person',       label: 'Perfil' },
 ];
