@@ -1,13 +1,9 @@
 import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
-import ParallaxImg from '../../components/ui/ParallaxImg';
-import { useSitePhoto } from '../../lib/feed';
 import { useDonationPurposes } from '../../lib/donationPurposes';
 
 export default function DonatePage() {
-  const sectionImg = useSitePhoto('donar_seccion', '/images/bg-donar.jpg');
   // Misma fuente admin-editable que el selector de "Destino" del acordeón
   // (useDonationPurposes) -- antes esta vitrina tenía SU PROPIO arreglo
   // (IMPACT) con 2 destinos que ni siquiera eran seleccionables de
@@ -20,41 +16,52 @@ export default function DonatePage() {
         subtitle="Cada quetzal sembrado con fe produce fruto eterno."
         photoSlot="hero_donar"
         photoFallback="/images/bg-legado.jpg"
+        align="left"
       />
 
-      <section className="relative py-16 md:py-24 z-10 overflow-hidden">
-        {/* Foto ambiente propia: el hero se desvanece antes de llegar aquí y
-            el cristal sobre navy plano se lee como caja gris — el material
-            necesita una escena detrás. Administrable (donar_seccion). */}
-        <ParallaxImg src={sectionImg} alt="" className="opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/60 to-bg pointer-events-none" />
+      {/* Sin foto de ambiente: la que había aquí llevaba `opacity-35` MÁS un
+          scrim de tres paradas encima, así que llegaba al visitante al ~14%
+          de su color real. Eso ya no es una escena detrás del cristal, es una
+          textura gris que además le baja el contraste al propio cristal.
+          Mejor bg-bg limpio y honesto. Si un día vuelve una foto a esta
+          sección, va a color pleno con una de las clases .scrim-*. */}
+      <section className="relative py-16 md:py-24 z-10">
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
 
             {/* Destinos + versículo */}
             <div>
-              <Reveal className="mb-8">
-                <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
-                  Siembra con alegría.
-                </h2>
-              </Reveal>
+              {/* Sin Reveal: el titular de sección es el punto fijo contra el
+                  que llega la lista de abajo. Si el título también entra
+                  deslizándose, no queda nada quieto que le dé sentido al
+                  movimiento y el scroll se siente gelatinoso. */}
+              <h2 className="text-d2 text-white mb-8">
+                Siembra con alegría.
+              </h2>
 
-              <RevealList className="space-y-3">
+              {/* Lista tipo directorio, no cinco cards de cristal apiladas.
+                  Cuando TODO es una card, la card deja de ser una decisión:
+                  cinco destinos con el mismo material y el mismo bisel
+                  compiten entre sí en vez de leerse como una sola oferta.
+                  Mismo patrón que el directorio de células. */}
+              <RevealList className="flex flex-col divide-y divide-white/10">
                 {purposes.map(({ value, title, description }) => (
-                  <RevealItem key={value}>
-                    <Tilt max={3} glass="standard" className="glass-light rounded-[20px] p-5">
-                      <h3 className="text-16 font-bold tracking-tight text-bg">{title}</h3>
-                      <p className="text-14 text-bg/60 mt-0.5">{description}</p>
-                    </Tilt>
+                  <RevealItem key={value} className="py-4 flex items-baseline justify-between gap-6">
+                    {/* shrink-0 + text-right: "Ministerio Joven" no se parte
+                        en dos líneas y la descripción queda alineada al borde
+                        derecho, que es lo que hace legible una fila de
+                        directorio cuando el segundo dato envuelve. */}
+                    <h3 className="text-17 font-bold text-white shrink-0">{title}</h3>
+                    <p className="text-14 text-white/55 text-right">{description}</p>
                   </RevealItem>
                 ))}
               </RevealList>
 
               {/* Versículo */}
               <Reveal delay={0.1}>
-                <div className="mt-6 glass-light rounded-[24px] p-8">
+                <div className="mt-6 glass-light rounded-[22px] p-8">
                   <blockquote>
-                    <p className="text-bg leading-relaxed mb-4" style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)' }}>
+                    <p className="text-bg leading-relaxed mb-4 text-18 md:text-22">
                       "El que siembra escasamente, también segará escasamente; y el que siembra
                       generosamente, generosamente también segará."
                     </p>
@@ -67,14 +74,21 @@ export default function DonatePage() {
             </div>
 
             {/* Acordeón de donación — cada paso es su propia card de
-                cristal directamente sobre la foto (sin panel envolvente:
+                cristal directamente sobre el canvas (sin panel envolvente:
                 cristal anidado prohibido por la guía) */}
-            <Reveal from="right" delay={0.05}>
-              <h2 className="display-mega text-white mb-7" style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)' }}>
+            <div>
+              {/* text-d3 y no d2: esta columna siempre estuvo subordinada a
+                  "Siembra con alegría" (era clamp 1.7-2.2 contra 2-3), y el
+                  token conserva esa relación sin volver a inventar un clamp.
+                  Fuera del Reveal por lo mismo que el otro titular: lo que
+                  llega es el acordeón, el título ya estaba. */}
+              <h2 className="text-d3 text-white mb-7">
                 Sembrar es sumar.
               </h2>
-              <DonationCard />
-            </Reveal>
+              <Reveal from="right" delay={0.05}>
+                <DonationCard />
+              </Reveal>
+            </div>
 
           </div>
         </div>

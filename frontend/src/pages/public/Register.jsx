@@ -8,7 +8,6 @@
 import { Link } from 'react-router-dom';
 import { GlassButton } from '../../components/ui/Glass';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
 
@@ -34,26 +33,37 @@ export default function Register() {
 
   return (
     <section className="relative min-h-screen pt-32 pb-20 overflow-hidden bg-bg flex items-center">
-      <ParallaxImg src={bg} alt="" className="opacity-40" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/50 to-bg pointer-events-none" />
+      {/* Foto a color pleno + .scrim-hero: la composición es centrada, así
+          que el óvalo oscuro cae justo donde vive el bloque de texto. Antes
+          la foto iba al 40% bajo otro degradado encima. */}
+      <ParallaxImg src={bg} alt="" />
+      <div className="scrim-hero" />
 
       <div className="relative z-10 w-full max-w-2xl mx-auto px-6 text-center">
-        <Reveal>
-          <h1 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)' }}>
-            Obtener una cuenta.
-          </h1>
-          <p className="mt-5 text-16 text-white/70">
-            Son tres pasos — y el primero no es un formulario.
-          </p>
-        </Reveal>
+        {/* Sin Reveal: es el titular de la pantalla, el punto fijo contra el
+            que aterrizan los 3 pasos de abajo. */}
+        <h1 className="text-d2 text-white">
+          Obtener una cuenta.
+        </h1>
+        <p className="mt-5 text-16 text-white/70">
+          Son tres pasos — y el primero no es un formulario.
+        </p>
 
         {/* Los 3 pasos como submódulos de cristal */}
         <RevealList className="mt-10 grid gap-3 sm:grid-cols-3 text-left">
           {PASOS.map((p, i) => (
             <RevealItem key={p.title} depth>
-              <Tilt max={4} glass className="liquid-glass rounded-[20px] p-5 h-full">
+              {/* Sin Tilt: la tarjeta no navega. Ninguno de los 3 pasos es
+                  clickeable -- el único enlace es el "Comunícate" del paso 1,
+                  que vive DENTRO. Un bloque que se inclina siguiendo al
+                  cursor y después no hace nada promete interacción y no la
+                  cumple. El bisel se conserva: .liquid-glass + .liquid-shine
+                  (mismo criterio que PhotoHeaderCard). */}
+              <div className="liquid-glass liquid-shine rounded-[22px] p-5 h-full">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <span className="grid place-items-center w-8 h-8 rounded-full bg-white text-bg text-13 font-extrabold shrink-0">
+                  {/* font-bold, no extrabold: Arimo topa en 700 y el 800
+                      pintaba el mismo trazo. Radio 22, el de toda card. */}
+                  <span className="grid place-items-center w-8 h-8 rounded-full bg-white text-bg text-13 font-bold shrink-0">
                     {i + 1}
                   </span>
                 </div>
@@ -67,7 +77,7 @@ export default function Register() {
                     {p.cta.label}
                   </Link>
                 )}
-              </Tilt>
+              </div>
             </RevealItem>
           ))}
         </RevealList>

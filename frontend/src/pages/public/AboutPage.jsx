@@ -4,20 +4,19 @@ import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import SocialSection from '../../components/sections/SocialSection';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
 import PhotoBentoTile from '../../components/ui/PhotoBentoTile';
 import PhotoHeaderCard from '../../components/ui/PhotoHeaderCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
 import { useSitePhoto, useApi, groupAlbums } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
+// El press ya no se define aquí: era una de las 7 copias del mismo objeto
+// repartidas por el sitio, cada una con su amplitud. Los dos MotionLink de
+// esta página son CTA (llevan a /celulas), así que ambos usan el press
+// primario -- el que se levanta.
+import { PRESS_PRIMARY } from '../../lib/motion';
 
 const MotionLink = motion.create(Link);
-const PRESS = {
-  whileHover: { scale: 1.04 },
-  whileTap: { scale: 0.94 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
 
 const STATS = [
   { n: '20', label: 'Líderes de célula' },
@@ -55,11 +54,15 @@ const BENTO_SPANS = [
 ];
 
 export default function AboutPage() {
-  // Fotos administrables (AdminSitePhotos) con fallback local garantizado
+  // Fotos administrables (AdminSitePhotos) con fallback local garantizado.
+  // `about_pastores` es la única que sigue usándose como fondo de sección
+  // (Nuestra historia); `about_servidores` y `about_comunidad` quedaron solo
+  // como fallback de las cards. El slot `about_lideres` ya no se consume aquí
+  // -- la sección de Células dejó de llevar foto ambiente -- pero sigue
+  // administrable y en uso en otras pantallas, así que no se toca el admin.
   const pastoresImg   = useSitePhoto('about_pastores',   '/images/nosotros/pastores.jpg');
   const servidoresImg = useSitePhoto('about_servidores', '/images/nosotros/servidores.jpg');
   const comunidadImg  = useSitePhoto('about_comunidad',  '/images/nosotros/comunidad.jpg');
-  const lideresImg    = useSitePhoto('about_lideres',    '/images/nosotros/lideres.jpg');
 
   // Fotos para las cards PhotoHeaderCard (franja ancha y corta) --
   // distintas de las de arriba: esas son fondo ambiente de sección (foto
@@ -125,24 +128,36 @@ export default function AboutPage() {
         subtitle="Una iglesia familiar en Huehuetenango, edificada célula por célula, generación tras generación."
         photoSlot="hero_nosotros"
         photoFallback="/images/nosotros/comunidad.jpg"
+        align="left"
       />
 
       {/* Fundadores + estructura actual — fotografía real de la congregación
-          en adoración como ambiente (no atribuida a nadie en particular) */}
-      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src={pastoresImg} alt="" className="opacity-55" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
+          en adoración como ambiente (no atribuida a nadie en particular).
+          Es la ÚNICA sección de la página que conserva foto de fondo: el
+          origen de la iglesia es lo que carga más peso narrativo, y por eso
+          también es la que más aire vertical recibe (py-24/36 contra las
+          otras tres, que antes eran py-16/24 idénticas). La foto va a color
+          pleno y el contraste lo pone .scrim-card. */}
+      <section className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
+        <ParallaxImg src={pastoresImg} alt="" />
+        <div className="scrim-card" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="mb-12">
-            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
-              Nuestra <span className="font-serif font-normal">historia</span>.
+          {/* Sin Reveal: el titular de sección es el punto fijo contra el que
+              llegan las cards de abajo. Si también entra deslizándose, no hay
+              nada quieto en la pantalla y el scroll se siente gelatinoso. */}
+          <div className="mb-12">
+            <h2 className="text-d2 text-white">
+              Nuestra historia.
             </h2>
-          </Reveal>
+          </div>
 
-          <RevealList className="grid md:grid-cols-2 gap-5">
+          {/* Asimétrica a propósito: los fundadores sembraron la visión, los
+              pastores actuales la continúan. Dos columnas iguales decían que
+              pesan lo mismo, que es no haber decidido nada. */}
+          <RevealList className="grid md:grid-cols-[1.6fr_1fr] gap-5">
             <RevealItem>
               <PhotoHeaderCard photo={fundadoresCardImg} glass="standard" objectPosition="center 15%">
-                <p className="text-13 font-bold text-white/60 uppercase tracking-tightish mb-2">Pastores fundadores</p>
+                <p className="text-13 font-semibold text-white/60 mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-white tracking-tight leading-tight">
                   José de León y Desidería López
                 </h3>
@@ -154,7 +169,7 @@ export default function AboutPage() {
 
             <RevealItem>
               <PhotoHeaderCard photo={pastoresCelulasCardImg} glass="featured">
-                <p className="text-13 font-bold text-white/60 uppercase tracking-tightish mb-2">Pastores</p>
+                <p className="text-13 font-semibold text-white/60 mb-2">Pastores</p>
                 <h3 className="text-24 font-bold text-white tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
                 </h3>
@@ -167,16 +182,18 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Misión y Visión */}
-      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src={servidoresImg} alt="" className="opacity-45" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="mb-12">
-            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+      {/* Misión y Visión — sin foto de ambiente: las dos cards de abajo YA
+          son fotos a sangre completa, y una tercera foto detrás compitiendo
+          con ellas no agregaba nada. Sobre bg-bg limpio las cards vuelven a
+          ser lo único que se mira. Es además la sección más corta de la
+          página, y el espaciado lo dice (py-14/20). */}
+      <section className="py-14 md:py-20 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-12">
+            <h2 className="text-d2 text-white">
               Lo que nos mueve.
             </h2>
-          </Reveal>
+          </div>
 
           <RevealList className="grid md:grid-cols-2 gap-5">
             <RevealItem>
@@ -202,34 +219,41 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Comunidad en números + departamentos de voluntariado */}
-      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src={comunidadImg} alt="" className="opacity-55" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/45 to-bg" />
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="mb-12 text-center">
-            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+      {/* Comunidad en números + departamentos de voluntariado — tampoco
+          lleva foto de ambiente: el bento de abajo son diez fotos reales de
+          los departamentos, y una foto más detrás las convertía a todas en
+          textura. Es el bloque más largo de la página (números + bento +
+          CTA) y por eso el segundo en aire vertical. */}
+      <section className="py-20 md:py-32 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-12 text-center">
+            <h2 className="text-d2 text-white">
               Una familia que sirve.
             </h2>
             <p className="mt-6 text-17 text-white/70 max-w-2xl mx-auto">
               Cada persona tiene un lugar. Así está organizada nuestra comunidad hoy.
             </p>
-          </Reveal>
+          </div>
 
           <RevealList className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {STATS.map(s => (
+              // Sin Tilt: una cifra no lleva a ningún lado. Inclinarse ante
+              // el cursor prometía un clic que nunca existió. El bisel de
+              // vidrio no se pierde (vive en .glass-light) y el reflejo se
+              // agrega a mano con .liquid-shine, que antes ponía la prop
+              // `glass` de Tilt.
               <RevealItem key={s.label}>
-                <Tilt max={3} glass="standard" className="glass-light rounded-[20px] p-6 md:p-8 text-center h-full">
-                  <div className="text-36 md:text-44 font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
+                <div className="glass-light liquid-shine rounded-[22px] p-6 md:p-8 text-center h-full">
+                  <div className="text-36 md:text-44 font-bold text-bg tracking-tighter leading-none">{s.n}</div>
                   <div className="mt-2 text-13 font-semibold text-bg/60">{s.label}</div>
-                </Tilt>
+                </div>
               </RevealItem>
             ))}
           </RevealList>
 
           <Reveal delay={0.1}>
             <div className="flex items-center justify-between gap-4 mb-6">
-              <p className="text-13 font-bold text-white/50 uppercase tracking-tightish">Departamentos de voluntariado</p>
+              <p className="text-13 font-semibold text-white/50">Departamentos de voluntariado</p>
               <Link to="/volunteering" className="shrink-0 text-13 font-semibold text-white/55 hover:text-white underline underline-offset-4 decoration-white/20">
                 Ver todos
               </Link>
@@ -299,7 +323,7 @@ export default function AboutPage() {
               </div>
               <div className="sm:col-span-2 flex flex-col gap-4">
                 <div className="glass-light-nested rounded-[16px] p-5 h-fit">
-                  <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+                  <p className="text-13 font-semibold text-bg/50 mb-2">¿Por qué aquí?</p>
                   <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
                 </div>
                 {a.testimonial && (
@@ -322,16 +346,22 @@ export default function AboutPage() {
           espacio oscuro alrededor. */}
       <section className="relative py-20 md:py-28 border-t border-white/5">
         <div className="max-w-5xl mx-auto px-6">
-          <Reveal className="text-center mb-12">
-            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }}>
+          {/* text-d3 y no text-d2: es una pregunta bisagra entre dos módulos,
+              no la apertura de un capítulo. Los cuatro titulares grandes de
+              la página van en d2 y este queda deliberadamente por debajo --
+              era el único que ya venía con un clamp más chico. */}
+          <div className="text-center mb-12">
+            <h2 className="text-d3 text-white">
               ¿Cuál es para mí?
             </h2>
-          </Reveal>
+          </div>
           <div className="grid sm:grid-cols-2 gap-10 sm:gap-14 sm:divide-x sm:divide-white/10">
             <Reveal from="left" className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
-              <Tilt max={5} glass className="liquid-glass shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[20px] overflow-hidden">
+              {/* Miniatura ilustrativa, no un control: sin Tilt (no navega y
+                  mide ~100px, muy poco para que la inclinación se lea). */}
+              <div className="liquid-glass liquid-shine shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
                 {areas[0]?.photo && <img src={areas[0].photo} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-              </Tilt>
+              </div>
               <div>
                 <p className="text-24 md:text-28 font-bold text-white tracking-tight">Voluntariado</p>
                 <p className="text-16 md:text-17 text-white/60 leading-relaxed mt-3 max-w-sm">
@@ -341,9 +371,9 @@ export default function AboutPage() {
               </div>
             </Reveal>
             <Reveal from="right" delay={0.06} className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6 sm:pl-14">
-              <Tilt max={5} glass className="liquid-glass shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[20px] overflow-hidden">
+              <div className="liquid-glass liquid-shine shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
                 {cellCategories[0]?.image_url && <img src={cellCategories[0].image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-              </Tilt>
+              </div>
               <div>
                 <p className="text-24 md:text-28 font-bold text-white tracking-tight">Células</p>
                 <p className="text-16 md:text-17 text-white/60 leading-relaxed mt-3 max-w-sm">
@@ -358,14 +388,14 @@ export default function AboutPage() {
 
       {/* Células — acceso directo al módulo, misma filosofía que el
           bloque de voluntariado de arriba: bento de fotos reales +
-          ventana de detalle en vez de una caja de solo texto. */}
-      <section className="relative py-16 md:py-24 border-t border-white/5 overflow-hidden">
-        <ParallaxImg src={lideresImg} alt="" className="opacity-45" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/50 to-bg" />
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="mb-10">
+          ventana de detalle en vez de una caja de solo texto. Sin foto de
+          ambiente por la misma razón que el bloque anterior: el bento ya
+          es un muro de fotos y la de fondo solo lo ensuciaba. */}
+      <section className="py-16 md:py-24 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-10">
             <div className="flex items-end justify-between gap-4">
-              <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+              <h2 className="text-d2 text-white">
                 Encuentra tu célula.
               </h2>
               <Link to="/celulas" className="shrink-0 mb-2 text-13 font-semibold text-white/55 hover:text-white underline underline-offset-4 decoration-white/20">
@@ -376,7 +406,7 @@ export default function AboutPage() {
               Adolescentes, jóvenes adultos, prejuveniles, varones y la red
               Mujeres de Palabra — cada grupo se reúne en casas durante la semana.
             </p>
-          </Reveal>
+          </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[120px] sm:auto-rows-[140px] gap-3 sm:gap-4 [grid-auto-flow:dense] mb-9">
             {cellCategories.map((c, i) => {
@@ -405,7 +435,7 @@ export default function AboutPage() {
 
           <MotionLink
             to="/celulas"
-            {...PRESS}
+            {...PRESS_PRIMARY}
             className="inline-flex items-center gap-3 px-7 py-4 rounded-pill bg-bg text-white text-15 font-bold focus-ring shadow-card"
           >
             Ver células
@@ -429,13 +459,16 @@ export default function AboutPage() {
           return (
             <div className="flex flex-col gap-4">
               {c.age_group && (
-                <span className="self-start inline-flex items-center gap-1.5 bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-11 font-bold uppercase tracking-wide">
+                // El rango de edad es un dato, no una etiqueta decorativa:
+                // en caja normal se lee ("15 a 24 años"); en versales de 11px
+                // con tracking era la fórmula del eyebrow otra vez.
+                <span className="self-start inline-flex items-center bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-13 font-semibold">
                   {c.age_group}
                 </span>
               )}
               {c.description && <p className="text-bg/70 text-15 leading-relaxed">{c.description}</p>}
               <MotionLink
-                {...PRESS}
+                {...PRESS_PRIMARY}
                 to={`/celulas?tipo=${encodeURIComponent(c.name)}`}
                 className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
               >

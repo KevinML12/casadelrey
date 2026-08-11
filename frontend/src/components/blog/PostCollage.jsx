@@ -17,7 +17,7 @@ export default function PostCollage({ posts }) {
   if (posts.length === 0) {
     return (
       <div className="py-24 flex flex-col items-center gap-5 text-center">
-        <p className="font-bold leading-[1.05] tracking-tight text-white/50" style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
+        <p className="text-d3 text-white/50">
           Pronto, primeras palabras.
         </p>
         <p className="text-white/40 text-16">Estamos preparando contenido para ti.</p>
@@ -33,15 +33,12 @@ export default function PostCollage({ posts }) {
         const rot = ROT[i % ROT.length];
         const big = span.includes('row-span-2');
         const excerpt = p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 110);
-        const category = p.category || (isExternal ? 'Red social' : 'Enseñanza');
 
         // Regla del sitio: cristal oscuro con foto propia (evita deslavarla),
         // cristal blanco sin foto -- ver EventsPage.jsx EventCard.
         const hasPhoto = Boolean(p.cover_image);
         const ink    = hasPhoto ? 'text-white'    : 'text-bg';
-        const ink90  = hasPhoto ? 'text-white/90' : 'text-bg/90';
         const ink70  = hasPhoto ? 'text-white/70' : 'text-bg/70';
-        const pillBg = hasPhoto ? 'bg-white/12 border-white/20' : 'bg-bg/8 border-bg/15';
 
         return (
           <motion.div
@@ -68,15 +65,24 @@ export default function PostCollage({ posts }) {
               <div className="absolute inset-0">
                 {hasPhoto && (
                   <>
-                    <img src={p.cover_image} alt={p.title} className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
+                    {/* Portada a color pleno: llegaba al 55% de su color y
+                        subía a 75% en hover, así que la foto que el autor
+                        eligió para el post se leía como fondo apagado. El
+                        contraste lo pone .scrim-card, que oscurece solo el
+                        tercio bajo donde vive el bloque de texto. */}
+                    <img src={p.cover_image} alt={p.title} className="parallax-layer absolute inset-0 w-full h-full object-cover" />
+                    <div className="scrim-card" />
                   </>
                 )}
               </div>
+              {/* Sin el pill de categoría arriba del título: era una etiqueta
+                  de clasificación encima del titular -- la misma fórmula del
+                  Eyebrow que se borró del sitio -- y encima su valor era medio
+                  inventado por el front cuando el post no traía category. Lo
+                  que de verdad distingue una tarjeta de otra ya está abajo
+                  ("Ver" sale del sitio, "Leer" se queda), y filtrar por
+                  categoría sigue viviendo en los chips del listado. */}
               <div className="relative z-10 h-full p-5 sm:p-6 flex flex-col justify-end gap-2">
-                <span className={`self-start ${pillBg} ${ink90} px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md`}>
-                  {category}
-                </span>
                 <p className={`font-bold leading-snug line-clamp-2 ${ink} ${big ? 'text-24 sm:text-28' : 'text-16 sm:text-18'}`}>
                   {p.title}
                 </p>

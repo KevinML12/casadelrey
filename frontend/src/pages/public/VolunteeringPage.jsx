@@ -1,21 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
-import ParallaxImg from '../../components/ui/ParallaxImg';
-import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+import Reveal from '../../components/ui/Reveal';
+import StatTrio from '../../components/ui/StatTrio';
 import Tilt from '../../components/ui/Tilt';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
-import { useSitePhoto, useApi } from '../../lib/feed';
+import { useApi } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
+import { PRESS_PRIMARY } from '../../lib/motion';
 import toast from 'react-hot-toast';
-
-const PRESS = {
-  whileHover: { scale: 1.03 },
-  whileTap: { scale: 0.96 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
 
 // Botón/CTA claro (bg-bg text-white) -- ya no hay GlassButton oscuro
 // en este flujo, todo el modal es glass-light.
@@ -74,32 +69,37 @@ const DEPT_TAGS = {
   logistica: ['organizacion', 'apoyo'],
 };
 
+// Cada entrada tenía además un campo `icon` ('mic', 'heart', 'book'…)
+// que NADIE leía: el sitio público no dibuja pictogramas por decisión
+// del dueño, así que eran nombres de glifos guardados por si acaso. Se
+// borran para que nadie los "reconecte" pensando que faltaba renderizar
+// algo.
 const INTEREST_TAGS = [
-  { key: 'musica', label: 'Música y arte', icon: 'mic' },
-  { key: 'personas', label: 'Atender personas', icon: 'heart' },
-  { key: 'ninos', label: 'Niños', icon: 'book' },
-  { key: 'tecnologia', label: 'Tecnología', icon: 'headphones' },
-  { key: 'oracion', label: 'Oración', icon: 'pray' },
-  { key: 'organizacion', label: 'Organización', icon: 'box' },
+  { key: 'musica', label: 'Música y arte' },
+  { key: 'personas', label: 'Atender personas' },
+  { key: 'ninos', label: 'Niños' },
+  { key: 'tecnologia', label: 'Tecnología' },
+  { key: 'oracion', label: 'Oración' },
+  { key: 'organizacion', label: 'Organización' },
 ];
 
 const QUIZ_QUESTIONS = [
   {
     q: '¿Qué te describe mejor?',
     options: [
-      { label: 'Me encanta la música y el arte', icon: 'mic', tags: ['musica'] },
-      { label: 'Disfruto servir y atender personas', icon: 'heart', tags: ['personas'] },
-      { label: 'Amo trabajar con niños', icon: 'book', tags: ['ninos'] },
-      { label: 'Se me da la tecnología', icon: 'headphones', tags: ['tecnologia'] },
-      { label: 'Prefiero orar y organizar', icon: 'pray', tags: ['oracion', 'organizacion'] },
+      { label: 'Me encanta la música y el arte', tags: ['musica'] },
+      { label: 'Disfruto servir y atender personas', tags: ['personas'] },
+      { label: 'Amo trabajar con niños', tags: ['ninos'] },
+      { label: 'Se me da la tecnología', tags: ['tecnologia'] },
+      { label: 'Prefiero orar y organizar', tags: ['oracion', 'organizacion'] },
     ],
   },
   {
     q: '¿Prefieres estar al frente o dar soporte detrás de cámara?',
     options: [
-      { label: 'Al frente, visible', icon: 'spark', tags: ['frente'] },
-      { label: 'Detrás, dando soporte', icon: 'box', tags: ['apoyo'] },
-      { label: 'Cualquiera de los dos', icon: 'check', tags: [] },
+      { label: 'Al frente, visible', tags: ['frente'] },
+      { label: 'Detrás, dando soporte', tags: ['apoyo'] },
+      { label: 'Cualquiera de los dos', tags: [] },
     ],
   },
 ];
@@ -133,7 +133,9 @@ function DepartmentLocked({ department, areas, onRequestChange }) {
   return (
     <div className="rounded-[14px] border border-bg/12 bg-bg/5 px-4 py-3.5 flex items-center justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-1">Departamento</p>
+        {/* Caja normal: las versales con tracking encima del dato son la
+            fórmula del eyebrow que se quitó del sitio, escrita a mano. */}
+        <p className="text-13 font-semibold text-bg/50 mb-1">Departamento</p>
         <p className="text-15 font-bold text-bg truncate">{area ? area.title : NO_PREFERENCE_LABEL}</p>
       </div>
       <button type="button" onClick={onRequestChange} className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
@@ -210,15 +212,15 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           <button onClick={() => setConfirming(false)} className="text-12 font-bold text-bg/60 hover:text-bg transition-colors shrink-0">
             Atrás
           </button>
-          <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar aplicación</p>
+          <p className="text-13 font-semibold text-bg">Confirmar aplicación</p>
         </div>
         <h3 className="text-21 font-bold text-bg tracking-tight mb-4">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
         <div className="glass-light-nested rounded-[16px] p-5 mb-6">
-          <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+          <p className="text-13 font-semibold text-bg/55 mb-2">¿Por qué aquí?</p>
           <p className="text-15 text-bg/75 leading-relaxed">{area ? area.why : NO_PREFERENCE_WHY}</p>
         </div>
         <div className="flex flex-col gap-2.5">
-          <motion.button {...PRESS} onClick={confirmSubmit} disabled={submitting} className={btnPrimary}>
+          <motion.button {...PRESS_PRIMARY} onClick={confirmSubmit} disabled={submitting} className={btnPrimary}>
             {submitting ? 'Enviando…' : 'Confirmar aplicación'}
           </motion.button>
           <button type="button" onClick={() => setConfirming(false)} disabled={submitting} className={btnGhost}>
@@ -232,7 +234,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   return (
     <>
       <div className="mb-4 pr-10">
-        <p className="text-12 text-bg font-bold uppercase tracking-wide">Aplicación</p>
+        <p className="text-13 font-semibold text-bg">Aplicación</p>
         <p className="text-14 text-bg/60 mt-0.5">{area ? area.title : NO_PREFERENCE_LABEL}</p>
       </div>
 
@@ -292,7 +294,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 
         <motion.button
           type="submit"
-          {...PRESS}
+          {...PRESS_PRIMARY}
           className={btnPrimary}
         >
           Continuar
@@ -322,7 +324,7 @@ function DepartmentCard({ title, desc, photo, big, height, onClick }) {
       max={6}
       glass
       hoverScale={1.02}
-      className={`group relative block w-full overflow-hidden rounded-[20px] text-left focus-ring ${height}`}
+      className={`group relative block w-full overflow-hidden rounded-[22px] text-left focus-ring ${height}`}
     >
       <img
         src={photo}
@@ -363,7 +365,11 @@ function QuizModal({ areas, onViewDetail, onApply }) {
   if (step === 'result') {
     return (
       <div className="text-center">
-        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Tu lugar ideal es</p>
+        {/* "Según tus respuestas" en vez de "Tu lugar ideal es": el quiz
+            de Células remataba con la misma fórmula ("Tu ___ ideal es") y
+            los dos modales se leían como el mismo widget con la palabra
+            cambiada. Además nombra de dónde sale el resultado. */}
+        <p className="text-13 font-semibold text-bg/50 mb-2">Según tus respuestas</p>
         <h3 className="text-24 font-bold text-bg tracking-tight mb-4">{result ? result.title : 'Cualquier departamento'}</h3>
         {result?.photo && (
           <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
@@ -372,7 +378,7 @@ function QuizModal({ areas, onViewDetail, onApply }) {
         )}
         <p className="text-14 text-bg/65 leading-relaxed mb-6">{result ? result.why : NO_PREFERENCE_WHY}</p>
         <div className="flex flex-col gap-2.5">
-          <motion.button {...PRESS} onClick={() => onApply(result?.value || '')} className={btnPrimary}>
+          <motion.button {...PRESS_PRIMARY} onClick={() => onApply(result?.value || '')} className={btnPrimary}>
             Aplicar a {result ? result.title : 'este departamento'}
           </motion.button>
           {result && (
@@ -396,7 +402,7 @@ function QuizModal({ areas, onViewDetail, onApply }) {
           <span key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? 'bg-bg' : 'bg-bg/12'}`} />
         ))}
       </div>
-      <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta {step + 1} de {QUIZ_QUESTIONS.length}</p>
+      <p className="text-13 font-semibold text-bg/50 mb-2">Pregunta {step + 1} de {QUIZ_QUESTIONS.length}</p>
       <h3 className="text-19 font-bold text-bg tracking-tight mb-5">{question.q}</h3>
       <div className="flex flex-col gap-2.5">
         {question.options.map(opt => (
@@ -425,9 +431,6 @@ export default function VolunteeringPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);   // chip de interés activo (filtra el grid) o null
   const [hoverCategory, setHoverCategory] = useState(null); // categoría bajo el cursor -- colorea el halo ambiental
-  // Administrable desde /admin/site-photos (antes ruta hardcodeada — el
-  // admin no podía cambiarla sin deploy). El local queda de fallback.
-  const sectionImg = useSitePhoto('voluntariado_seccion', '/images/nosotros/servidores.jpg');
   // Departamentos reales desde /volunteer-areas (admin-editable), con
   // fallback local si la API aun no responde. Una sola llamada a
   // /site-photos, la resolucion de foto por departamento es JS plano (no
@@ -479,9 +482,13 @@ export default function VolunteeringPage() {
         photoFallback="/images/bg-ministerios.jpg"
       />
 
+      {/* Sin foto de fondo: aquí vivía un ParallaxImg al 40% con un
+          degradado navy encima, o sea una foto de la iglesia entregada al
+          ~18% de su color, puesta DETRÁS de un collage que ya es puras
+          fotos a color pleno. Dos capas de foto compitiendo, y la de
+          abajo perdiendo. El canvas navy deja que el collage sea la
+          imagen de la sección. */}
       <section className="relative py-4 pb-24 overflow-hidden">
-        <ParallaxImg src={sectionImg} alt="" className="opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/55 to-bg" />
         {/* Halo ambiental -- cambia de color según la categoría bajo el
             cursor, le da sensación de "vivo" al fondo sin tocar el grid.
             CSS transition plano en vez de motion.div: el animate={{opacity}}
@@ -498,19 +505,29 @@ export default function VolunteeringPage() {
         />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <Reveal className="mb-10 text-center max-w-2xl mx-auto">
-            <h2 className="display-mega text-white" style={{ fontSize: 'clamp(1.9rem, 4.5vw, 3rem)' }}>
+          {/* Sin Reveal: el titular de sección es el punto FIJO contra el
+              que llega el contenido de abajo. Si él también se desliza al
+              entrar, no hay nada quieto en la pantalla y el scroll se
+              siente gelatinoso. Las cards del collage siguen entrando --
+              ahora llegan bajo un título que ya estaba ahí. */}
+          <div className="mb-10 text-center max-w-2xl mx-auto">
+            <h2 className="text-d2 text-white">
               ¿Dónde quieres servir?
             </h2>
             <p className="mt-4 text-16 text-white/70">Toca un departamento para conocerlo mejor.</p>
             <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
+              {/* "Dos preguntas y te decimos dónde": son exactamente dos
+                  (ver QUIZ_QUESTIONS). Antes decía "Descubre tu lugar
+                  ideal" y Células decía "Descubre tu célula ideal" -- dos
+                  botones blancos con la misma frase y una palabra
+                  cambiada, que es la firma de un widget parametrizado. */}
               <motion.button
-                {...PRESS}
+                {...PRESS_PRIMARY}
                 type="button"
                 onClick={() => setQuizOpen(true)}
                 className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
               >
-                Descubre tu lugar ideal
+                Dos preguntas y te decimos dónde
               </motion.button>
               <button
                 type="button"
@@ -520,18 +537,9 @@ export default function VolunteeringPage() {
                 O aplica sin preferencia
               </button>
             </div>
-          </Reveal>
+          </div>
 
-          <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto mb-14">
-            {STATS.map(s => (
-              <RevealItem key={s.label}>
-                <div className="glass-light rounded-[18px] px-3 py-5 text-center h-full">
-                  <div className="text-26 sm:text-30 font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
-                  <div className="mt-1.5 text-11 sm:text-12 font-semibold text-bg/55 leading-tight">{s.label}</div>
-                </div>
-              </RevealItem>
-            ))}
-          </RevealList>
+          <StatTrio stats={STATS} className="mx-auto mb-14" />
 
           {/* Chips de interés -- filtran el grid de abajo. Reusan los
               mismos tags que puntúan el quiz, así los dos caminos
@@ -562,7 +570,14 @@ export default function VolunteeringPage() {
               if (catAreas.length === 0) return null;
               return (
                 <div key={cat.name} onMouseEnter={() => setHoverCategory(cat.name)} onMouseLeave={() => setHoverCategory(null)}>
-                  <p className="text-13 font-bold text-white/50 uppercase tracking-tightish mb-4">{cat.name}</p>
+                  {/* Caja normal. `uppercase tracking-tightish` era un
+                      defecto real -- las versales piden MÁS aire, no
+                      -0.02em -- y encima repetía la fórmula del eyebrow
+                      (micro-mayúsculas encima de un bloque). En caja
+                      normal se lee mejor a 13px, así que basta subir un
+                      punto la opacidad para que siga leyéndose como el
+                      nombre de la familia y no como texto suelto. */}
+                  <p className="text-13 font-semibold text-white/60 mb-4">{cat.name}</p>
                   <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4">
                     {catAreas.map(area => {
                       const i = globalIndex[area.value];
@@ -620,14 +635,20 @@ export default function VolunteeringPage() {
                   apilada y la ventana (780px de ancho) se sentía vacía;
                   el "¿por qué aquí?" pasa a panel lateral en desktop. */}
               <div className="sm:col-span-3 flex flex-col gap-4">
+                {/* Caja normal: en versales con tracking este chip era un
+                    eyebrow de categoría, la fórmula que el sitio quitó.
+                    Se queda porque es dato real (a qué familia pertenece
+                    el departamento) y vive junto a la descripción, no
+                    encima del titular -- el titular va en el banner de la
+                    ventana. */}
                 {category && (
-                  <span className="self-start inline-flex items-center gap-1.5 bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-11 font-bold uppercase tracking-wide">
+                  <span className="self-start inline-flex items-center bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-12 font-semibold">
                     {category}
                   </span>
                 )}
                 <p className="text-bg/70 text-15 leading-relaxed">{a.desc}</p>
                 <motion.button
-                  {...PRESS}
+                  {...PRESS_PRIMARY}
                   onClick={() => openForm(a.value)}
                   className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
                 >
@@ -636,7 +657,7 @@ export default function VolunteeringPage() {
               </div>
               <div className="sm:col-span-2 flex flex-col gap-4">
                 <div className="glass-light-nested rounded-[16px] p-5 h-fit">
-                  <p className="text-11 font-bold uppercase tracking-widest text-bg/50 mb-2">¿Por qué aquí?</p>
+                  <p className="text-13 font-semibold text-bg/55 mb-2">¿Por qué aquí?</p>
                   <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
                 </div>
                 {/* Testimonio real -- solo si el admin cargó uno de verdad

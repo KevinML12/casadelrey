@@ -10,14 +10,8 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
 import Reveal from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
 import PageHero from '../../components/layout/PageHero';
-
-const PRESS = {
-  whileHover: { scale: 1.02 },
-  whileTap: { scale: 0.97 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
+import { PRESS_MICRO } from '../../lib/motion';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -75,9 +69,12 @@ export default function ProfilePage() {
       />
 
       <div className="relative z-10 max-w-2xl mx-auto px-6 pb-28">
-        {/* Identidad */}
+        {/* Identidad. Sin Tilt: es un panel de datos que no lleva a
+            ninguna parte -- inclinarlo al cursor prometía una navegación
+            que no existe. El bisel y el reflejo viven en las clases, así
+            que solo se pierde la rotación. */}
         <Reveal delay={0.05}>
-          <Tilt max={3} glass className="liquid-glass rounded-[24px] p-7 md:p-8 mb-6">
+          <div className="liquid-glass liquid-shine rounded-[22px] p-7 md:p-8 mb-6">
             <div className="flex items-center gap-5">
               <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
                 <span className="text-26 font-bold text-white">{initial}</span>
@@ -91,12 +88,12 @@ export default function ProfilePage() {
                 </span>
               </div>
             </div>
-          </Tilt>
+          </div>
         </Reveal>
 
-        {/* Metas */}
+        {/* Metas — mismo criterio: es una lista editable, no un enlace. */}
         <Reveal delay={0.1}>
-          <Tilt max={2} glass className="liquid-glass rounded-[24px] p-7 md:p-8">
+          <div className="liquid-glass liquid-shine rounded-[22px] p-7 md:p-8">
             <h2 className="text-20 font-bold text-white tracking-tight mb-5">
               Mis metas
             </h2>
@@ -112,7 +109,7 @@ export default function ProfilePage() {
               />
               <motion.button
                 type="submit"
-                {...PRESS}
+                {...PRESS_MICRO}
                 disabled={adding || !newTitle.trim()}
                 aria-label="Agregar meta"
                 className="w-11 h-11 rounded-full bg-white text-bg flex items-center justify-center text-22 font-bold focus-ring disabled:opacity-50 shrink-0"
@@ -155,7 +152,7 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
-          </Tilt>
+          </div>
         </Reveal>
       </div>
     </main>

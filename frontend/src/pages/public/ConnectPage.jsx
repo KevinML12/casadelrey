@@ -9,6 +9,7 @@ import apiClient from '../../lib/apiClient';
 import { FieldLight } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
+import { PRESS_PRIMARY } from '../../lib/motion';
 
 const CATEGORIES = [
   { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia' },
@@ -76,11 +77,16 @@ export default function ConnectPage() {
         <Reveal delay={0.06} className="mb-10">
           <ol className="relative grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-0">
             {/* Línea conectora entre los 3 pasos, solo desde sm (en una
-                sola fila) -- pasa por detrás de los círculos numerados. */}
-            <div className="hidden sm:block absolute top-[34px] left-[calc(16.66%+14px)] right-[calc(16.66%+14px)] h-px bg-bg/15" aria-hidden="true" />
+                sola fila) -- pasa por detrás de los círculos numerados.
+                En blanco: este bloque vive sobre el canvas navy, así que la
+                línea y los círculos van claros sobre oscuro. Antes eran
+                `bg-bg` sobre `bg-bg` -- navy sobre navy, literalmente
+                invisibles para el visitante, más una `shadow-card` navy que
+                tampoco tenía dónde verse. */}
+            <div className="hidden sm:block absolute top-[34px] left-[calc(16.66%+14px)] right-[calc(16.66%+14px)] h-px bg-white/15" aria-hidden="true" />
             {STEPS.map((s, i) => (
               <li key={s.text} className="relative flex flex-col items-center text-center sm:px-3">
-                <span className="relative z-10 shrink-0 grid place-items-center w-9 h-9 rounded-full bg-bg text-white text-14 font-bold shadow-card mb-3">
+                <span className="relative z-10 shrink-0 grid place-items-center w-9 h-9 rounded-full bg-white text-bg text-14 font-bold mb-3">
                   {i + 1}
                 </span>
                 <p className="text-13 text-white/70 leading-snug max-w-[15rem]">{s.text}</p>
@@ -107,7 +113,12 @@ export default function ConnectPage() {
                     decide. Tarjetas en vez de una lista de botones finitos
                     -- eso se leia como una version fea de un <select>. */}
                 <div>
-                  <p className="text-12 font-bold text-bg/60 mb-3 uppercase tracking-wide">
+                  {/* En caja normal, no versales: micro-mayúsculas con
+                      tracking encima de un bloque es la fórmula del eyebrow
+                      que el sitio ya desterró, y a 12px las versales piden
+                      MÁS aire del que caben. Es una pregunta, que se lea
+                      como una pregunta. */}
+                  <p className="text-13 font-semibold text-bg/60 mb-3">
                     ¿Qué te trae por aquí? <span className="text-rose">*</span>
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -118,7 +129,7 @@ export default function ConnectPage() {
                           key={c.value}
                           type="button"
                           onClick={() => setForm((p) => ({ ...p, category: c.value }))}
-                          className={`flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[18px] border-2 transition-all ${
+                          className={`flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[22px] border-2 transition-all ${
                             selected
                               ? 'bg-bg/10 border-bg shadow-card'
                               : 'bg-bg/[0.03] border-bg/10 hover:border-bg/25 hover:bg-bg/[0.06]'
@@ -136,7 +147,7 @@ export default function ConnectPage() {
                     separa visualmente "la decision" de "como te contactamos",
                     en vez de que todo sea un solo bloque de campos. */}
                 <div className="pt-1 border-t border-bg/10">
-                  <p className="text-12 font-bold text-bg/60 mt-5 mb-3 uppercase tracking-wide">Tus datos</p>
+                  <p className="text-13 font-semibold text-bg/60 mt-5 mb-3">Tus datos</p>
                   <div className="space-y-4">
                     <FieldLight label="Nombre *" value={form.name} onChange={set('name')} placeholder="Tu nombre completo" required />
 
@@ -173,11 +184,14 @@ export default function ConnectPage() {
                   </p>
                 )}
 
+                {/* PRESS_PRIMARY: es LA acción de la pantalla, así que usa el
+                    único press que sale del plano. El scale 1.02 al hover que
+                    tenía antes era un gesto inventado aquí mismo, distinto al
+                    de los demás CTA del sitio. */}
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
+                  {...PRESS_PRIMARY}
                   className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-bg text-white text-15 font-bold disabled:opacity-50"
                 >
                   {loading ? 'Enviando…' : 'Enviar'}

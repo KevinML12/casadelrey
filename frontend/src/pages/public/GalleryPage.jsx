@@ -70,15 +70,22 @@ export default function GalleryPage() {
       />
 
       <div className="relative z-10">
-        <section className="max-w-6xl mx-auto px-6 pt-6 pb-28">
+        {/* Se sale de la columna `max-w-6xl mx-auto px-6` que usan las otras
+            19 secciones del sitio: en una galería el marco natural es el
+            borde de la pantalla, no una columna de texto. Cuando TODAS las
+            páginas respiran igual, ninguna tiene forma propia -- esta es la
+            que tiene motivo real para romper la caja. El grid sube a 6
+            columnas en desktop para que el ancho extra sea más collage y no
+            solo cards más gordas. */}
+        <section className="px-4 sm:px-8 pt-6 pb-28">
           {albums.length === 0 ? (
             <div className="py-24 text-center">
-              <p className="font-bold text-white/50" style={{ fontSize: 'clamp(24px,4vw,36px)' }}>
+              <p className="text-d3 text-white/50">
                 Sin fotos publicadas aún.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
               {albums.map((a, i) => {
                 const big = SPANS[i % SPANS.length].includes('row-span-2');
                 return (
@@ -101,9 +108,14 @@ export default function GalleryPage() {
                       className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
                       style={{ rotate: ROT[i % ROT.length], transformOrigin: 'center' }}
                     >
+                      {/* Foto a color pleno (antes llegaba al 55% y subía a
+                          75% en hover: la portada del álbum se leía como
+                          textura gris hasta que la tocabas). El contraste lo
+                          pone .scrim-card, que oscurece solo el tercio bajo
+                          donde caen el título y el conteo. */}
                       <img src={a.photos[0]?.url} alt="" loading="lazy"
-                        className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-75 transition-all duration-700 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/35 to-transparent" />
+                        className="parallax-layer absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <div className="scrim-card" />
                       <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
                         <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md">
                           {a.photos.length} fotos
@@ -133,10 +145,18 @@ export default function GalleryPage() {
             <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
               {a.photos.map((photo, idx) => (
                 <RevealItem key={photo.ID ?? idx}>
-                  <Tilt max={5} glass className="rounded-[14px] overflow-hidden aspect-[4/5] relative group liquid-glass">
+                  {/* Sin Tilt: la miniatura no navega a ningún lado (abrir el
+                      álbum ya lo hizo la card de afuera) y mide ~120px, así
+                      que la inclinación no se lee -- pero un álbum de 30
+                      fotos montaba 30 resortes de framer-motion + 30
+                      IntersectionObserver dentro de un modal que ya está
+                      animando. El bisel y el reflejo viven en las clases
+                      (.liquid-glass + .liquid-shine, esta última la ponía el
+                      prop `glass`), no en Tilt: solo se pierde la rotación. */}
+                  <div className="rounded-[22px] overflow-hidden aspect-[4/5] relative group liquid-glass liquid-shine">
                     <img src={photo.url} alt={`Foto ${idx + 1}`} loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  </Tilt>
+                  </div>
                 </RevealItem>
               ))}
             </RevealList>

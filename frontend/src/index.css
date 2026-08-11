@@ -4,7 +4,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    CASA DEL REY — LIQUID GLASS LIGHT MODE  ·  Apple HIG
-   Pure white canvas · Deep Navy ink · Sapphire acento · Squircles
+   Canvas navy · Tinta blanca · Acento cálido de las fotos · Squircles
 ═══════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -27,7 +27,7 @@
      píxeles cálidos), albums/alabanza.jpg (#A38B69) y bg-hero.jpg
      (#B18768). #E8823C es esa familia llevada a saturación de acento.
 
-     Antes aquí vivían --acento/--rose/--amber/--emerald con los
+     Antes aquí vivían --celeste/--rose/--amber/--emerald con los
      valores #3B82F6 / #F43F5E / #F59E0B / #10B981: los cinco eran
      EXACTAMENTE la rampa 500 de Tailwind sin tocar (blue-500,
      rose-500, amber-500, emerald-500, violet-500), y --ink-2/--ink-3
@@ -406,7 +406,13 @@ html.lenis, html.lenis body { height: auto; }
   .scrim-hero {
     position: absolute; inset: 0; pointer-events: none;
     background:
-      radial-gradient(62% 55% ellipse at 50% 42%, rgba(10,21,38,.86), rgba(10,21,38,0) 72%),
+      /* El óvalo cubre título Y bajada. Con 55% de alto quedaba tan corto
+         que en un hero bajo (Eventos: pt-40 pb-12) el párrafo caía FUERA
+         del óvalo y aterrizaba sobre camisa blanca a plena luz -- medido,
+         el decil más claro dejaba la bajada en 3.2:1, bajo el 4.5 que pide
+         texto de cuerpo. El óvalo se estira, no se oscurece: la foto sigue
+         entera y a color en los bordes. */
+      radial-gradient(72% 82% ellipse at 50% 45%, rgba(10,21,38,.86), rgba(10,21,38,.30) 68%, rgba(10,21,38,0) 88%),
       linear-gradient(to bottom, rgba(10,21,38,.55) 0%, rgba(10,21,38,0) 28%, rgba(10,21,38,0) 60%, var(--bg) 100%);
   }
   /* Texto anclado al tercio inferior. Es el valor que PhotoHeaderCard ya
@@ -419,7 +425,16 @@ html.lenis, html.lenis body { height: auto; }
      deja la foto entera visible a la derecha. */
   .scrim-band {
     position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to right, var(--bg) 0%, rgba(10,21,38,.62) 42%, rgba(10,21,38,.10) 100%);
+    /* Tres paradas y no dos: con una rampa recta de .62 a .10 el titular d1
+       -- que ocupa hasta el 80% del ancho -- salía del área protegida por la
+       mitad y su cola caía sobre pelo y camisa a plena luz. La banda sostiene
+       el oscuro a lo ancho de la COLUMNA DE TEXTO y recién ahí suelta, así
+       que el tercio derecho de la foto sigue llegando casi entero. */
+    background: linear-gradient(to right,
+      var(--bg) 0%,
+      rgba(10,21,38,.70) 40%,
+      rgba(10,21,38,.46) 66%,
+      rgba(10,21,38,.08) 100%);
   }
 
   /* Brillo especular interactivo — sigue al cursor vía --spec-x/--spec-y

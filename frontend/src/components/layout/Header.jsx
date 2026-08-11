@@ -77,7 +77,7 @@ export default function Header() {
             <span className="grid place-items-center w-10 h-10 rounded-md bg-bg transition-transform duration-400 ease-spring group-hover:scale-105">
               <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
             </span>
-            <span className="text-15 font-extrabold tracking-tightish text-bg">Casa del Rey</span>
+            <span className="text-15 font-bold tracking-tightish text-bg">Casa del Rey</span>
           </Link>
 
           {/* Desktop nav links — solo desde xl (1280px). Con 7 links (se
@@ -112,7 +112,7 @@ export default function Header() {
                   onClick={() => setDropOpen(p => !p)}
                   className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-13 hover:bg-bg/5 transition-all duration-300 focus-ring"
                 >
-                  <span className="grid place-items-center w-7 h-7 rounded-full bg-bg text-white text-12 font-extrabold">
+                  <span className="grid place-items-center w-7 h-7 rounded-full bg-bg text-white text-12 font-bold">
                     {(user?.name || user?.email || '?')[0].toUpperCase()}
                   </span>
                   <span className="font-semibold text-bg">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>

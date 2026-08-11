@@ -23,13 +23,17 @@ const NETWORKS = [
 export default function SocialSection({ title = 'Síguenos en redes' }) {
   return (
     <section className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* El titular no se revela: es el punto fijo contra el que llega el
+          bento de abajo. Cuando también él entraba con Reveal no había
+          nada quieto en la pantalla y el scroll se sentía gelatinoso --
+          ahora el título ya está y las tarjetas aterrizan bajo él. */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+          <h2 className="text-d2 text-white">
             {title}
           </h2>
         </div>
-      </Reveal>
+      </div>
 
       <Reveal delay={0.05} className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Bento en .glass-light -- blanco y negro, Instagram destacada
@@ -48,9 +52,12 @@ export default function SocialSection({ title = 'Síguenos en redes' }) {
                 href={n.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`glass-light relative flex flex-col justify-end p-4 md:p-6 text-bg rounded-[18px] ${n.span}`}
+                className={`glass-light relative flex flex-col justify-end p-4 md:p-6 text-bg rounded-[22px] ${n.span}`}
               >
-                <p className={`relative z-10 font-extrabold leading-none tracking-tight ${big ? 'text-32 md:text-40' : 'text-17'}`}>{n.label}</p>
+                {/* font-bold y no extrabold: Arimo topa en 700, así que el
+                    800 pintaba exactamente el mismo trazo mientras declaraba
+                    una jerarquía que la pantalla nunca llegaba a mostrar. */}
+                <p className={`relative z-10 font-bold leading-none tracking-tight ${big ? 'text-32 md:text-40' : 'text-17'}`}>{n.label}</p>
                 <p className={`relative z-10 text-bg/60 truncate ${big ? 'text-15 mt-2' : 'text-12 mt-1'}`}>{n.handle}</p>
               </Tilt>
             );

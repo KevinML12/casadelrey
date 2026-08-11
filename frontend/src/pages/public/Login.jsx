@@ -36,7 +36,7 @@ export default function Login() {
     <AuthCard>
       <div className="flex flex-col items-center text-center mb-8">
         <img src="/logo.png" alt="Casa del Rey" className="w-14 h-14 object-contain mb-5" />
-        <h1 className="display-mega text-white" style={{ fontSize: '1.9rem' }}>Bienvenido de vuelta.</h1>
+        <h1 className="text-d3 text-white">Bienvenido de vuelta.</h1>
         <p className="text-15 text-white/60 mt-2">Ingresa con tus credenciales para continuar.</p>
       </div>
 

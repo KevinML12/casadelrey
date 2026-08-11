@@ -75,7 +75,7 @@ export default function BlogPage() {
     if (notFound || !post) {
       return (
         <main className="min-h-screen bg-bg flex flex-col items-center justify-center gap-4 px-6 text-center">
-          <p className="font-bold text-white/50" style={{ fontSize: 'clamp(24px,4vw,36px)' }}>Post no encontrado.</p>
+          <p className="text-d3 text-white/50">Post no encontrado.</p>
           <Link to="/blog" className="text-white/70 hover:text-white text-15 font-semibold">Volver al blog</Link>
         </main>
       );

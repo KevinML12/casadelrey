@@ -39,7 +39,7 @@ export default function Footer() {
                 className="w-16 h-16 object-contain group-hover:scale-105 transition-transform duration-500"
               />
               <div>
-                <span className="block text-20 font-extrabold tracking-tightish text-white">Casa del Rey</span>
+                <span className="block text-20 font-bold tracking-tightish text-white">Casa del Rey</span>
                 <span className="block text-13 text-white/50 font-medium">Iglesia cristiana · Huehuetenango</span>
               </div>
             </Link>

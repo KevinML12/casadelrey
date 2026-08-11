@@ -9,6 +9,13 @@
 //  superficie lisa clara como .glass-light, pero se lava contra una
 //  imagen). Con .liquid-glass + .liquid-shine juntos, la tarjeta se lee
 //  como vidrio real incluso con una foto de fondo.
+//
+//  Conserva el Tilt (ago-2026, revisión de dónde vale inclinarse): este
+//  tile SÍ navega -- es button o <a> y siempre lleva onClick/href, así
+//  que la inclinación anticipa algo que de verdad va a pasar. El radio
+//  pasa a 22px, el mismo de toda card de contenido con foto: el mismo
+//  objeto visual tenía 18 aquí, 24 en PhotoHeaderCard y 20/32 en otras
+//  secciones, según el archivo en el que le tocó nacer.
 // ============================================================
 import Tilt from './Tilt';
 
@@ -22,7 +29,7 @@ export default function PhotoBentoTile({ photo, title, desc, big, onClick, as = 
       max={5}
       glass
       whileHover={{ scale: 1.03, y: -4 }}
-      className="liquid-glass group relative block w-full h-full text-left focus-ring rounded-[18px] overflow-hidden"
+      className="liquid-glass group relative block w-full h-full text-left focus-ring rounded-[22px] overflow-hidden"
       {...rest}
     >
       <img

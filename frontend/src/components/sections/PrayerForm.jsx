@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { FieldLight } from '../ui/Glass';
+import { PRESS_PRIMARY, PRESS_SECONDARY } from '../../lib/motion';
 
 const CATEGORIES = [
   { value: 'salud',      label: 'Salud y Sanidad' },
@@ -17,11 +18,6 @@ const CATEGORIES = [
   { value: 'otro',       label: 'Otro' },
 ];
 
-const PRESS = {
-  whileHover: { scale: 1.02 },
-  whileTap: { scale: 0.97 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
 
 export default function PrayerForm({ compact = false }) {
   const [submitted, setSubmitted] = useState(false);
@@ -46,9 +42,11 @@ export default function PrayerForm({ compact = false }) {
         <p className="text-15 text-bg/70 max-w-xs leading-relaxed mb-6">
           Tu petición fue recibida. Nuestra comunidad estará intercediendo por ti.
         </p>
+        {/* Secundario: "enviar otra" es una salida, no la acción de la
+            pantalla -- no compite con el primario levantándose igual. */}
         <motion.button
           type="button"
-          {...PRESS}
+          {...PRESS_SECONDARY}
           onClick={() => setSubmitted(false)}
           className="inline-flex items-center gap-2 rounded-pill glass-light-nested px-6 py-3 text-14 font-bold text-bg focus-ring"
         >
@@ -98,7 +96,7 @@ export default function PrayerForm({ compact = false }) {
 
         <motion.button
           type="submit"
-          {...PRESS}
+          {...PRESS_PRIMARY}
           disabled={isSubmitting}
           className="w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring disabled:opacity-60"
         >

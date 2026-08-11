@@ -6,6 +6,11 @@ import apiClient from '../../lib/apiClient';
 import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
+// Vocabulario de movimiento compartido: la amplitud del press la decide el
+// ROL del botón (primario / apoyo / micro-control), no el archivo. Antes
+// vivía aquí como un `const PRESS` local que le daba la MISMA física al CTA
+// blanco del hero y a los chips de redes del pie de Ubicación.
+import { EASE_OUT, EASE_IN, PRESS_PRIMARY, PRESS_SECONDARY, PRESS_MICRO } from '../../lib/motion';
 
 // 3D — chunk aparte, solo se descarga si el dispositivo califica
 // (el campo de partículas global vive en App.jsx, vía StarField)
@@ -16,13 +21,6 @@ import ParallaxImg from '../../components/ui/ParallaxImg';
 import SocialSection from '../../components/sections/SocialSection';
 
 const MotionLink = motion.create(Link);
-
-// Física de resorte compartida para botones (hundir al presionar, rebotar al soltar)
-const PRESS = {
-  whileHover: { scale: 1.04 },
-  whileTap: { scale: 0.94 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
 
 // ════════════════════════════════════════════════════════════════════
 // 1 · HERO CAROUSEL — slides reales: los heroes que el admin activa en
@@ -48,8 +46,9 @@ const fmtEventDate = (d) =>
 // ── Coreografía del carrusel ──────────────────────────────────────
 // Entrada en cascada (label → título → subtítulo → CTA) con las líneas
 // del título emergiendo desde una máscara; salida rápida hacia arriba.
-const EASE_OUT = [0.16, 1, 0.3, 1];   // expo-out: llega suave
-const EASE_IN  = [0.6, 0, 0.8, 1];    // salida decidida
+// Las curvas ya no se declaran aquí: EASE_OUT nació en este hero y por eso
+// mismo se adoptó como el acento de movimiento del sitio entero — vive en
+// lib/motion.js y desde ahí la usan todas las páginas.
 
 const SLIDE_ANIM = {
   hidden: {},
@@ -84,7 +83,11 @@ function HeroCarousel({ onPlan }) {
   // se mantiene fijo y solo cambia de contenido según qué slide
   // quedó centrado, sincronizado por scroll listener.
   const trackRef = useRef(null);
-  const isSyncing = useRef(false);
+  // Espejo de `idx` para que la autorotación lea el índice actual sin
+  // recrear el intervalo en cada cambio de slide, y sin meter efectos
+  // secundarios dentro del updater de setIdx (ver la nota del intervalo).
+  const idxRef = useRef(0);
+  useEffect(() => { idxRef.current = idx; }, [idx]);
 
   useEffect(() => {
     Promise.all([fetchOnce('/hero/active'), fetchOnce('/events/')]).then(([heroData, events]) => {
@@ -147,41 +150,55 @@ function HeroCarousel({ onPlan }) {
   }, []);
 
   // Lleva el carril a un slide dado — scroll real, no solo estado.
-  // isSyncing evita que el listener de scroll (abajo) rebote el idx
-  // mientras la animación programática todavía está en camino.
   const goTo = (i) => {
     const track = trackRef.current;
     if (!track) return;
-    isSyncing.current = true;
     track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
     setIdx(i);
-    setTimeout(() => { isSyncing.current = false; }, 700);
   };
 
   // El usuario desliza/hace scroll con el trackpad o el dedo → detecta
   // qué slide quedó centrado y sincroniza el texto + los dots.
+  //
+  // Se espera a que el carril DEJE de moverse (140ms sin un solo evento
+  // de scroll) y recién ahí se sincroniza, una sola vez. Antes el guard
+  // contra el scroll programático era un `setTimeout` de 700ms adivinado
+  // a ojo: un `scrollTo({behavior:'smooth'})` sobre un carril de ~1400px
+  // puede tardar más, y los eventos residuales llegaban con el guard ya
+  // levantado, pudiendo redondear a un índice distinto del que se acababa
+  // de pedir. Cada cambio de índice cambia el `key` del bloque de texto y
+  // lo remonta, así que el precio de esa carrera era un parpadeo del
+  // titular. Esperar a que el scroll se asiente no adivina nada: tras un
+  // scroll programático el índice calculado coincide con el que ya está,
+  // `setIdx` no dispara render y el bloque no se remonta.
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    let raf;
+    let settle;
     const onScroll = () => {
-      if (isSyncing.current) return;
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
+      clearTimeout(settle);
+      settle = setTimeout(() => {
         const i = Math.round(track.scrollLeft / track.clientWidth);
         setIdx(prev => (prev === i ? prev : i));
-      });
+      }, 140);
     };
     track.addEventListener('scroll', onScroll, { passive: true });
-    return () => { track.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+    return () => { track.removeEventListener('scroll', onScroll); clearTimeout(settle); };
   }, []);
 
   // Autorotación cada 8s — programa el scroll real (no solo el índice),
   // así el carril y los dots siempre concuerdan con lo que se ve.
+  //
+  // El índice siguiente sale de un ref, no del updater de setIdx. Antes
+  // era `setIdx(i => { goTo(i + 1); return i + 1 })`: un efecto
+  // secundario DENTRO de una función de actualización. React exige que
+  // esas funciones sean puras y en StrictMode las invoca dos veces, así
+  // que el carril recibía dos `scrollTo` por tick y `goTo` volvía a
+  // llamar a `setIdx` desde dentro de otro `setIdx`.
   useEffect(() => {
     if (slides.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const t = setInterval(() => {
-      setIdx(i => { const next = (i + 1) % slides.length; goTo(next); return next; });
+      goTo((idxRef.current + 1) % slides.length);
     }, 8000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,21 +208,17 @@ function HeroCarousel({ onPlan }) {
   // El titulo de un HERO lo redacta el admin como frase editorial corta
   // ("SOMOS/CASA DEL REY"); el de un EVENTO es prosa normal (el titulo del
   // evento tal cual, "Noche de Alabanza y Adoracion") -- al tamaño gigante
-  // de display (hasta 7.5rem) una frase larga envuelve en 3-4 lineas y la
-  // seccion (ahora de alto fijo, ver mas abajo) la corta. Achicar la fuente
-  // segun el largo real en vez de truncar el texto con "…".
+  // de display una frase larga envuelve en 3-4 lineas y la seccion (de alto
+  // FIJO, h-[100svh]) la corta. Se sigue achicando segun el largo real en vez
+  // de truncar con "…", pero ya no con tres `clamp()` inventados aqui: los
+  // tres escalones caen sobre los tres tokens de display del sistema
+  // (d1/d2/d3), que ademas traen peso, tracking e interlineado horneados.
   const longestLine = Math.max(slide.l1?.length || 0, slide.l2?.length || 0);
-  const titleClamp = longestLine > 20
-    ? 'clamp(2rem, 4.5vw, 4rem)'
+  const titleSize = longestLine > 20
+    ? 'text-d3'
     : longestLine > 12
-      ? 'clamp(2.4rem, 6vw, 5.5rem)'
-      // Bajado de 7.5rem a 6.5rem: con la seccion ahora de alto FIJO
-      // (h-[100svh], no min-height), el caso de titulo corto en 3 lineas
-      // + label + subtitle + boton + dots ya no tenia margen real en
-      // ventanas de navegador normales (no maximizadas/con mucho chrome) --
-      // el label de arriba se recortaba contra el nav. 6.5rem sigue siendo
-      // grande y dramatico, pero deja aire real.
-      : 'clamp(3rem, 7vw, 6.5rem)';
+      ? 'text-d2'
+      : 'text-d1';
   // Subtítulo del hero: si el admin no puso uno propio, saludo dinámico
   // por hora del día (mismo lenguaje que "Buenos días, Pastor" del
   // Dashboard) -- personalizado con el nombre si hay sesión iniciada.
@@ -268,9 +281,12 @@ function HeroCarousel({ onPlan }) {
           })}
         </div>
       </motion.div>
-      {/* Scrims: legibilidad del texto sin apagar la foto */}
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/20 to-transparent pointer-events-none" />
+      {/* Scrim en banda: el hero es una composición de dos columnas — texto a
+          la izquierda, foto entera respirando a la derecha (donde además cae
+          la tarjeta de cristal). Antes eran dos degradados escritos a mano
+          aquí mismo; ahora es la misma clase que usa cualquier otra banda del
+          sitio, así que el hero y la Agenda por fin oscurecen igual. */}
+      <div className="scrim-band" />
 
       {/* Globo 3D — "Luz para las Naciones" girando detrás del contenido */}
       {show3D && (
@@ -300,10 +316,7 @@ function HeroCarousel({ onPlan }) {
                 <motion.div variants={RISE} className="mb-6 text-white/80 text-15 font-semibold">
                   {slide.label}
                 </motion.div>
-                <h1
-                  className="display-mega text-white"
-                  style={{ fontSize: titleClamp, lineHeight: '1' }}
-                >
+                <h1 className={`${titleSize} text-white`}>
                   {[slide.l1, slide.l2].filter(Boolean).map((line, li) => (
                     // pb/-mb: deja respirar los descendentes (g, j, p)
                     // dentro de la máscara sin abrir el interlineado
@@ -331,7 +344,7 @@ function HeroCarousel({ onPlan }) {
                       href={slide.ctaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      {...PRESS}
+                      {...PRESS_PRIMARY}
                       className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
@@ -339,7 +352,7 @@ function HeroCarousel({ onPlan }) {
                   ) : slide.ctaUrl?.startsWith('/') ? (
                     <MotionLink
                       to={slide.ctaUrl}
-                      {...PRESS}
+                      {...PRESS_PRIMARY}
                       className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
@@ -347,7 +360,7 @@ function HeroCarousel({ onPlan }) {
                   ) : (
                     <motion.button
                       onClick={onPlan}
-                      {...PRESS}
+                      {...PRESS_PRIMARY}
                       className="mt-9 inline-flex items-center gap-3 px-7 py-4 rounded-pill liquid-glass text-white text-15 font-bold focus-ring"
                     >
                       {slide.ctaText}
@@ -377,16 +390,14 @@ function HeroCarousel({ onPlan }) {
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
                   <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.94 }}
+                    {...PRESS_MICRO}
                     onClick={() => goTo((idx - 1 + slides.length) % slides.length)}
                     className="px-4 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white text-12 font-bold"
                   >
                     Anterior
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.94 }}
+                    {...PRESS_MICRO}
                     onClick={() => goTo((idx + 1) % slides.length)}
                     className="px-4 h-8 rounded-full liquid-glass flex items-center justify-center text-white/70 hover:text-white text-12 font-bold"
                   >
@@ -398,16 +409,18 @@ function HeroCarousel({ onPlan }) {
           </motion.div>
 
           {/* Tarjeta de cristal claro — próximo evento real de /events (Frame 1).
-              El wrapper lleva la coreografía de scroll; el Tilt interno la
-              inclinación 3D al cursor (no pueden compartir elemento). */}
+              El wrapper lleva la coreografía de scroll de la sección. */}
           <motion.div
             style={{ y: cardY, opacity: cardFade }}
             className="animate-hero-4 max-w-[340px] w-full justify-self-start lg:justify-self-end"
           >
           {/* Sin `glass`: esta card es glass-light (blanco/crema) — el
               vidrio WebGL está afinado en tono azul para el liquid-glass
-              oscuro, chocaría aquí en la tarjeta más visible del sitio */}
-          <Tilt max={7} className="glass-light rounded-[22px] p-7 md:p-8">
+              oscuro, chocaría aquí en la tarjeta más visible del sitio.
+              Sin Tilt tampoco: el Tilt es la señal de "esto se puede tocar" y
+              esta tarjeta no navega a ningún lado — navegan los dos botones
+              de adentro. El bisel del cristal vive en .glass-light, no en Tilt. */}
+          <div className="glass-light rounded-[22px] p-7 md:p-8">
             {/* El bloque de evento solo existe con un evento REAL de la API;
                 sin datos, la tarjeta queda solo con sus CTAs (que sí son
                 reales) en vez de mostrar un evento de mentira. */}
@@ -418,7 +431,7 @@ function HeroCarousel({ onPlan }) {
                 </div>
                 <div className="flex items-center gap-4 text-bg">
                   <div className="text-center shrink-0">
-                    <div className="text-44 font-extrabold leading-none tracking-tighter">{nextEvent.day}</div>
+                    <div className="text-44 font-bold leading-none tracking-tighter">{nextEvent.day}</div>
                     <div className="text-11 font-bold tracking-widest mt-1">{nextEvent.month}</div>
                   </div>
                   <div className="min-w-0">
@@ -433,20 +446,22 @@ function HeroCarousel({ onPlan }) {
             <div className={`${nextEvent ? 'mt-6' : ''} flex flex-col gap-2.5`}>
               <MotionLink
                 to="/conectate"
-                {...PRESS}
+                {...PRESS_PRIMARY}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white text-bg px-5 py-3.5 text-14 font-bold focus-ring shadow-card"
               >
                 Conéctate
               </MotionLink>
+              {/* De apoyo: el blanco de arriba es la acción principal de la
+                  tarjeta, así que este confirma el tap pero no se levanta. */}
               <MotionLink
                 to="/events"
-                {...PRESS}
+                {...PRESS_SECONDARY}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-bg/10 text-bg px-5 py-3.5 text-14 font-bold focus-ring hover:bg-bg/15 transition-colors"
               >
                 Ver todos los eventos
               </MotionLink>
             </div>
-          </Tilt>
+          </div>
           </motion.div>
 
         </div>
@@ -473,10 +488,14 @@ function AnnouncementsBar() {
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-4">
         {list.map((a, i) => (
           <Reveal key={a.ID} delay={i * 0.08}>
-            <Tilt max={3} glass="standard" className="liquid-glass rounded-[18px] px-6 py-5">
+            {/* Un anuncio se lee, no se toca: sin destino al que ir, el Tilt
+                prometía una interacción que no existe. Queda el cristal (la
+                clase) y su reflejo (liquid-shine, que antes agregaba la prop
+                `glass` del Tilt); se pierde solo la rotación al cursor. */}
+            <div className="liquid-glass liquid-shine rounded-[22px] px-6 py-5">
               <p className="text-16 font-bold text-white leading-tight">{a.title}</p>
               <p className="text-14 text-white/70 mt-1 line-clamp-2">{a.content}</p>
-            </Tilt>
+            </div>
           </Reveal>
         ))}
       </div>
@@ -530,35 +549,42 @@ function Agenda({ bg }) {
 
   return (
     <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
-      <ParallaxImg src={bg} alt="Eventos" className="opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-bg/10" />
+      {/* La foto va a plena fuerza: el contraste lo pone el scrim en banda,
+          que oscurece la columna izquierda (donde vive el texto) y deja la
+          foto entera a la derecha, debajo del panel. Antes la imagen llegaba
+          al 60% y encima un degradado propio: la congregación se leía gris. */}
+      <ParallaxImg src={bg} alt="Eventos" />
+      <div className="scrim-band" />
 
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
         <div className="flex flex-col justify-center">
-          <Reveal>
-            <div className="text-white/70 text-14 font-semibold mb-4">
-              Agenda mensual
-            </div>
-            <h2 className="display-mega text-white leading-[0.85] tracking-tighter mb-8" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}>
-              PRÓXIMOS<br />EVENTOS
-            </h2>
-          </Reveal>
+          {/* El titular NO se revela: es el punto fijo contra el que llegan
+              las cards de abajo. Si también entra animado, no queda nada
+              quieto en pantalla y el scroll se siente gelatinoso. */}
+          <h2 className="text-d2 text-white mb-8">
+            PRÓXIMOS<br />EVENTOS
+          </h2>
           <MotionLink
             to="/events"
-            {...PRESS}
+            {...PRESS_SECONDARY}
             className="mb-12 inline-flex items-center gap-3 self-start px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
           >
             Ver calendario completo
           </MotionLink>
           
           <Reveal delay={0.1}>
-          <Tilt as={Link} to={`/events?id=${featured.id}`} max={4} glass="featured" className="rounded-[24px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8 block">
+          <Tilt as={Link} to={`/events?id=${featured.id}`} max={4} glass="featured" className="rounded-[22px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8 block">
             <div className="text-center shrink-0">
-              <div className="text-72 font-extrabold text-white leading-none tracking-tighter">{featured.day}</div>
+              {/* Uno de los cuatro trabajos del acento en todo el sitio: el
+                  día del evento destacado. Es el único número que necesita
+                  gritar, y gritarlo con color pesa menos que con tamaño. */}
+              <div className="text-72 font-bold text-acento leading-none tracking-tighter">{featured.day}</div>
               <div className="text-14 font-bold text-white tracking-widest mt-2">{featured.month}</div>
             </div>
             <div className="flex-1 w-full text-center md:text-left">
-              <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-12 font-semibold mb-3 inline-block">Destacado</span>
+              {/* Sin chip "Destacado": que sea el primero, el más grande y el
+                  único con el día en acento ya lo dice. La etiqueta encima
+                  del titular era la misma fórmula del eyebrow que se eliminó. */}
               <h3 className="text-28 font-bold text-white tracking-tight mb-3">{featured.title}</h3>
               <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-14 text-white/60">
                 <span>{featured.time}</span>
@@ -570,16 +596,18 @@ function Agenda({ bg }) {
         </div>
 
         <Reveal from="right">
-        <Tilt max={3} glass="standard" className="liquid-glass rounded-[24px] p-8 md:p-12 border border-white/10">
+        {/* Panel (contiene cards), no card: por eso el radio mayor. Y sin
+            Tilt: no navega a ningún lado — navegan las filas de adentro. */}
+        <div className="liquid-glass liquid-shine rounded-[28px] p-8 md:p-12 border border-white/10">
           <div className="text-white/50 text-14 font-semibold mb-8">
             También este mes
           </div>
           <RevealList className="space-y-4">
             {others.map((ev) => (
               <RevealItem key={ev.id}>
-                <Link to={`/events?id=${ev.id}`} className="group rounded-[18px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
+                <Link to={`/events?id=${ev.id}`} className="group rounded-[22px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
                   <div className="text-center sm:text-left shrink-0">
-                    <div className="text-32 font-extrabold text-white leading-none">{ev.day}</div>
+                    <div className="text-32 font-bold text-white leading-none">{ev.day}</div>
                     <div className="text-10 text-white font-bold tracking-widest mt-1">{ev.month}</div>
                   </div>
                   <div className="hidden sm:block w-px h-12 bg-white/10" />
@@ -593,7 +621,7 @@ function Agenda({ bg }) {
               </RevealItem>
             ))}
           </RevealList>
-        </Tilt>
+        </div>
         </Reveal>
       </div>
     </section>
@@ -607,7 +635,7 @@ const HOME_COLLAGE_ROT = [-2.0, 1.6, -1.4, 2.2, -1.8, 1.2];
 // ════════════════════════════════════════════════════════════════════
 // 3 · CÉLULAS Y COMUNIDAD
 // ════════════════════════════════════════════════════════════════════
-function CelulasSection({ bg }) {
+function CelulasSection() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -632,13 +660,17 @@ function CelulasSection({ bg }) {
   if (categories.length === 0) return null;
 
   return (
+    // Sin foto ambiental: el collage de abajo YA es puro material fotográfico.
+    // Una foto de fondo detrás de una grilla de fotos no suma atmósfera, le
+    // compite. El ritmo de la página lo hace la alternancia "sección CON foto
+    // entera / sección sobre canvas limpio" — cuando todas llevan foto al 50%,
+    // ninguna significa nada.
     <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
-      <ParallaxImg src={bg} alt="Comunidad" className="opacity-50" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
-
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <Reveal className="mb-16 text-center">
-          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+        {/* El titular es el ancla fija; lo que se revela al entrar son las
+            cards de abajo, que llegan por debajo de él. */}
+        <div className="mb-16 text-center">
+          <h2 className="text-d2 text-white">
             Células
           </h2>
           <p className="mt-6 text-18 text-white/70 max-w-2xl mx-auto">
@@ -647,12 +679,12 @@ function CelulasSection({ bg }) {
           </p>
           <MotionLink
             to="/celulas"
-            {...PRESS}
+            {...PRESS_SECONDARY}
             className="mt-8 inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
           >
             Encuentra tu célula
           </MotionLink>
-        </Reveal>
+        </div>
 
         {/* Collage (mismo lenguaje que Células/Galería/Blog): recortes
             inclinados que se enderezan al pasar el cursor, en vez de un
@@ -682,20 +714,28 @@ function CelulasSection({ bg }) {
                   to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
                   whileHover={{ rotate: 0, scale: 1.03, zIndex: 30 }}
                   glass
-                  className="liquid-glass group relative w-full h-full rounded-[24px] flex flex-col overflow-hidden ring-1 ring-white/10"
+                  className="liquid-glass group relative w-full h-full rounded-[22px] flex flex-col overflow-hidden ring-1 ring-white/10"
                   style={{ rotate: rot, transformOrigin: 'center' }}
                 >
-                  <div className="absolute inset-0 rounded-[24px] overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+                  {/* Foto a plena fuerza: son las caras de la congregación, lo
+                      único irrepetible que tiene el sitio. El texto se lee por
+                      el scrim anclado abajo, no por apagar la imagen. */}
+                  <div className="absolute inset-0 rounded-[22px] overflow-hidden">
                     <img src={cat.image_url} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/40 to-bg/10" />
+                    <div className="scrim-card" />
                   </div>
                   <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
                     <div>
-                      <span className="bg-white/10 border border-white/20 text-white/90 px-3 py-1 rounded-full text-12 font-semibold mb-4 inline-block backdrop-blur-md">
-                        {cat.age_group}
-                      </span>
+                      {/* El rango de edad va DEBAJO del nombre: encima era una
+                          etiqueta de categoría sobre el titular, la misma
+                          fórmula del eyebrow. El dato es real (viene de la
+                          API) así que se conserva, solo cambia de lugar y
+                          pierde la píldora decorativa. */}
                       <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-40' : 'text-24'}`}>{cat.name}</h3>
                       <p className={`text-white/80 ${i === 0 ? 'text-16 max-w-sm' : 'text-14 max-w-xs'}`}>{cat.description}</p>
+                      {cat.age_group && (
+                        <p className="mt-3 text-13 font-semibold text-white/60">{cat.age_group}</p>
+                      )}
                     </div>
                   </div>
                 </Tilt>
@@ -716,7 +756,7 @@ function CelulasSection({ bg }) {
 // más abajo) — mostrar "El Precio del Propósito" como si fuera un
 // sermón real cuando la API falla contradice "nada estático".
 
-function MensajesCarousel({ bg }) {
+function MensajesCarousel() {
   const [sermons, setSermons] = useState([]);
 
   useEffect(() => {
@@ -743,24 +783,25 @@ function MensajesCarousel({ bg }) {
   if (sermons.length === 0) return null;
 
   return (
+    // Sobre canvas limpio, igual que Células y por la misma razón: el carril
+    // de abajo ya son puras portadas fotográficas. La foto ambiental detrás
+    // solo restaba contraste a las que sí importan.
     <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <ParallaxImg src={bg} alt="Mensajes Background" className="opacity-50" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-bg/20" />
-
-      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* El titular queda quieto; lo que entra al hacer scroll es el carril. */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
+          <h2 className="text-d2 text-white">
             Alimenta tu espíritu.
           </h2>
         </div>
         <MotionLink
           to="/blog"
-          {...PRESS}
+          {...PRESS_SECONDARY}
           className="inline-flex items-center gap-3 self-start md:self-auto px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring shrink-0"
         >
           Ver todas las enseñanzas
         </MotionLink>
-      </Reveal>
+      </div>
 
       <div className="relative z-10 flex overflow-x-auto gap-6 px-6 pb-12 snap-x snap-mandatory scrollbar-hide" style={{ scrollPaddingLeft: '1.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
@@ -774,10 +815,12 @@ function MensajesCarousel({ bg }) {
             {...(s.href
               ? { as: 'a', href: s.href, target: '_blank', rel: 'noopener noreferrer' }
               : { as: Link, to: s.to })}
-            className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[24px] liquid-glass hover:border-white/30 snap-start overflow-hidden"
+            className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[22px] liquid-glass hover:border-white/30 snap-start overflow-hidden"
           >
-            <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
+            {/* Portada a plena fuerza: el título se lee por el scrim anclado
+                abajo, no porque la foto esté a media luz. */}
+            <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="scrim-card" />
 
             <div className="absolute bottom-0 left-0 p-8 w-full z-10">
               <div className="text-13 font-semibold text-white/70 mb-2">{s.date}</div>
@@ -792,12 +835,13 @@ function MensajesCarousel({ bg }) {
 }
 
 // Accesos directos a redes -- usados en la fila rápida de Ubicación más
-// abajo (íconos correctos: antes Facebook/TikTok usaban heart/music,
-// mismo bug ya corregido en SocialSection.jsx).
+// abajo. Solo nombre y destino: los pictogramas se eliminaron del sitio
+// público (identidad del dueño) y el campo `icon` que quedaba aquí ya no
+// lo leía nadie.
 const NETWORKS = [
-  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  icon: 'facebook' },
-  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', icon: 'instagram' },
-  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    icon: 'tiktok' },
+  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook' },
+  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram' },
+  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok' },
 ];
 
 // ════════════════════════════════════════════════════════════════════
@@ -806,26 +850,35 @@ const NETWORKS = [
 function Ubicacion({ bg }) {
   return (
     <section id="ubicacion" className="relative py-24 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
-      <ParallaxImg src={bg} alt="Ubicación" className="opacity-50" />
-      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/20" />
+      {/* Foto entera del templo, con el scrim anclado abajo: el contenido
+          (titular + tarjetas) vive en el tercio inferior y ahí es donde
+          oscurece. Antes la foto llegaba al 50% y encima un degradado propio. */}
+      <ParallaxImg src={bg} alt="Ubicación" />
+      <div className="scrim-card" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Titular editorial del cierre */}
-        <Reveal className="text-center mb-14">
-          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)' }}>
-            Te esperamos <span className="font-serif font-normal">en casa</span>.
+        {/* Titular editorial del cierre. Fijo (sin Reveal) y en una sola
+            familia: el acento serif itálico que llevaba "en casa" no tiene
+            @font-face propio en el proyecto (public/fonts solo trae Arimo),
+            así que renderizaba New York, Georgia o Noto Serif según el
+            sistema del visitante -- una firma tipográfica que no controlas
+            no es una firma. Vuelve cuando haya serif auto-hospedada. */}
+        <div className="text-center mb-14">
+          <h2 className="text-d2 text-white">
+            Te esperamos en casa.
           </h2>
-        </Reveal>
+        </div>
 
         <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
           {/* Dirección protagonista */}
           <Reveal from="left">
-          <Tilt max={3} glass="featured" className="rounded-[24px] liquid-glass p-10 md:p-14 h-full flex flex-col justify-between gap-10">
+          {/* Sin Tilt: la tarjeta no navega, navegan los botones de adentro. */}
+          <div className="rounded-[22px] liquid-glass liquid-shine p-10 md:p-14 h-full flex flex-col justify-between gap-10">
             <div>
-              <div className="text-white/60 text-13 font-bold mb-6">
+              <div className="text-white/60 text-13 font-semibold mb-6">
                 Huehuetenango, Guatemala
               </div>
-              <p className="display-mega text-white leading-[1.15]" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.6rem)' }}>
+              <p className="text-d3 text-white">
                 7ª. Calle 12-66 zona 4,<br />
                 carretera a las Ruinas<br />
                 de Zaculeu
@@ -837,52 +890,57 @@ function Ubicacion({ bg }) {
                 href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
                 target="_blank"
                 rel="noopener noreferrer"
-                {...PRESS}
+                {...PRESS_PRIMARY}
                 className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card"
               >
                 Cómo llegar
               </motion.a>
+              {/* Chips terciarios: antes tenían la MISMA física que el botón
+                  blanco de al lado, y cuando todo reacciona igual la reacción
+                  deja de comunicar jerarquía. */}
               {NETWORKS.map(n => (
                 <motion.a
                   key={n.label}
                   href={n.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  {...PRESS}
+                  {...PRESS_MICRO}
                   className="inline-flex items-center px-5 h-12 rounded-full liquid-glass text-white text-14 font-bold focus-ring"
                 >
                   {n.label}
                 </motion.a>
               ))}
             </div>
-          </Tilt>
+          </div>
           </Reveal>
 
           {/* Primera vez + podcast */}
           <div className="flex flex-col gap-6">
             <Reveal from="right" delay={0.05}>
-            <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10">
+            <div className="rounded-[22px] glass-light liquid-shine p-9 md:p-10">
               <h3 className="text-26 font-bold text-bg tracking-tight mb-3">¿Es tu primera vez?</h3>
               <p className="text-15 text-bg/60 font-medium mb-7">
                 Queremos conocerte. Cuéntanos de ti y te recibimos desde el primer minuto.
               </p>
               <MotionLink
                 to="/conectate"
-                {...PRESS}
+                {...PRESS_PRIMARY}
                 className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card hover:opacity-90"
               >
                 Conéctate
               </MotionLink>
-            </Tilt>
+            </div>
             </Reveal>
 
+            {/* Dato puro, sin destino: nunca fue tocable, así que tampoco
+                debía inclinarse al cursor. */}
             <Reveal from="right" delay={0.12}>
-            <Tilt max={4} glass="standard" className="rounded-[24px] glass-light p-9 md:p-10">
+            <div className="rounded-[22px] glass-light liquid-shine p-9 md:p-10">
               <p className="text-17 font-bold text-bg leading-tight">Podcast Inusual Youth</p>
               <p className="text-14 text-bg/55 font-semibold mt-1">
                 92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
               </p>
-            </Tilt>
+            </div>
             </Reveal>
           </div>
         </div>
@@ -915,24 +973,29 @@ function GalleryPreviewSection() {
   return (
     <section id="galeria-preview" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
 
-      <Reveal className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* Titular fijo. Y sin el <span text-white> que envolvía "vivos": era el
+          fósil de un acento de color que se eliminó -- pintaba blanco sobre un
+          h2 que ya es blanco, o sea marcaba una palabra sin marcarla. */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)' }}>
-            Momentos <span className="text-white">vivos</span>.
+          <h2 className="text-d2 text-white">
+            Momentos vivos.
           </h2>
         </div>
-        <MotionLink to="/gallery" {...PRESS} className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-full liquid-glass text-white font-bold hover:bg-white/10 transition-colors border border-white/20 shrink-0">
+        <MotionLink to="/gallery" {...PRESS_SECONDARY} className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-full liquid-glass text-white font-bold hover:bg-white/10 transition-colors border border-white/20 shrink-0">
           Explorar Galería
         </MotionLink>
-      </Reveal>
+      </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <RevealList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {topAlbums.map(([albumName, photos]) => (
             <RevealItem key={albumName}>
-            <Tilt as={Link} to="/gallery" max={6} glass="standard" className="group relative rounded-[18px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
-              <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80" loading="lazy" />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
+            <Tilt as={Link} to="/gallery" max={6} glass="standard" className="group relative rounded-[22px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
+              {/* Tile de foto a plena fuerza: el nombre del álbum se sostiene
+                  con el scrim de abajo, no bajándole la opacidad a la foto. */}
+              <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+              <div className="scrim-card" />
               <div className="absolute bottom-5 inset-x-5">
                 <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>
                 {photos.length > 1 && (
@@ -956,9 +1019,13 @@ export default function Home() {
   // cada otro módulo del sitio, en vez del emparejamiento indirecto por
   // palabra clave de álbum que tenía antes. El admin sube una foto y
   // aparece, igual que en Blog/Galería/Células/Eventos.
+  //
+  // Solo dos secciones llevan foto ambiental, a propósito: el ritmo de la
+  // página es la alternancia entre sección con foto entera y sección sobre
+  // canvas limpio. Células y Mensajes ya son collage/carril de fotos, así
+  // que sus slots (home_celulas / home_mensajes) quedaron sin consumidor —
+  // siguen existiendo en el panel y habría que retirarlos de ahí.
   const agendaBg    = useSitePhoto('home_agenda',    '/images/bg-eventos.jpg');
-  const celulasBg   = useSitePhoto('home_celulas',   '/images/bg-ministerios.jpg');
-  const mensajesBg  = useSitePhoto('home_mensajes',  '/images/bg-ensenanzas.jpg');
   const ubicacionBg = useSitePhoto('home_ubicacion', '/images/bg-ubicacion.jpg');
   const navigate = useNavigate();
   // Fallback del CTA del hero (si un slide del backend trae un ctaUrl no
@@ -972,8 +1039,8 @@ export default function Home() {
       <HeroCarousel onPlan={handlePlan} />
       <AnnouncementsBar />
       <Agenda bg={agendaBg} />
-      <CelulasSection bg={celulasBg} />
-      <MensajesCarousel bg={mensajesBg} />
+      <CelulasSection />
+      <MensajesCarousel />
       <GalleryPreviewSection />
       <SocialSection title="Lo que está pasando." />
       <Ubicacion bg={ubicacionBg} />

@@ -2,7 +2,6 @@ import PrayerForm from '../../components/sections/PrayerForm';
 import PageHero from '../../components/layout/PageHero';
 import { Halos } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
 
 const TRUST = [
   { text: 'Comunidad que ora contigo' },
@@ -34,9 +33,14 @@ export default function PrayerPage() {
       <section className="relative py-16 md:py-24 overflow-hidden">
         <Halos variant="soft" />
         <Reveal className="relative z-10 max-w-3xl mx-auto px-6">
-          <Tilt max={3} glass="featured" className="glass-light rounded-[24px] p-7 md:p-10">
+          {/* Sin Tilt: es un panel de formulario, no un objeto navegable.
+              Inclinar en 3D el bloque donde alguien está escribiendo su
+              petición de oración mueve los campos bajo el dedo sin que eso
+              lleve a ninguna parte. El bisel y el reflejo no se pierden --
+              viven en .glass-light y .liquid-shine, que quedan. */}
+          <div className="glass-light liquid-shine rounded-[28px] p-7 md:p-10">
             <PrayerForm />
-          </Tilt>
+          </div>
         </Reveal>
       </section>
     </main>

@@ -15,18 +15,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
+import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
+import StatTrio from '../../components/ui/StatTrio';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import Tilt from '../../components/ui/Tilt';
 import { useApi } from '../../lib/feed';
+import { PRESS_PRIMARY } from '../../lib/motion';
 
-const PRESS = {
-  whileHover: { scale: 1.03 },
-  whileTap: { scale: 0.96 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
 const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring shadow-card hover:opacity-90';
 const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
 
@@ -235,9 +232,12 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
           <button onClick={() => setStep('category')} className="text-12 font-bold text-bg/60 hover:text-bg transition-colors shrink-0">
             Atrás
           </button>
-          <p className="text-12 text-bg font-bold uppercase tracking-wide">{category.name}</p>
+          <p className="text-13 font-semibold text-bg">{category.name}</p>
         </div>
-        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta 2 de 2</p>
+        {/* Caja normal, no versales: unas micro-mayúsculas con tracking
+            encima del titular son la fórmula del eyebrow que se quitó del
+            sitio, solo que escrita a mano en vez de con el componente. */}
+        <p className="text-13 font-semibold text-bg/50 mb-2">Pregunta 2 de 2</p>
         <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿En qué zona estás?</h3>
         <div className="flex flex-wrap gap-2">
           {zones.map(z => (
@@ -260,7 +260,12 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
     const href = cell ? waHrefFor(cell, category.name, leaderByName) : null;
     return (
       <div className="text-center">
-        <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Tu célula ideal es</p>
+        {/* "Por tu edad y zona" en vez de "Tu célula ideal es": el
+            resultado sale de las dos respuestas y nombrarlas es más
+            honesto -- y evita que este modal y el de Voluntariado
+            rematen con la misma frase ("Tu ___ ideal es"), que es lo que
+            los hacía leer como el mismo widget parametrizado. */}
+        <p className="text-13 font-semibold text-bg/50 mb-2">Por tu edad y zona</p>
         <h3 className="text-24 font-bold text-bg tracking-tight mb-1">{cell ? cell.name : category.name}</h3>
         <p className="text-14 text-bg/55 mb-4">{category.name}{cell?.zone ? ` · ${cell.zone}` : ''}</p>
         {category.image && (
@@ -275,7 +280,7 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
         )}
         <div className="flex flex-col gap-2.5">
           {href && (
-            <motion.a {...PRESS} href={href} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
+            <motion.a {...PRESS_PRIMARY} href={href} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
               Escribir por WhatsApp
             </motion.a>
           )}
@@ -292,8 +297,12 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
 
   return (
     <>
-      <p className="text-11 font-bold uppercase tracking-widest text-bg/45 mb-2">Pregunta 1 de 2</p>
-      <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿Cuál te describe mejor?</h3>
+      <p className="text-13 font-semibold text-bg/50 mb-2">Pregunta 1 de 2</p>
+      {/* Antes "¿Cuál te describe mejor?" -- una letra de diferencia con
+          la pregunta 1 del quiz de Voluntariado ("¿Qué te describe
+          mejor?"). Aquí lo que se pregunta de verdad es a qué grupo de
+          edad/etapa pertenece, así que se dice eso. */}
+      <h3 className="text-19 font-bold text-bg tracking-tight mb-5">¿A qué grupo perteneces?</h3>
       {/* Fichas con foto real -- mismo tratamiento que el collage de
           categorías de la página (foto + degradado + nombre), no filas
           genéricas de icono-en-círculo. Así el quiz se siente parte de
@@ -304,7 +313,7 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
             key={g.key}
             type="button"
             onClick={() => chooseCategory(g)}
-            className="group relative rounded-[16px] overflow-hidden aspect-[4/5] text-left focus-ring"
+            className="group relative rounded-[22px] overflow-hidden aspect-[4/5] text-left focus-ring"
           >
             {g.image && (
               <img
@@ -313,7 +322,10 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent" />
+            {/* Texto anclado abajo → .scrim-card. Antes era un gradiente
+                inline propio de esta ficha; el sitio tenía 25 variantes
+                así, cada una inventada donde tocó escribirla. */}
+            <div className="scrim-card" />
             <div className="relative z-10 h-full flex flex-col justify-end p-3.5">
               <p className="text-15 font-bold text-white leading-tight">{g.name}</p>
               {g.age && <p className="text-11 text-white/65 mt-0.5">{g.age}</p>}
@@ -399,10 +411,12 @@ export default function CelulasPage() {
     [groups]
   );
 
-  // Stats reales (nada inventado) -- mismo trío que el de Voluntariado
-  // (~90 voluntarios / 10 departamentos / 20 líderes), adaptado a lo que
-  // sí describe a Células: cuántas hay, cuántos grupos por edad, en
-  // cuántas zonas distintas.
+  // Stats reales (nada inventado): se CUENTAN sobre los grupos ya
+  // resueltos desde la API -- cuántas células hay, cuántos grupos por
+  // edad, en cuántas zonas distintas. La ficha que las pinta es
+  // <StatTrio>, compartida con Voluntariado (antes el markup estaba
+  // duplicado carácter por carácter en los dos archivos); lo que cambia
+  // entre las dos páginas son estos datos, no la caja.
   const stats = useMemo(() => {
     const allCells = groups.flatMap(g => g.cells);
     const zonesCount = new Set(allCells.map(c => c.zone).filter(Boolean)).size;
@@ -421,28 +435,25 @@ export default function CelulasPage() {
         photoSlot="hero_celulas"
         photoFallback="/images/bg-ministerios.jpg"
       >
+        {/* "Busca por edad y zona", no "Descubre tu célula ideal": es
+            literalmente lo que hace el quiz (pregunta 1 = grupo de edad,
+            pregunta 2 = zona) y deja de rimar con el botón gemelo de
+            Voluntariado, que decía "Descubre tu lugar ideal". Dos
+            "Descubre tu ___ ideal" en el mismo sitio delatan un widget
+            parametrizado, no dos herramientas distintas. */}
         <motion.button
-          {...PRESS}
+          {...PRESS_PRIMARY}
           type="button"
           onClick={() => setQuizOpen(true)}
           className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
         >
-          Descubre tu célula ideal
+          Busca por edad y zona
         </motion.button>
       </PageHero>
 
       <div className="relative z-10">
         <section className="pb-8 max-w-6xl mx-auto px-6">
-          <RevealList className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mt-10">
-            {stats.map(s => (
-              <RevealItem key={s.label}>
-                <div className="glass-light rounded-[18px] px-3 py-5 text-center h-full">
-                  <div className="text-26 sm:text-30 font-extrabold text-bg tracking-tighter leading-none">{s.n}</div>
-                  <div className="mt-1.5 text-11 sm:text-12 font-semibold text-bg/55 leading-tight">{s.label}</div>
-                </div>
-              </RevealItem>
-            ))}
-          </RevealList>
+          <StatTrio stats={stats} className="mt-10" />
         </section>
 
         {/* COLLAGE de tipos — cada recorte abre su ventana */}
@@ -491,12 +502,17 @@ export default function CelulasPage() {
                     className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
                     style={{ rotate: c.rot, y: c.y, transformOrigin: 'center' }}
                   >
+                    {/* Foto a color pleno. Antes llegaba al 45% (65% en
+                        hover) Y con un degradado navy encima: las caras
+                        de la congregación se leían como textura gris. El
+                        contraste lo pone .scrim-card, que oscurece solo
+                        el tercio de abajo, que es donde vive el texto. */}
                     <img
                       src={g.image}
                       alt=""
-                      className="parallax-layer absolute inset-0 w-full h-full object-cover opacity-45 group-hover:opacity-65 transition-all duration-700"
+                      className="parallax-layer absolute inset-0 w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/45 to-bg/5" />
+                    <div className="scrim-card" />
                     <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
                       <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md">
                         {g.age}
@@ -516,7 +532,13 @@ export default function CelulasPage() {
 
           {/* Contacto — sin exponer direcciones */}
           <Reveal delay={0.1} depth className="relative z-10 mt-14">
-            <Tilt max={3} glass className="glass-light rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
+            {/* Sin Tilt: el panel no es navegable (el navegable es el
+                link de adentro), así que inclinarlo prometía una
+                interacción que no existe. El bisel de cristal vive en
+                .glass-light y .liquid-shine -- lo único que se pierde es
+                la rotación, y .liquid-shine se agrega a mano porque
+                antes la ponía el prop `glass` de Tilt. */}
+            <div className="glass-light liquid-shine rounded-[28px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
                 <h3 className="text-22 font-bold text-bg">¿No sabes cuál es para ti?</h3>
                 <p className="text-15 text-bg/70 mt-2 max-w-lg">
@@ -531,7 +553,7 @@ export default function CelulasPage() {
               >
                 Escríbenos
               </a>
-            </Tilt>
+            </div>
           </Reveal>
         </section>
       </div>

@@ -16,6 +16,7 @@ import { FieldLight } from '../ui/Glass';
 import BankDetails from './BankDetails';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 import { useDonationPurposes } from '../../lib/donationPurposes';
+import { PRESS_PRIMARY, PRESS_SECONDARY } from '../../lib/motion';
 
 const AMOUNTS  = [50, 100, 250, 500];
 
@@ -24,11 +25,6 @@ const PAYMENT_METHODS = [
   { label: 'En persona',             sub: 'Te recibimos un domingo',        value: 'presencial' },
 ];
 
-const PRESS = {
-  whileHover: { scale: 1.02 },
-  whileTap: { scale: 0.96 },
-  transition: { type: 'spring', stiffness: 400, damping: 17 },
-};
 
 export default function DonationCard() {
   const [step,    setStep]    = useState(0);
@@ -141,8 +137,8 @@ export default function DonationCard() {
   // ── Success state ──────────────────────────────────────────────
   if (sent) {
     return (
-      <div className="glass-light liquid-shine rounded-[24px] p-8 text-center">
-        <h3 className="display-mega text-bg" style={{ fontSize: '1.7rem' }}>
+      <div className="glass-light liquid-shine rounded-[22px] p-8 text-center">
+        <h3 className="text-d3 text-bg">
           ¡Gracias por sembrar!
         </h3>
         {isTransfer ? (
@@ -164,7 +160,7 @@ export default function DonationCard() {
             </p>
           </>
         )}
-        <motion.button {...PRESS} onClick={resetForm} className="mt-7 px-6 py-3.5 rounded-pill glass-light-nested text-bg font-bold text-14">
+        <motion.button {...PRESS_SECONDARY} onClick={resetForm} className="mt-7 px-6 py-3.5 rounded-pill glass-light-nested text-bg font-bold text-14">
           Hacer otra donación
         </motion.button>
       </div>
@@ -188,7 +184,7 @@ export default function DonationCard() {
 
   const ContinueBtn = ({ children = 'Continuar' }) => (
     <motion.button
-      {...PRESS}
+      {...PRESS_PRIMARY}
       type="button"
       onClick={next}
       disabled={!canContinue}
@@ -218,7 +214,7 @@ export default function DonationCard() {
               onClick={() => done && setStep(i)}
               className={`w-full flex items-center gap-3.5 px-5 py-4 text-left focus-ring ${done ? 'cursor-pointer hover:bg-bg/5' : 'cursor-default'} transition-colors`}
             >
-              <span className={`grid place-items-center w-8 h-8 rounded-full text-13 font-extrabold shrink-0 transition-colors ${
+              <span className={`grid place-items-center w-8 h-8 rounded-full text-13 font-bold shrink-0 transition-colors ${
                 current ? 'bg-bg text-white' : done ? 'bg-bg/70 text-white' : 'bg-bg/6 text-bg/40'
               }`}>
                 {i + 1}
@@ -384,7 +380,10 @@ export default function DonationCard() {
                               {isTransfer ? 'Con comprobante adjunto' : 'Entrega en persona'}
                             </div>
                           </div>
-                          <span className="display-mega text-bg" style={{ fontSize: 34 }}>
+                          {/* Cifra dentro de una fila de resumen, no un
+                              titular de display: va en la escala numérica
+                              (text-34), no en d1/d2/d3. */}
+                          <span className="text-34 font-bold tracking-tighter leading-none text-bg">
                             Q{finalAmount}
                           </span>
                         </div>
@@ -402,7 +401,7 @@ export default function DonationCard() {
                         )}
 
                         <motion.button
-                          {...PRESS}
+                          {...PRESS_PRIMARY}
                           type="submit"
                           disabled={loading || uploading || !name.trim()}
                           className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 rounded-pill bg-bg text-white font-bold text-15 disabled:opacity-40 focus-ring"

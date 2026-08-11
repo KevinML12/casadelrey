@@ -158,13 +158,23 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                           key={idx}
                           src={photos[idx]}
                           alt=""
-                          initial={{ opacity: 0 }} animate={{ opacity: 0.7 }} exit={{ opacity: 0 }}
+                          // opacity 1 y no 0.7: el 0.7 era un segundo velo
+                          // encima del degradado, así que la foto llegaba a
+                          // media fuerza cuando el contraste del título ya
+                          // lo resolvía el scrim solo. El fade sigue siendo
+                          // la transición entre fotos del carrusel.
+                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                           transition={{ duration: 0.25 }}
                           className="absolute inset-0 w-full h-full object-cover"
                         />
                       </AnimatePresence>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A1526] via-[#0A1526]/50 to-transparent" />
+                    {/* .scrim-card: el título vive anclado abajo del banner,
+                        que es exactamente la composición para la que existe
+                        el token. Antes era un degradado escrito a mano con
+                        el navy hardcodeado en hex, uno de los 25 repartidos
+                        por el sitio. */}
+                    <div className="scrim-card" />
                     {showCarousel && (
                       // Sin flechas: son controles chicos de carrusel dentro
                       // del banner, los dots ya bastan como única navegación

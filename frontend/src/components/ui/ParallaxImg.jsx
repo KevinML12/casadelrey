@@ -15,7 +15,14 @@ export default function ParallaxImg({ src, alt = '', className = '' }) {
       <motion.img
         src={src}
         alt={alt}
-        style={{ y }}
+        // saturate(1.12): las fotos de la iglesia son el único activo
+        // irrepetible del sitio y llegaban lavadas -- primero por el
+        // `opacity-45` que cada caller le encimaba (ya eliminado, el
+        // contraste ahora lo pone el scrim) y después porque el JPG
+        // original ya venía plano. Un empujón leve de saturación, no un
+        // filtro de color: la piel y la luz cálida de escenario vuelven
+        // a leerse sin que la foto se sienta procesada.
+        style={{ y, filter: 'saturate(1.12)' }}
         className={`absolute inset-0 w-full h-full object-cover scale-[1.18] ${className}`}
       />
     </div>

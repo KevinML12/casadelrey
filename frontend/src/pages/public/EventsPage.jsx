@@ -3,12 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import Tilt from '../../components/ui/Tilt';
+import { RevealList, RevealItem } from '../../components/ui/Reveal';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
+import { PRESS_PRIMARY } from '../../lib/motion';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
 
 // El modal de RSVP es glass-light (blanco/translucido) -- .input-light es
@@ -27,6 +27,12 @@ const GRID_SPANS = [
   'col-span-2 sm:col-span-1 row-span-1',
   'col-span-2 row-span-1',
 ];
+
+// Las fechas se imprimen en caja normal, no en versales: `uppercase` con
+// tracking apretado en 9-10px era la fórmula del eyebrow disfrazada de
+// dato, y a ese tamaño además no se leía. es-ES devuelve "ago." / "lunes"
+// en minúscula, así que solo se levanta la inicial.
+const cap = s => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 // BankDetails.jsx es texto blanco a proposito -- lo comparten Donar y
 // Comprobante, paginas oscuras. Aca el modal es claro, asi que se
@@ -90,12 +96,18 @@ function PaymentBanner({ event, attendeeCount = 1 }) {
   const perPerson = Number(event.price_gtq) || 0;
   const total = perPerson * (attendeeCount || 1);
   return (
-    <div className="glass-light-nested rounded-[20px] p-5 space-y-4 mb-4">
+    <div className="glass-light-nested rounded-[22px] p-5 space-y-4 mb-4">
       <div>
-        <p className="text-11 font-bold text-bg/50 uppercase tracking-widest mb-1.5">
+        {/* Caja normal: en versales a 11px con tracking-widest esto era un
+            eyebrow, no una línea de datos -- y el dato (precio por persona)
+            es justo lo que hay que poder leer de un vistazo. */}
+        <p className="text-13 font-semibold text-bg/50 mb-1.5">
           Evento con costo · Q{perPerson.toFixed(2)} por persona
         </p>
-        <p className="text-30 text-bg font-black leading-none tracking-tight flex items-baseline gap-2">
+        {/* font-bold, no font-black: Arimo topa en 700 y los dos pintan el
+            mismo trazo -- declarar 900 promete una jerarquía que la pantalla
+            no cumple. */}
+        <p className="text-30 text-bg font-bold leading-none tracking-tight flex items-baseline gap-2">
           Q{total.toFixed(2)}
           {attendeeCount > 1 && (
             <span className="text-14 text-bg/50 font-semibold">({attendeeCount} asistentes)</span>
@@ -281,7 +293,11 @@ function RSVPModal({ event, onClose }) {
   return (
     <ModalWrapper onClose={onClose}>
       <div className="mb-4 pr-10">
-        <p className="text-12 text-bg font-bold uppercase tracking-wide">Confirmar asistencia</p>
+        {/* Es el título real del modal, no una etiqueta encima del título:
+            en versales a 12px se leía como eyebrow y dejaba al nombre del
+            evento (14px) pesando más que la acción. Sigue siendo <p> a
+            propósito -- el e2e de eventos localiza `p` con este texto. */}
+        <p className="text-16 text-bg font-bold">Confirmar asistencia</p>
         <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
       </div>
       {event.requires_payment && <PaymentBanner event={event} attendeeCount={form.attendee_count} />}
@@ -348,7 +364,7 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
   return (
     <ModalWrapper onClose={onClose}>
       <div className="mb-4 pr-10">
-        <p className="text-12 text-bg font-bold uppercase tracking-wide">Cancelar registro</p>
+        <p className="text-16 text-bg font-bold">Cancelar registro</p>
         <p className="text-14 text-bg/60 mt-0.5 truncate max-w-64">{event.title}</p>
       </div>
       <form onSubmit={handleCancel} className="space-y-3">
@@ -389,8 +405,8 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
 
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
   const dayNum   = d ? d.getDate() : null;
-  const monthStr = d ? d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase() : null;
-  const weekday  = d ? d.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase() : 'EVENTO';
+  const monthStr = d ? cap(d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')) : null;
+  const weekday  = d ? cap(d.toLocaleDateString('es-ES', { weekday: 'long' })) : 'Evento';
   const details  = [ev.time, ev.location]
     .filter(Boolean)
     .map(s => s[0].toUpperCase() + s.slice(1))
@@ -415,40 +431,45 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
   const wellBg     = hasPhoto ? 'bg-white/5'  : 'bg-bg/5';
   const wellBorder = hasPhoto ? 'border-white/10' : 'border-bg/10';
 
-  // Tilt reemplaza al motion.div plano: la card ahora se inclina en 3D
-  // siguiendo al cursor/scroll (mismo lenguaje reactivo que Home/Células/
-  // Galería) en vez de solo la rotación fija de entrada que tenía antes.
-  // Envuelta en un <div> simple (con el ref/id/bentoSpan) porque Tilt no
-  // es forwardRef -- scrollIntoView necesita ese ref para el deep-link
-  // desde Home, y el span del grid bento debe vivir en el elemento que
-  // Grid realmente mide.
+  // La card NO es navegable: no lleva href ni onClick, el que actúa es el
+  // botón de RSVP que vive adentro. El Tilt que la envolvía inclinaba en 3D
+  // una superficie que no responde al click, y eso promete una afordancia
+  // falsa -- se queda solo el motion.div con la entrada/salida (la necesita
+  // el AnimatePresence del grid) y `liquid-shine` a mano, que antes lo
+  // agregaba la prop `glass` de Tilt. El bisel de .liquid-glass/.glass-light
+  // vive en la clase, así que el material no cambia.
+  // Sigue envuelta en un <div> simple (con el ref/id/bentoSpan): scrollIntoView
+  // necesita ese ref para el deep-link desde Home, y el span del grid bento
+  // debe vivir en el elemento que Grid realmente mide.
   return (
     <div ref={nodeRef} id={`event-${ev.ID}`} className={`${bentoSpan} w-full h-full`}>
-    <Tilt
-      max={6}
-      hoverScale={1.02}
-      glass
+    <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-      className={`w-full h-full ${hasPhoto ? 'liquid-glass' : 'glass-light'} relative overflow-hidden rounded-[32px] group transition-shadow ${showHighlight ? 'event-highlight' : ''}`}
+      className={`w-full h-full ${hasPhoto ? 'liquid-glass' : 'glass-light'} liquid-shine relative overflow-hidden rounded-[22px] group transition-shadow ${showHighlight ? 'event-highlight' : ''}`}
     >
 
       {hasPhoto && (
         <>
-          {/* Flyer de fondo */}
-          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" />
-          {/* Gradiente oscuro para leer el texto blanco encima, sin deslavar el flyer */}
-          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent opacity-100" />
+          {/* Flyer a color pleno: el `opacity-80` que llevaba encima lo
+              entregaba deslavado antes de que el degradado siquiera actuara.
+              El contraste lo pone el scrim, no la opacidad de la foto. */}
+          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          {/* .scrim-card: el texto de esta card vive anclado al tercio
+              inferior, así que oscurece ahí y deja el flyer visible arriba. */}
+          <div className="scrim-card" />
         </>
       )}
 
-      {/* Etiqueta de próximo evento si es el primero */}
+      {/* Etiqueta de próximo evento si es el primero -- sin el punto que
+          pulsaba delante: es el mismo pill+punto que se quitó de todo el
+          sitio, un pictograma decorativo pegado a un dato que ya se dice
+          con palabras. */}
       {i === 0 && (
         <div className="absolute top-6 left-6 z-20">
-          <span className="bg-bg/90 px-4 py-1.5 rounded-full text-white text-12 font-bold flex items-center gap-2 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
+          <span className="bg-bg/90 px-4 py-1.5 rounded-full text-white text-12 font-bold backdrop-blur-md">
             Próximo evento
           </span>
         </div>
@@ -463,16 +484,20 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
         ? 'absolute bottom-0 left-0 right-0 z-20 p-5'
         : `relative z-20 h-full flex flex-col ${isFeaturedTall ? 'justify-center' : 'justify-end'} p-5`
       }>
-        <div className="rounded-[24px] flex flex-col gap-4">
+        {/* Contenedor de layout puro (sin fondo ni recorte): el radio que
+            llevaba no dibujaba nada, el que manda es el de la card. */}
+        <div className="flex flex-col gap-4">
 
           <div className="flex items-center gap-4 w-full min-w-0">
             {/* Fecha */}
             {dayNum && (
               <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl ${wellBg} border ${wellBorder} shadow-inner w-[60px] h-[60px]`}>
-                <div className={`font-black leading-none ${ink} tracking-tighter text-24`}>
+                <div className={`font-bold leading-none ${ink} tracking-tighter text-24`}>
                   {dayNum}
                 </div>
-                <div className={`font-bold tracking-[2px] mt-1 ${ink50} text-9`}>
+                {/* El mes iba en versales a 9px con 2px de tracking: no era
+                    legible y era la fórmula del eyebrow aplicada a un dato. */}
+                <div className={`font-semibold mt-0.5 ${ink50} text-13`}>
                   {monthStr}
                 </div>
               </div>
@@ -480,7 +505,9 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
 
             {/* Detalles */}
             <div className="min-w-0 flex-1">
-              <p className={`font-mono text-10 tracking-[1.5px] ${ink40} uppercase mb-1`}>
+              {/* Sin font-mono: era una tercera familia tipográfica usada
+                  solo para hacer micro-versales, y a 10px no se leía. */}
+              <p className={`text-13 font-semibold ${ink40} mb-1`}>
                 {weekday}
               </p>
               <h3 className={`font-bold tracking-tight ${ink} line-clamp-1 text-20 leading-tight`}>
@@ -524,10 +551,12 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
                 </span>
               )}
             </div>
+            {/* PRESS_PRIMARY: es la acción principal de la card, y ahora se
+                levanta con la misma física que el resto de CTAs del sitio en
+                vez de con una escala inventada acá (1.03/0.95). Con cupo
+                lleno no reacciona: no hay acción que confirmar. */}
             <motion.button
-              whileHover={ev.is_full ? undefined : { scale: 1.03 }}
-              whileTap={ev.is_full ? undefined : { scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              {...(ev.is_full ? {} : PRESS_PRIMARY)}
               onClick={() => !ev.is_full && onRsvp(ev)}
               disabled={ev.is_full}
               className={`rounded-full text-14 font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
@@ -550,7 +579,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
         </div>
       </div>
 
-    </Tilt>
+    </motion.div>
     </div>
   );
 }
@@ -561,18 +590,20 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
 function PastEventCard({ ev }) {
   const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
   const dayNum   = d ? d.getDate() : null;
-  const monthStr = d ? d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase() : null;
+  const monthStr = d ? cap(d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')) : null;
   const details  = [ev.time, ev.location]
     .filter(Boolean)
-    .map(s => s[0].toUpperCase() + s.slice(1))
+    .map(cap)
     .join(' · ');
 
   return (
-    <div className="glass-light rounded-[20px] p-4 flex items-center gap-4 opacity-80">
+    <div className="glass-light rounded-[22px] p-4 flex items-center gap-4 opacity-80">
       {dayNum && (
         <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-xl bg-bg/5 border border-bg/10 w-12 h-12">
-          <div className="font-black leading-none text-bg/70 text-16">{dayNum}</div>
-          <div className="font-bold tracking-[1.5px] text-bg/40 text-7">{monthStr}</div>
+          <div className="font-bold leading-none text-bg/70 text-16">{dayNum}</div>
+          {/* Igual que en la card de próximos: caja normal y un tamaño que
+              se pueda leer (venía en versales a 7px). */}
+          <div className="font-semibold text-bg/40 text-12">{monthStr}</div>
         </div>
       )}
       <div className="min-w-0 flex-1">
@@ -640,28 +671,50 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
-      <ParallaxImg src={heroImg} alt="Eventos" className="opacity-45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg/75 via-bg/55 to-bg" />
-
-      <div className="relative z-10 pt-40 pb-12 px-6 max-w-6xl mx-auto w-full text-center flex flex-col items-center">
-        <Reveal>
-          <h1 className="display-mega text-white mb-4" style={{ fontSize: 'clamp(3rem, 8vw, 5rem)' }}>EVENTOS</h1>
-          <p className="text-18 text-white/70 max-w-2xl mx-auto font-medium mb-2">
+      {/* Hero -- esta página reimplementa a mano el bloque de PageHero, así
+          que al menos sigue su misma gramática:
+          · La foto queda ACOTADA al hero. Antes el ParallaxImg colgaba de
+            <main> y estiraba una sola imagen sobre la página entera, por eso
+            hacía falta un degradado plano que la apagara de arriba abajo.
+          · Foto a color pleno (sin `opacity-45`) y .scrim-hero poniendo el
+            contraste solo bajo el titular centrado.
+          · Sin Reveal: es lo primero que se ve al cargar. Un titular que
+            todavía se está deslizando cuando llegás no es el ancla de la
+            pantalla, es algo acomodándose. */}
+      <section className="relative pt-40 pb-12 overflow-hidden">
+        <ParallaxImg src={heroImg} alt="" />
+        <div className="scrim-hero" />
+        <div className="relative z-10 px-6 max-w-6xl mx-auto w-full text-center">
+          <h1 className="text-d1 text-white">Eventos</h1>
+          <p className="mt-6 text-18 leading-relaxed text-white/70 max-w-2xl mx-auto">
             Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
           </p>
-        </Reveal>
-      </div>
+        </div>
+      </section>
 
       <div className="relative z-10 mx-auto pb-20 w-full flex-1 max-w-7xl px-6">
         {events.length === 0 ? (
-          /* ── Empty state ── */
-          <div className="py-32 flex flex-col items-center gap-5">
-            <p className="font-mono text-11 tracking-[2px] text-white/40 uppercase">Próximos eventos</p>
-            <p className="font-bold leading-[1.05] tracking-[-0.02em] text-center whitespace-pre-line text-white/50"
-              style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>
-              {'Sin eventos\npublicados aún.'}
+          /* ── Empty state ──
+             Antes cerraba con "publicamos nuevos eventos cada semana": una
+             promesa de frecuencia que nadie firmó y que esta misma pantalla
+             está desmintiendo mientras se lee (si hubiera uno por semana,
+             aquí habría eventos). Se queda solo con lo verificable -- cuando
+             se publique uno, aparece aquí -- y con la salida real que el
+             sitio ya tiene: el mismo Instagram del footer y de Células.
+             El label "Próximos eventos" que iba encima se elimina: era un
+             eyebrow puesto sobre el único titular del bloque. */
+          <div className="py-32 flex flex-col items-center gap-5 text-center">
+            <p className="text-d3 text-white/50">Sin eventos publicados aún.</p>
+            <p className="text-white/40 text-16 max-w-md">
+              Cuando se publique el próximo, aparece en esta página.
             </p>
-            <p className="text-white/40 text-16">Vuelve pronto — publicamos nuevos eventos cada semana.</p>
+            <a
+              href="https://www.instagram.com/ig.casadelrey/"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-pill bg-white text-bg text-14 font-bold hover:opacity-90 transition-opacity focus-ring"
+            >
+              Síguenos en Instagram
+            </a>
           </div>
         ) : upcomingEvents.length === 0 ? (
           <div className="py-16 text-center">
@@ -682,9 +735,11 @@ export default function EventsPage() {
         {/* ── Eventos pasados: compactos, sin RSVP, mas recientes primero ── */}
         {pastEvents.length > 0 && (
           <div className="mt-16 pt-12 border-t border-white/5">
-            <Reveal className="mb-6">
-              <p className="text-13 font-bold text-white/40 uppercase tracking-tightish">Eventos pasados</p>
-            </Reveal>
+            {/* Sin Reveal y en caja normal: el titular de sección es el punto
+                fijo contra el que llegan las cards de abajo, no una pieza más
+                que entra. Y `uppercase tracking-tightish` era la fórmula del
+                eyebrow -- las versales piden MÁS aire, no menos. */}
+            <p className="text-13 font-semibold text-white/40 mb-6">Eventos pasados</p>
             <RevealList className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {pastEvents.map(ev => (
                 <RevealItem key={ev.ID}>
@@ -696,21 +751,29 @@ export default function EventsPage() {
         )}
       </div>
 
-      {/* Secciones dinámicas: FAQs */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/5 pt-20 mt-10">
-
-        {/* FAQs */}
-        {faqs.length > 0 && (
+      {/* Secciones dinámicas: FAQs -- el wrapper con la hairline y los ~248px
+          de aire vertical vive DENTRO del condicional. Antes se renderizaba
+          siempre con el `faqs.length > 0` adentro, así que una página sin FAQs
+          (o con la API caída, que devuelve []) cerraba con un borde que no
+          separaba nada y un vacío enorme colgando debajo. */}
+      {faqs.length > 0 && (
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pb-32 border-t border-white/5 pt-20 mt-10">
           <div className="max-w-3xl mx-auto">
-            <Reveal className="text-center mb-10">
-              <h2 className="display-mega text-white" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)' }}>Preguntas frecuentes</h2>
+            {/* Sin Reveal: el titular de sección ya está cuando llegas, y las
+                FAQs entran por debajo contra él. */}
+            <div className="text-center mb-10">
+              <h2 className="text-d2 text-white">Preguntas frecuentes</h2>
               <p className="text-white/60 mt-4 max-w-2xl mx-auto">Todo lo que necesitas saber antes de asistir a nuestros eventos.</p>
-            </Reveal>
+            </div>
 
             <RevealList className="space-y-3">
               {faqs.map(faq => (
                 <RevealItem key={faq.ID} depth>
-                <Tilt max={3} glass="standard" className="glass-light rounded-[20px] overflow-hidden block">
+                {/* Sin Tilt: la fila no es navegable (el que actúa es el
+                    botón de adentro) y mide ~70px de alto -- inclinar en 3D
+                    algo así es ruido, no material. `liquid-shine` se agrega a
+                    mano porque lo aportaba la prop `glass`. */}
+                <div className="glass-light liquid-shine rounded-[22px] overflow-hidden block">
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
                     className="w-full px-6 py-5 text-left flex items-center justify-between group cursor-pointer"
@@ -738,13 +801,13 @@ export default function EventsPage() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </Tilt>
+                </div>
                 </RevealItem>
               ))}
             </RevealList>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* RSVP Modal */}
       <AnimatePresence>
