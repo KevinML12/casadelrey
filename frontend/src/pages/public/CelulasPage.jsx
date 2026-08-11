@@ -113,6 +113,8 @@ const zonasDe = (cells) =>
 // registrada y aterriza en el panel del líder de ESA célula.
 function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
   const dark = tone === 'dark';
+  const cuando = [cell.day, cell.time].filter(Boolean).join(' · ');
+
   return (
     <motion.button
       type="button"
@@ -121,37 +123,78 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 + index * 0.03 }}
-      className={`w-full text-left flex items-center gap-4 py-4 px-3 -mx-3 first:pt-0 last:pb-0 rounded-[12px] transition-colors focus-ring ${
-        dark ? 'hover:bg-white/5' : 'hover:bg-bg/5'
+      // .glass-light-nested y no un tinte plano: es la segunda capa del
+      // sistema (ver index.css), con su propio bisel y su hairline. Una
+      // lista de filas del MISMO material que la ventana no se lee como
+      // filas, se lee como una sola lámina con texto encima -- que es
+      // justo lo que hacía que la ventana se sintiera plana.
+      className={`group w-full text-left rounded-[16px] p-4 flex items-center gap-4 transition-colors focus-ring ${
+        dark ? 'bg-white/5 hover:bg-white/10' : 'glass-light-nested'
       }`}
     >
-      <div className="min-w-0 flex-1">
-        <p className={`text-17 font-bold leading-tight ${dark ? 'text-white' : 'text-bg'}`}>
-          {cell.name}
-        </p>
-
-        {/* CUÁNDO primero: es la pregunta que decide si alguien puede ir,
-            y hasta ago-2026 el sitio no la contestaba en ningún lado. Si
-            el líder todavía no cargó el horario, no se finge: la línea
-            simplemente no existe. */}
-        {(cell.day || cell.time) && (
-          <p className={`text-14 font-semibold mt-1 ${dark ? 'text-white/85' : 'text-bg/80'}`}>
-            {[cell.day, cell.time].filter(Boolean).join(' · ')}
-          </p>
-        )}
-
-        <p className={`text-13 font-medium mt-1 ${dark ? 'text-white/50' : 'text-bg/55'}`}>
-          {cell.leader}{cell.zone ? ` · ${cell.zone}` : ''}
-        </p>
-        {cell.description && (
-          <p className={`text-13 leading-relaxed line-clamp-2 mt-1.5 ${dark ? 'text-white/40' : 'text-bg/45'}`}>
-            {cell.description}
-          </p>
-        )}
-      </div>
-      <span className={`shrink-0 text-13 font-bold ${dark ? 'text-white/70' : 'text-bg/60'}`}>
-        Unirme
+      {/* La inicial de la célula en su propio cuadro. No es un ícono ni un
+          avatar de relleno: es la primera letra de su nombre, que es dato
+          real y distinto en cada fila. Da un ancla a la izquierda y rompe
+          la lista de puro texto que se leía como hoja de cálculo. */}
+      <span
+        className={`shrink-0 w-11 h-11 rounded-[12px] grid place-items-center text-17 font-bold ${
+          dark ? 'bg-white/10 text-white/80' : 'bg-bg/8 text-bg/70'
+        }`}
+        aria-hidden="true"
+      >
+        {(cell.name || '?').trim()[0].toUpperCase()}
       </span>
+
+      {/* Dos líneas, cada una con un ancla a la izquierda y otra a la
+          derecha. Antes todo se apelotonaba a la izquierda y "Unirme"
+          quedaba solo contra el borde derecho, a 400px del nombre: la fila
+          medía 730px y usaba 300. Con `justify-between` el nombre se
+          empareja con su líder y los chips con la afordancia, y la fila
+          ocupa el ancho que tiene. En pantalla angosta el `flex-wrap` deja
+          caer el líder a su propio renglón. */}
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+          <p className={`text-17 font-bold leading-tight truncate ${dark ? 'text-white' : 'text-bg'}`}>
+            {cell.name}
+          </p>
+          {cell.leader && (
+            <p className={`text-13 font-medium truncate ${dark ? 'text-white/55' : 'text-bg/55'}`}>
+              {cell.leader}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-4 mt-2">
+          {/* Los metadatos como chips y no como texto corrido: la zona
+              decide si alguien puede llegar, y en una línea gris pegada al
+              nombre del líder se perdía. */}
+          <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+            {cell.zone && (
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-11 font-semibold ${
+                dark ? 'bg-white/10 text-white/75' : 'bg-bg/8 text-bg/65'
+              }`}>
+                {cell.zone}
+              </span>
+            )}
+            {/* CUÁNDO es la pregunta que decide si alguien puede ir, y
+                hasta ago-2026 el sitio no la contestaba en ningún lado.
+                Va en el acento del sitio -- es lo único de la fila que se
+                gana el color. Si el líder no lo cargó, no se finge nada:
+                el chip sencillamente no existe. */}
+            {cuando && (
+              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-11 font-bold bg-acento/15 text-acento-hov">
+                {cuando}
+              </span>
+            )}
+          </div>
+
+          <span className={`shrink-0 text-13 font-bold transition-colors ${
+            dark ? 'text-white/45 group-hover:text-white' : 'text-bg/45 group-hover:text-bg'
+          }`}>
+            Ver
+          </span>
+        </div>
+      </div>
     </motion.button>
   );
 }
@@ -297,7 +340,12 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
       <button
         type="button"
         onClick={onBack}
-        className={`text-13 font-semibold mb-4 underline underline-offset-4 ${suave} ${dark ? 'decoration-white/25 hover:text-white' : 'decoration-bg/25 hover:text-bg'}`}
+        // Mismo pill que la salida de la ficha: es la misma acción (bajar
+        // un nivel de capa) y tiene que verse igual en las dos. Subrayado
+        // y al 55% de tinta se perdía contra el cristal.
+        className={`inline-flex items-center rounded-pill px-3.5 py-1.5 text-12 font-bold transition-colors focus-ring mb-5 ${
+          dark ? 'bg-white/10 hover:bg-white/20 text-white/70 hover:text-white' : 'bg-bg/8 hover:bg-bg/14 text-bg/70 hover:text-bg'
+        }`}
       >
         Volver a la lista
       </button>
@@ -408,15 +456,31 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
 
   return (
     <div className="text-left">
+      {/* Botón con superficie propia, no un enlace subrayado suelto: es
+          la salida de una CAPA, así que tiene que leerse tan sólido como
+          la capa. Subrayado y al 55% de tinta se perdía contra el cristal
+          y parecía una nota al pie. */}
       <button
         type="button"
         onClick={onCerrar}
-        className="text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/25 mb-4"
+        className="inline-flex items-center rounded-pill bg-bg/8 hover:bg-bg/14 text-bg/70 hover:text-bg px-3.5 py-1.5 text-12 font-bold transition-colors focus-ring mb-5"
       >
         Volver a la lista
       </button>
 
-      <h3 className="text-d3 text-bg">{cell.name}</h3>
+      {/* Mismo ancla visual que la fila de la lista: la inicial en su
+          cuadro. Al abrirse la ficha, ese cuadro es lo que dice "sigues en
+          la misma célula que tocaste" -- sin él la capa nueva empezaba en
+          un título flotando sobre cristal vacío. */}
+      <div className="flex items-center gap-4">
+        <span
+          className="shrink-0 w-14 h-14 rounded-[16px] grid place-items-center text-24 font-bold bg-bg/10 text-bg/75"
+          aria-hidden="true"
+        >
+          {(cell.name || '?').trim()[0].toUpperCase()}
+        </span>
+        <h3 className="text-d3 text-bg min-w-0 break-words">{cell.name}</h3>
+      </div>
 
       {datos.length > 0 && (
         <dl className="mt-5 divide-y divide-bg/10">
@@ -529,7 +593,7 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
           "de plantilla". Sin fingir una foto que no existe: tipografía
           grande para el nombre, un separador fino entre filas. Cada fila
           abre la solicitud de ingreso a ESA célula. */}
-      <Dock className="flex flex-col divide-y divide-bg/10">
+      <Dock className="flex flex-col gap-2">
         {filtered.map((c, i) => (
           <DockItem key={`${c.name}-${i}`}>
             <CellRow cell={c} onSolicitar={onAbrirCelula} index={i} tone="light" />

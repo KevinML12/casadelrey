@@ -100,6 +100,24 @@ export default {
         'full':   '9999px',
       },
 
+      // ── ESCALA DE OPACIDAD ENTERA (ago-2026) ───────────────────
+      // Tailwind trae la escala de 5 en 5 (0, 5, 10, 15, 20 …), así que
+      // TODO modificador que no cayera en un múltiplo de 5 no generaba
+      // ninguna clase y el navegador lo ignoraba en silencio. En este
+      // proyecto eso eran ~160 usos reales que llevaban meses sin
+      // pintarse: bg-bg/8 (58), bg-bg/6 (29), divide-bg/8 (23),
+      // bg-bg/4 (22), border-bg/12 (17)… Justo los tintes flojos con los
+      // que se separan las superficies -- las filas de una lista, el
+      // relleno de un chip, la línea entre dos bloques. Sin ellos cada
+      // panel quedaba en una sola lámina de un solo tono, que es
+      // exactamente lo que se sentía como "plano" y como "plantilla".
+      //
+      // No se corrigieron los 160 usos a múltiplos de 5: el valor escrito
+      // en cada sitio es el que el diseño quería. Se abre la escala.
+      opacity: Object.fromEntries(
+        Array.from({ length: 101 }, (_, n) => [n, String(n / 100)])
+      ),
+
       boxShadow: {
         'whisper':  '0 8px 32px rgba(10, 21, 38, 0.08)',
         'card':     '0 12px 36px -12px rgba(10, 21, 38, 0.10), 0 2px 6px rgba(10, 21, 38, 0.04)',

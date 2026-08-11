@@ -43,9 +43,16 @@ const VISIBLES = 4;
 // transición la ventana que estabas abriendo se pintaba DEBAJO de la que
 // dejabas, y recién al final saltaba al frente. El orden de capas tiene
 // que ser instantáneo, así que vive en el `style` de React.
+//
+// Las de atrás asoman 26px y no 16px, y encogen 4% y no 5.5%. Con los
+// valores viejos cada carta de atrás quedaba ENTERA por dentro de la del
+// frente (más chica + apenas subida), así que la pila no se veía: la
+// ventana se leía como una sola lámina plana. Ahora cada capa deja un filo
+// visible arriba, que es lo único que convierte "una ventana" en "una
+// pila de ventanas".
 const stackPose = (depth) => ({
-  scale: 1 - depth * 0.055,
-  y: -depth * 16,
+  scale: 1 - depth * 0.04,
+  y: -depth * 26,
   x: (depth % 2 === 0 ? 1 : -1) * depth * 12,
   rotate: (depth % 2 === 0 ? -1 : 1) * depth * 1.6,
   opacity: 1 - depth * 0.16,
@@ -172,8 +179,20 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
               saltan a cualquiera) y las flechas ←→ del teclado ya cubren
               esto por completo, así que no hace falta un botón aparte. */}
 
-          {/* Pila de ventanas */}
-          <div className="relative w-full max-w-[780px]" style={{ height, perspective: 1400 }}>
+          {/* Pila de ventanas.
+              Cuando se abre la ficha encima, la pila entera RETROCEDE (se
+              encoge un poco y baja). Antes se quedaba exactamente donde
+              estaba y solo se le ponía un velo difuminado encima: dos
+              superficies del mismo cristal, a la misma escala, en el mismo
+              sitio -- se leía plano, como si la ficha estuviera pegada a la
+              ventana en vez de flotando sobre ella. El retroceso es lo que
+              hace que se note que la de abajo quedó atrás. */}
+          <motion.div
+            className="relative w-full max-w-[780px]"
+            style={{ height, perspective: 1400 }}
+            animate={reducido || !sobrepuesto ? { scale: 1, y: 0 } : { scale: 0.93, y: 14 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 32 }}
+          >
             {stack.slice(0, VISIBLES).map((it, depth) => {
               const isFront = depth === 0;
               const photos = it.images?.length ? it.images : (it.image ? [it.image] : []);
@@ -283,7 +302,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
           {/* ── Capa sobrepuesta: la ficha de un ítem concreto ──────────
               Llega desde abajo y se posa ENCIMA de la ventana, que se
@@ -304,16 +323,37 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                   transition={{ duration: 0.2 }}
                   onClick={() => onCerrarSobrepuesto?.()}
                 />
+                {/* Centrado con `left-0 right-0 mx-auto`, NO con
+                    `left-1/2 -translate-x-1/2`: framer escribe su propio
+                    `transform` para animar la entrada (y + scale) y PISA
+                    el translate de Tailwind, así que la ficha se quedaba
+                    clavada en left:50% y se salía por la derecha -- en un
+                    teléfono quedaba medio cortada. Los `inset-x-4` le dan
+                    el margen contra los bordes que un elemento absolute no
+                    hereda del padding del padre. */}
+                {/* Dos elementos y no uno: el de fuera anima y proyecta la
+                    sombra (`drop-shadow`, que respeta las esquinas
+                    redondeadas), el de dentro es el cristal. Van separados
+                    porque en WebKit un `filter` y un `backdrop-filter` en
+                    el MISMO elemento se anulan -- el cristal se quedaría
+                    sin su desenfoque, que es todo el material. La sombra
+                    propia es lo que despega la ficha de la ventana de
+                    abajo: sin ella dos cristales pegados leen como uno. */}
                 <motion.div
-                  className={`absolute z-[115] w-full max-w-[560px] left-1/2 -translate-x-1/2 ${light ? 'glass-light' : 'liquid-glass'} liquid-shine rounded-[28px] overflow-hidden flex flex-col`}
-                  style={{ maxHeight: 'min(78vh, 620px)' }}
+                  className="absolute z-[115] inset-x-4 mx-auto max-w-[560px] flex flex-col"
+                  style={{
+                    maxHeight: 'min(78vh, 620px)',
+                    filter: 'drop-shadow(0 26px 44px rgba(10, 21, 38, 0.45))',
+                  }}
                   initial={reducido ? { opacity: 0 } : { opacity: 0, y: 40, scale: 0.96 }}
                   animate={reducido ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
                   exit={reducido ? { opacity: 0 } : { opacity: 0, y: 28, scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 >
-                  <div className="overflow-y-auto p-5 sm:p-7" data-lenis-prevent>
-                    {sobrepuesto}
+                  <div className={`${light ? 'glass-light' : 'liquid-glass'} liquid-shine rounded-[28px] overflow-hidden flex flex-col min-h-0`}>
+                    <div className="overflow-y-auto p-5 sm:p-7" data-lenis-prevent>
+                      {sobrepuesto}
+                    </div>
                   </div>
                 </motion.div>
               </>
