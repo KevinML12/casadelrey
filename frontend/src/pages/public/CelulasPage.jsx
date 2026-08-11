@@ -9,11 +9,13 @@
 //
 //  Cada célula muestra solo nombre · líder · zona (PRIVACIDAD: nunca
 //  direcciones exactas — el directorio completo es interno, ver
-//  CONTEXTO_IGLESIA). API-first (GET /cells + /cell-categories) con
-//  fallback del directorio real jul-2026 en su versión segura.
+//  CONTEXTO_IGLESIA). 100% API (GET /cells + /cell-categories +
+//  /leaders): si la API no trae categorías se pinta un estado vacío
+//  explícito, nunca un directorio hardcodeado — el que vivía aquí ya
+//  tenía nombres desactualizados respecto a la API.
 // ============================================================
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
@@ -39,58 +41,14 @@ const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-p
 // lo que el sitio no quiere.
 const GLOW = '#E8823C';
 
-const GROUPS_FALLBACK = [
-  {
-    key: 'adolescentes', name: 'Adolescentes', age: '15 a 24 años',
-    image: '/images/celulas/adolescentes.jpg',
-    cells: [
-      { name: 'Wild Youth', leader: 'Cristian de León', zone: 'Zona 4' },
-      { name: 'Rain',       leader: 'Sucely Rivas',     zone: 'Zona 4' },
-      { name: 'By Grace',   leader: 'Hugo Maldonado',   zone: 'Zona 2' },
-      { name: 'Haven',      leader: 'Paula Ríos',       zone: 'Brasilia, Zona 7' },
-    ],
-  },
-  {
-    key: 'jovenes', name: 'Jóvenes Adultos', age: 'Solteros',
-    image: '/images/celulas/jovenes.jpg',
-    cells: [{ name: 'Kingdom', leader: 'David Oliveros', zone: 'Zona 8' }],
-  },
-  {
-    key: 'prejuveniles', name: 'Prejuveniles', age: '12 a 15 años',
-    image: '/images/celulas/prejuveniles.jpg',
-    cells: [{ name: 'Esencia', leader: 'Heidy Marroquín', zone: 'Zona 8' }],
-  },
-  {
-    key: 'varones', name: 'Varones', age: 'Hombres',
-    image: '/images/celulas/varones.jpg',
-    cells: [
-      { name: 'Célula de varones', leader: 'Sergio Martínez',  zone: 'Zona 5' },
-      { name: 'Célula de varones', leader: 'Rosendo Jiménez',  zone: 'Zona 4' },
-      { name: 'Célula de varones', leader: 'Stephan Cruz',     zone: 'Zona 5' },
-      { name: 'Célula de varones', leader: 'Henry Hernández',  zone: 'Zona 1' },
-      { name: 'Célula de varones', leader: 'Aroldo Hernández', zone: 'Zona 2' },
-      { name: 'Célula de varones', leader: 'Estuardo Vásquez', zone: 'San Lorenzo' },
-    ],
-  },
-  {
-    key: 'mujeres', name: 'Mujeres', age: 'Red Mujeres de Palabra',
-    image: '/images/celulas/mujeres.jpg',
-    cells: [
-      { name: 'Conquistadoras',             leader: 'Pastora Ismeina Castillo', zone: 'Zona 4' },
-      { name: 'Conquistadoras de Promesas', leader: 'Evelin Martínez',          zone: 'Zona 1' },
-      { name: 'Conquistadoras del Rey',     leader: 'Arely García',             zone: 'Zona 4' },
-      { name: 'Mujer Conquistadora',        leader: 'Vaneska Rivas',            zone: 'Zona 4' },
-    ],
-  },
-];
-
-const TYPE_TO_KEY = {
-  hombres: 'varones', varones: 'varones',
-  mujeres: 'mujeres',
-  jovenes: 'jovenes', adolescentes: 'adolescentes',
-  prejus: 'prejuveniles', prejuveniles: 'prejuveniles',
-  ninos: 'ninos', niños: 'ninos',
-};
+// NOTA (ago-2026): aquí vivía GROUPS_FALLBACK, una copia hardcodeada del
+// directorio de células. Solo se pintaba si /cell-categories devolvía 0
+// categorías —- la API devuelve 5 activas, así que era código muerto—- y
+// mientras tanto se había quedado atrás: decía "Célula de varones" x6
+// donde la API dice "Célula de Sergio Martínez", y "Pastora Ismeina
+// Castillo" donde la API dice "Ismeina Castillo de De León". El día que
+// llegara a pintarse habría publicado nombres equivocados de personas
+// reales. Ahora, sin categorías, se pinta un estado vacío explícito.
 
 // Foto genérica para una categoría creada desde el panel que aún no tiene
 // foto propia en /admin/site-photos (mismo fallback genérico que usan los
@@ -112,15 +70,90 @@ const COLLAGE = [
 const norm = (s) =>
   (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 
+// El campo `zone` de una célula mezcla la zona con el punto de referencia
+// ("Zona 4, Arco de la Feria", "Hotel Premier, Zona 8"), así que contar
+// strings distintos daba 11 zonas donde solo hay 7 reales (1, 2, 4, 5, 7,
+// 8 y San Lorenzo) y generaba casi un chip de filtro por célula -- en
+// Varones salían 6 chips para 6 células y cada uno dejaba 1 sola fila.
+// Esto extrae solo la zona; si no hay patrón "Zona N" (ej. "San Lorenzo")
+// devuelve el string completo, que ahí SÍ es la zona entera. La referencia
+// fina sigue visible en la fila, que es donde ayuda a decidir si queda
+// cerca de casa.
+const zonaCanonica = (z) => {
+  const m = /zona\s*(\d+)/i.exec(z || '');
+  return m ? `Zona ${m[1]}` : (z || '').trim();
+};
+
+// Zonas canónicas distintas de una lista de células, en orden de aparición.
+const zonasDe = (cells) =>
+  [...new Set(cells.map(c => zonaCanonica(c.zone)).filter(Boolean))];
+
 // Compartido entre la lista de células (dentro del WindowStack) y el
 // resultado del quiz -- antes vivía duplicado inline en el .map de la
 // lista, ahora es una sola fuente de verdad para el link de WhatsApp.
+//
+// Devuelve null cuando el líder no tiene teléfono en /admin/leaders.
+// Antes caía a `https://wa.me/?text=...` (sin número): eso abre WhatsApp
+// con un selector de contactos VACÍO. Hoy ninguno de los 16 líderes está
+// en el directorio, así que las 16 filas prometían un contacto que no
+// existe y la iglesia ni se enteraba del intento. Con null, quien llama
+// decide: fila informativa en vez de link roto. El día que el dueño
+// cargue los números, las filas reviven solas sin tocar código.
 function waHrefFor(cell, groupName, leaderByName) {
-  const dir = leaderByName[norm(cell.leader)];
-  const waText = encodeURIComponent(`Hola${dir ? ` ${cell.leader.split(' ')[0]}` : ''}, me interesa unirme a la célula "${cell.name}" (${groupName}, ${cell.zone}). ¿Me pueden dar más información?`);
-  return dir?.phone
-    ? `https://wa.me/${dir.phone.replace(/\D/g, '')}?text=${waText}`
-    : `https://wa.me/?text=${waText}`;
+  const phone = (leaderByName[norm(cell.leader)]?.phone || '').replace(/\D/g, '');
+  if (!phone) return null;
+  const nombre = (cell.leader || '').split(' ')[0];
+  const contexto = [groupName, cell.zone].filter(Boolean).join(', ');
+  const waText = encodeURIComponent(
+    `Hola${nombre ? ` ${nombre}` : ''}, me interesa unirme a la célula "${cell.name}"${contexto ? ` (${contexto})` : ''}. ¿Me pueden dar más información?`
+  );
+  return `https://wa.me/${phone}?text=${waText}`;
+}
+
+// Una fila de célula, compartida por la ventana (tono oscuro sobre
+// .liquid-glass) y el resultado del quiz (tono claro sobre ModalWrapper).
+// Es <a> SOLO si hay teléfono real; si no, es un <div> informativo con la
+// misma tipografía y el mismo divide-y, pero sin href, sin aria-label de
+// acción, sin cursor-pointer y sin hover -- nada que prometa un clic que
+// no lleva a ningún lado.
+function CellRow({ cell, groupName, leaderByName, index = 0, tone = 'dark' }) {
+  const href = waHrefFor(cell, groupName, leaderByName);
+  const dark = tone === 'dark';
+  const Comp = href ? motion.a : motion.div;
+  const linkProps = href
+    ? {
+        href,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        'aria-label': `Escribir por WhatsApp al líder de la célula ${cell.name}`,
+      }
+    : {};
+
+  return (
+    <Comp
+      {...linkProps}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.05 + index * 0.03 }}
+      className={`flex items-center gap-4 py-4 px-3 -mx-3 first:pt-0 last:pb-0 rounded-[12px] transition-colors ${
+        href ? `cursor-pointer focus-ring ${dark ? 'hover:bg-white/5' : 'hover:bg-bg/5'}` : ''
+      }`}
+    >
+      <div className="min-w-0 flex-1">
+        <p className={`text-17 font-bold leading-tight truncate ${dark ? 'text-white' : 'text-bg'}`}>
+          {cell.name}
+        </p>
+        <p className={`text-13 font-medium mt-1 truncate ${dark ? 'text-white/50' : 'text-bg/55'}`}>
+          {cell.leader}{cell.zone ? ` · ${cell.zone}` : ''}
+        </p>
+        {cell.description && (
+          <p className={`text-13 leading-relaxed line-clamp-2 mt-1.5 ${dark ? 'text-white/40' : 'text-bg/45'}`}>
+            {cell.description}
+          </p>
+        )}
+      </div>
+    </Comp>
+  );
 }
 
 // Cuerpo de la ventana de una categoría -- componente propio (no una
@@ -130,20 +163,34 @@ function waHrefFor(cell, groupName, leaderByName) {
 // que se abre/reabre una ventana, sin lógica extra de reset.
 function CellCategoryDetail({ group, leaderByName }) {
   const [zoneFilter, setZoneFilter] = useState(null);
-  const zones = [...new Set(group.cells.map(c => c.zone).filter(Boolean))];
-  const filtered = zoneFilter ? group.cells.filter(c => c.zone === zoneFilter) : group.cells;
+  const zones = zonasDe(group.cells);
+  const filtered = zoneFilter
+    ? group.cells.filter(c => zonaCanonica(c.zone) === zoneFilter)
+    : group.cells;
 
   return (
     <>
+      {/* La descripción la escribe el dueño en /admin/cell-categories y es
+          lo único que explica de qué va la categoría ("Un espacio de
+          formación espiritual, apoyo mutuo y hermandad."). Se descartaba al
+          construir `groups`, así que al abrir "Mujeres" lo único que se
+          leía era "4 células activas". En el collage NO va: las tarjetas ya
+          llevan nombre + edad + conteo. */}
+      {group.description && (
+        <p className="text-15 text-white/70 leading-relaxed mb-5">{group.description}</p>
+      )}
+
       <p className="text-13 font-semibold text-white/70 mb-4">
         {group.cells.length} {group.cells.length === 1 ? 'célula activa' : 'células activas'}
       </p>
 
-      {/* Chips de zona -- solo si hay más de una, filtrar una sola zona
-          no aporta nada. Mismo patrón que los chips de interés de
-          Voluntariado, pero el dato real filtrable aquí es la zona, no
-          hay un equivalente a "interés" en una célula. */}
-      {zones.length > 1 && (
+      {/* Chips de zona -- solo si hay más de una zona canónica Y menos que
+          células en el grupo: un filtro 1:1 con la lista (un chip por fila)
+          no filtra nada, solo duplica la lista en forma de botones. Mismo
+          patrón que los chips de interés de Voluntariado, pero el dato real
+          filtrable aquí es la zona, no hay un equivalente a "interés" en
+          una célula. */}
+      {zones.length > 1 && zones.length < group.cells.length && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <button
             type="button"
@@ -170,36 +217,40 @@ function CellCategoryDetail({ group, leaderByName }) {
           así que un círculo-avatar era casi siempre el mismo placeholder
           gris repetido fila tras fila -- eso es justo lo que se siente
           "de plantilla". Sin fingir una foto que no existe: tipografía
-          grande para el nombre, un separador fino entre filas; toda la
-          fila es el link de WhatsApp (aria-label lo deja explícito). */}
+          grande para el nombre, un separador fino entre filas. La fila es
+          el link de WhatsApp solo cuando hay teléfono real (ver CellRow). */}
       <div className="flex flex-col divide-y divide-white/10">
-        {filtered.map((c, i) => {
-          const href = waHrefFor(c, group.name, leaderByName);
-          return (
-            <motion.a
-              key={`${c.name}-${i}`}
-              href={href}
-              target="_blank" rel="noopener noreferrer"
-              aria-label={`Escribir al líder de la célula ${c.name}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 + i * 0.03 }}
-              className="group flex items-center gap-4 py-4 px-3 -mx-3 first:pt-0 last:pb-0 rounded-[12px] hover:bg-white/5 transition-colors focus-ring cursor-pointer"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="text-17 font-bold text-white leading-tight truncate">{c.name}</p>
-                <p className="text-13 text-white/50 font-medium mt-1 truncate">
-                  {c.leader}{c.zone ? ` · ${c.zone}` : ''}
-                </p>
-                {c.description && (
-                  <p className="text-13 text-white/40 leading-relaxed line-clamp-2 mt-1.5">
-                    {c.description}
-                  </p>
-                )}
-              </div>
-            </motion.a>
-          );
-        })}
+        {filtered.map((c, i) => (
+          <CellRow
+            key={`${c.name}-${i}`}
+            cell={c}
+            groupName={group.name}
+            leaderByName={leaderByName}
+            index={i}
+          />
+        ))}
+      </div>
+
+      {/* Salida de la ventana. Mientras /admin/leaders no tenga los
+          teléfonos de los líderes, NINGUNA fila es clicable y el visitante
+          se quedaría sin forma de continuar. /conectate es el formulario de
+          contacto REAL del sitio (los envíos caen en /admin/connect-cards),
+          así que la iglesia sí se entera del intento. No se inventa aquí
+          ningún teléfono ni correo: el único teléfono en la API
+          (settings.contact_whatsapp) está documentado en el panel como
+          respaldo de DONACIONES, no como contacto general. */}
+      <div className="mt-6 pt-5 border-t border-white/10">
+        <p className="text-13 text-white/55 leading-relaxed mb-3">
+          {filtered.some(c => waHrefFor(c, group.name, leaderByName))
+            ? '¿Prefieres que te contactemos nosotros? Déjanos tus datos.'
+            : 'Déjanos tus datos y te conectamos con el líder de la célula más cercana a ti.'}
+        </p>
+        <Link
+          to="/conectate"
+          className="inline-flex items-center justify-center rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold focus-ring hover:opacity-90 transition-opacity"
+        >
+          Conéctate
+        </Link>
       </div>
     </>
   );
@@ -218,14 +269,16 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
 
   const chooseCategory = (g) => {
     setCategory(g);
-    const zones = [...new Set(g.cells.map(c => c.zone).filter(Boolean))];
-    setStep(zones.length > 1 ? 'zone' : 'result');
+    // Zona canónica: con el string crudo, "Zona 5, Pradera" y "Zona 5,
+    // atrás de los bomberos" contaban como dos zonas distintas y la
+    // pregunta 2 pedía elegir entre puntos de referencia, no entre zonas.
+    setStep(zonasDe(g.cells).length > 1 ? 'zone' : 'result');
   };
   const chooseZone = (z) => { setZone(z); setStep('result'); };
   const restart = () => { setStep('category'); setCategory(null); setZone(null); };
 
   if (step === 'zone' && category) {
-    const zones = [...new Set(category.cells.map(c => c.zone).filter(Boolean))];
+    const zones = zonasDe(category.cells);
     return (
       <>
         <div className="flex items-center gap-3 mb-4">
@@ -256,8 +309,14 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
   }
 
   if (step === 'result' && category) {
-    const cell = zone ? category.cells.find(c => c.zone === zone) : category.cells[0];
-    const href = cell ? waHrefFor(cell, category.name, leaderByName) : null;
+    // .filter(), no .find(): con datos reales una mujer de Zona 4 tiene 3
+    // células disponibles y el resultado le enseñaba UNA, escondiendo las
+    // otras dos bajo un titular que decía "por tu edad y zona". Si el
+    // filtro deja fuera todo (zona sin células tras canonizar), se cae a
+    // la categoría completa antes que mostrar una lista vacía.
+    const enZona = zone ? category.cells.filter(c => zonaCanonica(c.zone) === zone) : [];
+    const matches = enZona.length > 0 ? enZona : category.cells;
+    const unica = matches.length === 1;
     return (
       <div className="text-center">
         {/* "Por tu edad y zona" en vez de "Tu célula ideal es": el
@@ -266,24 +325,48 @@ function CellQuizModal({ groups, leaderByName, onViewDetail }) {
             rematen con la misma frase ("Tu ___ ideal es"), que es lo que
             los hacía leer como el mismo widget parametrizado. */}
         <p className="text-13 font-semibold text-bg/50 mb-2">Por tu edad y zona</p>
-        <h3 className="text-24 font-bold text-bg tracking-tight mb-1">{cell ? cell.name : category.name}</h3>
-        <p className="text-14 text-bg/55 mb-4">{category.name}{cell?.zone ? ` · ${cell.zone}` : ''}</p>
+        <h3 className="text-24 font-bold text-bg tracking-tight mb-1">
+          {unica ? matches[0].name : category.name}
+        </h3>
+        <p className="text-14 text-bg/55 mb-4">
+          {unica
+            ? `${category.name}${matches[0].zone ? ` · ${matches[0].zone}` : ''}`
+            : `${matches.length} células${zone && enZona.length > 0 ? ` en ${zone}` : ''}`}
+        </p>
         {category.image && (
           <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
             <img src={category.image} alt="" className="w-full h-full object-cover" />
           </div>
         )}
-        {cell && (
-          <p className="text-14 text-bg/65 leading-relaxed mb-6">
-            La lidera {cell.leader}. Escríbele por WhatsApp y te reciben en la próxima reunión.
-          </p>
-        )}
+
+        {/* Todas las coincidencias como lista divide-y, el mismo patrón
+            que la ventana de la categoría -- en tono claro porque el modal
+            del quiz es la superficie clara del sitio. Cada fila es link a
+            WhatsApp solo si el líder tiene teléfono real (ver CellRow). */}
+        <div className="flex flex-col divide-y divide-bg/10 text-left mb-5">
+          {matches.map((c, i) => (
+            <CellRow
+              key={`${c.name}-${i}`}
+              cell={c}
+              groupName={category.name}
+              leaderByName={leaderByName}
+              index={i}
+              tone="light"
+            />
+          ))}
+        </div>
+
         <div className="flex flex-col gap-2.5">
-          {href && (
-            <motion.a {...PRESS_PRIMARY} href={href} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
-              Escribir por WhatsApp
-            </motion.a>
-          )}
+          {/* CTA primario a /conectate y no a un WhatsApp sin número: hoy
+              ningún líder tiene teléfono cargado, así que "Escribir por
+              WhatsApp" abría un selector de contactos VACÍO y el visitante
+              se quedaba sin salida. Este formulario existe y sí llega a la
+              iglesia (/admin/connect-cards). <Link> y no <a>: un <a>
+              recargaría toda la SPA. Cuando el líder sí tiene teléfono, el
+              contacto directo ya está en su fila de la lista de arriba. */}
+          <Link to="/conectate" className={btnPrimary}>
+            Déjanos tus datos
+          </Link>
           <button type="button" onClick={() => onViewDetail(category.key)} className={btnGhost}>
             Ver todas las de {category.name}
           </button>
@@ -357,8 +440,9 @@ export default function CelulasPage() {
 
   // Categorías 100% administrables (/admin/cell-categories): nombre, edad,
   // descripción y type_key (a qué tipo estructural de célula pertenece)
-  // vienen de la API. GROUPS_FALLBACK SOLO se usa si el admin aún no ha
-  // creado ninguna categoría o la API falla -- nunca pisa datos reales.
+  // vienen de la API. Sin categorías activas no hay copia local que pintar
+  // (ver la nota de GROUPS_FALLBACK arriba): las células sueltas caen en
+  // "Otros" y, si tampoco hay células, la página muestra su estado vacío.
   const groups = useMemo(() => {
     const cats = Array.isArray(apiCategories) ? apiCategories.filter(c => c.is_active !== false) : [];
     const cellsByType = {};
@@ -367,19 +451,13 @@ export default function CelulasPage() {
       (cellsByType[t] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code, description: c.description });
     });
 
-    if (cats.length === 0) {
-      const byKey = {};
-      Object.entries(cellsByType).forEach(([type, cells]) => {
-        const key = TYPE_TO_KEY[type] || 'otros';
-        byKey[key] = [...(byKey[key] || []), ...cells];
-      });
-      return GROUPS_FALLBACK.map(g => byKey[g.key] ? { ...g, cells: byKey[g.key] } : g);
-    }
-
     const base = cats.map(cat => ({
       key: `cat-${cat.ID}`,
       name: cat.name,
       age: cat.age_group,
+      // La descripción la escribe el dueño en el panel y es el único texto
+      // que explica de qué va la categoría -- antes se descartaba aquí.
+      description: cat.description,
       image: cat.image_url || DEFAULT_CATEGORY_IMAGE,
       cells: cat.type_key ? (cellsByType[cat.type_key.toLowerCase()] || []) : [],
     }));
@@ -393,7 +471,7 @@ export default function CelulasPage() {
       .flatMap(([, cells]) => cells);
 
     return leftover.length > 0
-      ? [...base, { key: 'otros', name: 'Otros', age: '', image: DEFAULT_CATEGORY_IMAGE, cells: leftover }]
+      ? [...base, { key: 'otros', name: 'Otros', age: '', description: '', image: DEFAULT_CATEGORY_IMAGE, cells: leftover }]
       : base;
   }, [apiCells, apiCategories]);
 
@@ -405,9 +483,13 @@ export default function CelulasPage() {
     if (hit) setOpenKey(hit.key);
   }, [params, groups]);
 
-  // Ítems para la pila de ventanas (WindowStack)
+  // Ítems para la pila de ventanas (WindowStack). Sin `badge`: WindowStack
+  // lo pinta como pill JUSTO ENCIMA del <h2> del título, que es la forma
+  // exacta del eyebrow purgado del sitio -- y con datos reales el pill
+  // repetía la palabra del titular ("Mujeres" sobre "Mujeres"). La edad
+  // sigue visible en la tarjeta del collage, en su línea de metadatos.
   const windowItems = useMemo(
-    () => groups.map(g => ({ key: g.key, image: g.image, badge: g.age, title: g.name })),
+    () => groups.map(g => ({ key: g.key, image: g.image, title: g.name })),
     [groups]
   );
 
@@ -419,7 +501,13 @@ export default function CelulasPage() {
   // entre las dos páginas son estos datos, no la caja.
   const stats = useMemo(() => {
     const allCells = groups.flatMap(g => g.cells);
-    const zonesCount = new Set(allCells.map(c => c.zone).filter(Boolean)).size;
+    // Zona CANÓNICA, no el string crudo: contando strings el sitio publicaba
+    // "11 Zonas alcanzadas" porque "Zona 4" y "Zona 4, Arco de la Feria"
+    // contaban como dos. Las zonas reales hoy son 7 (1, 2, 4, 5, 7, 8 y San
+    // Lorenzo). Es una cifra pública sobre el alcance de la iglesia: inflarla
+    // por un descuido de parseo es exactamente el tipo de dato inventado que
+    // este sitio no publica.
+    const zonesCount = zonasDe(allCells).length;
     return [
       { n: String(allCells.length), label: allCells.length === 1 ? 'Célula activa' : 'Células activas' },
       { n: String(groups.length), label: 'Grupos por edad' },
@@ -429,11 +517,19 @@ export default function CelulasPage() {
 
   return (
     <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+      {/* El slot hero_celulas todavía no existe en /site-photos, así que
+          esta página abre SIEMPRE con el fallback -- y el fallback era
+          /images/bg-ministerios.jpg, exactamente el mismo que usa
+          VolunteeringPage: dos páginas distintas abriendo con la misma foto.
+          Una foto de células reales las distingue mientras tanto. El arreglo
+          de fondo es que el dueño suba la foto al slot hero_celulas desde
+          /admin/site-photos; el día que lo haga, esta línea deja de usarse
+          sola. */}
       <PageHero
         title="Células"
         subtitle="Grupos que se reúnen en casas durante la semana. Toca un tipo para abrir su ventana — y salta entre ellas."
         photoSlot="hero_celulas"
-        photoFallback="/images/bg-ministerios.jpg"
+        photoFallback="/images/nosotros/pastores-celulas.jpg"
       >
         {/* "Busca por edad y zona", no "Descubre tu célula ideal": es
             literalmente lo que hace el quiz (pregunta 1 = grupo de edad,
@@ -513,15 +609,20 @@ export default function CelulasPage() {
                       className="parallax-layer absolute inset-0 w-full h-full object-cover"
                     />
                     <div className="scrim-card" />
+                    {/* Sin pill de edad encima del <h3>: ese era un eyebrow
+                        (etiqueta sobre titular), la forma que se purgó del
+                        sitio -- y con datos reales repetía la palabra del
+                        titular en 2 de 5 tarjetas (age_group "Mujeres" sobre
+                        el título "Mujeres", "Hombres" sobre "Varones"). La
+                        edad baja a la línea de metadatos, y solo cuando
+                        aporta algo que el nombre no dice ya. */}
                     <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                      <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md">
-                        {g.age}
-                      </span>
                       <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-28 sm:text-34' : 'text-17 sm:text-19'}`}>
                         {g.name}
                       </h3>
                       <p className="text-13 text-white/60 font-medium mt-1.5">
-                        {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'} · abrir
+                        {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'}
+                        {g.age && norm(g.age) !== norm(g.name) ? ` · ${g.age}` : ''} · abrir
                       </p>
                     </div>
                   </Tilt>

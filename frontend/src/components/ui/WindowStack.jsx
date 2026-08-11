@@ -22,19 +22,33 @@
 //  chico de la card de origen). No reintroducir sin resolver ese conflicto.
 // ============================================================
 import { useMemo, useEffect, useCallback, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
+// Cuántas cartas se dibujan detrás de la del frente. Antes se montaban
+// TODAS (10 en Voluntariado) y las de profundidad > 3 se ocultaban con
+// `opacity: 0` -- invisibles, pero con su `backdrop-filter: blur()` vivo,
+// que es de las cosas más caras que puede pedirle una página al
+// compositor. Ahora sencillamente no existen.
+const VISIBLES = 4;
+
 // Posición de cada ventana según su profundidad (0 = frente). Las de
 // atrás asoman hacia arriba, alternando el lado, como cartas apiladas.
+//
+// OJO: aquí NO va `zIndex`. Estuvo dentro de este objeto y ese fue el
+// motivo real de que la pila se leyera como un mazo barajándose en vez de
+// como capas: todo lo que devuelve stackPose se le pasa a `animate`, así
+// que el resorte INTERPOLABA el z-index junto con el resto. A mitad de la
+// transición la ventana que estabas abriendo se pintaba DEBAJO de la que
+// dejabas, y recién al final saltaba al frente. El orden de capas tiene
+// que ser instantáneo, así que vive en el `style` de React.
 const stackPose = (depth) => ({
   scale: 1 - depth * 0.055,
   y: -depth * 16,
   x: (depth % 2 === 0 ? 1 : -1) * depth * 12,
   rotate: (depth % 2 === 0 ? -1 : 1) * depth * 1.6,
-  opacity: depth > 3 ? 0 : 1 - depth * 0.16,
-  zIndex: 50 - depth,
+  opacity: 1 - depth * 0.16,
 });
 
 // light: variante clara (.glass-light) para páginas donde la ventana de
@@ -45,6 +59,10 @@ const stackPose = (depth) => ({
 // no el material de la ventana.
 export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80vh, 640px)', light = false }) {
   const overlayRef = useRef(null);
+  // Quien pidió menos movimiento recibe la pila ya armada, sin el vuelo de
+  // entrada: solo un fundido. La jerarquía de capas no se pierde, porque
+  // esa la da la geometría de stackPose, no la animación.
+  const reducido = useReducedMotion();
   const stack = useMemo(() => {
     if (!openKey) return [];
     const idx = items.findIndex(it => it.key === openKey);
@@ -136,19 +154,34 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
 
           {/* Pila de ventanas */}
           <div className="relative w-full max-w-[780px]" style={{ height, perspective: 1400 }}>
-            {stack.map((it, depth) => {
+            {stack.slice(0, VISIBLES).map((it, depth) => {
               const isFront = depth === 0;
               const photos = it.images?.length ? it.images : (it.image ? [it.image] : []);
               const idx = isFront ? photoIdx % photos.length : 0;
               const showCarousel = isFront && photos.length > 1;
+              const pose = stackPose(depth);
               return (
                 <motion.div
                   key={it.key}
-                  animate={stackPose(depth)}
-                  transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+                  // Con `initial` la pila se ARMA a la vista: cada carta
+                  // llega desde un poco más abajo y algo más chica hasta su
+                  // sitio, la del frente primero y las de atrás detrás. Sin
+                  // esto las cartas nacían ya colocadas (framer monta
+                  // directo en el valor de `animate` cuando no hay
+                  // `initial`), así que al abrir no se ponía nada encima de
+                  // nada: solo aparecía una composición ya hecha.
+                  initial={reducido ? { opacity: 0 } : { ...pose, opacity: 0, y: pose.y + 26, scale: pose.scale * 0.94 }}
+                  animate={pose}
+                  exit={reducido ? { opacity: 0 } : { opacity: 0, y: 34, scale: 0.96 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 30, delay: reducido ? 0 : depth * 0.045 }}
                   onClick={() => !isFront && onChange(it.key)}
                   className={`absolute inset-0 ${light ? 'glass-light' : 'liquid-glass'} rounded-[28px] overflow-hidden flex flex-col ${isFront ? '' : 'cursor-pointer'}`}
-                  style={{ transformOrigin: 'top center', pointerEvents: depth > 3 ? 'none' : 'auto' }}
+                  // zIndex fuera de `animate` a propósito: ver la nota de
+                  // stackPose. Aquí el reordenamiento de capas es
+                  // instantáneo, que es lo que hace que la ventana nueva se
+                  // lea como puesta ENCIMA y no como una carta que se cuela
+                  // por debajo mientras el resorte todavía corre.
+                  style={{ transformOrigin: 'top center', zIndex: 50 - depth }}
                 >
                   {/* Banner -- carrusel si hay más de una foto (isFront) */}
                   <div className="relative h-32 sm:h-40 shrink-0">
@@ -219,15 +252,25 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
           </div>
 
           {/* Dots */}
+          {/* El punto sigue midiendo 6px porque visualmente es lo correcto,
+              pero ahora el BOTÓN que lo contiene mide 32px: el dedo apunta
+              al botón, no al punto. Antes el blanco táctil era el punto
+              mismo (6x6 px, muy por debajo del mínimo de ~44px), y en un
+              teléfono son diez de esos pegados al borde inferior. */}
           {items.length > 1 && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[120] flex gap-2">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[120] flex items-center">
               {items.map(it => (
                 <button
                   key={it.key}
                   onClick={() => onChange(it.key)}
                   aria-label={it.title}
-                  className={`h-1.5 rounded-full transition-all ${it.key === openKey ? 'w-6 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/60'}`}
-                />
+                  aria-current={it.key === openKey}
+                  className="px-3 min-h-[44px] flex items-center justify-center focus-ring rounded-full"
+                >
+                  <span
+                    className={`block h-1.5 rounded-full transition-all ${it.key === openKey ? 'w-6 bg-white' : 'w-1.5 bg-white/35'}`}
+                  />
+                </button>
               ))}
             </div>
           )}

@@ -15,15 +15,28 @@
 //  declarados como cifra real de la iglesia) -- este componente no
 //  inventa ni infiere ninguna cifra.
 //
-//  @param {{n: string, label: string}[]} stats  — normalmente 3
+//  El nombre dice "trío" porque nació con tres, pero la cantidad la pone
+//  la página y depende de cuántas cifras REALES tenga: Células cuenta
+//  tres sobre la API, Voluntariado solo puede sostener una (borrar una
+//  cifra inventada es el caso normal aquí, no la excepción). Con
+//  `grid-cols-3` fijo, una sola ficha quedaba encogida a un tercio y
+//  pegada a la izquierda de un bloque centrado, o sea con pinta de
+//  layout roto. Las clases van completas en un mapa porque Tailwind
+//  escanea strings literales: `grid-cols-${n}` no genera nada.
+//
+//  @param {{n: string, label: string}[]} stats  — 1 a 3
 //  @param {string} className — solo espaciado/alineación de la sección
 //                             que lo hospeda (mt-10, mx-auto mb-14…).
 // ============================================================
 import { RevealList, RevealItem } from './Reveal';
 
+const COLS = { 1: 'grid-cols-1 max-w-[220px]', 2: 'grid-cols-2 max-w-sm', 3: 'grid-cols-3 max-w-lg' };
+
 export default function StatTrio({ stats, className = '' }) {
+  if (!stats?.length) return null;
+  const cols = COLS[Math.min(stats.length, 3)];
   return (
-    <RevealList className={`grid grid-cols-3 gap-3 sm:gap-4 max-w-lg ${className}`}>
+    <RevealList className={`grid ${cols} gap-3 sm:gap-4 ${className}`}>
       {stats.map(s => (
         <RevealItem key={s.label}>
           {/* font-bold, no font-extrabold: Arimo topa en 700, así que el

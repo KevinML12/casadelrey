@@ -27,13 +27,19 @@ const NO_PREFERENCE = 'sin_preferencia';
 const NO_PREFERENCE_LABEL = 'Sin preferencia — que me recomienden';
 const NO_PREFERENCE_WHY = 'Nuestro equipo va a revisar tus talentos e intereses para recomendarte el área donde más puedas servir y crecer.';
 
-const STATS = [
-  { n: '~90', label: 'Voluntarios sirviendo' },
-  { n: '10', label: 'Departamentos' },
-  { n: '20', label: 'Líderes de célula' },
-];
+// Las cifras ya NO se escriben a mano aquí. Vivían como un STATS fijo
+// ('~90 voluntarios', '10 departamentos', '20 líderes de célula') y las
+// tres estaban mal por motivos distintos: la de líderes era de OTRA
+// página (Células) y además falsa contra la API (16, no 20); la de
+// departamentos era un número correcto por casualidad, congelado a mano
+// mientras /volunteer-areas es admin-editable; y el "~90" es un
+// placeholder disfrazado de dato -- no hay endpoint público que lo
+// respalde. Ahora la única ficha se CUENTA sobre las áreas ya
+// resueltas, igual que hace CelulasPage. Si el dueño quiere volver a
+// mostrar el total de voluntarios, tiene que existir como dato (campo
+// en el admin o endpoint), no como texto en este archivo.
 
-// Agrupa los 10 departamentos en familias temáticas -- antes era un solo
+// Agrupa los departamentos en familias temáticas -- antes era un solo
 // grid plano de 10 tarjetas idénticas, sin jerarquía visual.
 const CATEGORIES = [
   { name: 'Alabanza y arte', values: ['alabanza', 'danza'] },
@@ -43,31 +49,51 @@ const CATEGORIES = [
   { name: 'Oración y logística', values: ['oracion', 'logistica'] },
 ];
 
-// Masonry tipo Pinterest (CSS columns, no grid-auto-flow): se probó el
-// collage con spans/rotate fijos de GalleryPage.jsx pero el usuario lo
-// vio "torcido" e incompleto -- pidió tarjetas más grandes que llenen
-// todo el espacio y SIN inclinación. Con columns cada tarjeta ocupa su
-// alto natural y las columnas se acomodan solas, sin huecos que rellenar
-// a mano ni ángulos fijos.
-const HEIGHTS = ['h-[288px]', 'h-[240px]', 'h-[336px]', 'h-[272px]', 'h-[384px]', 'h-[256px]'];
+// Aquí vivía HEIGHTS, seis alturas fijas para un masonry de CSS columns
+// (columns-2/3/4). El masonry existe para rellenar huecos cuando hay
+// MUCHOS elementos, pero se aplicaba DENTRO de cada familia y las
+// familias tienen 2, 3, 1, 2 y 2 departamentos: con dos o tres tarjetas
+// lo único que producía eran filas mochas y alturas desparejas. Ahora
+// cada familia es una grilla regular con proporción fija (ver más
+// abajo), así que ni las alturas sueltas ni el columnSpan inline de la
+// tarjeta sola tienen razón de existir.
 
-// Tags de interés por departamento (frontend-only, no vive en la DB --
-// son una capa de descubrimiento, no contenido administrable). Los
-// reusan tanto los chips de filtro como el quiz de abajo: 'frente'/
-// 'apoyo' son un eje aparte (visibilidad) que solo usa la pregunta 2
-// del quiz, no aparecen como chip de filtro.
-const DEPT_TAGS = {
-  alabanza: ['musica', 'frente'],
-  danza: ['musica', 'frente'],
-  servidores: ['personas', 'apoyo'],
-  protocolo: ['personas', 'frente'],
-  pancartas: ['personas', 'apoyo'],
-  maestros_ninos: ['ninos', 'frente'],
-  tecnicos_audiovisuales: ['tecnologia', 'apoyo'],
-  multimedia: ['tecnologia', 'apoyo'],
-  oracion: ['oracion', 'apoyo'],
-  logistica: ['organizacion', 'apoyo'],
+// Match por departamento (frontend-only, no vive en la DB -- es una capa
+// de descubrimiento, no contenido administrable). Dos ejes distintos,
+// separados a propósito:
+//   interes     -- de qué se trata el departamento. Es lo que filtran
+//                  los chips de arriba y lo que pregunta la pregunta 1.
+//   visibilidad -- 'frente' o 'apoyo'. Solo lo usa la pregunta 2.
+// Antes era UN array plano por departamento con los dos ejes mezclados y
+// el quiz los puntuaba igual, que es de donde salía el resultado que
+// contradecía la respuesta ("amo trabajar con niños" + "detrás" caía en
+// Servidores, porque 'apoyo' pesaba lo mismo que 'ninos').
+//
+// 'pancartas' pasó de 'apoyo' a 'frente' -- no es un ajuste cosmético
+// para desempatar: la propia área dice "servir con entusiasmo VISIBLE y
+// ser parte activa del ambiente de cada culto" (campo `why` en la API).
+// Estaba mal clasificada, y de paso era indistinguible de 'servidores'.
+const DEPT_MATCH = {
+  alabanza: { interes: ['musica'], visibilidad: ['frente'] },
+  danza: { interes: ['musica'], visibilidad: ['frente'] },
+  servidores: { interes: ['personas'], visibilidad: ['apoyo'] },
+  protocolo: { interes: ['personas'], visibilidad: ['frente'] },
+  pancartas: { interes: ['personas'], visibilidad: ['frente'] },
+  maestros_ninos: { interes: ['ninos'], visibilidad: ['frente'] },
+  tecnicos_audiovisuales: { interes: ['tecnologia'], visibilidad: ['apoyo'] },
+  multimedia: { interes: ['tecnologia'], visibilidad: ['apoyo'] },
+  oracion: { interes: ['oracion'], visibilidad: ['apoyo'] },
+  logistica: { interes: ['organizacion'], visibilidad: ['apoyo'] },
 };
+
+// Un departamento que el dueño cree en /admin/volunteer-areas NO tiene
+// entrada aquí (este mapa es de código, la lista es de la DB). No es un
+// caso de error: es lo normal el día que agregue uno. Sin tags queda
+// fuera de los chips de interés y el quiz nunca lo recomienda, pero
+// aparece en el grid bajo "Otros" y se puede aplicar desde ahí. Este
+// helper es el que garantiza que "sin tags" no reviente nada.
+const EMPTY_MATCH = { interes: [], visibilidad: [] };
+const matchOf = (value) => DEPT_MATCH[value] || EMPTY_MATCH;
 
 // Cada entrada tenía además un campo `icon` ('mic', 'heart', 'book'…)
 // que NADIE leía: el sitio público no dibuja pictogramas por decisión
@@ -104,15 +130,43 @@ const QUIZ_QUESTIONS = [
   },
 ];
 
-// Encuentra el departamento con más tags en común con lo que respondió
-// el usuario -- empate se resuelve por orden (el primero que alcanza el
-// score más alto), determinista, no aleatorio.
-function bestMatch(areas, selectedTags) {
-  let best = null, bestScore = -1;
+// Puntúa cada departamento contra lo que respondió el visitante y
+// devuelve TODOS los que empatan en el puntaje más alto (un array, no
+// uno solo).
+//
+// Por qué así, tras encontrar tres defectos en la versión anterior:
+//
+// 1. El interés pesa el doble que la visibilidad. La pregunta 1 es de
+//    vocación ("me encanta la música", "amo trabajar con niños") y la 2
+//    es una preferencia de estilo. Cuando pesaban igual, "amo trabajar
+//    con niños" + "detrás, dando soporte" empataba a Maestros de Niños
+//    con Servidores y ganaba Servidores por ir antes en el array: la
+//    página le respondía al visitante lo contrario de lo que dijo.
+// 2. Devuelve el empate completo en vez del primero del array. Un quiz
+//    de dos preguntas NO puede distinguir Alabanza de Danza (misma
+//    música, ambos al frente); fingir que sí volvía inalcanzables a
+//    Danza, Pancartas, Multimedia y Logística -- 4 de 10 departamentos
+//    que ningún camino podía recomendar. Mostrar los dos es más honesto
+//    que inventar una precisión que las preguntas no dan.
+// 3. Puntaje 0 devuelve lista vacía. Antes `score > bestScore` con
+//    bestScore = -1 hacía que el PRIMER departamento ganara aunque no
+//    coincidiera en nada (p.ej. si todas las áreas son nuevas y no
+//    tienen tags). Vacío deja que el resultado caiga en la salida "sin
+//    preferencia" que la página ya tenía escrita.
+const PESO_INTERES = 2;
+const PESO_VISIBILIDAD = 1;
+
+function bestMatches(areas, selectedTags) {
+  let bestScore = 0;
+  let best = [];
   for (const a of areas) {
-    const tags = DEPT_TAGS[a.value] || [];
-    const score = tags.filter(t => selectedTags.includes(t)).length;
-    if (score > bestScore) { bestScore = score; best = a; }
+    const { interes, visibilidad } = matchOf(a.value);
+    const score =
+      interes.filter(t => selectedTags.includes(t)).length * PESO_INTERES +
+      visibilidad.filter(t => selectedTags.includes(t)).length * PESO_VISIBILIDAD;
+    if (score === 0) continue;
+    if (score > bestScore) { bestScore = score; best = [a]; }
+    else if (score === bestScore) best.push(a);
   }
   return best;
 }
@@ -307,15 +361,18 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 // Foto a toda vista (sin degradado ni ícono encima) + un chip flotante
 // "glass-light" (blanco escarchado, texto navy -- lo pidió el usuario en
 // vez del degradado navy que traía) con el título/descripción, igual
-// tratamiento que usan los modales claros del sitio. big: solo la tarjeta
-// "hero" de una categoría de un solo departamento -- título más grande.
+// tratamiento que usan los modales claros del sitio. Proporción fija
+// (aspect-[4/5]) en vez del alto suelto que pedía el masonry: todas las
+// tarjetas de una familia miden lo mismo, que es lo que hace que 2 o 3
+// tarjetas se lean como una fila y no como un rompecabezas a medio
+// armar.
 // Tilt (NO rotación estática): se probó el collage con spans/rotate FIJOS
-// (ver comentario de HEIGHTS más arriba) y el usuario lo rechazó por verse
-// "torcido". Tilt es distinto -- la card queda perfectamente recta en
-// reposo, solo se inclina en 3D siguiendo al cursor/scroll (vuelve a
-// plano al soltar). Es la misma reactividad de cristal que Home/Células/
-// Galería, sin reintroducir el ángulo fijo que se pidió quitar.
-function DepartmentCard({ title, desc, photo, big, height, onClick }) {
+// y el usuario lo rechazó por verse "torcido". Tilt es distinto -- la
+// card queda perfectamente recta en reposo, solo se inclina en 3D
+// siguiendo al cursor/scroll (vuelve a plano al soltar). Es la misma
+// reactividad de cristal que Home/Células/Galería, sin reintroducir el
+// ángulo fijo que se pidió quitar.
+function DepartmentCard({ title, desc, photo, onClick }) {
   return (
     <Tilt
       as="button"
@@ -324,7 +381,7 @@ function DepartmentCard({ title, desc, photo, big, height, onClick }) {
       max={6}
       glass
       hoverScale={1.02}
-      className={`group relative block w-full overflow-hidden rounded-[22px] text-left focus-ring ${height}`}
+      className="group relative block w-full aspect-[4/5] overflow-hidden rounded-[22px] text-left focus-ring"
     >
       <img
         src={photo}
@@ -332,7 +389,7 @@ function DepartmentCard({ title, desc, photo, big, height, onClick }) {
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-x-3 bottom-3 glass-light rounded-[16px] px-4 py-3">
-        <h3 className={`font-bold text-bg tracking-tight leading-tight ${big ? 'text-19' : 'text-15'}`}>{title}</h3>
+        <h3 className="text-15 font-bold text-bg tracking-tight leading-tight">{title}</h3>
         {desc && <p className="text-13 text-bg/60 mt-1 leading-snug line-clamp-2">{desc}</p>}
       </div>
     </Tilt>
@@ -345,24 +402,76 @@ function DepartmentCard({ title, desc, photo, big, height, onClick }) {
 // 1 -> 2 -> resultado) que VolunteerForm no maneja.
 function QuizModal({ areas, onViewDetail, onApply }) {
   const [step, setStep] = useState(0); // 0,1 = preguntas; 'result' = resultado
-  const [tags, setTags] = useState([]);
-  const [result, setResult] = useState(null);
+  // Una entrada POR PREGUNTA, no un array plano acumulado. Con el
+  // acumulado, "← Pregunta anterior" dejaba pegados los tags de la
+  // respuesta vieja: volver y contestar distinto puntuaba por las dos
+  // cosas a la vez, incluida la que el visitante acababa de descartar.
+  const [answers, setAnswers] = useState([]);
+  const [results, setResults] = useState([]);
 
   const answer = (optionTags) => {
-    const nextTags = [...tags, ...optionTags];
+    const next = answers.slice(0, step);
+    next[step] = optionTags;
+    setAnswers(next);
     if (step < QUIZ_QUESTIONS.length - 1) {
-      setTags(nextTags);
       setStep(step + 1);
     } else {
-      setTags(nextTags);
-      setResult(bestMatch(areas, nextTags));
+      setResults(bestMatches(areas, next.flat()));
       setStep('result');
     }
   };
 
-  const restart = () => { setStep(0); setTags([]); setResult(null); };
+  const restart = () => { setStep(0); setAnswers([]); setResults([]); };
 
   if (step === 'result') {
+    // Empate real: dos preguntas no distinguen Alabanza de Danza, ni
+    // Técnicos de Multimedia. Se muestran los dos (o tres) en vez de
+    // elegir uno al azar disfrazado de recomendación.
+    if (results.length > 1) {
+      const titulos = results.map(r => r.title);
+      const juntos = `${titulos.slice(0, -1).join(', ')} o ${titulos[titulos.length - 1]}`;
+      return (
+        <div>
+          <p className="text-13 font-semibold text-bg/50 mb-2 text-center">Según tus respuestas</p>
+          <h3 className="text-24 font-bold text-bg tracking-tight mb-3 text-center">{juntos}</h3>
+          <p className="text-14 text-bg/60 leading-relaxed mb-5 text-center">
+            Con dos preguntas no hay cómo separarlos: encajas igual de bien en cualquiera. Mira lo que hace cada uno y elige.
+          </p>
+          {/* Lista, no tarjetas: son opciones equivalentes en fila, y el
+              sistema de diseño compone las listas con divide-y. */}
+          <ul className="divide-y divide-bg/10 border-y border-bg/10 mb-5">
+            {results.map(r => (
+              <li key={r.value} className="py-4 flex items-start gap-4">
+                {r.photo && (
+                  <img src={r.photo} alt="" className="w-14 h-14 rounded-[12px] object-cover shrink-0" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-15 font-bold text-bg">{r.title}</p>
+                  <p className="text-13 text-bg/60 leading-snug mt-1">{r.why}</p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <button type="button" onClick={() => onApply(r.value)} className={btnSmallPrimary}>
+                      Aplicar
+                    </button>
+                    <button type="button" onClick={() => onViewDetail(r.value)} className={btnSmallGhost}>
+                      Ver detalle
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button type="button" onClick={restart} className="block mx-auto text-13 font-semibold text-bg/45 hover:text-bg/70 transition-colors">
+            Volver a intentar
+          </button>
+        </div>
+      );
+    }
+
+    // results vacío = ninguna coincidencia (p.ej. departamentos nuevos
+    // que todavía no tienen tags). Cae en la misma salida "sin
+    // preferencia" que ya usa el enlace del hero, en vez de recomendar
+    // el primero de la lista como si fuera un resultado.
+    const result = results[0] || null;
     return (
       <div className="text-center">
         {/* "Según tus respuestas" en vez de "Tu lugar ideal es": el quiz
@@ -459,11 +568,20 @@ export default function VolunteeringPage() {
     title: a.title,
   }));
 
-  // Índice global (no por categoría) para que el patrón de tamaños/
-  // inclinaciones del collage varíe de verdad a lo largo de las 10
-  // tarjetas, en vez de reiniciarse en cada categoría (donde 1-3 items
-  // casi nunca alcanzan a mostrar la variedad).
+  // Índice global (no por categoría) para escalonar la entrada de las
+  // tarjetas a lo largo de toda la página, en vez de reiniciar el
+  // retardo en cada familia (donde 1-3 items casi nunca alcanzan a
+  // mostrar la variedad). Ya no decide tamaños -- todas las tarjetas
+  // miden lo mismo desde que el masonry se fue.
   const globalIndex = Object.fromEntries(areas.map((a, i) => [a.value, i]));
+
+  // Única cifra que esta página puede sostener con un dato real: se
+  // CUENTA sobre las áreas ya resueltas desde /volunteer-areas, así que
+  // sigue al admin en vez de quedarse congelada. Mismo criterio que
+  // CelulasPage.
+  const stats = [
+    { n: String(areas.length), label: areas.length === 1 ? 'Departamento' : 'Departamentos' },
+  ];
   // A qué categoría pertenece cada departamento -- se usa también en el
   // chip de la ventana de detalle.
   const categoryOf = value => categoriesWithLeftover.find(c => c.values.includes(value))?.name;
@@ -475,12 +593,42 @@ export default function VolunteeringPage() {
 
   return (
     <main className="min-h-screen bg-bg text-white">
+      {/* Una sola apertura. Antes el hero decía "Únete a los más de 90
+          voluntarios que ya sirven en 10 departamentos" y treinta líneas
+          después un h2 "¿Dónde quieres servir?" volvía a abrir la página
+          con su propia bajada y sus propios botones: dos titulares
+          diciendo lo mismo antes de que se viera un solo departamento, y
+          las mismas dos cifras repetidas 200px más abajo en el trío de
+          fichas. La bajada ya no cuenta a nadie -- dice para qué sirve
+          esto -- y el CTA vive donde vive el de Células, como children
+          del hero. */}
       <PageHero
         title="Voluntariado"
-        subtitle="Cada persona tiene un lugar. Únete a los más de 90 voluntarios que ya sirven en 10 departamentos."
+        subtitle="Cada persona tiene algo que aportar. Aquí encuentras el departamento donde lo que sabes hacer sirve a los demás."
         photoSlot="hero_voluntariado"
         photoFallback="/images/bg-ministerios.jpg"
-      />
+      >
+        {/* "Dos preguntas y te decimos dónde": son exactamente dos (ver
+            QUIZ_QUESTIONS). Antes decía "Descubre tu lugar ideal" y
+            Células decía "Descubre tu célula ideal" -- dos botones
+            blancos con la misma frase y una palabra cambiada, que es la
+            firma de un widget parametrizado. */}
+        <motion.button
+          {...PRESS_PRIMARY}
+          type="button"
+          onClick={() => setQuizOpen(true)}
+          className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
+        >
+          Dos preguntas y te decimos dónde
+        </motion.button>
+        <button
+          type="button"
+          onClick={() => openForm('')}
+          className="text-14 font-semibold text-white/60 hover:text-white transition-colors underline underline-offset-4 decoration-white/25"
+        >
+          O aplica sin preferencia
+        </button>
+      </PageHero>
 
       {/* Sin foto de fondo: aquí vivía un ParallaxImg al 40% con un
           degradado navy encima, o sea una foto de la iglesia entregada al
@@ -514,32 +662,15 @@ export default function VolunteeringPage() {
             <h2 className="text-d2 text-white">
               ¿Dónde quieres servir?
             </h2>
+            {/* Sin botones aquí: los dos CTA (el quiz y "aplica sin
+                preferencia") ya viven en el hero, que es lo que decidió el
+                cambio de arriba. Repetirlos 300px más abajo, con el mismo
+                texto y el mismo estilo, era justo la duplicación que se
+                estaba quitando. */}
             <p className="mt-4 text-16 text-white/70">Toca un departamento para conocerlo mejor.</p>
-            <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
-              {/* "Dos preguntas y te decimos dónde": son exactamente dos
-                  (ver QUIZ_QUESTIONS). Antes decía "Descubre tu lugar
-                  ideal" y Células decía "Descubre tu célula ideal" -- dos
-                  botones blancos con la misma frase y una palabra
-                  cambiada, que es la firma de un widget parametrizado. */}
-              <motion.button
-                {...PRESS_PRIMARY}
-                type="button"
-                onClick={() => setQuizOpen(true)}
-                className="inline-flex items-center gap-2 rounded-pill bg-white text-bg px-5 py-3 text-14 font-bold shadow-card hover:opacity-90"
-              >
-                Dos preguntas y te decimos dónde
-              </motion.button>
-              <button
-                type="button"
-                onClick={() => openForm('')}
-                className="text-14 font-semibold text-white/50 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
-              >
-                O aplica sin preferencia
-              </button>
-            </div>
           </div>
 
-          <StatTrio stats={STATS} className="mx-auto mb-14" />
+          <StatTrio stats={stats} className="mx-auto mb-14" />
 
           {/* Chips de interés -- filtran el grid de abajo. Reusan los
               mismos tags que puntúan el quiz, así los dos caminos
@@ -566,7 +697,12 @@ export default function VolunteeringPage() {
 
           <div className="space-y-10">
             {categoriesWithLeftover.map(cat => {
-              const catAreas = areas.filter(a => cat.values.includes(a.value) && (!activeTag || DEPT_TAGS[a.value]?.includes(activeTag)));
+              // Filtra por el eje `interes` únicamente: 'frente'/'apoyo'
+              // son visibilidad y no existen como chip, así que mirar el
+              // mapa completo aquí nunca podría acertar y sí podría
+              // colar un falso positivo el día que un chip se llame
+              // igual que una visibilidad.
+              const catAreas = areas.filter(a => cat.values.includes(a.value) && (!activeTag || matchOf(a.value).interes.includes(activeTag)));
               if (catAreas.length === 0) return null;
               return (
                 <div key={cat.name} onMouseEnter={() => setHoverCategory(cat.name)} onMouseLeave={() => setHoverCategory(null)}>
@@ -578,24 +714,24 @@ export default function VolunteeringPage() {
                       punto la opacidad para que siga leyéndose como el
                       nombre de la familia y no como texto suelto. */}
                   <p className="text-13 font-semibold text-white/60 mb-4">{cat.name}</p>
-                  <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4">
+                  {/* Grilla regular, no `columns-*`: el masonry repartía
+                      las tarjetas de arriba abajo por columna (fila 1 =
+                      depto 1 y 3, no 1 y 2) y con 1-3 items por familia
+                      dejaba columnas vacías. Con proporción fija en la
+                      tarjeta, la grilla ordena en el sentido de lectura y
+                      todas las de una familia miden lo mismo. */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     {catAreas.map(area => {
                       const i = globalIndex[area.value];
-                      // Categorías de un solo departamento (ej. "Niños y
-                      // enseñanza") ocupan las columnas completas -- una
-                      // tarjeta angosta y sola se vería como un error de layout.
-                      const solo = catAreas.length === 1;
                       return (
                         <motion.div
                           key={area.value}
-                          className="break-inside-avoid mb-3 sm:mb-4"
-                          style={solo ? { columnSpan: 'all' } : undefined}
                           initial={{ opacity: 0, y: 18, scale: 0.96 }}
                           whileInView={{ opacity: 1, y: 0, scale: 1 }}
                           viewport={{ once: true, margin: '-60px' }}
                           transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
                         >
-                          <DepartmentCard {...area} big={solo} height={solo ? 'h-[300px]' : HEIGHTS[i % HEIGHTS.length]} onClick={() => setOpenKey(area.value)} />
+                          <DepartmentCard {...area} onClick={() => setOpenKey(area.value)} />
                         </motion.div>
                       );
                     })}
@@ -603,7 +739,7 @@ export default function VolunteeringPage() {
                 </div>
               );
             })}
-            {activeTag && !areas.some(a => DEPT_TAGS[a.value]?.includes(activeTag)) && (
+            {activeTag && !areas.some(a => matchOf(a.value).interes.includes(activeTag)) && (
               <div className="text-center py-10">
                 <p className="text-15 text-white/50 mb-3">Ningún departamento coincide con ese interés todavía.</p>
                 <button type="button" onClick={() => setActiveTag(null)} className="text-14 font-semibold text-white/70 hover:text-white underline underline-offset-4 decoration-white/20">
