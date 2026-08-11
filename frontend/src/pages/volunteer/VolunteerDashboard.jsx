@@ -9,7 +9,7 @@ import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-12">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
   </div>
 );
 
@@ -19,7 +19,7 @@ function GoalCard({ goal, onToggle, onDelete }) {
       <button
         onClick={() => onToggle(goal)}
         className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-          goal.completed ? 'bg-celeste-soft border-transparent' : 'border-bg/10 hover:border-celeste'
+          goal.completed ? 'bg-acento-soft border-transparent' : 'border-bg/10 hover:border-acento'
         }`}
       />
       <div className="flex-1 min-w-0">

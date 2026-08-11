@@ -175,7 +175,7 @@ function HeroForm({ initial, onSave, onCancel }) {
                   className="text-label-m text-rose hover:underline">Quitar imagen</button>
               </div>
             ) : (
-              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-celeste transition-colors">
+              <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-acento transition-colors">
                 <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del hero'}</p>
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
               </label>
@@ -189,7 +189,7 @@ function HeroForm({ initial, onSave, onCancel }) {
             <Field label={`Opacidad del overlay: ${form.overlay_opacity}%`}>
               <input type="range" min="0" max="100" value={form.overlay_opacity}
                 onChange={e => setForm(p => ({ ...p, overlay_opacity: parseInt(e.target.value) }))}
-                className="w-full h-10 accent-celeste" />
+                className="w-full h-10 accent-acento" />
             </Field>
           </div>
         </div>
@@ -283,7 +283,7 @@ export default function AdminHero() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
         </div>
       ) : heroes.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">

@@ -165,7 +165,7 @@ export default function AdminProfile() {
           <p className="text-18 font-bold text-bg leading-tight truncate">{user?.name || 'Sin nombre'}</p>
           <p className="text-14 text-bg/50 truncate">{user?.email}</p>
           <span className="inline-flex items-center gap-1.5 mt-2 bg-bg/8 text-bg/70 px-2.5 py-0.5 rounded-full text-12 font-semibold capitalize">
-            <span className="w-1.5 h-1.5 rounded-full bg-celeste" />
+            <span className="w-1.5 h-1.5 rounded-full bg-acento" />
             {user?.role || 'usuario'} · cuenta activa
           </span>
         </div>
@@ -210,7 +210,7 @@ export default function AdminProfile() {
 
         {loading ? (
           <div className="flex justify-center py-8">
-            <div className="w-5 h-5 rounded-full border-2 border-bg/12 border-t-celeste animate-spin" />
+            <div className="w-5 h-5 rounded-full border-2 border-bg/12 border-t-acento animate-spin" />
           </div>
         ) : goals.length === 0 ? (
           <p className="text-14 text-bg/50 py-3">Aún no tienes metas. ¡Agrega una!</p>
@@ -223,7 +223,7 @@ export default function AdminProfile() {
                   onClick={() => toggleGoal(g)}
                   aria-label={g.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
                   className={`w-6 h-6 rounded-full border-2 shrink-0 transition-colors focus-ring ${
-                    g.completed ? 'bg-celeste border-celeste' : 'border-bg/25 hover:border-bg/50'
+                    g.completed ? 'bg-acento border-acento' : 'border-bg/25 hover:border-bg/50'
                   }`}
                 />
                 <div className="flex-1 min-w-0">

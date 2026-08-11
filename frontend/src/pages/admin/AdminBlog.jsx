@@ -140,7 +140,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <div className="flex-1 min-w-0">
               <Input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')} />
             </div>
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-celeste/40 hover:text-bg'} text-bg/50`}>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-acento/40 hover:text-bg'} text-bg/50`}>
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
             </label>
@@ -185,7 +185,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
             <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-bg/10 bg-bg/4 text-body-s leading-relaxed"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editor?.getHTML() || '') }} />
           ) : (
-            <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-celeste focus-within:ring-2 focus-within:ring-celeste/15 transition-all">
+            <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-acento focus-within:ring-2 focus-within:ring-acento/15 transition-all">
               <EditorToolbar editor={editor} />
               <EditorContent editor={editor} />
             </div>
@@ -195,7 +195,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         <label className="flex items-center gap-2 text-body-s text-bg cursor-pointer select-none">
           <input type="checkbox" checked={form.status === 'published'}
             onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'published' : 'draft' }))}
-            className="rounded border-bg/10 accent-celeste w-4 h-4" />
+            className="rounded border-bg/10 accent-acento w-4 h-4" />
           Publicar inmediatamente
         </label>
 
@@ -214,7 +214,7 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
   </div>
 );
 

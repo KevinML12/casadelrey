@@ -69,7 +69,7 @@ export default function AdminSettings() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
         </div>
       ) : (
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">

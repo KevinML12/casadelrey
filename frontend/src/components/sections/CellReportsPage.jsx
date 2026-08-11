@@ -14,7 +14,7 @@ const STATUS_CONFIG = {
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
   </div>
 );
 
@@ -22,7 +22,7 @@ function MiniStat({ label, value, tint = 'pri' }) {
   const tintMap = {
     pri: 'text-bg',
     sec: 'text-emerald',
-    ter: 'text-celeste',
+    ter: 'text-acento',
   };
   return (
     <div className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">
@@ -235,7 +235,7 @@ export default function CellReportsPage() {
                       {[
                         { label: 'Asistentes',    value: r.total_attendees ?? 0, tint: 'text-bg' },
                         { label: 'Convertidos',   value: r.converts ?? 0,        tint: 'text-emerald' },
-                        { label: 'Reconciliados', value: r.reconciled ?? 0,      tint: 'text-celeste' },
+                        { label: 'Reconciliados', value: r.reconciled ?? 0,      tint: 'text-acento' },
                         { label: 'Ofrenda',       value: `Q${Number(r.offering ?? 0).toFixed(0)}`, tint: 'text-bg' },
                       ].map(({ label, value, tint }) => (
                         <div key={label} className="glass-light rounded-[24px] card-spring p-4 flex flex-col gap-2">

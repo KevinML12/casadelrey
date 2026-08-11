@@ -6,7 +6,7 @@ import Button from '../../components/ui/Button';
 
 const STATUS_CHIP = {
   pendiente:      { label: 'Pendiente',      cls: 'bg-bg/8 text-bg/50' },
-  asignado:       { label: 'Asignado',       cls: 'bg-celeste text-white' },
+  asignado:       { label: 'Asignado',       cls: 'bg-acento text-white' },
   coordinando:    { label: 'Coordinando',    cls: 'bg-amber text-white' },
   usuario_creado: { label: 'Usuario creado', cls: 'bg-emerald text-white' },
 };

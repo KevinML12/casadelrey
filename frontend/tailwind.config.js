@@ -13,9 +13,13 @@ export default {
         'ink-2':        '#94A3B8',     // Muted Text
         'ink-3':        '#475569',
 
-        'celeste':      '#3B82F6',     // Sapphire — primary
-        'celeste-hov':  '#60A5FA',
-        'celeste-soft': '#1E3A8A',     // Darker tint for navy bg
+        // Acento único, muestreado de las fotos reales de la iglesia
+        // (luz cálida de escenario). Ver el bloque ACENTO ÚNICO de
+        // index.css para el porqué: los valores anteriores eran la
+        // rampa 500 de Tailwind sin tocar.
+        'acento':      '#E8823C',
+        'acento-hov':  '#F2A03D',
+        'acento-soft': '#4A2609',
 
         // Canvas CLARO del panel admin/líder/voluntario (jul-2026): el
         // panel es modo claro estilo Apple (tinta navy sobre off-white);
@@ -31,21 +35,21 @@ export default {
         'emerald-soft': '#064E3B',
 
         // ── ALIAS LEGACY (compat con código existente) ──────────────
-        'pri':         'var(--celeste)',
-        'pri-press':   'var(--celeste-hov)',
+        'pri':         'var(--acento)',
+        'pri-press':   'var(--acento-hov)',
         'on-pri':      '#FFFFFF',
-        'pri-con':     'var(--celeste-soft)',
-        'on-pri-con':  'var(--celeste-hov)',
+        'pri-con':     'var(--acento-soft)',
+        'on-pri-con':  'var(--acento-hov)',
 
         'sec':         'var(--bg-soft)',
         'on-sec':      '#FFFFFF',
         'sec-con':     'var(--bg)',
         'on-sec-con':  '#FFFFFF',
 
-        'ter':         'var(--celeste)',
+        'ter':         'var(--acento)',
         'on-ter':      '#FFFFFF',
-        'ter-con':     'var(--celeste-soft)',
-        'on-ter-con':  'var(--celeste-hov)',
+        'ter-con':     'var(--acento-soft)',
+        'on-ter-con':  'var(--acento-hov)',
 
         'err':         'var(--rose)',
         'on-err':      '#FFFFFF',
@@ -69,7 +73,7 @@ export default {
 
         'inv-surf':    '#FFFFFF',
         'inv-on-surf': '#0A1526',
-        'inv-pri':     'var(--celeste)',
+        'inv-pri':     'var(--acento)',
       },
 
       fontFamily: {
@@ -119,6 +123,25 @@ export default {
       },
 
       fontSize: {
+        // ── ESCALA DE DISPLAY DEL SITIO PÚBLICO ──────────────────────
+        // Tres tamaños con nombre, y ninguno más. El tamaño va HORNEADO
+        // aquí, no escrito en cada JSX.
+        //
+        // Antes: la clase .display-mega definía peso y tracking pero NO
+        // tamaño, así que sus 24 usos resolvían el tamaño cada uno por
+        // su cuenta con `style={{fontSize:'clamp(...)'}}` -- 16 valores
+        // de clamp distintos. Cuatro secciones de Nosotros repetían el
+        // MISMO clamp carácter por carácter, y otras inventaban el suyo:
+        // cada sección decidía sin memoria de lo que se decidió dos
+        // archivos atrás, que es literalmente cómo trabaja un generador.
+        //
+        // Peso 700 y no 800: Arimo topa en 700 (ver el @font-face de
+        // index.css), así que declarar 800/900 pintaba el mismo trazo y
+        // fingía una jerarquía que la pantalla nunca cumplía.
+        'd1': ['clamp(2.75rem, 7vw, 6.5rem)', { lineHeight: '0.94', letterSpacing: '-0.045em', fontWeight: '700' }],
+        'd2': ['clamp(2.25rem, 5vw, 4rem)',   { lineHeight: '0.98', letterSpacing: '-0.035em', fontWeight: '700' }],
+        'd3': ['clamp(1.6rem, 3vw, 2.6rem)',  { lineHeight: '1.08', letterSpacing: '-0.02em',  fontWeight: '700' }],
+
         'display-l': ['clamp(4rem, 9vw, 8rem)',     { lineHeight: '0.92', letterSpacing: '-0.05em', fontWeight: '800' }],
         'display-m': ['clamp(3rem, 6vw, 5.5rem)',   { lineHeight: '0.95', letterSpacing: '-0.04em', fontWeight: '800' }],
         'display-s': ['clamp(2.25rem, 4vw, 3.5rem)', { lineHeight: '1.0',  letterSpacing: '-0.03em', fontWeight: '800' }],

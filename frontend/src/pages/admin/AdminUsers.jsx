@@ -101,7 +101,7 @@ function UserAvatar({ name }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
   </div>
 );
 
@@ -221,7 +221,7 @@ export default function AdminUsers() {
                   {u.role === 'leader' && (
                     <button
                       onClick={() => setCellModal(u)}
-                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-celeste hover:text-bg transition-colors font-mono"
+                      className="shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-lg border border-bg/10 text-label-m text-bg/50 hover:border-acento hover:text-bg transition-colors font-mono"
                       title="Editar código de célula"
                     >
                       {u.cell_code || 'Sin código'}

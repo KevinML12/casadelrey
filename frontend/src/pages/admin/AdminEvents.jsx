@@ -70,7 +70,7 @@ function EventForm({ initial, onSave, onCancel, loading }) {
             <div className="flex-1 min-w-0">
               <Input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')} />
             </div>
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-celeste/40 hover:text-bg'} text-bg/50`}>
+            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-acento/40 hover:text-bg'} text-bg/50`}>
               {uploading ? 'Subiendo…' : 'Subir'}
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
             </label>
@@ -89,12 +89,12 @@ function EventForm({ initial, onSave, onCancel, loading }) {
         <label className="flex items-center gap-2.5 cursor-pointer w-fit">
           <input type="checkbox" checked={form.requires_payment}
             onChange={e => setForm(p => ({ ...p, requires_payment: e.target.checked }))}
-            className="w-4 h-4 accent-celeste" />
+            className="w-4 h-4 accent-acento" />
           <span className="text-body-s text-bg">Este evento requiere pago</span>
         </label>
 
         {form.requires_payment && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-1 border-l-2 border-celeste/30 pl-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-1 border-l-2 border-acento/30 pl-4">
             <Input label="Precio (Q)" type="number" min="0" step="0.01" value={form.price_gtq} onChange={set('price_gtq')} />
             <Input label="Fecha límite de pago" type="date" value={form.payment_deadline} onChange={set('payment_deadline')} />
           </div>
@@ -113,7 +113,7 @@ function EventForm({ initial, onSave, onCancel, loading }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
   </div>
 );
 
@@ -165,7 +165,7 @@ function EventRSVPs({ eventId, onChanged }) {
 
   if (loading) return (
     <div className="px-5 pb-4 flex items-center gap-2 text-body-s text-bg/50">
-      <div className="w-4 h-4 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+      <div className="w-4 h-4 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
       Cargando confirmaciones…
     </div>
   );

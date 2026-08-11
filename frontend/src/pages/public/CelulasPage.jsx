@@ -30,10 +30,17 @@ const PRESS = {
 const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring shadow-card hover:opacity-90';
 const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
 
-// Mismo lenguaje que el glow de VolunteeringPage (halo ambiental por
-// categoría bajo el cursor) -- 4 acentos de la paleta + 1 violeta puntual
-// (no hay 5to tono semántico en tailwind.config.js, valor inline aquí).
-const CATEGORY_GLOW = ['#3B82F6', '#F43F5E', '#F59E0B', '#10B981', '#8B5CF6'];
+// Halo ambiental que se enciende bajo la categoría que tiene el cursor.
+// SIEMPRE el mismo tono (el acento único del sitio): lo que cambia al
+// pasar de una card a otra es la posición del halo, no su color.
+//
+// Antes era un arreglo de 5 colores asignados por índice -- y esos 5
+// resultaron ser literalmente la rampa 500 de Tailwind en su orden de
+// fábrica (blue, rose, amber, emerald, violet), duplicada verbatim aquí
+// y en VolunteeringPage. Un arcoíris repartido por posición de array no
+// comunica nada sobre la categoría: es color decorativo, que es justo
+// lo que el sitio no quiere.
+const GLOW = '#E8823C';
 
 const GROUPS_FALLBACK = [
   {
@@ -392,12 +399,6 @@ export default function CelulasPage() {
     [groups]
   );
 
-  // Color del halo ambiental por categoría -- mismo orden que se pinta.
-  const categoryGlow = useMemo(
-    () => Object.fromEntries(groups.map((g, i) => [g.key, CATEGORY_GLOW[i % CATEGORY_GLOW.length]])),
-    [groups]
-  );
-
   // Stats reales (nada inventado) -- mismo trío que el de Voluntariado
   // (~90 voluntarios / 10 departamentos / 20 líderes), adaptado a lo que
   // sí describe a Células: cuántas hay, cuántos grupos por edad, en
@@ -456,7 +457,7 @@ export default function CelulasPage() {
             className="pointer-events-none absolute inset-0 transition-opacity duration-500"
             style={{
               opacity: hoverCategory ? 0.5 : 0,
-              background: `radial-gradient(680px circle at 50% 10%, ${hoverCategory ? categoryGlow[hoverCategory] : '#3B82F6'}33, transparent 70%)`,
+              background: `radial-gradient(680px circle at 50% 10%, ${GLOW}33, transparent 70%)`,
             }}
           />
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">

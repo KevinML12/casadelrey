@@ -9,9 +9,9 @@
  */
 const colorMap = {
   default:   'bg-bg/6 border border-bg/12 text-bg/70',
-  primary:   'bg-celeste/12 border border-celeste/25 text-celeste',
+  primary:   'bg-acento/12 border border-acento/25 text-acento',
   secondary: 'bg-bg/6 border border-bg/12 text-bg',
-  tertiary:  'bg-celeste/10 border border-celeste/20 text-celeste',
+  tertiary:  'bg-acento/10 border border-acento/20 text-acento',
   error:     'bg-rose/10 border border-rose/25 text-rose',
 };
 

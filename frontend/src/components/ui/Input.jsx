@@ -1,7 +1,7 @@
 /**
  * Campos de formulario del panel — MODO CLARO estilo Apple.
  * Usan .input-light (index.css): blanco translúcido, hairline navy,
- * anillo celeste al enfocar. NO tocar .input-squircle (esa es la del
+ * anillo acento al enfocar. NO tocar .input-squircle (esa es la del
  * público sobre navy — Field/GlassField de Glass.jsx).
  */
 

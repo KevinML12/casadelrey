@@ -21,7 +21,7 @@ const EMPTY = { platform: 'instagram', post_url: '', caption: '', image_url: '',
 
 const Spinner = () => (
   <div className="flex justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
   </div>
 );
 
@@ -80,7 +80,7 @@ function Form({ initial, onSave, onCancel }) {
               className="text-label-m text-rose hover:underline">Cambiar imagen</button>
           </div>
         ) : (
-          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-celeste transition-colors">
+          <label className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-bg/10 cursor-pointer hover:border-acento transition-colors">
             <p className="text-body-s text-bg">{uploading ? 'Subiendo…' : 'Subir foto del post'}</p>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
           </label>
@@ -124,7 +124,7 @@ function Form({ initial, onSave, onCancel }) {
         <Input label="Orden (menor = primero)" type="number" value={form.sort_order} onChange={set('sort_order')} />
         <label className="flex items-end gap-2 text-body-s text-bg cursor-pointer pb-2">
           <input type="checkbox" checked={form.is_active} onChange={set('is_active')}
-            className="rounded accent-celeste w-4 h-4" />
+            className="rounded accent-acento w-4 h-4" />
           Visible en el sitio
         </label>
       </div>

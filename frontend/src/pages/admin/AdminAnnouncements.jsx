@@ -147,7 +147,7 @@ export default function AdminAnnouncements() {
       {/* List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
         </div>
       ) : items.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">

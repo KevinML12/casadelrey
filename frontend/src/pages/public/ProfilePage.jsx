@@ -86,7 +86,7 @@ export default function ProfilePage() {
                 <p className="text-20 font-bold text-white leading-tight truncate">{user?.name || 'Sin nombre'}</p>
                 <p className="text-14 text-white/60 truncate">{user?.email}</p>
                 <span className="inline-flex items-center gap-1.5 mt-2 bg-white/10 border border-white/15 text-white/80 px-2.5 py-0.5 rounded-full text-12 font-semibold capitalize">
-                  <span className="w-1.5 h-1.5 rounded-full bg-celeste" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-acento" />
                   {user?.role || 'usuario'} · cuenta activa
                 </span>
               </div>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
                       onClick={() => toggleGoal(g)}
                       aria-label={g.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
                       className={`w-6 h-6 rounded-full border-2 shrink-0 transition-colors focus-ring ${
-                        g.completed ? 'bg-celeste border-celeste text-white' : 'border-white/30 hover:border-white/60'
+                        g.completed ? 'bg-acento border-acento text-white' : 'border-white/30 hover:border-white/60'
                       }`}
                     />
                     <div className="flex-1 min-w-0">

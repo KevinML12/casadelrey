@@ -117,12 +117,12 @@ function bestMatch(areas, selectedTags) {
   return best;
 }
 
-// Halo ambiental detrás del grid que cambia de color según la categoría
-// bajo el cursor -- 4 acentos ya existentes en la paleta (rose/amber/
-// emerald/celeste) más un violeta puntual solo para esto (no hay 5to
-// tono semántico en tailwind.config.js, y usarlo aquí no exige agregar
-// uno -- es un valor inline, no una clase).
-const CATEGORY_GLOW = ['#3B82F6', '#F43F5E', '#F59E0B', '#10B981', '#8B5CF6'];
+// Halo ambiental que se enciende bajo la categoría con el cursor.
+// SIEMPRE el mismo tono (el acento único del sitio): lo que cambia al
+// pasar de una card a otra es la posición del halo, no su color. Ver la
+// nota gemela en CelulasPage.jsx -- antes ambos archivos duplicaban el
+// mismo arcoíris, que resultó ser la rampa 500 de Tailwind de fábrica.
+const GLOW = '#E8823C';
 
 // Departamento ya elegido (por WindowStack, o "sin preferencia" por
 // defecto) se muestra COMO DATO, no como un <select> abierto -- cambiar
@@ -456,10 +456,6 @@ export default function VolunteeringPage() {
     title: a.title,
   }));
 
-  // Color del halo ambiental por categoría -- mismo orden que se pinta,
-  // así el índice coincide con CATEGORY_GLOW.
-  const categoryGlow = Object.fromEntries(categoriesWithLeftover.map((c, i) => [c.name, CATEGORY_GLOW[i % CATEGORY_GLOW.length]]));
-
   // Índice global (no por categoría) para que el patrón de tamaños/
   // inclinaciones del collage varíe de verdad a lo largo de las 10
   // tarjetas, en vez de reiniciarse en cada categoría (donde 1-3 items
@@ -497,7 +493,7 @@ export default function VolunteeringPage() {
           className="pointer-events-none absolute inset-0 transition-opacity duration-500"
           style={{
             opacity: hoverCategory ? 0.5 : 0,
-            background: `radial-gradient(680px circle at 50% 20%, ${hoverCategory ? categoryGlow[hoverCategory] : '#3B82F6'}33, transparent 70%)`,
+            background: `radial-gradient(680px circle at 50% 20%, ${GLOW}33, transparent 70%)`,
           }}
         />
 

@@ -5,7 +5,7 @@ import StatCard from '../../components/ui/StatCard';
 
 const Spinner = () => (
   <div className="p-6 flex justify-center py-20">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/15 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/15 border-t-acento animate-spin" />
   </div>
 );
 

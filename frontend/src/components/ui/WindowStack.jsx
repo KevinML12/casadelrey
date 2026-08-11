@@ -116,7 +116,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
           />
 
           {/* Cerrar -- ya vivía fuera del contenido scrolleable (correcto).
-              Acento: el usuario pidió navy en vez de celeste, "invertido" --
+              Acento: el usuario pidió navy en vez de acento, "invertido" --
               aquí el contexto es oscuro/inmersivo (liquid-glass sobre foto),
               así que el relleno sólido que da contraste real es blanco con
               tinta navy (mismo pill primario del sitio público), no navy

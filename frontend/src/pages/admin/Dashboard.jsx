@@ -40,7 +40,7 @@ function SectionContainer({ label, children }) {
 
 const Spinner = () => (
   <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/12 border-t-celeste animate-spin" />
+    <div className="w-6 h-6 rounded-full border-2 border-bg/12 border-t-acento animate-spin" />
   </div>
 );
 
@@ -86,7 +86,7 @@ function TrendChart({ data, loading }) {
 
       {loading ? (
         <div className="h-[240px] flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/12 border-t-celeste animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/12 border-t-acento animate-spin" />
         </div>
       ) : (
         <div className="h-[240px] mt-3 -ml-2">
@@ -94,8 +94,8 @@ function TrendChart({ data, loading }) {
             <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--celeste)" stopOpacity={0.28} />
-                  <stop offset="100%" stopColor="var(--celeste)" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="var(--acento)" stopOpacity={0.28} />
+                  <stop offset="100%" stopColor="var(--acento)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid vertical={false} stroke="var(--bg)" strokeOpacity={0.08} />
@@ -109,7 +109,7 @@ function TrendChart({ data, loading }) {
               <Tooltip content={<TrendTooltip />} cursor={{ stroke: 'var(--bg)', strokeOpacity: 0.15 }} />
               <Area
                 yAxisId="amount" type="monotone" dataKey="donations_amount"
-                stroke="var(--celeste)" strokeWidth={2.5} fill="url(#trendFill)"
+                stroke="var(--acento)" strokeWidth={2.5} fill="url(#trendFill)"
               />
               <Line
                 yAxisId="users" type="monotone" dataKey="new_users"

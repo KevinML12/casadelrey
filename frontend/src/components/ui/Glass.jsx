@@ -163,20 +163,20 @@ export function Halos({ variant = 'hero' }) {
   if (variant === 'hero') {
     return (
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="halo" style={{ width: 640, height: 640, top: -180, right: -140, background: 'radial-gradient(circle, rgba(59,130,246,0.26), transparent 70%)' }} />
+        <div className="halo" style={{ width: 640, height: 640, top: -180, right: -140, background: 'radial-gradient(circle, rgba(232,130,60,0.22), transparent 70%)' }} />
         <div className="halo" style={{ width: 520, height: 520, top: '30%', left: -160, background: 'radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%)' }} />
-        <div className="halo" style={{ width: 520, height: 380, bottom: -200, left: '35%', background: 'radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%)' }} />
+        <div className="halo" style={{ width: 520, height: 380, bottom: -200, left: '35%', background: 'radial-gradient(circle, rgba(232,130,60,0.11), transparent 70%)' }} />
       </div>
     );
   }
-  /* ⚠️ Hubo una variante "mesh" (lavado multicolor celeste/esmeralda/
+  /* ⚠️ Hubo una variante "mesh" (lavado multicolor acento/esmeralda/
      rosa/ámbar por esquinas, jul-2026) — ELIMINADA a pedido del usuario:
      "los gradientes se ven horribles, se nota que están hechos por IA".
-     El ambiente del panel es monocromático (solo celeste), como el resto
+     El ambiente del panel es monocromático (solo acento), como el resto
      del sitio. No reintroducir fondos multicolor. */
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="halo" style={{ width: 480, height: 480, top: '10%', left: '-10%', background: 'radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%)' }} />
+      <div className="halo" style={{ width: 480, height: 480, top: '10%', left: '-10%', background: 'radial-gradient(circle, rgba(232,130,60,0.11), transparent 70%)' }} />
       <div className="halo" style={{ width: 420, height: 420, bottom: '-10%', right: '-6%', background: 'radial-gradient(circle, rgba(96,165,250,0.12), transparent 70%)' }} />
       {/* Tercer halo, centrado y más ancho: las cards glass-light (blancas)
           necesitan brillo real detrás para no leerse grises — los dos
@@ -191,9 +191,9 @@ export function Halos({ variant = 'hero' }) {
 /* ---------- Pill badge (chip) — sapphire tint. Sin ícono a propósito
    (ago-2026) -- solo texto, `icon` se ignora si algún caller viejo aún
    lo pasa. ---------- */
-export function Badge({ children, className = '', tone = 'celeste' }) {
-  const styles = tone === 'celeste'
-    ? 'bg-celeste-soft text-celeste-hov'
+export function Badge({ children, className = '', tone = 'acento' }) {
+  const styles = tone === 'acento'
+    ? 'bg-acento-soft text-acento-hov'
     : 'bg-bg-soft text-ink';
   return (
     <span className={`inline-flex items-center gap-2 rounded-pill px-3.5 py-1.5 text-12 font-bold tracking-tightish ${styles} ${className}`}>
@@ -203,7 +203,7 @@ export function Badge({ children, className = '', tone = 'celeste' }) {
 }
 
 /* ---------- Pill button (lenguaje actual del sitio) ----------
-   Antes: relleno bg-celeste plano + rounded-sm — sobreviviente del
+   Antes: relleno bg-acento plano + rounded-sm — sobreviviente del
    sistema S9 viejo, se leía "botón genérico de IA". La guía es clara:
    el material ES el acento, nada de colores planos. El primario del
    sitio es el pill BLANCO (como en el hero/Login), el secundario es

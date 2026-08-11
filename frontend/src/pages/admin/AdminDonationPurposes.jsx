@@ -129,7 +129,7 @@ export default function AdminDonationPurposes() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
         </div>
       ) : purposes.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">

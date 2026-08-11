@@ -75,9 +75,12 @@ function Field() {
 
   const geometry = useMemo(() => {
     const pos = [], col = [], size = [], phase = [];
-    const dim = new THREE.Color('#2A4A7E');
-    const mid = new THREE.Color('#6E96D8');
-    const hi  = new THREE.Color('#EAF2FF');
+    // Polvo de luz: navy neutro de base, con las motas medias en el
+    // cálido del acento. Antes eran tres azules (#2A4A7E/#6E96D8) que
+    // teñían de azul todo el ambiente del sitio.
+    const dim = new THREE.Color('#1B2C46');
+    const mid = new THREE.Color('#C08A5E');
+    const hi  = new THREE.Color('#FFF3E6');
     for (let i = 0; i < COUNT; i++) {
       pos.push(
         (Math.random() - 0.5) * 18,

@@ -68,7 +68,7 @@ export default function LeaderMyProfile() {
   if (loading || !form) {
     return (
       <div className="p-6 max-w-2xl mx-auto flex justify-center py-20">
-        <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-celeste animate-spin" />
+        <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
       </div>
     );
   }

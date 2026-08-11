@@ -9,7 +9,7 @@
 const TINTS = {
   pri: 'text-bg',
   sec: 'text-amber',
-  ter: 'text-celeste',
+  ter: 'text-acento',
   err: 'text-rose',
   ok:  'text-emerald',
 };

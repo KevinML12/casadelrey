@@ -54,7 +54,7 @@ function PageBtn({ num, active, onClick }) {
       onClick={() => onClick(num)}
       className={`w-9 h-9 rounded-full text-14 font-semibold transition-colors ${
         active
-          ? 'bg-celeste text-white'
+          ? 'bg-acento text-white'
           : 'text-bg/55 hover:bg-bg/6 hover:text-bg'
       }`}
     >

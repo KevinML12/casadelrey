@@ -4,7 +4,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    CASA DEL REY — LIQUID GLASS LIGHT MODE  ·  Apple HIG
-   Pure white canvas · Deep Navy ink · Sapphire celeste · Squircles
+   Pure white canvas · Deep Navy ink · Sapphire acento · Squircles
 ═══════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -21,11 +21,37 @@
   --ink-soft:     rgba(255, 255, 255, 0.05);   
   --ink-line:     rgba(255, 255, 255, 0.10);   
 
-  --celeste:      #3B82F6;      /* Sapphire — primary action */
-  --celeste-hov:  #60A5FA;      
-  --celeste-soft: #1E3A8A;      
-  --on-celeste:   #FFFFFF;
+  /* ── ACENTO ÚNICO ────────────────────────────────────────────────
+     Muestreado de las fotos reales de la iglesia: la luz cálida de
+     escenario que aparece en bg-ubicacion.jpg (#925D38 promedio de sus
+     píxeles cálidos), albums/alabanza.jpg (#A38B69) y bg-hero.jpg
+     (#B18768). #E8823C es esa familia llevada a saturación de acento.
 
+     Antes aquí vivían --acento/--rose/--amber/--emerald con los
+     valores #3B82F6 / #F43F5E / #F59E0B / #10B981: los cinco eran
+     EXACTAMENTE la rampa 500 de Tailwind sin tocar (blue-500,
+     rose-500, amber-500, emerald-500, violet-500), y --ink-2/--ink-3
+     eran slate-400/slate-600. Nadie elige cinco colores y aterriza en
+     el stop 500 cinco veces seguidas: era el default del starter, no
+     una decisión, y es lo primero que delata a un sitio generado.
+
+     Contraste verificado: 6.70:1 contra el canvas navy en ambas
+     direcciones (el azul anterior daba 4.97:1, o sea que además de
+     genérico era peor).
+
+     El acento tiene CUATRO trabajos y ninguno más: link activo del
+     header, borde de la cita bíblica, halo de hover de las cards de
+     categoría, y el día del evento destacado. El CTA primario sigue
+     siendo BLANCO sobre navy (18:1) -- no se pinta de acento. */
+  --acento:      #E8823C;
+  --acento-hov:  #F2A03D;
+  --acento-soft: #4A2609;
+  --on-acento:   #FFFFFF;
+
+  /* Estados de formulario. NO son colores de diseño: solo se usan para
+     comunicar error/aviso/éxito, nunca para decorar. Por eso conservan
+     los valores estándar -- en un estado de error, la convención vale
+     más que la personalidad. */
   --rose:         #F43F5E;
   --rose-soft:    #881337;
   --amber:        #F59E0B;
@@ -48,9 +74,9 @@
                 0 2px 6px rgba(10, 21, 38, 0.04);
   --sh-card-lg: 0 24px 60px -20px rgba(10, 21, 38, 0.18),
                 0 4px 12px rgba(10, 21, 38, 0.04);
-  --sh-pop:     0 24px 60px -16px rgba(59, 130, 246, 0.32),
+  --sh-pop:     0 24px 60px -16px rgba(232, 130, 60, 0.32),
                 0 6px 16px rgba(10, 21, 38, 0.08);
-  --sh-ring:    0 0 0 4px rgba(59, 130, 246, 0.18);
+  --sh-ring:    0 0 0 4px rgba(232, 130, 60, 0.18);
 
   /* ── MOTION (Spring) ─────────────────────────────────────────── */
   --ease-spring:   cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -58,21 +84,21 @@
   --ease-out:      cubic-bezier(0, 0, 0.2, 1);
 
   /* ── TOKENS LEGACY (compat) ──────────────────────────────────── */
-  --pri:         var(--celeste);
-  --pri-press:   var(--celeste-hov);
-  --on-pri:      var(--on-celeste);
-  --pri-con:     var(--celeste-soft);
-  --on-pri-con:  var(--celeste-hov);
+  --pri:         var(--acento);
+  --pri-press:   var(--acento-hov);
+  --on-pri:      var(--on-acento);
+  --pri-con:     var(--acento-soft);
+  --on-pri-con:  var(--acento-hov);
 
   --sec:         var(--ink);
   --on-sec:      #FFFFFF;
   --sec-con:     var(--bg-soft);
   --on-sec-con:  var(--ink);
 
-  --ter:         var(--celeste);
+  --ter:         var(--acento);
   --on-ter:      #FFFFFF;
-  --ter-con:     var(--celeste-soft);
-  --on-ter-con:  var(--celeste-hov);
+  --ter-con:     var(--acento-soft);
+  --on-ter-con:  var(--acento-hov);
 
   --err:         var(--rose);
   --on-err:      #FFFFFF;
@@ -98,7 +124,7 @@
 
   --inv-surf:    var(--ink);
   --inv-on-surf: #FFFFFF;
-  --inv-pri:     var(--celeste);
+  --inv-pri:     var(--acento);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -151,7 +177,7 @@ html.lenis, html.lenis body { height: auto; }
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.01em;
   }
-  ::selection { background: rgba(59, 130, 246, 0.22); color: var(--ink); }
+  ::selection { background: rgba(232, 130, 60, 0.26); color: var(--ink); }
   a { text-decoration: none; color: inherit; }
 
   /* Editorial display: massive + tight */
@@ -246,7 +272,7 @@ html.lenis, html.lenis body { height: auto; }
        fondo (foto sigue legible, blur bajo 8px) sino del MODELADO de la
        luz en un cristal grueso, todo con box-shadow:
         · bisel: luz en el borde arriba-izq, sombra abajo-der → espesor
-        · realce celeste inferior: como el agua/vidrio concentra la luz en
+        · realce acento inferior: como el agua/vidrio concentra la luz en
           su borde de abajo (el detalle que lo hace leer como "gota")
         · hairline superior: filo brillante donde pega la luz
         · sombra externa: lo despega del fondo, flota */
@@ -256,7 +282,7 @@ html.lenis, html.lenis body { height: auto; }
     border: 1px solid rgba(255, 255, 255, 0.11);
     /* Monocromático a propósito (mismo tono que el .glass-light claro):
        el modelado es sólo blanco/neutro — bisel + realce inferior tenue —
-       nada de tinte celeste, para que el cristal se sienta sobrio y
+       nada de tinte acento, para que el cristal se sienta sobrio y
        uniforme, no colorido. */
     box-shadow:
       inset 1.5px 2.5px 5px rgba(255, 255, 255, 0.26),
@@ -289,7 +315,7 @@ html.lenis, html.lenis body { height: auto; }
        el "ves a través" que sí tiene esta misma clase en el dropdown del
        header público (que el usuario señaló como referencia).
        v4 (actual): el panel admin YA NO es navy — es bg-paper claro
-       (ver .admin-light) más los halos celestes. Ya no hay nada oscuro
+       (ver .admin-light) más los halos acentos. Ya no hay nada oscuro
        detrás que ensuciar, así que se puede bajar la opacidad de vuelta
        a un rango translúcido de verdad sin repetir el problema de v2. */
     background: linear-gradient(155deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.42) 55%, rgba(255,255,255,0.28) 100%);
@@ -354,6 +380,46 @@ html.lenis, html.lenis body { height: auto; }
       inset -1px -1px 4px rgba(255, 255, 255, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.82),
       0 14px 30px -14px rgba(10, 21, 38, 0.22);
+  }
+
+  /* ── SCRIMS ────────────────────────────────────────────────────────
+     Las capas oscuras que van SOBRE una foto para que el texto encima
+     se lea. Tres, con nombre, y ninguna más.
+
+     Antes esto vivía como 25 gradientes inline distintos escritos a
+     mano (`from-bg via-bg/25|/35|/40|/45|/50|/55|/60|/75 to-bg|/5|/10|
+     transparent`), casi todos usados una sola vez: cuatro secciones
+     consecutivas de Nosotros tenían cuatro valores medios distintos
+     haciendo exactamente lo mismo. Nadie los comparó nunca porque cada
+     sección se escribió por separado -- y esa falta de sistema es
+     justo lo que hace que el sitio no se sienta construido.
+
+     La otra mitad del problema: además del scrim, la foto llevaba
+     `opacity-45` encima, así que llegaba al visitante entre el 14% y
+     el 33% de su color real. Las caras de la congregación -- lo único
+     irrepetible que tiene este sitio -- se leían como textura gris.
+     REGLA: la foto va a opacidad 100 y el contraste lo pone el scrim,
+     que solo oscurece DONDE hay texto. */
+
+  /* Bajo un titular centrado (PageHero): óvalo oscuro en el centro y
+     desvanecido al canvas abajo, para que la foto respire en los bordes. */
+  .scrim-hero {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(62% 55% ellipse at 50% 42%, rgba(10,21,38,.86), rgba(10,21,38,0) 72%),
+      linear-gradient(to bottom, rgba(10,21,38,.55) 0%, rgba(10,21,38,0) 28%, rgba(10,21,38,0) 60%, var(--bg) 100%);
+  }
+  /* Texto anclado al tercio inferior. Es el valor que PhotoHeaderCard ya
+     usaba y que funciona -- aquí solo se le pone nombre. */
+  .scrim-card {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, var(--bg) 0%, rgba(10,21,38,.75) 38%, rgba(10,21,38,.10) 100%);
+  }
+  /* Texto a un lado (composición en banda): oscurece a la izquierda y
+     deja la foto entera visible a la derecha. */
+  .scrim-band {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to right, var(--bg) 0%, rgba(10,21,38,.62) 42%, rgba(10,21,38,.10) 100%);
   }
 
   /* Brillo especular interactivo — sigue al cursor vía --spec-x/--spec-y
@@ -455,7 +521,7 @@ html.lenis, html.lenis body { height: auto; }
     border-radius: 20px;
   }
 
-  /* Focus ring de marca (celeste con halo suave) */
+  /* Focus ring de marca (acento con halo suave) */
   .focus-ring:focus-visible {
     outline: none;
     box-shadow: var(--sh-ring);
@@ -495,7 +561,7 @@ html.lenis, html.lenis body { height: auto; }
     speak: never;
   }
 
-  /* Decorative — orbe ambiental celeste muy suave (subtle "luz") */
+  /* Decorative — orbe ambiental acento muy suave (subtle "luz") */
   .halo {
     position: absolute;
     border-radius: 9999px;
@@ -515,7 +581,7 @@ html.lenis, html.lenis body { height: auto; }
   }
 
   /* Editorial gradient text */
-  .text-grad-celeste {
+  .text-grad-acento {
     background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
     -webkit-background-clip: text;
             background-clip: text;
@@ -559,7 +625,7 @@ html.lenis, html.lenis body { height: auto; }
   .input-light:focus {
     outline: none;
     background: #FFFFFF;
-    border-color: var(--celeste);
+    border-color: var(--acento);
     box-shadow: var(--sh-ring);
   }
 
@@ -578,7 +644,7 @@ html.lenis, html.lenis body { height: auto; }
   .input-squircle:focus {
     outline: none;
     background: var(--bg-tint);
-    border-color: var(--celeste);
+    border-color: var(--acento);
     box-shadow: var(--sh-ring);
   }
 
@@ -596,14 +662,14 @@ html.lenis, html.lenis body { height: auto; }
   .animate-hero-5   { animation: riseSpring 700ms var(--ease-spring) 600ms both; }
 
   /* Resalta la card de evento tras un deep-link (Home → /events?id=).
-     Anillo azul (--celeste) con glow, no blanco -- un anillo blanco se
+     Anillo azul (--acento) con glow, no blanco -- un anillo blanco se
      perdia contra las cards claras (glass-light). Pulsa 2 veces para que
      sea imposible de perder aunque el usuario ya este mirando otra parte
      de la pantalla al terminar el scroll. */
   @keyframes eventHighlightPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.9), 0 0 0 0 rgba(59, 130, 246, 0.5); }
-    50%  { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.55), 0 0 70px 16px rgba(59, 130, 246, 0.45); }
-    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0), 0 0 0 0 rgba(59, 130, 246, 0); }
+    0%   { box-shadow: 0 0 0 0 rgba(232, 130, 60, 0.9), 0 0 0 0 rgba(232, 130, 60, 0.5); }
+    50%  { box-shadow: 0 0 0 8px rgba(232, 130, 60, 0.55), 0 0 70px 16px rgba(232, 130, 60, 0.45); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 130, 60, 0), 0 0 0 0 rgba(232, 130, 60, 0); }
   }
   .event-highlight { animation: eventHighlightPulse 1.3s ease-out 2; }
 }
@@ -651,7 +717,7 @@ html.lenis, html.lenis body { height: auto; }
 .prose ol { list-style: decimal; }
 .prose li { margin-bottom: .375rem; }
 .prose blockquote {
-  border-left: 3px solid var(--celeste);
+  border-left: 3px solid var(--acento);
   padding: .5rem 0 .5rem 1.5rem;
   color: var(--ink);
   font-style: italic;
