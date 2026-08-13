@@ -37,6 +37,7 @@ export default function CellReportForm({ onSuccess }) {
     ...EMPTY,
     leader_name: user?.role === 'leader' ? (user?.name || '') : '',
     cell_code:   user?.cell_code || '',
+    cell_id:     user?.cell_id || null,
     cell_type:   user?.cell_type || leaderParsed.type || '',
   });
   const [submitted,  setSubmitted]  = useState(false);

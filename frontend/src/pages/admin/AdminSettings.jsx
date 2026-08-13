@@ -46,6 +46,21 @@ export default function AdminSettings() {
     } finally { setSaving(null); }
   };
 
+  const handlePhotoUpload = async (key, file) => {
+    if (!file) return;
+    setSaving(key);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setDraft(d => ({ ...d, [key]: res.data.url }));
+      await apiClient.put(`/admin/settings/${key}`, { value: res.data.url });
+      toast.success('Fondo guardado');
+      load();
+    } catch { toast.error('Error al subir foto'); }
+    finally { setSaving(null); }
+  };
+
   const accountMissing = settings.find(s => s.key === 'bank_account')?.using_default;
 
   return (
@@ -75,28 +90,43 @@ export default function AdminSettings() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {settings.map(s => (
             <div key={s.key} className="p-4 sm:p-5 hover:bg-bg/6 transition-colors">
-              <div className="flex gap-2 items-end">
-                <div className="flex-1 min-w-0">
-                  <Input
-                    label={<>{s.label}{s.using_default && s.value === '' && (
-                      <span className="ml-2 text-label-s text-amber">· sin configurar</span>
-                    )}</>}
-                    value={draft[s.key] ?? ''}
-                    onChange={e => setDraft(d => ({ ...d, [s.key]: e.target.value }))}
-                    placeholder={s.value || 'Escribe el valor…'}
-                  />
+              {s.key.endsWith('_bg') ? (
+                <div className="flex flex-col gap-3">
+                  <p className="text-label-l text-bg font-semibold">{s.label}</p>
+                  <div className="flex items-center gap-4">
+                    {(draft[s.key] || s.value) && (
+                      <img src={draft[s.key] || s.value} alt="bg" className="h-16 w-24 object-cover rounded-xl border border-bg/10 shadow-sm" />
+                    )}
+                    <label className={`flex items-center justify-center h-10 px-4 rounded-xl border border-bg/10 text-label-m font-bold cursor-pointer transition-colors ${saving === s.key ? 'opacity-50' : 'hover:border-bg/30 hover:bg-bg/5'} text-bg/70`}>
+                      {saving === s.key ? 'Subiendo…' : 'Cambiar foto'}
+                      <input type="file" accept="image/*" className="hidden" onChange={e => handlePhotoUpload(s.key, e.target.files[0])} disabled={saving === s.key} />
+                    </label>
+                  </div>
                 </div>
-                <Button
-                  variant="filled"
-                  onClick={() => save(s.key)}
-                  disabled={saving === s.key || (draft[s.key] ?? '') === s.value}
-                  className="shrink-0"
-                >
-                  {saving === s.key ? '…' : 'Guardar'}
-                </Button>
-              </div>
+              ) : (
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1 min-w-0">
+                    <Input
+                      label={<>{s.label}{s.using_default && s.value === '' && (
+                        <span className="ml-2 text-label-s text-amber">· sin configurar</span>
+                      )}</>}
+                      value={draft[s.key] ?? ''}
+                      onChange={e => setDraft(d => ({ ...d, [s.key]: e.target.value }))}
+                      placeholder={s.value || 'Escribe el valor…'}
+                    />
+                  </div>
+                  <Button
+                    variant="filled"
+                    onClick={() => save(s.key)}
+                    disabled={saving === s.key || (draft[s.key] ?? '') === s.value}
+                    className="shrink-0"
+                  >
+                    {saving === s.key ? '…' : 'Guardar'}
+                  </Button>
+                </div>
+              )}
               {HINTS[s.key] && (
-                <p className="text-label-s text-bg/50 mt-1.5">{HINTS[s.key]}</p>
+                <p className="text-label-s text-bg/50 mt-2">{HINTS[s.key]}</p>
               )}
             </div>
           ))}

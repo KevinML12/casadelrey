@@ -57,7 +57,7 @@ export default Button;
 export function IconButton({ children, variant = 'standard', className = '', ...props }) {
   const variantCls = {
     standard: 'bg-transparent text-bg/55 hover:text-bg hover:bg-bg/8',
-    filled:   'bg-acento text-white hover:bg-acento-hov',
+    filled:   'bg-acento text-bg hover:bg-acento-hov',
     tonal:    'glass-light text-bg',
     outlined: 'bg-transparent text-bg border border-bg/20 hover:bg-bg/5',
   }[variant];
@@ -89,7 +89,7 @@ export function FAB({ children, size = 'md', className = '', ...props }) {
     <button
       className={
         'inline-flex items-center justify-center gap-2 border-none ' +
-        'bg-acento text-white cursor-pointer btn-spring ' +
+        'bg-acento text-bg cursor-pointer btn-spring ' +
         'shadow-pop ' +
         `${sizeCls} ${className}`
       }

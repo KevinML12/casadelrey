@@ -334,6 +334,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminOrLeader.GET("/cell-reports",       cellReportHandler.GetAllCellReports)
 	adminOrLeader.GET("/cell-reports/stats", cellReportHandler.GetCellStats)
 
+	volunteerReportHandler := handlers.NewVolunteerReportHandler(db)
+	adminOrLeader.POST("/volunteer-reports",      volunteerReportHandler.CreateVolunteerReport)
+	adminOrLeader.GET("/volunteer-reports",       volunteerReportHandler.GetAllVolunteerReports)
+	adminOrLeader.PUT("/volunteer-reports/:id/approve", volunteerReportHandler.ApproveReport)
+
 	// Tarjetas de conexión — admin y líder ven la lista y dan seguimiento
 	adminOrLeader.GET("/connect-cards",     connectCardHandler.GetAll)
 	adminOrLeader.PUT("/connect-cards/:id", connectCardHandler.Update)

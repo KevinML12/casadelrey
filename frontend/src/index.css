@@ -43,10 +43,10 @@
      header, borde de la cita bíblica, halo de hover de las cards de
      categoría, y el día del evento destacado. El CTA primario sigue
      siendo BLANCO sobre navy (18:1) -- no se pinta de acento. */
-  --acento:      #E8823C;
-  --acento-hov:  #F2A03D;
-  --acento-soft: #4A2609;
-  --on-acento:   #FFFFFF;
+  --acento:      #FFFFFF;
+  --acento-hov:  #F8FAFC;
+  --acento-soft: #0F192B;
+  --on-acento:   #0B1320;
 
   /* Estados de formulario. NO son colores de diseño: solo se usan para
      comunicar error/aviso/éxito, nunca para decorar. Por eso conservan

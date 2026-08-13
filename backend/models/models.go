@@ -254,6 +254,24 @@ type CellReport struct {
 	ApprovedAt   *time.Time `json:"approved_at"`
 }
 
+type VolunteerReport struct {
+	gorm.Model
+	// Identificación
+	VolunteerID   *uint  `json:"volunteer_id" gorm:"index"`
+	VolunteerName string `json:"volunteer_name" gorm:"type:varchar(100);not null"`
+	Area          string `json:"area" gorm:"type:varchar(50);not null"`
+	ServiceDate   string `json:"service_date" gorm:"type:varchar(20);not null"`
+	LeaderName    string `json:"leader_name" gorm:"type:varchar(100)"`
+	// Detalles
+	TeamAttendance int    `json:"team_attendance" gorm:"default:0"`
+	Notes          string `json:"notes" gorm:"type:text"`
+	PhotoURL       string `json:"photo_url" gorm:"type:varchar(500)"`
+	// Aprobación
+	Status       string     `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|aprobado|rechazado
+	ApprovedByID *uint      `json:"approved_by_id" gorm:"index"`
+	ApprovedAt   *time.Time `json:"approved_at"`
+}
+
 type UserGoal struct {
 	gorm.Model
 	UserID      uint       `json:"user_id" gorm:"not null;index"`

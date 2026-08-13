@@ -3,11 +3,12 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
+import { useVolunteerAreas } from '../../lib/volunteerAreas';
 
 const STATUS_CHIP = {
   pendiente:      { label: 'Pendiente',      cls: 'bg-bg/8 text-bg/50' },
-  asignado:       { label: 'Asignado',       cls: 'bg-acento text-white' },
-  coordinando:    { label: 'Coordinando',    cls: 'bg-amber text-white' },
+  asignado:       { label: 'Asignado',       cls: 'bg-acento text-bg' },
+  activo:         { label: 'Activo',         cls: 'bg-emerald text-white' },
   usuario_creado: { label: 'Usuario creado', cls: 'bg-emerald text-white' },
 };
 
@@ -18,6 +19,7 @@ const Spinner = () => (
 );
 
 export default function LeaderVolunteers() {
+  const areas = useVolunteerAreas();
   const [volunteers,   setVolunteers]   = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [createModal,  setCreateModal]  = useState(null);
@@ -59,6 +61,7 @@ export default function LeaderVolunteers() {
         <div className="space-y-3">
           {volunteers.map(v => {
             const chip = STATUS_CHIP[v.status] || STATUS_CHIP.pendiente;
+            const deptLabel = areas.find(a => a.value === v.department)?.title || v.department || v.area;
             return (
               <div key={v.ID} className="glass-light rounded-[20px] card-spring p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -70,9 +73,9 @@ export default function LeaderVolunteers() {
                       </span>
                     </div>
                     <p className="text-label-s text-bg/50">{v.email}</p>
-                    {v.phone   && <p className="text-label-s text-bg/50">{v.phone}</p>}
-                    {v.area    && <p className="text-body-s text-bg mt-0.5">Área: <strong>{v.area}</strong></p>}
-                    {v.message && <p className="text-body-s text-bg/50 mt-1 line-clamp-2">{v.message}</p>}
+                    {v.phone     && <p className="text-label-s text-bg/50">{v.phone}</p>}
+                    {deptLabel   && <p className="text-body-s text-bg mt-0.5">Área: <strong>{deptLabel}</strong></p>}
+                    {v.message   && <p className="text-body-s text-bg/50 mt-1 line-clamp-2">{v.message}</p>}
                   </div>
                   {v.status !== 'usuario_creado' && (
                     <button

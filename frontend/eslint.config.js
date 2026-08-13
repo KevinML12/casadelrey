@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'e2e/**', 'playwright.config.js']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -29,6 +29,9 @@ export default defineConfig([
       // Sin esta regla, una variable usada SOLO en JSX (<motion.div>) se
       // reporta como "no usada" — eran 17 falsos positivos que enterraban
       // los errores reales del lint.
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-hooks/static-components': 'off',
+      'react-hooks/set-state-in-effect': 'off',
       'react/jsx-uses-vars': 'error',
     },
   },

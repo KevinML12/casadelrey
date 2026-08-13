@@ -462,7 +462,7 @@ function HeroCarousel({ onPlan }) {
 // ════════════════════════════════════════════════════════════════════
 function AnnouncementsBar() {
   const data = useApi('/announcements');
-  const now = Date.now();
+  const [now] = useState(() => Date.now());
   const list = (Array.isArray(data) ? data : [])
     .filter(a => !a.expires_at || new Date(a.expires_at).getTime() > now)
     .slice(0, 2);
@@ -707,7 +707,7 @@ function CelulasSection() {
                       único irrepetible que tiene el sitio. El texto se lee por
                       el scrim anclado abajo, no por apagar la imagen. */}
                   <div className="absolute inset-0 rounded-[22px] overflow-hidden">
-                    <img src={cat.image_url} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
+                    <img src={cat.image_url || '/images/nosotros/comunidad.jpg'} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
                     <div className="scrim-card" />
                   </div>
                   <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">

@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import App from './App';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import AdminLayout from './components/layout/AdminLayout';
+import PageFallback from './components/ui/PageFallback';
 
 // Páginas públicas (eager — sin dependencias pesadas)
 import Home             from './pages/public/Home';
@@ -31,14 +32,6 @@ const PaymentSuccess = lazy(() => import('./pages/public/PaymentSuccess'));
 // loading state). Antes esta pantalla de carga era SIEMPRE oscura, así
 // que cada navegación lazy dentro del panel mostraba un destello
 // oscuro→claro antes de revelar la página real.
-function PageFallback({ panel = false }) {
-  return (
-    <div className={`min-h-screen flex items-center justify-center ${panel ? 'bg-paper' : 'bg-surf'}`}>
-      <div className={`w-7 h-7 rounded-full border-2 border-t-pri animate-spin ${panel ? 'border-bg/12' : 'border-outline-var'}`} />
-    </div>
-  );
-}
-
 // Páginas admin — lazy para reducir bundle inicial
 const AdminIndex         = lazy(() => import('./pages/admin/AdminIndex'));
 const AdminUsers         = lazy(() => import('./pages/admin/AdminUsers'));
@@ -184,6 +177,7 @@ export const router = createBrowserRouter([
       { path: 'donate',                element: <Suspense fallback={<PageFallback />}><DonatePage /></Suspense> },
       { path: 'payment-success',       element: <Suspense fallback={<PageFallback />}><PaymentSuccess /></Suspense> },
       { path: 'volunteering',          element: <VolunteeringPage /> },
+      { path: 'voluntariado',          element: <Navigate to="/volunteering" replace /> },
       { path: 'comprobante',           element: <Suspense fallback={<PageFallback />}><ReceiptPage /></Suspense> },
       { path: 'profile',               element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
       { path: 'login',                 element: <Login /> },

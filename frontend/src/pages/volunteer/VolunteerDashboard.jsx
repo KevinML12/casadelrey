@@ -6,7 +6,8 @@ import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import StatCard from '../../components/ui/StatCard';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
-
+import VolunteerReportForm from '../../components/sections/VolunteerReportForm';
+import ModalWrapper from '../../components/ui/ModalWrapper';
 const Spinner = () => (
   <div className="flex items-center justify-center py-12">
     <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
@@ -103,6 +104,7 @@ export default function VolunteerDashboard() {
   const [goals,     setGoals]     = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [showForm,  setShowForm]  = useState(false);
+  const [showReportForm, setShowReportForm] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -223,13 +225,34 @@ export default function VolunteerDashboard() {
       )}
 
       {/* Stats rápidas */}
+      <div className="flex items-center justify-between mb-4 mt-8">
+        <h2 className="text-title-l text-bg font-bold">Resumen</h2>
+        <Button variant="filled" size="sm" onClick={() => setShowReportForm(true)}>
+          Nuevo Reporte
+        </Button>
+      </div>
+      
+      {showReportForm && (
+        <ModalWrapper>
+          <div className="bg-paper rounded-3xl p-6 sm:p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in shadow-xl">
+            <button
+              onClick={() => setShowReportForm(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg/5 flex items-center justify-center text-bg/50 hover:text-bg hover:bg-bg/10 transition-colors"
+            >
+              ✕
+            </button>
+            <VolunteerReportForm onSuccess={() => setShowReportForm(false)} />
+          </div>
+        </ModalWrapper>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         <StatCard icon="task_alt" label="Pendientes" value={pending} tint="pri" />
         <StatCard icon="check_circle" label="Completadas" value={completed} tint="ok" />
       </div>
 
       {/* Mis metas */}
-      <section>
+      <section className="mt-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-title-l text-bg font-bold">Mis metas</h2>
           <Button variant="filled" size="sm" onClick={() => setShowForm(s => !s)}>

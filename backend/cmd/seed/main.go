@@ -44,7 +44,7 @@ func main() {
 	if err != nil { log.Fatalf("Error BD: %v", err) }
 
 	db.AutoMigrate(
-		&models.User{}, &models.Post{}, &models.Event{}, &models.CellReport{},
+		&models.User{}, &models.Post{}, &models.Event{}, &models.CellReport{}, &models.VolunteerReport{},
 		&models.MemberBoleta{}, &models.Volunteer{}, &models.Announcement{},
 		&models.GalleryPhoto{}, &models.Donation{}, &models.Petition{},
 		&models.EventRegistration{}, &models.SocialPost{}, &models.UserGoal{},

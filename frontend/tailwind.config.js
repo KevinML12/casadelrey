@@ -17,9 +17,9 @@ export default {
         // (luz cálida de escenario). Ver el bloque ACENTO ÚNICO de
         // index.css para el porqué: los valores anteriores eran la
         // rampa 500 de Tailwind sin tocar.
-        'acento':      '#E8823C',
-        'acento-hov':  '#F2A03D',
-        'acento-soft': '#4A2609',
+        'acento':      'var(--acento)',
+        'acento-hov':  'var(--acento-hov)',
+        'acento-soft': 'var(--acento-soft)',
 
         // Canvas CLARO del panel admin/líder/voluntario (jul-2026): el
         // panel es modo claro estilo Apple (tinta navy sobre off-white);

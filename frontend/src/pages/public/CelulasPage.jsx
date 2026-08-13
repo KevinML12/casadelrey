@@ -822,11 +822,11 @@ export default function CelulasPage() {
     const cellsByType = {};
     (Array.isArray(apiCells) ? apiCells : []).forEach(c => {
       const t = (c.type || '').toLowerCase();
-      (cellsByType[t] ||= []).push({ name: c.name, leader: c.leader, zone: c.zone, code: c.code, description: c.description });
+      (cellsByType[t] ||= []).push({ ...c, id: c.id || c.ID });
     });
 
     const base = cats.map(cat => ({
-      key: `cat-${cat.ID}`,
+      key: `cat-${cat.ID || cat.id}`,
       name: cat.name,
       age: cat.age_group,
       // La descripción la escribe el dueño en el panel y es el único texto

@@ -133,7 +133,7 @@ export default function ProfilePage() {
                       onClick={() => toggleGoal(g)}
                       aria-label={g.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
                       className={`w-6 h-6 rounded-full border-2 shrink-0 transition-colors focus-ring ${
-                        g.completed ? 'bg-acento border-acento text-white' : 'border-white/30 hover:border-white/60'
+                        g.completed ? 'bg-acento border-acento text-bg' : 'border-white/30 hover:border-white/60'
                       }`}
                     />
                     <div className="flex-1 min-w-0">

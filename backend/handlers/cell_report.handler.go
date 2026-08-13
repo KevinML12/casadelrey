@@ -23,6 +23,7 @@ func NewCellReportHandler(db *gorm.DB) *CellReportHandler {
 // CreateCellReport POST /api/v1/admin/cell-reports — admin o líder.
 func (h *CellReportHandler) CreateCellReport(c echo.Context) error {
 	var req struct {
+		CellID         *uint   `json:"cell_id"`
 		CellCode       string  `json:"cell_code"`
 		CellName       string  `json:"cell_name"`
 		CellType       string  `json:"cell_type"`
@@ -41,6 +42,7 @@ func (h *CellReportHandler) CreateCellReport(c echo.Context) error {
 		Notes          string  `json:"notes"`
 	}
 
+
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos."})
 	}
@@ -57,6 +59,7 @@ func (h *CellReportHandler) CreateCellReport(c echo.Context) error {
 	}
 
 	r := models.CellReport{
+		CellID:         req.CellID,
 		CellCode:       req.CellCode,
 		CellName:       req.CellName,
 		CellType:       req.CellType,
