@@ -236,7 +236,7 @@ function HeroCarousel({ onPlan }) {
   const cardFade  = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section ref={heroRef} id="inicio" className="relative h-[100svh] overflow-hidden bg-bg">
+    <section ref={heroRef} id="inicio" className="relative h-[100svh] overflow-hidden">
       {/* Carril horizontal REAL: cada slide es una ventana de 100vw que se
           navega deslizando (touch, trackpad, scrollbar) — no solo con los
           dots. El wrapper externo lleva el parallax de scroll de página
@@ -470,7 +470,7 @@ function AnnouncementsBar() {
   if (list.length === 0) return null;
 
   return (
-    <section className="relative bg-bg border-t border-white/5 py-10">
+    <section className="relative border-t border-white/5 py-10">
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-4">
         {list.map((a, i) => (
           <Reveal key={a.ID} delay={i * 0.08}>
@@ -534,7 +534,7 @@ function Agenda({ bg }) {
   const others = events.slice(1, 4);
 
   return (
-    <section id="agenda" className="relative min-h-[80svh] bg-bg overflow-hidden flex items-center border-t border-white/5">
+    <section id="agenda" className="relative min-h-[80svh] overflow-hidden flex items-center border-t border-white/5">
       {/* La foto va a plena fuerza: el contraste lo pone el scrim en banda,
           que oscurece la columna izquierda (donde vive el texto) y deja la
           foto entera a la derecha, debajo del panel. Antes la imagen llegaba
@@ -651,7 +651,7 @@ function CelulasSection() {
     // compite. El ritmo de la página lo hace la alternancia "sección CON foto
     // entera / sección sobre canvas limpio" — cuando todas llevan foto al 50%,
     // ninguna significa nada.
-    <section id="celulas" className="relative py-28 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
+    <section id="celulas" className="relative py-28 md:py-36 border-t border-white/5 overflow-hidden">
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* El titular es el ancla fija; lo que se revela al entrar son las
             cards de abajo, que llegan por debajo de él. */}
@@ -772,7 +772,7 @@ function MensajesCarousel() {
     // Sobre canvas limpio, igual que Células y por la misma razón: el carril
     // de abajo ya son puras portadas fotográficas. La foto ambiental detrás
     // solo restaba contraste a las que sí importan.
-    <section id="mensajes" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+    <section id="mensajes" className="relative py-20 md:py-32 border-t border-white/5 overflow-hidden">
       {/* El titular queda quieto; lo que entra al hacer scroll es el carril. */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
@@ -835,7 +835,7 @@ const NETWORKS = [
 // ════════════════════════════════════════════════════════════════════
 function Ubicacion({ bg }) {
   return (
-    <section id="ubicacion" className="relative py-24 md:py-36 bg-bg border-t border-white/5 overflow-hidden">
+    <section id="ubicacion" className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
       {/* Foto entera del templo, con el scrim anclado abajo: el contenido
           (titular + tarjetas) vive en el tercio inferior y ahí es donde
           oscurece. Antes la foto llegaba al 50% y encima un degradado propio. */}
@@ -957,7 +957,7 @@ function GalleryPreviewSection() {
   const topAlbums = Object.entries(albums).slice(0, 4); // Tomar solo los primeros 4 para el preview
 
   return (
-    <section id="galeria-preview" className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+    <section id="galeria-preview" className="relative py-20 md:py-32 border-t border-white/5 overflow-hidden">
 
       {/* Titular fijo. Y sin el <span text-white> que envolvía "vivos": era el
           fósil de un acento de color que se eliminó -- pintaba blanco sobre un
@@ -1019,7 +1019,7 @@ export default function Home() {
   const handlePlan = () => navigate('/conectate');
 
   return (
-    <main className="bg-bg w-full">
+    <main className="w-full">
       {/* El polvo de luz 3D ("estrellitas") ya vive en App.jsx, global
           para todas las páginas públicas — aquí no hace falta montarlo */}
       <HeroCarousel onPlan={handlePlan} />

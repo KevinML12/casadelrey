@@ -75,3 +75,7 @@ frontend/*.zip
 
 # ── Config local de Claude Code ─────────────────────────────────────
 .claude/settings.local.json
+
+fotos/
+fotos/
+fotos/

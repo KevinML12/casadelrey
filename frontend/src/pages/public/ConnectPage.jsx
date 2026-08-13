@@ -60,7 +60,7 @@ export default function ConnectPage() {
   };
 
   return (
-    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+    <main className="relative w-full min-h-screen overflow-hidden">
       <PageHero
         title="Conéctate"
         subtitle="Cuéntanos un poco de ti — alguien de nuestro equipo te va a escribir para darte la bienvenida."

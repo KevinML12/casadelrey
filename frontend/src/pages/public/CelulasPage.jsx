@@ -890,7 +890,7 @@ export default function CelulasPage() {
   }, [groups]);
 
   return (
-    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+    <main className="relative w-full min-h-screen overflow-hidden">
       {/* El slot hero_celulas todavía no existe en /site-photos, así que
           esta página abre SIEMPRE con el fallback -- y el fallback era
           /images/bg-ministerios.jpg, exactamente el mismo que usa

@@ -74,7 +74,7 @@ export default function BlogPage() {
   if (slug) {
     if (notFound || !post) {
       return (
-        <main className="min-h-screen bg-bg flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
           <p className="text-d3 text-white/50">Post no encontrado.</p>
           <Link to="/blog" className="text-white/70 hover:text-white text-15 font-semibold">Volver al blog</Link>
         </main>
@@ -84,7 +84,7 @@ export default function BlogPage() {
   }
 
   return (
-    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+    <main className="relative w-full min-h-screen overflow-hidden">
       <div className="relative z-10">
         {/* Foto de fondo (admin-editable, slot "hero_blog") ahora vive
             DENTRO de BlogHero -> PageHero, acotada al hero -- ya no se

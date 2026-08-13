@@ -10,7 +10,7 @@ export default function DonatePage() {
   // verdad (Educación/Familias). Ahora es una sola lista real.
   const purposes = useDonationPurposes();
   return (
-    <main className="min-h-screen bg-bg text-white relative overflow-hidden">
+    <main className="min-h-screen text-white relative overflow-hidden">
       <PageHero
         title="Tu generosidad transforma."
         subtitle="Cada quetzal sembrado con fe produce fruto eterno."

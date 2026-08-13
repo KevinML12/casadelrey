@@ -11,7 +11,7 @@ const TRUST = [
 
 export default function PrayerPage() {
   return (
-    <main className="min-h-screen bg-bg text-ink">
+    <main className="min-h-screen text-ink">
       <PageHero
         title="Clama y Él responde."
         subtitle='"Clama a mí, y yo te responderé." — Jeremías 33:3'

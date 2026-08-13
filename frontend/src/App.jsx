@@ -4,6 +4,7 @@ import Lenis from 'lenis';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Splash from './components/ui/Splash';
+import { useApi } from './lib/feed';
 
 // Título de pestaña por ruta (SEO + pestañas distinguibles). Rutas
 // dinámicas (/blog/:slug) ponen título propio desde su componente;
@@ -25,6 +26,15 @@ const ROUTE_TITLES = {
   '/register':     'Crear cuenta',
 };
 
+const ROUTE_BG_KEYS = {
+  '/about':        'public_bg_nosotros',
+  '/celulas':      'public_bg_celulas',
+  '/events':       'public_bg_eventos',
+  '/donate':       'public_bg_donaciones',
+  '/volunteering': 'public_bg_voluntariado',
+  '/':             'public_bg_home',
+};
+
 // Public shell — Liquid Glass sobre canvas navy.
 // Lenis da scroll suave con inercia (se desactiva con prefers-reduced-motion).
 //
@@ -39,6 +49,7 @@ const ROUTE_TITLES = {
 // ventanas como cartas con puro transform/opacity y funciona en todos lados.
 export default function App() {
   const location = useLocation();
+  const settings = useApi('/settings') || {};
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -59,11 +70,21 @@ export default function App() {
     document.title = hit ? `${ROUTE_TITLES[hit]} · Casa del Rey` : BASE_TITLE;
   }, [location.pathname]);
 
+  // Encontrar el background según la ruta actual (Home es el fallback '/' por default)
+  const bgHit = Object.keys(ROUTE_BG_KEYS)
+    .filter(p => location.pathname === p || location.pathname.startsWith(p === '/' ? '@@' : p + '/'))
+    .sort((a, b) => b.length - a.length)[0] || '/';
+  
+  const bgImage = settings[ROUTE_BG_KEYS[bgHit]];
+
   return (
-    <div className="min-h-screen flex flex-col bg-bg text-ink">
+    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden">
+      {bgImage && (
+        <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.06] mix-blend-screen pointer-events-none" alt="" />
+      )}
       <Splash />
       <Header />
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full relative z-10">
         <Outlet />
       </main>
       <Footer />

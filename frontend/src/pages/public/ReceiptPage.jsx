@@ -13,7 +13,7 @@ export default function ReceiptPage() {
   const defaultAmount = params.get('amount') || '';
 
   return (
-    <main className="min-h-screen bg-bg text-white">
+    <main className="min-h-screen text-white">
       <PageHero
         title="Sube tu depósito."
         subtitle="Lo verificamos y confirmamos tu pago lo antes posible."

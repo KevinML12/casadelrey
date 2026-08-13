@@ -61,7 +61,7 @@ export default function GalleryPage() {
   );
 
   return (
-    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+    <main className="relative w-full min-h-screen overflow-hidden">
       <PageHero
         title="Galería"
         subtitle="Lo que Dios está haciendo en nuestra casa. Abre un álbum y recórrelo."

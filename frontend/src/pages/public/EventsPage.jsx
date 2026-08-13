@@ -670,7 +670,7 @@ export default function EventsPage() {
   );
 
   return (
-    <main className="min-h-[100svh] bg-bg relative overflow-hidden flex flex-col">
+    <main className="min-h-[100svh] relative overflow-hidden flex flex-col">
       {/* Hero -- esta página reimplementa a mano el bloque de PageHero, así
           que al menos sigue su misma gramática:
           · La foto queda ACOTADA al hero. Antes el ParallaxImg colgaba de

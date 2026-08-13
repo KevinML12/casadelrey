@@ -61,7 +61,7 @@ export default function ProfilePage() {
   const initial = (user?.name || user?.email || '?')[0].toUpperCase();
 
   return (
-    <main className="relative bg-bg w-full min-h-screen overflow-hidden">
+    <main className="relative w-full min-h-screen overflow-hidden">
       <PageHero
         title="Mi Perfil"
         photoSlot="hero_perfil"

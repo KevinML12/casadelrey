@@ -592,7 +592,7 @@ export default function VolunteeringPage() {
   };
 
   return (
-    <main className="min-h-screen bg-bg text-white">
+    <main className="min-h-screen text-white">
       {/* Una sola apertura. Antes el hero decía "Únete a los más de 90
           voluntarios que ya sirven en 10 departamentos" y treinta líneas
           después un h2 "¿Dónde quieres servir?" volvía a abrir la página

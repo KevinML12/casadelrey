@@ -122,7 +122,7 @@ export default function AboutPage() {
   const [openCellKey, setOpenCellKey] = useState(null);
 
   return (
-    <main className="min-h-screen bg-bg text-white">
+    <main className="min-h-screen text-white">
       <PageHero
         title="Somos Casa del Rey."
         subtitle="Una iglesia familiar en Huehuetenango, edificada célula por célula, generación tras generación."

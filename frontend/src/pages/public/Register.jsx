@@ -32,7 +32,7 @@ export default function Register() {
   const bg = useSitePhoto('hero_registro', '/images/bg-registro.jpg');
 
   return (
-    <section className="relative min-h-screen pt-32 pb-20 overflow-hidden bg-bg flex items-center">
+    <section className="relative min-h-screen pt-32 pb-20 overflow-hidden flex items-center">
       {/* Foto a color pleno + .scrim-hero: la composición es centrada, así
           que el óvalo oscuro cae justo donde vive el bloque de texto. Antes
           la foto iba al 40% bajo otro degradado encima. */}
