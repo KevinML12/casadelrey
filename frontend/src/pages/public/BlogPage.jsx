@@ -13,6 +13,7 @@ import apiClient from '../../lib/apiClient';
 import BlogHero from '../../components/blog/BlogHero';
 import PostCollage from '../../components/blog/PostCollage';
 import ArticleReader from '../../components/blog/ArticleReader';
+import SectionBg from '../../components/ui/SectionBg';
 
 // Mismo fallback de categoría que PostCollage.jsx (p.category vacío no
 // debe ser un filtro fantasma "undefined").
@@ -90,7 +91,9 @@ export default function BlogPage() {
             DENTRO de BlogHero -> PageHero, acotada al hero -- ya no se
             extiende como capa de página completa detrás del listado. */}
         <BlogHero />
-        <section className="max-w-6xl mx-auto px-6 pt-6 pb-28">
+        <section className="relative overflow-hidden max-w-6xl mx-auto px-6 pt-6 pb-28">
+          <SectionBg src="/images/components/bg_blog.jpg" />
+          <div className="relative z-10">
           {categories.length > 1 && (
             <div className="flex flex-wrap justify-center gap-2 mb-10">
               <button
@@ -117,6 +120,7 @@ export default function BlogPage() {
             </div>
           )}
           <PostCollage posts={filteredPosts} />
+          </div>
         </section>
       </div>
     </main>

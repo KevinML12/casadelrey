@@ -15,6 +15,7 @@ import { EASE_OUT, EASE_IN, PRESS_PRIMARY, PRESS_SECONDARY, PRESS_MICRO } from '
 import Tilt from '../../components/ui/Tilt';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import SocialSection from '../../components/sections/SocialSection';
+import SectionBg from '../../components/ui/SectionBg';
 
 const MotionLink = motion.create(Link);
 
@@ -470,7 +471,8 @@ function AnnouncementsBar() {
   if (list.length === 0) return null;
 
   return (
-    <section className="relative border-t border-white/5 py-10">
+    <section className="relative overflow-hidden border-t border-white/5 py-10">
+      <SectionBg src="/images/public_bg_home.jpg" />
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-4">
         {list.map((a, i) => (
           <Reveal key={a.ID} delay={i * 0.08}>
@@ -535,6 +537,7 @@ function Agenda({ bg }) {
 
   return (
     <section id="agenda" className="relative min-h-[80svh] overflow-hidden flex items-center border-t border-white/5">
+      <SectionBg src="/images/components/home_agenda.jpg" />
       {/* La foto va a plena fuerza: el contraste lo pone el scrim en banda,
           que oscurece la columna izquierda (donde vive el texto) y deja la
           foto entera a la derecha, debajo del panel. Antes la imagen llegaba
@@ -652,6 +655,7 @@ function CelulasSection() {
     // entera / sección sobre canvas limpio" — cuando todas llevan foto al 50%,
     // ninguna significa nada.
     <section id="celulas" className="relative py-28 md:py-36 border-t border-white/5 overflow-hidden">
+      <SectionBg src="/images/public_bg_celulas.jpg" />
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* El titular es el ancla fija; lo que se revela al entrar son las
             cards de abajo, que llegan por debajo de él. */}
@@ -773,6 +777,7 @@ function MensajesCarousel() {
     // de abajo ya son puras portadas fotográficas. La foto ambiental detrás
     // solo restaba contraste a las que sí importan.
     <section id="mensajes" className="relative py-20 md:py-32 border-t border-white/5 overflow-hidden">
+      <SectionBg src="/images/components/about_mision.jpg" />
       {/* El titular queda quieto; lo que entra al hacer scroll es el carril. */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
@@ -836,6 +841,7 @@ const NETWORKS = [
 function Ubicacion({ bg }) {
   return (
     <section id="ubicacion" className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
+      <SectionBg src="/images/components/about_visitanos.jpg" />
       {/* Foto entera del templo, con el scrim anclado abajo: el contenido
           (titular + tarjetas) vive en el tercio inferior y ahí es donde
           oscurece. Antes la foto llegaba al 50% y encima un degradado propio. */}
@@ -958,6 +964,7 @@ function GalleryPreviewSection() {
 
   return (
     <section id="galeria-preview" className="relative py-20 md:py-32 border-t border-white/5 overflow-hidden">
+      <SectionBg src="/images/components/bg_galeria.jpg" />
 
       {/* Titular fijo. Y sin el <span text-white> que envolvía "vivos": era el
           fósil de un acento de color que se eliminó -- pintaba blanco sobre un

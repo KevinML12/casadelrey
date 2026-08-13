@@ -108,12 +108,6 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden">
-      {bgImage && (
-        <>
-          <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-35 pointer-events-none" alt="" />
-          <div className="fixed inset-0 bg-bg/70 pointer-events-none" />
-        </>
-      )}
       <Splash />
       <Header />
       <main className="flex-1 w-full relative z-10">

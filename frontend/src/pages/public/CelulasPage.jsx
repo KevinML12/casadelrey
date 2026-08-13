@@ -28,6 +28,7 @@ import { PRESS_PRIMARY } from '../../lib/motion';
 import { Dock, DockItem } from '../../components/ui/Dock';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+import SectionBg from '../../components/ui/SectionBg';
 
 const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring shadow-card hover:opacity-90';
 const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
@@ -922,12 +923,16 @@ export default function CelulasPage() {
       </PageHero>
 
       <div className="relative z-10">
-        <section className="pb-8 max-w-6xl mx-auto px-6">
-          <StatTrio stats={stats} className="mt-10" />
+        <section className="relative overflow-hidden pb-8 max-w-6xl mx-auto px-6">
+          <SectionBg src="/images/public_bg_celulas.jpg" />
+          <div className="relative z-10">
+            <StatTrio stats={stats} className="mt-10" />
+          </div>
         </section>
 
         {/* COLLAGE de tipos — cada recorte abre su ventana */}
-        <section className="relative max-w-6xl mx-auto px-6 pt-6 pb-28">
+        <section className="relative overflow-hidden max-w-6xl mx-auto px-6 pt-6 pb-28">
+          <SectionBg src="/images/components/celula_general.jpg" />
           {/* Halo ambiental -- cambia de color según la categoría bajo el
               cursor, mismo lenguaje que VolunteeringPage. Transición CSS
               plana (no framer-motion animate): en Voluntariado el

@@ -2,6 +2,7 @@ import DonationCard from '../../components/sections/DonationCard';
 import PageHero from '../../components/layout/PageHero';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import { useDonationPurposes } from '../../lib/donationPurposes';
+import SectionBg from '../../components/ui/SectionBg';
 
 export default function DonatePage() {
   // Misma fuente admin-editable que el selector de "Destino" del acordeón
@@ -25,7 +26,8 @@ export default function DonatePage() {
           textura gris que además le baja el contraste al propio cristal.
           Mejor bg-bg limpio y honesto. Si un día vuelve una foto a esta
           sección, va a color pleno con una de las clases .scrim-*. */}
-      <section className="relative py-16 md:py-24 z-10">
+      <section className="relative overflow-hidden py-16 md:py-24 z-10">
+        <SectionBg src="/images/public_bg_donaciones.jpg" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
 

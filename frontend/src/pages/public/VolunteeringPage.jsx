@@ -11,6 +11,7 @@ import { useApi } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 import { PRESS_PRIMARY } from '../../lib/motion';
 import toast from 'react-hot-toast';
+import SectionBg from '../../components/ui/SectionBg';
 
 // Botón/CTA claro (bg-bg text-white) -- ya no hay GlassButton oscuro
 // en este flujo, todo el modal es glass-light.
@@ -637,6 +638,7 @@ export default function VolunteeringPage() {
           abajo perdiendo. El canvas navy deja que el collage sea la
           imagen de la sección. */}
       <section className="relative py-4 pb-24 overflow-hidden">
+        <SectionBg src="/images/components/voluntariado_general.jpg" />
         {/* Halo ambiental -- cambia de color según la categoría bajo el
             cursor, le da sensación de "vivo" al fondo sin tocar el grid.
             CSS transition plano en vez de motion.div: el animate={{opacity}}

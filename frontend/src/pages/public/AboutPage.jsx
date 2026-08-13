@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SectionBg from '../../components/ui/SectionBg';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
@@ -134,6 +135,7 @@ export default function AboutPage() {
           otras tres, que antes eran py-16/24 idénticas). La foto va a color
           pleno y el contraste lo pone .scrim-card. */}
       <section className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
+        <SectionBg src="/images/public_bg_nosotros.jpg" />
         <ParallaxImg src={pastoresImg} alt="" />
         <div className="scrim-card" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
@@ -182,8 +184,9 @@ export default function AboutPage() {
           con ellas no agregaba nada. Sobre bg-bg limpio las cards vuelven a
           ser lo único que se mira. Es además la sección más corta de la
           página, y el espaciado lo dice (py-14/20). */}
-      <section className="py-14 md:py-20 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative overflow-hidden py-14 md:py-20 border-t border-white/5">
+        <SectionBg src="/images/components/about_mision.jpg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="mb-12">
             <h2 className="text-d2 text-white">
               Lo que nos mueve.
@@ -219,8 +222,9 @@ export default function AboutPage() {
           los departamentos, y una foto más detrás las convertía a todas en
           textura. Es el bloque más largo de la página (números + bento +
           CTA) y por eso el segundo en aire vertical. */}
-      <section className="py-20 md:py-32 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative overflow-hidden py-20 md:py-32 border-t border-white/5">
+        <SectionBg src="/images/components/home_comunidad.jpg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="mb-12 text-center">
             <h2 className="text-d2 text-white">
               Una familia que sirve.
@@ -339,8 +343,9 @@ export default function AboutPage() {
           un área puntual cuando se necesita. Agrandado a pedido del
           usuario -- la primera versión se sentía perdida en tanto
           espacio oscuro alrededor. */}
-      <section className="relative py-20 md:py-28 border-t border-white/5">
-        <div className="max-w-5xl mx-auto px-6">
+      <section className="relative overflow-hidden py-20 md:py-28 border-t border-white/5">
+        <SectionBg src="/images/components/about_vision.jpg" />
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
           {/* text-d3 y no text-d2: es una pregunta bisagra entre dos módulos,
               no la apertura de un capítulo. Los cuatro titulares grandes de
               la página van en d2 y este queda deliberadamente por debajo --
@@ -386,8 +391,9 @@ export default function AboutPage() {
           ventana de detalle en vez de una caja de solo texto. Sin foto de
           ambiente por la misma razón que el bloque anterior: el bento ya
           es un muro de fotos y la de fondo solo lo ensuciaba. */}
-      <section className="py-16 md:py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative overflow-hidden py-16 md:py-24 border-t border-white/5">
+        <SectionBg src="/images/components/bg_conectate.jpg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="mb-10">
             <div className="flex items-end justify-between gap-4">
               <h2 className="text-d2 text-white">
@@ -475,8 +481,9 @@ export default function AboutPage() {
       />
 
       {/* Ubicación + podcast */}
-      <section className="relative py-16 md:py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
+      <section className="relative overflow-hidden py-16 md:py-24 border-t border-white/5">
+        <SectionBg src="/images/components/about_podcast.jpg" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-5">
           <Reveal from="left">
             <PhotoHeaderCard photo={visitanosCardImg} glass="standard">
               <h3 className="text-20 font-bold text-white mb-3">Visítanos</h3>

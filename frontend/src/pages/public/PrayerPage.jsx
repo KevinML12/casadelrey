@@ -2,6 +2,7 @@ import PrayerForm from '../../components/sections/PrayerForm';
 import PageHero from '../../components/layout/PageHero';
 import { Halos } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
+import SectionBg from '../../components/ui/SectionBg';
 
 const TRUST = [
   { text: 'Comunidad que ora contigo' },
@@ -31,6 +32,7 @@ export default function PrayerPage() {
       </PageHero>
 
       <section className="relative py-16 md:py-24 overflow-hidden">
+        <SectionBg src="/images/components/bg_oracion.jpg" />
         <Halos variant="soft" />
         <Reveal className="relative z-10 max-w-3xl mx-auto px-6">
           {/* Sin Tilt: es un panel de formulario, no un objeto navegable.

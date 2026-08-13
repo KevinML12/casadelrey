@@ -10,6 +10,7 @@ import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
+import SectionBg from '../../components/ui/SectionBg';
 
 // El modal de RSVP es glass-light (blanco/translucido) -- .input-light es
 // el mismo campo claro del panel admin/VolunteeringPage, funciona igual
@@ -682,6 +683,7 @@ export default function EventsPage() {
             todavía se está deslizando cuando llegás no es el ancla de la
             pantalla, es algo acomodándose. */}
       <section className="relative pt-40 pb-12 overflow-hidden">
+        <SectionBg src="/images/public_bg_eventos.jpg" />
         <ParallaxImg src={heroImg} alt="" />
         <div className="scrim-hero" />
         <div className="relative z-10 px-6 max-w-6xl mx-auto w-full text-center">

@@ -10,6 +10,7 @@ import { FieldLight } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import { PRESS_PRIMARY } from '../../lib/motion';
+import SectionBg from '../../components/ui/SectionBg';
 
 const CATEGORIES = [
   { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia' },
@@ -67,6 +68,8 @@ export default function ConnectPage() {
         photoSlot="hero_conectate"
         photoFallback="/images/bg-ministerios.jpg"
       />
+
+      <SectionBg src="/images/components/bg_conectate.jpg" />
 
       <div className="relative z-10 pb-24 px-6 max-w-xl mx-auto">
         {/* Qué sigue -- el flujo real (ConnectCard -> panel -> líder
