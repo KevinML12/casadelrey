@@ -108,7 +108,7 @@ export default function LeaderLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   useGlassSpecular();
   const settings = useApi('/settings') || {};
-  const bgImage = settings.leader_bg || '/images/bg-hero.jpg';
+  const bgImage = settings.leader_bg || '/images/bg-leader.png';
 
   return (
     <div className="admin-light relative flex h-screen bg-paper overflow-hidden text-bg ">

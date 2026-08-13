@@ -33,9 +33,9 @@ var knownSettings = []struct{ Key, Label, Default string }{
 	{"bank_account_type", "Tipo de cuenta", "Monetaria"},
 	{"bank_holder", "A nombre de", "Iglesia Casa del Rey"},
 	{"contact_whatsapp", "WhatsApp de contacto (con 502)", ""},
-	{"admin_bg", "Fondo Panel Admin (URL)", "/images/bg-hero.jpg"},
-	{"leader_bg", "Fondo Panel Líder (URL)", "/images/bg-hero.jpg"},
-	{"volunteer_bg", "Fondo Panel Voluntario (URL)", "/images/bg-hero.jpg"},
+	{"admin_bg", "Fondo Panel Admin (URL)", "/images/bg-admin.png"},
+	{"leader_bg", "Fondo Panel Líder (URL)", "/images/bg-leader.png"},
+	{"volunteer_bg", "Fondo Panel Voluntario (URL)", "/images/bg-volunteer.png"},
 }
 
 func settingDefault(key string) (label, def string, known bool) {

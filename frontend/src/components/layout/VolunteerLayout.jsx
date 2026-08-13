@@ -10,7 +10,7 @@ export default function VolunteerLayout() {
   const navigate = useNavigate();
   useGlassSpecular();
   const settings = useApi('/settings') || {};
-  const bgImage = settings.volunteer_bg || '/images/bg-hero.jpg';
+  const bgImage = settings.volunteer_bg || '/images/bg-volunteer.png';
 
   const handleLogout = () => {
     logout();

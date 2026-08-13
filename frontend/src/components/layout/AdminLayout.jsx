@@ -169,7 +169,7 @@ export default function AdminLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   useGlassSpecular();
   const settings = useApi('/settings') || {};
-  const bgImage = settings.admin_bg || '/images/bg-hero.jpg';
+  const bgImage = settings.admin_bg || '/images/bg-admin.png';
 
   return (
     <div className="admin-light relative flex h-screen bg-paper overflow-hidden text-bg">
