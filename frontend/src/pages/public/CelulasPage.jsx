@@ -934,6 +934,7 @@ export default function CelulasPage() {
         <section className="relative overflow-hidden pt-6 pb-28">
           <SectionBg src="/images/public_bg_eventos.jpg" />
           <div className="relative z-10 max-w-6xl mx-auto px-6">
+          {/* Halo ambiental -- cambia de color según la categoría bajo el
               cursor, mismo lenguaje que VolunteeringPage. Transición CSS
               plana (no framer-motion animate): en Voluntariado el
               animate={{opacity}} de motion.div no se comprometía al
