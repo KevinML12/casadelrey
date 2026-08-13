@@ -26,6 +26,26 @@ const ROUTE_TITLES = {
   '/register':     'Crear cuenta',
 };
 
+// Fotos de fondo por ruta — fallback estático que funciona sin backend.
+// Si /settings responde, sobreescribe estas; si no, las fotos siempre aparecen.
+const ROUTE_BG_IMAGES = {
+  '/about':        '/images/public_bg_nosotros.jpg',
+  '/celulas':      '/images/public_bg_celulas.jpg',
+  '/events':       '/images/public_bg_eventos.jpg',
+  '/donate':       '/images/public_bg_donaciones.jpg',
+  '/volunteering': '/images/public_bg_voluntariado.jpg',
+  '/blog':         '/images/components/bg_blog.jpg',
+  '/gallery':      '/images/components/bg_galeria.jpg',
+  '/prayer':       '/images/components/bg_oracion.jpg',
+  '/conectate':    '/images/components/bg_conectate.jpg',
+  '/login':        '/images/components/bg_login.jpg',
+  '/register':     '/images/components/bg_registro.jpg',
+  '/comprobante':  '/images/public_bg_donaciones.jpg',
+  '/profile':      '/images/public_bg_home.jpg',
+  '/':             '/images/public_bg_home.jpg',
+};
+
+// Mapeo de ruta → clave de settings (para override dinámico desde admin)
 const ROUTE_BG_KEYS = {
   '/about':        'public_bg_nosotros',
   '/celulas':      'public_bg_celulas',
@@ -79,11 +99,12 @@ export default function App() {
   }, [location.pathname]);
 
   // Encontrar el background según la ruta actual (Home es el fallback '/' por default)
-  const bgHit = Object.keys(ROUTE_BG_KEYS)
+  const bgHit = Object.keys(ROUTE_BG_IMAGES)
     .filter(p => location.pathname === p || location.pathname.startsWith(p === '/' ? '@@' : p + '/'))
     .sort((a, b) => b.length - a.length)[0] || '/';
   
-  const bgImage = settings[ROUTE_BG_KEYS[bgHit]];
+  // Settings del backend sobreescribe el fallback estático si está disponible
+  const bgImage = settings[ROUTE_BG_KEYS[bgHit]] || ROUTE_BG_IMAGES[bgHit];
 
   return (
     <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden">
