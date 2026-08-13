@@ -17,6 +17,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Shield, Users, Clock, ArrowRight, X, Phone, Heart, Users2 } from 'lucide-react';
+import useSeo from '../../hooks/useSeo';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import StatTrio from '../../components/ui/StatTrio';
@@ -793,6 +795,7 @@ function CellQuizModal({ groups, onViewDetail }) {
 }
 
 export default function CelulasPage() {
+  useSeo('Células', 'Encuentra tu grupo de crecimiento. Células en casas durante la semana para conectar, orar y aprender juntos.');
   const [params] = useSearchParams();
   const apiCells = useApi('/cells');
   const apiCategories = useApi('/cell-categories');

@@ -95,7 +95,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.GET("/settings", siteSettingHandler.GetPublic, cacheShort)
 
 	// Voluntariado
-	api.POST("/volunteer/register",   volunteerHandler.Register)
+	api.POST("/volunteer/register",   volunteerHandler.Register, authRateLimit)
 	api.GET("/volunteer/departments", volunteerHandler.GetDepartments)
 	api.GET("/volunteer/me",          volunteerHandler.GetMyInfo, authMW)
 	api.GET("/volunteer-areas",       volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong)
@@ -116,10 +116,10 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Peticiones de oración
 	contactGroup := api.Group("/contact")
-	contactGroup.POST("/petition", petitionHandler.CreatePetition)
+	contactGroup.POST("/petition", petitionHandler.CreatePetition, authRateLimit)
 
 	// Tarjeta de conexión — visitante nuevo se registra él mismo
-	api.POST("/connect-cards", connectCardHandler.Create)
+	api.POST("/connect-cards", connectCardHandler.Create, authRateLimit)
 
 	// Donaciones (registro local). PayPal fue removido (may-2026): sus
 	// rutas se quitaron para no ocupar el router ni el rate-limit; los

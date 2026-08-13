@@ -55,6 +55,9 @@ const BENTO_SPANS = [
 ];
 
 export default function AboutPage() {
+  const settings = useSiteSettings();
+  useSeo('Nosotros', 'Conoce la historia, misión y visión de Casa del Rey. Edificando la iglesia célula por célula, generación tras generación.');
+
   // Fotos administrables (AdminSitePhotos) con fallback local garantizado.
   // `about_pastores` es la única que sigue usándose como fondo de sección
   // (Nuestra historia); `about_servidores` y `about_comunidad` quedaron solo
