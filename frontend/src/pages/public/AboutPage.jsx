@@ -84,15 +84,10 @@ export default function AboutPage() {
     (albums[album] || []).find(p => p.title?.startsWith(titleStartsWith))?.url;
   const fundadoresCardImg       = '/images/nosotros/fundadores.jpg';
   const pastoresCelulasCardImg  = '/images/nosotros/pastores-celulas.jpg';
-  const podcastCardImg          = findPhoto('SABADOS', 'SABADOS - Palis') || comunidadImg;
-  const visitanosCardImg        = '/images/bg-ubicacion.jpg'; // misma foto real que ya usa Home.jsx para "Ubicación" -- horizontal, a diferencia de about_lideres (retrato)
-  // Misión/Visión eran las únicas cards de toda la página sin ninguna
-  // foto -- el usuario lo señaló como falta de concordancia entre
-  // formatos. Mismo PhotoHeaderCard que el resto, con fotos reales de
-  // la Galería (horizontales, ya verificadas) en vez de dejarlas planas.
-  const misionCardImg           = findPhoto('CONFERENCIA UNA VEZ Y PARA SIEMPRE', 'CONFERENCIA UNA VEZ Y PARA SIEMPRE - FF92F933') || servidoresImg;
-  const visionCardImg           = findPhoto('Alabanza', 'Alabanza - 8') || servidoresImg;
-  // Mismo patrón que VolunteeringPage.jsx: foto real por departamento
+  const misionCardImg           = '/images/components/about_mision.jpg';
+  const visionCardImg           = '/images/components/about_vision.jpg';
+  const podcastCardImg          = '/images/components/about_podcast.jpg';
+  const visitanosCardImg        = '/images/components/about_visitanos.jpg';  // Mismo patrón que VolunteeringPage.jsx: foto real por departamento
   // (con fallback), más una segunda foto opcional (voluntariado_<value>_2)
   // que activa el carrusel en la ventana de detalle si el admin la sube.
   const volunteerAreas = useVolunteerAreas();

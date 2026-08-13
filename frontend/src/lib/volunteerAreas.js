@@ -27,66 +27,66 @@ export const VOLUNTEER_AREAS = [
   {
     value: 'alabanza', icon: 'mic', title: 'Alabanza',
     desc: 'Lidera la adoración y la música en los servicios y células.',
-    photoFallback: '/images/albums/alabanza.jpg',
+    photoFallback: '/images/components/vol_alabanza.jpg',
     why: 'Si te apasiona la música y quieres guiar a otros al encuentro con Dios, este es tu lugar.',
   },
   {
     value: 'danza', icon: 'spark', title: 'Danza',
     desc: 'Expresa la adoración a través del movimiento en los servicios.',
-    photoFallback: '/images/albums/danza.jpg',
+    photoFallback: '/images/components/vol_danza.jpg',
     why: 'Si te mueve adorar con el cuerpo y quieres inspirar a otros con tu expresión, únete aquí.',
   },
   {
     value: 'servidores', icon: 'heart', title: 'Servidores',
     desc: 'Recibe a cada persona; cuida la recepción y la limpieza de la iglesia.',
-    photoFallback: '/images/nosotros/servidores.jpg',
+    photoFallback: '/images/components/vol_limpieza.jpg',
     why: 'Si te gusta recibir a las personas con calidez y hacer que se sientan en casa, esto es para ti.',
   },
   {
     value: 'protocolo', icon: 'crown', title: 'Protocolo',
     desc: 'Atención VIP a políticos, pastores invitados y personas de alto nivel.',
-    photoFallback: '/images/nosotros/lideres.jpg',
+    photoFallback: '/images/components/vol_bienvenida.jpg',
     why: 'Si tienes don de gente y atención al detalle, aquí darás la bienvenida a quienes más lo necesitan.',
   },
   {
     value: 'pancartas', icon: 'flag', title: 'Pancartas',
     desc: 'Porta y coordina las pancartas durante los días de culto.',
-    photoFallback: '/images/nosotros/comunidad.jpg',
+    photoFallback: '/images/components/vol_ujieres.jpg',
     why: 'Si quieres servir con entusiasmo visible y ser parte activa del ambiente de cada culto, únete.',
   },
   {
     value: 'maestros_ninos', icon: 'book', title: 'Maestros de Niños',
     desc: 'Enseña e inspira a los más pequeños con creatividad y amor.',
-    photoFallback: '/images/albums/ninos.jpg',
+    photoFallback: '/images/components/vol_ninos.jpg',
     why: 'Si tienes paciencia y amor por enseñar, aquí formarás la fe de la próxima generación.',
   },
   {
     value: 'tecnicos_audiovisuales', icon: 'headphones', title: 'Técnicos Audiovisuales',
     desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.',
-    photoFallback: '/images/predicas/predica-1.jpg',
+    photoFallback: '/images/components/vol_multimedia.jpg',
     why: 'Si te gusta la tecnología y el detalle técnico, aquí aseguras que el mensaje llegue claro.',
   },
   {
     value: 'multimedia', icon: 'camera', title: 'Multimedia',
     desc: 'Diseño gráfico, video y redes sociales para la comunicación de la iglesia.',
-    photoFallback: '/images/predicas/predica-2.jpg',
+    photoFallback: '/images/components/vol_multimedia.jpg',
     why: 'Si tienes ojo creativo para el diseño o el video, aquí contarás la historia de la iglesia.',
   },
   {
     value: 'oracion', icon: 'pray', title: 'Oración',
     desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.',
-    photoFallback: '/images/predicas/predica-3.jpg',
+    photoFallback: '/images/components/vol_intercesor.jpg',
     why: 'Si sientes el llamado a interceder, aquí sostienes en oración a toda la congregación.',
   },
   {
     value: 'logistica', icon: 'box', title: 'Logística',
     desc: 'Coordina recursos, transporte y organización de eventos y servicios.',
-    photoFallback: '/images/albums/miembros.jpg',
+    photoFallback: '/images/components/vol_admin.jpg',
     why: 'Si eres organizado y te gusta que todo funcione bien detrás de cámaras, aquí eres clave.',
   },
 ];
 
-const DEFAULT_PHOTO_FALLBACK = '/images/nosotros/comunidad.jpg';
+const DEFAULT_PHOTO_FALLBACK = '/images/components/voluntariado_general.jpg';
 
 // Hook: departamentos reales desde /volunteer-areas (admin-editable),
 // con VOLUNTEER_AREAS como fallback si la API aún no responde o está

@@ -56,7 +56,7 @@ const GLOW = '#E8823C';
 // Foto genérica para una categoría creada desde el panel que aún no tiene
 // foto propia en /admin/site-photos (mismo fallback genérico que usan los
 // departamentos de voluntariado) -- nunca un hueco en blanco.
-const DEFAULT_CATEGORY_IMAGE = '/images/nosotros/comunidad.jpg';
+const DEFAULT_CATEGORY_IMAGE = '/images/components/celula_general.jpg';
 
 // COLLAGE base — recortes de tamaños/inclinaciones distintos
 const COLLAGE = [

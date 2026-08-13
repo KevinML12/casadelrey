@@ -606,7 +606,7 @@ export default function VolunteeringPage() {
         title="Voluntariado"
         subtitle="Cada persona tiene algo que aportar. Aquí encuentras el departamento donde lo que sabes hacer sirve a los demás."
         photoSlot="hero_voluntariado"
-        photoFallback="/images/bg-ministerios.jpg"
+        photoFallback="/images/components/voluntariado_general.jpg"
       >
         {/* "Dos preguntas y te decimos dónde": son exactamente dos (ver
             QUIZ_QUESTIONS). Antes decía "Descubre tu lugar ideal" y
