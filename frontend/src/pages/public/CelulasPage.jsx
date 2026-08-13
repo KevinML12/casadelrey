@@ -923,17 +923,17 @@ export default function CelulasPage() {
       </PageHero>
 
       <div className="relative z-10">
-        <section className="relative overflow-hidden pb-8 max-w-6xl mx-auto px-6">
+        <section className="relative overflow-hidden pb-8">
           <SectionBg src="/images/public_bg_celulas.jpg" />
-          <div className="relative z-10">
+          <div className="relative z-10 max-w-6xl mx-auto px-6">
             <StatTrio stats={stats} className="mt-10" />
           </div>
         </section>
 
         {/* COLLAGE de tipos — cada recorte abre su ventana */}
-        <section className="relative overflow-hidden max-w-6xl mx-auto px-6 pt-6 pb-28">
-          <SectionBg src="/images/components/celula_general.jpg" />
-          {/* Halo ambiental -- cambia de color según la categoría bajo el
+        <section className="relative overflow-hidden pt-6 pb-28">
+          <SectionBg src="/images/public_bg_eventos.jpg" />
+          <div className="relative z-10 max-w-6xl mx-auto px-6">
               cursor, mismo lenguaje que VolunteeringPage. Transición CSS
               plana (no framer-motion animate): en Voluntariado el
               animate={{opacity}} de motion.div no se comprometía al
@@ -1035,6 +1035,7 @@ export default function CelulasPage() {
               </a>
             </div>
           </Reveal>
+          </div>
         </section>
       </div>
 

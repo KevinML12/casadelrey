@@ -91,9 +91,9 @@ export default function BlogPage() {
             DENTRO de BlogHero -> PageHero, acotada al hero -- ya no se
             extiende como capa de página completa detrás del listado. */}
         <BlogHero />
-        <section className="relative overflow-hidden max-w-6xl mx-auto px-6 pt-6 pb-28">
+        <section className="relative overflow-hidden pt-6 pb-28">
           <SectionBg src="/images/components/bg_blog.jpg" />
-          <div className="relative z-10">
+          <div className="relative z-10 max-w-6xl mx-auto px-6">
           {categories.length > 1 && (
             <div className="flex flex-wrap justify-center gap-2 mb-10">
               <button

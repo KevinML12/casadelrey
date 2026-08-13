@@ -78,9 +78,9 @@ export default function GalleryPage() {
             que tiene motivo real para romper la caja. El grid sube a 6
             columnas en desktop para que el ancho extra sea más collage y no
             solo cards más gordas. */}
-        <section className="relative overflow-hidden px-4 sm:px-8 pt-6 pb-28">
+        <section className="relative overflow-hidden pt-6 pb-28">
           <SectionBg src="/images/components/bg_galeria.jpg" />
-          <div className="relative z-10">
+          <div className="relative z-10 px-4 sm:px-8">
           {albums.length === 0 ? (
             <div className="py-24 text-center">
               <p className="text-d3 text-white/50">

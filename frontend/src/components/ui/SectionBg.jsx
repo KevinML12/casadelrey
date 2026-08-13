@@ -9,7 +9,7 @@
 //   <div className="relative z-10">...contenido...</div>
 // </section>
 
-export default function SectionBg({ src, opacity = 'opacity-35', position = 'center' }) {
+export default function SectionBg({ src, opacity = 'opacity-25', position = 'center' }) {
   if (!src) return null;
   return (
     <>
@@ -19,7 +19,7 @@ export default function SectionBg({ src, opacity = 'opacity-35', position = 'cen
         className={`absolute inset-0 w-full h-full object-cover ${opacity} pointer-events-none`}
         style={{ objectPosition: position }}
       />
-      <div className="absolute inset-0 bg-bg/50 pointer-events-none" />
+      <div className="absolute inset-0 bg-bg/60 pointer-events-none" />
     </>
   );
 }
