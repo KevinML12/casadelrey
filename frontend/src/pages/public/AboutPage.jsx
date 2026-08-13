@@ -156,7 +156,7 @@ export default function AboutPage() {
               pesan lo mismo, que es no haber decidido nada. */}
           <RevealList className="grid md:grid-cols-[1.6fr_1fr] gap-5">
             <RevealItem>
-              <PhotoHeaderCard photo={fundadoresCardImg} glass="standard" objectPosition="center 15%">
+              <PhotoHeaderCard photo={fundadoresCardImg} glass="standard" objectPosition="center 40%" className="min-h-[480px]">
                 <p className="text-13 font-semibold text-white/60 mb-2">Pastores fundadores</p>
                 <h3 className="text-24 font-bold text-white tracking-tight leading-tight">
                   José de León y Desidería López
@@ -168,7 +168,7 @@ export default function AboutPage() {
             </RevealItem>
 
             <RevealItem>
-              <PhotoHeaderCard photo={pastoresCelulasCardImg} glass="featured">
+              <PhotoHeaderCard photo={pastoresCelulasCardImg} glass="featured" objectPosition="center 30%" className="min-h-[480px]">
                 <p className="text-13 font-semibold text-white/60 mb-2">Pastores</p>
                 <h3 className="text-24 font-bold text-white tracking-tight leading-tight">
                   Leonel de León e Ismeina Castillo
