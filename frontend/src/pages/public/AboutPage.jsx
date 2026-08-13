@@ -136,7 +136,7 @@ export default function AboutPage() {
           pleno y el contraste lo pone .scrim-card. */}
       <section className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
         <SectionBg src="/images/public_bg_nosotros.jpg" />
-        <ParallaxImg src={pastoresImg} alt="" />
+        <ParallaxImg src={pastoresImg} alt="" overlay={true} />
         <div className="scrim-card" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Sin Reveal: el titular de sección es el punto fijo contra el que

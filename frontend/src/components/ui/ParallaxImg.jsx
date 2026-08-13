@@ -6,7 +6,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
  * La capa de profundidad que separa un sitio real de una plantilla.
  * Compartido entre todas las páginas públicas (nació en Home.jsx).
  */
-export default function ParallaxImg({ src, alt = '', className = '' }) {
+export default function ParallaxImg({ src, alt = '', className = '', overlay = false }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['-9%', '9%']);
@@ -25,6 +25,7 @@ export default function ParallaxImg({ src, alt = '', className = '' }) {
         style={{ y, filter: 'saturate(1.12)' }}
         className={`absolute inset-0 w-full h-full object-cover scale-[1.18] ${className}`}
       />
+      {overlay && <div className="absolute inset-0 bg-bg/60 pointer-events-none" />}
     </div>
   );
 }
