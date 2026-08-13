@@ -355,11 +355,11 @@ export default function AboutPage() {
               ¿Cuál es para mí?
             </h2>
           </div>
-          <div className="grid sm:grid-cols-2 gap-10 sm:gap-14 sm:divide-x sm:divide-white/10">
-            <Reveal from="left" className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
+          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+            <Reveal from="left" className="liquid-glass p-8 md:p-10 rounded-[22px] border border-white/5 flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
               {/* Miniatura ilustrativa, no un control: sin Tilt (no navega y
                   mide ~100px, muy poco para que la inclinación se lea). */}
-              <div className="liquid-glass liquid-shine shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
+              <div className="shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
                 {areas[0]?.photo && <img src={areas[0].photo} alt="" className="absolute inset-0 w-full h-full object-cover" />}
               </div>
               <div>
@@ -370,8 +370,8 @@ export default function AboutPage() {
                 </p>
               </div>
             </Reveal>
-            <Reveal from="right" delay={0.06} className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6 sm:pl-14">
-              <div className="liquid-glass liquid-shine shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
+            <Reveal from="right" delay={0.06} className="liquid-glass p-8 md:p-10 rounded-[22px] border border-white/5 flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
+              <div className="shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
                 {cellCategories[0]?.image_url && <img src={cellCategories[0].image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />}
               </div>
               <div>

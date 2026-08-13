@@ -13,6 +13,7 @@
 import Reveal from '../ui/Reveal';
 import Tilt from '../ui/Tilt';
 import { Dock, DockItem } from '../ui/Dock';
+import SectionBg from '../ui/SectionBg';
 
 const NETWORKS = [
   { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',    span: 'col-span-2 row-span-2' },
@@ -24,6 +25,7 @@ const NETWORKS = [
 export default function SocialSection({ title = 'Síguenos en redes' }) {
   return (
     <section className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
+      <SectionBg src="/images/components/bg_conectate.jpg" />
       {/* El titular no se revela: es el punto fijo contra el que llega el
           bento de abajo. Cuando también él entraba con Reveal no había
           nada quieto en la pantalla y el scroll se sentía gelatinoso --
