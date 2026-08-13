@@ -32,6 +32,14 @@ const ROUTE_BG_KEYS = {
   '/events':       'public_bg_eventos',
   '/donate':       'public_bg_donaciones',
   '/volunteering': 'public_bg_voluntariado',
+  '/blog':         'public_bg_blog',
+  '/gallery':      'public_bg_galeria',
+  '/prayer':       'public_bg_oracion',
+  '/conectate':    'public_bg_conectate',
+  '/login':        'public_bg_login',
+  '/register':     'public_bg_registro',
+  '/comprobante':  'public_bg_donaciones',
+  '/profile':      'public_bg_home',
   '/':             'public_bg_home',
 };
 
@@ -80,7 +88,10 @@ export default function App() {
   return (
     <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden">
       {bgImage && (
-        <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.06] mix-blend-screen pointer-events-none" alt="" />
+        <>
+          <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-35 pointer-events-none" alt="" />
+          <div className="fixed inset-0 bg-bg/70 pointer-events-none" />
+        </>
       )}
       <Splash />
       <Header />

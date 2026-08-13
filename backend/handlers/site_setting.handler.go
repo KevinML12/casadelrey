@@ -42,6 +42,12 @@ var knownSettings = []struct{ Key, Label, Default string }{
 	{"public_bg_voluntariado", "Fondo Voluntariado (URL)", "/images/public_bg_voluntariado.jpg"},
 	{"public_bg_donaciones", "Fondo Dar (URL)", "/images/public_bg_donaciones.jpg"},
 	{"public_bg_nosotros", "Fondo Nosotros (URL)", "/images/public_bg_nosotros.jpg"},
+	{"public_bg_blog", "Fondo Blog (URL)", "/images/components/bg_blog.jpg"},
+	{"public_bg_galeria", "Fondo Galería (URL)", "/images/components/bg_galeria.jpg"},
+	{"public_bg_oracion", "Fondo Oración (URL)", "/images/components/bg_oracion.jpg"},
+	{"public_bg_conectate", "Fondo Conéctate (URL)", "/images/components/bg_conectate.jpg"},
+	{"public_bg_login", "Fondo Login (URL)", "/images/components/bg_login.jpg"},
+	{"public_bg_registro", "Fondo Registro (URL)", "/images/components/bg_registro.jpg"},
 }
 
 func settingDefault(key string) (label, def string, known bool) {
