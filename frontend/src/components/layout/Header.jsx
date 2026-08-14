@@ -127,13 +127,22 @@ export default function Header() {
                       <p className="text-13 font-bold text-bg truncate">{user?.name || 'Usuario'}</p>
                       <p className="text-12 text-bg/60 truncate">{user?.email}</p>
                     </div>
-                    {(isAdmin || user?.role === 'leader') && (
+                    {isAdmin && (
                       <Link
-                        to={isAdmin ? '/admin' : '/leader'}
+                        to="/admin"
                         onClick={() => setDropOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                       >
-                        {isAdmin ? 'Panel Admin' : 'Panel Líder'}
+                        Panel Admin
+                      </Link>
+                    )}
+                    {(isAdmin || user?.role === 'leader') && (
+                      <Link
+                        to="/leader"
+                        onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
+                      >
+                        Panel Líder
                       </Link>
                     )}
                     <Link
@@ -237,13 +246,22 @@ export default function Header() {
               )}
               {isAuthenticated && (
                 <>
-                  {(isAdmin || user?.role === 'leader') && (
+                  {isAdmin && (
                     <Link
-                      to={isAdmin ? '/admin' : '/leader'}
+                      to="/admin"
                       onClick={() => setMenuOpen(false)}
                       className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                     >
-                      {isAdmin ? 'Panel Admin' : 'Panel Líder'}
+                      Panel Admin
+                    </Link>
+                  )}
+                  {(isAdmin || user?.role === 'leader') && (
+                    <Link
+                      to="/leader"
+                      onClick={() => setMenuOpen(false)}
+                      className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
+                    >
+                      Panel Líder
                     </Link>
                   )}
                   <Link

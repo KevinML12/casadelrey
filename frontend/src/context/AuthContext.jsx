@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: !!token,
       isAdmin:         user?.role === 'admin',
-      isLeader:        user?.role === 'leader',
+      isLeader:        user?.role === 'leader' || user?.role === 'admin',
       isVolunteer:     user?.role === 'volunteer',
       canAccessPanel:  user?.role === 'admin' || user?.role === 'leader',
       login,
