@@ -347,21 +347,10 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
 
   return (
     <form onSubmit={revisar} className="text-left flex flex-col min-h-full">
-      <button
-        type="button"
-        onClick={onBack}
-        className={`self-start inline-flex items-center gap-1.5 rounded-pill pr-4 pl-3 py-1.5 text-13 font-bold transition-colors focus-ring mb-6 ${
-          dark ? 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white' : 'bg-bg/8 hover:bg-bg/14 text-bg/80 hover:text-bg'
-        }`}
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Atrás
-      </button>
-
-      <p className={`text-13 font-bold uppercase tracking-widest mb-1.5 ${suave}`}>Estás aplicando a</p>
-      <h3 className={`text-28 font-bold leading-tight mb-8 ${titulo}`}>{cell.name}</h3>
+      <div className="mb-8">
+        <p className={`text-13 font-bold uppercase tracking-widest mb-1.5 ${suave}`}>Aplicación</p>
+        <h3 className={`text-28 font-bold leading-tight ${titulo}`}>{cell.name}</h3>
+      </div>
 
       <div className="space-y-5">
         <label className="block">
@@ -1054,20 +1043,11 @@ export default function CelulasPage() {
         onChange={setOpenKey}
         onCerrarSobrepuesto={cerrarCelula}
         sobrepuesto={celulaAbierta && (
-          solicitando ? (
-            <CellJoinForm
-              cell={celulaAbierta}
-              cells={groups.find(g => g.key === openKey)?.cells || []}
-              onBack={() => setSolicitando(false)}
-              tone="light"
-            />
-          ) : (
-            <CellDetailCard
-              cell={celulaAbierta}
-              onUnirme={() => setSolicitando(true)}
-              onCerrar={cerrarCelula}
-            />
-          )
+          <CellDetailCard
+            cell={celulaAbierta}
+            onUnirme={() => setSolicitando(true)}
+            onCerrar={cerrarCelula}
+          />
         )}
         renderContent={(it) => {
           const g = groups.find(gr => gr.key === it.key);
@@ -1084,6 +1064,20 @@ export default function CelulasPage() {
             <CellQuizModal
               groups={groups}
               onViewDetail={(key) => { setQuizOpen(false); setOpenKey(key); }}
+            />
+          </ModalWrapper>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Formulario de Célula */}
+      <AnimatePresence>
+        {solicitando && celulaAbierta && (
+          <ModalWrapper onClose={() => setSolicitando(false)}>
+            <CellJoinForm
+              cell={celulaAbierta}
+              cells={groups.find(g => g.key === openKey)?.cells || []}
+              onBack={() => setSolicitando(false)}
+              tone="light"
             />
           </ModalWrapper>
         )}
