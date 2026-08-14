@@ -6,7 +6,7 @@ import apiClient from '../../lib/apiClient';
 import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
-import useSeo from '../hooks/useSeo';
+import useSeo from '../../hooks/useSeo';
 // Vocabulario de movimiento compartido: la amplitud del press la decide el
 // ROL del botón (primario / apoyo / micro-control), no el archivo. Antes
 // vivía aquí como un `const PRESS` local que le daba la MISMA física al CTA

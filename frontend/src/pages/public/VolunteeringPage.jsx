@@ -367,7 +367,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           Continuar
         </motion.button>
       </form>
-    </>
+    </div>
   );
 }
 
@@ -761,7 +761,7 @@ export default function VolunteeringPage() {
                 </button>
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -831,7 +831,7 @@ export default function VolunteeringPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         }}
       />
