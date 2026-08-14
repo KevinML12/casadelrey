@@ -713,7 +713,7 @@ function CellQuizModal({ groups, onViewDetail }) {
         </p>
         {category.image && (
           <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
-            <img src={category.image} alt="" className="w-full h-full object-cover" />
+            <img src={category.image} alt={`Imagen representativa de ${category.name}`} className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -778,7 +778,7 @@ function CellQuizModal({ groups, onViewDetail }) {
             {g.image && (
               <img
                 src={g.image}
-                alt=""
+                alt="Imagen representativa"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             )}
@@ -991,7 +991,7 @@ export default function CelulasPage() {
                         el tercio de abajo, que es donde vive el texto. */}
                     <img
                       src={g.image}
-                      alt=""
+                      alt="Imagen representativa"
                       className="parallax-layer absolute inset-0 w-full h-full object-cover"
                     />
                     <div className="scrim-card" />

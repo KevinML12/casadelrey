@@ -9,6 +9,26 @@ import { SiteConfigProvider } from './context/SiteConfigContext';
 import useDarkMode from './hooks/useDarkMode';
 import { router } from './router';
 import './index.css';
+import * as Sentry from '@sentry/react';
+
+// Inicializar Sentry (solo en producción o si VITE_SENTRY_DSN está definido)
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        maskAllText: false,
+        blockAllMedia: false,
+      }),
+    ],
+    // Tracing
+    tracesSampleRate: 1.0, 
+    // Session Replay
+    replaysSessionSampleRate: 0.1, 
+    replaysOnErrorSampleRate: 1.0, 
+  });
+}
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },

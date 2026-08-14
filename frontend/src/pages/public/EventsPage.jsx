@@ -684,7 +684,7 @@ export default function EventsPage() {
             pantalla, es algo acomodándose. */}
       <section className="relative pt-40 pb-12 overflow-hidden">
         <SectionBg src="/images/public_bg_eventos.jpg" />
-        <ParallaxImg src={heroImg} alt="" />
+        <ParallaxImg src={heroImg} alt="Imagen del evento" />
         <div className="scrim-hero" />
         <div className="relative z-10 px-6 max-w-6xl mx-auto w-full text-center">
           <h1 className="text-d1 text-white">Eventos</h1>

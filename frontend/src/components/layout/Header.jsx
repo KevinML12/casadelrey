@@ -183,6 +183,8 @@ export default function Header() {
               onClick={() => setMenuOpen(o => !o)}
               className="xl:hidden grid place-items-center h-10 px-4 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring text-14 font-bold"
               aria-label="Menú"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
             >
               {menuOpen ? 'Cerrar' : 'Menú'}
             </button>
@@ -198,6 +200,8 @@ export default function Header() {
             Ahora la altura es relativa al viewport (nunca más grande que
             la pantalla) con scroll interno si aun asi no entra todo. */}
         <div
+          id="mobile-menu"
+          aria-hidden={!menuOpen}
           className={`xl:hidden transition-all duration-500 ease-spring ${
             menuOpen ? 'opacity-100 overflow-y-auto' : 'opacity-0 overflow-hidden'
           }`}

@@ -141,7 +141,7 @@ export default function AboutPage() {
           pleno y el contraste lo pone .scrim-card. */}
       <section className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
         <SectionBg src="/images/public_bg_nosotros.jpg" />
-        <ParallaxImg src={pastoresImg} alt="" overlay={true} />
+        <ParallaxImg src={pastoresImg} alt="Decorativo" overlay={true} />
         <div className="scrim-card" />
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Sin Reveal: el titular de sección es el punto fijo contra el que
@@ -365,7 +365,7 @@ export default function AboutPage() {
               {/* Miniatura ilustrativa, no un control: sin Tilt (no navega y
                   mide ~100px, muy poco para que la inclinación se lea). */}
               <div className="shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
-                {areas[0]?.photo && <img src={areas[0].photo} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+                {areas[0]?.photo && <img src={areas[0].photo} alt="Decorativo" className="absolute inset-0 w-full h-full object-cover" />}
               </div>
               <div>
                 <p className="text-24 md:text-28 font-bold text-white tracking-tight">Voluntariado</p>
@@ -377,7 +377,7 @@ export default function AboutPage() {
             </Reveal>
             <Reveal from="right" delay={0.06} className="liquid-glass p-8 md:p-10 rounded-[22px] border border-white/5 flex flex-col sm:flex-row items-center text-center sm:text-left gap-6">
               <div className="shrink-0 relative w-24 h-24 md:w-28 md:h-28 rounded-[22px] overflow-hidden">
-                {cellCategories[0]?.image_url && <img src={cellCategories[0].image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+                {cellCategories[0]?.image_url && <img src={cellCategories[0].image_url} alt="Decorativo" className="absolute inset-0 w-full h-full object-cover" />}
               </div>
               <div>
                 <p className="text-24 md:text-28 font-bold text-white tracking-tight">Células</p>

@@ -18,19 +18,71 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Limpia el token si el servidor responde 401. localStorage.removeItem
-// por sí solo NO actualiza el estado de React (AuthContext solo lee
-// localStorage una vez al montar) — sin el evento, `user`/
-// `isAuthenticated` quedaban desincronizados con un token ya muerto,
-// dejando la UI mostrando sesión iniciada. AuthContext escucha este
-// evento para limpiar su propio estado también.
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 apiClient.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.dispatchEvent(new Event('auth:unauthorized'));
+  async (err) => {
+    const originalRequest = err.config;
+
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise(function(resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = 'Bearer ' + token;
+          return apiClient(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+      
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (refreshToken) {
+        try {
+          const res = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
+          const { token, refresh_token: newRefreshToken } = res.data;
+          
+          localStorage.setItem('token', token);
+          localStorage.setItem('refresh_token', newRefreshToken);
+          
+          apiClient.defaults.headers.common.Authorization = 'Bearer ' + token;
+          originalRequest.headers.Authorization = 'Bearer ' + token;
+          
+          processQueue(null, token);
+          return apiClient(originalRequest);
+        } catch (refreshErr) {
+          processQueue(refreshErr, null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refresh_token');
+          window.dispatchEvent(new Event('auth:unauthorized'));
+          return Promise.reject(refreshErr);
+        } finally {
+          isRefreshing = false;
+        }
+      } else {
+        isRefreshing = false;
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        window.dispatchEvent(new Event('auth:unauthorized'));
+      }
     }
+
     return Promise.reject(err);
   },
 );

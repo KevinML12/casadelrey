@@ -111,7 +111,7 @@ export default function GalleryPage() {
                           textura gris hasta que la tocabas). El contraste lo
                           pone .scrim-card, que oscurece solo el tercio bajo
                           donde caen el título y el conteo. */}
-                      <img src={a.photos[0]?.url} alt="" loading="lazy"
+                      <img src={a.photos[0]?.url} alt={`Portada del álbum ${a.album}`} loading="lazy"
                         className="parallax-layer absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="scrim-card" />
                       <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">

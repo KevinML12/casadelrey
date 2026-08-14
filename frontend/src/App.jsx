@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
+import useDeviceTier from './hooks/useDeviceTier';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Splash from './components/ui/Splash';
@@ -76,7 +77,11 @@ const ROUTE_BG_KEYS = {
 // profundidad que aportaban ahora la carga WindowStack, que apila las
 // ventanas como cartas con puro transform/opacity y funciona en todos lados.
 export default function App() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+  const isDashboard = pathname.startsWith('/admin') || pathname.startsWith('/leader') || pathname.startsWith('/volunteer-dashboard');
+
+  useDeviceTier();
+
   const settings = useApi('/settings') || {};
 
   useEffect(() => {

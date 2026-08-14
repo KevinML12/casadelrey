@@ -105,6 +105,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	authGroup := api.Group("/auth", authRateLimit)
 	authGroup.POST("/register",        authHandler.RegisterDisabled)
 	authGroup.POST("/login",           authHandler.Login)
+	authGroup.POST("/refresh",         authHandler.Refresh)
 	authGroup.GET("/verify-email",     authHandler.VerifyEmail)
 	authGroup.POST("/forgot-password", authHandler.ForgotPassword)
 	authGroup.POST("/reset-password",  authHandler.ResetPassword)

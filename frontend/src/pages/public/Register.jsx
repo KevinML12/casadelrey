@@ -36,7 +36,7 @@ export default function Register() {
       {/* Foto a color pleno + .scrim-hero: la composición es centrada, así
           que el óvalo oscuro cae justo donde vive el bloque de texto. Antes
           la foto iba al 40% bajo otro degradado encima. */}
-      <ParallaxImg src={bg} alt="" />
+      <ParallaxImg src={bg} alt="Fondo" />
       <div className="scrim-hero" />
 
       <div className="relative z-10 w-full max-w-2xl mx-auto px-6 text-center">

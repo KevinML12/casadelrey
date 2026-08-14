@@ -3,8 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 // E2E contra el sitio REAL desplegado (Vercel + Fly + Supabase), no un
 // mock — la filosofía del proyecto es "nada estático, todo el flujo
 // real". PW_BASE_URL permite apuntar a localhost si se levanta el dev
-// server (`npm run dev`) en otra sesión.
-const baseURL = process.env.PW_BASE_URL || 'https://casadelreyhue.vercel.app';
+// server (`npm run dev`) en otra sesión. ¡Nunca testear directo contra producción!
+const baseURL = process.env.PW_BASE_URL || 'http://localhost:5173';
 
 export default defineConfig({
   testDir: './e2e',

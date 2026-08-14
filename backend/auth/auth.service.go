@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"time"
 
 	"casadelrey/backend/config"
@@ -58,4 +60,13 @@ func GenerateJWT(userID uint, name, email, role string) (string, error) {
 // GetJWTSecret obtiene la clave secreta para JWT (usado por middlewares)
 func GetJWTSecret() []byte {
 	return []byte(config.AppConfig.JWTSecret)
+}
+
+// GenerateSecureToken genera una cadena segura aleatoria de tamaño especificado
+func GenerateSecureToken(length int) (string, error) {
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }

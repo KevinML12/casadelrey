@@ -18,7 +18,7 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await apiClient.post('/auth/login', { email, password });
-      login(res.data.token);
+      login(res.data.token, res.data.refresh_token);
       toast.success('¡Bienvenido!');
       const role = res.data.user?.role || '';
       if (role === 'admin')          navigate('/admin');

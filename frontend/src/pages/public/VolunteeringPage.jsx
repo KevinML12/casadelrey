@@ -399,7 +399,7 @@ function DepartmentCard({ title, desc, photo, onClick }) {
     >
       <img
         src={photo}
-        alt=""
+        alt="Imagen de voluntariado"
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-x-3 bottom-3 glass-light rounded-[16px] px-4 py-3">
@@ -457,7 +457,7 @@ function QuizModal({ areas, onViewDetail, onApply }) {
             {results.map(r => (
               <li key={r.value} className="py-4 flex items-start gap-4">
                 {r.photo && (
-                  <img src={r.photo} alt="" className="w-14 h-14 rounded-[12px] object-cover shrink-0" />
+                  <img src={r.photo} alt="Imagen de voluntariado" className="w-14 h-14 rounded-[12px] object-cover shrink-0" />
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-15 font-bold text-bg">{r.title}</p>
@@ -496,7 +496,7 @@ function QuizModal({ areas, onViewDetail, onApply }) {
         <h3 className="text-24 font-bold text-bg tracking-tight mb-4">{result ? result.title : 'Cualquier departamento'}</h3>
         {result?.photo && (
           <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
-            <img src={result.photo} alt="" className="w-full h-full object-cover" />
+            <img src={result.photo} alt="Imagen de voluntariado" className="w-full h-full object-cover" />
           </div>
         )}
         <p className="text-14 text-bg/65 leading-relaxed mb-6">{result ? result.why : NO_PREFERENCE_WHY}</p>

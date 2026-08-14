@@ -18,4 +18,6 @@ type User struct {
 	EmailVerified           bool       `json:"email_verified" gorm:"default:false"`
 	VerificationToken       *string    `json:"-" gorm:"index"`
 	VerificationTokenExpiry *time.Time `json:"-"`
+	RefreshToken            *string    `json:"-" gorm:"index"`
+	RefreshTokenExpiry      *time.Time `json:"-"`
 }

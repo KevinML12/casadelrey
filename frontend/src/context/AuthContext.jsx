@@ -16,8 +16,16 @@ export function AuthProvider({ children }) {
   useEffect(() => { setLoading(false); }, []);
 
   // ── Guardar / limpiar token ──────────────────────────────────
-  const saveToken = (t) => { localStorage.setItem('token', t); setToken(t); };
-  const clearToken = () => { localStorage.removeItem('token'); setToken(null); };
+  const saveToken = (t, rT) => { 
+    localStorage.setItem('token', t); 
+    if (rT) localStorage.setItem('refresh_token', rT);
+    setToken(t); 
+  };
+  const clearToken = () => { 
+    localStorage.removeItem('token'); 
+    localStorage.removeItem('refresh_token');
+    setToken(null); 
+  };
 
   // apiClient dispara este evento en un 401 — ya limpió localStorage,
   // pero el estado de React (token/user) necesita enterarse también.
@@ -29,7 +37,7 @@ export function AuthProvider({ children }) {
 
   // ── Auth actions ─────────────────────────────────────────────
 
-  const login = (newToken) => saveToken(newToken);
+  const login = (newToken, newRefreshToken = null) => saveToken(newToken, newRefreshToken);
 
   const logout = () => clearToken();
 

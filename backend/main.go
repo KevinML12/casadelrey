@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"casadelrey/backend/config"
 	"casadelrey/backend/database"
@@ -17,9 +18,25 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	
+	"github.com/getsentry/sentry-go"
 )
 
 func main() {
+	// 0. Inicializar Sentry (solo si hay DSN configurado)
+	sentryDsn := os.Getenv("SENTRY_DSN")
+	if sentryDsn != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:              sentryDsn,
+			EnableTracing:    true,
+			TracesSampleRate: 1.0,
+		}); err != nil {
+			log.Printf("Sentry initialization failed: %v", err)
+		} else {
+			defer sentry.Flush(2 * time.Second)
+		}
+	}
+
 	// 1. Cargar .env solo en desarrollo.
 	//    En producción (Dokploy/Docker), las vars se inyectan directamente.
 	if os.Getenv("ENV") != "production" {
@@ -52,6 +69,22 @@ func main() {
 
 	// Recover: captura panics inesperados y responde 500 en lugar de crashear.
 	e.Use(middleware.Recover())
+
+	// Sentry Middleware (atrapa panics y traces)
+	if os.Getenv("SENTRY_DSN") != "" {
+		e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				defer func() {
+					if r := recover(); r != nil {
+						sentry.CurrentHub().Recover(r)
+						sentry.Flush(2 * time.Second)
+						c.Error(fmt.Errorf("panic: %v", r))
+					}
+				}()
+				return next(c)
+			}
+		})
+	}
 
 	// CORS: permite peticiones desde el frontend (local y producción).
 	//       AllowOrigins acepta la URL del frontend configurada en CLIENT_URL.

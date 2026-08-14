@@ -146,7 +146,7 @@ func (h *Handler) Login(c echo.Context) error {
 		})
 	}
 
-	// Generar el token JWT (válido 24h, firmado con JWT_SECRET)
+	// Generar el token JWT (Access Token válido por ej. 24h o 15m)
 	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role)
 	if err != nil {
 		log.Printf("[Auth] Error al generar JWT: %v", err)
@@ -155,8 +155,68 @@ func (h *Handler) Login(c echo.Context) error {
 		})
 	}
 
+	// Generar Refresh Token (cadena aleatoria o UUID)
+	refreshToken, err := GenerateSecureToken(32)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al generar refresh token."})
+	}
+	
+	expiry := time.Now().Add(7 * 24 * time.Hour)
+	user.RefreshToken = &refreshToken
+	user.RefreshTokenExpiry = &expiry
+	h.DB.Save(&user)
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
+		"refresh_token": refreshToken,
+		"user": map[string]interface{}{
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+			"role":  user.Role,
+		},
+	})
+}
+
+// Refresh godoc
+// POST /api/v1/auth/refresh
+// Usa un refresh_token válido para emitir un nuevo JWT.
+func (h *Handler) Refresh(c echo.Context) error {
+	type RefreshRequest struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	req := new(RefreshRequest)
+	if err := c.Bind(req); err != nil || req.RefreshToken == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Refresh token requerido."})
+	}
+
+	var user User
+	if result := h.DB.Where("refresh_token = ?", req.RefreshToken).First(&user); result.Error != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Refresh token inválido."})
+	}
+
+	if user.RefreshTokenExpiry == nil || time.Now().After(*user.RefreshTokenExpiry) {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Refresh token expirado."})
+	}
+
+	// Generar nuevo JWT
+	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error interno al generar nuevo token."})
+	}
+	
+	// Opcional: Rotar el refresh token (refresh token rotation)
+	// Para hacerlo simple y confiable para sesiones largas, lo mantendremos igual hasta que expire, o podemos emitir uno nuevo.
+	// Emitiremos uno nuevo para mayor seguridad.
+	newRefreshToken, _ := GenerateSecureToken(32)
+	expiry := time.Now().Add(7 * 24 * time.Hour)
+	user.RefreshToken = &newRefreshToken
+	user.RefreshTokenExpiry = &expiry
+	h.DB.Save(&user)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"token": token,
+		"refresh_token": newRefreshToken,
 		"user": map[string]interface{}{
 			"id":    user.ID,
 			"name":  user.Name,

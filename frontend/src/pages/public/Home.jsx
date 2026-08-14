@@ -267,7 +267,7 @@ function HeroCarousel({ onPlan }) {
                   />
                 ) : (
                   <img
-                    src={url} alt=""
+                    src={url} alt="Fondo decorativo"
                     onError={() => markFailed(s.media)}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
