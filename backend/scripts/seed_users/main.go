@@ -63,51 +63,28 @@ func main() {
 		}
 	}
 
-	// 2. Crear cuentas para líderes de célula (a partir de la tabla de directorio de líderes o reportes si es necesario)
-	fmt.Println("\nBuscando líderes sin cuenta de usuario asociada...")
-
-	var leaders []models.Leader
-	db.Find(&leaders)
+	// 2. Crear cuentas para líderes específicos (basado en capturas)
+	explicitLeaders := []models.User{
+		{Name: "Hugo Maldonado", Email: "hugo.maldonado@casadelrey.org", Role: "leader"},
+		{Name: "Paula Ríos", Email: "paula.rios@casadelrey.org", Role: "leader"},
+		{Name: "Sucely Rivas", Email: "sucely.rivas@casadelrey.org", Role: "leader"},
+	}
 
 	creados := 0
-	for _, l := range leaders {
-		if l.UserID == nil || *l.UserID == 0 {
-			// No tiene cuenta, generamos un email genérico si no tiene
-			email := l.Email
-			if email == "" {
-				cleanName := strings.ReplaceAll(strings.ToLower(l.Name), " ", ".")
-				email = fmt.Sprintf("%s@casadelrey.org", cleanName)
+	for _, l := range explicitLeaders {
+		var ex models.User
+		if db.Where("email = ?", l.Email).First(&ex).Error == nil {
+			if ex.Role != "admin" {
+				ex.Role = "leader"
+				db.Save(&ex)
 			}
-
-			// Revisar si ese correo ya está en la base de datos de usuarios
-			var ex models.User
-			if db.Where("email = ?", email).First(&ex).Error == nil {
-				// Ya existe un usuario con ese correo, solo lo enlazamos y nos aseguramos de que sea líder o admin
-				if ex.Role != "admin" {
-					ex.Role = "leader"
-					db.Save(&ex)
-				}
-				l.UserID = &ex.ID
-				db.Save(&l)
-				fmt.Printf(" [~] Líder enlazado a usuario existente: %s (%s)\n", l.Name, email)
-			} else {
-				// Crear usuario nuevo
-				newUser := models.User{
-					Name:          l.Name,
-					Email:         email,
-					Password:      hashedPw,
-					Role:          "leader",
-					EmailVerified: true,
-				}
-				db.Create(&newUser)
-				
-				// Enlazar líder con el nuevo usuario
-				l.UserID = &newUser.ID
-				db.Save(&l)
-				
-				fmt.Printf(" [+] Líder creado: %s (Email: %s)\n", l.Name, email)
-				creados++
-			}
+			fmt.Printf(" [~] Líder actualizado: %s (%s)\n", l.Name, l.Email)
+		} else {
+			l.Password = hashedPw
+			l.EmailVerified = true
+			db.Create(&l)
+			fmt.Printf(" [+] Líder creado: %s (%s)\n", l.Name, l.Email)
+			creados++
 		}
 	}
 
