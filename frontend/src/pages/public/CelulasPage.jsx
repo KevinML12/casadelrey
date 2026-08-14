@@ -139,14 +139,22 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
           avatar de relleno: es la primera letra de su nombre, que es dato
           real y distinto en cada fila. Da un ancla a la izquierda y rompe
           la lista de puro texto que se leía como hoja de cálculo. */}
-      <span
-        className={`shrink-0 w-11 h-11 rounded-[12px] grid place-items-center text-17 font-bold ${
-          dark ? 'bg-white/10 text-white/80' : 'bg-bg/8 text-bg/70'
-        }`}
-        aria-hidden="true"
-      >
-        {(cell.name || '?').trim()[0].toUpperCase()}
-      </span>
+      {cell.leader_photo ? (
+        <img
+          src={cell.leader_photo}
+          alt={`Líder ${cell.leader}`}
+          className="shrink-0 w-14 h-14 rounded-full object-cover shadow-sm border border-black/5"
+        />
+      ) : (
+        <span
+          className={`shrink-0 w-12 h-12 rounded-[14px] grid place-items-center text-18 font-bold shadow-sm ${
+            dark ? 'bg-white/10 text-white/80' : 'bg-bg/8 text-bg/70'
+          }`}
+          aria-hidden="true"
+        >
+          {(cell.name || '?').trim()[0].toUpperCase()}
+        </span>
+      )}
 
       {/* Dos líneas, cada una con un ancla a la izquierda y otra a la
           derecha. Antes todo se apelotonaba a la izquierda y "Unirme"
@@ -478,12 +486,20 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
       </motion.button>
 
       <motion.div variants={itemVariants} className="flex items-center gap-4">
-        <span
-          className="shrink-0 w-14 h-14 rounded-[16px] grid place-items-center text-24 font-bold bg-bg/10 text-bg/75"
-          aria-hidden="true"
-        >
-          {(cell.name || '?').trim()[0].toUpperCase()}
-        </span>
+        {cell.leader_photo ? (
+          <img
+            src={cell.leader_photo}
+            alt={`Líder ${cell.leader}`}
+            className="shrink-0 w-20 h-20 rounded-full object-cover shadow-sm border border-bg/5"
+          />
+        ) : (
+          <span
+            className="shrink-0 w-16 h-16 rounded-[18px] grid place-items-center text-28 font-bold bg-bg/10 text-bg/75 shadow-sm"
+            aria-hidden="true"
+          >
+            {(cell.name || '?').trim()[0].toUpperCase()}
+          </span>
+        )}
         <h3 className="text-d3 text-bg min-w-0 break-words">{cell.name}</h3>
       </motion.div>
 

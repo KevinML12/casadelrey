@@ -165,11 +165,43 @@ func (h *CellCategoryHandler) GetPublicCells(c echo.Context) error {
 		Type         string `json:"type"`
 		Description  string `json:"description"`
 		Leader       string `json:"leader"`
+		LeaderPhoto  string `json:"leader_photo"`
 		Zone         string `json:"zone"`
 		Day          string `json:"day"`
 		Time         string `json:"time"`
 		WhatToExpect string `json:"what_to_expect"`
 	}
+	
+	// Buscar fotos de los perfiles de líderes para las células
+	var leaderProfiles []models.Leader
+	if err := h.db.Where("is_active = ?", true).Find(&leaderProfiles).Error; err == nil {
+		// Mapa de UserID -> PhotoURL
+		photos := make(map[uint]string)
+		for _, lp := range leaderProfiles {
+			if lp.UserID != nil && lp.PhotoURL != "" {
+				photos[*lp.UserID] = lp.PhotoURL
+			}
+		}
+
+		out := make([]publicCell, 0, len(cells))
+		for _, cl := range cells {
+			out = append(out, publicCell{
+				ID:           cl.ID,
+				Code:         cl.Code,
+				Name:         cl.Name,
+				Type:         cl.Type,
+				Description:  cl.Description,
+				Leader:       cl.Leader.Name,
+				LeaderPhoto:  photos[cl.LeaderID],
+				Zone:         cl.Zone,
+				Day:          cl.Day,
+				Time:         cl.Time,
+				WhatToExpect: cl.WhatToExpect,
+			})
+		}
+		return c.JSON(http.StatusOK, out)
+	}
+
 	out := make([]publicCell, 0, len(cells))
 	for _, cl := range cells {
 		out = append(out, publicCell{

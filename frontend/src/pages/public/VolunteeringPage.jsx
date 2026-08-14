@@ -202,6 +202,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', department: initialDepartment || NO_PREFERENCE, message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const area = areas.find(a => a.value === form.department);
   // Cambiar de departamento requiere: abrir el selector (changing) ->
   // elegir uno (pendingChange, todavia NO aplicado) -> confirmar. Cerrar
   // sin confirmar deja form.department intacto -- la "doble verificacion"
@@ -710,7 +711,7 @@ export default function VolunteeringPage() {
           </Reveal>
 
           <motion.div layout className="space-y-10">
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence>
             {categoriesWithLeftover.map(cat => {
               // Filtra por el eje `interes` únicamente: 'frente'/'apoyo'
               // son visibilidad y no existen como chip, así que mirar el
@@ -722,10 +723,10 @@ export default function VolunteeringPage() {
               return (
                 <motion.div 
                   layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+                  initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                  animate={{ opacity: 1, height: 'auto', overflow: 'visible' }}
+                  exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                  transition={{ opacity: { duration: 0.2 }, height: { type: 'spring', stiffness: 250, damping: 25 } }}
                   key={cat.name} 
                   onMouseEnter={() => setHoverCategory(cat.name)} 
                   onMouseLeave={() => setHoverCategory(null)}

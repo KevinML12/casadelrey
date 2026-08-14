@@ -11,6 +11,8 @@ import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
 import { useSitePhoto, useApi, groupAlbums } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
+import { useSiteConfig } from '../../context/SiteConfigContext';
+import useSeo from '../../hooks/useSeo';
 // El press ya no se define aquí: era una de las 7 copias del mismo objeto
 // repartidas por el sitio, cada una con su amplitud. Los dos MotionLink de
 // esta página son CTA (llevan a /celulas), así que ambos usan el press
@@ -55,7 +57,7 @@ const BENTO_SPANS = [
 ];
 
 export default function AboutPage() {
-  const settings = useSiteSettings();
+  const settings = useSiteConfig();
   useSeo('Nosotros', 'Conoce la historia, misión y visión de Casa del Rey. Edificando la iglesia célula por célula, generación tras generación.');
 
   // Fotos administrables (AdminSitePhotos) con fallback local garantizado.
