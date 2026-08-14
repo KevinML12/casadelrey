@@ -697,7 +697,8 @@ export default function VolunteeringPage() {
             ))}
           </Reveal>
 
-          <div className="space-y-10">
+          <motion.div layout className="space-y-10">
+            <AnimatePresence mode="popLayout">
             {categoriesWithLeftover.map(cat => {
               // Filtra por el eje `interes` únicamente: 'frente'/'apoyo'
               // son visibilidad y no existen como chip, así que mirar el
@@ -707,40 +708,39 @@ export default function VolunteeringPage() {
               const catAreas = areas.filter(a => cat.values.includes(a.value) && (!activeTag || matchOf(a.value).interes.includes(activeTag)));
               if (catAreas.length === 0) return null;
               return (
-                <div key={cat.name} onMouseEnter={() => setHoverCategory(cat.name)} onMouseLeave={() => setHoverCategory(null)}>
-                  {/* Caja normal. `uppercase tracking-tightish` era un
-                      defecto real -- las versales piden MÁS aire, no
-                      -0.02em -- y encima repetía la fórmula del eyebrow
-                      (micro-mayúsculas encima de un bloque). En caja
-                      normal se lee mejor a 13px, así que basta subir un
-                      punto la opacidad para que siga leyéndose como el
-                      nombre de la familia y no como texto suelto. */}
+                <motion.div 
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+                  key={cat.name} 
+                  onMouseEnter={() => setHoverCategory(cat.name)} 
+                  onMouseLeave={() => setHoverCategory(null)}
+                >
                   <p className="text-13 font-semibold text-white/60 mb-4">{cat.name}</p>
-                  {/* Grilla regular, no `columns-*`: el masonry repartía
-                      las tarjetas de arriba abajo por columna (fila 1 =
-                      depto 1 y 3, no 1 y 2) y con 1-3 items por familia
-                      dejaba columnas vacías. Con proporción fija en la
-                      tarjeta, la grilla ordena en el sentido de lectura y
-                      todas las de una familia miden lo mismo. */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <AnimatePresence mode="popLayout">
                     {catAreas.map(area => {
-                      const i = globalIndex[area.value];
                       return (
                         <motion.div
+                          layout
                           key={area.value}
-                          initial={{ opacity: 0, y: 18, scale: 0.96 }}
-                          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                          viewport={{ once: true, margin: '-60px' }}
-                          transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.05 }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          transition={{ type: 'spring', stiffness: 250, damping: 25 }}
                         >
                           <DepartmentCard {...area} onClick={() => setOpenKey(area.value)} />
                         </motion.div>
                       );
                     })}
-                  </div>
-                </div>
+                    </AnimatePresence>
+                  </motion.div>
+                </motion.div>
               );
             })}
+            </AnimatePresence>
             {activeTag && !areas.some(a => matchOf(a.value).interes.includes(activeTag)) && (
               <div className="text-center py-10">
                 <p className="text-15 text-white/50 mb-3">Ningún departamento coincide con ese interés todavía.</p>
