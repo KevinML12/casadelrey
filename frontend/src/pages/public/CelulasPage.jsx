@@ -261,30 +261,35 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
   };
 
   const titulo = dark ? 'text-white' : 'text-bg';
-  const suave = dark ? 'text-white/55' : 'text-bg/55';
-  const tenue = dark ? 'text-white/70' : 'text-bg/70';
-  const campo = `w-full rounded-[12px] px-4 py-3 text-15 outline-none transition-colors ${
+  const suave = dark ? 'text-white/60' : 'text-bg/60';
+  const tenue = dark ? 'text-white/75' : 'text-bg/75';
+  const campo = `w-full rounded-[14px] px-4 py-3.5 text-15 outline-none transition-all ${
     dark
-      ? 'bg-white/8 border border-white/15 text-white placeholder:text-white/30 focus:border-white/35'
-      : 'bg-bg/5 border border-bg/12 text-bg placeholder:text-bg/30 focus:border-bg/30'
+      ? 'bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:border-white/50 focus:bg-white/15 focus:ring-4 focus:ring-white/5'
+      : 'bg-white border border-bg/15 text-bg placeholder:text-bg/40 focus:border-bg/40 focus:ring-4 focus:ring-bg/5 shadow-sm'
   }`;
-  const btnPpal = `w-full inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-15 font-bold focus-ring disabled:opacity-50 ${
-    dark ? 'bg-white text-bg' : 'bg-bg text-white'
+  const btnPpal = `w-full inline-flex items-center justify-center rounded-pill px-6 py-4 text-15 font-bold focus-ring shadow-card disabled:opacity-50 transition-opacity ${
+    dark ? 'bg-white text-bg' : 'bg-bg text-white hover:opacity-90'
   }`;
-  const btnSec = `w-full inline-flex items-center justify-center rounded-pill px-6 py-3 text-14 font-semibold transition-colors ${
-    dark ? 'text-white/55 hover:text-white hover:bg-white/5' : 'text-bg/55 hover:text-bg hover:bg-bg/5'
+  const btnSec = `w-full inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-14 font-semibold transition-colors ${
+    dark ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-bg/60 hover:text-bg hover:bg-bg/8'
   }`;
 
   if (listo) {
     return (
-      <div className="text-center py-6">
-        <h3 className={`text-22 font-bold mb-2 ${titulo}`}>Solicitud enviada</h3>
-        <p className={`text-15 leading-relaxed ${tenue}`}>
+      <div className="text-center py-8">
+        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 className={`text-24 font-bold mb-3 ${titulo}`}>¡Solicitud enviada!</h3>
+        <p className={`text-16 leading-relaxed ${tenue}`}>
           {cell.leader
-            ? `Le avisamos a ${cell.leader.split(' ')[0]}, que lidera ${cell.name}. Te contactan pronto.`
-            : `Le avisamos al equipo de ${cell.name}. Te contactan pronto.`}
+            ? `Le avisamos a ${cell.leader.split(' ')[0]}, que lidera ${cell.name}. Te contactará muy pronto.`
+            : `Le avisamos al equipo de ${cell.name}. Te contactaremos muy pronto.`}
         </p>
-        <button type="button" onClick={onBack} className={`${btnSec} mt-5`}>Listo</button>
+        <button type="button" onClick={onBack} className={`${btnSec} mt-8`}>Terminar</button>
       </div>
     );
   }
@@ -296,39 +301,41 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
         <button
           type="button"
           onClick={() => setConfirmando(false)}
-          className={`text-13 font-semibold mb-4 underline underline-offset-4 ${suave} ${dark ? 'decoration-white/25 hover:text-white' : 'decoration-bg/25 hover:text-bg'}`}
+          className={`inline-flex items-center gap-1.5 text-13 font-bold mb-5 transition-colors focus-ring rounded-full px-2 py-1 -ml-2 ${
+            dark ? 'text-white/60 hover:text-white' : 'text-bg/60 hover:text-bg'
+          }`}
         >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
           Atrás
         </button>
-        <p className={`text-13 font-semibold mb-1 ${suave}`}>Confirmar solicitud</p>
-        <h3 className={`text-21 font-bold tracking-tight mb-4 ${titulo}`}>{cell.name}</h3>
+        <p className={`text-13 font-bold uppercase tracking-widest mb-2 ${suave}`}>Confirmar solicitud</p>
+        <h3 className={`text-28 font-bold tracking-tight mb-6 ${titulo}`}>{cell.name}</h3>
 
-        <div className={`rounded-[16px] p-5 mb-6 ${dark ? 'bg-white/6 border border-white/10' : 'glass-light-nested'}`}>
-          <p className={`text-13 font-semibold mb-2 ${suave}`}>¿Quién te va a contactar?</p>
-          <p className={`text-15 leading-relaxed ${tenue}`}>
+        <div className={`rounded-[20px] p-6 mb-8 border shadow-sm ${dark ? 'bg-white/5 border-white/15' : 'bg-white border-bg/10'}`}>
+          <p className={`text-12 font-bold uppercase tracking-widest mb-3 ${suave}`}>¿Quién te va a contactar?</p>
+          <p className={`text-16 leading-relaxed font-medium ${tenue}`}>
             {cell.leader
               ? `${cell.leader}, que lidera esta célula.`
               : 'El equipo de la iglesia, que te pondrá en contacto con el líder.'}
             {cell.zone ? ` Se reúnen en ${cell.zone}.` : ''}
           </p>
           {(cell.day || cell.time) && (
-            <p className={`text-15 font-semibold mt-2 ${tenue}`}>
+            <p className={`text-15 font-bold mt-3 ${titulo}`}>
               Se reúnen {[cell.day, cell.time].filter(Boolean).join(' a las ')}.
             </p>
           )}
           {cell.what_to_expect && (
-            <p className={`text-14 leading-relaxed mt-3 ${dark ? 'text-white/55' : 'text-bg/60'}`}>
+            <p className={`text-15 leading-relaxed mt-4 font-medium ${suave}`}>
               {cell.what_to_expect}
             </p>
           )}
-          {cell.description && (
-            <p className={`text-14 leading-relaxed mt-2 ${dark ? 'text-white/50' : 'text-bg/55'}`}>{cell.description}</p>
-          )}
         </div>
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-3">
           <motion.button {...PRESS_PRIMARY} type="button" onClick={enviar} disabled={enviando} className={btnPpal}>
-            {enviando ? 'Enviando…' : 'Confirmar solicitud'}
+            {enviando ? 'Enviando…' : 'Confirmar y Enviar'}
           </motion.button>
           <button type="button" onClick={() => setConfirmando(false)} disabled={enviando} className={btnSec}>
             Volver a editar
@@ -339,44 +346,44 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
   }
 
   return (
-    <form onSubmit={revisar} className="text-left">
+    <form onSubmit={revisar} className="text-left flex flex-col min-h-full">
       <button
         type="button"
         onClick={onBack}
-        // Mismo pill que la salida de la ficha: es la misma acción (bajar
-        // un nivel de capa) y tiene que verse igual en las dos. Subrayado
-        // y al 55% de tinta se perdía contra el cristal.
-        className={`inline-flex items-center rounded-pill px-3.5 py-1.5 text-12 font-bold transition-colors focus-ring mb-5 ${
-          dark ? 'bg-white/10 hover:bg-white/20 text-white/70 hover:text-white' : 'bg-bg/8 hover:bg-bg/14 text-bg/70 hover:text-bg'
+        className={`self-start inline-flex items-center gap-1.5 rounded-pill pr-4 pl-3 py-1.5 text-13 font-bold transition-colors focus-ring mb-6 ${
+          dark ? 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white' : 'bg-bg/8 hover:bg-bg/14 text-bg/80 hover:text-bg'
         }`}
       >
-        Volver a la lista
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Atrás
       </button>
 
-      <p className={`text-13 font-semibold ${suave}`}>Quiero unirme a</p>
-      <h3 className={`text-20 font-bold leading-tight mb-5 ${titulo}`}>{cell.name}</h3>
+      <p className={`text-13 font-bold uppercase tracking-widest mb-1.5 ${suave}`}>Estás aplicando a</p>
+      <h3 className={`text-28 font-bold leading-tight mb-8 ${titulo}`}>{cell.name}</h3>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         <label className="block">
-          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Tu nombre <span className="text-rose">*</span></span>
-          <input className={campo} value={form.name} onChange={set('name')} required />
+          <span className={`block text-13 font-bold mb-2 ${titulo}`}>Tu nombre <span className="text-rose-500">*</span></span>
+          <input className={campo} value={form.name} onChange={set('name')} placeholder="Ej. Ana Pérez" required />
         </label>
         <label className="block">
-          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Teléfono o WhatsApp <span className="text-rose">*</span></span>
-          <input className={campo} type="tel" value={form.phone} onChange={set('phone')} required />
+          <span className={`block text-13 font-bold mb-2 ${titulo}`}>Teléfono o WhatsApp <span className="text-rose-500">*</span></span>
+          <input className={campo} type="tel" value={form.phone} onChange={set('phone')} placeholder="Ej. 5555 1234" required />
         </label>
         <label className="block">
-          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Correo (opcional)</span>
-          <input className={campo} type="email" value={form.email} onChange={set('email')} />
+          <span className={`block text-13 font-bold mb-2 ${titulo}`}>Correo <span className={`font-normal ${suave}`}>(opcional)</span></span>
+          <input className={campo} type="email" value={form.email} onChange={set('email')} placeholder="ana@ejemplo.com" />
         </label>
         <label className="block">
-          <span className={`block text-13 font-semibold mb-2 ${suave}`}>Cuéntanos algo de ti (opcional)</span>
+          <span className={`block text-13 font-bold mb-2 ${titulo}`}>Cuéntanos algo de ti <span className={`font-normal ${suave}`}>(opcional)</span></span>
           <textarea
             className={`${campo} resize-none`}
             rows={3}
             value={form.message}
             onChange={set('message')}
-            placeholder="Tu edad, en qué horarios puedes, lo que quieras que sepan…"
+            placeholder="Tu edad, horarios libres, por qué quieres unirte..."
           />
         </label>
 
@@ -473,9 +480,12 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
         variants={itemVariants}
         type="button"
         onClick={onCerrar}
-        className="inline-flex items-center rounded-pill bg-bg/8 hover:bg-bg/14 text-bg/70 hover:text-bg px-3.5 py-1.5 text-12 font-bold transition-colors focus-ring mb-5"
+        className="inline-flex items-center gap-1.5 rounded-pill bg-bg/8 hover:bg-bg/14 text-bg/75 hover:text-bg pr-4 pl-3 py-1.5 text-13 font-bold transition-colors focus-ring mb-6"
       >
-        Volver a la lista
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Atrás
       </motion.button>
 
       <motion.div variants={itemVariants} className="flex items-center gap-4">

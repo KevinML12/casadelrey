@@ -186,11 +186,9 @@ const GLOW = '#E8823C';
 function DepartmentLocked({ department, areas, onRequestChange }) {
   const area = areas.find(a => a.value === department);
   return (
-    <div className="rounded-[14px] border border-bg/12 bg-bg/5 px-4 py-3.5 flex items-center justify-between gap-3">
+    <div className="rounded-[14px] border border-bg/15 bg-white px-4 py-3.5 flex items-center justify-between gap-3 shadow-sm mt-5">
       <div className="min-w-0">
-        {/* Caja normal: las versales con tracking encima del dato son la
-            fórmula del eyebrow que se quitó del sitio, escrita a mano. */}
-        <p className="text-13 font-semibold text-bg/50 mb-1">Departamento</p>
+        <p className="text-12 font-bold uppercase tracking-widest text-bg/50 mb-1">Departamento</p>
         <p className="text-15 font-bold text-bg truncate">{area ? area.title : NO_PREFERENCE_LABEL}</p>
       </div>
       <button type="button" onClick={onRequestChange} className="shrink-0 text-13 font-semibold text-bg/55 hover:text-bg underline underline-offset-4 decoration-bg/20">
@@ -245,15 +243,20 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
     } finally { setSubmitting(false); }
   };
 
-  const area = areas.find(a => a.value === form.department);
+  const campo = `w-full rounded-[14px] px-4 py-3.5 text-15 outline-none transition-all bg-white border border-bg/15 text-bg placeholder:text-bg/40 focus:border-bg/40 focus:ring-4 focus:ring-bg/5 shadow-sm`;
 
   if (sent) {
     return (
-      <div className="text-center py-6">
-        <h3 className="text-22 text-bg font-bold mb-2">Inscripción recibida</h3>
-        <p className="text-14 text-bg/60">Nuestro equipo se pondrá en contacto contigo.</p>
-        <button onClick={onClose} className="mt-5 px-6 h-10 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90">
-          Listo
+      <div className="text-center py-8">
+        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 className="text-24 text-bg font-bold mb-3">¡Inscripción recibida!</h3>
+        <p className="text-16 text-bg/75 leading-relaxed">Nuestro equipo se pondrá en contacto contigo.</p>
+        <button onClick={onClose} className="mt-8 w-full inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-14 font-semibold transition-colors text-bg/60 hover:text-bg hover:bg-bg/8">
+          Terminar
         </button>
       </div>
     );
@@ -262,62 +265,71 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   // ── Pantalla: confirmar antes de enviar, con el "por qué" a la vista
   if (confirming) {
     return (
-      <>
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => setConfirming(false)} className="text-12 font-bold text-bg/60 hover:text-bg transition-colors shrink-0">
-            Atrás
-          </button>
-          <p className="text-13 font-semibold text-bg">Confirmar aplicación</p>
+      <div className="text-left flex flex-col min-h-full">
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          className="self-start inline-flex items-center gap-1.5 text-13 font-bold mb-5 transition-colors focus-ring rounded-full px-2 py-1 -ml-2 text-bg/60 hover:text-bg"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Atrás
+        </button>
+        <p className="text-13 font-bold uppercase tracking-widest mb-2 text-bg/60">Confirmar aplicación</p>
+        <h3 className="text-28 font-bold text-bg tracking-tight mb-6">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
+        
+        <div className="glass-light-nested rounded-[20px] p-6 mb-8 border border-bg/10 shadow-sm bg-white">
+          <p className="text-12 font-bold uppercase tracking-widest mb-3 text-bg/60">¿Por qué aquí?</p>
+          <p className="text-16 text-bg/75 leading-relaxed font-medium">{area ? area.why : NO_PREFERENCE_WHY}</p>
         </div>
-        <h3 className="text-21 font-bold text-bg tracking-tight mb-4">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
-        <div className="glass-light-nested rounded-[16px] p-5 mb-6">
-          <p className="text-13 font-semibold text-bg/55 mb-2">¿Por qué aquí?</p>
-          <p className="text-15 text-bg/75 leading-relaxed">{area ? area.why : NO_PREFERENCE_WHY}</p>
-        </div>
-        <div className="flex flex-col gap-2.5">
+        
+        <div className="flex flex-col gap-3">
           <motion.button {...PRESS_PRIMARY} onClick={confirmSubmit} disabled={submitting} className={btnPrimary}>
-            {submitting ? 'Enviando…' : 'Confirmar aplicación'}
+            {submitting ? 'Enviando…' : 'Confirmar y Enviar'}
           </motion.button>
-          <button type="button" onClick={() => setConfirming(false)} disabled={submitting} className={btnGhost}>
+          <button type="button" onClick={() => setConfirming(false)} disabled={submitting} className="w-full inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-14 font-semibold transition-colors text-bg/60 hover:text-bg hover:bg-bg/8">
             Volver a editar
           </button>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="mb-4 pr-10">
-        <p className="text-13 font-semibold text-bg">Aplicación</p>
-        <p className="text-14 text-bg/60 mt-0.5">{area ? area.title : NO_PREFERENCE_LABEL}</p>
+    <div className="text-left flex flex-col min-h-full">
+      <div className="mb-8">
+        <p className="text-13 font-bold uppercase tracking-widest mb-1.5 text-bg/60">Aplicación</p>
+        <h3 className="text-28 font-bold leading-tight text-bg">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
       </div>
 
-      <form onSubmit={reviewSubmit} className="space-y-4">
-        <div className="grid sm:grid-cols-2 gap-4">
+      <form onSubmit={reviewSubmit} className="space-y-5">
+        <div className="grid sm:grid-cols-2 gap-5">
           <label className="block">
-            <span className="block text-13 font-semibold text-bg/60 mb-2">Nombre completo</span>
-            <input className="input-light" value={form.name} onChange={set('name')} required />
+            <span className="block text-13 font-bold text-bg mb-2">Nombre completo <span className="text-rose-500">*</span></span>
+            <input className={campo} value={form.name} onChange={set('name')} placeholder="Ej. Ana Pérez" required />
           </label>
           <label className="block">
-            <span className="block text-13 font-semibold text-bg/60 mb-2">Correo electrónico</span>
-            <input type="email" className="input-light" value={form.email} onChange={set('email')} required />
+            <span className="block text-13 font-bold text-bg mb-2">Correo electrónico <span className="text-rose-500">*</span></span>
+            <input type="email" className={campo} value={form.email} onChange={set('email')} placeholder="ana@ejemplo.com" required />
           </label>
         </div>
-        <label className="block">
-          <span className="block text-13 font-semibold text-bg/60 mb-2">Teléfono (opcional)</span>
-          <input type="tel" className="input-light" value={form.phone} onChange={set('phone')} />
-        </label>
+        <div className="grid sm:grid-cols-2 gap-5">
+          <label className="block">
+            <span className="block text-13 font-bold text-bg mb-2">Teléfono / WhatsApp</span>
+            <input type="tel" className={campo} value={form.phone} onChange={set('phone')} placeholder="Ej. 5555 1234" />
+          </label>
+        </div>
 
         {!changing ? (
           <DepartmentLocked department={form.department} areas={areas} onRequestChange={requestChange} />
         ) : (
-          <div className="rounded-[14px] border border-bg/12 bg-bg/5 p-4 space-y-3">
-            <p className="text-13 font-semibold text-bg/60">
+          <div className="rounded-[14px] border border-bg/15 bg-white p-5 shadow-sm space-y-3">
+            <p className="text-13 font-bold text-bg/60">
               ¿Seguro que quieres cambiar tu elección actual ({area ? area.title : NO_PREFERENCE_LABEL})?
             </p>
             <select
-              className="input-light w-full appearance-none cursor-pointer"
+              className={`${campo} appearance-none cursor-pointer pr-10`}
               value={pendingChange}
               onChange={e => setPendingChange(e.target.value)}
             >
@@ -336,11 +348,11 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           </div>
         )}
 
-        <label className="block">
-          <span className="block text-13 font-semibold text-bg/60 mb-2">Mensaje (opcional)</span>
+        <label className="block mt-4">
+          <span className="block text-13 font-bold text-bg mb-2">Mensaje <span className="font-normal text-bg/60">(opcional)</span></span>
           <textarea
             rows={3}
-            className="input-light w-full resize-none"
+            className={`${campo} resize-none`}
             value={form.message}
             onChange={set('message')}
             placeholder="Cuéntanos por qué quieres servir..."
