@@ -91,7 +91,7 @@ test.describe('Sitio público — smoke', () => {
     const fila = dialog.getByRole('button', { name: /^ver la célula /i }).first();
     await expect(fila, 'las células deben ofrecer una acción de contacto').toBeVisible({ timeout: 10_000 });
     await fila.click();
-    await expect(dialog.getByRole('button', { name: /volver a la lista/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /cerrar/i })).toBeVisible();
 
     // Sigue habiendo UN solo dialog: la capa vive dentro del overlay que
     // ya existe, no en un segundo [role=dialog]. Dos diálogos anidados
