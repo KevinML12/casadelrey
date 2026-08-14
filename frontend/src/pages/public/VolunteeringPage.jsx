@@ -767,37 +767,49 @@ export default function VolunteeringPage() {
           const a = areas.find(x => x.value === it.key);
           if (!a) return null;
           const category = categoryOf(a.value);
+          const itemVariants = {
+            hidden: { opacity: 0, y: 16 },
+            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } }
+          };
+
           return (
-            <div className="grid sm:grid-cols-5 gap-5">
-              {/* Columna principal -- antes todo iba en una sola columna
-                  apilada y la ventana (780px de ancho) se sentía vacía;
-                  el "¿por qué aquí?" pasa a panel lateral en desktop. */}
-              <div className="sm:col-span-3 flex flex-col gap-4">
-                {/* Caja normal: en versales con tracking este chip era un
-                    eyebrow de categoría, la fórmula que el sitio quitó.
-                    Se queda porque es dato real (a qué familia pertenece
-                    el departamento) y vive junto a la descripción, no
-                    encima del titular -- el titular va en el banner de la
-                    ventana. */}
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: { staggerChildren: 0.08 }
+                }
+              }}
+              className="grid sm:grid-cols-5 gap-6"
+            >
+              <div className="sm:col-span-3 flex flex-col gap-5">
                 {category && (
-                  <span className="self-start inline-flex items-center bg-bg/6 border border-bg/12 text-bg/60 px-3 py-1 rounded-full text-12 font-semibold">
+                  <motion.span variants={itemVariants} className="self-start inline-flex items-center bg-bg/5 border border-bg/10 text-bg/65 px-3.5 py-1.5 rounded-full text-12 font-bold tracking-wide uppercase">
                     {category}
-                  </span>
+                  </motion.span>
                 )}
-                <p className="text-bg/70 text-15 leading-relaxed">{a.desc}</p>
-                <motion.button
-                  {...PRESS_PRIMARY}
-                  onClick={() => openForm(a.value)}
-                  className="mt-auto w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold shadow-card hover:opacity-90"
-                >
-                  Aplicar a {a.title}
-                </motion.button>
+                {/* Texto más vivo, tamaño base mayor, primera frase sutilmente destacada */}
+                <motion.p variants={itemVariants} className="text-bg/80 text-16 sm:text-17 leading-relaxed font-medium">
+                  {a.desc}
+                </motion.p>
+                
+                <motion.div variants={itemVariants} className="mt-auto pt-6">
+                  <motion.button
+                    {...PRESS_PRIMARY}
+                    onClick={() => openForm(a.value)}
+                    className="w-full inline-flex items-center justify-center rounded-pill bg-bg text-white px-6 py-4.5 text-15 font-bold shadow-card hover:opacity-90"
+                  >
+                    Aplicar a {a.title}
+                  </motion.button>
+                </motion.div>
               </div>
               <div className="sm:col-span-2 flex flex-col gap-4">
-                <div className="glass-light-nested rounded-[16px] p-5 h-fit">
-                  <p className="text-13 font-semibold text-bg/55 mb-2">¿Por qué aquí?</p>
-                  <p className="text-bg/75 text-15 leading-relaxed">{a.why}</p>
-                </div>
+                {/* Bento box typography sin íconos, solo jerarquía pura */}
+                <motion.div variants={itemVariants} className="glass-light-nested rounded-[20px] p-6 h-fit border-t border-white/40 shadow-sm">
+                  <p className="text-12 font-bold text-bg/50 uppercase tracking-widest mb-3">¿Por qué aquí?</p>
+                  <p className="text-bg/85 text-15 leading-relaxed font-medium">{a.why}</p>
+                </motion.div>
                 {/* Testimonio real -- solo si el admin cargó uno de verdad
                     (nunca se inventa una cita atribuida a alguien). */}
                 {a.testimonial && (

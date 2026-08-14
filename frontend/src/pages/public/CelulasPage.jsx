@@ -457,25 +457,28 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
     cell.leader && { k: 'Líder', v: cell.leader },
   ].filter(Boolean);
 
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } }
+  };
+
   return (
-    <div className="text-left">
-      {/* Botón con superficie propia, no un enlace subrayado suelto: es
-          la salida de una CAPA, así que tiene que leerse tan sólido como
-          la capa. Subrayado y al 55% de tinta se perdía contra el cristal
-          y parecía una nota al pie. */}
-      <button
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+      className="text-left"
+    >
+      <motion.button
+        variants={itemVariants}
         type="button"
         onClick={onCerrar}
         className="inline-flex items-center rounded-pill bg-bg/8 hover:bg-bg/14 text-bg/70 hover:text-bg px-3.5 py-1.5 text-12 font-bold transition-colors focus-ring mb-5"
       >
         Volver a la lista
-      </button>
+      </motion.button>
 
-      {/* Mismo ancla visual que la fila de la lista: la inicial en su
-          cuadro. Al abrirse la ficha, ese cuadro es lo que dice "sigues en
-          la misma célula que tocaste" -- sin él la capa nueva empezaba en
-          un título flotando sobre cristal vacío. */}
-      <div className="flex items-center gap-4">
+      <motion.div variants={itemVariants} className="flex items-center gap-4">
         <span
           className="shrink-0 w-14 h-14 rounded-[16px] grid place-items-center text-24 font-bold bg-bg/10 text-bg/75"
           aria-hidden="true"
@@ -483,61 +486,55 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
           {(cell.name || '?').trim()[0].toUpperCase()}
         </span>
         <h3 className="text-d3 text-bg min-w-0 break-words">{cell.name}</h3>
-      </div>
+      </motion.div>
 
       {datos.length > 0 && (
-        <dl className="mt-5 divide-y divide-bg/10">
+        <motion.dl variants={itemVariants} className="mt-5 divide-y divide-bg/10">
           {datos.map(d => (
             <div key={d.k} className="flex items-baseline justify-between gap-6 py-3">
-              <dt className="text-13 font-semibold text-bg/55 shrink-0">{d.k}</dt>
+              <dt className="text-13 font-semibold text-bg/55 shrink-0 uppercase tracking-widest">{d.k}</dt>
               <dd className="text-15 font-bold text-bg text-right">{d.v}</dd>
             </div>
           ))}
-        </dl>
+        </motion.dl>
       )}
 
       {cell.description && (
-        <p className="text-15 text-bg/70 leading-relaxed mt-5">{cell.description}</p>
+        <motion.p variants={itemVariants} className="text-16 sm:text-17 text-bg/80 leading-relaxed font-medium mt-5">
+          {cell.description}
+        </motion.p>
       )}
 
       {cell.what_to_expect && (
-        <div className="glass-light-nested rounded-[16px] p-5 mt-5">
-          <p className="text-13 font-semibold text-bg/55 mb-2">Qué esperar</p>
-          <p className="text-15 text-bg/75 leading-relaxed">{cell.what_to_expect}</p>
-        </div>
+        <motion.div variants={itemVariants} className="glass-light-nested rounded-[20px] p-6 mt-6 border-t border-white/40 shadow-sm">
+          <p className="text-12 font-bold text-bg/50 uppercase tracking-widest mb-3">Qué esperar</p>
+          <p className="text-15 text-bg/85 leading-relaxed font-medium">{cell.what_to_expect}</p>
+        </motion.div>
       )}
 
-      {/* Si el líder todavía no llenó nada, la ficha quedaría en el
-          nombre solo. Se dice qué falta en vez de fingir contenido, y el
-          botón de abajo sigue siendo una salida real. */}
       {datos.length === 0 && !cell.description && !cell.what_to_expect && (
-        <p className="text-15 text-bg/55 leading-relaxed mt-5">
+        <motion.p variants={itemVariants} className="text-15 text-bg/55 leading-relaxed mt-5">
           Esta célula todavía no publicó sus horarios. Déjanos tus datos y su
           líder te cuenta cuándo y dónde se reúnen.
-        </p>
+        </motion.p>
       )}
 
-      {/* El CTA es lo más grande de la ficha, no un enlace más: es la
-          única acción de toda la pantalla. */}
-      <DockItem className="mt-7 block">
-        <motion.button
-          {...PRESS_PRIMARY}
-          type="button"
-          onClick={onUnirme}
-          className="w-full inline-flex items-center justify-center rounded-pill bg-bg text-white px-6 py-4 text-16 font-bold focus-ring shadow-card hover:opacity-95"
-        >
-          Quiero unirme a {cell.name}
-        </motion.button>
-      </DockItem>
-    </div>
+      <motion.div variants={itemVariants} className="mt-7 block">
+        <DockItem>
+          <motion.button
+            {...PRESS_PRIMARY}
+            type="button"
+            onClick={onUnirme}
+            className="w-full inline-flex items-center justify-center rounded-pill bg-bg text-white px-6 py-4 text-16 font-bold focus-ring shadow-card hover:opacity-95"
+          >
+            Quiero unirme a {cell.name}
+          </motion.button>
+        </DockItem>
+      </motion.div>
+    </motion.div>
   );
 }
 
-// Cuerpo de la ventana de una categoría -- componente propio (no una
-// función inline en renderContent) para que el filtro de zona tenga su
-// propio estado LOCAL: WindowStack solo monta este cuerpo mientras esa
-// categoría está al frente, así que el filtro se resetea solo cada vez
-// que se abre/reabre una ventana, sin lógica extra de reset.
 function CellCategoryDetail({ group, onAbrirCelula }) {
   const [zoneFilter, setZoneFilter] = useState(null);
   const zones = zonasDe(group.cells);
@@ -545,30 +542,29 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
     ? group.cells.filter(c => zonaCanonica(c.zone) === zoneFilter)
     : group.cells;
 
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } }
+  };
+
   return (
-    <>
-      {/* La descripción la escribe el dueño en /admin/cell-categories y es
-          lo único que explica de qué va la categoría ("Un espacio de
-          formación espiritual, apoyo mutuo y hermandad."). Se descartaba al
-          construir `groups`, así que al abrir "Mujeres" lo único que se
-          leía era "4 células activas". En el collage NO va: las tarjetas ya
-          llevan nombre + edad + conteo. */}
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+    >
       {group.description && (
-        <p className="text-15 text-bg/70 leading-relaxed mb-5">{group.description}</p>
+        <motion.p variants={itemVariants} className="text-16 sm:text-17 text-bg/80 leading-relaxed font-medium mb-6">
+          {group.description}
+        </motion.p>
       )}
 
-      <p className="text-13 font-semibold text-bg/55 mb-4">
+      <motion.p variants={itemVariants} className="text-12 font-bold text-bg/50 uppercase tracking-widest mb-4">
         {group.cells.length} {group.cells.length === 1 ? 'célula activa' : 'células activas'}
-      </p>
+      </motion.p>
 
-      {/* Chips de zona -- solo si hay más de una zona canónica Y menos que
-          células en el grupo: un filtro 1:1 con la lista (un chip por fila)
-          no filtra nada, solo duplica la lista en forma de botones. Mismo
-          patrón que los chips de interés de Voluntariado, pero el dato real
-          filtrable aquí es la zona, no hay un equivalente a "interés" en
-          una célula. */}
       {zones.length > 1 && zones.length < group.cells.length && (
-        <div className="flex flex-wrap items-center gap-2 mb-4">
+        <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-2 mb-6">
           <button
             type="button"
             onClick={() => setZoneFilter(null)}
@@ -586,29 +582,21 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
               {z}
             </button>
           ))}
-        </div>
+        </motion.div>
       )}
 
-      {/* Lista tipo directorio, no tarjetas con avatar -- de 16 células
-          reales solo 1 líder tiene foto en el directorio (/admin/leaders),
-          así que un círculo-avatar era casi siempre el mismo placeholder
-          gris repetido fila tras fila -- eso es justo lo que se siente
-          "de plantilla". Sin fingir una foto que no existe: tipografía
-          grande para el nombre, un separador fino entre filas. Cada fila
-          abre la solicitud de ingreso a ESA célula. */}
-      <Dock className="flex flex-col gap-2">
-        {filtered.map((c, i) => (
-          <DockItem key={`${c.name}-${i}`}>
-            <CellRow cell={c} onSolicitar={onAbrirCelula} index={i} tone="light" />
-          </DockItem>
-        ))}
-      </Dock>
+      <motion.div variants={itemVariants}>
+        <Dock className="flex flex-col gap-2">
+          {filtered.map((c, i) => (
+            <DockItem key={`${c.name}-${i}`}>
+              <CellRow cell={c} onSolicitar={onAbrirCelula} index={i} tone="light" />
+            </DockItem>
+          ))}
+        </Dock>
+      </motion.div>
 
-      {/* Salida para quien no se decide por una célula concreta: el
-          formulario general del sitio, que cae en la misma bandeja
-          (/admin/connect-cards) pero sin célula asignada. */}
-      <div className="mt-6 pt-5 border-t border-bg/10">
-        <p className="text-13 text-bg/55 leading-relaxed mb-3">
+      <motion.div variants={itemVariants} className="mt-8 pt-6 border-t border-bg/10">
+        <p className="text-14 font-medium text-bg/60 leading-relaxed mb-4">
           ¿No sabes cuál elegir? Déjanos tus datos y te ubicamos en la más cercana a ti.
         </p>
         <Link
@@ -617,8 +605,8 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
         >
           Conéctate
         </Link>
-      </div>
-    </>
+      </motion.div>
+    </motion.div>
   );
 }
 
