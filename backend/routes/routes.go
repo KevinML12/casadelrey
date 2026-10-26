@@ -3,6 +3,9 @@ package routes
 import (
 	"log"
 	"net/http"
+	"net/url"
+	"path"
+	"strings"
 	"time"
 
 	"casadelrey/backend/auth"
@@ -12,52 +15,53 @@ import (
 	"casadelrey/backend/storage"
 
 	"github.com/labstack/echo/v4"
+	echomw "github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
 func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store) {
 
 	// ── Handlers ─────────────────────────────────────────────────────────────────
-	authHandler          := auth.NewHandler(db)
-	blogHandler          := handlers.NewBlogHandler(db)
-	petitionHandler      := handlers.NewPetitionHandler(db)
-	donationHandler      := handlers.NewDonationHandler(db)
-	eventHandler         := handlers.NewEventHandler(db)
-	cellCategoryHandler  := handlers.NewCellCategoryHandler(db)
-	cellReportHandler    := handlers.NewCellReportHandler(db)
-	socialHandler        := handlers.NewSocialHandler(db)
-	adminHandler         := handlers.NewAdminHandler(db)
-	profileHandler       := handlers.NewProfileHandler(db)
-	volunteerHandler     := handlers.NewVolunteerHandler(db)
+	authHandler := auth.NewHandler(db)
+	blogHandler := handlers.NewBlogHandler(db)
+	petitionHandler := handlers.NewPetitionHandler(db)
+	donationHandler := handlers.NewDonationHandler(db)
+	eventHandler := handlers.NewEventHandler(db)
+	cellCategoryHandler := handlers.NewCellCategoryHandler(db)
+	cellReportHandler := handlers.NewCellReportHandler(db)
+	socialHandler := handlers.NewSocialHandler(db)
+	adminHandler := handlers.NewAdminHandler(db)
+	profileHandler := handlers.NewProfileHandler(db)
+	volunteerHandler := handlers.NewVolunteerHandler(db)
 	volunteerAreaHandler := handlers.NewVolunteerAreaHandler(db)
 	donationPurposeHandler := handlers.NewDonationPurposeHandler(db)
-	boletaHandler        := handlers.NewBoletaHandler(db)
-	uploadHandler        := handlers.NewUploadHandler(store)
-	receiptHandler       := handlers.NewPaymentReceiptHandler(db)
-	heroHandler          := handlers.NewHeroHandler(db)
-	sitePhotoHandler     := handlers.NewSitePhotoHandler(db)
-	siteSettingHandler   := handlers.NewSiteSettingHandler(db)
-	announcementHandler  := handlers.NewAnnouncementHandler(db)
-	notificationHandler  := handlers.NewNotificationHandler(db)
-	galleryHandler       := handlers.NewGalleryHandler(db)
-	faqHandler           := handlers.NewFAQHandler(db)
-	leaderDirHandler     := handlers.NewLeaderDirectoryHandler(db)
-	rsvpHandler          := handlers.NewRSVPHandler(db)
-	leaderDashHandler    := handlers.NewLeaderDashboardHandler(db)
-	activityLogHandler   := handlers.NewActivityLogHandler(db)
-	connectCardHandler   := handlers.NewConnectCardHandler(db)
+	boletaHandler := handlers.NewBoletaHandler(db)
+	uploadHandler := handlers.NewUploadHandler(store)
+	receiptHandler := handlers.NewPaymentReceiptHandler(db, store)
+	heroHandler := handlers.NewHeroHandler(db)
+	sitePhotoHandler := handlers.NewSitePhotoHandler(db)
+	siteSettingHandler := handlers.NewSiteSettingHandler(db)
+	announcementHandler := handlers.NewAnnouncementHandler(db)
+	notificationHandler := handlers.NewNotificationHandler(db)
+	galleryHandler := handlers.NewGalleryHandler(db)
+	faqHandler := handlers.NewFAQHandler(db)
+	leaderDirHandler := handlers.NewLeaderDirectoryHandler(db)
+	rsvpHandler := handlers.NewRSVPHandler(db)
+	leaderDashHandler := handlers.NewLeaderDashboardHandler(db)
+	activityLogHandler := handlers.NewActivityLogHandler(db)
+	connectCardHandler := handlers.NewConnectCardHandler(db)
 
 	// ── Middlewares ───────────────────────────────────────────────────────────────
-	authMW          := middleware.NewAuthMiddleware(cfg.JWTSecret)
-	adminMW         := middleware.AdminMiddleware()
+	authMW := middleware.NewDatabaseAuthMiddleware(cfg.JWTSecret, db)
+	adminMW := middleware.AdminMiddleware()
 	adminOrLeaderMW := middleware.AdminOrLeaderMiddleware()
 	globalRateLimit := middleware.GlobalRateLimit()
-	authRateLimit   := middleware.AuthRateLimit()
+	authRateLimit := middleware.AuthRateLimit()
 	// Cache-Control por tipo de contenido: lo que cambia poco (categorías de
 	// células) cachea más tiempo que lo que el admin edita seguido (hero, feed)
-	cacheShort := middleware.PublicCache(20)  // hero, eventos, feed, anuncios
-	cacheMed   := middleware.PublicCache(60)  // blog, galería
-	cacheLong  := middleware.PublicCache(300) // categorías de células (casi estáticas)
+	cacheShort := middleware.PublicCache(20) // hero, eventos, feed, anuncios
+	cacheMed := middleware.PublicCache(60)   // blog, galería
+	cacheLong := middleware.PublicCache(300) // categorías de células (casi estáticas)
 
 	// Aplicar Rate Limiter Global a todo el servidor
 	e.Use(globalRateLimit)
@@ -71,10 +75,25 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 		})
 	})
 
-	e.Static("/uploads", "./uploads")
+	// Historical local receipts must not remain accessible through the public
+	// static directory. New receipts live outside this directory entirely.
+	e.Group("/uploads", func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			raw, err := url.PathUnescape(strings.TrimPrefix(c.Request().URL.Path, "/uploads"))
+			if err != nil {
+				return c.NoContent(http.StatusNotFound)
+			}
+			name := path.Clean("/" + strings.ReplaceAll(raw, "\\", "/"))
+			if name == "/comprobantes" || strings.HasPrefix(name, "/comprobantes/") {
+				c.Response().Header().Set("Cache-Control", "private, no-store")
+				return c.NoContent(http.StatusNotFound)
+			}
+			return next(c)
+		}
+	}).Static("", "./uploads")
 
 	// ── API v1 ────────────────────────────────────────────────────────────────────
-	api := e.Group("/api/v1")
+	api := e.Group("/api/v1", middleware.ValidateNumericID, echomw.BodyLimit("11M"))
 
 	// Comprobantes bancarios — público: enviar el registro + subir la foto.
 	// La subida es pública a propósito (un donante/asistente anónimo no
@@ -95,24 +114,24 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.GET("/settings", siteSettingHandler.GetPublic, cacheShort)
 
 	// Voluntariado
-	api.POST("/volunteer/register",   volunteerHandler.Register, authRateLimit)
+	api.POST("/volunteer/register", volunteerHandler.Register, authRateLimit)
 	api.GET("/volunteer/departments", volunteerHandler.GetDepartments)
-	api.GET("/volunteer/me",          volunteerHandler.GetMyInfo, authMW)
-	api.GET("/volunteer-areas",       volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong)
-	api.GET("/donation-purposes",     donationPurposeHandler.GetPublicDonationPurposes, cacheLong)
+	api.GET("/volunteer/me", volunteerHandler.GetMyInfo, authMW)
+	api.GET("/volunteer-areas", volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong)
+	api.GET("/donation-purposes", donationPurposeHandler.GetPublicDonationPurposes, cacheLong)
 
 	// Auth
 	authGroup := api.Group("/auth", authRateLimit)
-	authGroup.POST("/register",        authHandler.RegisterDisabled)
-	authGroup.POST("/login",           authHandler.Login)
-	authGroup.POST("/refresh",         authHandler.Refresh)
-	authGroup.GET("/verify-email",     authHandler.VerifyEmail)
+	authGroup.POST("/register", authHandler.RegisterDisabled)
+	authGroup.POST("/login", authHandler.Login)
+	authGroup.POST("/refresh", authHandler.Refresh)
+	authGroup.GET("/verify-email", authHandler.VerifyEmail)
 	authGroup.POST("/forgot-password", authHandler.ForgotPassword)
-	authGroup.POST("/reset-password",  authHandler.ResetPassword)
+	authGroup.POST("/reset-password", authHandler.ResetPassword)
 
 	// Blog (público: lectura)
 	blogGroup := api.Group("/blog")
-	blogGroup.GET("/",      blogHandler.GetPublishedPosts, cacheMed)
+	blogGroup.GET("/", blogHandler.GetPublishedPosts, cacheMed)
 	blogGroup.GET("/:slug", blogHandler.GetPostBySlug, cacheMed)
 
 	// Peticiones de oración
@@ -131,10 +150,12 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Eventos (público: lectura + RSVP) — con y sin slash final:
 	// Echo no redirige entre ambos y el frontend histórico usa /events
 	eventsGroup := api.Group("/events")
-	eventsGroup.GET("",               eventHandler.GetEvents, cacheShort)
-	eventsGroup.GET("/",              eventHandler.GetEvents, cacheShort)
-	eventsGroup.POST("/:id/rsvp",    rsvpHandler.RegisterRSVP)
-	eventsGroup.DELETE("/:id/rsvp",  rsvpHandler.CancelMyRSVP)
+	eventsGroup.GET("", eventHandler.GetEvents, cacheShort)
+	eventsGroup.GET("/", eventHandler.GetEvents, cacheShort)
+	eventsGroup.POST("/:id/rsvp", rsvpHandler.RegisterRSVP)
+	eventsGroup.DELETE("/:id/rsvp", rsvpHandler.CancelMyRSVP, authRateLimit)
+
+	eventsGroup.POST("/:id/rsvp/cancellation", rsvpHandler.RequestCancellation, authRateLimit)
 
 	// Células (público: lectura de categorías + listado seguro de células)
 	cellsGroup := api.Group("/cell-categories")
@@ -161,11 +182,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Perfil y metas (usuario autenticado)
 	profileGroup := api.Group("/profile", authMW)
-	profileGroup.PUT("",              profileHandler.UpdateProfile)
-	profileGroup.PUT("/password",     profileHandler.ChangePassword)
-	profileGroup.GET("/goals",        profileHandler.GetGoals)
-	profileGroup.POST("/goals",       profileHandler.CreateGoal)
-	profileGroup.PUT("/goals/:id",    profileHandler.UpdateGoal)
+	profileGroup.PUT("", profileHandler.UpdateProfile)
+	profileGroup.PUT("/password", profileHandler.ChangePassword)
+	profileGroup.GET("/goals", profileHandler.GetGoals)
+	profileGroup.POST("/goals", profileHandler.CreateGoal)
+	profileGroup.PUT("/goals/:id", profileHandler.UpdateGoal)
 	profileGroup.DELETE("/goals/:id", profileHandler.DeleteGoal)
 
 	// Upload (admin o líder -- lideres lo usan para la foto de reporte de
@@ -182,13 +203,13 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup := api.Group("/admin", authMW, adminMW)
 
 	// Dashboard y KPIs
-	adminGroup.GET("/kpis",               adminHandler.GetKPIs)
-	adminGroup.GET("/kpis/trend",         adminHandler.GetKPIsTrend)
-	adminGroup.GET("/donations",          adminHandler.GetDonations)
-	adminGroup.GET("/users",              adminHandler.GetUsers)
-	adminGroup.PUT("/users/:id/role",     adminHandler.UpdateUserRole)
-	adminGroup.PUT("/users/:id/cell",     adminHandler.UpdateUserCell)
-	adminGroup.GET("/leaders",            adminHandler.GetLeaders)
+	adminGroup.GET("/kpis", adminHandler.GetKPIs)
+	adminGroup.GET("/kpis/trend", adminHandler.GetKPIsTrend)
+	adminGroup.GET("/donations", adminHandler.GetDonations)
+	adminGroup.GET("/users", adminHandler.GetUsers)
+	adminGroup.PUT("/users/:id/role", adminHandler.UpdateUserRole)
+	adminGroup.PUT("/users/:id/cell", adminHandler.UpdateUserCell)
+	adminGroup.GET("/leaders", adminHandler.GetLeaders)
 	adminGroup.PUT("/volunteers/:id/assign", volunteerHandler.Assign)
 
 	// Notificaciones
@@ -201,49 +222,50 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.GET("/activity-log", activityLogHandler.GetActivityLog)
 
 	// Comprobantes bancarios — admin
-	adminGroup.GET("/receipts",              receiptHandler.GetAll)
-	adminGroup.PUT("/receipts/:id/verify",   receiptHandler.Verify)
-	adminGroup.PUT("/receipts/:id/revert",   receiptHandler.Revert)
-	adminGroup.GET("/receipts/count",        receiptHandler.GetPendingCount)
+	adminGroup.GET("/receipts", receiptHandler.GetAll)
+	adminGroup.GET("/receipts/:id/file", receiptHandler.File)
+	adminGroup.PUT("/receipts/:id/verify", receiptHandler.Verify)
+	adminGroup.PUT("/receipts/:id/revert", receiptHandler.Revert)
+	adminGroup.GET("/receipts/count", receiptHandler.GetPendingCount)
 
 	// Hero CMS — admin
-	adminGroup.GET("/hero",               heroHandler.GetAll)
-	adminGroup.POST("/hero",              heroHandler.Create)
-	adminGroup.PUT("/hero/:id",           heroHandler.Update)
-	adminGroup.PUT("/hero/:id/activate",  heroHandler.Activate)
-	adminGroup.DELETE("/hero/:id",        heroHandler.Delete)
+	adminGroup.GET("/hero", heroHandler.GetAll)
+	adminGroup.POST("/hero", heroHandler.Create)
+	adminGroup.PUT("/hero/:id", heroHandler.Update)
+	adminGroup.PUT("/hero/:id/activate", heroHandler.Activate)
+	adminGroup.DELETE("/hero/:id", heroHandler.Delete)
 
 	// Fotos del sitio (fondos ambiente de secciones fijas) — admin
-	adminGroup.GET("/site-photos",       sitePhotoHandler.GetAllSitePhotos)
-	adminGroup.PUT("/site-photos/:key",  sitePhotoHandler.UpdateSitePhoto)
+	adminGroup.GET("/site-photos", sitePhotoHandler.GetAllSitePhotos)
+	adminGroup.PUT("/site-photos/:key", sitePhotoHandler.UpdateSitePhoto)
 
 	// Configuración de texto (datos bancarios) — admin
-	adminGroup.GET("/settings",          siteSettingHandler.GetAll)
-	adminGroup.PUT("/settings/:key",     siteSettingHandler.UpdateSetting)
+	adminGroup.GET("/settings", siteSettingHandler.GetAll)
+	adminGroup.PUT("/settings/:key", siteSettingHandler.UpdateSetting)
 
 	// Categorías de células — CRUD completo (nombre/edad/descripción/foto/
 	// type_key/orden/activo), no solo la foto
-	adminGroup.GET("/cell-categories",       cellCategoryHandler.GetAllCellCategoriesAdmin)
-	adminGroup.POST("/cell-categories",      cellCategoryHandler.CreateCellCategory)
-	adminGroup.PUT("/cell-categories/:id",   cellCategoryHandler.UpdateCellCategory)
+	adminGroup.GET("/cell-categories", cellCategoryHandler.GetAllCellCategoriesAdmin)
+	adminGroup.POST("/cell-categories", cellCategoryHandler.CreateCellCategory)
+	adminGroup.PUT("/cell-categories/:id", cellCategoryHandler.UpdateCellCategory)
 	adminGroup.DELETE("/cell-categories/:id", cellCategoryHandler.DeleteCellCategory)
 
 	// Células individuales — admin (antes solo existían hardcodeadas en el frontend)
-	adminGroup.GET("/cells",       cellCategoryHandler.GetAllCellsAdmin)
-	adminGroup.POST("/cells",      cellCategoryHandler.CreateCell)
-	adminGroup.PUT("/cells/:id",   cellCategoryHandler.UpdateCell)
+	adminGroup.GET("/cells", cellCategoryHandler.GetAllCellsAdmin)
+	adminGroup.POST("/cells", cellCategoryHandler.CreateCell)
+	adminGroup.PUT("/cells/:id", cellCategoryHandler.UpdateCell)
 	adminGroup.DELETE("/cells/:id", cellCategoryHandler.DeleteCell)
 
 	// Departamentos de voluntariado — admin (antes hardcodeados en volunteerAreas.js)
-	adminGroup.GET("/volunteer-areas",       volunteerAreaHandler.GetAllVolunteerAreasAdmin)
-	adminGroup.POST("/volunteer-areas",      volunteerAreaHandler.CreateVolunteerArea)
-	adminGroup.PUT("/volunteer-areas/:id",   volunteerAreaHandler.UpdateVolunteerArea)
+	adminGroup.GET("/volunteer-areas", volunteerAreaHandler.GetAllVolunteerAreasAdmin)
+	adminGroup.POST("/volunteer-areas", volunteerAreaHandler.CreateVolunteerArea)
+	adminGroup.PUT("/volunteer-areas/:id", volunteerAreaHandler.UpdateVolunteerArea)
 	adminGroup.DELETE("/volunteer-areas/:id", volunteerAreaHandler.DeleteVolunteerArea)
 
 	// Destinos de donación — admin (antes hardcodeados en 2 arreglos del frontend)
-	adminGroup.GET("/donation-purposes",       donationPurposeHandler.GetAllDonationPurposesAdmin)
-	adminGroup.POST("/donation-purposes",      donationPurposeHandler.CreateDonationPurpose)
-	adminGroup.PUT("/donation-purposes/:id",   donationPurposeHandler.UpdateDonationPurpose)
+	adminGroup.GET("/donation-purposes", donationPurposeHandler.GetAllDonationPurposesAdmin)
+	adminGroup.POST("/donation-purposes", donationPurposeHandler.CreateDonationPurpose)
+	adminGroup.PUT("/donation-purposes/:id", donationPurposeHandler.UpdateDonationPurpose)
 	adminGroup.DELETE("/donation-purposes/:id", donationPurposeHandler.DeleteDonationPurpose)
 
 	// Aprobación de reportes de células (solo admin)
@@ -251,9 +273,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Blog admin
 	adminBlog := adminGroup.Group("/blog")
-	adminBlog.GET("/",       blogHandler.GetAllPosts)
-	adminBlog.POST("/",      blogHandler.CreatePost)
-	adminBlog.PUT("/:id",    blogHandler.UpdatePost)
+	adminBlog.GET("/", blogHandler.GetAllPosts)
+	adminBlog.POST("/", blogHandler.CreatePost)
+	adminBlog.PUT("/:id", blogHandler.UpdatePost)
 	adminBlog.DELETE("/:id", blogHandler.DeletePost)
 
 	// Directorio de líderes (foto + contacto) — CRUD admin. Ruta DISTINTA
@@ -261,21 +283,21 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// líder para los selects de asignación de voluntarios/connect-cards.
 	// Antes ambos usaban /admin/leaders: Echo dejaba ganar al último y
 	// rompía silenciosamente esos selects.
-	adminGroup.GET("/leader-directory",        leaderDirHandler.GetAll)
-	adminGroup.POST("/leader-directory",       leaderDirHandler.Create)
-	adminGroup.PUT("/leader-directory/:id",    leaderDirHandler.Update)
+	adminGroup.GET("/leader-directory", leaderDirHandler.GetAll)
+	adminGroup.POST("/leader-directory", leaderDirHandler.Create)
+	adminGroup.PUT("/leader-directory/:id", leaderDirHandler.Update)
 	adminGroup.DELETE("/leader-directory/:id", leaderDirHandler.Delete)
 
 	// Peticiones admin
-	adminGroup.GET("/petitions",          petitionHandler.GetAllPetitions)
+	adminGroup.GET("/petitions", petitionHandler.GetAllPetitions)
 	adminGroup.PUT("/petitions/:id/read", petitionHandler.MarkAsRead)
-	adminGroup.DELETE("/petitions/:id",   petitionHandler.DeletePetition)
+	adminGroup.DELETE("/petitions/:id", petitionHandler.DeletePetition)
 
 	// Eventos admin
 	adminEvents := adminGroup.Group("/events")
-	adminEvents.POST("/",       eventHandler.CreateEvent)
-	adminEvents.PUT("/:id",     eventHandler.UpdateEvent)
-	adminEvents.DELETE("/:id",  eventHandler.DeleteEvent)
+	adminEvents.POST("/", eventHandler.CreateEvent)
+	adminEvents.PUT("/:id", eventHandler.UpdateEvent)
+	adminEvents.DELETE("/:id", eventHandler.DeleteEvent)
 	adminEvents.GET("/:id/rsvps", rsvpHandler.GetEventRSVPs)
 
 	// RSVP admin
@@ -283,30 +305,30 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Social admin
 	adminSocial := adminGroup.Group("/social")
-	adminSocial.GET("/",       socialHandler.GetAllSocialPosts)
-	adminSocial.POST("/",      socialHandler.CreateSocialPost)
-	adminSocial.PUT("/:id",    socialHandler.UpdateSocialPost)
+	adminSocial.GET("/", socialHandler.GetAllSocialPosts)
+	adminSocial.POST("/", socialHandler.CreateSocialPost)
+	adminSocial.PUT("/:id", socialHandler.UpdateSocialPost)
 	adminSocial.DELETE("/:id", socialHandler.DeleteSocialPost)
 
 	// Anuncios admin
 	adminAnnouncements := adminGroup.Group("/announcements")
-	adminAnnouncements.GET("/",       announcementHandler.GetAllAnnouncements)
-	adminAnnouncements.POST("/",      announcementHandler.CreateAnnouncement)
-	adminAnnouncements.PUT("/:id",    announcementHandler.UpdateAnnouncement)
+	adminAnnouncements.GET("/", announcementHandler.GetAllAnnouncements)
+	adminAnnouncements.POST("/", announcementHandler.CreateAnnouncement)
+	adminAnnouncements.PUT("/:id", announcementHandler.UpdateAnnouncement)
 	adminAnnouncements.DELETE("/:id", announcementHandler.DeleteAnnouncement)
 
 	// Galería admin
 	adminGallery := adminGroup.Group("/gallery")
-	adminGallery.GET("/",       galleryHandler.GetAllPhotos)
-	adminGallery.POST("/",      galleryHandler.CreatePhoto)
-	adminGallery.PUT("/:id",    galleryHandler.UpdatePhoto)
+	adminGallery.GET("/", galleryHandler.GetAllPhotos)
+	adminGallery.POST("/", galleryHandler.CreatePhoto)
+	adminGallery.PUT("/:id", galleryHandler.UpdatePhoto)
 	adminGallery.DELETE("/:id", galleryHandler.DeletePhoto)
 
 	// FAQs admin
 	adminFAQs := adminGroup.Group("/faqs")
-	adminFAQs.GET("/",       faqHandler.GetAllFAQs)
-	adminFAQs.POST("/",      faqHandler.CreateFAQ)
-	adminFAQs.PUT("/:id",    faqHandler.UpdateFAQ)
+	adminFAQs.GET("/", faqHandler.GetAllFAQs)
+	adminFAQs.POST("/", faqHandler.CreateFAQ)
+	adminFAQs.PUT("/:id", faqHandler.UpdateFAQ)
 	adminFAQs.DELETE("/:id", faqHandler.DeleteFAQ)
 
 	// Boletas (admin: eliminar)
@@ -327,26 +349,30 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminOrLeader.POST("/users", adminHandler.CreateUser)
 
 	// Voluntarios
-	adminOrLeader.GET("/volunteers",                      volunteerHandler.GetAll)
-	adminOrLeader.POST("/volunteers/:id/create-user",     volunteerHandler.CreateUserFromVolunteer)
+	adminOrLeader.GET("/volunteers", volunteerHandler.GetAll)
+	adminOrLeader.POST("/volunteers/:id/create-user", volunteerHandler.CreateUserFromVolunteer)
 
 	// Reportes de células
-	adminOrLeader.POST("/cell-reports",      cellReportHandler.CreateCellReport)
-	adminOrLeader.GET("/cell-reports",       cellReportHandler.GetAllCellReports)
+	adminOrLeader.POST("/cell-reports", cellReportHandler.CreateCellReport)
+	adminOrLeader.GET("/cell-reports", cellReportHandler.GetAllCellReports)
 	adminOrLeader.GET("/cell-reports/stats", cellReportHandler.GetCellStats)
 
 	volunteerReportHandler := handlers.NewVolunteerReportHandler(db)
-	adminOrLeader.POST("/volunteer-reports",      volunteerReportHandler.CreateVolunteerReport)
-	adminOrLeader.GET("/volunteer-reports",       volunteerReportHandler.GetAllVolunteerReports)
-	adminOrLeader.PUT("/volunteer-reports/:id/approve", volunteerReportHandler.ApproveReport)
+	volunteerSelf := api.Group("/volunteer", authMW, middleware.VolunteerMiddleware())
+	volunteerSelf.POST("/reports", volunteerReportHandler.CreateVolunteerReport)
+	volunteerSelf.GET("/reports", volunteerReportHandler.GetAllVolunteerReports)
+	volunteerSelf.POST("/reports/upload", uploadHandler.UploadVolunteerPhoto, middleware.AuthRateLimit())
+	adminOrLeader.POST("/volunteer-reports", volunteerReportHandler.CreateVolunteerReport)
+	adminOrLeader.GET("/volunteer-reports", volunteerReportHandler.GetAllVolunteerReports)
+	adminGroup.PUT("/volunteer-reports/:id/approve", volunteerReportHandler.ApproveReport)
 
 	// Tarjetas de conexión — admin y líder ven la lista y dan seguimiento
-	adminOrLeader.GET("/connect-cards",     connectCardHandler.GetAll)
+	adminOrLeader.GET("/connect-cards", connectCardHandler.GetAll)
 	adminOrLeader.PUT("/connect-cards/:id", connectCardHandler.Update)
 
 	// Boletas de nuevos miembros
-	adminOrLeader.POST("/boletas",    boletaHandler.CreateBoleta)
-	adminOrLeader.GET("/boletas",     boletaHandler.GetBoletas)
+	adminOrLeader.POST("/boletas", boletaHandler.CreateBoleta)
+	adminOrLeader.GET("/boletas", boletaHandler.GetBoletas)
 	adminOrLeader.PUT("/boletas/:id", boletaHandler.UpdateBoleta)
 
 	// ── Panel Líder ───────────────────────────────────────────────────────────────
@@ -355,8 +381,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// (roster de líderes + conteos). Ahora exige rol líder o admin.
 	leaderGroup := api.Group("/leader", authMW, adminOrLeaderMW)
 
-	leaderGroup.GET("/kpis",            leaderDashHandler.GetLeaderKPIs)
-	leaderGroup.GET("/cell-directory",  leaderDashHandler.GetCellDirectory)
+	leaderGroup.GET("/kpis", leaderDashHandler.GetLeaderKPIs)
+	leaderGroup.GET("/cell-directory", leaderDashHandler.GetCellDirectory)
 	// Su propia celula: el lider edita dia/hora/descripcion/que esperar.
 	// El handler busca POR leader_id, no por un :id del body, asi que no
 	// puede tocar la de otro ni mandando el ID a mano.

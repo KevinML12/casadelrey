@@ -214,6 +214,10 @@ func TestLogin_Exito_Retorna200ConToken(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "password", "role", "email_verified"}).
 			AddRow(1, "Admin", "admin@test.com", hash, "admin", true))
 
+	mock.ExpectBegin()
+	mock.ExpectExec(`UPDATE "users"`).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
 		"email": "admin@test.com", "password": "password123",
 	}, nil)

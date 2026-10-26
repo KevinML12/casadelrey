@@ -109,7 +109,7 @@ func (h *BoletaHandler) GetBoletas(c echo.Context) error {
 func (h *BoletaHandler) UpdateBoleta(c echo.Context) error {
 	id := c.Param("id")
 	var b models.MemberBoleta
-	if err := h.DB.First(&b, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&b).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Boleta no encontrada."})
 	}
 
@@ -180,8 +180,8 @@ func (h *BoletaHandler) UpdateBoleta(c echo.Context) error {
 func (h *BoletaHandler) DeleteBoleta(c echo.Context) error {
 	id := c.Param("id")
 	var b models.MemberBoleta
-	h.DB.First(&b, id)
-	if err := h.DB.Delete(&models.MemberBoleta{}, id).Error; err != nil {
+	h.DB.Where("id = ?", id).First(&b)
+	if err := h.DB.Where("id = ?", id).Delete(&models.MemberBoleta{}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar la boleta."})
 	}
 

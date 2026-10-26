@@ -167,6 +167,8 @@ func (h *CellCategoryHandler) GetPublicCells(c echo.Context) error {
 		Leader       string `json:"leader"`
 		LeaderPhoto  string `json:"leader_photo"`
 		Zone         string `json:"zone"`
+		Address      string `json:"address"`
+		MapURL       string `json:"map_url"`
 		Day          string `json:"day"`
 		Time         string `json:"time"`
 		WhatToExpect string `json:"what_to_expect"`
@@ -194,6 +196,8 @@ func (h *CellCategoryHandler) GetPublicCells(c echo.Context) error {
 				Leader:       cl.Leader.Name,
 				LeaderPhoto:  photos[cl.LeaderID],
 				Zone:         cl.Zone,
+				Address:      cl.Address,
+				MapURL:       cl.MapURL,
 				Day:          cl.Day,
 				Time:         cl.Time,
 				WhatToExpect: cl.WhatToExpect,
@@ -212,6 +216,8 @@ func (h *CellCategoryHandler) GetPublicCells(c echo.Context) error {
 			Description:  cl.Description,
 			Leader:       cl.Leader.Name,
 			Zone:         cl.Zone,
+			Address:      cl.Address,
+			MapURL:       cl.MapURL,
 			Day:          cl.Day,
 			Time:         cl.Time,
 			WhatToExpect: cl.WhatToExpect,
@@ -272,6 +278,8 @@ func (h *CellCategoryHandler) UpdateCell(c echo.Context) error {
 		Description string `json:"description"`
 		LeaderID    uint   `json:"leader_id"`
 		Zone        string `json:"zone"`
+		Address     string `json:"address"`
+		MapURL      string `json:"map_url"`
 		IsActive    *bool  `json:"is_active"`
 
 		Day          *string `json:"day"`
@@ -298,6 +306,8 @@ func (h *CellCategoryHandler) UpdateCell(c echo.Context) error {
 		cell.LeaderID = req.LeaderID
 	}
 	cell.Zone = req.Zone
+	cell.Address = req.Address
+	cell.MapURL = req.MapURL
 	if req.IsActive != nil {
 		cell.IsActive = *req.IsActive
 	}

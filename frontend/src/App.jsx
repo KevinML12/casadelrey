@@ -77,8 +77,7 @@ const ROUTE_BG_KEYS = {
 // profundidad que aportaban ahora la carga WindowStack, que apila las
 // ventanas como cartas con puro transform/opacity y funciona en todos lados.
 export default function App() {
-  const { pathname } = useLocation();
-  const isDashboard = pathname.startsWith('/admin') || pathname.startsWith('/leader') || pathname.startsWith('/volunteer-dashboard');
+  const location = useLocation();
 
   useDeviceTier();
 
@@ -109,10 +108,10 @@ export default function App() {
     .sort((a, b) => b.length - a.length)[0] || '/';
   
   // Settings del backend sobreescribe el fallback estático si está disponible
-  const bgImage = settings[ROUTE_BG_KEYS[bgHit]] || ROUTE_BG_IMAGES[bgHit];
+  const bgImage = settings[ROUTE_BG_KEYS[bgHit]] || null;
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden">
+    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden" style={bgImage ? { backgroundImage: `linear-gradient(rgba(10,21,38,.8), rgba(10,21,38,.8)), url(${JSON.stringify(bgImage)})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
       <Splash />
       <Header />
       <main className="flex-1 w-full relative z-10">

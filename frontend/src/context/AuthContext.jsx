@@ -24,6 +24,7 @@ export function AuthProvider({ children }) {
   const clearToken = () => { 
     localStorage.removeItem('token'); 
     localStorage.removeItem('refresh_token');
+    delete apiClient.defaults.headers.common.Authorization;
     setToken(null); 
   };
 
@@ -31,8 +32,13 @@ export function AuthProvider({ children }) {
   // pero el estado de React (token/user) necesita enterarse también.
   useEffect(() => {
     const onUnauthorized = () => setToken(null);
+    const onRefreshed = () => setToken(localStorage.getItem('token'));
     window.addEventListener('auth:unauthorized', onUnauthorized);
-    return () => window.removeEventListener('auth:unauthorized', onUnauthorized);
+    window.addEventListener('auth:refreshed', onRefreshed);
+    return () => {
+      window.removeEventListener('auth:unauthorized', onUnauthorized);
+      window.removeEventListener('auth:refreshed', onRefreshed);
+    };
   }, []);
 
   // ── Auth actions ─────────────────────────────────────────────
@@ -62,10 +68,10 @@ export function AuthProvider({ children }) {
 
   const resetPassword = async (resetToken, password) => {
     try {
-      await apiClient.post('/auth/reset-password', { token: resetToken, password });
+      await apiClient.post('/auth/reset-password', { token: resetToken, newPassword: password });
       return { success: true };
     } catch (err) {
-      return { success: false, error: err.response?.data?.message || 'Error al restablecer la contraseña' };
+      return { success: false, error: err.response?.data?.error || err.response?.data?.message || 'Error al restablecer la contraseña' };
     }
   };
 

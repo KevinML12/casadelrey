@@ -76,8 +76,25 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
             respuestas reales que un selector de días no admite. El líder
             también puede editarlos desde su panel, que es quien se entera
             primero si esta semana cambió la hora. */}
-        <Input label="Día de reunión" value={form.day || ''} onChange={set('day')} placeholder="Ej. Martes" />
+        <Input label="Día" value={form.day || ''} onChange={set('day')} placeholder="Ej. Miércoles" />
         <Input label="Hora" value={form.time || ''} onChange={set('time')} placeholder="Ej. 7:00 PM" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Textarea
+          label="Dirección exacta"
+          value={form.address || ''}
+          onChange={set('address')}
+          rows={2}
+          placeholder="Ej. 4a Calle 10-30, Zona 1..."
+        />
+        <Textarea
+          label="Enlace del Mapa (Google Maps / Waze)"
+          value={form.map_url || ''}
+          onChange={set('map_url')}
+          rows={2}
+          placeholder="https://maps.app.goo.gl/..."
+        />
       </div>
 
       <Textarea

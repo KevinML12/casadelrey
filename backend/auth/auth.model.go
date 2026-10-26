@@ -12,6 +12,7 @@ type User struct {
 	Name                    string     `json:"name" gorm:"not null"`
 	Email                   string     `json:"email" gorm:"unique;not null"`
 	Password                string     `json:"-" gorm:"not null"` // "-" omite el campo en JSON
+	SessionVersion          uint       `json:"-" gorm:"not null;default:0"`
 	Role                    string     `json:"role" gorm:"default:member"`
 	ResetToken              *string    `json:"-" gorm:"index"` // Token para reseteo de contraseña
 	ResetTokenExpiry        *time.Time `json:"-"`              // Expiración del token de reseteo

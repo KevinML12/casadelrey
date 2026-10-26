@@ -1,9 +1,18 @@
 package handlers
 
 import (
+	"bytes"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+	"io"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"casadelrey/backend/storage"
+	"github.com/google/uuid"
 
 	"github.com/labstack/echo/v4"
 )
@@ -61,10 +70,34 @@ func (h *UploadHandler) saveUpload(c echo.Context, folder string) error {
 	}
 	defer src.Close()
 
+	data, err := io.ReadAll(io.LimitReader(src, maxSize+1))
+	if err != nil || len(data) == 0 || len(data) > maxSize {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Archivo vacío, ilegible o demasiado grande."})
+	}
+	contentType := http.DetectContentType(data)
+	expected := storage.DetectContentType(file.Filename, nil)
+	if contentType != expected {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El contenido no coincide con el tipo de archivo."})
+	}
+	if contentType == "image/jpeg" || contentType == "image/png" || contentType == "image/gif" {
+		cfg, _, err := image.DecodeConfig(bytes.NewReader(data))
+		if err != nil || cfg.Width < 1 || cfg.Height < 1 || int64(cfg.Width)*int64(cfg.Height) > 40000000 {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Imagen inválida o con dimensiones excesivas."})
+		}
+	}
 	uniqueName := storage.UniqueFilename(file.Filename)
-	contentType := storage.DetectContentType(file.Filename, nil)
 
-	url, err := h.store.Upload(c.Request().Context(), folder, uniqueName, src, file.Size, contentType)
+	var url string
+	if folder == "comprobantes" {
+		private, ok := h.store.(storage.ReceiptStore)
+		if !ok {
+			return c.JSON(http.StatusServiceUnavailable, map[string]string{"error": "El almacenamiento privado no está disponible."})
+		}
+		uniqueName = uuid.NewString() + strings.ToLower(filepath.Ext(file.Filename))
+		url, err = private.UploadReceipt(c.Request().Context(), uniqueName, bytes.NewReader(data), int64(len(data)), contentType)
+	} else {
+		url, err = h.store.Upload(c.Request().Context(), folder, uniqueName, bytes.NewReader(data), int64(len(data)), contentType)
+	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error al guardar el archivo.",
@@ -113,4 +146,13 @@ func isAllowedType(filename string) bool {
 		}
 	}
 	return allowed[ext]
+}
+
+// UploadVolunteerPhoto fixes the destination and only accepts report images.
+func (h *UploadHandler) UploadVolunteerPhoto(c echo.Context) error {
+	file, err := c.FormFile("file")
+	if err != nil || !isAllowedType(file.Filename) || strings.EqualFold(filepath.Ext(file.Filename), ".pdf") {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Sube una imagen válida del reporte."})
+	}
+	return h.saveUpload(c, "reportes-voluntarios")
 }

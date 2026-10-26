@@ -16,6 +16,8 @@ export default function SectionBg({ src, opacity = 'opacity-25', position = 'cen
       <img
         src={src}
         alt=""
+        loading="lazy"
+        decoding="async"
         className={`absolute inset-0 w-full h-full object-cover ${opacity} pointer-events-none`}
         style={{ objectPosition: position }}
       />

@@ -47,7 +47,7 @@ export default function VolunteerReportForm({ onSuccess }) {
       const compressed = await compressImageIfNeeded(file);
       const fd = new FormData();
       fd.append('file', compressed);
-      const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await apiClient.post('/volunteer/reports/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       set('photo_url', res.data.url);
       toast.success('Foto subida');
     } catch { toast.error('No se pudo subir la foto'); }
@@ -62,7 +62,7 @@ export default function VolunteerReportForm({ onSuccess }) {
     }
     setLoading(true);
     try {
-      await apiClient.post('/admin/volunteer-reports', {
+      await apiClient.post('/volunteer/reports', {
         ...form,
         team_attendance: parseInt(form.team_attendance, 10) || 0,
       });
@@ -133,7 +133,7 @@ export default function VolunteerReportForm({ onSuccess }) {
         </Field>
       </div>
 
-      <Button type="submit" variant="filled" size="lg" className="w-full justify-center" disabled={loading}>
+      <Button type="submit" variant="filled" size="lg" className="w-full justify-center" disabled={loading || uploading}>
         {loading ? 'Enviando…' : 'Enviar Reporte'}
       </Button>
     </form>

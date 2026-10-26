@@ -56,14 +56,14 @@ func (h *ProfileHandler) UpdateProfile(c echo.Context) error {
 		user.Email = *req.Email
 	}
 
-	if err := h.DB.Save(&user).Error; err != nil {
+	if err := h.DB.Model(&user).Updates(map[string]interface{}{"name": user.Name, "email": user.Email}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo actualizar el perfil."})
 	}
 
 	// El JWT lleva name/email en sus claims (ver AuthContext.jsx -- decodifica
 	// el token en vez de pedirle el perfil al backend) -- sin reemitirlo, el
 	// front seguiria mostrando el nombre/correo VIEJO hasta el proximo login.
-	newToken, err := auth.GenerateJWT(user.ID, user.Name, user.Email, user.Role)
+	newToken, err := auth.GenerateJWT(user.ID, user.Name, user.Email, user.Role, user.SessionVersion)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Perfil actualizado, pero no se pudo renovar la sesión."})
 	}
@@ -107,8 +107,10 @@ func (h *ProfileHandler) ChangePassword(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error interno al procesar la contraseña."})
 	}
-	user.Password = hashed
-	if err := h.DB.Save(&user).Error; err != nil {
+	if err := h.DB.Model(&user).Updates(map[string]interface{}{
+		"password": hashed, "refresh_token": nil, "refresh_token_expiry": nil,
+		"reset_token": nil, "reset_token_expiry": nil, "session_version": gorm.Expr("session_version + 1"),
+	}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo actualizar la contraseña."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Contraseña actualizada correctamente."})

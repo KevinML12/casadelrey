@@ -2,6 +2,7 @@ package models
 
 import (
 	"gorm.io/gorm"
+	"time"
 )
 
 type Event struct {
@@ -20,6 +21,8 @@ type Event struct {
 }
 
 type EventRegistration struct {
+	CancellationTokenHash   string     `json:"-"`
+	CancellationTokenExpiry *time.Time `json:"-"`
 	gorm.Model
 	EventID       uint   `json:"event_id" gorm:"not null;index"`
 	Event         Event  `json:"event" gorm:"foreignKey:EventID"`

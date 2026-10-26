@@ -71,7 +71,7 @@ func (h *VolunteerReportHandler) GetAllVolunteerReports(c echo.Context) error {
 	page, limit := parsePage(c)
 
 	q := h.DB.Model(&models.VolunteerReport{})
-	
+
 	// Si no es admin, solo ve los suyos
 	if role, _ := c.Get("user_role").(string); role != "admin" {
 		uid, _ := c.Get("user_id").(uint)
@@ -101,6 +101,9 @@ func (h *VolunteerReportHandler) GetAllVolunteerReports(c echo.Context) error {
 }
 
 func (h *VolunteerReportHandler) ApproveReport(c echo.Context) error {
+	if c.Get("user_role") != "admin" {
+		return c.JSON(http.StatusForbidden, map[string]string{"error": "Solo un administrador puede aprobar reportes."})
+	}
 	id := c.Param("id")
 	var req struct {
 		Status string `json:"status"`
@@ -110,7 +113,7 @@ func (h *VolunteerReportHandler) ApproveReport(c echo.Context) error {
 	}
 
 	var r models.VolunteerReport
-	if err := h.DB.First(&r, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&r).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Reporte no encontrado."})
 	}
 
@@ -119,7 +122,9 @@ func (h *VolunteerReportHandler) ApproveReport(c echo.Context) error {
 	r.Status = req.Status
 	r.ApprovedByID = &adminID
 	r.ApprovedAt = &now
-	h.DB.Save(&r)
+	if err := h.DB.Save(&r).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo guardar el estado del reporte."})
+	}
 
 	adminName, _ := c.Get("user_name").(string)
 	LogActivity(h.DB, adminID, adminName, "approve", "volunteer_report", r.ID, r.VolunteerName+" → "+req.Status, c.RealIP())

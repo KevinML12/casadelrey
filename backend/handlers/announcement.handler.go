@@ -39,10 +39,14 @@ func (h *AnnouncementHandler) GetAnnouncements(c echo.Context) error {
 	// admin ve todos
 
 	var list []models.Announcement
-	if err := q.Preload("Author").Find(&list).Error; err != nil {
+	if err := q.Preload("Author", func(db *gorm.DB) *gorm.DB { return db.Select("id", "name") }).Find(&list).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener anuncios."})
 	}
-	return c.JSON(http.StatusOK, list)
+	public := make([]PublicAnnouncement, 0, len(list))
+	for _, item := range list {
+		public = append(public, PublicAnnouncement{Announcement: item, Author: PublicAuthor{ID: item.Author.ID, Name: item.Author.Name}})
+	}
+	return c.JSON(http.StatusOK, public)
 }
 
 // GetAllAnnouncements GET /api/v1/admin/announcements — admin ve todos.
@@ -119,7 +123,7 @@ func (h *AnnouncementHandler) CreateAnnouncement(c echo.Context) error {
 func (h *AnnouncementHandler) UpdateAnnouncement(c echo.Context) error {
 	id := c.Param("id")
 	var a models.Announcement
-	if err := h.DB.First(&a, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&a).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Anuncio no encontrado."})
 	}
 
@@ -164,8 +168,8 @@ func (h *AnnouncementHandler) UpdateAnnouncement(c echo.Context) error {
 func (h *AnnouncementHandler) DeleteAnnouncement(c echo.Context) error {
 	id := c.Param("id")
 	var a models.Announcement
-	h.DB.First(&a, id)
-	if err := h.DB.Delete(&models.Announcement{}, id).Error; err != nil {
+	h.DB.Where("id = ?", id).First(&a)
+	if err := h.DB.Where("id = ?", id).Delete(&models.Announcement{}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar."})
 	}
 

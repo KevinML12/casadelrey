@@ -5,7 +5,6 @@ import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import { useApi } from '../../lib/feed';
 import toast from 'react-hot-toast';
 import { Halos } from '../ui/Glass';
-import useGlassSpecular from '../../hooks/useGlassSpecular';
 
 // Nav agrupado por área — un listado plano de 20 ítems se leía como una
 // bandeja de entrada sin orden; las secciones lo hacen escaneable.
@@ -167,13 +166,12 @@ function SidebarContent({ onClose }) {
 
 export default function AdminLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  useGlassSpecular();
   const settings = useApi('/settings') || {};
   const bgImage = settings.admin_bg || '/images/bg-admin.png';
 
   return (
     <div className="admin-light relative flex h-screen bg-paper overflow-hidden text-bg">
-      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.04] mix-blend-multiply pointer-events-none" alt="" />
+      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
       <Halos variant="section" />
 
       {/* Sidebar desktop — panel de cristal flotante */}

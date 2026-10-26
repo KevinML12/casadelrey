@@ -5,7 +5,6 @@ import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import { useApi } from '../../lib/feed';
 import toast from 'react-hot-toast';
 import { Halos } from '../ui/Glass';
-import useGlassSpecular from '../../hooks/useGlassSpecular';
 
 const NAV = [
   { to: '/leader',                   icon: 'dashboard',    label: 'Inicio',       exact: true },
@@ -106,13 +105,12 @@ function SidebarContent({ onClose }) {
 
 export default function LeaderLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  useGlassSpecular();
   const settings = useApi('/settings') || {};
   const bgImage = settings.leader_bg || '/images/bg-leader.png';
 
   return (
     <div className="admin-light relative flex h-screen bg-paper overflow-hidden text-bg ">
-      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.04] mix-blend-multiply pointer-events-none" alt="" />
+      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
       <Halos variant="section" />
 
       <aside className="hidden md:flex w-72 shrink-0 flex-col p-3 relative z-10">

@@ -17,8 +17,10 @@ type Donation struct {
 	PaymentReference string  `json:"payment_reference" gorm:"type:varchar(255)"`
 	ReceiptURL       string  `json:"receipt_url" gorm:"type:varchar(500)"`
 	ReceiptID        *uint   `json:"receipt_id" gorm:"index"` // FK → PaymentReceipt
-	IsSuccessful     bool    `json:"is_successful" gorm:"default:true"`
+	IsSuccessful     bool    `json:"is_successful" gorm:"default:false"`
 	DonationPurpose  string  `json:"donation_purpose" gorm:"type:varchar(255)"`
+	IdempotencyKey   *string `json:"-" gorm:"type:varchar(64);uniqueIndex"`
+	RequestHash      string  `json:"-" gorm:"type:varchar(64)"`
 }
 
 // PaymentReceipt verifica comprobantes bancarios para cobros de eventos y donaciones.

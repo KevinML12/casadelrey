@@ -8,12 +8,13 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string `json:"name" gorm:"not null"`
-	Email    string `json:"email" gorm:"unique;not null"`
-	Password string `json:"-" gorm:"not null"`
-	Role     string `json:"role" gorm:"default:member"` // admin|leader|volunteer|member
-	Address  string `json:"address"`
-	Phone    string `json:"phone" gorm:"type:varchar(30)"`
+	Name           string `json:"name" gorm:"not null"`
+	Email          string `json:"email" gorm:"unique;not null"`
+	Password       string `json:"-" gorm:"not null"`
+	SessionVersion uint   `json:"-" gorm:"not null;default:0"`
+	Role           string `json:"role" gorm:"default:member"` // admin|leader|volunteer|member
+	Address        string `json:"address"`
+	Phone          string `json:"phone" gorm:"type:varchar(30)"`
 	// Célula — normalizada
 	CellID   *uint  `json:"cell_id" gorm:"index"` // FK → Cell (nuevo)
 	CellCode string `json:"cell_code"`            // deprecar tras migración

@@ -9,7 +9,7 @@
 const TINTS = {
   pri: 'text-bg',
   sec: 'text-amber',
-  ter: 'text-acento',
+  ter: 'text-bg',
   err: 'text-rose',
   ok:  'text-emerald',
 };
@@ -25,7 +25,7 @@ const TINTS = {
 // LeaderDashboard, que la pone directo sobre el canvas), deja nested en
 // false — .glass-light-nested sin nada semi-opaco detrás se lava.
 export default function StatCard({ label, value, tint = 'pri', sub, variant = 'light', nested = false }) {
-  const valColor = TINTS[tint] || TINTS.pri;
+  const valColor = variant === 'dark' && ['pri', 'ter'].includes(tint) ? 'text-white' : (TINTS[tint] || TINTS.pri);
   const light = variant !== 'dark';
   const material = light ? (nested ? 'glass-light-nested' : 'glass-light') : 'liquid-glass';
   return (

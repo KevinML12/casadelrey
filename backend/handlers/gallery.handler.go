@@ -106,7 +106,7 @@ func (h *GalleryHandler) CreatePhoto(c echo.Context) error {
 func (h *GalleryHandler) UpdatePhoto(c echo.Context) error {
 	id := c.Param("id")
 	var photo models.GalleryPhoto
-	if err := h.DB.First(&photo, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&photo).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Foto no encontrada."})
 	}
 
@@ -162,8 +162,8 @@ func (h *GalleryHandler) UpdatePhoto(c echo.Context) error {
 func (h *GalleryHandler) DeletePhoto(c echo.Context) error {
 	id := c.Param("id")
 	var photo models.GalleryPhoto
-	h.DB.First(&photo, id)
-	if err := h.DB.Delete(&models.GalleryPhoto{}, id).Error; err != nil {
+	h.DB.Where("id = ?", id).First(&photo)
+	if err := h.DB.Where("id = ?", id).Delete(&models.GalleryPhoto{}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar la foto."})
 	}
 

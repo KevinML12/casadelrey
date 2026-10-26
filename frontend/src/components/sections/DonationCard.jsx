@@ -6,9 +6,9 @@
 //  esperan atenuados. Submódulos que emulan los pasos de una
 //  operación — la card refracta directamente la foto de la sección
 //  (nada de cristal anidado: la guía lo prohíbe).
-//  La lógica de envío (donations/register + receipts) es la de siempre.
+//  Intención y comprobante se registran juntos; la verificación confirma el importe.
 // ============================================================
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
@@ -17,6 +17,7 @@ import BankDetails from './BankDetails';
 import { compressImageIfNeeded } from '../../lib/compressImage';
 import { useDonationPurposes } from '../../lib/donationPurposes';
 import { PRESS_PRIMARY, PRESS_SECONDARY } from '../../lib/motion';
+import useFilePreview from '../../hooks/useFilePreview';
 
 const AMOUNTS  = [50, 100, 250, 500];
 
@@ -38,11 +39,13 @@ export default function DonationCard() {
   const [phone,   setPhone]   = useState('');
 
   const [receiptUrl, setReceiptUrl] = useState('');
+  const { preview, showFile } = useFilePreview();
   const [referenceNumber, setReferenceNumber] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const [sent,    setSent]    = useState(false);
   const [loading, setLoading] = useState(false);
+  const submitting = useRef(false);
 
   const finalAmount = custom ? parseFloat(custom) : amount;
   const purposeLabel = purposes.find(p => p.value === purpose)?.title || '';
@@ -61,6 +64,7 @@ export default function DonationCard() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setReceiptUrl(res.data.url);
+      showFile(compressed);
       toast.success('Comprobante cargado');
     } catch {
       toast.error('Error al subir la imagen');
@@ -71,44 +75,51 @@ export default function DonationCard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting.current) return;
     if (!finalAmount || finalAmount < 10) { toast.error('El monto mínimo es Q10'); return; }
     if (!name.trim())                      { toast.error('Por favor ingresa tu nombre'); return; }
     if (isTransfer && !receiptUrl)         { toast.error('Sube tu comprobante de transferencia'); return; }
 
+    submitting.current = true;
     setLoading(true);
     try {
-      await apiClient.post('/donations/register', {
+      const payload = {
         name, email,
         amount: finalAmount,
         currency: 'GTQ',
         donation_purpose: purpose,
         payment_method: method,
-      });
-
-      if (isTransfer) {
-        await apiClient.post('/receipts', {
-          payer_name: name,
-          payer_email: email,
-          payer_phone: phone,
-          amount: finalAmount,
-          bank_name: 'Banrural',
-          reference_number: referenceNumber,
+        receipt: isTransfer ? {
+          payer_phone: phone, bank_name: 'Banrural', reference_number: referenceNumber,
           receipt_image_url: receiptUrl,
-          purpose: 'donacion',
-          event_id: null,
-        });
+        } : null,
+      };
+      // Keep the same credential after an ambiguous network failure or reload.
+      // Store only a digest and random key, never donor details.
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(payload)));
+      const fingerprint = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+      let attempt;
+      try { attempt = JSON.parse(sessionStorage.getItem('donation:attempt')); } catch { /* Ignore invalid stored state. */ }
+      if (attempt?.fingerprint !== fingerprint || !/^[0-9a-f-]{36}$/.test(attempt?.key || '')) {
+        attempt = { fingerprint, key: crypto.randomUUID() };
+        sessionStorage.setItem('donation:attempt', JSON.stringify(attempt));
       }
+      await apiClient.post('/donations/register', payload, {
+        headers: { 'Idempotency-Key': attempt.key },
+      });
 
       setSent(true);
       toast.success('¡Donación registrada! Gracias.');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al registrar la donación.');
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   };
 
   const resetForm = () => {
+    sessionStorage.removeItem('donation:attempt');
     setSent(false);
     setStep(0);
     setCustom('');
@@ -116,6 +127,7 @@ export default function DonationCard() {
     setEmail('');
     setPhone('');
     setReceiptUrl('');
+    showFile(null);
     setReferenceNumber('');
     setAmount(100);
     setPurpose('general');
@@ -339,7 +351,7 @@ export default function DonationCard() {
 
                             {receiptUrl ? (
                               <div className="flex items-center gap-4 rounded-[14px] bg-bg/4 border border-bg/12 p-4">
-                                <img src={receiptUrl} alt="comprobante" className="h-16 w-16 object-cover rounded-[10px] border border-bg/10" />
+                                {preview?.type.startsWith('image/') ? <img src={preview.url} alt="comprobante" className="h-16 w-16 object-cover rounded-[10px] border border-bg/10" /> : <span className="text-13 text-bg">PDF cargado</span>}
                                 <div className="flex-1 min-w-0">
                                   <p className="text-14 font-bold text-bg">
                                     Comprobante cargado

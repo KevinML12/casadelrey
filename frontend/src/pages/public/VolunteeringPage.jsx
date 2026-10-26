@@ -587,7 +587,6 @@ export default function VolunteeringPage() {
   // retardo en cada familia (donde 1-3 items casi nunca alcanzan a
   // mostrar la variedad). Ya no decide tamaños -- todas las tarjetas
   // miden lo mismo desde que el masonry se fue.
-  const globalIndex = Object.fromEntries(areas.map((a, i) => [a.value, i]));
 
   // Única cifra que esta página puede sostener con un dato real: se
   // CUENTA sobre las áreas ya resueltas desde /volunteer-areas, así que

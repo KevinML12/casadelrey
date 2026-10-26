@@ -139,7 +139,7 @@ func (h *VolunteerHandler) Assign(c echo.Context) error {
 	}
 
 	var v models.Volunteer
-	if err := h.DB.First(&v, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&v).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Voluntario no encontrado."})
 	}
 
@@ -199,7 +199,7 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 	}
 
 	var v models.Volunteer
-	if err := h.DB.First(&v, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&v).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Voluntario no encontrado."})
 	}
 

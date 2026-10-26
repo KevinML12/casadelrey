@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip, { FilterChip } from '../../components/ui/Chip';
+import ReceiptFile from '../../components/sections/ReceiptFile';
 
 const STATUS = {
   pendiente:  { label: 'Pendiente',  color: 'default' },
@@ -96,10 +97,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
         {/* Foto del comprobante */}
         {receipt.receipt_image_url && (
           <div className="px-6 pt-5">
-            <a href={receipt.receipt_image_url} target="_blank" rel="noopener noreferrer">
-              <img src={receipt.receipt_image_url} alt="comprobante"
-                className="w-full max-h-64 object-contain rounded-xl border border-bg/10 hover:opacity-90 transition-opacity" />
-            </a>
+            <ReceiptFile receipt={receipt} />
             <p className="text-label-s text-bg/50 mt-1.5 text-center">Toca la imagen para verla en tamaño completo</p>
           </div>
         )}
@@ -249,9 +247,7 @@ export default function AdminReceipts() {
 
                 {/* Miniatura */}
                 {r.receipt_image_url ? (
-                  <img src={r.receipt_image_url} alt="comprobante"
-                    className="w-14 h-14 rounded-xl object-cover border border-bg/10 shrink-0 cursor-pointer"
-                    onClick={() => setSelected(r)} />
+                  <ReceiptFile receipt={r} thumbnail onClick={() => setSelected(r)} />
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-bg/8 shrink-0" />
                 )}

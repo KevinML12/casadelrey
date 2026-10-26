@@ -18,7 +18,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	
+
 	"github.com/getsentry/sentry-go"
 )
 
@@ -89,9 +89,9 @@ func main() {
 	// CORS: permite peticiones desde el frontend (local y producción).
 	//       AllowOrigins acepta la URL del frontend configurada en CLIENT_URL.
 	allowedOrigins := []string{
-		"http://localhost:5173",        // Vite dev server
-		"http://localhost:3000",        // Alternativa local
-		"https://casadelreyhue.org",    // Producción
+		"http://localhost:5173",     // Vite dev server
+		"http://localhost:3000",     // Alternativa local
+		"https://casadelreyhue.org", // Producción
 	}
 	if cfg.ClientURL != "" {
 		allowedOrigins = append(allowedOrigins, cfg.ClientURL)
@@ -99,7 +99,7 @@ func main() {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: allowedOrigins,
 		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization", "Idempotency-Key"},
 	}))
 
 	// 5b. Inicializar storage (R2 si hay vars configuradas, local como fallback).

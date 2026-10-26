@@ -138,7 +138,7 @@ func (h *CellReportHandler) ApproveReport(c echo.Context) error {
 	}
 
 	var r models.CellReport
-	if err := h.DB.First(&r, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&r).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Reporte no encontrado."})
 	}
 

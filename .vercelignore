@@ -1,0 +1,16 @@
+/backend
+/docs
+/Guias_mejoradas
+/images
+/fotos
+/preview
+/frontend/dist
+/frontend/node_modules
+/node_modules
+/*.pen
+/.env*
+/frontend/.env*
+/frontend/test-results
+/frontend/playwright-report
+**/node_modules
+**/.DS_Store

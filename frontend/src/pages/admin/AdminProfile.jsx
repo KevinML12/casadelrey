@@ -55,6 +55,7 @@ function EditProfileForm({ user, onClose, onSaved }) {
 }
 
 function ChangePasswordForm({ onClose }) {
+  const { logout } = useAuth();
   const [current,  setCurrent]  = useState('');
   const [next,     setNext]     = useState('');
   const [confirm,  setConfirm]  = useState('');
@@ -67,7 +68,8 @@ function ChangePasswordForm({ onClose }) {
     setSaving(true);
     try {
       await apiClient.put('/profile/password', { current_password: current, new_password: next });
-      toast.success('Contraseña actualizada');
+      logout();
+      toast.success('Contraseña actualizada. Inicia sesión nuevamente.');
       onClose();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al cambiar la contraseña');

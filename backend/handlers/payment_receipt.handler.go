@@ -1,24 +1,62 @@
 package handlers
 
 import (
+	"errors"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"casadelrey/backend/email"
 	"casadelrey/backend/models"
+	"casadelrey/backend/storage"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PaymentReceiptHandler struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	store storage.ReceiptStore
 }
 
-func NewPaymentReceiptHandler(db *gorm.DB) *PaymentReceiptHandler {
-	return &PaymentReceiptHandler{DB: db}
+func NewPaymentReceiptHandler(db *gorm.DB, stores ...storage.Store) *PaymentReceiptHandler {
+	h := &PaymentReceiptHandler{DB: db}
+	if len(stores) > 0 {
+		h.store, _ = stores[0].(storage.ReceiptStore)
+	}
+	return h
+}
+
+// File streams a receipt only after the router has validated a live admin session.
+// Never fetch client-supplied URLs (including historical public URLs).
+func (h *PaymentReceiptHandler) File(c echo.Context) error {
+	c.Response().Header().Set("Cache-Control", "private, no-store")
+	c.Response().Header().Set("X-Content-Type-Options", "nosniff")
+	var receipt models.PaymentReceipt
+	if err := h.DB.Where("id = ?", c.Param("id")).First(&receipt).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "Comprobante no encontrado."})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo consultar el comprobante."})
+	}
+	key, ok := storage.ReceiptKey(receipt.ReceiptImageURL)
+	if !ok {
+		return c.JSON(http.StatusConflict, map[string]string{"error": "Este archivo requiere migración al almacenamiento privado."})
+	}
+	if h.store == nil {
+		return c.JSON(http.StatusServiceUnavailable, map[string]string{"error": "El almacenamiento privado no está disponible."})
+	}
+	file, contentType, err := h.store.OpenReceipt(c.Request().Context(), receipt.ReceiptImageURL)
+	if err != nil {
+		return c.JSON(http.StatusServiceUnavailable, map[string]string{"error": "No se pudo abrir el archivo privado."})
+	}
+	defer file.Close()
+	c.Response().Header().Set("Content-Disposition", `inline; filename="`+strings.TrimPrefix(key, "comprobantes/")+`"`)
+	return c.Stream(http.StatusOK, contentType, file)
 }
 
 // Submit POST /api/v1/receipts — público, cualquiera puede subir un comprobante.
@@ -43,6 +81,9 @@ func (h *PaymentReceiptHandler) Submit(c echo.Context) error {
 			"error": "Nombre, monto y foto del comprobante son requeridos.",
 		})
 	}
+	if _, ok := storage.ReceiptKey(req.ReceiptImageURL); !ok {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Sube el comprobante mediante el formulario antes de enviarlo."})
+	}
 
 	receipt := models.PaymentReceipt{
 		PayerName:       req.PayerName,
@@ -64,7 +105,7 @@ func (h *PaymentReceiptHandler) Submit(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al registrar el comprobante."})
 	}
 
-	log.Printf("[Receipt] Nuevo comprobante: %s Q%.2f banco:%s ref:%s", receipt.PayerName, receipt.Amount, receipt.BankName, receipt.ReferenceNumber)
+	log.Printf("[Receipt] Nuevo comprobante ID:%d", receipt.ID)
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "Comprobante recibido. El equipo lo verificará en 24-48 horas.",
 		"id":      receipt.ID,
@@ -118,29 +159,20 @@ func (h *PaymentReceiptHandler) Verify(c echo.Context) error {
 	}
 
 	var receipt models.PaymentReceipt
-	if err := h.DB.First(&receipt, id).Error; err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Comprobante no encontrado."})
-	}
-
 	adminID, _ := c.Get("user_id").(uint)
-	now := time.Now()
-
-	receipt.Status = req.Status
-	receipt.VerifiedByID = &adminID
-	receipt.VerifiedAt = &now
-	receipt.RejectionReason = req.RejectionReason
-
-	h.DB.Save(&receipt)
-
-	// Si está ligado a una inscripción de evento, actualizar su payment_status
-	if receipt.Purpose == "evento" && receipt.EventID != nil {
-		newPaymentStatus := "verificado"
-		if req.Status == "rechazado" {
-			newPaymentStatus = "rechazado"
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&receipt, id).Error; err != nil {
+			return err
 		}
-		h.DB.Model(&models.EventRegistration{}).
-			Where("receipt_id = ?", receipt.ID).
-			Update("payment_status", newPaymentStatus)
+		now := time.Now()
+		receipt.Status = req.Status
+		receipt.VerifiedByID = &adminID
+		receipt.VerifiedAt = &now
+		receipt.RejectionReason = req.RejectionReason
+		return persistReceiptStatus(tx, &receipt)
+	})
+	if err != nil {
+		return receiptWriteError(c, err)
 	}
 
 	// Notificar al pagador -- la UI (AdminReceipts.jsx) le promete al admin
@@ -177,28 +209,76 @@ func (h *PaymentReceiptHandler) Revert(c echo.Context) error {
 	}
 
 	var receipt models.PaymentReceipt
-	if err := h.DB.First(&receipt, id).Error; err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Comprobante no encontrado."})
-	}
-	if receipt.Status == "pendiente" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El comprobante ya está en estado pendiente."})
-	}
-
-	prevStatus := receipt.Status
-	receipt.Status = "pendiente"
-	receipt.VerifiedByID = nil
-	receipt.VerifiedAt = nil
-	receipt.RejectionReason = ""
-	h.DB.Save(&receipt)
-
-	// Si estaba ligado a una inscripción de evento, revertir también su payment_status
-	if receipt.Purpose == "evento" && receipt.EventID != nil {
-		h.DB.Model(&models.EventRegistration{}).
-			Where("receipt_id = ?", receipt.ID).
-			Update("payment_status", "pendiente")
-	}
-
+	var prevStatus string
 	adminID, _ := c.Get("user_id").(uint)
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&receipt, id).Error; err != nil {
+			return err
+		}
+		prevStatus = receipt.Status
+		receipt.Status = "pendiente"
+		receipt.VerifiedByID = nil
+		receipt.VerifiedAt = nil
+		receipt.RejectionReason = ""
+		return persistReceiptStatus(tx, &receipt)
+	})
+	if err != nil {
+		return receiptWriteError(c, err)
+	}
+
 	log.Printf("[Receipt] Revertido de '%s' a 'pendiente' por admin %d — ID:%d", prevStatus, adminID, receipt.ID)
 	return c.JSON(http.StatusOK, receipt)
+}
+
+// persistReceiptStatus changes receipt and financial/RSVP state in one transaction.
+func persistReceiptStatus(tx *gorm.DB, receipt *models.PaymentReceipt) error {
+	if receipt.Purpose == "evento" {
+		var registrations []models.EventRegistration
+		if err := tx.Preload("Event").Where("receipt_id = ?", receipt.ID).Find(&registrations).Error; err != nil {
+			return err
+		}
+		if receipt.Status == "verificado" {
+			if len(registrations) > 1 {
+				return echo.NewHTTPError(http.StatusConflict, "El comprobante está asociado a más de una inscripción. Revisa los datos antes de verificar.")
+			}
+			for _, reg := range registrations {
+				if receipt.EventID == nil || *receipt.EventID != reg.EventID || receipt.Currency != "GTQ" || receipt.Amount+0.005 < reg.Event.PriceGTQ*float64(reg.AttendeeCount) {
+					return echo.NewHTTPError(http.StatusBadRequest, "El comprobante no cubre el importe del evento.")
+				}
+			}
+		}
+	}
+	if receipt.Purpose == "donacion" && receipt.DonationID != nil {
+		var donation models.Donation
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&donation, *receipt.DonationID).Error; err != nil {
+			return err
+		}
+		if donation.ReceiptID != nil && *donation.ReceiptID != receipt.ID {
+			return echo.NewHTTPError(http.StatusConflict, "La donación ya tiene otro comprobante asociado.")
+		}
+		if donation.Currency != receipt.Currency || math.Round(donation.Amount*100) != math.Round(receipt.Amount*100) || !strings.EqualFold(strings.TrimSpace(donation.Email), strings.TrimSpace(receipt.PayerEmail)) {
+			return echo.NewHTTPError(http.StatusBadRequest, "El comprobante no coincide con la donación.")
+		}
+		if err := tx.Model(&donation).Updates(map[string]interface{}{"receipt_id": receipt.ID, "is_successful": receipt.Status == "verificado"}).Error; err != nil {
+			return err
+		}
+	}
+	if err := tx.Save(receipt).Error; err != nil {
+		return err
+	}
+	if receipt.Purpose == "evento" {
+		return tx.Model(&models.EventRegistration{}).Where("receipt_id = ?", receipt.ID).Update("payment_status", receipt.Status).Error
+	}
+	return nil
+}
+func receiptWriteError(c echo.Context, err error) error {
+	var he *echo.HTTPError
+	if errors.As(err, &he) {
+		return c.JSON(he.Code, map[string]interface{}{"error": he.Message})
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Comprobante o registro relacionado no encontrado."})
+	}
+	log.Printf("[Receipt] Error al guardar: %v", err)
+	return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo actualizar el comprobante."})
 }

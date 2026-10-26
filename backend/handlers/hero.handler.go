@@ -68,7 +68,7 @@ func (h *HeroHandler) Update(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	var hero models.HeroSetting
-	if err := h.DB.First(&hero, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&hero).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Hero no encontrado."})
 	}
 
@@ -112,14 +112,14 @@ func (h *HeroHandler) Activate(c echo.Context) error {
 	tx.Commit()
 
 	var hero models.HeroSetting
-	h.DB.First(&hero, id)
+	h.DB.Where("id = ?", id).First(&hero)
 	return c.JSON(http.StatusOK, hero)
 }
 
 // Delete DELETE /api/v1/admin/hero/:id
 func (h *HeroHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
-	if err := h.DB.Delete(&models.HeroSetting{}, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).Delete(&models.HeroSetting{}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Hero eliminado."})

@@ -4,6 +4,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { FieldLight } from '../ui/Glass';
 import { compressImageIfNeeded } from '../../lib/compressImage';
+import useFilePreview from '../../hooks/useFilePreview';
 
 const BANKS = ['Banrural', 'BAC Credomatic', 'G&T Continental', 'Industrial', 'Agromercantil', 'Promerica', 'Citibank', 'Otro'];
 
@@ -28,6 +29,7 @@ export default function ReceiptUploadForm({
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent]       = useState(false);
+  const { preview, showFile } = useFilePreview();
 
   const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -45,6 +47,7 @@ export default function ReceiptUploadForm({
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setForm(p => ({ ...p, receipt_image_url: res.data.url }));
+      showFile(compressed);
       toast.success('Comprobante subido');
     } catch { toast.error('Error al subir la imagen'); }
     finally { setUploading(false); }
@@ -107,12 +110,12 @@ export default function ReceiptUploadForm({
         <p className="text-13 font-semibold text-bg/50 mb-3">Foto del comprobante</p>
         {form.receipt_image_url ? (
           <div className="flex items-center gap-4 p-4 rounded-[16px] glass-light-nested">
-            <img src={form.receipt_image_url} alt="comprobante" className="h-20 w-20 object-cover rounded-[10px] border border-bg/10" />
+            {preview?.type.startsWith('image/') ? <img src={preview.url} alt="comprobante" className="h-20 w-20 object-cover rounded-[10px] border border-bg/10" /> : <span className="text-13 text-bg">PDF cargado</span>}
             <div className="flex-1">
               <p className="text-14 text-bg font-bold">
                 Comprobante cargado
               </p>
-              <button type="button" onClick={() => setForm(p => ({ ...p, receipt_image_url: '' }))}
+              <button type="button" onClick={() => { setForm(p => ({ ...p, receipt_image_url: '' })); showFile(null); }}
                 className="text-13 font-semibold text-bg/50 hover:text-bg transition-colors mt-1">
                 Cambiar foto
               </button>

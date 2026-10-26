@@ -19,13 +19,14 @@ import { useSitePhoto } from '../../lib/feed';
 // la derecha; `align="center"` se reserva para las pantallas que son un
 // anuncio corto (Donar, Recibo, Oración), donde el centrado vuelve a
 // significar algo porque ya no es lo único que hay.
-export default function PageHero({ title, subtitle, children, photoSlot, photoFallback, align = 'left' }) {
+export default function PageHero({ title, subtitle, children, photoSlot, photoFallback, photoSrc, align = 'left' }) {
   const photo = useSitePhoto(photoSlot || '', photoFallback || '');
-  const hasPhoto = Boolean(photoSlot && photo);
+  const image = photoSrc || photo;
+  const hasPhoto = Boolean(image);
   const centered = align === 'center';
 
   return (
-    <section className="relative pt-40 pb-20 md:pt-48 md:pb-28 overflow-hidden bg-bg">
+    <section className="page-hero relative min-h-[56svh] flex items-end pt-40 pb-16 md:pt-48 md:pb-24 overflow-hidden bg-bg">
       {hasPhoto ? (
         <>
           {/* Foto a color pleno: el contraste lo pone el scrim, que oscurece
@@ -34,7 +35,7 @@ export default function PageHero({ title, subtitle, children, photoSlot, photoFa
               izquierda (deja la foto entera visible del otro lado),
               .scrim-hero cuando el bloque va centrado y necesita el óvalo
               oscuro justo en el medio. */}
-          <ParallaxImg src={photo} alt="" overlay={true} />
+          <ParallaxImg src={image} alt="" />
           <div className={centered ? 'scrim-hero' : 'scrim-band'} />
         </>
       ) : (
@@ -48,7 +49,7 @@ export default function PageHero({ title, subtitle, children, photoSlot, photoFa
           no es el ancla de la pantalla, es algo acomodándose. El contenido
           de más abajo sigue entrando con Reveal -- ahí el movimiento sí
           tiene contra qué leerse. */}
-      <div className={`relative z-10 max-w-5xl mx-auto px-6 ${centered ? 'text-center' : ''}`}>
+      <div className={`relative z-10 w-full max-w-6xl mx-auto px-6 md:px-8 ${centered ? 'text-center' : ''}`}>
         <h1 className="text-d1 text-white">
           {title}
         </h1>

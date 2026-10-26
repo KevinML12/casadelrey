@@ -10,7 +10,7 @@ import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
-import SectionBg from '../../components/ui/SectionBg';
+import PageHero from '../../components/layout/PageHero';
 
 // El modal de RSVP es glass-light (blanco/translucido) -- .input-light es
 // el mismo campo claro del panel admin/VolunteeringPage, funciona igual
@@ -341,11 +341,11 @@ function RSVPModal({ event, onClose }) {
   );
 }
 
-// El invitado no tiene sesion, asi que el correo con el que se registro es
-// la unica prueba de identidad disponible (misma logica que RegisterRSVP
-// usa para evitar duplicados).
+// La cancelación exige un código de un solo uso enviado al correo registrado.
 function CancelRSVPModal({ event, onClose, onCancelled }) {
-  const [email, setEmail]     = useState('');
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [codeRequested, setCodeRequested] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleCancel = async (e) => {
@@ -353,7 +353,13 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
     if (!email) return;
     setLoading(true);
     try {
-      await apiClient.delete(`/events/${event.ID}/rsvp?email=${encodeURIComponent(email)}`);
+      if (!codeRequested) {
+        const res = await apiClient.post(`/events/${event.ID}/rsvp/cancellation`, { email });
+        toast.success(res.data.message);
+        setCodeRequested(true);
+        return;
+      }
+      await apiClient.delete(`/events/${event.ID}/rsvp`, { data: { email, token: code } });
       toast.success('Tu registro fue cancelado.');
       onCancelled?.();
       onClose();
@@ -370,12 +376,17 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
       </div>
       <form onSubmit={handleCancel} className="space-y-3">
         <div>
-          <label className="block text-12 font-bold text-bg/60 mb-1">Correo con el que te registraste</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-light" placeholder="tu@correo.com" required autoFocus />
+          <label htmlFor="cancel-rsvp-email" className="block text-12 font-bold text-bg/60 mb-1">Correo con el que te registraste</label>
+          <input id="cancel-rsvp-email" type="email" value={email} onChange={e => { setEmail(e.target.value); setCodeRequested(false); setCode(''); }} className="input-light" placeholder="tu@correo.com" required autoFocus />
         </div>
+        {codeRequested && <div>
+          <label htmlFor="cancel-rsvp-code" className="block text-12 font-bold text-bg/60 mb-1">Código enviado a tu correo</label>
+          <input id="cancel-rsvp-code" value={code} onChange={e => setCode(e.target.value)} className="input-light" required autoComplete="one-time-code" />
+          <p className="text-12 text-bg/60 mt-1">Caduca en 15 minutos. Revisa también tu carpeta de spam.</p>
+        </div>}
         <div className="flex gap-3 pt-2 border-t border-bg/10">
           <button type="submit" disabled={loading} className={btnPrimary}>
-            {loading ? 'Cancelando…' : 'Cancelar mi registro'}
+            {loading ? 'Procesando…' : codeRequested ? 'Cancelar mi registro' : 'Enviar código'}
           </button>
           <button type="button" onClick={onClose} className={btnGhost}>Volver</button>
         </div>
@@ -672,27 +683,8 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] relative overflow-hidden flex flex-col">
-      {/* Hero -- esta página reimplementa a mano el bloque de PageHero, así
-          que al menos sigue su misma gramática:
-          · La foto queda ACOTADA al hero. Antes el ParallaxImg colgaba de
-            <main> y estiraba una sola imagen sobre la página entera, por eso
-            hacía falta un degradado plano que la apagara de arriba abajo.
-          · Foto a color pleno (sin `opacity-45`) y .scrim-hero poniendo el
-            contraste solo bajo el titular centrado.
-          · Sin Reveal: es lo primero que se ve al cargar. Un titular que
-            todavía se está deslizando cuando llegás no es el ancla de la
-            pantalla, es algo acomodándose. */}
-      <section className="relative pt-40 pb-12 overflow-hidden">
-        <SectionBg src="/images/public_bg_eventos.jpg" />
-        <ParallaxImg src={heroImg} alt="Imagen del evento" />
-        <div className="scrim-hero" />
-        <div className="relative z-10 px-6 max-w-6xl mx-auto w-full text-center">
-          <h1 className="text-d1 text-white">Eventos</h1>
-          <p className="mt-6 text-18 leading-relaxed text-white/70 max-w-2xl mx-auto">
-            Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros.
-          </p>
-        </div>
-      </section>
+      <PageHero title="Eventos" photoSrc={heroImg}
+        subtitle="Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros." />
 
       <div className="relative z-10 mx-auto pb-20 w-full flex-1 max-w-7xl px-6">
         {events.length === 0 ? (

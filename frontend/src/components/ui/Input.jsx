@@ -1,3 +1,4 @@
+import { useId } from 'react';
 /**
  * Campos de formulario del panel — MODO CLARO estilo Apple.
  * Usan .input-light (index.css): blanco translúcido, hairline navy,
@@ -11,15 +12,16 @@ const labelCls  = 'block text-13 font-bold tracking-tightish text-bg/60 mb-2';
 const errorCls  = 'mt-1.5 text-13 font-medium text-rose';
 const helperCls = 'mt-1.5 text-13 text-bg/45';
 
-let uid = 0;
-const nextId = (prefix) => `${prefix}-${++uid}`;
+
+
 
 export default function Input({ label, error, helperText, size = 'md', className = '', id, ...props }) {
   const sizeCls = { sm: '!px-3 !py-2', md: '', lg: '!px-4 !py-4' }[size];
   const errCls  = error ? '!border-rose' : '';
   // htmlFor/id: sin esto el <label> es solo texto visual, no asociado al
   // input — rompe lectores de pantalla Y selectores de test getByLabel().
-  const fieldId = id || (label ? nextId('field') : undefined);
+  const generatedId = useId();
+  const fieldId = id || generatedId;
 
   return (
     <div className="w-full">
@@ -33,7 +35,8 @@ export default function Input({ label, error, helperText, size = 'md', className
 
 export function Select({ label, error, helperText, options = [], placeholder = 'Selecciona una opción', className = '', id, ...props }) {
   const errCls = error ? '!border-rose' : '';
-  const fieldId = id || (label ? nextId('field') : undefined);
+  const generatedId = useId();
+  const fieldId = id || generatedId;
 
   return (
     <div className="w-full">
@@ -62,7 +65,8 @@ export function Select({ label, error, helperText, options = [], placeholder = '
 
 export function Textarea({ label, error, helperText, rows = 4, className = '', id, ...props }) {
   const errCls = error ? '!border-rose' : '';
-  const fieldId = id || (label ? nextId('field') : undefined);
+  const generatedId = useId();
+  const fieldId = id || generatedId;
 
   return (
     <div className="w-full">

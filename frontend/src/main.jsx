@@ -18,15 +18,15 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
-        maskAllText: false,
-        blockAllMedia: false,
+        maskAllText: true,
+        blockAllMedia: true,
       }),
     ],
     // Tracing
-    tracesSampleRate: 1.0, 
+    tracesSampleRate: 1.0,
     // Session Replay
-    replaysSessionSampleRate: 0.1, 
-    replaysOnErrorSampleRate: 1.0, 
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0,
   });
 }
 

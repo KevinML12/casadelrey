@@ -2,7 +2,9 @@ package auth
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"time"
 
 	"casadelrey/backend/config"
@@ -13,10 +15,11 @@ import (
 
 // JWTClaims define los claims personalizados del JWT
 type JWTClaims struct {
-	UserID uint   `json:"user_id"`
-	Name   string `json:"name"`
-	Email  string `json:"email"`
-	Role   string `json:"role"`
+	UserID         uint   `json:"user_id"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	Role           string `json:"role"`
+	SessionVersion uint   `json:"session_version"`
 	jwt.RegisteredClaims
 }
 
@@ -35,14 +38,19 @@ func ComparePassword(hashedPassword, password string) error {
 }
 
 // GenerateJWT genera un token JWT con los datos básicos del usuario
-func GenerateJWT(userID uint, name, email, role string) (string, error) {
+func GenerateJWT(userID uint, name, email, role string, versions ...uint) (string, error) {
+	var version uint
+	if len(versions) > 0 {
+		version = versions[0]
+	}
 	claims := &JWTClaims{
-		UserID: userID,
-		Name:   name,
-		Email:  email,
-		Role:   role,
+		SessionVersion: version,
+		UserID:         userID,
+		Name:           name,
+		Email:          email,
+		Role:           role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
@@ -69,4 +77,10 @@ func GenerateSecureToken(length int) (string, error) {
 		return "", err
 	}
 	return base64.URLEncoding.EncodeToString(b), nil
+}
+
+// HashToken keeps opaque bearer credentials out of database storage.
+func HashToken(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
 }

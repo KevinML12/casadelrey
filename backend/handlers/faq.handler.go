@@ -54,7 +54,7 @@ func (h *FAQHandler) UpdateFAQ(c echo.Context) error {
 	id := c.Param("id")
 	var faq models.FAQ
 
-	if err := h.DB.First(&faq, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&faq).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Pregunta frecuente no encontrada"})
 	}
 
@@ -97,7 +97,7 @@ func (h *FAQHandler) DeleteFAQ(c echo.Context) error {
 	id := c.Param("id")
 	var faq models.FAQ
 
-	if err := h.DB.First(&faq, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&faq).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Pregunta frecuente no encontrada"})
 	}
 

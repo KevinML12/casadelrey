@@ -147,7 +147,7 @@ func (h *Handler) Login(c echo.Context) error {
 	}
 
 	// Generar el token JWT (Access Token válido por ej. 24h o 15m)
-	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role)
+	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role, user.SessionVersion)
 	if err != nil {
 		log.Printf("[Auth] Error al generar JWT: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
@@ -160,14 +160,20 @@ func (h *Handler) Login(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al generar refresh token."})
 	}
-	
+
 	expiry := time.Now().Add(7 * 24 * time.Hour)
-	user.RefreshToken = &refreshToken
-	user.RefreshTokenExpiry = &expiry
-	h.DB.Save(&user)
+	result := h.DB.Model(&User{}).Where("id = ? AND session_version = ? AND role = ?", user.ID, user.SessionVersion, user.Role).Updates(map[string]interface{}{
+		"refresh_token": HashToken(refreshToken), "refresh_token_expiry": expiry,
+	})
+	if result.Error != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo guardar la sesión."})
+	}
+	if result.RowsAffected != 1 {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "La cuenta cambió. Vuelve a iniciar sesión."})
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
+		"token":         token,
 		"refresh_token": refreshToken,
 		"user": map[string]interface{}{
 			"id":    user.ID,
@@ -191,7 +197,7 @@ func (h *Handler) Refresh(c echo.Context) error {
 	}
 
 	var user User
-	if result := h.DB.Where("refresh_token = ?", req.RefreshToken).First(&user); result.Error != nil {
+	if result := h.DB.Where("refresh_token = ? OR (length(refresh_token) <> 64 AND refresh_token = ?)", HashToken(req.RefreshToken), req.RefreshToken).First(&user); result.Error != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Refresh token inválido."})
 	}
 
@@ -200,22 +206,28 @@ func (h *Handler) Refresh(c echo.Context) error {
 	}
 
 	// Generar nuevo JWT
-	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role)
+	token, err := GenerateJWT(user.ID, user.Name, user.Email, user.Role, user.SessionVersion)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error interno al generar nuevo token."})
 	}
-	
-	// Opcional: Rotar el refresh token (refresh token rotation)
-	// Para hacerlo simple y confiable para sesiones largas, lo mantendremos igual hasta que expire, o podemos emitir uno nuevo.
-	// Emitiremos uno nuevo para mayor seguridad.
-	newRefreshToken, _ := GenerateSecureToken(32)
+
+	newRefreshToken, err := GenerateSecureToken(32)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo renovar la sesión."})
+	}
 	expiry := time.Now().Add(7 * 24 * time.Hour)
-	user.RefreshToken = &newRefreshToken
-	user.RefreshTokenExpiry = &expiry
-	h.DB.Save(&user)
+	result := h.DB.Model(&User{}).Where("id = ? AND refresh_token = ? AND session_version = ? AND refresh_token_expiry > ?", user.ID, *user.RefreshToken, user.SessionVersion, time.Now()).Updates(map[string]interface{}{
+		"refresh_token": HashToken(newRefreshToken), "refresh_token_expiry": expiry,
+	})
+	if result.Error != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo renovar la sesión."})
+	}
+	if result.RowsAffected != 1 {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Refresh token inválido."})
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
+		"token":         token,
 		"refresh_token": newRefreshToken,
 		"user": map[string]interface{}{
 			"id":    user.ID,
@@ -258,7 +270,7 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 	user.ResetToken = &resetToken
 	user.ResetTokenExpiry = &expiry
 
-	if result := h.DB.Save(&user); result.Error != nil {
+	if result := h.DB.Model(&user).Updates(map[string]interface{}{"reset_token": resetToken, "reset_token_expiry": expiry}); result.Error != nil {
 		log.Printf("[Auth] Error al guardar token de reseteo: %v", result.Error)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error interno al procesar la solicitud.",
@@ -318,16 +330,17 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 		})
 	}
 
-	// Actualizar contraseña e invalidar el token usado
-	user.Password = hashedPassword
-	user.ResetToken = nil
-	user.ResetTokenExpiry = nil
-
-	if result := h.DB.Save(&user); result.Error != nil {
-		log.Printf("[Auth] Error al actualizar contraseña: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Error interno al actualizar la contraseña.",
-		})
+	// Consume the reset token atomically and invalidate every previous session.
+	result := h.DB.Model(&User{}).Where("id = ? AND reset_token = ? AND reset_token_expiry > ?", user.ID, req.Token, time.Now()).Updates(map[string]interface{}{
+		"password": hashedPassword, "reset_token": nil, "reset_token_expiry": nil,
+		"refresh_token": nil, "refresh_token_expiry": nil,
+		"session_version": gorm.Expr("session_version + 1"),
+	})
+	if result.Error != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error interno al actualizar la contraseña."})
+	}
+	if result.RowsAffected != 1 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Token inválido o expirado."})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{
@@ -363,7 +376,7 @@ func (h *Handler) VerifyEmail(c echo.Context) error {
 	user.VerificationToken = nil
 	user.VerificationTokenExpiry = nil
 
-	if result := h.DB.Save(&user); result.Error != nil {
+	if result := h.DB.Model(&user).Updates(map[string]interface{}{"email_verified": true, "verification_token": nil, "verification_token_expiry": nil}); result.Error != nil {
 		log.Printf("[Auth] Error al verificar correo: %v", result.Error)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error interno al verificar el correo.",

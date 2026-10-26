@@ -151,7 +151,7 @@ func GetVerificationEmailTemplate(name, token string) string {
 
 // GetPasswordResetTemplate devuelve la plantilla HTML para reseteo de contraseña
 func GetPasswordResetTemplate(token string) string {
-	resetURL := fmt.Sprintf("%s/reset-password?token=%s", baseURL(), token)
+	resetURL := fmt.Sprintf("%s/reset-password/%s", baseURL(), token)
 	body := h1("Recuperación de contraseña") + fmt.Sprintf(`
 <p style="margin:0;">Recibimos una solicitud para restablecer la contraseña de tu cuenta. Crea una nueva contraseña:</p>
 %s

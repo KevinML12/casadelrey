@@ -64,11 +64,11 @@ func (h *AdminHandler) GetKPIs(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"total_users":      totalUsers,
-		"total_donations":  totalDonations,
-		"total_petitions":  totalPetitions,
-		"total_revenue":    totalRevenue,
-		"total_blog_views": totalBlogViews,
+		"total_users":        totalUsers,
+		"total_donations":    totalDonations,
+		"total_petitions":    totalPetitions,
+		"total_revenue":      totalRevenue,
+		"total_blog_views":   totalBlogViews,
 		"total_cell_reports": totalCellReports,
 	})
 }
@@ -192,7 +192,7 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 	if !validRoles[req.Role] {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader, volunteer o admin."})
 	}
-	if result := h.DB.Model(&models.User{}).Where("id = ?", id).Update("role", req.Role); result.Error != nil || result.RowsAffected == 0 {
+	if result := h.DB.Model(&models.User{}).Where("id = ?", id).Updates(map[string]interface{}{"role": req.Role, "session_version": gorm.Expr("session_version + 1"), "refresh_token": nil, "refresh_token_expiry": nil}); result.Error != nil || result.RowsAffected == 0 {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
 	}
 

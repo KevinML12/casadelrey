@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Base URL del backend. Debe terminar en /api/v1 para que las rutas coincidan.
-const raw = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-const BASE_URL = raw.endsWith('/api/v1') ? raw : raw.replace(/\/?$/, '') + '/api/v1';
+const raw = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:8080')).replace(/\/+$/, '');
+const BASE_URL = raw.endsWith('/api/v1') ? raw : raw.endsWith('/api') ? `${raw}/v1` : `${raw}/api/v1`;
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -15,6 +15,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  else delete config.headers.Authorization;
   return config;
 });
 
@@ -33,13 +34,21 @@ const processQueue = (error, token = null) => {
 };
 
 apiClient.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // A misconfigured SPA rewrite can return index.html with HTTP 200.
+    // Reject that response before a feed tries to render HTML as an array.
+    if (!res.config.responseType && typeof res.data === 'string' && /^\s*</.test(res.data)) {
+      return Promise.reject(new Error('La API devolvió una respuesta inválida.'));
+    }
+    return res;
+  },
   async (err) => {
     const originalRequest = err.config;
 
-    if (err.response?.status === 401 && !originalRequest._retry) {
+    if (err.response?.status === 401 && originalRequest && !originalRequest._retry && !originalRequest.url?.startsWith('/auth/')) {
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
+          originalRequest._retry = true;
           failedQueue.push({ resolve, reject });
         }).then(token => {
           originalRequest.headers.Authorization = 'Bearer ' + token;
@@ -57,17 +66,22 @@ apiClient.interceptors.response.use(
         try {
           const res = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
           const { token, refresh_token: newRefreshToken } = res.data;
+          if (localStorage.getItem('refresh_token') !== refreshToken) {
+            throw new Error('La sesión cambió durante la renovación');
+          }
           
           localStorage.setItem('token', token);
           localStorage.setItem('refresh_token', newRefreshToken);
           
-          apiClient.defaults.headers.common.Authorization = 'Bearer ' + token;
+          window.dispatchEvent(new Event('auth:refreshed'));
           originalRequest.headers.Authorization = 'Bearer ' + token;
           
           processQueue(null, token);
           return apiClient(originalRequest);
         } catch (refreshErr) {
           processQueue(refreshErr, null);
+          if (localStorage.getItem('refresh_token') !== refreshToken) return Promise.reject(refreshErr);
+          delete apiClient.defaults.headers.common.Authorization;
           localStorage.removeItem('token');
           localStorage.removeItem('refresh_token');
           window.dispatchEvent(new Event('auth:unauthorized'));
@@ -77,7 +91,8 @@ apiClient.interceptors.response.use(
         }
       } else {
         isRefreshing = false;
-        localStorage.removeItem('token');
+        delete apiClient.defaults.headers.common.Authorization;
+          localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
         window.dispatchEvent(new Event('auth:unauthorized'));
       }

@@ -23,6 +23,7 @@ func TestRegisterDonation_MontoMenorAMinimo_Retorna400(t *testing.T) {
 			"name": "Juan", "amount": 5.0, "payment_method": "presencial",
 		},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 
@@ -47,6 +48,7 @@ func TestRegisterDonation_MontoExactoMinimo_NoPasa400(t *testing.T) {
 			"name": "María", "amount": 10.0, "payment_method": "presencial",
 		},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	// Solo verificamos que no retorna 400 por validación de monto.
 	assert.NotEqual(t, http.StatusBadRequest, rec.Code)
@@ -60,6 +62,7 @@ func TestRegisterDonation_SinNombre_Retorna400(t *testing.T) {
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{"amount": 100.0, "payment_method": "transferencia"},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 
@@ -84,6 +87,7 @@ func TestRegisterDonation_MetodoPagoInvalido_NormalizaAPresencial(t *testing.T) 
 			"name": "Carlos", "amount": 50.0, "payment_method": "tarjeta_invalida",
 		},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	assert.NotEqual(t, http.StatusBadRequest, rec.Code, "método inválido debe normalizarse, no rechazarse")
 }
@@ -101,6 +105,7 @@ func TestRegisterDonation_MetodoPagoVacio_NormalizaAPresencial(t *testing.T) {
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{"name": "Luis", "amount": 25.0},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	assert.NotEqual(t, http.StatusBadRequest, rec.Code)
 }
@@ -115,6 +120,7 @@ func TestRegisterDonation_CuerpoInvalido_Retorna400(t *testing.T) {
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{"name": "Test", "amount": "cien"},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	// Puede ser 400 (bind) o 400 (validación de monto 0 < 10).
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
@@ -139,29 +145,26 @@ func TestRegisterDonation_MetodosValidos_SeGuardan(t *testing.T) {
 				"name": "Donante", "amount": 100.0, "payment_method": metodo,
 			},
 		})
+		c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 		require.NoError(t, h.RegisterDonation(c))
 		assert.Equal(t, http.StatusCreated, rec.Code, "método '%s' debe aceptarse", metodo)
 		sqlDB.Close()
 	}
 }
 
-func TestRegisterDonation_CurrencyCustom_SeRespeta(t *testing.T) {
-	db, mock, sqlDB := newMockDB(t)
+func TestRegisterDonation_MonedaDistintaDeGTQ_SeRechaza(t *testing.T) {
+	db, _, sqlDB := newMockDB(t)
 	defer sqlDB.Close()
 	h := handlers.NewDonationHandler(db)
-
-	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "donations"`).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectCommit()
 
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{
 			"name": "Ana", "amount": 50.0, "payment_method": "transferencia", "currency": "USD",
 		},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
-	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
 func TestRegisterDonation_ErrorDB_Retorna500(t *testing.T) {
@@ -178,6 +181,7 @@ func TestRegisterDonation_ErrorDB_Retorna500(t *testing.T) {
 			"name": "Carlos", "amount": 30.0, "payment_method": "presencial",
 		},
 	})
+	c.Request().Header.Set("Idempotency-Key", "donation-handler-fixture-key")
 	require.NoError(t, h.RegisterDonation(c))
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }

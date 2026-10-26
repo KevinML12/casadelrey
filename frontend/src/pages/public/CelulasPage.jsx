@@ -218,7 +218,7 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
 // con category 'busco_celula' y el cell_id. El backend valida la célula y
 // auto-asigna la tarjeta al líder de esa célula, así que entra directo en
 // su panel y en el del admin, sin que nadie la reparta a mano.
-function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) {
+function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory, tone = 'dark' }) {
   const dark = tone === 'dark';
   const [cell, setCell] = useState(cellInicial);
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
@@ -230,7 +230,7 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
   // tocar su fila; que un desliz del mouse sobre un dropdown se la cambie
   // sin avisar sería peor que no dejarla cambiar.
   const [cambiando, setCambiando] = useState(false);
-  const [pendiente, setPendiente] = useState('');
+  const [, setPendiente] = useState('');
   // Enviar tampoco dispara el POST directo: primero muestra a QUIÉN le va
   // a llegar. Ese es el dato que importa aquí -- cada célula tiene su
   // propio líder y es él quien va a recibir la solicitud.
@@ -327,11 +327,28 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
             {cell.leader
               ? `${cell.leader}, que lidera esta célula.`
               : 'El equipo de la iglesia, que te pondrá en contacto con el líder.'}
-            {cell.zone ? ` Se reúnen en ${cell.zone}.` : ''}
           </p>
+
+          {cell.address ? (
+            <div className="mt-4">
+              <p className={`text-15 leading-relaxed font-medium ${titulo}`}>
+                Se reúnen en: {cell.address}
+              </p>
+              {cell.map_url && (
+                <a href={cell.map_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-13 font-bold mt-2 text-primary hover:underline underline-offset-4">
+                  Ver ubicación en el mapa <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+          ) : (
+            <p className={`text-16 leading-relaxed font-medium mt-1 ${tenue}`}>
+              {cell.zone ? `Se reúnen en ${cell.zone}.` : ''}
+            </p>
+          )}
+
           {(cell.day || cell.time) && (
-            <p className={`text-15 font-bold mt-3 ${titulo}`}>
-              Se reúnen {[cell.day, cell.time].filter(Boolean).join(' a las ')}.
+            <p className={`text-15 font-bold mt-4 ${titulo}`}>
+              Día de reunión: {[cell.day, cell.time].filter(Boolean).join(' a las ')}
             </p>
           )}
           {cell.what_to_expect && (
@@ -391,7 +408,7 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
           otras.length > 0 && (
             <div className={`rounded-[14px] px-4 py-3.5 flex items-center justify-between gap-3 ${dark ? 'border border-white/12 bg-white/5' : 'border border-bg/12 bg-bg/5'}`}>
               <div className="min-w-0">
-                <p className={`text-13 font-semibold mb-1 ${suave}`}>Célula</p>
+                <p className={`text-13 font-semibold mb-1 ${suave}`}>Célula seleccionada</p>
                 <p className={`text-15 font-bold truncate ${titulo}`}>{cell.name}</p>
               </div>
               <button
@@ -404,31 +421,44 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
             </div>
           )
         ) : (
-          <div className={`rounded-[14px] p-4 space-y-3 ${dark ? 'border border-white/12 bg-white/5' : 'border border-bg/12 bg-bg/5'}`}>
-            <p className={`text-13 font-semibold ${suave}`}>¿Cambiar tu elección ({cell.name})?</p>
-            <select
-              className={`${campo} appearance-none cursor-pointer`}
-              value={pendiente}
-              onChange={e => setPendiente(e.target.value)}
-            >
-              {cells.map(c => (
-                <option key={c.id} value={c.id}>{c.name}{c.zone ? ` — ${c.zone}` : ''}</option>
-              ))}
-            </select>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const elegida = cells.find(c => String(c.id) === pendiente);
-                  if (elegida) setCell(elegida);
-                  setCambiando(false);
-                }}
-                className={`flex-1 rounded-pill px-4 py-2.5 text-13 font-bold ${dark ? 'bg-white text-bg' : 'bg-bg text-white'}`}
-              >
-                Confirmar cambio
-              </button>
-              <button type="button" onClick={() => setCambiando(false)} className={`flex-1 rounded-pill px-4 py-2.5 text-13 font-semibold ${suave}`}>
-                Cancelar
+          <div className={`rounded-[16px] p-4 space-y-4 ${dark ? 'bg-white/5 border border-white/10' : 'bg-black/5 border border-bg/10'}`}>
+            <p className={`text-12 font-bold uppercase tracking-widest ${suave}`}>Opciones de cambio</p>
+
+            {otras.length > 0 && (
+              <div className="space-y-2">
+                <p className={`text-13 font-semibold ${titulo}`}>Elegir otra célula en esta categoría:</p>
+                <div className="grid grid-cols-1 gap-2 max-h-[180px] overflow-y-auto pr-1">
+                  {cells.map(c => (
+                     <button
+                       key={c.id}
+                       type="button"
+                       onClick={() => { setCell(c); setCambiando(false); }}
+                       className={`flex flex-col text-left px-4 py-3 rounded-[12px] border transition-all ${cell.id === c.id ? 'border-primary bg-primary/10' : dark ? 'border-white/10 hover:border-white/30' : 'border-bg/10 hover:border-bg/30'}`}
+                     >
+                        <span className={`text-14 font-bold ${titulo}`}>{c.name}</span>
+                        {c.zone && <span className={`text-12 ${suave}`}>{c.zone}</span>}
+                     </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onChangeCategory && (
+              <div className="pt-2">
+                <button
+                   type="button"
+                   onClick={onChangeCategory}
+                   className={`w-full py-3 px-4 rounded-[12px] text-13 font-bold flex items-center justify-between transition-colors ${dark ? 'bg-white/10 hover:bg-white/15' : 'bg-black/10 hover:bg-black/15'}`}
+                >
+                   <span className={titulo}>Explorar otras categorías</span>
+                   <ArrowRight className={`w-4 h-4 ${suave}`} />
+                </button>
+              </div>
+            )}
+
+            <div className="pt-1">
+              <button type="button" onClick={() => setCambiando(false)} className={`w-full text-center text-13 font-semibold py-2 ${suave} hover:opacity-100`}>
+                Cancelar cambio
               </button>
             </div>
           </div>
@@ -457,7 +487,11 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, tone = 'dark' }) 
 function CellDetailCard({ cell, onUnirme, onCerrar }) {
   const datos = [
     (cell.day || cell.time) && { k: 'Se reúnen', v: [cell.day, cell.time].filter(Boolean).join(' · ') },
-    cell.zone && { k: 'Dónde', v: cell.zone },
+    (cell.address || cell.zone) && {
+       k: 'Dónde',
+       v: cell.address || cell.zone,
+       link: cell.map_url
+    },
     cell.leader && { k: 'Líder', v: cell.leader },
   ].filter(Boolean);
 
@@ -467,7 +501,7 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
@@ -508,7 +542,14 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
           {datos.map(d => (
             <div key={d.k} className="flex items-baseline justify-between gap-6 py-3">
               <dt className="text-13 font-semibold text-bg/55 shrink-0 uppercase tracking-widest">{d.k}</dt>
-              <dd className="text-15 font-bold text-bg text-right">{d.v}</dd>
+              <dd className="text-15 font-bold text-bg text-right">
+                {d.v}
+                {d.link && (
+                  <a href={d.link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-end gap-1 text-13 text-primary hover:underline underline-offset-4 mt-1.5">
+                    Ver mapa <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </dd>
             </div>
           ))}
         </motion.dl>
@@ -563,7 +604,7 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
@@ -652,7 +693,7 @@ function CellQuizModal({ groups, onViewDetail }) {
   // La solicitud gana a cualquier paso del quiz: es la acción final, y
   // volver la devuelve al resultado donde estaba.
   if (solicitando) {
-    return <CellJoinForm cell={solicitando} cells={category?.cells || []} onBack={() => setSolicitando(null)} tone="light" />;
+    return <CellJoinForm cell={solicitando} cells={category?.cells || []} onBack={() => setSolicitando(null)} onChangeCategory={() => { setSolicitando(null); restart(); }} tone="light" />;
   }
 
   if (step === 'zone' && category) {
@@ -1093,6 +1134,7 @@ export default function CelulasPage() {
               cell={celulaAbierta}
               cells={groups.find(g => g.key === openKey)?.cells || []}
               onBack={() => setSolicitando(false)}
+              onChangeCategory={() => { setSolicitando(false); setOpenKey(null); }}
               tone="light"
             />
           </ModalWrapper>

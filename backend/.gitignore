@@ -16,6 +16,7 @@ casadelrey-backend
 
 # Archivos subidos por usuarios (runtime, no se versiona)
 uploads/
+uploads-private/
 
 # Archivos de test
 *.test

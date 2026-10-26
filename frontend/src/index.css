@@ -76,7 +76,7 @@
                 0 4px 12px rgba(10, 21, 38, 0.04);
   --sh-pop:     0 24px 60px -16px rgba(232, 130, 60, 0.32),
                 0 6px 16px rgba(10, 21, 38, 0.08);
-  --sh-ring:    0 0 0 4px rgba(232, 130, 60, 0.18);
+  --sh-ring:    0 0 0 3px rgba(148, 163, 184, 0.45);
 
   /* ── MOTION (Spring) ─────────────────────────────────────────── */
   --ease-spring:   cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -206,25 +206,13 @@ html.lenis, html.lenis body { height: auto; }
    se pierdan elementos blancos sobre blanco.
 ═══════════════════════════════════════════════════════════════════ */
 
-/* Registra --spec-x/--spec-y como <length> animable: al transicionar
-   la propiedad en el elemento, el brillo especular (que la consume en
-   el radial-gradient del ::after) se desliza con inercia en vez de
-   saltar de golpe — el "líquido movible" sin JS ni WebGL extra. */
-@property --spec-x { syntax: '<length>'; inherits: true; initial-value: 0px; }
-@property --spec-y { syntax: '<length>'; inherits: true; initial-value: 0px; }
-/* -1 (card entra por abajo) → 0 (centro del viewport) → 1 (sale por arriba),
-   la misma que Tilt usa para rotateX/rotateY. La foto DENTRO de la card
-   (.parallax-layer) la lee para moverse más lento que la card — profundidad
-   ambiental mientras haces scroll, sin JS por imagen. */
-@property --scroll-p { syntax: '<number>'; inherits: true; initial-value: 0; }
-
 @layer components {
 
   /* Cristal estándar — la base para cards translúcidas y navbars */
   .glass {
     background: rgba(255, 255, 255, 0.05);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-            backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(135%);
+            backdrop-filter: blur(22px) saturate(135%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
@@ -233,9 +221,9 @@ html.lenis, html.lenis body { height: auto; }
      blanco translúcido con tinta navy encima. Al scroll sube la opacidad
      para mantener legibilidad sobre cualquier contenido. */
   .glass-nav {
-    background: rgba(255, 255, 255, 0.62);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-            backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255,255,255,.62);
+    -webkit-backdrop-filter: blur(22px) saturate(135%);
+            backdrop-filter: blur(22px) saturate(135%);
     border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
@@ -268,83 +256,23 @@ html.lenis, html.lenis body { height: auto; }
      que es lo que da la lectura de "vidrio curvo" del material de Apple. */
 
   .liquid-glass {
-    /* Vidrio real, casi transparente. El realismo NO viene de opacar el
-       fondo (foto sigue legible, blur bajo 8px) sino del MODELADO de la
-       luz en un cristal grueso, todo con box-shadow:
-        · bisel: luz en el borde arriba-izq, sombra abajo-der → espesor
-        · realce acento inferior: como el agua/vidrio concentra la luz en
-          su borde de abajo (el detalle que lo hace leer como "gota")
-        · hairline superior: filo brillante donde pega la luz
-        · sombra externa: lo despega del fondo, flota */
-    background: linear-gradient(157deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 55%, rgba(255,255,255,0.008) 100%);
-    -webkit-backdrop-filter: blur(8px) saturate(150%) brightness(1.05);
-            backdrop-filter: blur(8px) saturate(150%) brightness(1.05);
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    /* Monocromático a propósito (mismo tono que el .glass-light claro):
-       el modelado es sólo blanco/neutro — bisel + realce inferior tenue —
-       nada de tinte acento, para que el cristal se sienta sobrio y
-       uniforme, no colorido. */
-    box-shadow:
-      inset 1.5px 2.5px 5px rgba(255, 255, 255, 0.26),
-      inset -1.5px -2px 8px rgba(255, 255, 255, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.20),
-      inset 0 -26px 40px -26px rgba(255, 255, 255, 0.15),
-      0 24px 50px -20px rgba(0, 0, 0, 0.5);
-    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
-                --spec-x 0.6s var(--ease-spring), --spec-y 0.6s var(--ease-spring);
+    background: linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,.014) 55%, rgba(255,255,255,.008));
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    backdrop-filter: blur(8px) saturate(130%);
+    border: 1px solid rgba(255,255,255,.22);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.44), inset 1px 0 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(255,255,255,.08), 0 20px 48px -24px rgba(0,0,0,.6);
     position: relative;
     overflow: hidden;
-  }
-  .liquid-glass:hover {
-    border-color: rgba(255, 255, 255, 0.22);
-    box-shadow:
-      inset 1.5px 2.5px 5px rgba(255, 255, 255, 0.32),
-      inset -1.5px -2px 8px rgba(255, 255, 255, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25),
-      inset 0 -28px 44px -26px rgba(255, 255, 255, 0.20),
-      0 30px 60px -22px rgba(0, 0, 0, 0.55);
   }
 
   .glass-light {
-    /* v1: rgba(255,255,255,0.48) plano — caja blanca lechosa, sin luz.
-       v2: gradiente 0.64→0.30 — mejor bisel, pero sobre NAVY liso (el
-       panel admin de esa época) el backdrop-filter mezclaba tanto navy
-       oscuro que salía gris azulado apagado ("parece pañal").
-       v3: opacidad forzada a 0.90→0.62 para que se sostuviera sola sobre
-       ese navy — funcionó, pero quedó demasiado opaca/plana, perdiendo
-       el "ves a través" que sí tiene esta misma clase en el dropdown del
-       header público (que el usuario señaló como referencia).
-       v4 (actual): el panel admin YA NO es navy — es bg-paper claro
-       (ver .admin-light) más los halos acentos. Ya no hay nada oscuro
-       detrás que ensuciar, así que se puede bajar la opacidad de vuelta
-       a un rango translúcido de verdad sin repetir el problema de v2. */
-    background: linear-gradient(155deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.42) 55%, rgba(255,255,255,0.28) 100%);
-    -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.06);
-            backdrop-filter: blur(26px) saturate(180%) brightness(1.06);
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgba(255, 255, 255, 0.7) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.42) rgba(255, 255, 255, 0.62);
-    box-shadow:
-      inset 1.5px 2px 4px rgba(255, 255, 255, 0.85),
-      inset -1.5px -1.5px 6px rgba(255, 255, 255, 0.22),
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -22px 36px -24px rgba(255, 255, 255, 0.55),
-      0 24px 60px -20px rgba(10, 21, 38, 0.45),
-      0 4px 12px rgba(10, 21, 38, 0.12);
-    transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
-                --spec-x 0.6s var(--ease-spring), --spec-y 0.6s var(--ease-spring);
+    background: linear-gradient(155deg, rgba(255,255,255,.62), rgba(255,255,255,.42) 55%, rgba(255,255,255,.28));
+    -webkit-backdrop-filter: blur(22px) saturate(135%);
+    backdrop-filter: blur(22px) saturate(135%);
+    border: 1px solid rgba(255,255,255,.65);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 1px 0 0 rgba(255,255,255,.38), inset 0 -1px 0 rgba(10,21,38,.055), 0 18px 48px -28px rgba(10,21,38,.32);
     position: relative;
     overflow: hidden;
-  }
-  .glass-light:hover {
-    border-color: rgba(255, 255, 255, 0.82) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.72);
-    box-shadow:
-      inset 1.5px 2px 4px rgba(255, 255, 255, 0.92),
-      inset -1.5px -1.5px 6px rgba(255, 255, 255, 0.28),
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -24px 40px -24px rgba(255, 255, 255, 0.6),
-      0 30px 70px -22px rgba(10, 21, 38, 0.5),
-      0 4px 12px rgba(10, 21, 38, 0.14);
   }
 
   /* .glass-light-nested — segunda capa, MÁS transparente que .glass-light.
@@ -369,18 +297,11 @@ html.lenis, html.lenis body { height: auto; }
       inset 0 1px 0 rgba(255, 255, 255, 0.75),
       0 10px 24px -12px rgba(10, 21, 38, 0.18);
     transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
-                --spec-x 0.6s var(--ease-spring), --spec-y 0.6s var(--ease-spring);
+                background-color 0.25s var(--ease-out);
     position: relative;
     overflow: hidden;
   }
-  .glass-light-nested:hover {
-    border-color: rgba(255, 255, 255, 0.65) rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.48);
-    box-shadow:
-      inset 1px 1.5px 3px rgba(255, 255, 255, 0.78),
-      inset -1px -1px 4px rgba(255, 255, 255, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82),
-      0 14px 30px -14px rgba(10, 21, 38, 0.22);
-  }
+
 
   /* ── SCRIMS ────────────────────────────────────────────────────────
      Las capas oscuras que van SOBRE una foto para que el texto encima
@@ -437,47 +358,7 @@ html.lenis, html.lenis body { height: auto; }
       rgba(10,21,38,.08) 100%);
   }
 
-  /* Brillo especular interactivo — sigue al cursor vía --spec-x/--spec-y
-     (seteadas con pointermove/touchmove, ver useGlassSpecular.js).
-     Modelo de una gota de agua real fotografiada: NO es un solo punto de
-     luz, son dos — el "catch light" (reflejo directo de la fuente, chico
-     y muy definido) y un segundo reflejo más suave y grande, desplazado
-     unos px hacia abajo-derecha (la luz que se refracta DENTRO de la
-     gota, no la que rebota en la superficie) — más una dispersión ancha
-     y tenue de ambiente. `mix-blend-mode: overlay` en el oscuro hace que
-     el brillo se sienta como luz interactuando con el cristal en vez de
-     una calcomanía blanca pegada encima. Reemplaza al shine en loop: el
-     material de Apple es calmo y reacciona a la interacción, no anima
-     solo. */
-  .liquid-glass::after,
-  .glass-light::after,
-  .glass-light-nested::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background:
-      radial-gradient(30px 20px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.85), transparent 72%),
-      radial-gradient(115px 85px ellipse at calc(var(--spec-x, 50%) + 20px) calc(var(--spec-y, 0%) + 24px), rgba(255, 255, 255, 0.28), transparent 74%),
-      radial-gradient(230px 175px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.10), transparent 76%);
-    /* --spec-o: además del :hover (mouse), useGlassSpecular la fuerza a 1
-       en touch — donde :hover no dispara. */
-    opacity: var(--spec-o, 0);
-    transition: opacity 0.5s var(--ease-out);
-  }
-  .liquid-glass::after { mix-blend-mode: overlay; }
-  .glass-light::after,
-  .glass-light-nested::after {
-    background:
-      radial-gradient(28px 18px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.95), transparent 70%),
-      radial-gradient(105px 78px ellipse at calc(var(--spec-x, 50%) + 18px) calc(var(--spec-y, 0%) + 22px), rgba(255, 255, 255, 0.4), transparent 74%),
-      radial-gradient(210px 160px ellipse at var(--spec-x, 50%) var(--spec-y, 0%), rgba(255, 255, 255, 0.18), transparent 76%);
-  }
-  .liquid-glass:hover::after,
-  .glass-light:hover::after,
-  .glass-light-nested:hover::after { opacity: 1; }
-
+  /* Static glass: no cursor-following highlights or hover reflections. */
   /* Reflejo de vidrio FIJO (antes barría en loop — se leía como flash de
      plantilla/IA). Ahora es una franja de luz diagonal estática en la
      esquina superior, como el reflejo de una ventana sobre el cristal:
@@ -495,15 +376,15 @@ html.lenis, html.lenis body { height: auto; }
     pointer-events: none;
     background: linear-gradient(
       125deg,
-      rgba(255, 255, 255, 0.32) 0%,
-      rgba(255, 255, 255, 0.12) 35%,
+      rgba(255, 255, 255, 0.13) 0%,
+      rgba(255, 255, 255, 0.04) 35%,
       transparent 62%
     );
     mix-blend-mode: overlay;
     opacity: 0.85;
     transition: opacity 0.4s var(--ease-out);
   }
-  .liquid-shine:hover::before { opacity: 1; }
+
 
   /* Parallax por card — la foto vive un poco "más atrás" que el vidrio:
      se desplaza y se acerca sutilmente con --scroll-p (la misma señal de
@@ -532,8 +413,6 @@ html.lenis, html.lenis body { height: auto; }
   }
   .card-spring:hover {
     transform: translateY(-2px) scale(1.005);
-    box-shadow: var(--sh-card-lg);
-    border-radius: 20px;
   }
 
   /* Focus ring de marca (acento con halo suave) */

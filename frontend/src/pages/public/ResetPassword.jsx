@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import AuthCard from '../../components/ui/AuthCard';
@@ -10,7 +10,9 @@ export default function ResetPassword() {
   const [confirm,  setConfirm]  = useState('');
   const [loading,  setLoading]  = useState(false);
   const { resetPassword } = useAuth();
-  const { token }  = useParams();
+  const { token: pathToken } = useParams();
+  const [params] = useSearchParams();
+  const token = pathToken || params.get('token');
   const navigate   = useNavigate();
 
   const handleSubmit = async (e) => {

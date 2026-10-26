@@ -15,6 +15,7 @@ export default function ParallaxImg({ src, alt = '', className = '', overlay = f
       <motion.img
         src={src}
         alt={alt}
+        decoding="async"
         // saturate(1.12): las fotos de la iglesia son el único activo
         // irrepetible del sitio y llegaban lavadas -- primero por el
         // `opacity-45` que cada caller le encimaba (ya eliminado, el

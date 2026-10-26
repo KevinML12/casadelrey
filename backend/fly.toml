@@ -1,6 +1,9 @@
 app = "casa-del-rey-mvp"
 primary_region = "dfw"
 
+[env]
+  CF_R2_PRIVATE_BUCKET = "casadelreyhue-receipts-private"
+
 [http_service]
   internal_port = 8080
   force_https = true

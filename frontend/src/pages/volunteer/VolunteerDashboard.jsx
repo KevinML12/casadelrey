@@ -233,18 +233,8 @@ export default function VolunteerDashboard() {
       </div>
       
       {showReportForm && (
-        <ModalWrapper>
-          <div className="bg-paper rounded-3xl p-6 sm:p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in shadow-xl">
-            <button
-              onClick={() => setShowReportForm(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg/5 flex items-center justify-center text-bg/50 hover:text-bg hover:bg-bg/10 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <VolunteerReportForm onSuccess={() => setShowReportForm(false)} />
-          </div>
+        <ModalWrapper onClose={() => setShowReportForm(false)} ariaLabel="Reporte de servicio">
+          <VolunteerReportForm onSuccess={() => setShowReportForm(false)} />
         </ModalWrapper>
       )}
 

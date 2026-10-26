@@ -9,9 +9,8 @@ import PhotoBentoTile from '../../components/ui/PhotoBentoTile';
 import PhotoHeaderCard from '../../components/ui/PhotoHeaderCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import WindowStack from '../../components/ui/WindowStack';
-import { useSitePhoto, useApi, groupAlbums } from '../../lib/feed';
+import { useSitePhoto, useApi } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
-import { useSiteConfig } from '../../context/SiteConfigContext';
 import useSeo from '../../hooks/useSeo';
 // El press ya no se define aquí: era una de las 7 copias del mismo objeto
 // repartidas por el sitio, cada una con su amplitud. Los dos MotionLink de
@@ -57,7 +56,6 @@ const BENTO_SPANS = [
 ];
 
 export default function AboutPage() {
-  const settings = useSiteConfig();
   useSeo('Nosotros', 'Conoce la historia, misión y visión de Casa del Rey. Edificando la iglesia célula por célula, generación tras generación.');
 
   // Fotos administrables (AdminSitePhotos) con fallback local garantizado.
@@ -67,8 +65,6 @@ export default function AboutPage() {
   // -- la sección de Células dejó de llevar foto ambiente -- pero sigue
   // administrable y en uso en otras pantallas, así que no se toca el admin.
   const pastoresImg   = useSitePhoto('about_pastores',   '/images/nosotros/pastores.jpg');
-  const servidoresImg = useSitePhoto('about_servidores', '/images/nosotros/servidores.jpg');
-  const comunidadImg  = useSitePhoto('about_comunidad',  '/images/nosotros/comunidad.jpg');
 
   // Fotos para las cards PhotoHeaderCard (franja ancha y corta) --
   // distintas de las de arriba: esas son fondo ambiente de sección (foto
@@ -83,11 +79,6 @@ export default function AboutPage() {
   // corta a la altura del pecho) -- pastores-celulas.jpg ya es horizontal
   // (1800x1192) y no necesita ajuste. Comprimidas de sus originales
   // (3.2MB, foto de cámara sin optimizar) a ~200KB c/u antes de subirlas.
-  const gallery = useApi('/gallery/?limit=200');
-  const galleryPhotos = gallery?.data || gallery;
-  const albums = Array.isArray(galleryPhotos) && galleryPhotos.length > 0 ? groupAlbums(galleryPhotos) : {};
-  const findPhoto = (album, titleStartsWith) =>
-    (albums[album] || []).find(p => p.title?.startsWith(titleStartsWith))?.url;
   const fundadoresCardImg       = '/images/nosotros/fundadores.jpg';
   const pastoresCelulasCardImg  = '/images/nosotros/pastores-celulas.jpg';
   const misionCardImg           = '/images/components/about_mision.jpg';

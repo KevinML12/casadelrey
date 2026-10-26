@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"casadelrey/backend/config"
 )
@@ -50,7 +51,7 @@ func SendEmail(to, subject, htmlContent string) error {
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("api-key", config.AppConfig.BrevoKey)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := (&http.Client{Timeout: 10 * time.Second}).Do(req)
 	if err != nil {
 		log.Printf("Error al enviar email a %s: %v", to, err)
 		return err

@@ -124,7 +124,7 @@ func (h *ConnectCardHandler) Update(c echo.Context) error {
 	}
 
 	var card models.ConnectCard
-	if err := h.DB.First(&card, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).First(&card).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Tarjeta no encontrada."})
 	}
 
@@ -161,7 +161,7 @@ func (h *ConnectCardHandler) Update(c echo.Context) error {
 // DELETE /api/v1/admin/connect-cards/:id — solo admin.
 func (h *ConnectCardHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
-	if err := h.DB.Delete(&models.ConnectCard{}, id).Error; err != nil {
+	if err := h.DB.Where("id = ?", id).Delete(&models.ConnectCard{}).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al eliminar."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Tarjeta eliminada."})

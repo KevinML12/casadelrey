@@ -3,6 +3,9 @@
 package middleware
 
 import (
+	"casadelrey/backend/models"
+	"gorm.io/gorm"
+	"math"
 	"net/http"
 	"strings"
 
@@ -54,7 +57,7 @@ func NewAuthMiddleware(jwtSecret string) echo.MiddlewareFunc {
 
 			// user_id se almacena como número en el JWT (float64 en Go al deserializar JSON)
 			uidFloat, ok := claims["user_id"].(float64)
-			if !ok {
+			if !ok || uidFloat < 1 || math.Trunc(uidFloat) != uidFloat || uidFloat > math.MaxUint32 {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
 					"error": "Claim 'user_id' no encontrado o tiene tipo inválido.",
 				})
@@ -115,5 +118,40 @@ func VolunteerMiddleware() echo.MiddlewareFunc {
 			}
 			return next(c)
 		}
+	}
+}
+
+// NewDatabaseAuthMiddleware checks live permissions and the revocable session version.
+// Legacy JWTs without session_version are accepted only while the account remains at version zero.
+func NewDatabaseAuthMiddleware(secret string, db *gorm.DB) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return NewAuthMiddleware(secret)(func(c echo.Context) error {
+			token, err := jwt.Parse(strings.TrimPrefix(c.Request().Header.Get("Authorization"), "Bearer "), func(t *jwt.Token) (interface{}, error) { return []byte(secret), nil }, jwt.WithValidMethods([]string{"HS256"}), jwt.WithExpirationRequired())
+			if err != nil || !token.Valid {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Sesión inválida o expirada."})
+			}
+			claims := token.Claims.(jwt.MapClaims)
+			version := float64(0)
+			if value, exists := claims["session_version"]; exists {
+				var ok bool
+				version, ok = value.(float64)
+				if !ok || version < 0 || math.Trunc(version) != version || version > math.MaxUint32 {
+					return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Sesión inválida."})
+				}
+			}
+			var user models.User
+			err = db.Select("id", "name", "role", "session_version").First(&user, c.Get("user_id")).Error
+			if err != nil {
+				if err != gorm.ErrRecordNotFound {
+					return c.JSON(http.StatusServiceUnavailable, map[string]string{"error": "No se pudo validar la sesión."})
+				}
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Sesión inválida."})
+			}
+			if user.SessionVersion != uint(version) || user.Role != c.Get("user_role") {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "La sesión cambió. Vuelve a iniciar sesión."})
+			}
+			c.Set("user_name", user.Name)
+			return next(c)
+		})
 	}
 }

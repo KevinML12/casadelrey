@@ -1,14 +1,12 @@
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApi } from '../../lib/feed';
 import toast from 'react-hot-toast';
 import { Halos } from '../ui/Glass';
-import useGlassSpecular from '../../hooks/useGlassSpecular';
 
 export default function VolunteerLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  useGlassSpecular();
   const settings = useApi('/settings') || {};
   const bgImage = settings.volunteer_bg || '/images/bg-volunteer.png';
 
@@ -22,7 +20,7 @@ export default function VolunteerLayout() {
 
   return (
     <div className="admin-light relative min-h-screen bg-paper text-bg flex flex-col">
-      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.04] mix-blend-multiply pointer-events-none" alt="" />
+      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
       <Halos variant="section" />
 
       {/* Topbar — panel de cristal flotante */}

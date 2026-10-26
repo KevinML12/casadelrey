@@ -34,6 +34,7 @@ build/
 tmp_*
 backend/main
 backend/uploads/
+backend/uploads-private/
 
 # ── IDE / OS ────────────────────────────────────────────────────────
 .vscode/
@@ -79,3 +80,5 @@ frontend/*.zip
 fotos/
 fotos/
 fotos/
+.vercel
+.env*

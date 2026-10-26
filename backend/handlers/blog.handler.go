@@ -28,7 +28,7 @@ func (h *BlogHandler) GetPublishedPosts(c echo.Context) error {
 	var posts []models.Post
 	result := h.DB.
 		Where("status = ?", "published").
-		Preload("Author").
+		Preload("Author", func(db *gorm.DB) *gorm.DB { return db.Select("id", "name") }).
 		Order("created_at DESC").
 		Find(&posts)
 
@@ -39,7 +39,11 @@ func (h *BlogHandler) GetPublishedPosts(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, posts)
+	public := make([]PublicPost, 0, len(posts))
+	for _, post := range posts {
+		public = append(public, publicPost(post))
+	}
+	return c.JSON(http.StatusOK, public)
 }
 
 // GetPostBySlug godoc
@@ -51,7 +55,7 @@ func (h *BlogHandler) GetPostBySlug(c echo.Context) error {
 	var post models.Post
 	result := h.DB.
 		Where("slug = ? AND status = ?", slug, "published").
-		Preload("Author").
+		Preload("Author", func(db *gorm.DB) *gorm.DB { return db.Select("id", "name") }).
 		First(&post)
 
 	if result.Error != nil {
@@ -69,7 +73,7 @@ func (h *BlogHandler) GetPostBySlug(c echo.Context) error {
 	h.DB.Model(&post).UpdateColumn("view_count", gorm.Expr("view_count + 1"))
 	post.ViewCount++
 
-	return c.JSON(http.StatusOK, post)
+	return c.JSON(http.StatusOK, publicPost(post))
 }
 
 // GetAllPosts godoc
@@ -227,8 +231,8 @@ func (h *BlogHandler) UpdatePost(c echo.Context) error {
 		post.Status = req.Status
 	}
 	// Siempre actualizar estos campos (pueden ser cadena vacía para borrar)
-	post.CoverImage  = req.CoverImage
-	post.Excerpt     = req.Excerpt
+	post.CoverImage = req.CoverImage
+	post.Excerpt = req.Excerpt
 	post.RedirectURL = req.RedirectURL
 
 	if req.Slug != "" && req.Slug != post.Slug {

@@ -59,7 +59,7 @@ func (h *SocialHandler) CreateSocialPost(c echo.Context) error {
 func (h *SocialHandler) UpdateSocialPost(c echo.Context) error {
 	id := c.Param("id")
 	var p models.SocialPost
-	if result := h.DB.First(&p, id); result.Error != nil {
+	if result := h.DB.Where("id = ?", id).First(&p); result.Error != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "No encontrado."})
 	}
 	var upd struct {
@@ -88,7 +88,7 @@ func (h *SocialHandler) UpdateSocialPost(c echo.Context) error {
 // DeleteSocialPost DELETE /api/v1/admin/social/:id — admin, eliminar.
 func (h *SocialHandler) DeleteSocialPost(c echo.Context) error {
 	id := c.Param("id")
-	if result := h.DB.Delete(&models.SocialPost{}, id); result.Error != nil || result.RowsAffected == 0 {
+	if result := h.DB.Where("id = ?", id).Delete(&models.SocialPost{}); result.Error != nil || result.RowsAffected == 0 {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "No encontrado."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Eliminado."})

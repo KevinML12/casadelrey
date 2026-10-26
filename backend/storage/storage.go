@@ -48,9 +48,10 @@ type Store interface {
 // ── R2 Store ──────────────────────────────────────────────────────────────────
 
 type r2Store struct {
-	client    *s3.Client
-	bucket    string
-	publicURL string // https://cdn.casadelreyhue.org  o  https://pub-xxx.r2.dev
+	client        *s3.Client
+	bucket        string
+	publicURL     string // https://cdn.casadelreyhue.org  o  https://pub-xxx.r2.dev
+	privateBucket string
 }
 
 func newR2Store(accountID, accessKey, secretKey, bucket, publicURL string) (*r2Store, error) {
@@ -76,6 +77,9 @@ func newR2Store(accountID, accessKey, secretKey, bucket, publicURL string) (*r2S
 }
 
 func (s *r2Store) Upload(ctx context.Context, folder, filename string, data io.Reader, size int64, contentType string) (string, error) {
+	if strings.Trim(folder, "/") == "comprobantes" {
+		return "", fmt.Errorf("receipts require private storage")
+	}
 	key := buildKey(folder, filename)
 
 	body, err := io.ReadAll(data)
@@ -125,6 +129,9 @@ func newLocalStore(dir, baseURL string) (*localStore, error) {
 }
 
 func (s *localStore) Upload(_ context.Context, folder, filename string, data io.Reader, _ int64, _ string) (string, error) {
+	if strings.Trim(folder, "/") == "comprobantes" {
+		return "", fmt.Errorf("receipts require private storage")
+	}
 	subDir := filepath.Join(s.dir, folder)
 	if err := os.MkdirAll(subDir, 0755); err != nil {
 		return "", fmt.Errorf("crear subdirectorio: %w", err)
@@ -165,16 +172,17 @@ func (s *localStore) ActiveBackend() Backend { return BackendLocal }
 //
 // Si alguna falta → cae automáticamente a almacenamiento local en ./uploads
 func New() Store {
-	accountID  := os.Getenv("CF_R2_ACCOUNT_ID")
-	accessKey  := os.Getenv("CF_R2_ACCESS_KEY")
-	secretKey  := os.Getenv("CF_R2_SECRET_KEY")
-	bucket     := os.Getenv("CF_R2_BUCKET")
-	publicURL  := os.Getenv("CF_R2_PUBLIC_URL")
+	accountID := os.Getenv("CF_R2_ACCOUNT_ID")
+	accessKey := os.Getenv("CF_R2_ACCESS_KEY")
+	secretKey := os.Getenv("CF_R2_SECRET_KEY")
+	bucket := os.Getenv("CF_R2_BUCKET")
+	publicURL := os.Getenv("CF_R2_PUBLIC_URL")
 
 	// Si todas las vars R2 están presentes → usar R2
 	if accountID != "" && accessKey != "" && secretKey != "" && bucket != "" {
 		store, err := newR2Store(accountID, accessKey, secretKey, bucket, publicURL)
 		if err == nil {
+			store.privateBucket = os.Getenv("CF_R2_PRIVATE_BUCKET")
 			return store
 		}
 		log.Printf("[Storage] R2 no pudo iniciar: %v — usando almacenamiento local", err)

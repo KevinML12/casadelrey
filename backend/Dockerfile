@@ -51,8 +51,9 @@ WORKDIR /app
 COPY --from=builder /build/casadelrey-backend .
 
 # Crear el directorio de uploads con permisos correctos
-# (En Dokploy, montar un volume en /app/uploads para persistencia)
-RUN mkdir -p /app/uploads && chown -R appuser:appgroup /app
+# Para storage local, montar volúmenes separados en /app/uploads y
+# /app/uploads-private. La carpeta privada nunca se sirve por Static.
+RUN mkdir -p /app/uploads /app/uploads-private && chmod 700 /app/uploads-private && chown -R appuser:appgroup /app
 
 # Cambiar al usuario no-root antes de ejecutar
 USER appuser

@@ -9,6 +9,8 @@ package handlers_test
 import (
 	"bytes"
 	"context"
+	"image"
+	"image/png"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -31,6 +33,19 @@ type fakeStore struct {
 	uploads      int
 }
 
+type publicOnlyStore struct{ storage.Store }
+
+func TestUploadReceipt_NoPrivateStoreNeverFallsBackToPublic(t *testing.T) {
+	store := &fakeStore{}
+	h := handlers.NewUploadHandler(publicOnlyStore{Store: store})
+	e := echo.New()
+	rec := httptest.NewRecorder()
+	c := e.NewContext(multipartReq(t, "/", "boleta.png", validPNG(t)), rec)
+	require.NoError(t, h.UploadReceipt(c))
+	assert.Equal(t, http.StatusServiceUnavailable, rec.Code)
+	assert.Zero(t, store.uploads)
+}
+
 func (f *fakeStore) Upload(_ context.Context, folder, filename string, _ io.Reader, _ int64, _ string) (string, error) {
 	f.lastFolder, f.lastFilename = folder, filename
 	f.uploads++
@@ -38,6 +53,14 @@ func (f *fakeStore) Upload(_ context.Context, folder, filename string, _ io.Read
 }
 func (f *fakeStore) Delete(_ context.Context, _ string) error { return nil }
 func (f *fakeStore) ActiveBackend() storage.Backend           { return storage.Backend("fake") }
+func (f *fakeStore) UploadReceipt(_ context.Context, filename string, _ io.Reader, _ int64, _ string) (string, error) {
+	f.lastFolder, f.lastFilename = "comprobantes", filename
+	f.uploads++
+	return storage.ReceiptReference(filename), nil
+}
+func (f *fakeStore) OpenReceipt(context.Context, string) (io.ReadCloser, string, error) {
+	return io.NopCloser(strings.NewReader("test receipt")), "image/png", nil
+}
 
 // multipartReq arma un request multipart/form-data con un campo "file".
 func multipartReq(t *testing.T, path, filename, content string) *http.Request {
@@ -71,7 +94,7 @@ func TestUploadFile_ConImagen_Retorna201(t *testing.T) {
 	h := handlers.NewUploadHandler(store)
 
 	e := echo.New()
-	req := multipartReq(t, "/", "foto.png", "contenido de prueba")
+	req := multipartReq(t, "/", "foto.png", validPNG(t))
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
@@ -92,7 +115,7 @@ func TestUploadFile_FolderQueryParam_SeRespeta(t *testing.T) {
 	h := handlers.NewUploadHandler(store)
 
 	e := echo.New()
-	req := multipartReq(t, "/?folder=galeria", "foto.jpg", "data")
+	req := multipartReq(t, "/?folder=galeria", "foto.png", validPNG(t))
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
@@ -120,7 +143,7 @@ func TestUploadFile_NombreMalicioso_SeSanitiza(t *testing.T) {
 	h := handlers.NewUploadHandler(store)
 
 	e := echo.New()
-	req := multipartReq(t, "/", "../../evil file<>.png", "data")
+	req := multipartReq(t, "/", "../../evil file<>.png", validPNG(t))
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
@@ -143,13 +166,18 @@ func TestUploadReceipt_CarpetaFijaComprobantes(t *testing.T) {
 
 	e := echo.New()
 	// Aunque intente forzar otra carpeta por query, se ignora.
-	req := multipartReq(t, "/?folder=hero", "boleta.jpg", "data")
+	req := multipartReq(t, "/?folder=hero", "boleta.png", validPNG(t))
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
 	require.NoError(t, h.UploadReceipt(c))
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	assert.Equal(t, "comprobantes", store.lastFolder, "la carpeta debe ser fija, no la del query")
+	var resp map[string]interface{}
+	decodeBody(t, rec, &resp)
+	_, ok := storage.ReceiptKey(resp["url"].(string))
+	assert.True(t, ok, "must return an opaque private reference, never a public URL")
+	assert.NotContains(t, store.lastFilename, "boleta")
 }
 
 // El /upload autenticado ya no acepta carpetas arbitrarias: lo que no
@@ -159,11 +187,28 @@ func TestUploadFile_FolderNoPermitido_CaeAGeneral(t *testing.T) {
 	h := handlers.NewUploadHandler(store)
 
 	e := echo.New()
-	req := multipartReq(t, "/?folder=../../etc", "x.png", "data")
+	req := multipartReq(t, "/?folder=../../etc", "x.png", validPNG(t))
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
 	require.NoError(t, h.UploadFile(c))
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	assert.Equal(t, "general", store.lastFolder)
+}
+
+func validPNG(t *testing.T) string {
+	t.Helper()
+	var b bytes.Buffer
+	require.NoError(t, png.Encode(&b, image.NewRGBA(image.Rect(0, 0, 1, 1))))
+	return b.String()
+}
+func TestUploadFile_FalsoJPG_Rechazado(t *testing.T) {
+	store := &fakeStore{}
+	h := handlers.NewUploadHandler(store)
+	e := echo.New()
+	rec := httptest.NewRecorder()
+	c := e.NewContext(multipartReq(t, "/", "audit.jpg", "texto plano"), rec)
+	require.NoError(t, h.UploadFile(c))
+	assert.Equal(t, 400, rec.Code)
+	assert.Zero(t, store.uploads)
 }

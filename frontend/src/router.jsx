@@ -184,6 +184,7 @@ export const router = createBrowserRouter([
       { path: 'register',              element: <Register /> },
       { path: 'forgot-password',       element: <ForgotPassword /> },
       { path: 'verify-email',          element: <VerifyEmail /> },
+      { path: 'reset-password', element: <ResetPassword /> },
       { path: 'reset-password/:token', element: <ResetPassword /> },
       { path: '*',                     element: <NotFound /> },
     ],
