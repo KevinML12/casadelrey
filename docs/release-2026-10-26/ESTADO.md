@@ -34,7 +34,9 @@ https://casadelreyhue-flo7e0ux1-kevinml12s-projects.vercel.app
 
 Se comprobó HTTP 200 en `/` y `/api/v1/events/` usando el acceso autorizado de Vercel. La vista previa puede requerir sesión de Vercel. No fue promovida a producción.
 
-Fly rechazó la construcción de imagen con HTTP 403 por facturas vencidas. No se actualizó el backend ni se intentó cobrar. El usuario decidió preparar otro backend en otra cuenta. Falta conocer la nueva app/URL y configurar allí sus secretos antes de desplegar. El binario también se compila localmente para Linux; esto no equivale a una publicación.
+Fly rechazó la construcción de imagen con HTTP 403 por facturas vencidas. No se actualizó el backend ni se intentó cobrar. El usuario decidió usar Render gratuito para pruebas. La rama `codex/render-qa` está publicada e incluye el blueprint de backend y frontend estático.
+
+Con autorización del usuario se crearon un schema y un usuario exclusivos de pruebas en Supabase. La comprobación de permisos confirmó que el usuario no puede leer ni modificar las tablas de `public`, `auth` o `storage`. El backend completó sus migraciones en ese espacio vacío y respondió health/eventos localmente. Se prepararon un JWT independiente y un pool de tres conexiones; no se copiaron registros ni claves de correo reales. Las credenciales de pruebas están cargadas en el formulario gratuito de Render, pero eso todavía no equivale a una publicación. Falta el almacenamiento exclusivo de pruebas.
 
 ## Pasos restantes para publicar
 

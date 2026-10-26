@@ -4,7 +4,10 @@
 package database
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -63,8 +66,18 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		// en este pool, causando errores intermitentes reales en endpoints
 		// públicos (ej. GetEvents fallando con "failed to connect"). Bajado
 		// a 10 -- deja margen para el dashboard de Supabase y otras conexiones.
-		sqlDB.SetMaxIdleConns(5)               // Conexiones inactivas en el pool
-		sqlDB.SetMaxOpenConns(10)              // Conexiones simultáneas máximas
+		maxOpen := 10
+		if configured := os.Getenv("DB_MAX_OPEN_CONNS"); configured != "" {
+			value, err := strconv.Atoi(configured)
+			if err != nil || value < 1 || value > 10 {
+				connectErr = fmt.Errorf("DB_MAX_OPEN_CONNS must be between 1 and 10")
+				_ = sqlDB.Close()
+				return
+			}
+			maxOpen = value
+		}
+		sqlDB.SetMaxIdleConns(min(5, maxOpen)) // Conexiones inactivas en el pool
+		sqlDB.SetMaxOpenConns(maxOpen)         // Conexiones simultáneas máximas
 		sqlDB.SetConnMaxLifetime(time.Hour)    // Tiempo máximo de vida de una conexión
 
 		// AutoMigrate crea o altera las tablas para que coincidan con los modelos.
@@ -73,7 +86,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		if err := db.AutoMigrate(
 			// Core
 			&models.User{},
-			&models.Cell{},             // NUEVA — normaliza células
+			&models.Cell{}, // NUEVA — normaliza células
 			// Contenido
 			&models.Post{},
 			&models.Announcement{},
@@ -81,7 +94,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.SocialPost{},
 			&models.FAQ{},
 			// Células
-			&models.CellCategory{},     // categorías públicas (Grupos de Vida)
+			&models.CellCategory{}, // categorías públicas (Grupos de Vida)
 			&models.CellReport{},
 			&models.VolunteerReport{},
 			&models.MemberBoleta{},
@@ -89,13 +102,13 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.Event{},
 			&models.EventRegistration{},
 			// Pagos
-			&models.PaymentReceipt{},   // NUEVA — verifica comprobantes bancarios
+			&models.PaymentReceipt{}, // NUEVA — verifica comprobantes bancarios
 			&models.Donation{},
-			&models.DonationPurpose{},  // NUEVA — destinos de donación editables desde el admin
+			&models.DonationPurpose{}, // NUEVA — destinos de donación editables desde el admin
 			// Personas
-			&models.Leader{},           // directorio de líderes (foto + contacto)
+			&models.Leader{}, // directorio de líderes (foto + contacto)
 			&models.Volunteer{},
-			&models.VolunteerArea{},    // NUEVA — departamentos editables desde el admin
+			&models.VolunteerArea{}, // NUEVA — departamentos editables desde el admin
 			&models.Petition{},
 			&models.ConnectCard{}, // NUEVA — tarjeta de conexión para visitantes nuevos
 			// CMS
