@@ -946,5 +946,125 @@
       "width": 1600,
       "height": 900
     }
+  ],
+  "/images/backgrounds/vol-alabanza.webp": [
+    {
+      "src": "/images/backgrounds/vol-alabanza-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-alabanza.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-danza.webp": [
+    {
+      "src": "/images/backgrounds/vol-danza-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-danza.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-servidores.webp": [
+    {
+      "src": "/images/backgrounds/vol-servidores-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-servidores.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-protocolo.webp": [
+    {
+      "src": "/images/backgrounds/vol-protocolo-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-protocolo.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-pancartas.webp": [
+    {
+      "src": "/images/backgrounds/vol-pancartas-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-pancartas.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-ninos.webp": [
+    {
+      "src": "/images/backgrounds/vol-ninos-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-ninos.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-audiovisuales.webp": [
+    {
+      "src": "/images/backgrounds/vol-audiovisuales-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-audiovisuales.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-multimedia.webp": [
+    {
+      "src": "/images/backgrounds/vol-multimedia-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-multimedia.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-oracion.webp": [
+    {
+      "src": "/images/backgrounds/vol-oracion-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/vol-oracion.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/vol-logistica.webp": [
+    {
+      "src": "/images/backgrounds/vol-logistica-640.webp",
+      "width": 640,
+      "height": 480
+    },
+    {
+      "src": "/images/backgrounds/vol-logistica.webp",
+      "width": 1024,
+      "height": 768
+    }
   ]
 }

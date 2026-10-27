@@ -1,5 +1,5 @@
-import { useState, useSyncExternalStore } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import GlassCard from '../../components/ui/GlassCard';
 import WindowStack from '../../components/ui/WindowStack';
@@ -7,7 +7,8 @@ import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
 import { useApi } from '../../lib/feed';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
-import { PRESS_PRIMARY } from '../../lib/motion';
+import { PRESS_PRIMARY, DUR, EASE_OUT } from '../../lib/motion';
+import { VOLUNTEER_BACKGROUNDS } from '../../lib/volunteerBackgrounds';
 import toast from 'react-hot-toast';
 import SectionBg from '../../components/ui/SectionBg';
 
@@ -29,36 +30,8 @@ const NO_PREFERENCE = 'sin_preferencia';
 const NO_PREFERENCE_LABEL = 'Sin preferencia — que me recomienden';
 const NO_PREFERENCE_WHY = 'Nuestro equipo va a revisar tus talentos e intereses para recomendarte el área donde más puedas servir y crecer.';
 
-// Las cifras ya NO se escriben a mano aquí. Vivían como un STATS fijo
-// ('~90 voluntarios', '10 departamentos', '20 líderes de célula') y las
-// tres estaban mal por motivos distintos: la de líderes era de OTRA
-// página (Células) y además falsa contra la API (16, no 20); la de
-// departamentos era un número correcto por casualidad, congelado a mano
-// mientras /volunteer-areas es admin-editable; y el "~90" es un
-// placeholder disfrazado de dato -- no hay endpoint público que lo
-// respalde. Ahora la única ficha se CUENTA sobre las áreas ya
-// resueltas, igual que hace CelulasPage. Si el dueño quiere volver a
-// mostrar el total de voluntarios, tiene que existir como dato (campo
-// en el admin o endpoint), no como texto en este archivo.
-
-// Agrupa los departamentos en familias temáticas -- antes era un solo
-// grid plano de 10 tarjetas idénticas, sin jerarquía visual.
-const CATEGORIES = [
-  { name: 'Alabanza y arte', values: ['alabanza', 'danza'] },
-  { name: 'Anfitrionaje y protocolo', values: ['servidores', 'protocolo', 'pancartas'] },
-  { name: 'Niños y enseñanza', values: ['maestros_ninos'] },
-  { name: 'Multimedia y producción', values: ['tecnicos_audiovisuales', 'multimedia'] },
-  { name: 'Oración y logística', values: ['oracion', 'logistica'] },
-];
-
-// Aquí vivía HEIGHTS, seis alturas fijas para un masonry de CSS columns
-// (columns-2/3/4). El masonry existe para rellenar huecos cuando hay
-// MUCHOS elementos, pero se aplicaba DENTRO de cada familia y las
-// familias tienen 2, 3, 1, 2 y 2 departamentos: con dos o tres tarjetas
-// lo único que producía eran filas mochas y alturas desparejas. Ahora
-// cada familia es una grilla regular con proporción fija (ver más
-// abajo), así que ni las alturas sueltas ni el columnSpan inline de la
-// tarjeta sola tienen razón de existir.
+// Todos los departamentos de la API participan en el recorrido, en su
+// orden de publicación; los nuevos no requieren una clasificación local.
 
 // Match por departamento (frontend-only, no vive en la DB -- es una capa
 // de descubrimiento, no contenido administrable). Dos ejes distintos,
@@ -92,7 +65,7 @@ const DEPT_MATCH = {
 // entrada aquí (este mapa es de código, la lista es de la DB). No es un
 // caso de error: es lo normal el día que agregue uno. Sin tags queda
 // fuera de los chips de interés y el quiz nunca lo recomienda, pero
-// aparece en el grid bajo "Otros" y se puede aplicar desde ahí. Este
+// aparece en el recorrido y se puede aplicar desde ahí. Este
 // helper es el que garantiza que "sin tags" no reviente nada.
 const EMPTY_MATCH = { interes: [], visibilidad: [] };
 const matchOf = (value) => DEPT_MATCH[value] || EMPTY_MATCH;
@@ -107,14 +80,6 @@ const PANEL_TABS = [
   { value: 'photos', label: 'Fotos' },
   { value: 'info', label: 'Información' },
 ];
-const subscribeCardLayout = callback => {
-  const query = window.matchMedia('(min-width: 768px)');
-  query.addEventListener('change', callback);
-  return () => query.removeEventListener('change', callback);
-};
-const desktopCards = () => window.matchMedia('(min-width: 768px)').matches;
-const mobileCards = () => false;
-
 const QUIZ_QUESTIONS = [
   {
     q: '¿Qué te describe mejor?',
@@ -368,20 +333,18 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   );
 }
 
-// Una clasificación abre sus colecciones; ninguna fotografía vive en la card.
-function ClassificationCard({ title, count, onClick }) {
+// The glass stays fixed; only its copy dissolves when the scene changes.
+function DepartmentSlide({ area, onClick }) {
+  const reducedMotion = useReducedMotion();
   return (
-    <GlassCard
-      as="button"
-      type="button"
-      onClick={onClick}
-      aria-haspopup="dialog"
-      glass
-      className="liquid-glass relative flex flex-col w-full h-full min-h-[180px] rounded-[16px] p-7 text-left focus-ring"
+    <GlassCard as="button" type="button" onClick={onClick} aria-haspopup="dialog" glass
+      className="liquid-glass relative flex flex-col w-full h-[250px] md:h-[270px] rounded-[16px] p-7 md:p-9 text-left focus-ring"
     >
-      <h3 className="text-24 font-bold text-white tracking-tight leading-tight">{title}</h3>
-      <p className="text-14 text-white/75 mt-3">{count} {count === 1 ? 'departamento' : 'departamentos'}</p>
-      <span className="mt-auto pt-6 text-13 font-semibold text-white/80">Explorar</span>
+      <motion.div key={area.value} className="flex flex-col h-full w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
+        <h3 className="text-26 font-bold text-white tracking-tight leading-tight">{area.title}</h3>
+        <p className="text-15 text-white/85 mt-4 leading-relaxed line-clamp-3">{area.desc}</p>
+        <span className="mt-auto pt-5 text-13 font-semibold text-white/85">Explorar departamento</span>
+      </motion.div>
     </GlassCard>
   );
 }
@@ -517,13 +480,13 @@ function QuizModal({ areas, onViewDetail, onApply }) {
 }
 
 export default function VolunteeringPage() {
-  const [openKey, setOpenKey] = useState(null);   // departamento abierto en el WindowStack
+  const [openKey, setOpenKey] = useState(null);
   const [formDept, setFormDept] = useState(null);  // null = modal cerrado, '' = abierto sin preseleccion
   const [quizOpen, setQuizOpen] = useState(false);
-  const [cardStart, setCardStart] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [shownSlide, setShownSlide] = useState(0);
   const [panelTab, setPanelTab] = useState('gallery');
-  const [selectedArea, setSelectedArea] = useState(null);
-  const pageSize = useSyncExternalStore(subscribeCardLayout, desktopCards, mobileCards) ? 2 : 1;
+  const reducedMotion = useReducedMotion();
 
   // Departamentos reales desde /volunteer-areas (admin-editable), con
   // fallback local si la API aun no responde. Una sola llamada a
@@ -533,43 +496,37 @@ export default function VolunteeringPage() {
   const liveAreas = useVolunteerAreas();
   const sitePhotos = useApi('/site-photos') || {};
   const sectionPhoto = sitePhotos.voluntariado_seccion || VOLUNTEER_BACKGROUND_FALLBACK;
-  const areas = liveAreas.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || sectionPhoto }));
-
-  // Departamentos que el admin agregue y no encajen en ninguna de las 5
-  // categorias curadas (values fijos abajo) igual deben aparecer en
-  // algun lado -- "Otros" los recoge en vez de desaparecer en silencio.
-  const categorized = new Set(CATEGORIES.flatMap(c => c.values));
-  const leftover = areas.filter(a => !categorized.has(a.value));
-  const categoriesWithLeftover = leftover.length > 0
-    ? [...CATEGORIES, { name: 'Otros', values: leftover.map(a => a.value) }]
-    : CATEGORIES;
-
-  const groups = categoriesWithLeftover.map(category => ({
-    key: category.name,
-    title: category.name,
-    areas: areas.filter(area => category.values.includes(area.value)),
-  })).filter(group => group.areas.length > 0);
-  const start = Math.min(cardStart, Math.max(0, groups.length - 1));
-  const visibleGroups = groups.slice(start, start + pageSize);
-  const end = Math.min(start + pageSize, groups.length);
-  const areaOf = group => group.areas.find(area => area.value === selectedArea) || group.areas[0];
+  const areas = liveAreas.map(area => ({
+    ...area,
+    photo: sitePhotos[`voluntariado_${area.value}`] || VOLUNTEER_BACKGROUNDS[area.value] || sectionPhoto,
+    fallbackImage: VOLUNTEER_BACKGROUNDS[area.value] || sectionPhoto,
+  }));
+  const requestedIndex = Math.max(0, Math.min(slideIndex, areas.length - 1));
+  const requestedArea = areas[requestedIndex];
+  const currentIndex = Math.max(0, Math.min(shownSlide, areas.length - 1));
+  const currentArea = areas[currentIndex];
+  const previousArea = areas[(currentIndex - 1 + areas.length) % areas.length];
+  const nextArea = areas[(currentIndex + 1) % areas.length];
   const photosOf = area => [...new Set([area.photo, sitePhotos[`voluntariado_${area.value}_2`]].filter(Boolean))];
-  const windowItems = groups.map(group => {
-    const area = areaOf(group);
-    const photo = panelTab === 'gallery' ? sectionPhoto : area.photo;
-    return { ...group, image: photo, images: panelTab === 'photos' ? photosOf(area) : [photo] };
-  });
-  const openGroup = key => {
-    setPanelTab('gallery');
-    setSelectedArea(null);
-    setOpenKey(key);
+  const windowItems = areas.map(area => ({
+    ...area, key: area.value, image: area.photo,
+    images: panelTab === 'photos' ? photosOf(area) : [area.photo],
+  }));
+  const go = direction => setSlideIndex(value => (Math.max(0, Math.min(value, areas.length - 1)) + direction + areas.length) % areas.length);
+  const openArea = (value, tab = 'gallery') => {
+    const index = areas.findIndex(area => area.value === value);
+    if (index < 0) return;
+    setSlideIndex(index);
+    setShownSlide(index);
+    setPanelTab(tab);
+    setOpenKey(value);
   };
-  const openAreaDetail = value => {
-    const group = groups.find(item => item.areas.some(area => area.value === value));
-    if (!group) return;
-    setSelectedArea(value);
-    setPanelTab('info');
-    setOpenKey(group.key);
+  const changeOpenArea = value => {
+    setOpenKey(value);
+    if (value) {
+      const index = areas.findIndex(area => area.value === value);
+      if (index >= 0) setSlideIndex(index);
+    }
   };
 
   const openForm = (value = '') => {
@@ -616,49 +573,50 @@ export default function VolunteeringPage() {
         </button>
       </PageHero>
 
-      <section className="relative min-h-[88svh] py-16 md:py-20 overflow-clip" aria-labelledby="volunteer-classifications">
-        <SectionBg src={sectionPhoto} opacity="opacity-70" viewport />
+      <section className="relative min-h-[88svh] py-16 md:py-20 overflow-clip" aria-labelledby="volunteer-departments">
+        <SectionBg src={requestedArea.photo} fallbackSrc={requestedArea.fallbackImage} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-70" viewport animate />
         <div className="relative z-10 max-w-4xl mx-auto px-6">
           <div className="mb-9 max-w-2xl">
-            <h2 id="volunteer-classifications" className="text-d2 text-white">¿Dónde quieres servir?</h2>
-            <p className="mt-4 text-16 text-white/80">Elige un área para explorar sus departamentos.</p>
+            <h2 id="volunteer-departments" className="text-d2 text-white">¿Dónde quieres servir?</h2>
+            <p className="mt-4 text-16 text-white/80">Conoce un departamento a la vez y encuentra tu lugar.</p>
           </div>
-          <motion.ul
-            id="volunteer-classification-cards"
-            key={`${start}-${pageSize}`}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}
-            className="grid md:grid-cols-2 gap-5"
-            aria-label="Clasificaciones de voluntariado"
+          <div role="region" aria-roledescription="carrusel" aria-label="Departamentos de voluntariado" className="max-w-xl"
+            onKeyDown={event => {
+              if (event.key === 'ArrowRight') { event.preventDefault(); go(1); }
+              if (event.key === 'ArrowLeft') { event.preventDefault(); go(-1); }
+            }}
           >
-            {visibleGroups.map(group => <li key={group.key}>
-              <ClassificationCard title={group.title} count={group.areas.length} onClick={() => openGroup(group.key)} />
-            </li>)}
-          </motion.ul>
-          {groups.length > pageSize && <nav className="mt-7 flex items-center justify-between gap-3" aria-label="Navegar clasificaciones">
-            <button type="button" disabled={start === 0} aria-controls="volunteer-classification-cards" onClick={() => setCardStart(Math.max(0, start - pageSize))} className="min-h-11 px-2 rounded-[8px] text-14 font-semibold text-white disabled:opacity-35 focus-ring">Anterior</button>
-            <p role="status" className="text-12 text-white/75">{start + 1}{end > start + 1 ? `–${end}` : ''} de {groups.length}</p>
-            <button type="button" disabled={end >= groups.length} aria-controls="volunteer-classification-cards" onClick={() => setCardStart(start + pageSize)} className="min-h-11 px-2 rounded-[8px] text-14 font-semibold text-white disabled:opacity-35 focus-ring">Siguiente</button>
-          </nav>}
+            <div role="group" aria-roledescription="diapositiva" aria-label={`${currentIndex + 1} de ${areas.length}`}>
+              <DepartmentSlide area={currentArea} onClick={() => openArea(currentArea.value)} />
+            </div>
+            {areas.length > 1 && <nav className="mt-6 flex items-center justify-between gap-4" aria-label="Navegar departamentos">
+              <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-2 rounded-[8px] text-left text-14 font-semibold text-white focus-ring">Anterior<span className="block truncate text-12 font-normal text-white/75">{previousArea.title}</span></button>
+              <p role="status" className="shrink-0 text-12 text-white/85">{currentIndex + 1} de {areas.length}</p>
+              <button type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-2 rounded-[8px] text-right text-14 font-semibold text-white focus-ring">Siguiente<span className="block truncate text-12 font-normal text-white/75">{nextArea.title}</span></button>
+            </nav>}
+          </div>
         </div>
       </section>
 
       <WindowStack
         items={windowItems}
         openKey={openKey}
-        onChange={key => key ? openGroup(key) : setOpenKey(null)}
-        height="auto"
+        onChange={changeOpenArea}
+        height="min(76svh, 580px)"
+        animated
+        neighborTitles
+        contentKey={openKey}
         light
         photoBackdrop
-        renderContent={group => {
-          const area = areaOf(group);
+        renderContent={area => {
           return (
             <div className="text-bg">
-              <div role="tablist" aria-label="Apartados de la clasificación" className="flex gap-1 border-b border-bg/15 mb-6">
+              <div role="tablist" aria-label="Apartados del departamento" className="flex gap-1 border-b border-bg/15 mb-6">
                 {PANEL_TABS.map((tab, index) => <button
                   key={tab.value}
                   id={`volunteer-tab-${tab.value}`}
                   type="button" role="tab" aria-selected={panelTab === tab.value}
-                  aria-controls="volunteer-category-panel" tabIndex={panelTab === tab.value ? 0 : -1}
+                  aria-controls="volunteer-department-panel" tabIndex={panelTab === tab.value ? 0 : -1}
                   onClick={() => setPanelTab(tab.value)}
                   onKeyDown={event => {
                     let target;
@@ -675,22 +633,20 @@ export default function VolunteeringPage() {
                   className={`min-h-11 px-3 rounded-t-[8px] text-13 font-semibold focus-ring border-b-2 ${panelTab === tab.value ? 'border-bg text-bg' : 'border-transparent text-bg/60 hover:text-bg'}`}
                 >{tab.label}</button>)}
               </div>
-              <div id="volunteer-category-panel" role="tabpanel" aria-labelledby={`volunteer-tab-${panelTab}`} tabIndex={0} className="focus-ring rounded-[8px]">
-                {panelTab === 'gallery' && <ul className="divide-y divide-bg/15">
-                  {group.areas.map(collection => <li key={collection.value}>
-                    <button type="button" onClick={() => { setSelectedArea(collection.value); setPanelTab('photos'); document.getElementById('volunteer-tab-photos')?.focus(); }} className="w-full flex items-center justify-between gap-4 py-4 px-1 text-left focus-ring rounded-[8px]">
-                      <span className="text-16 font-bold">{collection.title}</span>
+              <motion.div key={panelTab} id="volunteer-department-panel" role="tabpanel" aria-labelledby={`volunteer-tab-${panelTab}`} tabIndex={0} className="focus-ring rounded-[8px]" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
+                {panelTab === 'gallery' && <ul>
+                  <li>
+                    <button type="button" onClick={() => { setPanelTab('photos'); document.getElementById('volunteer-tab-photos')?.focus(); }} className="w-full flex items-center justify-between gap-4 py-4 px-1 text-left focus-ring rounded-[8px]">
+                      <span className="text-16 font-bold">{area.title}</span>
                       <span className="text-12 text-bg/65 shrink-0">Ver fotos</span>
                     </button>
-                  </li>)}
+                  </li>
                 </ul>}
                 {panelTab === 'photos' && <div className="space-y-5">
-                  <h3 className="text-20 font-bold">{area.title}</h3>
                   <p className="text-14 text-bg/75">{photosOf(area).length} {photosOf(area).length === 1 ? 'fotografía' : 'fotografías'}</p>
                   <button type="button" onClick={() => { setPanelTab('info'); document.getElementById('volunteer-tab-info')?.focus(); }} className="min-h-11 text-14 font-semibold underline underline-offset-4 focus-ring rounded-[8px]">Conocer {area.title}</button>
                 </div>}
                 {panelTab === 'info' && <div className="space-y-5">
-                  <h3 className="text-20 font-bold">{area.title}</h3>
                   <p className="text-16 leading-relaxed text-bg/85">{area.desc}</p>
                   {area.why && <div className="border-t border-bg/10 pt-5">
                     <h4 className="text-14 font-bold mb-2">¿Por qué aquí?</h4>
@@ -702,20 +658,20 @@ export default function VolunteeringPage() {
                   </blockquote>}
                   <motion.button {...PRESS_PRIMARY} type="button" onClick={() => openForm(area.value)} className={btnPrimary}>Aplicar a {area.title}</motion.button>
                 </div>}
-              </div>
+              </motion.div>
             </div>
           );
         }}
       />
 
-      {/* Quiz/matchmaker -- alternativa a hojear las 10 tarjetas para
+      {/* Quiz/matchmaker -- alternativa a recorrer los departamentos para
           quien no sabe cuál departamento elegir. */}
       <AnimatePresence>
         {quizOpen && (
           <ModalWrapper onClose={() => setQuizOpen(false)}>
             <QuizModal
               areas={areas}
-              onViewDetail={(value) => { setQuizOpen(false); openAreaDetail(value); }}
+              onViewDetail={(value) => { setQuizOpen(false); openArea(value, 'info'); }}
               onApply={(value) => { setQuizOpen(false); openForm(value); }}
             />
           </ModalWrapper>

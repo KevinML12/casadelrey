@@ -128,16 +128,16 @@ for (const width of [390, 1440]) {
       body: JSON.stringify({ voluntariado_seccion: '/images/components/voluntariado_general.jpg', voluntariado_equipo_nuevo: '/images/components/vol_intercesor.jpg', voluntariado_equipo_nuevo_2: '/images/components/vol_alabanza.jpg' }),
     }));
     await page.goto('/volunteering');
-    const trigger = page.getByRole('button', { name: /^Otros/ });
+    const trigger = page.getByRole('button', { name: /^Equipo administrado/ });
     await expect(trigger.locator('img')).toHaveCount(0);
     await trigger.click();
-    const dialog = page.getByRole('dialog', { name: 'Otros' });
+    const dialog = page.getByRole('dialog', { name: 'Equipo administrado' });
     await expect(dialog.getByRole('tab', { name: 'Galería', exact: true })).toHaveAttribute('aria-selected', 'true');
     await dialog.getByRole('button', { name: 'Equipo administrado Ver fotos', exact: true }).click();
     await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toHaveAttribute('aria-selected', 'true');
     await expect(dialog.getByRole('heading', { name: 'Equipo administrado', exact: true })).toBeVisible();
     await expect(dialog.locator('.glass-light img, .glass-light .glass-light-nested')).toHaveCount(0);
-    const photo = dialog.locator('img');
+    const photo = dialog.locator('img').last();
     await expect(photo).toHaveAttribute('src', /vol_intercesor/);
     await dialog.getByRole('button', { name: 'Foto 2', exact: true }).click();
     await expect(photo).toHaveAttribute('src', /vol_alabanza/);
@@ -155,7 +155,7 @@ for (const width of [390, 1440]) {
   });
 }
 
-test('the quiz opens the chosen department information inside its classification', async ({ page }) => {
+test('the quiz opens the chosen department information in the same slider', async ({ page }) => {
   await isolate(page);
   await page.goto('/volunteering');
   await page.getByRole('button', { name: 'Dos preguntas y te decimos dónde', exact: true }).click();
@@ -164,7 +164,7 @@ test('the quiz opens the chosen department information inside its classification
   await quiz.getByRole('button', { name: 'Al frente, visible', exact: true }).click();
   await quiz.getByRole('button', { name: 'Ver detalle', exact: true }).first().click();
   await expect(quiz).toHaveCount(0);
-  const detail = page.getByRole('dialog', { name: 'Alabanza y arte', exact: true });
+  const detail = page.getByRole('dialog', { name: 'Alabanza', exact: true });
   await expect(detail).toBeVisible();
   await expect(detail.getByRole('tab', { name: 'Información', exact: true })).toHaveAttribute('aria-selected', 'true');
   await expect(detail.getByRole('heading', { name: 'Alabanza', exact: true })).toBeVisible();
@@ -175,38 +175,58 @@ test('the quiz opens the chosen department information inside its classification
 });
 
 for (const width of [390, 1440]) {
-  test(`classification cards disclose every area without crowding at ${width}px`, async ({ page }) => {
+  test(`every department has a successive scene with one glass card at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await isolate(page);
     await page.goto('/volunteering');
-    const cards = page.getByRole('list', { name: 'Clasificaciones de voluntariado' });
-    await expect(cards.getByRole('button')).toHaveCount(width < 768 ? 1 : 2);
-    const nav = page.getByRole('navigation', { name: 'Navegar clasificaciones' });
-    await expect(nav.getByRole('button', { name: 'Anterior', exact: true })).toBeDisabled();
-    const seen = new Set();
-    for (let i = 0; i < 5; i++) {
-      for (const title of await cards.getByRole('heading').allTextContents()) seen.add(title);
-      const next = nav.getByRole('button', { name: 'Siguiente', exact: true });
-      if (await next.isDisabled()) break;
-      await next.click();
+    const carousel = page.getByRole('region', { name: 'Departamentos de voluntariado', exact: true });
+    const trigger = carousel.getByRole('button', { name: /Explorar departamento$/ });
+    const nav = carousel.getByRole('navigation', { name: 'Navegar departamentos' });
+    const photo = page.locator('section[aria-labelledby="volunteer-departments"] [data-scene-photo]');
+    const titles = ['Alabanza', 'Danza', 'Servidores', 'Protocolo', 'Pancartas', 'Maestros de Niños', 'Técnicos Audiovisuales', 'Multimedia', 'Oración', 'Logística'];
+    const scenes = new Set();
+    for (const title of titles) {
+      await expect(carousel.getByRole('heading', { name: title, exact: true })).toBeVisible();
+      await expect(trigger).toHaveCount(1);
+      await expect(trigger.locator('img')).toHaveCount(0);
+      scenes.add(await photo.getAttribute('data-scene-photo'));
+      await nav.getByRole('button', { name: /^Siguiente/ }).click();
     }
-    expect([...seen]).toEqual(['Alabanza y arte', 'Anfitrionaje y protocolo', 'Niños y enseñanza', 'Multimedia y producción', 'Oración y logística']);
-    await expect(nav.getByRole('button', { name: 'Siguiente', exact: true })).toBeDisabled();
-    const trigger = cards.getByRole('button').last();
+    expect(scenes.size).toBe(10);
+    await expect(carousel.getByRole('heading', { name: 'Alabanza', exact: true })).toBeVisible();
+    await nav.getByRole('button', { name: /^Anterior/ }).click();
+    await expect(carousel.getByRole('heading', { name: 'Logística', exact: true })).toBeVisible();
     await trigger.click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toHaveCount(1);
+    const pane = dialog.locator('.glass-light');
+    const before = await pane.boundingBox();
+    await expect(dialog.getByRole('button', { name: /^Siguiente/ })).toContainText('Alabanza');
+    await dialog.getByRole('button', { name: /^Siguiente/ }).click();
+    await expect(dialog).toHaveAttribute('aria-label', 'Alabanza');
+    const after = await pane.boundingBox();
+    expect(Math.abs(after.x - before.x)).toBeLessThan(1);
+    expect(Math.abs(after.y - before.y)).toBeLessThan(1);
+    expect(Math.abs(after.height - before.height)).toBeLessThan(1);
     const gallery = dialog.getByRole('tab', { name: 'Galería', exact: true });
     await gallery.focus();
     await page.keyboard.press('ArrowRight');
     await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toBeFocused();
-    await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await expect(dialog).toHaveAttribute('aria-label', 'Alabanza');
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
     await expect(trigger).toBeFocused();
-    const photo = page.locator('section[aria-labelledby="volunteer-classifications"] img');
-    await expect(photo).toHaveCount(1);
-    await expect(photo).toHaveAttribute('src', /backgrounds\/congregacion/);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
+
+test('a failed managed background falls back to the matching department scene', async ({ page }) => {
+  await isolate(page);
+  await page.route('**/api/v1/site-photos', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ voluntariado_alabanza: '/fixture/missing-background.jpg' }) }));
+  await page.route('**/fixture/missing-background.jpg', route => route.fulfill({ status: 404, body: '' }));
+  await page.goto('/volunteering');
+  const background = page.locator('section[aria-labelledby="volunteer-departments"] [data-scene-photo]');
+  await expect(background).toHaveAttribute('data-scene-photo', '/images/backgrounds/vol-alabanza.webp');
+  await expect(background.locator('img').last()).toBeVisible();
+  expect(await background.locator('img').last().evaluate(el => el.complete && el.naturalWidth > 0)).toBe(true);
+});

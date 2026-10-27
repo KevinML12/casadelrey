@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PhotoImage from './PhotoImage';
+import CrossfadePhoto from './CrossfadePhoto';
+import { DUR, EASE_OUT } from '../../lib/motion';
 import { lockDialogBackground, restoreParentDialogFocus } from '../../lib/dialogBackground';
 
 const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 // Shared flat glass dialog. Previous/next changes the content in the same
 // plane. The legacy name remains so existing page integrations stay intact.
-export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80svh, 640px)', light = false, photoBackdrop = false, sobrepuesto = null, onCerrarSobrepuesto }) {
+export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80svh, 640px)', light = false, photoBackdrop = false, animated = false, neighborTitles = false, contentKey, sobrepuesto = null, onCerrarSobrepuesto }) {
   const dialogRef = useRef(null);
+  const reducedMotion = useReducedMotion();
   const [photoIdx, setPhotoIdx] = useState(0);
   const active = items.find(it => it.key === openKey);
+  const isOpen = Boolean(openKey);
   const index = items.findIndex(it => it.key === openKey);
   const photos = active?.images?.length ? active.images : active?.image ? [active.image] : [];
   const close = () => sobrepuesto ? onCerrarSobrepuesto?.() : onChange(null);
@@ -22,7 +26,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
   useEffect(() => { actions.current = { close, go }; });
 
   useEffect(() => {
-    if (!openKey) return;
+    if (!isOpen) return;
     const previousFocus = document.activeElement;
     const releaseBackground = lockDialogBackground();
     const focusable = () => [...(dialogRef.current?.querySelectorAll(FOCUSABLE) || [])]
@@ -51,7 +55,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
       releaseBackground();
       restoreParentDialogFocus(previousFocus);
     };
-  }, [openKey, sobrepuesto, items.length]);
+  }, [isOpen, sobrepuesto, items.length]);
 
   return createPortal(
     <AnimatePresence>
@@ -62,7 +66,9 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
         >
           <div className={`absolute inset-0 ${photoBackdrop ? 'bg-bg' : 'bg-bg/65 backdrop-blur-lg'}`} onClick={close}>
-            {photoBackdrop && photos.length > 0 && <PhotoImage src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover opacity-70" />}
+            {photoBackdrop && photos.length > 0 && (animated
+              ? <CrossfadePhoto src={photos[photoIdx % photos.length]} fallbackSrc={active.fallbackImage} className="opacity-70" />
+              : <PhotoImage src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover opacity-70" />)}
             {photoBackdrop && <div className="absolute inset-0 bg-bg/55" />}
           </div>
           <div className={`relative w-full ${photoBackdrop ? 'max-w-md' : 'max-w-[780px]'} ${light ? 'glass-light' : 'liquid-glass'} rounded-[16px] flex flex-col overflow-hidden`} style={{ height, maxHeight: 'calc(100svh - 48px)' }}>
@@ -88,15 +94,15 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                   </div>}
                 </div>}
                 <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 flex flex-col" data-lenis-prevent>
-                  <div className="m-auto w-full">{renderContent(active)}</div>
+                  {animated ? <motion.div key={contentKey || active.key} className="m-auto w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>{renderContent(active)}</motion.div> : <div className="m-auto w-full">{renderContent(active)}</div>}
                 </div>
                 {photoBackdrop && photos.length > 1 && <div className={`flex gap-2 px-5 pb-3 ${light ? 'text-bg' : 'text-white'}`} aria-label="Fotos de fondo">
                   {photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-pressed={i === photoIdx} className="rounded-[8px] border border-current px-3 min-h-11 text-12 font-semibold focus-ring">Foto {i + 1}</button>)}
                 </div>}
                 {items.length > 1 && <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
-                  <button type="button" onClick={() => go(-1)} className="min-h-11 px-3 rounded-full text-13 font-bold focus-ring">Anterior</button>
-                  <span className="text-12 opacity-70">{index + 1} / {items.length}</span>
-                  <button type="button" onClick={() => go(1)} className="min-h-11 px-3 rounded-full text-13 font-bold focus-ring">Siguiente</button>
+                  <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-left text-13 font-bold focus-ring">Anterior{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index - 1 + items.length) % items.length].title}</span>}</button>
+                  <span className="shrink-0 text-12 opacity-70" role="status">{index + 1} / {items.length}</span>
+                  <button type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-right text-13 font-bold focus-ring">Siguiente{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index + 1) % items.length].title}</span>}</button>
                 </div>}
               </>
             )}
