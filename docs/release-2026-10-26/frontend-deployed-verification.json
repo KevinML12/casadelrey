@@ -1,0 +1,13 @@
+{
+  "frontend": "https://casadelrey-web-pruebas.onrender.com",
+  "commit": "330c4b29fc4261589e6886dd8c59c6f50d20b22c",
+  "render_deploy": "dep-dbgcac942hec73e7au9g",
+  "page_status": 200,
+  "entry_asset": "/assets/index-CLvGCbLc.js",
+  "entry_status": 200,
+  "stylesheet": "/assets/index-Dz4yE_uI.css",
+  "perimeter_reflections_present": true,
+  "qa_api_configured": true,
+  "connection_content_present": true,
+  "animated_logo_absent": true
+}

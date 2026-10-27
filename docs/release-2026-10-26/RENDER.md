@@ -36,7 +36,7 @@ La rama remota `codex/render-qa` contiene las correcciones de esta entrega; cone
 
 Con autorización del usuario se creó el schema vacío `cdr_render_qa` y un usuario exclusivo con contraseña aleatoria, sin privilegios de administración y con límite de cuatro conexiones (tres de aplicación y una de mantenimiento). Se verificó que no tiene permisos SELECT/INSERT/UPDATE/DELETE sobre tablas de `public`, `auth` o `storage`. No se copiaron registros reales. El JWT de pruebas es independiente; no se configuró Brevo. Se añadieron usuarios admin/member y contenido sintético claramente identificado para validar los flujos; la cuenta bancaria quedó vacía.
 
-Backend publicado desde `32384ed`; frontend de esta revisión pendiente de confirmar. Despliegues automáticos desactivados:
+Backend publicado desde `32384ed`; frontend Live desde `330c4b2`, despliegue `dep-dbgcac942hec73e7au9g` (44.8 s). Despliegues automáticos desactivados:
 
 - Backend Free: https://casadelrey-api-pruebas.onrender.com (`srv-dbfqi0sipgvc739ach60`). La creación manual quedó en Oregon; el blueprint propone Ohio para una futura instancia cercana a Supabase.
 - Frontend Static Site: https://casadelrey-web-pruebas.onrender.com (`srv-dbfqiu3rjlhs73ed9h5g`), con rewrite `/*` → `/index.html` guardado.

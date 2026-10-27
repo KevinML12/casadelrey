@@ -4,6 +4,8 @@
 
 Inicio se conserva como referencia. Blanco escarchado sin cambio de tono y cristal oscuro casi transparente. `.glass` y `.liquid-glass` comparten material. Se pulieron los bordes asimétricos y el bisel estático, se contuvo la sombra y se eliminó la franja diagonal artificial. Pulsación de 120 ms, entradas de 180 ms y titulares de hasta 220 ms, sin rebotes. Se retiraron Tilt, Dock, la cortina de video del logo, las inclinaciones, las perspectivas, el parallax, la ampliación por proximidad y los halos de hover. No hay emojis, SVG decorativos ni spinners de pictogramas; los controles son de texto y se conserva el logo real.
 
+Refinamiento posterior del bisel: reflejos especulares estáticos en el perímetro, luz superior más intensa y contraluz inferior tenue, con máscara de 1.5 px que deja vacío el centro. Sombras interiores suaves y sombra corta de contacto. Los rellenos blanco y oscuro mantienen su composición. El fallback sin máscaras conserva el borde asimétrico y las sombras.
+
 Conéctate usa bienvenida/seguimiento junto al formulario claro, con una columna en móvil. Los encabezados comparten foto, contraste y espaciado. Eventos, Blog y Galería muestran el encabezado mientras carga la API y distinguen carga, error con reintento y vacío real. El menú móvil se cierra con Escape, bloquea el scroll y deja sus links ocultos fuera del foco. Los detalles se abren en un diálogo plano por encima de la navegación; se conserva el foco al cerrar.
 
 77 fotos locales tienen derivados WebP: originales 201,155,726 bytes, variante grande 6,275,322 y pequeña 1,753,286. Ambas juntas pesan 8,028,608 bytes (96% menos que los originales). Esto compara los archivos preparados, no el consumo medido de una visita. Los originales y las URLs externas/CMS siguen disponibles. La primera foto tiene prioridad; las inferiores usan carga diferida. El bundle se separó para reutilizar React/motion en caché; build sin aviso de chunks mayores a 500 kB.
@@ -13,8 +15,9 @@ El documento `Casa-del-Rey-Liquid-Glass.pen` contiene referencia de Inicio, mate
 ## Verificación
 
 - 27 pruebas locales de UI aprobadas: reglas visuales, 12 rutas a 390/1440 px y páginas principales a 320/768/1024 px, menú, ventanas, formularios críticos, imágenes y ausencia de 3D/iconos/emojis. API interceptada.
-- Versión compilada: comprobaciones de navegación, material, imágenes y controles aprobadas; reporte junto a este documento.
+- Versión compilada: 11 comprobaciones de navegación, material, imágenes y controles aprobadas; reporte junto a este documento.
 - Build aprobado; lint sin errores, con 20 advertencias existentes.
+- Tras el refinamiento de reflejos: build y 12 pruebas existentes de material, navegación, imágenes, ventanas y diseño responsive aprobadas nuevamente (25.1 s). Inspección visual de material blanco y oscuro en el frontend local.
 - Backend publicado: 19 comprobaciones aprobadas, incluidas R2 privado, login admin/member, idempotencia y bloqueo de descargas anónimas/member.
 - Las pruebas Go/vet y la concurrencia local de doce donaciones aprobadas en la entrega previa siguen documentadas. No se hicieron cambios al ejecutable Go en esta revisión.
 
@@ -31,7 +34,7 @@ QA mantiene su schema/rol `cdr_render_qa`, JWT independiente, dos usuarios sint�
 - Backend Free: https://casadelrey-api-pruebas.onrender.com
 - Frontend Static: https://casadelrey-web-pruebas.onrender.com
 
-El backend fue desplegado desde `32384ed`. El frontend de esta revisión está preparado para publicar en la rama `codex/render-qa`; el despliegue efectivo se registra en RENDER.md al verificarlo. Los despliegues automáticos están desactivados.
+El backend fue desplegado desde `32384ed`. El frontend está Live desde `330c4b2`, despliegue `dep-dbgcac942hec73e7au9g` (44.8 s). Se verificaron el contenido nuevo, la configuración de la API QA y el CSS de reflejos de bisel. Fotos WebP y headers fueron verificados en el despliegue previo `76ae5cc`. El reporte HTTP está en `frontend-deployed-verification.json`. Los despliegues automáticos están desactivados.
 
 Con autorización explícita se amplió la credencial R2 existente a los dos buckets: medios y `casadelreyhue-receipts-private`. El privado tiene acceso público desactivado. Render ya usa R2; una prueba independiente aprobó PUT/GET/DELETE de un objeto sintético y las 19 comprobaciones del backend confirman el almacenamiento privado. No se copió el JWT ni la conexión de producción al backend QA. R2 sí es compartido por decisión expresa del usuario.
 
