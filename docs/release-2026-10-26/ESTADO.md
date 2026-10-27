@@ -36,7 +36,7 @@ QA mantiene su schema/rol `cdr_render_qa`, JWT independiente, dos usuarios sint�
 - Backend Free: https://casadelrey-api-pruebas.onrender.com
 - Frontend Static: https://casadelrey-web-pruebas.onrender.com
 
-El backend fue desplegado desde `32384ed`. El frontend está Live desde `330c4b2`, despliegue `dep-dbgcac942hec73e7au9g` (44.8 s). Se verificaron el contenido nuevo, la configuración de la API QA y el CSS de reflejos de bisel. Fotos WebP y headers fueron verificados en el despliegue previo `76ae5cc`. El reporte HTTP está en `frontend-deployed-verification.json`. Los despliegues automáticos están desactivados.
+El backend fue desplegado desde `32384ed`. El frontend está Live desde `97d8a81`, despliegue `dep-dbgcqti9lscs739mmem0` (35.1 s). Se verificaron el contenido nuevo, la configuración de la API QA y el CSS de reflejos finos y los cuatro WebP de fondos grupales. Fotos WebP y headers fueron verificados en el despliegue previo `76ae5cc`. El reporte HTTP está en `frontend-deployed-verification.json`. Los despliegues automáticos están desactivados.
 
 Con autorización explícita se amplió la credencial R2 existente a los dos buckets: medios y `casadelreyhue-receipts-private`. El privado tiene acceso público desactivado. Render ya usa R2; una prueba independiente aprobó PUT/GET/DELETE de un objeto sintético y las 19 comprobaciones del backend confirman el almacenamiento privado. No se copió el JWT ni la conexión de producción al backend QA. R2 sí es compartido por decisión expresa del usuario.
 

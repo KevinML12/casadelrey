@@ -1,13 +1,31 @@
 {
   "frontend": "https://casadelrey-web-pruebas.onrender.com",
-  "commit": "330c4b29fc4261589e6886dd8c59c6f50d20b22c",
-  "render_deploy": "dep-dbgcac942hec73e7au9g",
+  "commit": "97d8a81cfe1b9b64907358f0d5d6095e36ecf2e2",
+  "render_deploy": "dep-dbgcqti9lscs739mmem0",
   "page_status": 200,
-  "entry_asset": "/assets/index-CLvGCbLc.js",
+  "entry_asset": "/assets/index-CWTmEKxY.js",
   "entry_status": 200,
-  "stylesheet": "/assets/index-Dz4yE_uI.css",
-  "perimeter_reflections_present": true,
+  "stylesheet": "/assets/index-DCrhXk2V.css",
+  "thin_perimeter_reflections_present": true,
   "qa_api_configured": true,
-  "connection_content_present": true,
-  "animated_logo_absent": true
+  "group_backgrounds_present": true,
+  "admin_photo_sources_preserved": true,
+  "group_photo_assets": {
+    "congregacion.webp": {
+      "status": 200,
+      "bytes": 99774
+    },
+    "congregacion-640.webp": {
+      "status": 200,
+      "bytes": 25646
+    },
+    "comunidad-templo.webp": {
+      "status": 200,
+      "bytes": 148450
+    },
+    "comunidad-templo-640.webp": {
+      "status": 200,
+      "bytes": 39168
+    }
+  }
 }
