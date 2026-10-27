@@ -88,3 +88,18 @@ test('all public entry points keep a visible main landmark and a single page tit
   }
   expect(failures).toEqual([]);
 });
+test('collection controls identify a browsable scene and give fast press feedback', async ({ page }) => {
+  let many = true;
+  await isolate(page, path => path.startsWith('/gallery/') ? { body: [{ ID: 1, title: 'Primer álbum - Foto', url: image }, ...(many ? [{ ID: 2, title: 'Segundo álbum - Foto', url: image }] : [])] } : undefined);
+  await page.emulateMedia({ reducedMotion: 'no-preference' }); await page.goto('/gallery');
+  await expect(page.getByText('Colección · Anterior / Siguiente', { exact: true })).toBeVisible();
+  const next = page.getByRole('button', { name: /^Siguiente/ });
+  await next.hover(); const box = await next.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down();
+  await expect.poll(() => next.evaluate(el => Number(getComputedStyle(el, '::after').opacity))).toBeGreaterThan(0);
+  await page.mouse.up(); await expect(page.getByRole('heading', { name: 'Segundo álbum' })).toBeVisible();
+  many = false; await page.reload(); await expect(page.getByRole('heading', { name: 'Primer álbum' })).toBeVisible();
+  await expect(page.locator('.collection-navigation')).toHaveCount(0);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await page.locator('main').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+});

@@ -75,3 +75,7 @@ El panel Admin/Líder/Voluntario conserva su variante clara del material y sus c
 ## Vistas previas fotográficas (27 de octubre)
 
 Las vistas previas de eventos, mensajes y colecciones deben dejar una parte amplia de la fotografía visible, sin desenfoque. El cristal sólo sostiene la ficha breve: título, dato principal y acción. Aplicar el contraste con un degradado localizado hacia la ficha, sin apagar toda la foto. Reducir el desenfoque de esa ficha a 5 px, conservar el filo estático fino y los radios de 16 px. Inspiración editorial de Pinterest: fotografía protagonista y jerarquía sobria, sin mosaicos recargados ni fotografías insertadas dentro del cristal. Recorrer por disolución, abrir los detalles completos en el mismo lenguaje de ventanas y conservar los flujos existentes.
+
+## Identificación e interacción de controles
+
+Mostrar el identificador «Colección · Anterior / Siguiente» y la posición sólo cuando exista un recorrido con varios registros. Las superficies estáticas no llevan ese identificador. Los controles del recorrido tienen borde, fondo tenue y foco visible; las ventanas usan el mismo tratamiento. Respuesta de pulsación con una capa de tinta de 160 ms, cambios de estado de 120 ms y contenido por opacidad de 180 ms. Sin rebotes, luz que siga el cursor ni desplazamientos laterales. Respetar movimiento reducido. `CollectionNavigation` concentra el identificador y las reglas compartidas de `index.css` dan respuesta consistente a los botones públicos y de paneles.

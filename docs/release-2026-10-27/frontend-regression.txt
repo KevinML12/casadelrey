@@ -1,53 +1,56 @@
 
-Running 45 tests using 1 worker
+Running 48 tests using 1 worker
 
 
-(node:9435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:11049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
 
-[1/45] [chromium] › e2e/audit-fixes.spec.js:21:1 › reset accepts emailed query URL and sends the backend contract
-[2/45] [chromium] › e2e/audit-fixes.spec.js:35:1 › shared dialog traps focus, closes on Escape and restores the trigger
-[3/45] [chromium] › e2e/audit-fixes.spec.js:55:1 › volunteer submits via self-service and the shared close works
-[4/45] [chromium] › e2e/audit-fixes.spec.js:76:1 › donation retries preserve the key and include the receipt in the same request
-[5/45] [chromium] › e2e/audit-fixes.spec.js:113:1 › admin opens private receipt through an authenticated request and local blob
-[6/45] [chromium] › e2e/audit-fixes.spec.js:133:1 › refresh updates the rendered account and stale defaults cannot survive logout
-[7/45] [chromium] › e2e/design-rules.spec.js:74:3 › Reglas de diseño — anti-iconos › ninguna página pública renderiza un ícono SVG
-[8/45] [chromium] › e2e/design-rules.spec.js:84:3 › Reglas de diseño — anti-iconos › el código fuente no reintroduce iconos decorativos
-[9/45] [chromium] › e2e/design-rules.spec.js:94:3 › Reglas de diseño — anti-iconos › el código fuente no usa emojis en la interfaz
-[10/45] [chromium] › e2e/design-rules.spec.js:115:3 › Reglas de diseño — anti-eyebrow › el componente Eyebrow no existe en el código
-[11/45] [chromium] › e2e/design-rules.spec.js:120:3 › Reglas de diseño — anti-eyebrow › PageHero no acepta un prop eyebrow
-[12/45] [chromium] › e2e/design-rules.spec.js:130:3 › Reglas de diseño — las fotos van a color › ninguna imagen del sitio público lleva filtro grayscale
-[13/45] [chromium] › e2e/design-rules.spec.js:143:3 › Reglas de diseño — las fotos van a color › el código fuente no aplica grayscale a imágenes
-[14/45] [chromium] › e2e/design-rules.spec.js:160:3 › Reglas de diseño — estructura editorial › cada página pública tiene exactamente un h1
-[15/45] [chromium] › e2e/design-rules.spec.js:172:3 › Reglas de diseño — estructura editorial › las secciones con foto de fondo la cargan de verdad
-[16/45] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 320px
-[17/45] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 768px
-[18/45] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 1024px
-[19/45] [chromium] › e2e/frontend-refinement.spec.js:31:1 › mobile navigation closes with Escape and removes hidden links from focus
-[20/45] [chromium] › e2e/frontend-refinement.spec.js:52:1 › flat glass windows sit above navigation and restore focus
-[21/45] [chromium] › e2e/frontend-refinement.spec.js:70:1 › public surfaces keep the real logo without decorative icons or 3D
-[22/45] [chromium] › e2e/frontend-refinement.spec.js:87:1 › events keeps its hero visible while loading and can retry a failed feed
-[23/45] [chromium] › e2e/frontend-refinement.spec.js:106:1 › first photo is prioritized and local photos use responsive WebP
-[24/45] [chromium] › e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 390px
-[25/45] [chromium] › e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 1440px
-[26/45] [chromium] › e2e/frontend-refinement.spec.js:159:1 › the quiz opens the chosen department information in the same slider
-[27/45] [chromium] › e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 390px
-[28/45] [chromium] › e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 1440px
-[29/45] [chromium] › e2e/frontend-refinement.spec.js:224:1 › a failed managed background falls back to the matching department scene
-[30/45] [chromium] › e2e/glass-system.spec.js:18:3 › public pages keep the shared glass system at 390px
-[31/45] [chromium] › e2e/glass-system.spec.js:18:3 › public pages keep the shared glass system at 1440px
-[32/45] [chromium] › e2e/glass-system.spec.js:31:1 › dark glass stays almost transparent without pointer-follow reflections
-[33/45] [chromium] › e2e/glass-system.spec.js:44:1 › an HTML response from an API rewrite is rejected before rendering a feed
-[34/45] [chromium] › e2e/module-polish.spec.js:16:1 › empty cell finder offers contact and an accessible close control
-[35/45] [chromium] › e2e/module-polish.spec.js:27:1 › broken administrator hero uses its local photograph
-[36/45] [chromium] › e2e/module-polish.spec.js:33:1 › nullable gallery is empty and retry recovers a failed feed
-[37/45] [chromium] › e2e/module-polish.spec.js:40:1 › captions follow the background, albums reset photos and keyboard retains focus
-[38/45] [chromium] › e2e/module-polish.spec.js:56:1 › long titles fit mobile and past-event links select the requested event
-[39/45] [chromium] › e2e/scene-modules.spec.js:18:3 › gallery discovers all pages, one glass panel and compact photo controls at 390px
-[40/45] [chromium] › e2e/scene-modules.spec.js:18:3 › gallery discovers all pages, one glass panel and compact photo controls at 1440px
-[41/45] [chromium] › e2e/scene-modules.spec.js:47:1 › empty API does not resurrect local departments, albums or fixed totals
-[42/45] [chromium] › e2e/scene-modules.spec.js:56:1 › admin institutional copy and a newly created cell flow stay accessible
-[43/45] [chromium] › e2e/scene-modules.spec.js:74:1 › blog filters use real categories and an event deep link still opens registration
-[44/45] [chromium] › e2e/scene-modules.spec.js:88:1 › normal motion keeps glass fixed and focus on navigation when scenes share a photo
-[45/45] [chromium] › e2e/scene-modules.spec.js:104:1 › administrator can edit an existing gallery record and institutional settings
-  45 passed (55.7s)
+[1/48] [chromium] › e2e/audit-fixes.spec.js:21:1 › reset accepts emailed query URL and sends the backend contract
+[2/48] [chromium] › e2e/audit-fixes.spec.js:35:1 › shared dialog traps focus, closes on Escape and restores the trigger
+[3/48] [chromium] › e2e/audit-fixes.spec.js:55:1 › volunteer submits via self-service and the shared close works
+[4/48] [chromium] › e2e/audit-fixes.spec.js:76:1 › donation retries preserve the key and include the receipt in the same request
+[5/48] [chromium] › e2e/audit-fixes.spec.js:113:1 › admin opens private receipt through an authenticated request and local blob
+[6/48] [chromium] › e2e/audit-fixes.spec.js:133:1 › refresh updates the rendered account and stale defaults cannot survive logout
+[7/48] [chromium] › e2e/design-rules.spec.js:74:3 › Reglas de diseño — anti-iconos › ninguna página pública renderiza un ícono SVG
+[8/48] [chromium] › e2e/design-rules.spec.js:84:3 › Reglas de diseño — anti-iconos › el código fuente no reintroduce iconos decorativos
+[9/48] [chromium] › e2e/design-rules.spec.js:94:3 › Reglas de diseño — anti-iconos › el código fuente no usa emojis en la interfaz
+[10/48] [chromium] › e2e/design-rules.spec.js:115:3 › Reglas de diseño — anti-eyebrow › el componente Eyebrow no existe en el código
+[11/48] [chromium] › e2e/design-rules.spec.js:120:3 › Reglas de diseño — anti-eyebrow › PageHero no acepta un prop eyebrow
+[12/48] [chromium] › e2e/design-rules.spec.js:130:3 › Reglas de diseño — las fotos van a color › ninguna imagen del sitio público lleva filtro grayscale
+[13/48] [chromium] › e2e/design-rules.spec.js:143:3 › Reglas de diseño — las fotos van a color › el código fuente no aplica grayscale a imágenes
+[14/48] [chromium] › e2e/design-rules.spec.js:160:3 › Reglas de diseño — estructura editorial › cada página pública tiene exactamente un h1
+[15/48] [chromium] › e2e/design-rules.spec.js:172:3 › Reglas de diseño — estructura editorial › las secciones con foto de fondo la cargan de verdad
+[16/48] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 320px
+[17/48] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 768px
+[18/48] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 1024px
+[19/48] [chromium] › e2e/frontend-refinement.spec.js:31:1 › mobile navigation closes with Escape and removes hidden links from focus
+[20/48] [chromium] › e2e/frontend-refinement.spec.js:52:1 › flat glass windows sit above navigation and restore focus
+[21/48] [chromium] › e2e/frontend-refinement.spec.js:70:1 › public surfaces keep the real logo without decorative icons or 3D
+[22/48] [chromium] › e2e/frontend-refinement.spec.js:87:1 › events keeps its hero visible while loading and can retry a failed feed
+[23/48] [chromium] › e2e/frontend-refinement.spec.js:106:1 › first photo is prioritized and local photos use responsive WebP
+[24/48] [chromium] › e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 390px
+[25/48] [chromium] › e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 1440px
+[26/48] [chromium] › e2e/frontend-refinement.spec.js:159:1 › the quiz opens the chosen department information in the same slider
+[27/48] [chromium] › e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 390px
+[28/48] [chromium] › e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 1440px
+[29/48] [chromium] › e2e/frontend-refinement.spec.js:224:1 › a failed managed background falls back to the matching department scene
+[30/48] [chromium] › e2e/glass-system.spec.js:18:3 › public pages keep the shared glass system at 390px
+[31/48] [chromium] › e2e/glass-system.spec.js:18:3 › public pages keep the shared glass system at 1440px
+[32/48] [chromium] › e2e/glass-system.spec.js:31:1 › dark glass stays almost transparent without pointer-follow reflections
+[33/48] [chromium] › e2e/glass-system.spec.js:44:1 › an HTML response from an API rewrite is rejected before rendering a feed
+[34/48] [chromium] › e2e/module-polish.spec.js:16:1 › empty cell finder offers contact and an accessible close control
+[35/48] [chromium] › e2e/module-polish.spec.js:27:1 › broken administrator hero uses its local photograph
+[36/48] [chromium] › e2e/module-polish.spec.js:33:1 › nullable gallery is empty and retry recovers a failed feed
+[37/48] [chromium] › e2e/module-polish.spec.js:40:1 › captions follow the background, albums reset photos and keyboard retains focus
+[38/48] [chromium] › e2e/module-polish.spec.js:56:1 › long titles fit mobile and past-event links select the requested event
+[39/48] [chromium] › e2e/module-polish.spec.js:69:1 › event preview exposes the background and opens full details without losing registration
+[40/48] [chromium] › e2e/module-polish.spec.js:84:1 › all public entry points keep a visible main landmark and a single page title
+[41/48] [chromium] › e2e/module-polish.spec.js:91:1 › collection controls identify a browsable scene and give fast press feedback
+[42/48] [chromium] › e2e/scene-modules.spec.js:18:3 › gallery discovers all pages, one glass panel and compact photo controls at 390px
+[43/48] [chromium] › e2e/scene-modules.spec.js:18:3 › gallery discovers all pages, one glass panel and compact photo controls at 1440px
+[44/48] [chromium] › e2e/scene-modules.spec.js:47:1 › empty API does not resurrect local departments, albums or fixed totals
+[45/48] [chromium] › e2e/scene-modules.spec.js:56:1 › admin institutional copy and a newly created cell flow stay accessible
+[46/48] [chromium] › e2e/scene-modules.spec.js:74:1 › blog filters use real categories and an event deep link still opens registration
+[47/48] [chromium] › e2e/scene-modules.spec.js:88:1 › normal motion keeps glass fixed and focus on navigation when scenes share a photo
+[48/48] [chromium] › e2e/scene-modules.spec.js:104:1 › administrator can edit an existing gallery record and institutional settings
+  48 passed (1.1m)

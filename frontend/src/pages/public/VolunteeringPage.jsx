@@ -1,3 +1,4 @@
+import CollectionNavigation from '../../components/ui/CollectionNavigation';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
@@ -590,11 +591,11 @@ export default function VolunteeringPage() {
             <div role="group" aria-roledescription="diapositiva" aria-label={`${currentIndex + 1} de ${areas.length}`}>
               <DepartmentSlide area={currentArea} onClick={() => openArea(currentArea.value)} />
             </div>
-            {areas.length > 1 && <nav className="mt-6 flex items-center justify-between gap-4" aria-label="Navegar departamentos">
+            {areas.length > 1 && <CollectionNavigation className="mt-6 flex items-center justify-between gap-4" aria-label="Navegar departamentos">
               <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-2 rounded-[8px] text-left text-14 font-semibold text-white focus-ring">Anterior<span className="block truncate text-12 font-normal text-white/75">{previousArea.title}</span></button>
               <p role="status" className="shrink-0 text-12 text-white/85">{currentIndex + 1} de {areas.length}</p>
               <button type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-2 rounded-[8px] text-right text-14 font-semibold text-white focus-ring">Siguiente<span className="block truncate text-12 font-normal text-white/75">{nextArea.title}</span></button>
-            </nav>}
+            </CollectionNavigation>}
           </div>}
         </div>
       </section>

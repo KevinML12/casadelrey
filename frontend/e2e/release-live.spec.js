@@ -80,7 +80,7 @@ test('live prayer and connection submissions reach their administrator modules',
     await expect(page.getByText('¡Gracias por registrarte!')).toBeVisible();
     await page.goto('/admin/connect-cards'); await expect(page.locator('main').getByText(stamp, { exact: false })).toBeVisible();
   } finally {
-    for (const path of created) expect((await page.request.delete(API + path, { headers })).ok(), `QA cleanup ${path}`).toBe(true);
+    for (const path of created) expect((await page.request.delete(API + path, { headers, timeout: 15000 })).ok(), `QA cleanup ${path}`).toBe(true);
   }
 });
 test('live administrator event reaches its photographic preview, registration and payment gate', async ({ page }) => {
@@ -106,6 +106,11 @@ test('live administrator event reaches its photographic preview, registration an
       const detail = page.getByRole('dialog'); await expect(detail.getByText('Prueba técnica temporal; no corresponde a una convocatoria real.')).toBeVisible();
       await detail.getByRole('button', { name: paid ? 'Registrarme' : 'Confirmar', exact: true }).click();
       const dialog = page.getByRole('dialog').last();
+      if (paid) {
+        const gate = dialog.getByRole('heading', { name: 'Registro no disponible aún', exact: true });
+        await expect(gate.or(dialog.getByLabel('Nombre *', { exact: true }))).toBeVisible();
+        if (await gate.isVisible()) continue; // No fictional bank account is configured for QA.
+      }
       await dialog.getByLabel('Nombre *', { exact: true }).fill('Prueba de inscripción QA');
       await dialog.getByLabel('Correo *', { exact: true }).fill(`qa-event-${Date.now()}@casadelrey.invalid`);
       const registrationResponse = page.waitForResponse(r => r.url().includes(`/events/${eventId}/rsvp`) && r.request().method() === 'POST');
@@ -114,8 +119,8 @@ test('live administrator event reaches its photographic preview, registration an
       if (paid) await expect(page.getByText('Comprobante requerido', { exact: true })).toBeVisible();
       else { registrations.push((await registration.json()).registration.ID); await expect(page.getByText('¡Registro confirmado!', { exact: true })).toBeVisible(); }
     } finally {
-      for (const id of registrations) expect((await page.request.delete(`${API}/admin/rsvps/${id}`, { headers })).ok()).toBe(true);
-      if (eventId) expect((await page.request.delete(`${API}/admin/events/${eventId}`, { headers })).ok()).toBe(true);
+      for (const id of registrations) expect((await page.request.delete(`${API}/admin/rsvps/${id}`, { headers, timeout: 15000 })).ok()).toBe(true);
+      if (eventId) expect((await page.request.delete(`${API}/admin/events/${eventId}`, { headers, timeout: 15000 })).ok()).toBe(true);
     }
   }
 });

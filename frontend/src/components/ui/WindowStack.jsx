@@ -107,7 +107,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                     <button type="button" onClick={() => setPhotoIdx(value => (value + 1) % photos.length)} className="min-h-11 px-2 rounded-[8px] text-12 font-semibold focus-ring">Foto siguiente</button>
                   </>}
                 </div>}
-                {items.length > 1 && <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
+                {items.length > 1 && <div className={`collection-controls shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
                   <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-left text-13 font-bold focus-ring">Anterior{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index - 1 + items.length) % items.length].title}</span>}</button>
                   <span className="shrink-0 text-12 opacity-70" role="status">{index + 1} / {items.length}</span>
                   <button ref={nextRef} type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-right text-13 font-bold focus-ring">Siguiente{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index + 1) % items.length].title}</span>}</button>

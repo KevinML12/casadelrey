@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import SectionBg from './SectionBg';
+import CollectionNavigation from './CollectionNavigation';
 import GlassCard from './GlassCard';
 import { DUR, EASE_OUT } from '../../lib/motion';
 
@@ -37,11 +38,11 @@ export default function SceneCarousel({ items, label, onOpen, renderContent, emp
             </>}
           </motion.div>
         </GlassCard>
-        {items.length > 1 && <nav aria-label={`Navegar ${label.toLowerCase()}`} className="mt-6 flex items-center gap-4 text-white">
+        {items.length > 1 && <CollectionNavigation aria-label={`Navegar ${label.toLowerCase()}`} className="mt-6 flex items-center gap-4 text-white">
           <button type="button" onClick={() => go(-1)} className="flex-1 min-w-0 min-h-11 rounded-[8px] px-2 text-left text-14 font-semibold focus-ring">Anterior<span className="block truncate text-12 font-normal text-white/75">{items[(currentIndex - 1 + items.length) % items.length].title}</span></button>
           <span role="status" className="shrink-0 text-12">{currentIndex + 1} de {items.length}</span>
           <button ref={navigationRef} type="button" onClick={() => go(1)} className="flex-1 min-w-0 min-h-11 rounded-[8px] px-2 text-right text-14 font-semibold focus-ring">Siguiente<span className="block truncate text-12 font-normal text-white/75">{items[(currentIndex + 1) % items.length].title}</span></button>
-        </nav>}
+        </CollectionNavigation>}
       </div>}
     </div>
   </section>;

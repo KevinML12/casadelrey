@@ -9,7 +9,7 @@ export default function PhotoTabs({ value, onChange, id, galleryLabel = 'Galerí
       event.preventDefault(); event.stopPropagation();
       onChange(TABS[target].value);
       document.getElementById(`${id}-tab-${TABS[target].value}`)?.focus();
-    }} className={`min-h-11 px-3 rounded-t-[8px] text-13 font-semibold focus-ring border-b-2 ${value === tab.value ? 'border-bg text-bg' : 'border-transparent text-bg/60 hover:text-bg'}`}>
+    }} className={`min-h-11 px-3 rounded-t-[8px] transition-colors duration-150 text-13 font-semibold focus-ring border-b-2 ${value === tab.value ? 'border-bg text-bg bg-bg/8' : 'border-transparent text-bg/60 hover:text-bg'}`}>
       {tab.value === 'gallery' ? galleryLabel : tab.label}
     </button>)}
   </div>;

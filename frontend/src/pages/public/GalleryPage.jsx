@@ -44,7 +44,7 @@ export default function GalleryPage() {
     {loading || feedError ? <div className="max-w-4xl mx-auto px-6"><CollectionStatus loading={loading} label="los álbumes" onRetry={() => setAttempt(value => value + 1)} /></div> : <SceneCarousel items={albums} label="Álbumes" empty="Sin fotos publicadas aún." onOpen={key => { setTab('gallery'); setOpenKey(key); }} />}
     <WindowStack items={albums.map(album => ({ ...album, images: tab === 'photos' ? album.images : [album.image] }))} openKey={openKey} onChange={setOpenKey} height="min(76svh, 580px)" light photoBackdrop animated neighborTitles renderContent={(album, { photoIndex }) => <>
       <PhotoTabs value={tab} onChange={setTab} id="gallery" />
-      <div role="tabpanel" id="gallery-panel" aria-labelledby={`gallery-tab-${tab}`} tabIndex={0} className="focus-ring rounded-[8px] text-bg">
+      <div key={tab} role="tabpanel" id="gallery-panel" aria-labelledby={`gallery-tab-${tab}`} tabIndex={0} className="focus-ring rounded-[8px] text-bg">
         {tab === 'gallery' && <button type="button" className="w-full py-5 text-left focus-ring rounded-[8px]" onClick={() => { setTab('photos'); document.getElementById('gallery-tab-photos')?.focus(); }}><span className="block text-20 font-bold">{album.title}</span><span className="block mt-2 text-14 text-bg/70">{album.meta} · Ver fotos</span></button>}
         {tab === 'photos' && <div className="py-5 space-y-3" aria-live="polite">
           <p className="text-17 font-semibold">{album.photos[photoIndex]?.title}</p>
