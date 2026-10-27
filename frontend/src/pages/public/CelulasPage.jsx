@@ -1,3 +1,4 @@
+import PhotoImage from '../../components/ui/PhotoImage';
 // ============================================================
 //  CelulasPage — módulo de VENTANAS SOBREPUESTAS (filosofía macOS
 //  Liquid Glass). Base: un hero de fondo + las 5 categorías como
@@ -17,17 +18,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Users, Clock, ArrowRight, X, Phone, Heart, Users2 } from 'lucide-react';
 import useSeo from '../../hooks/useSeo';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import StatTrio from '../../components/ui/StatTrio';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
-import Tilt from '../../components/ui/Tilt';
+import GlassCard from '../../components/ui/GlassCard';
 import { useApi } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
-import { Dock, DockItem } from '../../components/ui/Dock';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import SectionBg from '../../components/ui/SectionBg';
@@ -45,7 +44,6 @@ const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-p
 // y en VolunteeringPage. Un arcoíris repartido por posición de array no
 // comunica nada sobre la categoría: es color decorativo, que es justo
 // lo que el sitio no quiere.
-const GLOW = '#E8823C';
 
 // NOTA (ago-2026): aquí vivía GROUPS_FALLBACK, una copia hardcodeada del
 // directorio de células. Solo se pintaba si /cell-categories devolvía 0
@@ -63,12 +61,12 @@ const DEFAULT_CATEGORY_IMAGE = '/images/components/celula_general.jpg';
 
 // COLLAGE base — recortes de tamaños/inclinaciones distintos
 const COLLAGE = [
-  { span: 'col-span-2 row-span-2', rot: -2.4, y: 0 },
-  { span: 'col-span-1 row-span-1', rot: 2.8,  y: 26 },
-  { span: 'col-span-1 row-span-1', rot: -1.8, y: -8 },
-  { span: 'col-span-1 row-span-1', rot: 3.2,  y: 34 },
-  { span: 'col-span-2 row-span-1', rot: -2.6, y: 12 },
-  { span: 'col-span-1 row-span-1', rot: 2.0,  y: -4 },
+  { span: 'col-span-2 row-span-2' },
+  { span: 'col-span-1 row-span-1' },
+  { span: 'col-span-1 row-span-1' },
+  { span: 'col-span-1 row-span-1' },
+  { span: 'col-span-2 row-span-1' },
+  { span: 'col-span-1 row-span-1' },
 ];
 
 // Normaliza nombres para matchear célula ↔ directorio de líderes
@@ -140,7 +138,7 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
           real y distinto en cada fila. Da un ancla a la izquierda y rompe
           la lista de puro texto que se leía como hoja de cálculo. */}
       {cell.leader_photo ? (
-        <img
+        <PhotoImage
           src={cell.leader_photo}
           alt={`Líder ${cell.leader}`}
           className="shrink-0 w-14 h-14 rounded-full object-cover shadow-sm border border-black/5"
@@ -286,11 +284,6 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory,
   if (listo) {
     return (
       <div className="text-center py-8">
-        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5">
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
         <h3 className={`text-24 font-bold mb-3 ${titulo}`}>¡Solicitud enviada!</h3>
         <p className={`text-16 leading-relaxed ${tenue}`}>
           {cell.leader
@@ -313,9 +306,6 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory,
             dark ? 'text-white/60 hover:text-white' : 'text-bg/60 hover:text-bg'
           }`}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
           Atrás
         </button>
         <p className={`text-13 font-bold uppercase tracking-widest mb-2 ${suave}`}>Confirmar solicitud</p>
@@ -336,7 +326,7 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory,
               </p>
               {cell.map_url && (
                 <a href={cell.map_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-13 font-bold mt-2 text-primary hover:underline underline-offset-4">
-                  Ver ubicación en el mapa <ArrowRight className="w-3.5 h-3.5" />
+                  Ver ubicación en el mapa
                 </a>
               )}
             </div>
@@ -451,7 +441,7 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory,
                    className={`w-full py-3 px-4 rounded-[12px] text-13 font-bold flex items-center justify-between transition-colors ${dark ? 'bg-white/10 hover:bg-white/15' : 'bg-black/10 hover:bg-black/15'}`}
                 >
                    <span className={titulo}>Explorar otras categorías</span>
-                   <ArrowRight className={`w-4 h-4 ${suave}`} />
+
                 </button>
               </div>
             )}
@@ -475,7 +465,6 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory,
     </form>
   );
 }
-
 
 // Ficha de UNA célula, en la capa que se pone encima de la ventana de su
 // categoría. Reúne todo lo que el líder y el admin pueden editar desde
@@ -513,15 +502,12 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
         onClick={onCerrar}
         className="inline-flex items-center gap-1.5 rounded-pill bg-bg/8 hover:bg-bg/14 text-bg/75 hover:text-bg pr-4 pl-3 py-1.5 text-13 font-bold transition-colors focus-ring mb-6"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
         Atrás
       </motion.button>
 
       <motion.div variants={itemVariants} className="flex items-center gap-4">
         {cell.leader_photo ? (
-          <img
+          <PhotoImage
             src={cell.leader_photo}
             alt={`Líder ${cell.leader}`}
             className="shrink-0 w-20 h-20 rounded-full object-cover shadow-sm border border-bg/5"
@@ -546,7 +532,7 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
                 {d.v}
                 {d.link && (
                   <a href={d.link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-end gap-1 text-13 text-primary hover:underline underline-offset-4 mt-1.5">
-                    Ver mapa <ArrowRight className="w-3.5 h-3.5" />
+                    Ver mapa
                   </a>
                 )}
               </dd>
@@ -576,7 +562,7 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
       )}
 
       <motion.div variants={itemVariants} className="mt-7 block">
-        <DockItem>
+        <div>
           <motion.button
             {...PRESS_PRIMARY}
             type="button"
@@ -585,7 +571,7 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
           >
             Quiero unirme a {cell.name}
           </motion.button>
-        </DockItem>
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -642,13 +628,13 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
       )}
 
       <motion.div variants={itemVariants}>
-        <Dock className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
           {filtered.map((c, i) => (
-            <DockItem key={`${c.name}-${i}`}>
+            <div key={`${c.name}-${i}`}>
               <CellRow cell={c} onSolicitar={onAbrirCelula} index={i} tone="light" />
-            </DockItem>
+            </div>
           ))}
-        </Dock>
+        </div>
       </motion.div>
 
       <motion.div variants={itemVariants} className="mt-8 pt-6 border-t border-bg/10">
@@ -754,7 +740,7 @@ function CellQuizModal({ groups, onViewDetail }) {
         </p>
         {category.image && (
           <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
-            <img src={category.image} alt={`Imagen representativa de ${category.name}`} className="w-full h-full object-cover" />
+            <PhotoImage src={category.image} alt={`Imagen representativa de ${category.name}`} className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -817,7 +803,7 @@ function CellQuizModal({ groups, onViewDetail }) {
             className="group relative rounded-[22px] overflow-hidden aspect-[4/5] text-left focus-ring"
           >
             {g.image && (
-              <img
+              <PhotoImage
                 src={g.image}
                 alt="Imagen representativa"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -857,8 +843,6 @@ export default function CelulasPage() {
   // célula que ya no está en la lista de abajo.
   useEffect(() => { cerrarCelula(); }, [openKey]);
   const [quizOpen, setQuizOpen] = useState(false);
-  const [hoverCategory, setHoverCategory] = useState(null); // key bajo el cursor -- colorea el halo ambiental
-
 
   // Categorías 100% administrables (/admin/cell-categories): nombre, edad,
   // descripción y type_key (a qué tipo estructural de célula pertenece)
@@ -987,50 +971,32 @@ export default function CelulasPage() {
               animate={{opacity}} de motion.div no se comprometía al
               inline style de forma confiable, una transición CSS normal
               funciona igual de bien para un fade así de directo. */}
-          <div
-            className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-            style={{
-              opacity: hoverCategory ? 0.5 : 0,
-              background: `radial-gradient(680px circle at 50% 10%, ${GLOW}33, transparent 70%)`,
-            }}
-          />
-          {/* Dock: el collage es una fila de hermanos, que es exactamente
-              para lo que existe la magnificación por proximidad -- la
-              tarjeta bajo el cursor crece y sus vecinas la acompañan un
-              poco, así que el grupo entero responde como una superficie. */}
-          <Dock className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
+
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
             {groups.map((g, i) => {
               const c = COLLAGE[i % COLLAGE.length];
               const big = c.span.includes('row-span-2');
               return (
-                // Wrapper solo para la ENTRADA en 3D (rotateX): Tilt ya es
-                // dueño de rotateX/rotateY para el tilt de cursor/scroll, así
-                // que la profundidad de aparición vive en un nodo aparte —
-                // si compartieran la misma propiedad, una de las dos se
-                // pisaría en silencio.
-                <DockItem
+
+                <div
                   key={g.key}
                   className={c.span}
-                  style={{ transformPerspective: 1000, transformOrigin: 'center' }}
+
                 >
-                  <Tilt
+                  <GlassCard
                     as="button"
-                    max={4}
-                    scrollMax={3}
                     onClick={() => setOpenKey(g.key)}
-                    onMouseEnter={() => setHoverCategory(g.key)}
-                    onMouseLeave={() => setHoverCategory(null)}
-                    whileHover={{ rotate: 0, scale: 1.05, y: c.y - 6, zIndex: 30 }}
+
                     glass
                     className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
-                    style={{ rotate: c.rot, y: c.y, transformOrigin: 'center' }}
+
                   >
                     {/* Foto a color pleno. Antes llegaba al 45% (65% en
                         hover) Y con un degradado navy encima: las caras
                         de la congregación se leían como textura gris. El
                         contraste lo pone .scrim-card, que oscurece solo
                         el tercio de abajo, que es donde vive el texto. */}
-                    <img
+                    <PhotoImage
                       src={g.image}
                       alt="Imagen representativa"
                       className="parallax-layer absolute inset-0 w-full h-full object-cover"
@@ -1052,20 +1018,15 @@ export default function CelulasPage() {
                         {g.age && norm(g.age) !== norm(g.name) ? ` · ${g.age}` : ''} · abrir
                       </p>
                     </div>
-                  </Tilt>
-                </DockItem>
+                  </GlassCard>
+                </div>
               );
             })}
-          </Dock>
+          </div>
 
           {/* Contacto — sin exponer direcciones */}
           <Reveal delay={0.1} depth className="relative z-10 mt-14">
-            {/* Sin Tilt: el panel no es navegable (el navegable es el
-                link de adentro), así que inclinarlo prometía una
-                interacción que no existe. El bisel de cristal vive en
-                .glass-light y .liquid-shine -- lo único que se pierde es
-                la rotación, y .liquid-shine se agrega a mano porque
-                antes la ponía el prop `glass` de Tilt. */}
+
             <div className="glass-light liquid-shine rounded-[28px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
               <div>
                 <h3 className="text-22 font-bold text-bg">¿No sabes cuál es para ti?</h3>

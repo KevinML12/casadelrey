@@ -1,3 +1,4 @@
+import PhotoImage from './PhotoImage';
 // ============================================================
 //  PhotoBentoTile — tile reusable para bentos de fotos (Voluntariado y
 //  Células en Nosotros, mismo tratamiento que /volunteering). Antes esta
@@ -17,22 +18,21 @@
 //  objeto visual tenía 18 aquí, 24 en PhotoHeaderCard y 20/32 en otras
 //  secciones, según el archivo en el que le tocó nacer.
 // ============================================================
-import Tilt from './Tilt';
+import GlassCard from './GlassCard';
 
 export default function PhotoBentoTile({ photo, title, desc, big, onClick, as = 'button', href, ...rest }) {
   return (
-    <Tilt
+    <GlassCard
       as={as}
       type={as === 'button' ? 'button' : undefined}
       href={href}
       onClick={onClick}
-      max={5}
       glass
       whileHover={{ scale: 1.03, y: -4 }}
       className="liquid-glass group relative block w-full h-full text-left focus-ring rounded-[22px] overflow-hidden"
       {...rest}
     >
-      <img
+      <PhotoImage
         src={photo}
         alt=""
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -41,6 +41,6 @@ export default function PhotoBentoTile({ photo, title, desc, big, onClick, as = 
         <p className={`font-bold text-bg leading-tight line-clamp-2 ${big ? 'text-18' : 'text-13'}`}>{title}</p>
         {big && desc && <p className="text-12 text-bg/60 mt-1 leading-snug line-clamp-2">{desc}</p>}
       </div>
-    </Tilt>
+    </GlassCard>
   );
 }

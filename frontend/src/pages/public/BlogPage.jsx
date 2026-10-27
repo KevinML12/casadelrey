@@ -14,6 +14,7 @@ import BlogHero from '../../components/blog/BlogHero';
 import PostCollage from '../../components/blog/PostCollage';
 import ArticleReader from '../../components/blog/ArticleReader';
 import SectionBg from '../../components/ui/SectionBg';
+import CollectionStatus from '../../components/ui/CollectionStatus';
 
 // Mismo fallback de categoría que PostCollage.jsx (p.category vacío no
 // debe ser un filtro fantasma "undefined").
@@ -21,19 +22,13 @@ function categoryOf(p) {
   return p.category || (p.redirect_url ? 'Red social' : 'Enseñanza');
 }
 
-function Loader() {
-  return (
-    <div className="min-h-screen bg-bg flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-    </div>
-  );
-}
-
 export default function BlogPage() {
   const [posts, setPosts] = useState([]);
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [feedError, setFeedError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [activeCategory, setActiveCategory] = useState(null);
   const { slug } = useParams();
 
@@ -49,30 +44,36 @@ export default function BlogPage() {
     : posts;
 
   useEffect(() => {
+    let active = true;
     setLoading(true);
     setNotFound(false);
+    setFeedError(false);
     (async () => {
       try {
         if (slug) {
           const r = await apiClient.get(`/blog/${slug}`);
-          setPost(r.data);
+          if (active) setPost(r.data);
         } else {
           const r = await apiClient.get('/blog/');
-          setPosts(r.data || []);
+          if (active) setPosts(r.data || []);
         }
       } catch (err) {
-        console.error(err);
-        if (slug) setNotFound(true);
-        else setPosts([]);
+        if (!active) return;
+        if (slug && err.response?.status === 404) setNotFound(true);
+        else setFeedError(true);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     })();
-  }, [slug]);
-
-  if (loading) return <Loader />;
+    return () => { active = false; };
+  }, [slug, attempt]);
 
   if (slug) {
+    if (loading || feedError) return (
+      <main className="min-h-screen pt-40 pb-24 px-6 max-w-6xl mx-auto">
+        <CollectionStatus loading={loading} label="el mensaje" onRetry={() => setAttempt(v => v + 1)} />
+      </main>
+    );
     if (notFound || !post) {
       return (
         <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
@@ -119,7 +120,9 @@ export default function BlogPage() {
               ))}
             </div>
           )}
-          <PostCollage posts={filteredPosts} />
+          {loading || feedError ? (
+            <CollectionStatus loading={loading} label="los mensajes" onRetry={() => setAttempt(v => v + 1)} />
+          ) : <PostCollage posts={filteredPosts} />}
           </div>
         </section>
       </div>

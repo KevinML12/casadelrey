@@ -1,0 +1,16 @@
+{
+  "rls_enabled_tables": 28,
+  "anonymous_table_access": 0,
+  "authenticated_table_access": 0,
+  "anonymous_sequence_access": 0,
+  "trigger_search_path": [
+    "search_path=\"\""
+  ],
+  "trigger_qa_execute": false,
+  "production_receipts": 3,
+  "qa_users": 2,
+  "checked_at": "2026-10-27",
+  "production_api_health": 200,
+  "production_api_events": 200,
+  "render_r2_smoke_checks": 19
+}

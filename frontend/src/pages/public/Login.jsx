@@ -1,3 +1,4 @@
+import PhotoImage from '../../components/ui/PhotoImage';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -35,7 +36,7 @@ export default function Login() {
   return (
     <AuthCard>
       <div className="flex flex-col items-center text-center mb-8">
-        <img src="/logo.png" alt="Casa del Rey" className="w-14 h-14 object-contain mb-5" />
+        <PhotoImage src="/logo.png" alt="Casa del Rey" className="w-14 h-14 object-contain mb-5" />
         <h1 className="text-d3 text-white">Bienvenido de vuelta.</h1>
         <p className="text-15 text-white/60 mt-2">Ingresa con tus credenciales para continuar.</p>
       </div>

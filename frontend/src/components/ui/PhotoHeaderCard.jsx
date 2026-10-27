@@ -1,3 +1,4 @@
+import PhotoImage from './PhotoImage';
 // ============================================================
 //  PhotoHeaderCard — foto real a color a sangre completa, con el
 //  texto superpuesto vía degradado -- misma gramática que las cards
@@ -21,7 +22,7 @@ export default function PhotoHeaderCard({ photo, glass = 'standard', contentClas
   return (
     <div className={`group liquid-glass ${glass ? 'liquid-shine' : ''} relative rounded-[22px] overflow-hidden h-full min-h-[280px] flex flex-col justify-end ${className}`}>
       {photo && (
-        <img
+        <PhotoImage
           src={photo}
           alt=""
           style={{ objectPosition }}

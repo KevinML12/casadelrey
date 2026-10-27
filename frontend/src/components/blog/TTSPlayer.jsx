@@ -7,7 +7,6 @@
 //  más robótico; para una voz naturalizada hace falta esa credencial.
 // ============================================================
 import { motion } from 'framer-motion';
-import { Icon } from '../ui/Glass';
 import useTTS from '../../hooks/useTTS';
 
 const ENGINE_LABEL = {
@@ -31,11 +30,6 @@ export default function TTSPlayer({ content }) {
   return (
     <div className="glass-light-nested rounded-[20px] overflow-hidden">
       <div className="flex items-center gap-4 px-5 py-4">
-        {isLoading && (
-          <div className="w-12 h-12 rounded-full bg-bg/8 border border-bg/12 flex items-center justify-center shrink-0">
-            <Icon name="spark" className="w-5 h-5 text-bg animate-spin" />
-          </div>
-        )}
 
         <div className="flex-1 min-w-0">
           <p className="text-15 font-semibold text-bg">

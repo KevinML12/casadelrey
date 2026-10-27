@@ -1,100 +1,49 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const EASE = [0.25, 0.1, 0.25, 1];
+const offset = (from, distance) => ({
+  opacity: 0,
+  y: from === 'bottom' ? distance : from === 'top' ? -distance : 0,
+  x: from === 'left' ? -distance : from === 'right' ? distance : 0,
+});
 
-/**
- * Reveal — envuelve cualquier elemento y lo anima cuando entra al viewport.
- *
- * @param {number}  delay     — retraso en segundos (para stagger)
- * @param {string}  from      — dirección: 'bottom' | 'left' | 'right' | 'none'
- * @param {number}  distance  — píxeles de desplazamiento (default 20)
- * @param {boolean} depth     — transición 3D real: el bloque rota en X
- *                              (perspectiva) al entrar, en vez de solo
- *                              deslizar en 2D. Úsalo en cards/paneles,
- *                              no en bloques de texto largos.
- * @param {string}  className
- */
-export default function Reveal({
-  children,
-  delay = 0,
-  from = 'bottom',
-  distance = 20,
-  duration = 0.5,
-  depth = false,
-  className = '',
-  ...props
-}) {
-  const hidden = {
-    opacity: 0,
-    y: from === 'bottom' ? distance : from === 'top' ? -distance : 0,
-    x: from === 'left' ? -distance : from === 'right' ? distance : 0,
-    ...(depth && { rotateX: 10, scale: 0.96 }),
-  };
-
+// Two-dimensional entrances only. Reduced motion shows content immediately.
+export default function Reveal({ children, delay = 0, from = 'bottom', distance = 20, duration = 0.5, className = '', ...props }) {
+  const reducedMotion = useReducedMotion();
   return (
     <motion.div
       className={className}
-      style={depth ? { transformPerspective: 1000 } : undefined}
-      initial={hidden}
-      whileInView={{ opacity: 1, y: 0, x: 0, ...(depth && { rotateX: 0, scale: 1 }) }}
+      initial={reducedMotion ? false : offset(from, distance)}
+      animate={reducedMotion ? { opacity: 1, y: 0, x: 0 } : undefined}
+      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, x: 0 }}
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: depth ? duration + 0.15 : duration, delay, ease: EASE }}
+      transition={{ duration: reducedMotion ? 0 : duration, delay: reducedMotion ? 0 : delay, ease: EASE }}
       {...props}
-    >
-      {children}
-    </motion.div>
+    >{children}</motion.div>
   );
 }
 
-/**
- * RevealList — aplica stagger automático a sus children.
- *
- * @param {number} stagger — segundos entre cada hijo (default 0.07)
- */
 export function RevealList({ children, stagger = 0.07, delay = 0, className = '' }) {
+  const reducedMotion = useReducedMotion();
   return (
     <motion.div
       className={className}
-      initial="hidden"
-      whileInView="visible"
+      initial={reducedMotion ? false : 'hidden'}
+      animate={reducedMotion ? 'visible' : undefined}
+      whileInView={reducedMotion ? undefined : 'visible'}
       viewport={{ once: true, margin: '-60px' }}
-      variants={{
-        hidden:  {},
-        visible: { transition: { staggerChildren: stagger, delayChildren: delay } },
-      }}
-    >
-      {children}
-    </motion.div>
+      variants={{ hidden: {}, visible: { transition: { staggerChildren: reducedMotion ? 0 : stagger, delayChildren: reducedMotion ? 0 : delay } } }}
+    >{children}</motion.div>
   );
 }
 
-/**
- * RevealItem — hijo de RevealList.
- * @param {boolean} depth — misma transición 3D real que Reveal, pero
- *                          orquestada por el stagger del padre.
- */
-export function RevealItem({ children, from = 'bottom', distance = 18, depth = false, className = '' }) {
-  const hidden = {
-    opacity: 0,
-    y: from === 'bottom' ? distance : from === 'top' ? -distance : 0,
-    x: from === 'left' ? -distance : from === 'right' ? distance : 0,
-    ...(depth && { rotateX: 14, scale: 0.94 }),
-  };
-
+export function RevealItem({ children, from = 'bottom', distance = 18, className = '' }) {
+  const reducedMotion = useReducedMotion();
   return (
     <motion.div
       className={className}
-      style={depth ? { transformPerspective: 900 } : undefined}
-      variants={{
-        hidden,
-        visible: {
-          opacity: 1, y: 0, x: 0,
-          ...(depth && { rotateX: 0, scale: 1 }),
-          transition: { duration: depth ? 0.6 : 0.45, ease: EASE },
-        },
-      }}
-    >
-      {children}
-    </motion.div>
+      initial={reducedMotion ? false : undefined}
+      variants={{ hidden: offset(from, distance), visible: { opacity: 1, y: 0, x: 0, transition: { duration: reducedMotion ? 0 : 0.45, ease: EASE } } }}
+    >{children}</motion.div>
   );
 }

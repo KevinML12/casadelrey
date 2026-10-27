@@ -1,10 +1,10 @@
+import PhotoImage from '../ui/PhotoImage';
 import { useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotificationCounts } from '../../hooks/useNotificationCounts';
 import { useApi } from '../../lib/feed';
 import toast from 'react-hot-toast';
-import { Halos } from '../ui/Glass';
 
 // Nav agrupado por área — un listado plano de 20 ítems se leía como una
 // bandeja de entrada sin orden; las secciones lo hacen escaneable.
@@ -171,8 +171,7 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-light relative flex h-screen bg-paper overflow-hidden text-bg">
-      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
-      <Halos variant="section" />
+      <PhotoImage src={bgImage} sizes="100vw" className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
 
       {/* Sidebar desktop — panel de cristal flotante */}
       <aside className="hidden md:flex w-72 shrink-0 flex-col p-3 relative z-10">

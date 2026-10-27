@@ -4,8 +4,8 @@ import Lenis from 'lenis';
 import useDeviceTier from './hooks/useDeviceTier';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
-import Splash from './components/ui/Splash';
 import { useApi } from './lib/feed';
+import { photoSource } from './lib/photos';
 
 // Título de pestaña por ruta (SEO + pestañas distinguibles). Rutas
 // dinámicas (/blog/:slug) ponen título propio desde su componente;
@@ -106,17 +106,17 @@ export default function App() {
   const bgHit = Object.keys(ROUTE_BG_IMAGES)
     .filter(p => location.pathname === p || location.pathname.startsWith(p === '/' ? '@@' : p + '/'))
     .sort((a, b) => b.length - a.length)[0] || '/';
-  
+
   // Settings del backend sobreescribe el fallback estático si está disponible
   const bgImage = settings[ROUTE_BG_KEYS[bgHit]] || null;
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden" style={bgImage ? { backgroundImage: `linear-gradient(rgba(10,21,38,.8), rgba(10,21,38,.8)), url(${JSON.stringify(bgImage)})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
-      <Splash />
+    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden" style={bgImage ? { backgroundImage: `linear-gradient(rgba(10,21,38,.8), rgba(10,21,38,.8)), url(${JSON.stringify(photoSource(bgImage))})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
+      <a href="#main-content" className="skip-link">Ir al contenido</a>
       <Header />
-      <main className="flex-1 w-full relative z-10">
+      <div id="main-content" tabIndex={-1} className="flex-1 w-full relative z-10 outline-none">
         <Outlet />
-      </main>
+      </div>
       <Footer />
     </div>
   );

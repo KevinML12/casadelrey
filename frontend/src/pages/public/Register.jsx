@@ -53,12 +53,7 @@ export default function Register() {
         <RevealList className="mt-10 grid gap-3 sm:grid-cols-3 text-left">
           {PASOS.map((p, i) => (
             <RevealItem key={p.title} depth>
-              {/* Sin Tilt: la tarjeta no navega. Ninguno de los 3 pasos es
-                  clickeable -- el único enlace es el "Comunícate" del paso 1,
-                  que vive DENTRO. Un bloque que se inclina siguiendo al
-                  cursor y después no hace nada promete interacción y no la
-                  cumple. El bisel se conserva: .liquid-glass + .liquid-shine
-                  (mismo criterio que PhotoHeaderCard). */}
+
               <div className="liquid-glass liquid-shine rounded-[22px] p-5 h-full">
                 <div className="flex items-center gap-2.5 mb-3">
                   {/* font-bold, no extrabold: Arimo topa en 700 y el 800

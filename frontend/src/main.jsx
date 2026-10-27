@@ -56,6 +56,7 @@ function AppRoot() {
       <Toaster
         position="top-right"
         toastOptions={{
+          icon: null,
           style: {
             background: 'var(--card)',
             color: 'var(--ink)',

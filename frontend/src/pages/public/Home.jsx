@@ -1,6 +1,7 @@
+import PhotoImage from '../../components/ui/PhotoImage';
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
 import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
@@ -12,7 +13,7 @@ import { saludo } from '../../lib/greeting';
 // blanco del hero y a los chips de redes del pie de Ubicación.
 import { EASE_OUT, EASE_IN, PRESS_PRIMARY, PRESS_SECONDARY, PRESS_MICRO } from '../../lib/motion';
 
-import Tilt from '../../components/ui/Tilt';
+import GlassCard from '../../components/ui/GlassCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import SocialSection from '../../components/sections/SocialSection';
 import SectionBg from '../../components/ui/SectionBg';
@@ -225,24 +226,13 @@ function HeroCarousel({ onPlan }) {
   const mediaFor = (s) => failed[s.media] ? LOCAL_MEDIA : (s.media || LOCAL_MEDIA);
   const markFailed = (url) => setFailed(f => ({ ...f, [url]: true }));
 
-  // Coreografía de scroll: la foto se aleja y agranda lentamente,
-  // el contenido sube y se desvanece a otra velocidad (profundidad real)
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
-  const bgY       = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
-  const bgScale   = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
-  const textY     = useTransform(scrollYProgress, [0, 1], [0, -110]);
-  const textFade  = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
-  const cardY     = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const cardFade  = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-
   return (
-    <section ref={heroRef} id="inicio" className="relative h-[100svh] overflow-hidden">
+    <section id="inicio" className="relative h-[100svh] overflow-hidden">
       {/* Carril horizontal REAL: cada slide es una ventana de 100vw que se
           navega deslizando (touch, trackpad, scrollbar) — no solo con los
           dots. El wrapper externo lleva el parallax de scroll de página
           (Ken Burns al bajar); el carril interno es scroll-snap propio. */}
-      <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0">
+      <motion.div className="absolute inset-0">
         <div
           ref={trackRef}
           className="h-full w-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar"
@@ -265,8 +255,8 @@ function HeroCarousel({ onPlan }) {
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
-                  <img
-                    src={url} alt="Fondo decorativo"
+                  <PhotoImage
+                    src={url} alt="" sizes="100vw" loading={i === idx ? 'eager' : 'lazy'} fetchPriority={i === idx ? 'high' : 'auto'}
                     onError={() => markFailed(s.media)}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -283,14 +273,13 @@ function HeroCarousel({ onPlan }) {
           sitio, así que el hero y la Agenda por fin oscurecen igual. */}
       <div className="scrim-band" />
 
-
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 h-full flex items-center pt-28 pb-20">
         <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-center w-full">
 
           {/* Texto editorial — izquierda. Cambia con cada slide del carrusel.
               min-height fija + contenido centrado: cada slide mide distinto
               y sin esto el bloque (y la card vecina) brincan sin animación */}
-          <motion.div style={{ y: textY, opacity: textFade }} className="text-left">
+          <motion.div className="text-left">
             <div className="min-h-[340px] md:min-h-[420px] lg:min-h-[460px] flex flex-col justify-center">
             <AnimatePresence mode="wait">
               <motion.div
@@ -398,7 +387,6 @@ function HeroCarousel({ onPlan }) {
           {/* Tarjeta de cristal claro — próximo evento real de /events (Frame 1).
               El wrapper lleva la coreografía de scroll de la sección. */}
           <motion.div
-            style={{ y: cardY, opacity: cardFade }}
             className="animate-hero-4 max-w-[340px] w-full justify-self-start lg:justify-self-end"
           >
           {/* Sin `glass`: esta card es glass-light (blanco/crema) — el
@@ -560,9 +548,9 @@ function Agenda({ bg }) {
           >
             Ver calendario completo
           </MotionLink>
-          
+
           <Reveal delay={0.1}>
-          <Tilt as={Link} to={`/events?id=${featured.id}`} max={4} glass="featured" className="rounded-[22px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8 block">
+          <GlassCard as={Link} to={`/events?id=${featured.id}`} glass="featured" className="rounded-[22px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8 block">
             <div className="text-center shrink-0">
               {/* Uno de los cuatro trabajos del acento en todo el sitio: el
                   día del evento destacado. Es el único número que necesita
@@ -580,7 +568,7 @@ function Agenda({ bg }) {
                 <span>{featured.loc}</span>
               </div>
             </div>
-          </Tilt>
+          </GlassCard>
           </Reveal>
         </div>
 
@@ -619,7 +607,6 @@ function Agenda({ bg }) {
 
 // Inclinaciones cíclicas para el collage de categorías — mismo lenguaje
 // que CelulasPage/GalleryPage/PostCollage (COLLAGE/ROT determinístico).
-const HOME_COLLAGE_ROT = [-2.0, 1.6, -1.4, 2.2, -1.8, 1.2];
 
 // ════════════════════════════════════════════════════════════════════
 // 3 · CÉLULAS Y COMUNIDAD
@@ -685,33 +672,30 @@ function CelulasSection() {
             let gridSpan = 'md:col-span-1';
             if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2';
             else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2';
-            const rot = HOME_COLLAGE_ROT[i % HOME_COLLAGE_ROT.length];
 
             return (
               <motion.div
                 key={i}
                 className={gridSpan}
-                initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
-                whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.06 }}
-                style={{ transformPerspective: 1000, transformOrigin: 'center' }}
+
               >
-                <Tilt
+                <GlassCard
                   as={Link}
-                  max={4}
-                  scrollMax={3}
                   to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
-                  whileHover={{ rotate: 0, scale: 1.03, zIndex: 30 }}
+
                   glass
                   className="liquid-glass group relative w-full h-full rounded-[22px] flex flex-col overflow-hidden ring-1 ring-white/10"
-                  style={{ rotate: rot, transformOrigin: 'center' }}
+
                 >
                   {/* Foto a plena fuerza: son las caras de la congregación, lo
                       único irrepetible que tiene el sitio. El texto se lee por
                       el scrim anclado abajo, no por apagar la imagen. */}
                   <div className="absolute inset-0 rounded-[22px] overflow-hidden">
-                    <img src={cat.image_url || '/images/components/celula_general.jpg'} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
+                    <PhotoImage src={cat.image_url || '/images/components/celula_general.jpg'} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
                     <div className="scrim-card" />
                   </div>
                   <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
@@ -728,7 +712,7 @@ function CelulasSection() {
                       )}
                     </div>
                   </div>
-                </Tilt>
+                </GlassCard>
               </motion.div>
             );
           })}
@@ -797,11 +781,10 @@ function MensajesCarousel() {
       <div className="relative z-10 flex overflow-x-auto gap-6 px-6 pb-12 snap-x snap-mandatory scrollbar-hide" style={{ scrollPaddingLeft: '1.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
         <div className="w-[1px] shrink-0 md:w-[calc((100vw-72rem)/2)] hidden md:block" />
-        
+
         {sermons.map((s) => (
-          <Tilt
+          <GlassCard
             key={s.id}
-            max={5}
             glass="standard"
             {...(s.href
               ? { as: 'a', href: s.href, target: '_blank', rel: 'noopener noreferrer' }
@@ -810,14 +793,14 @@ function MensajesCarousel() {
           >
             {/* Portada a plena fuerza: el título se lee por el scrim anclado
                 abajo, no porque la foto esté a media luz. */}
-            <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
+            <PhotoImage src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
             <div className="scrim-card" />
 
             <div className="absolute bottom-0 left-0 p-8 w-full z-10">
               <div className="text-13 font-semibold text-white/70 mb-2">{s.date}</div>
               <h3 className="text-20 md:text-24 font-bold text-white leading-tight">{s.title}</h3>
             </div>
-          </Tilt>
+          </GlassCard>
         ))}
         <div className="w-6 shrink-0" />
       </div>
@@ -864,7 +847,7 @@ function Ubicacion({ bg }) {
         <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
           {/* Dirección protagonista */}
           <Reveal from="left">
-          {/* Sin Tilt: la tarjeta no navega, navegan los botones de adentro. */}
+
           <div className="rounded-[22px] liquid-glass liquid-shine p-10 md:p-14 h-full flex flex-col justify-between gap-10">
             <div>
               <div className="text-white/60 text-13 font-semibold mb-6">
@@ -984,10 +967,10 @@ function GalleryPreviewSection() {
         <RevealList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {topAlbums.map(([albumName, photos]) => (
             <RevealItem key={albumName}>
-            <Tilt as={Link} to="/gallery" max={6} glass="standard" className="group relative rounded-[22px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
+            <GlassCard as={Link} to="/gallery" glass="standard" className="group relative rounded-[22px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
               {/* Tile de foto a plena fuerza: el nombre del álbum se sostiene
                   con el scrim de abajo, no bajándole la opacidad a la foto. */}
-              <img src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+              <PhotoImage src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
               <div className="scrim-card" />
               <div className="absolute bottom-5 inset-x-5">
                 <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>
@@ -995,7 +978,7 @@ function GalleryPreviewSection() {
                   <p className="text-white/60 text-12 font-medium mt-1">{photos.length} fotos</p>
                 )}
               </div>
-            </Tilt>
+            </GlassCard>
             </RevealItem>
           ))}
         </RevealList>

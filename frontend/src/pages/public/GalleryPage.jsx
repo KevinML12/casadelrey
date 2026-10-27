@@ -1,3 +1,5 @@
+import PhotoImage from '../../components/ui/PhotoImage';
+import CollectionStatus from '../../components/ui/CollectionStatus';
 // ============================================================
 //  GalleryPage — hero de fondo + álbumes como recortes de cristal en
 //  COLLAGE. Al abrir un álbum, sus fotos aparecen en una VENTANA
@@ -9,8 +11,7 @@ import apiClient from '../../lib/apiClient';
 import { RevealList, RevealItem } from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import WindowStack from '../../components/ui/WindowStack';
-import Tilt from '../../components/ui/Tilt';
-import { Dock, DockItem } from '../../components/ui/Dock';
+import GlassCard from '../../components/ui/GlassCard';
 import SectionBg from '../../components/ui/SectionBg';
 
 // Collage: tamaños/inclinaciones variados que se repiten por índice.
@@ -19,11 +20,12 @@ const SPANS = [
   'col-span-2 row-span-2', 'col-span-1 row-span-1', 'col-span-1 row-span-1',
   'col-span-2 row-span-1', 'col-span-1 row-span-2', 'col-span-1 row-span-1',
 ];
-const ROT = [-2.2, 1.8, -1.4, 2.4, -2.6, 1.2];
 
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [openKey, setOpenKey] = useState(null);
 
   // Los apartados curados (Alabanza, Danza, Niños...) ya NO viven como
@@ -46,20 +48,18 @@ export default function GalleryPage() {
   );
 
   useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setFeedError(false);
     // limit=200 (el máximo que acepta el backend): con los apartados
     // curados ya son ~75+ fotos, el default de 20 dejaba fuera álbumes
     // enteros (los más viejos, por created_at DESC).
     apiClient.get('/gallery/?limit=200')
-      .then(res => setGallery(res.data?.data || res.data || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return (
-    <div className="min-h-[100svh] bg-bg flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-    </div>
-  );
+      .then(res => { if (active) setGallery(res.data?.data || res.data || []); })
+      .catch(() => { if (active) setFeedError(true); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [attempt]);
 
   return (
     <main className="relative w-full min-h-screen overflow-hidden">
@@ -81,7 +81,9 @@ export default function GalleryPage() {
         <section className="relative overflow-hidden pt-6 pb-28">
           <SectionBg src="/images/components/bg_galeria.jpg" />
           <div className="relative z-10 px-4 sm:px-8">
-          {albums.length === 0 ? (
+          {loading || feedError ? (
+            <CollectionStatus loading={loading} label="los álbumes" onRetry={() => setAttempt(v => v + 1)} />
+          ) : albums.length === 0 ? (
             <div className="py-24 text-center">
               <p className="text-d3 text-white/50">
                 Sin fotos publicadas aún.
@@ -91,27 +93,25 @@ export default function GalleryPage() {
             // Dock: la grilla de álbumes son hermanos -- la magnificación
             // por proximidad hace que el grupo responda como una
             // superficie, no como cards sueltas.
-            <Dock className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9 [grid-auto-flow:dense]">
               {albums.map((a, i) => {
                 const big = SPANS[i % SPANS.length].includes('row-span-2');
                 return (
-                  <DockItem key={a.name} className={SPANS[i % SPANS.length]} style={{ transformPerspective: 1000, transformOrigin: 'center' }}>
-                    <Tilt
+                  <div key={a.name} className={SPANS[i % SPANS.length]} >
+                    <GlassCard
                       as="button"
-                      max={4}
-                      scrollMax={3}
                       onClick={() => setOpenKey(a.name)}
-                      whileHover={{ rotate: 0, scale: 1.05, y: -6, zIndex: 30 }}
+
                       glass
                       className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
-                      style={{ rotate: ROT[i % ROT.length], transformOrigin: 'center' }}
+
                     >
                       {/* Foto a color pleno (antes llegaba al 55% y subía a
                           75% en hover: la portada del álbum se leía como
                           textura gris hasta que la tocabas). El contraste lo
                           pone .scrim-card, que oscurece solo el tercio bajo
                           donde caen el título y el conteo. */}
-                      <img src={a.photos[0]?.url} alt={`Portada del álbum ${a.album}`} loading="lazy"
+                      <PhotoImage src={a.photos[0]?.url} alt={`Portada del álbum ${a.name}`} loading="lazy"
                         className="parallax-layer absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="scrim-card" />
                       <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
@@ -122,11 +122,11 @@ export default function GalleryPage() {
                           {a.name}
                         </h3>
                       </div>
-                    </Tilt>
-                  </DockItem>
+                    </GlassCard>
+                  </div>
                 );
               })}
-            </Dock>
+            </div>
           )}
           </div>
         </section>
@@ -144,16 +144,9 @@ export default function GalleryPage() {
             <RevealList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
               {a.photos.map((photo, idx) => (
                 <RevealItem key={photo.ID ?? idx}>
-                  {/* Sin Tilt: la miniatura no navega a ningún lado (abrir el
-                      álbum ya lo hizo la card de afuera) y mide ~120px, así
-                      que la inclinación no se lee -- pero un álbum de 30
-                      fotos montaba 30 resortes de framer-motion + 30
-                      IntersectionObserver dentro de un modal que ya está
-                      animando. El bisel y el reflejo viven en las clases
-                      (.liquid-glass + .liquid-shine, esta última la ponía el
-                      prop `glass`), no en Tilt: solo se pierde la rotación. */}
+
                   <div className="rounded-[22px] overflow-hidden aspect-[4/5] relative group liquid-glass liquid-shine">
-                    <img src={photo.url} alt={`Foto ${idx + 1}`} loading="lazy"
+                    <PhotoImage src={photo.url} alt={`Foto ${idx + 1}`} loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   </div>
                 </RevealItem>

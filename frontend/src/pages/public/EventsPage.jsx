@@ -1,3 +1,5 @@
+import PhotoImage from '../../components/ui/PhotoImage';
+import CollectionStatus from '../../components/ui/CollectionStatus';
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -468,7 +470,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
           {/* Flyer a color pleno: el `opacity-80` que llevaba encima lo
               entregaba deslavado antes de que el degradado siquiera actuara.
               El contraste lo pone el scrim, no la opacidad de la foto. */}
-          <img src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          <PhotoImage src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
           {/* .scrim-card: el texto de esta card vive anclado al tercio
               inferior, así que oscurece ahí y deja el flyer visible arriba. */}
           <div className="scrim-card" />
@@ -640,6 +642,8 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   // States para modales/interacción
   const [rsvpEvent, setRsvpEvent] = useState(null);
@@ -664,22 +668,22 @@ export default function EventsPage() {
       .catch(() => {});
 
   useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setFeedError(false);
     Promise.all([
-      apiClient.get('/events/').catch(() => ({ data: [] })),
+      apiClient.get('/events/'),
       apiClient.get('/faqs/').catch(() => ({ data: [] }))
     ])
       .then(([eventsRes, faqsRes]) => {
+        if (!active) return;
         setEvents(eventsRes.data || []);
         setFaqs(faqsRes.data || []);
       })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return (
-    <div className="min-h-[100svh] bg-bg flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-    </div>
-  );
+      .catch(() => { if (active) setFeedError(true); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [attempt]);
 
   return (
     <main className="min-h-[100svh] relative overflow-hidden flex flex-col">
@@ -687,7 +691,9 @@ export default function EventsPage() {
         subtitle="Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros." />
 
       <div className="relative z-10 mx-auto pb-20 w-full flex-1 max-w-7xl px-6">
-        {events.length === 0 ? (
+        {loading || feedError ? (
+          <CollectionStatus loading={loading} label="los eventos" onRetry={() => setAttempt(v => v + 1)} />
+        ) : events.length === 0 ? (
           /* ── Empty state ──
              Antes cerraba con "publicamos nuevos eventos cada semana": una
              promesa de frecuencia que nadie firmó y que esta misma pantalla
@@ -763,23 +769,15 @@ export default function EventsPage() {
             <RevealList className="space-y-3">
               {faqs.map(faq => (
                 <RevealItem key={faq.ID} depth>
-                {/* Sin Tilt: la fila no es navegable (el que actúa es el
-                    botón de adentro) y mide ~70px de alto -- inclinar en 3D
-                    algo así es ruido, no material. `liquid-shine` se agrega a
-                    mano porque lo aportaba la prop `glass`. */}
+
                 <div className="glass-light liquid-shine rounded-[22px] overflow-hidden block">
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
+                    aria-expanded={openFaq === faq.ID}
                     className="w-full px-6 py-5 text-left flex items-center justify-between group cursor-pointer"
                   >
                     <span className="text-bg font-semibold pr-4">{faq.question}</span>
-                    <motion.span
-                      animate={{ rotate: openFaq === faq.ID ? 45 : 0 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                      className="w-9 h-9 rounded-full bg-bg/6 border border-bg/12 flex items-center justify-center text-bg shrink-0 text-18 font-bold leading-none select-none"
-                    >
-                      +
-                    </motion.span>
+                    <span className="text-13 font-bold text-bg/70 shrink-0">{openFaq === faq.ID ? 'Ocultar' : 'Ver'}</span>
                   </button>
                   <AnimatePresence>
                     {openFaq === faq.ID && (

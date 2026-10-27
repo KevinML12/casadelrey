@@ -1,3 +1,4 @@
+import PhotoImage from '../ui/PhotoImage';
 // ============================================================
 //  ArticleReader — lectura de un post. A propósito NO usa el patrón
 //  de ventana sobrepuesta (WindowStack): un artículo es contenido
@@ -37,7 +38,7 @@ export default function ArticleReader({ post }) {
       {/* Hero inmersivo: la portada domina y se disuelve en el canvas */}
       <div className="relative h-[42vh] min-h-[300px] max-h-[520px] overflow-hidden">
         {post.cover_image ? (
-          <img src={post.cover_image} alt={post.title} className="absolute inset-0 w-full h-full object-cover opacity-55" />
+          <PhotoImage src={post.cover_image} alt={post.title} className="absolute inset-0 w-full h-full object-cover opacity-55" />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
         )}

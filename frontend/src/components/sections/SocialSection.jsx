@@ -11,8 +11,7 @@
 //  tanto en Nosotros como en Home.
 // ============================================================
 import Reveal from '../ui/Reveal';
-import Tilt from '../ui/Tilt';
-import { Dock, DockItem } from '../ui/Dock';
+import GlassCard from '../ui/GlassCard';
 import SectionBg from '../ui/SectionBg';
 
 const NETWORKS = [
@@ -42,7 +41,7 @@ export default function SocialSection({ title = 'Síguenos en redes' }) {
         {/* Bento en .glass-light -- blanco y negro, Instagram destacada
             como red principal, el nombre de cada red se lee grande,
             como una portada. */}
-        <Dock className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[120px] sm:auto-rows-[150px] gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[120px] sm:auto-rows-[150px] gap-3 md:gap-4">
           {NETWORKS.map(n => {
             const big = n.span === 'col-span-2 row-span-2';
             return (
@@ -50,10 +49,9 @@ export default function SocialSection({ title = 'Síguenos en redes' }) {
               // la inclinación al cursor. Sin `whileHover` propio: el
               // crecimiento ahora lo pone el dock, y dos escalas peleando
               // por el mismo nodo se multiplican y saltan.
-              <DockItem key={n.label} className={n.span}>
-              <Tilt
+              <div key={n.label} className={n.span}>
+              <GlassCard
                 as="a"
-                max={6}
                 glass
                 href={n.href}
                 target="_blank"
@@ -65,11 +63,11 @@ export default function SocialSection({ title = 'Síguenos en redes' }) {
                     una jerarquía que la pantalla nunca llegaba a mostrar. */}
                 <p className={`relative z-10 font-bold leading-none tracking-tight ${big ? 'text-32 md:text-40' : 'text-17'}`}>{n.label}</p>
                 <p className={`relative z-10 text-bg/60 truncate ${big ? 'text-15 mt-2' : 'text-12 mt-1'}`}>{n.handle}</p>
-              </Tilt>
-              </DockItem>
+              </GlassCard>
+              </div>
             );
           })}
-        </Dock>
+        </div>
       </Reveal>
     </section>
   );

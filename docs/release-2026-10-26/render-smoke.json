@@ -1,6 +1,6 @@
 {
   "base": "https://casadelrey-api-pruebas.onrender.com/api/v1",
-  "storage": "local",
+  "storage": "r2",
   "checks": [
     {
       "check": "Login admin",
@@ -18,7 +18,7 @@
       "observed": true
     },
     {
-      "check": "Receipt upload (ephemeral test storage)",
+      "check": "Receipt upload to R2",
       "passed": true,
       "observed": 201
     },
@@ -26,6 +26,11 @@
       "check": "Private opaque reference",
       "passed": true,
       "observed": true
+    },
+    {
+      "check": "R2 active in deployed backend",
+      "passed": true,
+      "observed": "r2"
     },
     {
       "check": "Synthetic donation",
@@ -40,7 +45,7 @@
     {
       "check": "Same donation ID",
       "passed": true,
-      "observed": 1
+      "observed": 7
     },
     {
       "check": "Changed payload rejected",
@@ -78,11 +83,21 @@
       "observed": true
     },
     {
+      "check": "Private response nosniff",
+      "passed": true,
+      "observed": true
+    },
+    {
       "check": "Legacy public path blocked",
+      "passed": true,
+      "observed": 404
+    },
+    {
+      "check": "New private receipt absent from public CDN",
       "passed": true,
       "observed": 404
     }
   ],
-  "donation_id": 1,
-  "receipt_id": 1
+  "donation_id": 7,
+  "receipt_id": 3
 }

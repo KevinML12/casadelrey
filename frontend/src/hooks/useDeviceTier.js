@@ -17,11 +17,8 @@ export default function useDeviceTier() {
       isLowTier = true;
     }
 
-    // Also respect 'prefers-reduced-motion' and 'prefers-reduced-transparency'
-    if (window.matchMedia('(prefers-reduced-transparency: reduce)').matches || 
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      isLowTier = true;
-    }
+    // Accessibility preferences are handled independently in CSS and motion.
+    // Reduced motion does not imply reduced transparency or slower hardware.
 
     if (isLowTier) {
       document.documentElement.classList.add('low-tier');

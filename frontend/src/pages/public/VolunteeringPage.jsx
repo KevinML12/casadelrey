@@ -1,9 +1,10 @@
+import PhotoImage from '../../components/ui/PhotoImage';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
 import Reveal from '../../components/ui/Reveal';
 import StatTrio from '../../components/ui/StatTrio';
-import Tilt from '../../components/ui/Tilt';
+import GlassCard from '../../components/ui/GlassCard';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
@@ -177,7 +178,6 @@ function bestMatches(areas, selectedTags) {
 // pasar de una card a otra es la posición del halo, no su color. Ver la
 // nota gemela en CelulasPage.jsx -- antes ambos archivos duplicaban el
 // mismo arcoíris, que resultó ser la rampa 500 de Tailwind de fábrica.
-const GLOW = '#E8823C';
 
 // Departamento ya elegido (por WindowStack, o "sin preferencia" por
 // defecto) se muestra COMO DATO, no como un <select> abierto -- cambiar
@@ -249,11 +249,6 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   if (sent) {
     return (
       <div className="text-center py-8">
-        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5">
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
         <h3 className="text-24 text-bg font-bold mb-3">¡Inscripción recibida!</h3>
         <p className="text-16 text-bg/75 leading-relaxed">Nuestro equipo se pondrá en contacto contigo.</p>
         <button onClick={onClose} className="mt-8 w-full inline-flex items-center justify-center rounded-pill px-6 py-3.5 text-14 font-semibold transition-colors text-bg/60 hover:text-bg hover:bg-bg/8">
@@ -272,19 +267,16 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
           onClick={() => setConfirming(false)}
           className="self-start inline-flex items-center gap-1.5 text-13 font-bold mb-5 transition-colors focus-ring rounded-full px-2 py-1 -ml-2 text-bg/60 hover:text-bg"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
           Atrás
         </button>
         <p className="text-13 font-bold uppercase tracking-widest mb-2 text-bg/60">Confirmar aplicación</p>
         <h3 className="text-28 font-bold text-bg tracking-tight mb-6">{area ? area.title : NO_PREFERENCE_LABEL}</h3>
-        
+
         <div className="glass-light-nested rounded-[20px] p-6 mb-8 border border-bg/10 shadow-sm bg-white">
           <p className="text-12 font-bold uppercase tracking-widest mb-3 text-bg/60">¿Por qué aquí?</p>
           <p className="text-16 text-bg/75 leading-relaxed font-medium">{area ? area.why : NO_PREFERENCE_WHY}</p>
         </div>
-        
+
         <div className="flex flex-col gap-3">
           <motion.button {...PRESS_PRIMARY} onClick={confirmSubmit} disabled={submitting} className={btnPrimary}>
             {submitting ? 'Enviando…' : 'Confirmar y Enviar'}
@@ -388,16 +380,14 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 // ángulo fijo que se pidió quitar.
 function DepartmentCard({ title, desc, photo, onClick }) {
   return (
-    <Tilt
+    <GlassCard
       as="button"
       type="button"
       onClick={onClick}
-      max={6}
       glass
-      hoverScale={1.02}
       className="group relative block w-full aspect-[4/5] overflow-hidden rounded-[22px] text-left focus-ring"
     >
-      <img
+      <PhotoImage
         src={photo}
         alt="Imagen de voluntariado"
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -406,7 +396,7 @@ function DepartmentCard({ title, desc, photo, onClick }) {
         <h3 className="text-15 font-bold text-bg tracking-tight leading-tight">{title}</h3>
         {desc && <p className="text-13 text-bg/60 mt-1 leading-snug line-clamp-2">{desc}</p>}
       </div>
-    </Tilt>
+    </GlassCard>
   );
 }
 
@@ -457,7 +447,7 @@ function QuizModal({ areas, onViewDetail, onApply }) {
             {results.map(r => (
               <li key={r.value} className="py-4 flex items-start gap-4">
                 {r.photo && (
-                  <img src={r.photo} alt="Imagen de voluntariado" className="w-14 h-14 rounded-[12px] object-cover shrink-0" />
+                  <PhotoImage src={r.photo} alt="Imagen de voluntariado" className="w-14 h-14 rounded-[12px] object-cover shrink-0" />
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-15 font-bold text-bg">{r.title}</p>
@@ -496,7 +486,7 @@ function QuizModal({ areas, onViewDetail, onApply }) {
         <h3 className="text-24 font-bold text-bg tracking-tight mb-4">{result ? result.title : 'Cualquier departamento'}</h3>
         {result?.photo && (
           <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
-            <img src={result.photo} alt="Imagen de voluntariado" className="w-full h-full object-cover" />
+            <PhotoImage src={result.photo} alt="Imagen de voluntariado" className="w-full h-full object-cover" />
           </div>
         )}
         <p className="text-14 text-bg/65 leading-relaxed mb-6">{result ? result.why : NO_PREFERENCE_WHY}</p>
@@ -553,7 +543,7 @@ export default function VolunteeringPage() {
   const [formDept, setFormDept] = useState(null);  // null = modal cerrado, '' = abierto sin preseleccion
   const [quizOpen, setQuizOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);   // chip de interés activo (filtra el grid) o null
-  const [hoverCategory, setHoverCategory] = useState(null); // categoría bajo el cursor -- colorea el halo ambiental
+
   // Departamentos reales desde /volunteer-areas (admin-editable), con
   // fallback local si la API aun no responde. Una sola llamada a
   // /site-photos, la resolucion de foto por departamento es JS plano (no
@@ -658,13 +648,6 @@ export default function VolunteeringPage() {
             (se quedaba en el opacity por defecto del navegador) -- una
             transición CSS normal es más simple y funciona igual de bien
             para un fade tan directo. */}
-        <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-          style={{
-            opacity: hoverCategory ? 0.5 : 0,
-            background: `radial-gradient(680px circle at 50% 20%, ${GLOW}33, transparent 70%)`,
-          }}
-        />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Sin Reveal: el titular de sección es el punto FIJO contra el
@@ -727,8 +710,7 @@ export default function VolunteeringPage() {
                   exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                   transition={{ opacity: { duration: 0.2 }, height: { type: 'spring', stiffness: 250, damping: 25 } }}
                   key={cat.name} 
-                  onMouseEnter={() => setHoverCategory(cat.name)} 
-                  onMouseLeave={() => setHoverCategory(null)}
+
                 >
                   <p className="text-13 font-semibold text-white/60 mb-4">{cat.name}</p>
                   <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -805,7 +787,7 @@ export default function VolunteeringPage() {
                 <motion.p variants={itemVariants} className="text-bg/80 text-16 sm:text-17 leading-relaxed font-medium">
                   {a.desc}
                 </motion.p>
-                
+
                 <motion.div variants={itemVariants} className="mt-auto pt-6">
                   <motion.button
                     {...PRESS_PRIMARY}

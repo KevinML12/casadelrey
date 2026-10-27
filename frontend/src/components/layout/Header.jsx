@@ -24,6 +24,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const dropRef = useRef(null);
+  const navRef = useRef(null);
+  const menuButtonRef = useRef(null);
 
   // Alto del menu movil en PIXELES reales via window.innerHeight, no vh:
   // 100vh tiene un bug de plataforma conocido en Safari movil real (no
@@ -31,7 +33,10 @@ export default function Header() {
   // mas alto que el viewport visible.
   const [viewportH, setViewportH] = useState(() => (typeof window !== 'undefined' ? window.innerHeight : 800));
   useEffect(() => {
-    const onResize = () => setViewportH(window.innerHeight);
+    const onResize = () => {
+      setViewportH(window.innerHeight);
+      if (window.innerWidth >= 1280) setMenuOpen(false);
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -52,7 +57,33 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  useEffect(() => { setMenuOpen(false); }, [location]);
+  useEffect(() => { setMenuOpen(false); setDropOpen(false); }, [location]);
+
+  useEffect(() => {
+    if (!menuOpen && !dropOpen) return;
+    const onKey = e => {
+      if (e.key !== 'Escape') return;
+      setMenuOpen(false);
+      setDropOpen(false);
+      (menuOpen ? menuButtonRef.current : dropRef.current?.querySelector('button'))?.focus();
+    };
+    const onOutside = e => {
+      if (!navRef.current?.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onOutside);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onOutside);
+    };
+  }, [menuOpen, dropOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previous; };
+  }, [menuOpen]);
 
   const handleLogout = () => { logout(); setDropOpen(false); navigate('/'); };
 
@@ -67,6 +98,8 @@ export default function Header() {
       className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-4 pointer-events-none"
     >
       <nav
+        ref={navRef}
+        aria-label="Navegación principal"
         className={`pointer-events-auto w-full max-w-6xl glass-nav transition-all duration-500 ease-spring ${
           menuOpen ? 'rounded-[22px]' : 'rounded-pill'
         } ${scrolled ? 'glass-nav--scrolled shadow-card-lg' : 'shadow-whisper'}`}
@@ -110,16 +143,19 @@ export default function Header() {
               <div className="relative hidden sm:block" ref={dropRef}>
                 <button
                   onClick={() => setDropOpen(p => !p)}
+                  aria-expanded={dropOpen}
+                  aria-controls="account-menu"
                   className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-13 hover:bg-bg/5 transition-all duration-300 focus-ring"
                 >
                   <span className="grid place-items-center w-7 h-7 rounded-full bg-bg text-white text-12 font-bold">
                     {(user?.name || user?.email || '?')[0].toUpperCase()}
                   </span>
-                  <span className="font-semibold text-bg">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>
+                  <span className="font-semibold text-bg max-w-24 truncate">{(user?.name || user?.email || 'Cuenta').split(' ')[0]}</span>
                 </button>
 
                 {dropOpen && (
                   <div
+                    id="account-menu"
                     className="absolute right-0 top-full mt-3 w-60 glass-light rounded-[20px] p-2 z-50 animate-rise"
                     style={{ animationDuration: '300ms' }}
                   >
@@ -189,6 +225,7 @@ export default function Header() {
             </Link>
 
             <button
+              ref={menuButtonRef}
               onClick={() => setMenuOpen(o => !o)}
               className="xl:hidden grid place-items-center h-10 px-4 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring text-14 font-bold"
               aria-label="Menú"
@@ -211,6 +248,8 @@ export default function Header() {
         <div
           id="mobile-menu"
           aria-hidden={!menuOpen}
+          inert={!menuOpen}
+          data-lenis-prevent
           className={`xl:hidden transition-all duration-500 ease-spring ${
             menuOpen ? 'opacity-100 overflow-y-auto' : 'opacity-0 overflow-hidden'
           }`}

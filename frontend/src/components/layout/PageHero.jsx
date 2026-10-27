@@ -1,4 +1,3 @@
-import { Halos } from '../ui/Glass';
 import ParallaxImg from '../ui/ParallaxImg';
 import { useSitePhoto } from '../../lib/feed';
 
@@ -35,12 +34,12 @@ export default function PageHero({ title, subtitle, children, photoSlot, photoFa
               izquierda (deja la foto entera visible del otro lado),
               .scrim-hero cuando el bloque va centrado y necesita el óvalo
               oscuro justo en el medio. */}
-          <ParallaxImg src={image} alt="" />
+          <ParallaxImg src={image} alt="" priority />
           <div className={centered ? 'scrim-hero' : 'scrim-band'} />
         </>
       ) : (
         <>
-          <Halos variant="hero" />
+
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-bg" />
         </>
       )}

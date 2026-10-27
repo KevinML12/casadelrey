@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import apiClient from '../../lib/apiClient';
 import AuthCard from '../../components/ui/AuthCard';
-import { Icon } from '../../components/ui/Glass';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -29,11 +28,6 @@ export default function VerifyEmail() {
 
   return (
     <AuthCard className="text-center">
-      {status === 'loading' && (
-        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-5">
-          <Icon name="spark" className="w-7 h-7 text-white animate-spin" />
-        </div>
-      )}
       <h1 className={`font-bold text-white mb-2 ${status === 'loading' ? 'text-22' : 'text-26'}`}>
         {status === 'loading' && 'Verificando…'}
         {status === 'success' && '¡Correo verificado!'}

@@ -16,7 +16,7 @@ Decisión: 26 de octubre de 2026. Usar Render gratuito para pruebas; proponer el
 | Publish Directory | No aplica | `dist` |
 | Health Check | `/health` | No aplica |
 | Plan inicial | Free | Static gratuito |
-| Región | Ohio, junto a la región de Supabase | CDN global |
+| Región | Oregon actual; Ohio propuesto en blueprint | CDN global |
 
 Para React Router: añadir un rewrite de `/*` a `/index.html`.
 
@@ -36,14 +36,16 @@ La rama remota `codex/render-qa` contiene las correcciones de esta entrega; cone
 
 Con autorización del usuario se creó el schema vacío `cdr_render_qa` y un usuario exclusivo con contraseña aleatoria, sin privilegios de administración y con límite de cuatro conexiones (tres de aplicación y una de mantenimiento). Se verificó que no tiene permisos SELECT/INSERT/UPDATE/DELETE sobre tablas de `public`, `auth` o `storage`. No se copiaron registros reales. El JWT de pruebas es independiente; no se configuró Brevo. Se añadieron usuarios admin/member y contenido sintético claramente identificado para validar los flujos; la cuenta bancaria quedó vacía.
 
-Ambos servicios están publicados desde `9b89545`, con despliegues automáticos desactivados:
+Backend publicado desde `32384ed`; frontend de esta revisión pendiente de confirmar. Despliegues automáticos desactivados:
 
 - Backend Free: https://casadelrey-api-pruebas.onrender.com (`srv-dbfqi0sipgvc739ach60`). La creación manual quedó en Oregon; el blueprint propone Ohio para una futura instancia cercana a Supabase.
 - Frontend Static Site: https://casadelrey-web-pruebas.onrender.com (`srv-dbfqiu3rjlhs73ed9h5g`), con rewrite `/*` → `/index.html` guardado.
 
-El usuario autorizó después reutilizar la configuración de almacenamiento de Fly. Las cinco variables R2 existentes y `CF_R2_PRIVATE_BUCKET=casadelreyhue-receipts-private` se guardaron en Render mediante **Save only**, manteniendo DATABASE_URL/JWT de pruebas. Se creó ese bucket privado en la cuenta Cloudflare abierta en Brave y se verificó **Public Access: Disabled**. La clave existente autentica al bucket de medios, pero devuelve `AccessDenied` en el privado: falta ampliar su alcance antes de activar la configuración/reiniciar el backend. Mientras tanto el servicio activo utiliza almacenamiento local efímero; no valida persistencia.
+El usuario autorizó reutilizar las cinco variables R2 existentes de Fly y añadir el bucket privado. Se amplió el token existente a Object Read & Write únicamente en los buckets de medios y comprobantes. El bucket `casadelreyhue-receipts-private` tiene acceso público desactivado y el backend fue desplegado con R2 activo. PUT/GET/DELETE de un objeto sintético y 19 comprobaciones funcionales del backend publicado aprobaron. Se mantuvieron DATABASE_URL/JWT exclusivos de QA y no se configuró correo real.
 
-Las comprobaciones HTTP del despliegue aprobaron salud, CORS, eventos, login admin/member, subida sintética privada, donación, reenvío sin duplicación, conflicto por payload distinto, descarga admin con bytes correctos/no-store y rechazo a anónimo/member/ruta pública. Son pruebas funcionales, no una medición de carga ni una validación de R2. El navegador mostró el despertar de Render Free y después cargó los datos sintéticos del Home.
+Se verificaron CORS, rutas internas y headers del frontend. `VITE_API_TIMEOUT_MS=65000` está aplicado para el backend gratuito. En la revisión del 27 de octubre se retiraron emojis, iconos decorativos, entrada de video del logo y efectos 3D; se optimizaron 77 fotos locales y se verificaron las páginas principales en cinco anchos. Ver ESTADO.md y los reportes de pruebas.
+
+El asesor de Supabase ya no reporta incidencias tras cerrar los permisos directos del Data API sobre las tablas de aplicación. Go sigue usando su conexión directa. La base real y la base de QA siguen separadas por schema/rol; R2 se comparte con aprobación expresa.
 
 ## Límites y validación
 

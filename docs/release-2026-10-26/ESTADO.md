@@ -1,55 +1,47 @@
-# Estado de la entrega — 26 de octubre de 2026
+# Estado de la entrega — revisión del 27 de octubre de 2026
 
-## Diseño aplicado
+## Frontend
 
-Inicio usado como referencia e importado mediante el MCP de Pen al archivo `Casa-del-Rey-Liquid-Glass.pen`. El documento contiene la referencia, los tokens, un componente reutilizable de cristal y una composición de Nosotros. Las comprobaciones estructurales del canvas no reportaron recortes.
+Inicio se conserva como referencia. Blanco escarchado sin cambio de tono y cristal oscuro casi transparente. `.glass` y `.liquid-glass` comparten material. Se retiraron Tilt, Dock, la cortina de video del logo, las inclinaciones, las perspectivas, el parallax, la ampliación por proximidad y los halos de hover. No hay emojis, SVG decorativos ni spinners de pictogramas; los controles son de texto y se conserva el logo real.
 
-El frontend conserva el tono del blanco escarchado. El material oscuro usa un gradiente de blanco al 5%, 1.4% y 0.8%, con desenfoque de 8 px, borde fino y bisel estático. Se eliminaron las capas especulares de hover y el seguimiento del cursor/tacto, así como el hook de listeners que las alimentaba. Se conservan el movimiento de presión y la profundidad de las tarjetas.
+Conéctate usa bienvenida/seguimiento junto al formulario claro, con una columna en móvil. Los encabezados comparten foto, contraste y espaciado. Eventos, Blog y Galería muestran el encabezado mientras carga la API y distinguen carga, error con reintento y vacío real. El menú móvil se cierra con Escape, bloquea el scroll y deja sus links ocultos fuera del foco. Los detalles se abren en un diálogo plano por encima de la navegación; se conserva el foco al cerrar.
 
-PageHero unifica foto, scrim, ancho y espaciado; Eventos ya utiliza el mismo componente. Se eliminó el overlay duplicado que apagaba las fotos de los encabezados. Admin/líder/voluntario comparten material claro y fondo fotográfico tenue. Las imágenes de sección ahora permiten carga diferida y decodificación asíncrona.
+77 fotos locales tienen derivados WebP: originales 201,155,726 bytes, variante grande 6,275,322 y pequeña 1,753,286. Ambas juntas pesan 8,028,608 bytes (96% menos que los originales). Esto compara los archivos preparados, no el consumo medido de una visita. Los originales y las URLs externas/CMS siguen disponibles. La primera foto tiene prioridad; las inferiores usan carga diferida. El bundle se separó para reutilizar React/motion en caché; build sin aviso de chunks mayores a 500 kB.
 
-Se normalizó la configuración de API para admitir base de dominio, `/api` y `/api/v1`, se corrigió el proxy del `vercel.json` raíz y se rechazan respuestas HTML antes de que un feed las interprete como listas. `.vercelignore` excluye fotos originales, documentos, diseños, secretos locales y artefactos de pruebas del upload.
+El documento `Casa-del-Rey-Liquid-Glass.pen` contiene referencia de Inicio, materiales, Nosotros y Conéctate. Se actualizó la regla de diseño plano, sin emojis ni iconos. Las comprobaciones estructurales de Conéctate no reportan recortes. La inspección visual se realizó sobre el frontend real en móvil y escritorio.
 
-## Validación
+## Verificación
 
-- Go: suite completa y `go vet ./...` aprobados.
-- PostgreSQL 18 local desechable: doce peticiones concurrentes, una donación y un comprobante; prueba con detector de carreras aprobada. La prueba exige un host local y crea su propio schema.
-- UI Chromium: diez pruebas aprobadas. Incluyen 12 rutas públicas a 390 y 1440 px sin desbordamiento horizontal, materiales estáticos, reset, modales, voluntario, donaciones y comprobantes privados. API interceptada; no se envían formularios de pruebas a producción.
-- Build aprobado; lint sin errores, con 20 advertencias existentes. Persiste aviso por tamaño del bundle.
-- Capturas locales de Home, Nosotros y Donar en ambas resoluciones en esta carpeta.
+- 27 pruebas locales de UI aprobadas: reglas visuales, 12 rutas a 390/1440 px y páginas principales a 320/768/1024 px, menú, ventanas, formularios críticos, imágenes y ausencia de 3D/iconos/emojis. API interceptada.
+- Versión compilada: comprobaciones de navegación, material, imágenes y controles aprobadas; reporte junto a este documento.
+- Build aprobado; lint sin errores, con 20 advertencias existentes.
+- Backend publicado: 19 comprobaciones aprobadas, incluidas R2 privado, login admin/member, idempotencia y bloqueo de descargas anónimas/member.
+- Las pruebas Go/vet y la concurrencia local de doce donaciones aprobadas en la entrega previa siguen documentadas. No se hicieron cambios al ejecutable Go en esta revisión.
 
-## Infraestructura observada
+## Supabase
 
-Supabase fue restaurado por el usuario. La API anterior de Fly vuelve a responder HTTP 200 en health, eventos y settings.
+Verificado en Safari: proyecto Healthy. Se detectaron 27 tablas de aplicación con RLS desactivado y permisos directos para anon/authenticated. Se habilitó RLS, se revocaron permisos directos en las 28 tablas públicas y 26 secuencias, se restringieron permisos por defecto de futuras tablas/secuencias públicas y se fijó el search_path de `handle_new_user`, retirando su ejecución pública. El asesor pasó a indicar que no encontró incidencias.
 
-Se generó y verificó un backup completo en formato pg_dump: `~/.codex/backups/casadelrey/pre-release-2026-10-26.dump`, protegido con permisos 0600 y carpeta 0700. El índice del archivo contiene 669 entradas. No está dentro del repositorio ni se subió al hosting.
+Se guardaron ACL, configuración previa, rollback SQL y backup de datos fuera del repositorio, bajo `~/.codex/backups/casadelrey/`, con permisos privados. No se cambiaron filas reales. La conexión del backend actual usa el propietario con BYPASSRLS; health y eventos de Fly continúan en HTTP 200. El SQL reproducible está en `backend/scripts/harden_public_schema.sql` y el resultado agregado, sin datos personales, en `supabase-verification.json`.
 
-Inventario de los datos reales: tres registros de comprobantes con referencias antiguas y tres objetos en el prefijo público `comprobantes/`. Después se comprobó desde Brave que el bucket privado faltaba y se creó `casadelreyhue-receipts-private`, con acceso público desactivado. La credencial existente autentica al bucket de medios, pero todavía devuelve `AccessDenied` en el privado; falta ampliar su alcance y comprobar PUT/GET. No se cambiaron las referencias reales ni se eliminaron objetos históricos.
+QA mantiene su schema/rol `cdr_render_qa`, JWT independiente, dos usuarios sintéticos y cero acceso a tablas/secuencias de public/auth/storage. Pool de aplicación de tres conexiones y límite de rol cuatro. Se archivaron mediante soft-delete fixtures sintéticos anteriores conservando la última prueba de R2; no se tocaron registros reales.
 
-## Despliegue
+## Render y archivos
 
-Vista previa Vercel construida y estado Ready:
+- Backend Free: https://casadelrey-api-pruebas.onrender.com
+- Frontend Static: https://casadelrey-web-pruebas.onrender.com
 
-https://casadelreyhue-flo7e0ux1-kevinml12s-projects.vercel.app
+El backend fue desplegado desde `32384ed`. El frontend de esta revisión está preparado para publicar en la rama `codex/render-qa`; el despliegue efectivo se registra en RENDER.md al verificarlo. Los despliegues automáticos están desactivados.
 
-Se comprobó HTTP 200 en `/` y `/api/v1/events/` usando el acceso autorizado de Vercel. La vista previa puede requerir sesión de Vercel. No fue promovida a producción.
+Con autorización explícita se amplió la credencial R2 existente a los dos buckets: medios y `casadelreyhue-receipts-private`. El privado tiene acceso público desactivado. Render ya usa R2; una prueba independiente aprobó PUT/GET/DELETE de un objeto sintético y las 19 comprobaciones del backend confirman el almacenamiento privado. No se copió el JWT ni la conexión de producción al backend QA. R2 sí es compartido por decisión expresa del usuario.
 
-Fly rechazó la construcción de imagen con HTTP 403 por facturas vencidas. No se actualizó el backend ni se intentó cobrar. El usuario decidió usar Render gratuito para pruebas. La rama `codex/render-qa` está publicada e incluye el blueprint de backend y frontend estático.
+Se conserva un backup completo de producción, 669 entradas, fuera del repositorio. Los tres comprobantes reales con referencia histórica y sus objetos públicos aún no se migraron ni eliminaron.
 
-Con autorización del usuario se crearon un schema y un usuario exclusivos de pruebas en Supabase. La comprobación de permisos confirmó que el usuario no puede leer ni modificar las tablas de `public`, `auth` o `storage`. Se prepararon un JWT independiente y un pool de tres conexiones, con una cuarta reservada para mantenimiento; no se copiaron registros ni claves de correo reales. Se crearon fixtures sintéticos, identificados como pruebas, y se dejó vacía la cuenta bancaria.
+## Pendientes de producción
 
-Backend y frontend están **Live** en Render desde `9b89545`:
+1. Migrar los tres comprobantes históricos mediante copia privada verificada y backup de referencias; retirar originales públicos/caché tras validar.
+2. Configurar el backend definitivo con base real y correo, comprobar autorización por registro, migraciones y flujos reales. Render actual usa datos de pruebas.
+3. Conectar el dominio final y publicar el frontend definitivo con su configuración real.
+4. Medir carga antes de afirmar capacidad para mil usuarios. Render Free duerme y su arranque en frío fue observado; no constituye la configuración recomendada para el lanzamiento.
 
-- https://casadelrey-api-pruebas.onrender.com
-- https://casadelrey-web-pruebas.onrender.com
-
-Se verificaron CORS, rutas internas, Home con datos sintéticos y 16 comprobaciones funcionales del backend publicado: login, donación sin duplicados y lectura privada exclusiva de admin, entre otras. Los archivos de esa prueba fueron desechables en disco efímero. Por instrucción posterior del usuario se guardaron las variables R2 de Fly mediante **Save only** en Render; no se reinició el backend con esa configuración pendiente del permiso al bucket privado. Los despliegues automáticos quedaron desactivados en ambos servicios. La espera del cliente se está ajustando para el despertar de Render Free; el plazo de producción se conserva.
-
-## Pasos restantes para publicar
-
-1. Permitir acceso al bucket privado con la credencial R2 autorizada y validar PUT/GET antes de reiniciar el backend de Render con esa configuración.
-2. Preparar la configuración definitiva de producción y migrar las tres boletas mediante copia verificada y backup de referencias. Retirar los originales públicos después de verificar la migración y su posible caché.
-3. Publicar el backend con la base de producción y comprobar migraciones aditivas, health, correo y permisos. Las credenciales actuales de Render son de pruebas.
-4. Construir la entrega definitiva del frontend y conectar el dominio de producción. La publicación actual bajo `*-pruebas.onrender.com` no sustituye este paso.
-
-La auditoría global conserva tareas de autorización por registro, correos reales, metadatos y rendimiento detalladas en el plan de mejora. Esta entrega no certifica que todos esos pendientes estén cerrados.
+La auditoría global de permisos, correo, metadatos y rendimiento no está certificada como cerrada. No se contrató un plan, no se cambió el dominio de producción y no se promovió el backend QA a producción.

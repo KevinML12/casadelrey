@@ -1,3 +1,4 @@
+import PhotoImage from './PhotoImage';
 // SectionBg — foto de fondo por sección individual.
 // Cada sección de cada página puede tener su propia foto detrás del
 // contenido, para que el liquid glass tenga textura real que refractar.
@@ -13,11 +14,12 @@ export default function SectionBg({ src, opacity = 'opacity-25', position = 'cen
   if (!src) return null;
   return (
     <>
-      <img
+      <PhotoImage
         src={src}
         alt=""
         loading="lazy"
         decoding="async"
+        sizes="100vw"
         className={`absolute inset-0 w-full h-full object-cover ${opacity} pointer-events-none`}
         style={{ objectPosition: position }}
       />

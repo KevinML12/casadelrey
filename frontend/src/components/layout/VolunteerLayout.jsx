@@ -1,8 +1,8 @@
+import PhotoImage from '../ui/PhotoImage';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApi } from '../../lib/feed';
 import toast from 'react-hot-toast';
-import { Halos } from '../ui/Glass';
 
 export default function VolunteerLayout() {
   const { user, logout } = useAuth();
@@ -20,8 +20,7 @@ export default function VolunteerLayout() {
 
   return (
     <div className="admin-light relative min-h-screen bg-paper text-bg flex flex-col">
-      <img src={bgImage} className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
-      <Halos variant="section" />
+      <PhotoImage src={bgImage} sizes="100vw" className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
 
       {/* Topbar — panel de cristal flotante */}
       <header className="relative z-10 m-3 mb-0 glass-light rounded-[24px] h-16 flex items-center px-6 gap-4 shrink-0 sticky top-3">

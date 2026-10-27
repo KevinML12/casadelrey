@@ -1,3 +1,4 @@
+import PhotoImage from '../ui/PhotoImage';
 // ============================================================
 //  PostCollage — listado de posts en COLLAGE (tamaños/inclinaciones
 //  variados, determinístico por índice), mismo lenguaje que Galería/
@@ -5,13 +6,12 @@
 // ============================================================
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Tilt from '../ui/Tilt';
+import GlassCard from '../ui/GlassCard';
 
 const SPANS = [
   'col-span-2 row-span-2', 'col-span-1 row-span-1', 'col-span-1 row-span-1',
   'col-span-1 row-span-2', 'col-span-2 row-span-1', 'col-span-1 row-span-1',
 ];
-const ROT = [-2.0, 1.6, -1.2, 2.2, -1.8, 1.4];
 
 export default function PostCollage({ posts }) {
   if (posts.length === 0) {
@@ -30,7 +30,7 @@ export default function PostCollage({ posts }) {
       {posts.map((p, i) => {
         const isExternal = !!p.redirect_url;
         const span = SPANS[i % SPANS.length];
-        const rot = ROT[i % ROT.length];
+
         const big = span.includes('row-span-2');
         const excerpt = p.excerpt || p.content?.replace(/<[^>]+>/g, '').substring(0, 110);
 
@@ -44,23 +44,21 @@ export default function PostCollage({ posts }) {
           <motion.div
             key={p.ID}
             className={span}
-            initial={{ opacity: 0, rotateX: 16, scale: 0.92 }}
-            whileInView={{ opacity: 1, rotateX: 0, scale: 1 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
-            style={{ transformPerspective: 1000, transformOrigin: 'center' }}
+
           >
-            <Tilt
+            <GlassCard
               as={isExternal ? 'a' : Link}
-              max={4}
-              scrollMax={3}
               {...(isExternal
                 ? { href: p.redirect_url, target: '_blank', rel: 'noopener noreferrer' }
                 : { to: `/blog/${p.slug}` })}
-              whileHover={{ rotate: 0, scale: 1.04, y: -6, zIndex: 30 }}
+
               glass
               className={`${hasPhoto ? 'liquid-glass' : 'glass-light'} group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ${hasPhoto ? 'ring-white/10' : 'ring-bg/10'} block`}
-              style={{ rotate: rot, transformOrigin: 'center' }}
+
             >
               <div className="absolute inset-0">
                 {hasPhoto && (
@@ -70,7 +68,7 @@ export default function PostCollage({ posts }) {
                         eligió para el post se leía como fondo apagado. El
                         contraste lo pone .scrim-card, que oscurece solo el
                         tercio bajo donde vive el bloque de texto. */}
-                    <img src={p.cover_image} alt={p.title} className="parallax-layer absolute inset-0 w-full h-full object-cover" />
+                    <PhotoImage src={p.cover_image} alt={p.title} className="parallax-layer absolute inset-0 w-full h-full object-cover" />
                     <div className="scrim-card" />
                   </>
                 )}
@@ -93,7 +91,7 @@ export default function PostCollage({ posts }) {
                   {isExternal ? 'Ver' : 'Leer'}
                 </span>
               </div>
-            </Tilt>
+            </GlassCard>
           </motion.div>
         );
       })}

@@ -51,6 +51,20 @@ const leerCodigo = (f) => {
 // Rutas públicas que un visitante anónimo puede abrir sin sesión.
 const RUTAS_PUBLICAS = ['/', '/about', '/celulas', '/volunteering', '/events', '/donate', '/gallery', '/blog', '/conectate', '/prayer'];
 
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.route('**/*', route => {
+    const url = new URL(route.request().url());
+    if (url.pathname.includes('/api/v1')) {
+      const path = url.pathname.split('/api/v1')[1];
+      const body = ['/settings', '/site-photos'].includes(path) ? {} : path === '/hero/active' ? null : [];
+      return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
+    }
+    if (!['localhost', '127.0.0.1'].includes(url.hostname)) return route.abort();
+    return route.continue();
+  });
+});
+
 test.describe('Reglas de diseño — anti-iconos', () => {
   // El dueño es "antiiconos" por identidad, no por estética pasajera:
   // "la atención está sobre las fotos, el liquid glass y su estilo tan
@@ -67,15 +81,11 @@ test.describe('Reglas de diseño — anti-iconos', () => {
     }
   });
 
-  test('el código fuente no reintroduce <Icon> fuera de los 2 spinners permitidos', () => {
-    // Única excepción viva: el spinner de carga. Es feedback de
-    // movimiento, no un pictograma, y no tiene sustituto de solo texto.
-    const PERMITIDOS = new Set(['components/blog/TTSPlayer.jsx', 'pages/public/VerifyEmail.jsx']);
+  test('el código fuente no reintroduce iconos decorativos', () => {
     const infractores = [];
     for (const f of FUENTES) {
       const { ruta, texto } = leerCodigo(f);
       if (!/<Icon[\s/>]/.test(texto)) continue;
-      if (PERMITIDOS.has(ruta) && /animate-spin/.test(texto)) continue;
       infractores.push(ruta);
     }
     expect(infractores, `<Icon> reapareció en: ${infractores.join(', ')}`).toEqual([]);
