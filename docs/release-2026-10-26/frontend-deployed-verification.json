@@ -1,11 +1,11 @@
 {
   "frontend": "https://casadelrey-web-pruebas.onrender.com",
-  "commit": "97d8a81cfe1b9b64907358f0d5d6095e36ecf2e2",
-  "render_deploy": "dep-dbgcqti9lscs739mmem0",
+  "commit": "5898e987171342e9b9cabc76f8a12bb6e8fcc3a2",
+  "render_deploy": "dep-dbgd91rl550s73b5a8m0",
   "page_status": 200,
-  "entry_asset": "/assets/index-CWTmEKxY.js",
+  "entry_asset": "/assets/index-DEN5W166.js",
   "entry_status": 200,
-  "stylesheet": "/assets/index-DCrhXk2V.css",
+  "stylesheet": "/assets/index-CvGYXImq.css",
   "thin_perimeter_reflections_present": true,
   "qa_api_configured": true,
   "group_backgrounds_present": true,
@@ -27,5 +27,7 @@
       "status": 200,
       "bytes": 39168
     }
-  }
+  },
+  "classification_controls_present": true,
+  "gallery_tabs_present": true
 }
