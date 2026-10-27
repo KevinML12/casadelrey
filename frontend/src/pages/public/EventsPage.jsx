@@ -450,7 +450,7 @@ export default function EventsPage() {
     setLoading(true);
     setFeedError(false);
     Promise.all([
-      apiClient.get('/events/'),
+      apiClient.get(highlightId ? `/events/?id=${encodeURIComponent(highlightId)}` : '/events/'),
       apiClient.get('/faqs/').catch(() => ({ data: [] }))
     ])
       .then(([eventsRes, faqsRes]) => {
@@ -461,7 +461,7 @@ export default function EventsPage() {
       .catch(() => { if (active) setFeedError(true); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [attempt]);
+  }, [attempt, highlightId]);
 
   return (
     <main className="min-h-[100svh] relative overflow-hidden flex flex-col">

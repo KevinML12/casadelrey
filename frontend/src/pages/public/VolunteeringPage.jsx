@@ -335,7 +335,7 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
 function DepartmentSlide({ area, onClick }) {
   const reducedMotion = useReducedMotion();
   return (
-    <GlassCard as="button" type="button" onClick={onClick} aria-haspopup="dialog" glass
+    <GlassCard as="button" type="button" onClick={onClick} aria-haspopup="dialog" glass style={{ '--glass-dark-blur': 'blur(5px) saturate(115%)' }}
       className="liquid-glass relative flex flex-col w-full h-[250px] md:h-[270px] rounded-[16px] p-7 md:p-9 text-left focus-ring"
     >
       <motion.div key={area.value} className="flex flex-col h-full w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
@@ -575,7 +575,7 @@ export default function VolunteeringPage() {
       </PageHero>
 
       <section className="relative min-h-[88svh] py-16 md:py-20 overflow-clip" aria-labelledby="volunteer-departments">
-        <SectionBg sceneKey={requestedArea?.value} src={requestedArea?.photo || sectionPhoto} fallbackSrc={requestedArea?.fallbackImage || sectionPhoto} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-70" viewport animate />
+        <SectionBg sceneKey={requestedArea?.value} src={requestedArea?.photo || sectionPhoto} fallbackSrc={requestedArea?.fallbackImage || sectionPhoto} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-100" scrimClassName="bg-gradient-to-b from-bg/75 via-bg/15 to-bg/90" viewport animate />
         <div className="relative z-10 max-w-4xl mx-auto px-6">
           <div className="mb-9 max-w-2xl">
             <h2 id="volunteer-departments" className="text-d2 text-white">¿Dónde quieres servir?</h2>

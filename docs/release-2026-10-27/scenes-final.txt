@@ -1,0 +1,22 @@
+
+Running 14 tests using 1 worker
+
+
+(node:10258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/14] [chromium] › e2e/module-polish.spec.js:16:1 › empty cell finder offers contact and an accessible close control
+[2/14] [chromium] › e2e/module-polish.spec.js:27:1 › broken administrator hero uses its local photograph
+[3/14] [chromium] › e2e/module-polish.spec.js:33:1 › nullable gallery is empty and retry recovers a failed feed
+[4/14] [chromium] › e2e/module-polish.spec.js:40:1 › captions follow the background, albums reset photos and keyboard retains focus
+[5/14] [chromium] › e2e/module-polish.spec.js:56:1 › long titles fit mobile and past-event links select the requested event
+[6/14] [chromium] › e2e/module-polish.spec.js:69:1 › event preview exposes the background and opens full details without losing registration
+[7/14] [chromium] › e2e/module-polish.spec.js:84:1 › all public entry points keep a visible main landmark and a single page title
+[8/14] [chromium] › e2e/scene-modules.spec.js:18:3 › gallery discovers all pages, one glass panel and compact photo controls at 390px
+[9/14] [chromium] › e2e/scene-modules.spec.js:18:3 › gallery discovers all pages, one glass panel and compact photo controls at 1440px
+[10/14] [chromium] › e2e/scene-modules.spec.js:47:1 › empty API does not resurrect local departments, albums or fixed totals
+[11/14] [chromium] › e2e/scene-modules.spec.js:56:1 › admin institutional copy and a newly created cell flow stay accessible
+[12/14] [chromium] › e2e/scene-modules.spec.js:74:1 › blog filters use real categories and an event deep link still opens registration
+[13/14] [chromium] › e2e/scene-modules.spec.js:88:1 › normal motion keeps glass fixed and focus on navigation when scenes share a photo
+[14/14] [chromium] › e2e/scene-modules.spec.js:104:1 › administrator can edit an existing gallery record and institutional settings
+  14 passed (18.1s)

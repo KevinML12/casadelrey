@@ -1,0 +1,29 @@
+{
+  "destination": "Render QA / Supabase cdr_render_qa",
+  "events": [
+    {
+      "id": 1,
+      "title": "Un domingo en familia",
+      "date": "2026-11-01",
+      "photo": "https://casadelreyhue.vercel.app/images/backgrounds/comunidad-templo.webp"
+    },
+    {
+      "id": 3,
+      "title": "Noche de adoración",
+      "date": "2026-11-07",
+      "photo": "https://casadelreyhue.vercel.app/images/backgrounds/vol-alabanza.webp"
+    },
+    {
+      "id": 4,
+      "title": "Conecta Joven",
+      "date": "2026-11-14",
+      "photo": "https://casadelreyhue.vercel.app/images/backgrounds/congregacion.webp"
+    },
+    {
+      "id": 5,
+      "title": "Manos que sirven",
+      "date": "2026-11-21",
+      "photo": "https://casadelreyhue.vercel.app/images/backgrounds/vol-logistica.webp"
+    }
+  ]
+}

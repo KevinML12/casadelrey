@@ -15,3 +15,7 @@ Ajuste posterior solicitado: dar protagonismo a la fotografía en vistas previas
 Validación del ajuste fotográfico: 45 regresiones aprobadas y una prueba adicional de vista previa/detalles/inscripción aprobada. Publicar esta corrección y repetir el recorrido real antes de darlo por terminado.
 
 El recorrido real amplió la revisión a las 10 pantallas de líder accesibles para el administrador, además de sus 25 módulos. La pantalla de registro de cuentas necesitaba un landmark principal: se corrigió a `<main>` y se alineó el radio a 16 px. La comprobación local de los 18 puntos de entrada públicos pasa sin excepciones JS y con un único h1 por página. Los flujos reales de oración/conexión/eventos usan QA y eliminan sus registros temporales al terminar.
+
+Contenido de ejemplo solicitado expresamente: cuatro eventos administrables con nombres naturales y fotos reales de grupo/infraestructura, sin etiquetas de prueba en sus títulos. Se actualizó el registro sintético inicial y se añadieron tres eventos en el schema QA, mediante la API de administrador. No se modificaron registros históricos del schema público. Inventario en `eventos-ejemplo.json`.
+
+La prueba real de crear un evento detectó una respuesta pública previamente cacheada al seguir su enlace. El enlace `?id=` ahora también identifica la petición del feed, para que la nueva convocatoria no quede oculta por una respuesta anterior; el efecto recarga si cambia ese identificador. Se conserva la caché habitual para el listado general.

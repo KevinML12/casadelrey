@@ -1,0 +1,22 @@
+
+Running 14 tests using 1 worker
+
+
+(node:10497) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/14] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 320px
+[2/14] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 768px
+[3/14] [chromium] › e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 1024px
+[4/14] [chromium] › e2e/frontend-refinement.spec.js:31:1 › mobile navigation closes with Escape and removes hidden links from focus
+[5/14] [chromium] › e2e/frontend-refinement.spec.js:52:1 › flat glass windows sit above navigation and restore focus
+[6/14] [chromium] › e2e/frontend-refinement.spec.js:70:1 › public surfaces keep the real logo without decorative icons or 3D
+[7/14] [chromium] › e2e/frontend-refinement.spec.js:87:1 › events keeps its hero visible while loading and can retry a failed feed
+[8/14] [chromium] › e2e/frontend-refinement.spec.js:106:1 › first photo is prioritized and local photos use responsive WebP
+[9/14] [chromium] › e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 390px
+[10/14] [chromium] › e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 1440px
+[11/14] [chromium] › e2e/frontend-refinement.spec.js:159:1 › the quiz opens the chosen department information in the same slider
+[12/14] [chromium] › e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 390px
+[13/14] [chromium] › e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 1440px
+[14/14] [chromium] › e2e/frontend-refinement.spec.js:224:1 › a failed managed background falls back to the matching department scene
+  14 passed (19.2s)
