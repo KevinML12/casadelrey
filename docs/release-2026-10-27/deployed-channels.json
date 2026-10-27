@@ -1,0 +1,40 @@
+{
+  "frontend_commit": "2a139ab01d0c9ff9207c067ae2b3b3410a72399c",
+  "backend": "https://casadelrey-api-pruebas.onrender.com",
+  "database": "Supabase / cdr_render_qa",
+  "channels": [
+    {
+      "url": "https://casadelreyhue.vercel.app",
+      "entry": "/assets/index-1M7WsQTD.js",
+      "photographic_previews": true,
+      "event_titles": [
+        "Un domingo en familia",
+        "Noche de adoración",
+        "Conecta Joven",
+        "Manos que sirven"
+      ]
+    },
+    {
+      "url": "https://casadelrey-web-pruebas.onrender.com",
+      "entry": "/assets/index-Cdr2oRAP.js",
+      "photographic_previews": true,
+      "event_titles": [
+        "Un domingo en familia",
+        "Noche de adoración",
+        "Conecta Joven",
+        "Manos que sirven"
+      ]
+    }
+  ],
+  "vercel_render_rewrite_verified": true,
+  "active_frontend_fly_references": false,
+  "vercel_deployment": "dpl_AxzZSonB4Cmyu5zGsKRDVi6PxHQe",
+  "render_deployment": "dep-dbgi19t9fdbs73dhpi50",
+  "branch": "main",
+  "local_ui_tests": 48,
+  "live_e2e_tests": 5,
+  "public_routes_per_viewport": 18,
+  "admin_and_leader_modules": 35,
+  "email_delivery_verified": false,
+  "paid_registration": "Correctly blocked without configured bank details"
+}

@@ -23,3 +23,19 @@ La prueba real de crear un evento detectó una respuesta pública previamente ca
 Interacción final solicitada: `CollectionNavigation` distingue los recorridos de los paneles estáticos; controles con borde y fondo tenue, posición discreta, estado de pulsación de 160 ms, estados de 120 ms y fundidos de contenido de 180 ms. Tabs conservan foco y muestran estado activo. Movimiento reducido sin animaciones. 48 pruebas locales aprobadas tras este ajuste, build correcto y lint sin errores (20 avisos existentes).
 
 La prueba real de Eventos pasa: creación por UI de administrador, foto administrada, enlace a su vista previa, detalles y RSVP gratuito persistido. En eventos con costo, el entorno QA sin cuenta bancaria muestra «Registro no disponible aún»; no se inventa una cuenta ni se fuerza el pago. La prueba se corrigió para comprobar ese comportamiento real en vez de esperar el formulario que deliberadamente está bloqueado. Los eventos temporales e inscripciones de la verificación se limpian; se conservan únicamente los cuatro ejemplos solicitados.
+
+## Resultado final verificado
+
+Frontend de aplicación `2a139ab01d0c9ff9207c067ae2b3b3410a72399c`, rama `main`, publicado en ambos canales:
+
+- Vercel Production READY: `dpl_AxzZSonB4Cmyu5zGsKRDVi6PxHQe`, enlace estable `https://casadelreyhue.vercel.app`.
+- Render Static Live: `dep-dbgi19t9fdbs73dhpi50`, enlace `https://casadelrey-web-pruebas.onrender.com`.
+- Backend Render existente, código `9e74735` (sin cambios posteriores de backend), conectado al mismo proyecto Supabase mediante el schema QA aislado.
+
+48 pruebas locales de interfaz aprobadas; build y lint correctos, con 20 avisos anteriores. Suite real de 5 pruebas aprobada en 1.6 minutos: 18 puntos de entrada públicos a 390 y 1440 px, 25 módulos de administrador y 10 de líder, perfil/acceso de miembro, oración y conexión desde formulario público hasta el panel, creación de evento por UI, portada administrada, vista previa/detalles, inscripción gratuita y bloqueo de inscripción pagada sin cuenta bancaria. Las comprobaciones de voluntario y comprobantes privados tienen además regresiones aisladas en `audit-fixes.spec.js`; no se presentan como entrega de correo real ni transferencia de dinero.
+
+Se eliminaron los registros temporales de estas pruebas. Permanecen cuatro eventos de ejemplo solicitados por el propietario, editables desde el administrador. No se cargaron álbumes, líderes ni células ficticios.
+
+Las pestañas que estaban abiertas conservaban la interfaz anterior en memoria. Se recargó la pestaña de Render y se verificó por interfaz el evento «Noche de adoración», posición 2 de 4, controles nuevos y cambio de fondo. Una nueva pestaña de Vercel muestra y conserva la revisión actual. Captura final: `eventos-interaccion-final.png`.
+
+Pendientes de puesta en servicio definitiva: mantener explícita la separación QA/producción, publicar contenido y cuentas definitivos, configurar y comprobar correo transaccional y los datos bancarios reales. Esta revisión no migra el schema histórico ni certifica carga concurrente de 1000 usuarios. No se compraron planes ni se eliminó infraestructura de Fly; el frontend deja de usarla.
