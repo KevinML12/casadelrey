@@ -806,7 +806,7 @@ function CellQuizModal({ groups, onViewDetail }) {
               <PhotoImage
                 src={g.image}
                 alt="Imagen representativa"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 "
               />
             )}
             {/* Texto anclado abajo → .scrim-card. Antes era un gradiente

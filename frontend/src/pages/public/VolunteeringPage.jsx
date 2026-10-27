@@ -390,7 +390,7 @@ function DepartmentCard({ title, desc, photo, onClick }) {
       <PhotoImage
         src={photo}
         alt="Imagen de voluntariado"
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 "
       />
       <div className="absolute inset-x-3 bottom-3 glass-light rounded-[16px] px-4 py-3">
         <h3 className="text-15 font-bold text-bg tracking-tight leading-tight">{title}</h3>

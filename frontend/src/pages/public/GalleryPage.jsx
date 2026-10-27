@@ -112,7 +112,7 @@ export default function GalleryPage() {
                           pone .scrim-card, que oscurece solo el tercio bajo
                           donde caen el título y el conteo. */}
                       <PhotoImage src={a.photos[0]?.url} alt={`Portada del álbum ${a.name}`} loading="lazy"
-                        className="parallax-layer absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        className="parallax-layer absolute inset-0 w-full h-full object-cover transition-transform duration-700 " />
                       <div className="scrim-card" />
                       <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
                         <span className="self-start bg-white/12 border border-white/20 text-white/90 px-2.5 py-0.5 rounded-full text-11 font-semibold mb-auto backdrop-blur-md">
@@ -147,7 +147,7 @@ export default function GalleryPage() {
 
                   <div className="rounded-[22px] overflow-hidden aspect-[4/5] relative group liquid-glass liquid-shine">
                     <PhotoImage src={photo.url} alt={`Foto ${idx + 1}`} loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                      className="w-full h-full object-cover transition-transform duration-700 " />
                   </div>
                 </RevealItem>
               ))}

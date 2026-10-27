@@ -50,19 +50,19 @@ const fmtEventDate = (d) =>
 
 const SLIDE_ANIM = {
   hidden: {},
-  show:   { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-  exit:   { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
+  show:   { transition: { staggerChildren: 0.025, delayChildren: 0 } },
+  exit:   { transition: { staggerChildren: 0.015, staggerDirection: -1 } },
 };
 const RISE = {
-  hidden: { opacity: 0, y: 30 },
-  show:   { opacity: 1, y: 0,  transition: { duration: 0.6,  ease: EASE_OUT } },
-  exit:   { opacity: 0, y: -24, transition: { duration: 0.28, ease: EASE_IN } },
+  hidden: { opacity: 0, y: 6 },
+  show:   { opacity: 1, y: 0,  transition: { duration: 0.18, ease: EASE_OUT } },
+  exit:   { opacity: 0, y: -4, transition: { duration: 0.12, ease: EASE_IN } },
 };
 // Máscara de línea: el texto sube desde detrás de un overflow-hidden
 const LINE = {
-  hidden: { y: '115%' },
-  show:   { y: '0%',   transition: { duration: 0.9,  ease: EASE_OUT } },
-  exit:   { y: '-115%', transition: { duration: 0.35, ease: EASE_IN } },
+  hidden: { opacity: 0, y: 6 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.22, ease: EASE_OUT } },
+  exit:   { opacity: 0, y: -4, transition: { duration: 0.12, ease: EASE_IN } },
 };
 
 function HeroCarousel({ onPlan }) {
@@ -680,7 +680,7 @@ function CelulasSection() {
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: '-60px' }}
-                transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 6) * 0.06 }}
+                transition={{ duration: 0.18, ease: EASE_OUT, delay: (i % 4) * 0.025 }}
 
               >
                 <GlassCard
@@ -970,7 +970,7 @@ function GalleryPreviewSection() {
             <GlassCard as={Link} to="/gallery" glass="standard" className="group relative rounded-[22px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
               {/* Tile de foto a plena fuerza: el nombre del álbum se sostiene
                   con el scrim de abajo, no bajándole la opacidad a la foto. */}
-              <PhotoImage src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+              <PhotoImage src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 " loading="lazy" />
               <div className="scrim-card" />
               <div className="absolute bottom-5 inset-x-5">
                 <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>

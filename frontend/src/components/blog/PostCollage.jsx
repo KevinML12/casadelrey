@@ -47,7 +47,7 @@ export default function PostCollage({ posts }) {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ type: 'spring', stiffness: 120, damping: 16, delay: (i % 8) * 0.05 }}
+            transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1], delay: (i % 4) * 0.025 }}
 
           >
             <GlassCard

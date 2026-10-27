@@ -26,7 +26,7 @@ export default function PhotoHeaderCard({ photo, glass = 'standard', contentClas
           src={photo}
           alt=""
           style={{ objectPosition }}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 "
         />
       )}
       {/* .scrim-card: el texto siempre cae sobre la zona más opaca, sin

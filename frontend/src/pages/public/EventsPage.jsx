@@ -470,7 +470,7 @@ function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
           {/* Flyer a color pleno: el `opacity-80` que llevaba encima lo
               entregaba deslavado antes de que el degradado siquiera actuara.
               El contraste lo pone el scrim, no la opacidad de la foto. */}
-          <PhotoImage src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          <PhotoImage src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 " />
           {/* .scrim-card: el texto de esta card vive anclado al tercio
               inferior, así que oscurece ahí y deja el flyer visible arriba. */}
           <div className="scrim-card" />

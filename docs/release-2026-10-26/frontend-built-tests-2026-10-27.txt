@@ -1,18 +1,18 @@
 
 Running 11 tests using 1 worker
 
-(node:97906) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:98441) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ✓   1 [chromium] › e2e/frontend-refinement.spec.js:18:3 › main layouts fit at 320px (1.2s)
-  ✓   2 [chromium] › e2e/frontend-refinement.spec.js:18:3 › main layouts fit at 768px (1.3s)
-  ✓   3 [chromium] › e2e/frontend-refinement.spec.js:18:3 › main layouts fit at 1024px (1.3s)
-  ✓   4 [chromium] › e2e/frontend-refinement.spec.js:30:1 › mobile navigation closes with Escape and removes hidden links from focus (487ms)
+  ✓   1 [chromium] › e2e/frontend-refinement.spec.js:18:3 › main layouts fit at 320px (1.4s)
+  ✓   2 [chromium] › e2e/frontend-refinement.spec.js:18:3 › main layouts fit at 768px (1.4s)
+  ✓   3 [chromium] › e2e/frontend-refinement.spec.js:18:3 › main layouts fit at 1024px (1.4s)
+  ✓   4 [chromium] › e2e/frontend-refinement.spec.js:30:1 › mobile navigation closes with Escape and removes hidden links from focus (511ms)
   ✓   5 [chromium] › e2e/frontend-refinement.spec.js:51:1 › flat glass windows sit above navigation and restore focus (1.2s)
-  ✓   6 [chromium] › e2e/frontend-refinement.spec.js:69:1 › public surfaces keep the real logo without decorative icons or 3D (1.1s)
-  ✓   7 [chromium] › e2e/frontend-refinement.spec.js:86:1 › events keeps its hero visible while loading and can retry a failed feed (437ms)
-  ✓   8 [chromium] › e2e/frontend-refinement.spec.js:105:1 › first photo is prioritized and local photos use responsive WebP (365ms)
+  ✓   6 [chromium] › e2e/frontend-refinement.spec.js:69:1 › public surfaces keep the real logo without decorative icons or 3D (1.2s)
+  ✓   7 [chromium] › e2e/frontend-refinement.spec.js:86:1 › events keeps its hero visible while loading and can retry a failed feed (481ms)
+  ✓   8 [chromium] › e2e/frontend-refinement.spec.js:105:1 › first photo is prioritized and local photos use responsive WebP (359ms)
   ✓   9 [chromium] › e2e/glass-system.spec.js:18:3 › public pages keep the shared glass system at 390px (1.8s)
   ✓  10 [chromium] › e2e/glass-system.spec.js:18:3 › public pages keep the shared glass system at 1440px (2.6s)
-  ✓  11 [chromium] › e2e/glass-system.spec.js:31:1 › dark glass stays almost transparent without pointer-follow reflections (529ms)
+  ✓  11 [chromium] › e2e/glass-system.spec.js:31:1 › dark glass stays almost transparent without pointer-follow reflections (568ms)
 
-  11 passed (12.9s)
+  11 passed (13.4s)

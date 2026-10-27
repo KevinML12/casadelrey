@@ -7,6 +7,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
+import { DUR, EASE_OUT } from '../../lib/motion';
 
 export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulario' }) {
   const dialogRef = useRef(null);
@@ -55,10 +56,10 @@ export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulari
         ref={dialogRef} role="dialog" aria-modal="true" aria-label={ariaLabel} tabIndex={-1}
         className="relative w-full max-w-md max-h-[90vh]"
         onClick={e => e.stopPropagation()}
-        initial={{ opacity: 0, scale: 0.94, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: DUR.base, ease: EASE_OUT }}
       >
         <div
           className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"

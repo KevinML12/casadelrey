@@ -2,7 +2,7 @@
 
 ## Frontend
 
-Inicio se conserva como referencia. Blanco escarchado sin cambio de tono y cristal oscuro casi transparente. `.glass` y `.liquid-glass` comparten material. Se retiraron Tilt, Dock, la cortina de video del logo, las inclinaciones, las perspectivas, el parallax, la ampliación por proximidad y los halos de hover. No hay emojis, SVG decorativos ni spinners de pictogramas; los controles son de texto y se conserva el logo real.
+Inicio se conserva como referencia. Blanco escarchado sin cambio de tono y cristal oscuro casi transparente. `.glass` y `.liquid-glass` comparten material. Se pulieron los bordes asimétricos y el bisel estático, se contuvo la sombra y se eliminó la franja diagonal artificial. Pulsación de 120 ms, entradas de 180 ms y titulares de hasta 220 ms, sin rebotes. Se retiraron Tilt, Dock, la cortina de video del logo, las inclinaciones, las perspectivas, el parallax, la ampliación por proximidad y los halos de hover. No hay emojis, SVG decorativos ni spinners de pictogramas; los controles son de texto y se conserva el logo real.
 
 Conéctate usa bienvenida/seguimiento junto al formulario claro, con una columna en móvil. Los encabezados comparten foto, contraste y espaciado. Eventos, Blog y Galería muestran el encabezado mientras carga la API y distinguen carga, error con reintento y vacío real. El menú móvil se cierra con Escape, bloquea el scroll y deja sus links ocultos fuera del foco. Los detalles se abren en un diálogo plano por encima de la navegación; se conserva el foco al cerrar.
 

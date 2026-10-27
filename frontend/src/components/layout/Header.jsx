@@ -100,7 +100,7 @@ export default function Header() {
       <nav
         ref={navRef}
         aria-label="Navegación principal"
-        className={`pointer-events-auto w-full max-w-6xl glass-nav transition-all duration-500 ease-spring ${
+        className={`pointer-events-auto w-full max-w-6xl glass-nav transition-all duration-200 ease-spring ${
           menuOpen ? 'rounded-[22px]' : 'rounded-pill'
         } ${scrolled ? 'glass-nav--scrolled shadow-card-lg' : 'shadow-whisper'}`}
       >
@@ -250,7 +250,7 @@ export default function Header() {
           aria-hidden={!menuOpen}
           inert={!menuOpen}
           data-lenis-prevent
-          className={`xl:hidden transition-all duration-500 ease-spring ${
+          className={`xl:hidden transition-all duration-200 ease-spring ${
             menuOpen ? 'opacity-100 overflow-y-auto' : 'opacity-0 overflow-hidden'
           }`}
           // max-height en pixeles reales (viewportH, de window.innerHeight)
