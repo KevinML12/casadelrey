@@ -10,7 +10,7 @@ const EMPTY = { title: '', description: '', url: '', thumbnail_url: '', sort_ord
 function PhotoForm({ photo, onSave, onCancel }) {
   const [form, setForm] = useState(photo || EMPTY);
   const [loading, setLoading] = useState(false);
-  const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
+  const set = k => e => setForm(p => ({ ...p, [k]: k === 'sort_order' ? Number(e.target.value) : e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();

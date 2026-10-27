@@ -111,9 +111,11 @@ test('administrator can edit an existing gallery record and institutional settin
   await page.goto('/admin/gallery');
   await page.getByRole('button', { name: 'Editar', exact: true }).click();
   await page.getByLabel('Título', { exact: true }).fill('Álbum editado - Foto');
+  await page.getByLabel('Orden', { exact: true }).fill('7');
   await page.getByRole('button', { name: 'Guardar cambios', exact: true }).click();
   expect(writes[0].path).toBe('/admin/gallery/42');
   expect(writes[0].data.title).toBe('Álbum editado - Foto');
+  expect(writes[0].data.sort_order).toBe(7);
   await page.goto('/admin/settings');
   await page.getByLabel('Nosotros — Misión', { exact: true }).fill('Misión editada');
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
