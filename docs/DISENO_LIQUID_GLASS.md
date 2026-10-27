@@ -9,7 +9,7 @@ Actualizado el 27 de octubre de 2026 con las indicaciones del usuario. Esta dire
 - Cero renderizados 3D, canvas, globos, perspectiva, rotaciones de tarjetas, parallax y ampliación por proximidad. No volver a introducir Tilt, Dock, Splash ni WebGL.
 - El sitio abre directamente. El logo permanece en la navegación; no hay cortina con un video animado.
 - Movimiento breve: pulsación de 120 ms, entradas/ventanas de 180 ms y titulares de hasta 220 ms. Desplazamiento de entrada de 6 px; curvas sin rebote. Con movimiento reducido, contenido inmediato.
-- Bisel estático asimétrico y borde fino; sin franja diagonal pintada. Conservar el relleno original de ambos materiales.
+- Bisel estático asimétrico y borde fino; reflejos suaves concentrados en los extremos del contorno. La máscara de 1.5 px deja vacío el centro; sin franja diagonal pintada. Conservar el relleno original de ambos materiales. Los navegadores sin máscara conservan borde y sombras como fallback.
 - El cristal no sigue al cursor ni cambia de reflejo al hacer hover. Se permite confirmar una pulsación con una escala 2D discreta.
 
 ## Material y tipografía

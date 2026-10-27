@@ -69,7 +69,7 @@
   --r-pill: 9999px;
   --glass-dark-fill: linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,.014) 55%, rgba(255,255,255,.008));
   --glass-dark-blur: blur(8px) saturate(130%);
-  --glass-dark-shadow: inset 0 1px 0 rgba(255,255,255,.44), inset 1px 0 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(255,255,255,.08), 0 14px 36px -24px rgba(0,0,0,.48);
+  --glass-dark-shadow: inset 0 1px 1px rgba(255,255,255,.32), inset 1px 0 2px rgba(255,255,255,.10), inset 0 -1px 1px rgba(255,255,255,.12), inset 0 2px 5px rgba(255,255,255,.035), 0 2px 4px -3px rgba(0,0,0,.4), 0 14px 36px -24px rgba(0,0,0,.48);
 
   /* ── ELEVATION (whisper-soft) ────────────────────────────────── */
   --sh-glass:   0 8px 32px rgba(10, 21, 38, 0.08);
@@ -214,6 +214,7 @@ html.lenis, html.lenis body { height: auto; }
 
   /* Cristal estándar — la base para cards translúcidas y navbars */
   .glass {
+    position: relative;
     background: var(--glass-dark-fill);
     -webkit-backdrop-filter: var(--glass-dark-blur);
     backdrop-filter: var(--glass-dark-blur);
@@ -227,12 +228,15 @@ html.lenis, html.lenis body { height: auto; }
      blanco translúcido con tinta navy encima. Al scroll sube la opacidad
      para mantener legibilidad sobre cualquier contenido. */
   .glass-nav {
+    position: relative;
     background: rgba(255,255,255,.62);
     -webkit-backdrop-filter: blur(22px) saturate(135%);
             backdrop-filter: blur(22px) saturate(135%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border: 1px solid;
+    border-color: rgba(255,255,255,.72) rgba(255,255,255,.38) rgba(255,255,255,.28) rgba(255,255,255,.55);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 1px 1px rgba(255,255,255,.75),
+      inset 0 -1px 1px rgba(10,21,38,.07),
       0 8px 32px rgba(10, 21, 38, 0.22);
   }
   .glass-nav--scrolled {
@@ -280,7 +284,7 @@ html.lenis, html.lenis body { height: auto; }
     border: 1px solid;
     border-color: rgba(255,255,255,.78) rgba(255,255,255,.48) rgba(255,255,255,.32) rgba(255,255,255,.65);
     background-clip: padding-box;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 1px 0 0 rgba(255,255,255,.38), inset 0 -1px 0 rgba(10,21,38,.055), 0 18px 48px -28px rgba(10,21,38,.32);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,.8), inset 1px 0 2px rgba(255,255,255,.25), inset 0 -1px 1px rgba(10,21,38,.08), inset 0 2px 5px rgba(255,255,255,.09), 0 2px 4px -3px rgba(10,21,38,.24), 0 18px 48px -28px rgba(10,21,38,.32);
     position: relative;
     overflow: hidden;
   }
@@ -368,7 +372,33 @@ html.lenis, html.lenis body { height: auto; }
       rgba(10,21,38,.08) 100%);
   }
 
-  /* Bisel fijo; no hay reflejos que sigan el cursor. */
+  /* Reflejo especular fijo, recortado a un bisel de 1.5 px. La máscara
+     vacía el centro: no blanquea la foto, no tapa texto ni recibe clicks.
+     Dos luces amplias se extinguen a lo largo del borde, como en vidrio
+     pulido; la contraluz inferior es más tenue. Sin listeners ni hover. */
+  @supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+    :where(.glass, .liquid-glass, .glass-light, .glass-nav)::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 1.5px;
+      border-radius: inherit;
+      corner-shape: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 16% 0%, rgba(255,255,255,.85), transparent 52%),
+        radial-gradient(ellipse at 100% 100%, rgba(255,255,255,.34), transparent 48%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    :where(.glass-light, .glass-nav)::before {
+      opacity: .65;
+    }
+  }
+
+  /* Contenedor del material; los reflejos no siguen el cursor. */
   .liquid-shine {
     position: relative;
     overflow: hidden;
