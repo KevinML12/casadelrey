@@ -6,6 +6,7 @@ import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { RevealList, RevealItem } from '../../components/ui/Reveal';
 import SceneCarousel from '../../components/ui/SceneCarousel';
+import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
@@ -385,17 +386,21 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
   );
 }
 
-function EventCard({ ev, onRsvp, onCancelRsvp, past = false }) {
+function EventCard({ ev, onRsvp, onCancelRsvp, past = false, preview = false, onDetails, light = false }) {
   const date = ev.date ? new Date(`${ev.date}T12:00:00`).toLocaleDateString('es-GT', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  return <div className="text-white" id={`event-${ev.ID}`}>
-    <h2 className="text-28 sm:text-32 font-bold tracking-tight">{ev.title}</h2>
-    <p className="mt-4 text-14 text-white/80">{[date, ev.time, ev.location].filter(Boolean).join(' · ')}</p>
-    {ev.description && <p className="mt-5 text-16 leading-relaxed text-white/85">{ev.description}</p>}
-    {!past && <div className="mt-6 space-y-4">
-      <p className="text-14 font-semibold">{ev.requires_payment ? `Q${Number(ev.price_gtq).toFixed(2)} por persona` : 'Gratis'}{ev.spots_remaining != null ? ` · ${ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupos disponibles`}` : ''}</p>
-      <button type="button" disabled={ev.is_full} onClick={() => onRsvp(ev)} className="min-h-11 rounded-pill bg-white px-6 py-3 text-14 font-bold text-bg disabled:opacity-50 focus-ring">{ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}</button>
-      <button type="button" onClick={() => onCancelRsvp(ev)} className="block min-h-11 text-13 text-white/80 underline underline-offset-4 focus-ring rounded-[8px]">¿Ya te registraste? Cancelar mi registro</button>
-    </div>}
+  return <div className={light ? 'text-bg' : 'text-white'} id={`event-${ev.ID}`}>
+    <h2 className={`${preview ? 'text-24 sm:text-28 line-clamp-2' : 'text-28 sm:text-32'} font-bold tracking-tight`}>{ev.title}</h2>
+    <p className="mt-3 text-14 opacity-80">{[date, ev.time, ev.location].filter(Boolean).join(' · ')}</p>
+    {!preview && ev.description && <p className="mt-5 text-16 leading-relaxed opacity-85">{ev.description}</p>}
+    {!past && <>
+      <p className="mt-4 text-14 font-semibold">{ev.requires_payment ? `Q${Number(ev.price_gtq).toFixed(2)} por persona` : 'Gratis'}{ev.spots_remaining != null ? ` · ${ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupos disponibles`}` : ''}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+        <button type="button" disabled={ev.is_full} onClick={() => onRsvp(ev)} className={`min-h-11 rounded-pill px-6 py-3 text-14 font-bold disabled:opacity-50 focus-ring ${light ? 'bg-bg text-white' : 'bg-white text-bg'}`}>{ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}</button>
+        {preview && <button type="button" onClick={() => onDetails(ev)} className="min-h-11 text-13 font-semibold underline underline-offset-4 focus-ring rounded-[8px]">Ver detalles</button>}
+      </div>
+      {!preview && <button type="button" onClick={() => onCancelRsvp(ev)} className="block mt-3 min-h-11 text-13 opacity-80 underline underline-offset-4 focus-ring rounded-[8px]">¿Ya te registraste? Cancelar mi registro</button>}
+    </>}
+    {past && preview && <button type="button" onClick={() => onDetails(ev)} className="mt-4 min-h-11 text-13 font-semibold underline underline-offset-4 focus-ring rounded-[8px]">Ver detalles</button>}
   </div>;
 }
 
@@ -418,6 +423,7 @@ export default function EventsPage() {
   const [attempt, setAttempt] = useState(0);
 
   // States para modales/interacción
+  const [detailsEvent, setDetailsEvent] = useState(null);
   const [rsvpEvent, setRsvpEvent] = useState(null);
   const [cancelEvent, setCancelEvent] = useState(null);
   const [openFaq, setOpenFaq] = useState(null);
@@ -494,7 +500,7 @@ export default function EventsPage() {
             <p className="text-white/40 text-15 mt-2">Revisa los eventos pasados más abajo.</p>
           </div>
         ) : (
-          <SceneCarousel key={highlightId || 'upcoming'} initialKey={upcomingEvents.find(event => String(event.ID) === highlightId)?.ID} items={upcomingEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Próximos eventos" panelClassName="h-[440px]" renderContent={event => <EventCard ev={event} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />} />
+          <SceneCarousel key={highlightId || 'upcoming'} initialKey={upcomingEvents.find(event => String(event.ID) === highlightId)?.ID} items={upcomingEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Próximos eventos" photoPreview renderContent={event => <EventCard ev={event} preview onDetails={event => setDetailsEvent(event.ID)} onRsvp={setRsvpEvent} />} />
         )}
 
         {/* ── Eventos pasados: compactos, sin RSVP, mas recientes primero ── */}
@@ -505,7 +511,7 @@ export default function EventsPage() {
                 que entra. Y `uppercase tracking-tightish` era la fórmula del
                 eyebrow -- las versales piden MÁS aire, no menos. */}
             <p className="text-13 font-semibold text-white/40 mb-6">Eventos pasados</p>
-            <SceneCarousel key={highlightId || 'past'} initialKey={pastEvents.find(event => String(event.ID) === highlightId)?.ID} items={pastEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Eventos pasados" renderContent={event => <EventCard ev={event} past />} />
+            <SceneCarousel key={highlightId || 'past'} initialKey={pastEvents.find(event => String(event.ID) === highlightId)?.ID} items={pastEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Eventos pasados" photoPreview renderContent={event => <EventCard ev={event} past preview onDetails={event => setDetailsEvent(event.ID)} />} />
           </div>
         )}
       </div>
@@ -559,6 +565,8 @@ export default function EventsPage() {
           </div>
         </div>
       )}
+
+      <WindowStack items={[...upcomingEvents, ...pastEvents].map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} openKey={detailsEvent} onChange={setDetailsEvent} height="min(80svh, 640px)" light photoBackdrop animated neighborTitles renderContent={event => <EventCard ev={event} light past={Boolean(event.date && event.date < todayStr)} onRsvp={event => { setDetailsEvent(null); setRsvpEvent(event); }} onCancelRsvp={event => { setDetailsEvent(null); setCancelEvent(event); }} />} />
 
       {/* RSVP Modal */}
       <AnimatePresence>

@@ -71,3 +71,7 @@ Los dos respaldos generales de Voluntariado provienen de `fotos/DOMINGOS 2026/MI
 Validar móvil desde 320 px, tablet y escritorio: sin desbordamientos, foco visible, menú cerrado fuera del orden de tabulación, Escape/cierre con foco restaurado y formularios accesibles. Las pruebas de frontend interceptan la API para evitar escrituras a producción.
 
 El panel Admin/Líder/Voluntario conserva su variante clara del material y sus controles de texto; comparte fotografías optimizadas y ausencia de gráficos decorativos/3D.
+
+## Vistas previas fotográficas (27 de octubre)
+
+Las vistas previas de eventos, mensajes y colecciones deben dejar una parte amplia de la fotografía visible, sin desenfoque. El cristal sólo sostiene la ficha breve: título, dato principal y acción. Aplicar el contraste con un degradado localizado hacia la ficha, sin apagar toda la foto. Reducir el desenfoque de esa ficha a 5 px, conservar el filo estático fino y los radios de 16 px. Inspiración editorial de Pinterest: fotografía protagonista y jerarquía sobria, sin mosaicos recargados ni fotografías insertadas dentro del cristal. Recorrer por disolución, abrir los detalles completos en el mismo lenguaje de ventanas y conservar los flujos existentes.

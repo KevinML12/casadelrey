@@ -66,3 +66,18 @@ test('long titles fit mobile and past-event links select the requested event', a
   await page.keyboard.press('Escape'); await page.goto('/events?id=1');
   await expect(page.getByRole('region', { name: 'Eventos pasados', exact: true }).getByRole('heading', { name: 'Evento elegido pasado' })).toBeVisible();
 });
+test('event preview exposes the background and opens full details without losing registration', async ({ page }) => {
+  await isolate(page, path => path === '/events/' ? { body: [{ ID: 4, title: 'Encuentro administrado', description: 'Detalle completo administrado', cover_image: image, date: '2099-12-01', requires_payment: false }] } : undefined);
+  await page.setViewportSize({ width: 390, height: 900 }); await page.goto('/events');
+  const scene = page.getByRole('region', { name: 'Próximos eventos', exact: true });
+  const section = page.locator('section[aria-label="Próximos eventos"]');
+  await expect(section.locator('[data-scene-photo]')).toHaveClass(/opacity-100/);
+  expect((await section.boundingBox()).height - (await scene.locator('.liquid-glass').boundingBox()).height).toBeGreaterThan(200);
+  await expect(scene.getByText('Detalle completo administrado')).toHaveCount(0);
+  await scene.getByRole('button', { name: 'Ver detalles' }).click();
+  const dialog = page.getByRole('dialog'); await expect(dialog.getByText('Detalle completo administrado')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Confirmar', exact: true }).click();
+  const registration = page.getByRole('dialog').last(); await expect(registration.getByLabel('Nombre *', { exact: true })).toBeVisible();
+  await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0);
+  expect(await page.locator('#root').evaluate(el => el.inert)).toBe(false);
+});

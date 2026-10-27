@@ -1,0 +1,10 @@
+{
+  "provider": "Supabase",
+  "connection_tls": "require",
+  "project": "fnpymdtvhnzgwivihjks",
+  "database": {
+    "schema": "cdr_render_qa",
+    "tables": 26,
+    "events": 1
+  }
+}

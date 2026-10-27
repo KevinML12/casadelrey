@@ -11,7 +11,7 @@ import CrossfadePhoto from './CrossfadePhoto';
 //   <div className="relative z-10">...contenido...</div>
 // </section>
 
-export default function SectionBg({ src, opacity = 'opacity-25', position = 'center', viewport = false, animate = false, fallbackSrc, onReady, sceneKey }) {
+export default function SectionBg({ src, opacity = 'opacity-25', position = 'center', viewport = false, animate = false, scrimClassName = 'bg-bg/60', fallbackSrc, onReady, sceneKey }) {
   if (!src) return null;
   return (
     <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -25,7 +25,7 @@ export default function SectionBg({ src, opacity = 'opacity-25', position = 'cen
           className={`absolute inset-0 w-full h-full object-cover ${opacity} pointer-events-none`}
           style={{ objectPosition: position }}
         />}
-        <div className="absolute inset-0 bg-bg/60 pointer-events-none" />
+        <div className={`absolute inset-0 ${scrimClassName} pointer-events-none`} />
       </div>
     </div>
   );

@@ -59,7 +59,7 @@ function Form({ initial, onSave, onCancel }) {
         await apiClient.put(`/admin/social/${initial.ID}`, form);
         toast.success('Actualizado');
       } else {
-        await apiClient.post('/admin/social', form);
+        await apiClient.post('/admin/social/', form);
         toast.success('Agregado');
       }
       onSave();
@@ -150,7 +150,7 @@ export default function AdminSocial() {
 
   const load = () => {
     setLoading(true);
-    apiClient.get('/admin/social')
+    apiClient.get('/admin/social/')
       .then(r => setPosts(r.data?.data || r.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));

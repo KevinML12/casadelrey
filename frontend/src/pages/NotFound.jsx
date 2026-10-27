@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom';
-import Reveal from '../components/ui/Reveal';
+import AuthCard from '../components/ui/AuthCard';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-6">
-      <Reveal className="text-center max-w-sm liquid-glass rounded-[28px] p-10">
+    <AuthCard className="text-center">
         {/* text-d2 en vez del último display-mega + fontSize inline que
             quedaba vivo. Vive en pages/ y no en pages/public/, así que se
             escapaba de los greps del refactor -- pero es una pantalla
@@ -15,7 +14,6 @@ export default function NotFound() {
         <Link to="/" className="inline-flex items-center px-6 py-3.5 rounded-pill bg-white text-bg font-bold text-14">
           Volver al inicio
         </Link>
-      </Reveal>
-    </div>
+    </AuthCard>
   );
 }

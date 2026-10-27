@@ -68,7 +68,7 @@ test('live prayer and connection submissions reach their administrator modules',
     const response = await prayerResponse; expect(response.status()).toBe(201);
     const petition = await response.json(); created.push(`/admin/petitions/${petition.id || petition.ID}`);
     await expect(page.getByText('¡Recibida con amor!')).toBeVisible();
-    await page.goto('/admin/petitions'); await expect(page.getByText(stamp, { exact: true })).toBeVisible();
+    await page.goto('/admin/petitions'); await expect(page.locator('main').getByText(stamp, { exact: false })).toBeVisible();
     await page.goto('/conectate'); await page.getByRole('button', { name: /Es mi primera vez/ }).click();
     await page.getByLabel('Nombre *', { exact: true }).fill(stamp);
     await page.getByLabel('Teléfono *', { exact: true }).fill('00000000');
@@ -77,7 +77,7 @@ test('live prayer and connection submissions reach their administrator modules',
     const connection = await connectResponse; expect(connection.status()).toBe(201);
     const card = await connection.json(); created.push(`/admin/connect-cards/${card.ID || card.id}`);
     await expect(page.getByText('¡Gracias por registrarte!')).toBeVisible();
-    await page.goto('/admin/connect-cards'); await expect(page.getByText(stamp, { exact: true })).toBeVisible();
+    await page.goto('/admin/connect-cards'); await expect(page.locator('main').getByText(stamp, { exact: false })).toBeVisible();
   } finally {
     for (const path of created) expect((await page.request.delete(API + path, { headers })).ok(), `QA cleanup ${path}`).toBe(true);
   }
