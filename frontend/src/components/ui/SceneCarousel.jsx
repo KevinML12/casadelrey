@@ -19,7 +19,7 @@ export default function SceneCarousel({ items, label, onOpen, renderContent, emp
   const go = direction => setSelected(items[(requestedIndex + direction + items.length) % items.length].key);
 
   return <section className={`relative isolate overflow-clip py-16 md:py-20 ${className}`} aria-label={label}>
-    <SectionBg sceneKey={requested?.key} src={requested?.image || FALLBACK} fallbackSrc={FALLBACK} opacity="opacity-70" viewport animate onReady={() => setShown(requested?.key)} />
+    <SectionBg sceneKey={requested?.key} src={requested?.image || FALLBACK} fallbackSrc={FALLBACK} opacity="opacity-70" animate onReady={() => setShown(requested?.key)} />
     <div className="relative z-10 max-w-4xl mx-auto px-6">
       {!current ? <p className="py-12 text-20 text-white/75">{empty}</p> : <div role="region" aria-roledescription="carrusel" aria-label={label} className="max-w-xl" onKeyDown={event => {
         if (event.target.closest('input, select, textarea, [role="tablist"]') || event.defaultPrevented) return;

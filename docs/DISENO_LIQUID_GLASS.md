@@ -51,7 +51,7 @@ Nosotros lee su contenido institucional desde Configuración (`about_*`), incluy
 - `PageHero`: foto administrable con fallback local, scrim y espaciado común. La primera imagen se carga con prioridad.
 - `GlassCard`: superficie plana; no instala listeners de posición del mouse/scroll.
 - `PhotoImage`: sirve WebP responsive para fotos locales conocidas. Respeta las URLs externas y las imágenes del CMS.
-- `SceneCarousel`: escena fija por identidad de registro, navegación cíclica con teclado, nombres vecinos y fotografía de fondo precargada. También cambia el contenido si dos registros comparten la misma fotografía.
+- `SceneCarousel`: escena fija por identidad de registro, navegación cíclica con teclado, nombres vecinos y fotografía de fondo precargada. También cambia el contenido si dos registros comparten la misma fotografía. Las escenas cortas ajustan la foto a toda la sección; no recortan una ventana de 100svh dentro de un bloque más pequeño.
 - `SceneCollection` y `PhotoTabs`: panel de detalle con Galería/Fotos/Información, sin desmontar las pestañas al cambiar de apartado.
 - Se retiraron `PhotoHeaderCard` y `PhotoBentoTile`, que ya no tienen consumidores tras migrar Nosotros.
 - `CrossfadePhoto`: mantiene la última foto válida mientras carga la siguiente y cancela respuestas tardías; sólo anima opacidad.

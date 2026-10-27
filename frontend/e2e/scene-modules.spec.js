@@ -94,6 +94,9 @@ test('normal motion keeps glass fixed and focus on navigation when scenes share 
   const before = await card.boundingBox(); await next.click();
   await expect(scene.getByRole('heading', { name: 'Segundo grupo' })).toBeVisible();
   const after = await card.boundingBox();
+  const section = page.locator('section[aria-label="Tipos de células"]');
+  const background = await section.locator('[data-scene-photo]').boundingBox();
+  expect(Math.abs(background.height - (await section.boundingBox()).height)).toBeLessThan(1);
   expect(after.x).toBe(before.x); expect(after.y).toBe(before.y); expect(after.height).toBe(before.height);
   await expect(next).toBeFocused(); expect(await card.evaluate(el => getComputedStyle(el).transform)).toBe('none');
 });
