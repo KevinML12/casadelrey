@@ -34,7 +34,7 @@ export default function PageHero({ title, subtitle, children, photoSlot, photoFa
               izquierda (deja la foto entera visible del otro lado),
               .scrim-hero cuando el bloque va centrado y necesita el óvalo
               oscuro justo en el medio. */}
-          <ParallaxImg src={image} alt="" priority />
+          <ParallaxImg src={image} fallbackSrc={photoFallback} alt="" priority />
           <div className={centered ? 'scrim-hero' : 'scrim-band'} />
         </>
       ) : (

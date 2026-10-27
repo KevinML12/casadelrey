@@ -1,18 +1,26 @@
+import { useState } from 'react';
 import { photoVariants } from '../../lib/photos';
 
 // Only local, known photographs are substituted. Admin uploads, private files,
 // data URLs and external CMS media keep their original URL and behavior.
-export default function PhotoImage({ src, alt = '', loading = 'lazy', decoding = 'async', sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px', srcSet, width, height, ...props }) {
-  const variants = photoVariants(src);
+export default function PhotoImage({ src, fallbackSrc, onError, alt = '', loading = 'lazy', decoding = 'async', sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px', srcSet, width, height, ...props }) {
+  const [failedSrc, setFailedSrc] = useState(null);
+  const usingFallback = failedSrc === src && fallbackSrc && fallbackSrc !== src;
+  const displaySrc = usingFallback ? fallbackSrc : src;
+  const variants = photoVariants(displaySrc);
   const largest = variants?.at(-1);
   return (
     <img
       {...props}
-      src={largest?.src || src}
+      src={largest?.src || displaySrc}
+      onError={event => {
+        if (!usingFallback && fallbackSrc && fallbackSrc !== src) setFailedSrc(src);
+        onError?.(event);
+      }}
       alt={alt}
       width={width ?? largest?.width}
       height={height ?? largest?.height}
-      srcSet={srcSet ?? variants?.map(v => `${v.src} ${v.width}w`).join(', ')}
+      srcSet={(!usingFallback ? srcSet : undefined) ?? variants?.map(v => `${v.src} ${v.width}w`).join(', ')}
       sizes={srcSet || variants ? sizes : undefined}
       loading={loading}
       decoding={decoding}

@@ -1,6 +1,7 @@
 import PrayerForm from '../../components/sections/PrayerForm';
 import PageHero from '../../components/layout/PageHero';
 import Reveal from '../../components/ui/Reveal';
+import { useSitePhoto } from '../../lib/feed';
 import SectionBg from '../../components/ui/SectionBg';
 
 const TRUST = [
@@ -10,6 +11,7 @@ const TRUST = [
 ];
 
 export default function PrayerPage() {
+  const photo = useSitePhoto('hero_oracion', '/images/backgrounds/congregacion.webp');
   return (
     <main className="min-h-screen text-ink">
       <PageHero
@@ -31,11 +33,11 @@ export default function PrayerPage() {
       </PageHero>
 
       <section className="relative py-16 md:py-24 overflow-hidden">
-        <SectionBg src="/images/components/bg_oracion.jpg" />
+        <SectionBg src={photo} fallbackSrc="/images/backgrounds/congregacion.webp" />
 
         <Reveal className="relative z-10 max-w-3xl mx-auto px-6">
 
-          <div className="glass-light liquid-shine rounded-[28px] p-7 md:p-10">
+          <div className="glass-light liquid-shine rounded-[16px] p-7 md:p-10">
             <PrayerForm />
           </div>
         </Reveal>

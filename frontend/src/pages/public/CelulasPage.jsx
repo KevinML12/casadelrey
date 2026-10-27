@@ -1,7 +1,7 @@
 // Directorio administrable; una escena por categoría, sin fotografías dentro del cristal.
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import useSeo from '../../hooks/useSeo';
 import PageHero from '../../components/layout/PageHero';
 import SceneCarousel from '../../components/ui/SceneCarousel';
@@ -80,7 +80,8 @@ const zonasDe = (cells) =>
 // iglesia nunca se enteraba de que alguien había querido entrar -- el
 // intento se perdía en el chat de una persona. Ahora la solicitud queda
 // registrada y aterriza en el panel del líder de ESA célula.
-function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
+function CellRow({ cell, onSolicitar, tone = 'dark' }) {
+  const reducedMotion = useReducedMotion();
   const dark = tone === 'dark';
   const cuando = [cell.day, cell.time].filter(Boolean).join(' · ');
 
@@ -89,9 +90,9 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
       type="button"
       onClick={() => onSolicitar(cell)}
       aria-label={`Ver la célula ${cell.name}`}
-      initial={{ opacity: 0 }}
+      initial={{ opacity: reducedMotion ? 1 : 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 0.05 + index * 0.03 }}
+      transition={{ duration: reducedMotion ? 0 : 0.18 }}
       // .glass-light-nested y no un tinte plano: es la segunda capa del
       // sistema (ver index.css), con su propio bisel y su hairline. Una
       // lista de filas del MISMO material que la ventana no se lee como
@@ -415,6 +416,7 @@ function CellJoinForm({ cell: cellInicial, cells = [], onBack, onChangeCategory,
 // proyecto, un renglón que dijera "Horario: por confirmar" sería una
 // promesa que nadie hizo -- mejor que la ficha sea corta y cierta.
 function CellDetailCard({ cell, onUnirme, onCerrar }) {
+  const reducedMotion = useReducedMotion();
   const datos = [
     (cell.day || cell.time) && { k: 'Se reúnen', v: [cell.day, cell.time].filter(Boolean).join(' · ') },
     (cell.address || cell.zone) && {
@@ -426,15 +428,15 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
   ].filter(Boolean);
 
   const itemVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.18 } }
+    hidden: { opacity: reducedMotion ? 1 : 0 },
+    visible: { opacity: 1, transition: { duration: reducedMotion ? 0 : 0.18 } }
   };
 
   return (
     <motion.div
       initial="hidden"
       animate="visible"
-      variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+      variants={{ visible: { transition: { staggerChildren: 0 } } }}
       className="text-left"
     >
       <motion.button
@@ -505,6 +507,7 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
 }
 
 function CellCategoryDetail({ group, onAbrirCelula }) {
+  const reducedMotion = useReducedMotion();
   const [zoneFilter, setZoneFilter] = useState(null);
   const zones = zonasDe(group.cells);
   const filtered = zoneFilter
@@ -512,15 +515,15 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
     : group.cells;
 
   const itemVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.18 } }
+    hidden: { opacity: reducedMotion ? 1 : 0 },
+    visible: { opacity: 1, transition: { duration: reducedMotion ? 0 : 0.18 } }
   };
 
   return (
     <motion.div
       initial="hidden"
       animate="visible"
-      variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+      variants={{ visible: { transition: { staggerChildren: 0 } } }}
     >
       {group.description && (
         <motion.p variants={itemVariants} className="text-16 sm:text-17 text-bg/80 leading-relaxed font-medium mb-6">
@@ -607,6 +610,14 @@ function CellQuizModal({ groups, onViewDetail }) {
   // volver la devuelve al resultado donde estaba.
   if (solicitando) {
     return <CellJoinForm cell={solicitando} cells={category?.cells || []} onBack={() => setSolicitando(null)} onChangeCategory={() => { setSolicitando(null); restart(); }} tone="light" />;
+  }
+
+  if (!groups.some(group => group.cells.length > 0)) {
+    return <>
+      <h3 className="text-24 font-bold text-bg">Aún no hay células publicadas</h3>
+      <p className="mt-4 mb-6 text-15 text-bg/75 leading-relaxed">Déjanos tus datos para que podamos orientarte.</p>
+      <Link to="/conectate" className={btnPrimary}>Déjanos tus datos</Link>
+    </>;
   }
 
   if (step === 'zone' && category) {

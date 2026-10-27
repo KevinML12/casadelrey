@@ -1,7 +1,7 @@
 import CollectionStatus from '../../components/ui/CollectionStatus';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { RevealList, RevealItem } from '../../components/ui/Reveal';
@@ -294,21 +294,21 @@ function RSVPModal({ event, onClose }) {
       {event.requires_payment && <PaymentBanner event={event} attendeeCount={form.attendee_count} />}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-12 font-bold text-bg/60 mb-1">Nombre <span className="text-rose">*</span></label>
-          <input value={form.name} onChange={set('name')} className="input-light" placeholder="Tu nombre completo" required />
+          <label htmlFor="rsvp-name" className="block text-12 font-bold text-bg/60 mb-1">Nombre <span className="text-rose">*</span></label>
+          <input id="rsvp-name" autoComplete="name" value={form.name} onChange={set('name')} className="input-light" placeholder="Tu nombre completo" required />
         </div>
         <div>
-          <label className="block text-12 font-bold text-bg/60 mb-1">Correo <span className="text-rose">*</span></label>
-          <input type="email" value={form.email} onChange={set('email')} className="input-light" placeholder="El mismo correo del comprobante" required />
+          <label htmlFor="rsvp-email" className="block text-12 font-bold text-bg/60 mb-1">Correo <span className="text-rose">*</span></label>
+          <input id="rsvp-email" autoComplete="email" type="email" value={form.email} onChange={set('email')} className="input-light" placeholder="El mismo correo del comprobante" required />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-12 font-bold text-bg/60 mb-1">Teléfono</label>
-            <input value={form.phone} onChange={set('phone')} className="input-light" placeholder="+502 …" />
+            <label htmlFor="rsvp-phone" className="block text-12 font-bold text-bg/60 mb-1">Teléfono</label>
+            <input id="rsvp-phone" type="tel" autoComplete="tel" value={form.phone} onChange={set('phone')} className="input-light" placeholder="+502 …" />
           </div>
           <div>
-            <label className="block text-12 font-bold text-bg/60 mb-1">Asistentes</label>
-            <input type="number" min={1} max={event.spots_remaining ?? 20} value={form.attendee_count} onChange={set('attendee_count')} className="input-light" />
+            <label htmlFor="rsvp-count" className="block text-12 font-bold text-bg/60 mb-1">Asistentes</label>
+            <input id="rsvp-count" type="number" min={1} max={event.spots_remaining ?? 20} value={form.attendee_count} onChange={set('attendee_count')} className="input-light" />
             {event.spots_remaining != null && (
               <p className="text-11 text-bg/40 mt-1">
                 {event.spots_remaining} cupo{event.spots_remaining === 1 ? '' : 's'} disponible{event.spots_remaining === 1 ? '' : 's'}
@@ -317,8 +317,8 @@ function RSVPModal({ event, onClose }) {
           </div>
         </div>
         <div>
-          <label className="block text-12 font-bold text-bg/60 mb-1">Notas</label>
-          <textarea rows={2} value={form.notes} onChange={set('notes')} className="input-light resize-none" placeholder="¿Algo que debamos saber?" />
+          <label htmlFor="rsvp-notes" className="block text-12 font-bold text-bg/60 mb-1">Notas</label>
+          <textarea id="rsvp-notes" rows={2} value={form.notes} onChange={set('notes')} className="input-light resize-none" placeholder="¿Algo que debamos saber?" />
         </div>
         <div className="flex gap-3 pt-2 border-t border-bg/10">
           <button type="submit" disabled={loading} className={btnPrimary}>
@@ -407,6 +407,7 @@ function EventCard({ ev, onRsvp, onCancelRsvp, past = false }) {
 // del sitio. El componente compartido ya trae ambas cosas resueltas.
 
 export default function EventsPage() {
+  const reducedMotion = useReducedMotion();
   const heroImg = useSitePhoto('hero_eventos', '/images/backgrounds/congregacion.webp');
   const [searchParams] = useSearchParams();
   const highlightId = searchParams.get('id');
@@ -458,7 +459,7 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[100svh] relative overflow-hidden flex flex-col">
-      <PageHero title="Eventos" photoSrc={heroImg}
+      <PageHero title="Eventos" photoSrc={heroImg} photoFallback="/images/backgrounds/congregacion.webp"
         subtitle="Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros." />
 
       <div className="relative z-10 mx-auto pb-20 w-full flex-1">
@@ -504,7 +505,7 @@ export default function EventsPage() {
                 que entra. Y `uppercase tracking-tightish` era la fórmula del
                 eyebrow -- las versales piden MÁS aire, no menos. */}
             <p className="text-13 font-semibold text-white/40 mb-6">Eventos pasados</p>
-            <SceneCarousel items={pastEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Eventos pasados" renderContent={event => <EventCard ev={event} past />} />
+            <SceneCarousel key={highlightId || 'past'} initialKey={pastEvents.find(event => String(event.ID) === highlightId)?.ID} items={pastEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Eventos pasados" renderContent={event => <EventCard ev={event} past />} />
           </div>
         )}
       </div>
@@ -528,7 +529,7 @@ export default function EventsPage() {
               {faqs.map(faq => (
                 <RevealItem key={faq.ID} depth>
 
-                <div className="glass-light liquid-shine rounded-[22px] overflow-hidden block">
+                <div className="glass-light liquid-shine rounded-[16px] overflow-hidden block">
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.ID ? null : faq.ID)}
                     aria-expanded={openFaq === faq.ID}
@@ -543,7 +544,7 @@ export default function EventsPage() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: reducedMotion ? 0 : 0.18 }}
                       >
                         <div className="px-6 pb-5 pt-0 text-bg/60 text-15 leading-relaxed border-t border-bg/10 mt-2">
                           {faq.answer}

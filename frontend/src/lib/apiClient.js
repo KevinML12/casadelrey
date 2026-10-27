@@ -67,7 +67,7 @@ apiClient.interceptors.response.use(
       const refreshToken = localStorage.getItem('refresh_token');
       if (refreshToken) {
         try {
-          const res = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
+          const res = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken }, { timeout });
           const { token, refresh_token: newRefreshToken } = res.data;
           if (localStorage.getItem('refresh_token') !== refreshToken) {
             throw new Error('La sesión cambió durante la renovación');

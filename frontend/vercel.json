@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://casa-del-rey-mvp.fly.dev/api/$1"
+      "destination": "https://casadelrey-api-pruebas.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",

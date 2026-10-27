@@ -13,15 +13,19 @@ const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]:not([tab
 export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80svh, 640px)', light = false, photoBackdrop = false, animated = false, neighborTitles = false, contentKey, sobrepuesto = null, onCerrarSobrepuesto }) {
   const dialogRef = useRef(null);
   const reducedMotion = useReducedMotion();
-  const [photoIdx, setPhotoIdx] = useState(0);
+  const [photoSelection, setPhotoSelection] = useState({});
+  const nextRef = useRef(null);
   const active = items.find(it => it.key === openKey);
-  const isOpen = Boolean(openKey);
+  const isOpen = Boolean(active);
   const index = items.findIndex(it => it.key === openKey);
   const photos = active?.images?.length ? active.images : active?.image ? [active.image] : [];
+  const photoOwner = `${openKey}:${active?.image || ''}`;
+  if (photoSelection.owner !== photoOwner) setPhotoSelection({ owner: photoOwner, index: 0 });
+  const photoIdx = photoSelection.owner === photoOwner ? (photoSelection.index || 0) % Math.max(photos.length, 1) : 0;
+  const setPhotoIdx = value => setPhotoSelection({ owner: photoOwner, index: typeof value === 'function' ? value(photoIdx) : value });
   const close = () => sobrepuesto ? onCerrarSobrepuesto?.() : onChange(null);
   const go = direction => onChange(items[(index + direction + items.length) % items.length].key);
 
-  useEffect(() => { setPhotoIdx(0); }, [openKey, active?.image]);
   const actions = useRef({ close, go });
   useEffect(() => { actions.current = { close, go }; });
 
@@ -40,13 +44,13 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
         const nodes = focusable();
         const first = nodes[0], last = nodes.at(-1);
         if (!first) { event.preventDefault(); dialogRef.current?.focus(); }
-        else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        else if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement) || document.activeElement === dialogRef.current)) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement) || document.activeElement === dialogRef.current)) { event.preventDefault(); first.focus(); }
       }
-      const editing = event.target.matches('input, textarea, select, [contenteditable="true"]');
-      if (!sobrepuesto && !editing && items.length > 1) {
-        if (event.key === 'ArrowRight') { event.preventDefault(); actions.current.go(1); }
-        if (event.key === 'ArrowLeft') { event.preventDefault(); actions.current.go(-1); }
+      const editing = event.target.closest('input, textarea, select, a[href], [contenteditable="true"], [role="tablist"]');
+      if (!event.defaultPrevented && !sobrepuesto && !editing && items.length > 1) {
+        if (event.key === 'ArrowRight') { event.preventDefault(); nextRef.current?.focus(); actions.current.go(1); }
+        if (event.key === 'ArrowLeft') { event.preventDefault(); nextRef.current?.focus(); actions.current.go(-1); }
       }
     };
     document.addEventListener('keydown', onKey);
@@ -63,19 +67,19 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
         <motion.div
           ref={dialogRef} role="dialog" aria-modal="true" aria-label={active.title} tabIndex={-1}
           className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 outline-none"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : DUR.base }}
         >
           <div className={`absolute inset-0 ${photoBackdrop ? 'bg-bg' : 'bg-bg/65 backdrop-blur-lg'}`} onClick={close}>
             {photoBackdrop && photos.length > 0 && (animated
-              ? <CrossfadePhoto src={photos[photoIdx % photos.length]} fallbackSrc={active.fallbackImage} className="opacity-70" />
+              ? <CrossfadePhoto src={photos[photoIdx % photos.length]} fallbackSrc={active.fallbackImage || '/images/backgrounds/congregacion.webp'} className="opacity-70" />
               : <PhotoImage src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover opacity-70" />)}
             {photoBackdrop && <div className="absolute inset-0 bg-bg/55" />}
           </div>
           <div className={`relative w-full ${photoBackdrop ? 'max-w-md' : 'max-w-[780px]'} ${light ? 'glass-light' : 'liquid-glass'} rounded-[16px] flex flex-col overflow-hidden`} style={{ height, maxHeight: 'calc(100svh - 48px)' }}>
             <div className={`shrink-0 flex items-center justify-between gap-4 px-5 py-3 border-b ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
               {sobrepuesto ? (
-                <button type="button" onClick={onCerrarSobrepuesto} className="text-13 font-bold focus-ring rounded-full min-h-11 px-2">Volver a {active.title}</button>
-              ) : photoBackdrop ? <h2 className="text-26 font-bold tracking-tight">{active.title}</h2> : <p className="text-13 font-semibold truncate">{active.title}</p>}
+                <button type="button" onClick={onCerrarSobrepuesto} className="min-w-0 [overflow-wrap:anywhere] text-13 font-bold focus-ring rounded-full min-h-11 px-2">Volver a {active.title}</button>
+              ) : photoBackdrop ? <h2 className="min-w-0 [overflow-wrap:anywhere] text-26 font-bold tracking-tight">{active.title}</h2> : <p className="text-13 font-semibold truncate">{active.title}</p>}
               <button type="button" onClick={close} className={`shrink-0 rounded-full min-h-11 px-4 text-13 font-bold focus-ring ${light ? 'bg-bg/8' : 'bg-white/10'}`}>Cerrar</button>
             </div>
             {sobrepuesto ? (
@@ -93,8 +97,8 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                     {photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-current={i === photoIdx} className="liquid-glass rounded-full px-3 min-h-11 text-12 text-white focus-ring">Foto {i + 1}</button>)}
                   </div>}
                 </div>}
-                <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 flex flex-col" data-lenis-prevent>
-                  {animated ? <motion.div key={contentKey || active.key} className="m-auto w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>{renderContent(active)}</motion.div> : <div className="m-auto w-full">{renderContent(active)}</div>}
+                <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 flex flex-col [overflow-wrap:anywhere]" data-lenis-prevent>
+                  {animated ? <motion.div key={contentKey || active.key} className="m-auto w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>{renderContent(active, { photoIndex: photoIdx, photoCount: photos.length })}</motion.div> : <div className="m-auto w-full">{renderContent(active, { photoIndex: photoIdx, photoCount: photos.length })}</div>}
                 </div>
                 {photoBackdrop && photos.length > 1 && <div className={`flex gap-2 px-5 pb-3 ${light ? 'text-bg' : 'text-white'}`} aria-label="Fotos de fondo">
                   {photos.length <= 2 ? photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-pressed={i === photoIdx} className="rounded-[8px] border border-current px-3 min-h-11 text-12 font-semibold focus-ring">Foto {i + 1}</button>) : <>
@@ -106,7 +110,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                 {items.length > 1 && <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
                   <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-left text-13 font-bold focus-ring">Anterior{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index - 1 + items.length) % items.length].title}</span>}</button>
                   <span className="shrink-0 text-12 opacity-70" role="status">{index + 1} / {items.length}</span>
-                  <button type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-right text-13 font-bold focus-ring">Siguiente{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index + 1) % items.length].title}</span>}</button>
+                  <button ref={nextRef} type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-right text-13 font-bold focus-ring">Siguiente{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index + 1) % items.length].title}</span>}</button>
                 </div>}
               </>
             )}

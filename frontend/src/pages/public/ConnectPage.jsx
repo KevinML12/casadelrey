@@ -10,6 +10,7 @@ import { FieldLight } from '../../components/ui/Glass';
 import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
 import { PRESS_PRIMARY } from '../../lib/motion';
+import { useSitePhoto } from '../../lib/feed';
 import SectionBg from '../../components/ui/SectionBg';
 
 const CATEGORIES = [
@@ -35,6 +36,7 @@ const STEPS = [
 ];
 
 export default function ConnectPage() {
+  const photo = useSitePhoto('hero_conectate', '/images/backgrounds/congregacion.webp');
   const [form, setForm] = useState({ name: '', phone: '', email: '', category: '', how_found: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -70,7 +72,7 @@ export default function ConnectPage() {
       />
 
       <section className="relative overflow-hidden py-16 md:py-24">
-        <SectionBg src="/images/components/bg_conectate.jpg" />
+        <SectionBg src={photo} fallbackSrc="/images/backgrounds/congregacion.webp" />
         <div className="relative z-10 px-6 max-w-6xl mx-auto grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-20 items-start">
           <Reveal className="lg:sticky lg:top-28">
             <h2 className="text-d2 text-white">Queremos conocerte.</h2>

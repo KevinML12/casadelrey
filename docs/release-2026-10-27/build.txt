@@ -1,0 +1,66 @@
+
+> frontend@0.0.0 build
+> vite build
+
+vite v7.3.6 building client environment for production...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming...
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 1674 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                  1.68 kB │ gzip:   0.72 kB
+dist/assets/index-DQWa4jl7.css                  53.90 kB │ gzip:  11.23 kB
+dist/assets/LeaderConnectCards-DBX3BjJi.js       0.23 kB │ gzip:   0.19 kB
+dist/assets/LeaderBoletas-CSa3bfO-.js            0.28 kB │ gzip:   0.21 kB
+dist/assets/AdminCellReports-B5hKYixL.js         0.32 kB │ gzip:   0.23 kB
+dist/assets/LeaderReports-B7-vaWJT.js            0.32 kB │ gzip:   0.23 kB
+dist/assets/StatCard-B2ah6fqK.js                 0.73 kB │ gzip:   0.45 kB
+dist/assets/Chip-Mr6eX7sQ.js                     1.12 kB │ gzip:   0.54 kB
+dist/assets/PaymentSuccess-DuHlQeuu.js           1.14 kB │ gzip:   0.56 kB
+dist/assets/Paginator-BrsSjs68.js                1.22 kB │ gzip:   0.63 kB
+dist/assets/Button-CYhEdvtc.js                   1.57 kB │ gzip:   0.71 kB
+dist/assets/CellCodePicker-ENnUtMj1.js           1.62 kB │ gzip:   0.84 kB
+dist/assets/ReceiptPage-BouXTKtF.js              1.68 kB │ gzip:   0.77 kB
+dist/assets/with-selector-DuK68FaF.js            1.80 kB │ gzip:   0.84 kB
+dist/assets/Input-DeCXR-5G.js                    2.05 kB │ gzip:   0.85 kB
+dist/assets/LeaderCellDirectory-DvcoGjoQ.js      2.12 kB │ gzip:   0.84 kB
+dist/assets/LeaderIndex-DS9utmFg.js              2.86 kB │ gzip:   1.10 kB
+dist/assets/LeaderMyCell-BLP0wL3P.js             3.40 kB │ gzip:   1.58 kB
+dist/assets/AdminSitePhotos-d0b5Mjkd.js          3.50 kB │ gzip:   1.50 kB
+dist/assets/AdminActivityLog-mFROwPYS.js         3.74 kB │ gzip:   1.44 kB
+dist/assets/LeaderMyProfile-CEamMj-l.js          3.84 kB │ gzip:   1.77 kB
+dist/assets/AdminDonations-edlwiV1e.js           3.85 kB │ gzip:   1.65 kB
+dist/assets/AdminSettings-Did0iQo8.js            3.99 kB │ gzip:   1.84 kB
+dist/assets/LeaderVolunteers-DspXiZC4.js         4.04 kB │ gzip:   1.65 kB
+dist/assets/ProfilePage-Byk3EiVq.js              4.14 kB │ gzip:   1.66 kB
+dist/assets/LeaderEvents-7Hxl1veQ.js             4.19 kB │ gzip:   1.61 kB
+dist/assets/AdminVolunteers-CKopa716.js          4.98 kB │ gzip:   1.94 kB
+dist/assets/AdminConnectCards-CNHbZl4p.js        5.03 kB │ gzip:   2.04 kB
+dist/assets/AdminFAQs-Ci8Ol65G.js                5.07 kB │ gzip:   1.96 kB
+dist/assets/AdminDonationPurposes-CNHmRK9a.js    5.37 kB │ gzip:   2.07 kB
+dist/assets/AdminCellCategories-B9RAw-fu.js      5.69 kB │ gzip:   2.19 kB
+dist/assets/AdminGallery-LWRMZee2.js             5.78 kB │ gzip:   2.31 kB
+dist/assets/AdminAnnouncements-CcIXfq3p.js       5.94 kB │ gzip:   2.17 kB
+dist/assets/AdminUsers-C41kK1Up.js               6.09 kB │ gzip:   2.39 kB
+dist/assets/AdminVolunteerAreas-Bod3pkvq.js      6.21 kB │ gzip:   2.35 kB
+dist/assets/AdminLeaders-Cc7NYVBy.js             6.44 kB │ gzip:   2.41 kB
+dist/assets/AdminCells-p3GcqKRp.js               6.69 kB │ gzip:   2.51 kB
+dist/assets/AdminProfile-DfleOQS1.js             6.98 kB │ gzip:   2.21 kB
+dist/assets/AdminPetitions-T5SJbfA7.js           7.03 kB │ gzip:   2.69 kB
+dist/assets/AdminBoletas-BDVsZx1A.js             7.27 kB │ gzip:   2.58 kB
+dist/assets/AdminSocial-CPKZzy9h.js              8.07 kB │ gzip:   2.93 kB
+dist/assets/AdminEvents-DqGrMX7s.js             10.50 kB │ gzip:   3.66 kB
+dist/assets/AdminHero-DX5Btmbn.js               10.55 kB │ gzip:   3.28 kB
+dist/assets/AdminReceipts-e15KLZa1.js           10.88 kB │ gzip:   3.36 kB
+dist/assets/VolunteerDashboard-CIWydyKL.js      12.26 kB │ gzip:   4.06 kB
+dist/assets/DonatePage-mcncDCWg.js              12.69 kB │ gzip:   4.51 kB
+dist/assets/CellReportsPage-DOlVsCPR.js         15.30 kB │ gzip:   4.58 kB
+dist/assets/motion-Bvyjcony.js                 122.08 kB │ gzip:  40.54 kB
+dist/assets/react-D67GilVA.js                  284.88 kB │ gzip:  91.35 kB
+dist/assets/AdminIndex-Csp20wAR.js             355.21 kB │ gzip: 105.19 kB
+dist/assets/index-D_5LiwJZ.js                  360.34 kB │ gzip: 106.28 kB
+dist/assets/AdminBlog-BDe7M_By.js              388.56 kB │ gzip: 123.03 kB
+✓ built in 3.26s

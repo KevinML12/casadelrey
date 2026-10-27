@@ -13,7 +13,8 @@ const cta = 'inline-flex items-center justify-center min-h-11 mt-6 rounded-pill 
 
 export default function AboutPage() {
   useSeo('Nosotros', 'Conoce Casa del Rey y encuentra tu lugar en nuestra comunidad.');
-  const settings = useApi('/settings') || {};
+  const settingsResource = useApiResource('/settings');
+  const settings = settingsResource.data || {};
   const photos = useApi('/site-photos') || {};
   const volunteers = useVolunteerAreasResource();
   const categories = useApiResource('/cell-categories');
@@ -31,6 +32,7 @@ export default function AboutPage() {
   ].filter(item => item.description);
   return <main className="min-h-screen overflow-clip text-white">
     <PageHero title={settings.about_title || 'Nosotros'} subtitle={settings.about_intro || ''} photoSlot="hero_nosotros" photoFallback="/images/backgrounds/comunidad-templo.webp" />
+    {(settingsResource.loading || settingsResource.error) && <div className="max-w-4xl mx-auto px-6"><CollectionStatus loading={settingsResource.loading} label="la información de la iglesia" onRetry={settingsResource.retry} /></div>}
     {institution.length > 0 && <SceneCarousel items={institution} label="Nuestra iglesia" />}
     <div className="max-w-4xl mx-auto px-6 pt-12"><h2 className="text-d2">Una familia que sirve.</h2></div>
     {volunteers.loading || volunteers.error ? <div className="max-w-4xl mx-auto px-6"><CollectionStatus loading={volunteers.loading} label="los departamentos" onRetry={volunteers.retry} /></div> : <SceneCollection items={areas} id="about-volunteers" label="Departamentos de voluntariado" empty="Sin departamentos publicados aún." renderInfo={area => <div className="space-y-5">

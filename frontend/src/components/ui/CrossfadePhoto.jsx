@@ -24,7 +24,9 @@ export default function CrossfadePhoto({ src, fallbackSrc, className = '', style
         }
       };
       image.onerror = () => {
-        if (!cancelled && fallbackSrc && candidate !== fallbackSrc) load(fallbackSrc);
+        if (cancelled) return;
+        if (fallbackSrc && candidate !== fallbackSrc) load(fallbackSrc);
+        else onReadyRef.current?.(); // Keep content usable when all photos fail.
       };
       image.sizes = '100vw';
       image.srcset = variants?.map(variant => `${variant.src} ${variant.width}w`).join(', ') || '';
@@ -45,7 +47,7 @@ export default function CrossfadePhoto({ src, fallbackSrc, className = '', style
         transition={{ duration: reducedMotion ? 0 : DUR.slow, ease: EASE_OUT }}
         onAnimationComplete={() => setFrame(old => old.current === frame.current && old.previous ? { ...old, previous: null } : old)}
       >
-        <PhotoImage src={frame.current} loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover" />
+        <PhotoImage src={frame.current} fallbackSrc={fallbackSrc} loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover" />
       </motion.div>
     </div>
   );
