@@ -6,7 +6,7 @@ import { DUR, EASE_OUT } from '../../lib/motion';
 
 // Keep the last loaded scene opaque until the next photograph is ready.
 // Only opacity changes; the camera and glass surfaces stay in place.
-export default function CrossfadePhoto({ src, fallbackSrc, className = '', style, onReady }) {
+export default function CrossfadePhoto({ src, fallbackSrc, className = '', style, onReady, sceneKey }) {
   const [frame, setFrame] = useState({ current: src, previous: null });
   const reducedMotion = useReducedMotion();
   const onReadyRef = useRef(onReady);
@@ -32,7 +32,7 @@ export default function CrossfadePhoto({ src, fallbackSrc, className = '', style
     };
     load(src);
     return () => { cancelled = true; image.onload = null; image.onerror = null; };
-  }, [src, fallbackSrc]);
+  }, [src, fallbackSrc, sceneKey]);
 
   return (
     <div className={`absolute inset-0 ${className}`} style={style} aria-hidden="true" data-scene-photo={frame.current}>

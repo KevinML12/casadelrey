@@ -1,3 +1,4 @@
+import SceneCarousel from '../../components/ui/SceneCarousel';
 import PhotoImage from '../../components/ui/PhotoImage';
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -927,21 +928,13 @@ function Ubicacion({ bg }) {
 // ════════════════════════════════════════════════════════════════════
 // 4.5 · GALERÍA (Preview)
 // ════════════════════════════════════════════════════════════════════
-// Álbumes reales de la iglesia (DOMINGOS 2026) como fallback sin API
-const ALBUMS_FALLBACK = {
-  'Alabanza': [{ url: '/images/albums/alabanza.jpg' }],
-  'Danza':    [{ url: '/images/albums/danza.jpg' }],
-  'Niños':    [{ url: '/images/albums/ninos.jpg' }],
-  'Miembros': [{ url: '/images/albums/miembros.jpg' }],
-};
-
 function GalleryPreviewSection() {
   // Mismo fetch cacheado que usa useBackdrops — un solo GET /gallery/
   const gallery = useApi('/gallery/?limit=200');
   const photos = gallery?.data || gallery;
   const albums = Array.isArray(photos) && photos.length > 0
     ? groupAlbums(photos)
-    : ALBUMS_FALLBACK;
+    : {};
 
   const topAlbums = Object.entries(albums).slice(0, 4); // Tomar solo los primeros 4 para el preview
 
@@ -963,26 +956,10 @@ function GalleryPreviewSection() {
         </MotionLink>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <RevealList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {topAlbums.map(([albumName, photos]) => (
-            <RevealItem key={albumName}>
-            <GlassCard as={Link} to="/gallery" glass="standard" className="group relative rounded-[22px] overflow-hidden aspect-[4/5] liquid-glass block border border-white/5 hover:border-white/20">
-              {/* Tile de foto a plena fuerza: el nombre del álbum se sostiene
-                  con el scrim de abajo, no bajándole la opacidad a la foto. */}
-              <PhotoImage src={photos[0].url} alt={albumName} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 " loading="lazy" />
-              <div className="scrim-card" />
-              <div className="absolute bottom-5 inset-x-5">
-                <p className="text-white font-bold text-18 leading-tight line-clamp-1">{albumName}</p>
-                {photos.length > 1 && (
-                  <p className="text-white/60 text-12 font-medium mt-1">{photos.length} fotos</p>
-                )}
-              </div>
-            </GlassCard>
-            </RevealItem>
-          ))}
-        </RevealList>
-      </div>
+      <SceneCarousel items={topAlbums.map(([title, photos]) => ({ key: title, title, image: photos[0].url, count: photos.length }))} label="Álbumes de la comunidad" empty="Sin álbumes publicados aún." renderContent={album => <>
+        <h3 className="text-28 font-bold">{album.title}</h3><p className="mt-4 text-14 text-white/80">{album.count} fotografías</p>
+        <Link to="/gallery" className="inline-flex mt-6 min-h-11 items-center rounded-pill bg-white px-6 text-14 font-bold text-bg focus-ring">Explorar álbum</Link>
+      </>} />
     </section>
   );
 }

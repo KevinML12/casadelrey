@@ -68,3 +68,23 @@ func TestSiteSettings_Update_CreaCuandoNoExiste(t *testing.T) {
 	require.NoError(t, h.UpdateSetting(c))
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
+
+// Institutional content is returned from settings, including an intentional
+// empty value used by the administrator to hide a previously published block.
+func TestSiteSettings_AboutContentRespectsEditsAndClearing(t *testing.T) {
+	db, mock, sqlDB := newMockDB(t)
+	defer sqlDB.Close()
+	h := handlers.NewSiteSettingHandler(db)
+	mock.ExpectQuery(`SELECT .* FROM "site_settings"`).WillReturnRows(
+		sqlmock.NewRows([]string{"id", "key", "value"}).
+			AddRow(1, "about_mission", "Misión editada por el administrador").
+			AddRow(2, "about_podcast_schedule", ""))
+	c, rec := newCtx(t, ctxOpts{method: "GET"})
+	require.NoError(t, h.GetPublic(c))
+	var out map[string]string
+	decodeBody(t, rec, &out)
+	assert.Equal(t, "Misión editada por el administrador", out["about_mission"])
+	assert.Empty(t, out["about_podcast_schedule"], "clearing must not republish the default")
+	assert.NotEmpty(t, out["about_intro"], "existing institutional copy remains an editable default")
+	require.NoError(t, mock.ExpectationsWereMet())
+}

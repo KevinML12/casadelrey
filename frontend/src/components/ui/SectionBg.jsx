@@ -11,12 +11,12 @@ import CrossfadePhoto from './CrossfadePhoto';
 //   <div className="relative z-10">...contenido...</div>
 // </section>
 
-export default function SectionBg({ src, opacity = 'opacity-25', position = 'center', viewport = false, animate = false, fallbackSrc, onReady }) {
+export default function SectionBg({ src, opacity = 'opacity-25', position = 'center', viewport = false, animate = false, fallbackSrc, onReady, sceneKey }) {
   if (!src) return null;
   return (
     <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
       <div className={viewport ? 'sticky top-0 h-[100svh] overflow-hidden' : 'absolute inset-0'}>
-        {animate ? <CrossfadePhoto src={src} fallbackSrc={fallbackSrc} className={opacity} onReady={onReady} /> : <PhotoImage
+        {animate ? <CrossfadePhoto src={src} fallbackSrc={fallbackSrc} className={opacity} onReady={onReady} sceneKey={sceneKey} /> : <PhotoImage
           src={src}
           alt=""
           loading="lazy"

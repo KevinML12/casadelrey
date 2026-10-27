@@ -40,15 +40,23 @@ Al cambiar de departamento cambia la fotografía del fondo mediante una disoluci
 
 Cada departamento abre el mismo panel de cristal y permite seguir al anterior o siguiente, conservando su tamaño y el foco de navegación. Galería es el primer apartado; Fotos permite ver las fotografías administradas como fondo; Información reúne descripción, motivo, testimonio real y aplicación. Las pestañas funcionan con teclado y conservan el foco al cambiar de apartado. El quiz entra directamente a Información del departamento recomendado. No añadir tarjetas o fotografías decorativas dentro del panel para rellenar espacio.
 
+## Aplicación a los módulos
+
+Galería, Células, Nosotros, Blog y Eventos reutilizan escenas con una sola superficie visible. La vista previa de Galería de Inicio sigue el mismo criterio. Las clasificaciones y los elementos salen de la API, sin listas de ejemplo cuando la respuesta está vacía. Galería recorre todas las páginas publicadas, agrupa los álbumes por el título administrado y usa controles compactos para las fotos; no crea un botón por cada una cuando hay muchas.
+
+Nosotros lee su contenido institucional desde Configuración (`about_*`), incluyendo presentación, fundadores, pastores, misión, visión, dirección y podcast. Los valores originales se conservan como valores iniciales editables del backend; los valores vacíos guardados se respetan; vaciar los campos de un bloque permite retirarlo. Las cifras fijas de voluntarios, líderes o tipos se retiraron. La dirección, fundadores y podcast del pie de página usan la misma configuración. Los departamentos nuevos reciben automáticamente sus dos espacios de fotografías en Fotos del sitio; Galería permite editar registros existentes.
+
 ## Componentes compartidos
 
 - `PageHero`: foto administrable con fallback local, scrim y espaciado común. La primera imagen se carga con prioridad.
 - `GlassCard`: superficie plana; no instala listeners de posición del mouse/scroll.
 - `PhotoImage`: sirve WebP responsive para fotos locales conocidas. Respeta las URLs externas y las imágenes del CMS.
-- `PhotoHeaderCard`, `PhotoBentoTile`: componentes heredados con fotografías dentro; migrarlos en la revisión de cada módulo. No extender esta composición a nuevas tarjetas.
+- `SceneCarousel`: escena fija por identidad de registro, navegación cíclica con teclado, nombres vecinos y fotografía de fondo precargada. También cambia el contenido si dos registros comparten la misma fotografía.
+- `SceneCollection` y `PhotoTabs`: panel de detalle con Galería/Fotos/Información, sin desmontar las pestañas al cambiar de apartado.
+- Se retiraron `PhotoHeaderCard` y `PhotoBentoTile`, que ya no tienen consumidores tras migrar Nosotros.
 - `CrossfadePhoto`: mantiene la última foto válida mientras carga la siguiente y cancela respuestas tardías; sólo anima opacidad.
 - `SectionBg`: escena fotográfica de la sección. Vive dentro de su propia sección, sin cubrir el encabezado anterior. En secciones largas, `viewport` mantiene el encuadre ligado a la altura visible, con ancestros `overflow-clip`; evita ampliar una panorámica hasta convertirla en un retrato.
-- `WindowStack`: muestra un solo detalle plano. Voluntariado usa `photoBackdrop`: foto administrada detrás del panel, sin banner interior ni recuadro de cristal anidado. Anterior/Siguiente cambia el contenido; Foto 1/2 cambia el fondo; Escape vuelve un nivel. Foco y scroll quedan controlados. Las tarjetas de departamentos y los resultados del quiz de Voluntariado ya no incluyen fotos. Los demás módulos conservan su composición hasta revisarlos.
+- `WindowStack`: muestra un solo detalle plano. Voluntariado usa `photoBackdrop`: foto administrada detrás del panel, sin banner interior ni recuadro de cristal anidado. Anterior/Siguiente cambia el contenido; Foto 1/2 cambia el fondo; Escape vuelve un nivel. Foco y scroll quedan controlados. Las tarjetas de departamentos y los resultados del quiz de Voluntariado ya no incluyen fotos. Galería, Células y los resúmenes de Nosotros usan también fotografía exterior, animación por opacidad y nombres vecinos.
 - `ModalWrapper`: formularios claros, con cierre y navegación por teclado.
 - `CollectionStatus`: carga, error y reintento de listas. No ocultar el hero esperando al backend ni presentar un fallo como una lista vacía.
 

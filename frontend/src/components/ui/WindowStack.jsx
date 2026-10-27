@@ -97,7 +97,11 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                   {animated ? <motion.div key={contentKey || active.key} className="m-auto w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>{renderContent(active)}</motion.div> : <div className="m-auto w-full">{renderContent(active)}</div>}
                 </div>
                 {photoBackdrop && photos.length > 1 && <div className={`flex gap-2 px-5 pb-3 ${light ? 'text-bg' : 'text-white'}`} aria-label="Fotos de fondo">
-                  {photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-pressed={i === photoIdx} className="rounded-[8px] border border-current px-3 min-h-11 text-12 font-semibold focus-ring">Foto {i + 1}</button>)}
+                  {photos.length <= 2 ? photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-pressed={i === photoIdx} className="rounded-[8px] border border-current px-3 min-h-11 text-12 font-semibold focus-ring">Foto {i + 1}</button>) : <>
+                    <button type="button" onClick={() => setPhotoIdx(value => (value - 1 + photos.length) % photos.length)} className="min-h-11 px-2 rounded-[8px] text-12 font-semibold focus-ring">Foto anterior</button>
+                    <span className="m-auto text-12" role="status">{photoIdx + 1} de {photos.length}</span>
+                    <button type="button" onClick={() => setPhotoIdx(value => (value + 1) % photos.length)} className="min-h-11 px-2 rounded-[8px] text-12 font-semibold focus-ring">Foto siguiente</button>
+                  </>}
                 </div>}
                 {items.length > 1 && <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
                   <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-left text-13 font-bold focus-ring">Anterior{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index - 1 + items.length) % items.length].title}</span>}</button>

@@ -20,7 +20,7 @@ export default function BlogHero() {
       title="Blog"
       subtitle="Enseñanzas, reflexiones y mensajes para tu crecimiento espiritual."
       photoSlot="hero_blog"
-      photoFallback="/images/bg-ensenanzas.jpg"
+      photoFallback="/images/backgrounds/comunidad-templo.webp"
     />
   );
 }

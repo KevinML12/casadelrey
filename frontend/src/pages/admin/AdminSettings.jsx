@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import Input from '../../components/ui/Input';
+import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
 // Pistas por llave para guiar al admin
@@ -14,6 +14,10 @@ const HINTS = {
   bank_account: 'Sin este dato, el sitio invita a coordinar el depósito por contacto (no muestra ninguna cuenta).',
   contact_whatsapp: 'Formato 502XXXXXXXX. Se usa como respaldo cuando no hay cuenta configurada.',
 };
+
+function SettingField({ multiline, ...props }) {
+  return multiline ? <Textarea rows={3} {...props} /> : <Input {...props} />;
+}
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState([]);
@@ -90,7 +94,7 @@ export default function AdminSettings() {
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
           {settings.map(s => (
             <div key={s.key} className="p-4 sm:p-5 hover:bg-bg/6 transition-colors">
-              {s.key.endsWith('_bg') ? (
+              {s.key.endsWith('_bg') || s.key.startsWith('public_bg_') ? (
                 <div className="flex flex-col gap-3">
                   <p className="text-label-l text-bg font-semibold">{s.label}</p>
                   <div className="flex items-center gap-4">
@@ -106,7 +110,7 @@ export default function AdminSettings() {
               ) : (
                 <div className="flex gap-2 items-end">
                   <div className="flex-1 min-w-0">
-                    <Input
+                    <SettingField multiline={s.key.startsWith('about_')}
                       label={<>{s.label}{s.using_default && s.value === '' && (
                         <span className="ml-2 text-label-s text-amber">· sin configurar</span>
                       )}</>}

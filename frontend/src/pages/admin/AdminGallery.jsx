@@ -7,8 +7,8 @@ import Paginator from '../../components/ui/Paginator';
 
 const EMPTY = { title: '', description: '', url: '', thumbnail_url: '', sort_order: 0, is_active: true };
 
-function PhotoForm({ onSave, onCancel }) {
-  const [form, setForm] = useState(EMPTY);
+function PhotoForm({ photo, onSave, onCancel }) {
+  const [form, setForm] = useState(photo || EMPTY);
   const [loading, setLoading] = useState(false);
   const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -17,8 +17,9 @@ function PhotoForm({ onSave, onCancel }) {
     if (!form.url) { toast.error('La URL de la foto es obligatoria'); return; }
     setLoading(true);
     try {
-      await apiClient.post('/admin/gallery/', form);
-      toast.success('Foto agregada');
+      if (photo) await apiClient.put(`/admin/gallery/${photo.ID}`, form);
+      else await apiClient.post('/admin/gallery/', form);
+      toast.success(photo ? 'Foto actualizada' : 'Foto agregada');
       onSave();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al guardar');
@@ -32,7 +33,7 @@ function PhotoForm({ onSave, onCancel }) {
         value={form.url} onChange={set('url')} placeholder="https://…" required
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input label="Título" value={form.title} onChange={set('title')} placeholder="Nombre de la foto" />
+        <Input label="Título" value={form.title} onChange={set('title')} placeholder="Álbum - Nombre de la foto" />
         <Input label="URL miniatura" value={form.thumbnail_url} onChange={set('thumbnail_url')} placeholder="https://… (opcional)" />
       </div>
       <Textarea label="Descripción" rows={2} value={form.description} onChange={set('description')} placeholder="Descripción breve…" />
@@ -49,7 +50,7 @@ function PhotoForm({ onSave, onCancel }) {
       </div>
       <div className="flex gap-3 pt-2 border-t border-bg/10">
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          {loading ? 'Guardando…' : 'Agregar foto'}
+          {loading ? 'Guardando…' : photo ? 'Guardar cambios' : 'Agregar foto'}
         </Button>
         <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
       </div>
@@ -63,6 +64,7 @@ export default function AdminGallery() {
   const [page,   setPage]     = useState(1);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState(null);
 
   const load = (p = page) => {
     setLoading(true);
@@ -101,22 +103,20 @@ export default function AdminGallery() {
             <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} foto{meta?.total !== 1 ? 's' : ''}</p>
           </div>
         </div>
-        <Button variant="filled" onClick={() => setShowForm(s => !s)}>
+        <Button variant="filled" onClick={() => { setEditing(null); setShowForm(s => !s); }}>
           {showForm ? 'Cancelar' : 'Agregar foto'}
         </Button>
       </div>
 
       {showForm && (
         <div className="glass-light rounded-[24px] card-spring mb-8 p-6">
-          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest mb-5">Nueva foto</p>
-          <PhotoForm onSave={() => { setShowForm(false); load(1); setPage(1); }} onCancel={() => setShowForm(false)} />
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest mb-5">{editing ? 'Editar foto' : 'Nueva foto'}</p>
+          <PhotoForm key={editing?.ID || 'new'} photo={editing} onSave={() => { setShowForm(false); load(1); setPage(1); }} onCancel={() => setShowForm(false)} />
         </div>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
-        </div>
+        <p role="status" className="py-16 text-bg/70">Cargando fotografías…</p>
       ) : photos.length === 0 ? (
         <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4">
           <p className="text-body-l text-bg font-medium">Sin fotos</p>
@@ -138,8 +138,9 @@ export default function AdminGallery() {
                 </div>
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100">
+                <button onClick={() => { setEditing(p); setShowForm(true); }} className="min-h-11 px-3 rounded-full bg-white text-bg text-12 font-semibold focus-ring">Editar</button>
                 <button onClick={() => handleToggle(p)}
-                  className="px-3 h-8 rounded-full bg-bg/90 text-bg text-12 font-semibold hover:bg-white transition-colors">
+                  className="px-3 min-h-11 rounded-full bg-white text-bg text-12 font-semibold hover:bg-white transition-colors">
                   {p.is_active ? 'Ocultar' : 'Mostrar'}
                 </button>
                 <button onClick={() => handleDelete(p.ID)}

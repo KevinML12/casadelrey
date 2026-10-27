@@ -1,113 +1,22 @@
-import { useApi } from './feed';
+import { useApiResource } from './feed';
+import { VOLUNTEER_BACKGROUNDS } from './volunteerBackgrounds';
 
-// Los 10 departamentos reales donde sirven los ~90 voluntarios
-// (CONTEXTO_IGLESIA jul-2026). Única fuente de verdad: antes vivía
-// duplicado como array de strings en AboutPage.jsx y como objetos
-// {icon,title,desc} en VolunteeringPage.jsx — podían desincronizarse.
-//
-// Este array YA NO es la fuente de verdad del contenido -- eso vive en
-// VolunteerArea (DB, editable desde /admin/volunteer-areas). Ahora es
-// SOLO el fallback si la API falla/está vacía, y la fuente de
-// photoFallback (las fotos siguen resolviéndose aparte via site-photos,
-// ver VolunteeringPage.jsx). Usar useVolunteerAreas() de abajo, no este
-// array directo, salvo que de verdad necesites el fallback puro.
-//
-// photoFallback: foto REAL ya existente en el sitio (ninguna generada/
-// stock nueva), emparejada por afinidad temática -- alabanza/danza/niños
-// tienen match exacto en /images/albums; el resto usa la foto real más
-// cercana en tema (servidores, líderes, prédicas, comunidad). Cada una
-// vive también en /admin/site-photos bajo la key `voluntariado_<value>`
-// por si el admin quiere subir una foto real de ESE departamento en vez
-// del fallback -- el fallback nunca deja un hueco en blanco.
-//
-// why: por qué serviría bien alguien ahí -- se muestra al abrir el
-// departamento (WindowStack), responde a "por qué es bueno que vaya
-// a ese departamento" en vez de repetir la descripción funcional.
-export const VOLUNTEER_AREAS = [
-  {
-    value: 'alabanza', icon: 'mic', title: 'Alabanza',
-    desc: 'Lidera la adoración y la música en los servicios y células.',
-    photoFallback: '/images/components/vol_alabanza.jpg',
-    why: 'Si te apasiona la música y quieres guiar a otros al encuentro con Dios, este es tu lugar.',
-  },
-  {
-    value: 'danza', icon: 'spark', title: 'Danza',
-    desc: 'Expresa la adoración a través del movimiento en los servicios.',
-    photoFallback: '/images/components/vol_danza.jpg',
-    why: 'Si te mueve adorar con el cuerpo y quieres inspirar a otros con tu expresión, únete aquí.',
-  },
-  {
-    value: 'servidores', icon: 'heart', title: 'Servidores',
-    desc: 'Recibe a cada persona; cuida la recepción y la limpieza de la iglesia.',
-    photoFallback: '/images/components/vol_limpieza.jpg',
-    why: 'Si te gusta recibir a las personas con calidez y hacer que se sientan en casa, esto es para ti.',
-  },
-  {
-    value: 'protocolo', icon: 'crown', title: 'Protocolo',
-    desc: 'Atención VIP a políticos, pastores invitados y personas de alto nivel.',
-    photoFallback: '/images/components/vol_bienvenida.jpg',
-    why: 'Si tienes don de gente y atención al detalle, aquí darás la bienvenida a quienes más lo necesitan.',
-  },
-  {
-    value: 'pancartas', icon: 'flag', title: 'Pancartas',
-    desc: 'Porta y coordina las pancartas durante los días de culto.',
-    photoFallback: '/images/components/vol_ujieres.jpg',
-    why: 'Si quieres servir con entusiasmo visible y ser parte activa del ambiente de cada culto, únete.',
-  },
-  {
-    value: 'maestros_ninos', icon: 'book', title: 'Maestros de Niños',
-    desc: 'Enseña e inspira a los más pequeños con creatividad y amor.',
-    photoFallback: '/images/components/vol_ninos.jpg',
-    why: 'Si tienes paciencia y amor por enseñar, aquí formarás la fe de la próxima generación.',
-  },
-  {
-    value: 'tecnicos_audiovisuales', icon: 'headphones', title: 'Técnicos Audiovisuales',
-    desc: 'Sonido, proyección y streaming para que el servicio llegue más lejos.',
-    photoFallback: '/images/components/vol_multimedia.jpg',
-    why: 'Si te gusta la tecnología y el detalle técnico, aquí aseguras que el mensaje llegue claro.',
-  },
-  {
-    value: 'multimedia', icon: 'camera', title: 'Multimedia',
-    desc: 'Diseño gráfico, video y redes sociales para la comunicación de la iglesia.',
-    photoFallback: '/images/components/vol_multimedia.jpg',
-    why: 'Si tienes ojo creativo para el diseño o el video, aquí contarás la historia de la iglesia.',
-  },
-  {
-    value: 'oracion', icon: 'pray', title: 'Oración',
-    desc: 'Intercede por la iglesia, los miembros y las necesidades de la ciudad.',
-    photoFallback: '/images/components/vol_intercesor.jpg',
-    why: 'Si sientes el llamado a interceder, aquí sostienes en oración a toda la congregación.',
-  },
-  {
-    value: 'logistica', icon: 'box', title: 'Logística',
-    desc: 'Coordina recursos, transporte y organización de eventos y servicios.',
-    photoFallback: '/images/components/vol_admin.jpg',
-    why: 'Si eres organizado y te gusta que todo funcione bien detrás de cámaras, aquí eres clave.',
-  },
-];
+// Published records are the only source of departments and their copy.
+// Local files provide visual fallbacks, never replacement directory entries.
+export function useVolunteerAreasResource() {
+  const resource = useApiResource('/volunteer-areas');
+  const areas = (Array.isArray(resource.data) ? resource.data : []).map(area => ({
+    value: area.value,
+    title: area.title,
+    desc: area.description,
+    why: area.why,
+    testimonial: area.testimonial,
+    testimonialAuthor: area.testimonial_author,
+    photoFallback: VOLUNTEER_BACKGROUNDS[area.value] || '/images/backgrounds/congregacion.webp',
+  }));
+  return { ...resource, areas };
+}
 
-const DEFAULT_PHOTO_FALLBACK = '/images/components/voluntariado_general.jpg';
-
-// Hook: departamentos reales desde /volunteer-areas (admin-editable),
-// con VOLUNTEER_AREAS como fallback si la API aún no responde o está
-// vacía -- el slot nunca queda en blanco. El texto (title/desc/why/icon)
-// viene de la API cuando hay datos; photoFallback SIEMPRE sale del
-// array local (las fotos se administran aparte, en site-photos) y usa
-// un fallback genérico para departamentos nuevos que el admin cree y
-// que no tengan match en este array.
 export function useVolunteerAreas() {
-  const data = useApi('/volunteer-areas');
-  if (Array.isArray(data) && data.length > 0) {
-    return data.map(a => ({
-      value: a.value,
-      icon: a.icon || 'box',
-      title: a.title,
-      desc: a.description,
-      why: a.why,
-      testimonial: a.testimonial,
-      testimonialAuthor: a.testimonial_author,
-      photoFallback: VOLUNTEER_AREAS.find(f => f.value === a.value)?.photoFallback || DEFAULT_PHOTO_FALLBACK,
-    }));
-  }
-  return VOLUNTEER_AREAS;
+  return useVolunteerAreasResource().areas;
 }

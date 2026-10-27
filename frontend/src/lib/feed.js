@@ -44,7 +44,7 @@ export function useApi(path) {
 
 /** Agrupa fotos de galería por álbum (convención "Álbum - Foto") */
 export function groupAlbums(photos) {
-  const grouped = {};
+  const grouped = Object.create(null);
   (photos || []).forEach(p => {
     const name = p.title?.includes(' - ') ? p.title.split(' - ')[0].trim() : 'Otros';
     (grouped[name] ||= []).push(p);
@@ -60,4 +60,20 @@ export function groupAlbums(photos) {
 export function useSitePhoto(key, fallback) {
   const photos = useApi('/site-photos');
   return (photos && photos[key]) || fallback;
+}
+
+/** Resource state for public collections: empty and failed are distinct. */
+export function useApiResource(path) {
+  const [state, setState] = useState({ data: null, loading: true, error: false });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let active = true;
+    setState({ data: null, loading: true, error: false });
+    fetchOnce(path).then(data => {
+      if (active) setState({ data, loading: false, error: data === null });
+    });
+    return () => { active = false; };
+  }, [path, attempt]);
+  const retry = () => { cache.delete(path); setAttempt(value => value + 1); };
+  return { ...state, retry };
 }

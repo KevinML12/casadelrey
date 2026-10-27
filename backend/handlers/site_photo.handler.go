@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"casadelrey/backend/models"
 
@@ -26,6 +27,7 @@ var knownSlots = []struct{ Key, Label string }{
 	{"about_servidores", "Nosotros — Misión y visión"},
 	{"about_comunidad", "Nosotros — Comunidad"},
 	{"about_lideres", "Nosotros — Encuentra tu célula"},
+	{"hero_nosotros", "Nosotros — Fondo del encabezado"},
 	{"hero_blog", "Blog — Fondo del encabezado"},
 	{"hero_galeria", "Galería — Fondo del encabezado"},
 	{"hero_celulas", "Células — Fondo del encabezado"},
@@ -99,6 +101,34 @@ func (h *SitePhotoHandler) GetAllSitePhotos(c echo.Context) error {
 			out = append(out, models.SitePhoto{Key: slot.Key, Label: slot.Label})
 		}
 	}
+	// New departments get their photo slots without a frontend/backend release.
+	var areas []models.VolunteerArea
+	if err := h.DB.Order("sort_order, title").Find(&areas).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener departamentos."})
+	}
+	known := map[string]bool{}
+	for _, slot := range knownSlots {
+		known[slot.Key] = true
+	}
+	for _, area := range areas {
+		for _, suffix := range []string{"", "_2"} {
+			key := "voluntariado_" + area.Value + suffix
+			if known[key] {
+				continue
+			}
+			label := "Voluntariado — " + area.Title
+			if suffix != "" {
+				label += " (foto extra, opcional)"
+			}
+			if photo, ok := byKey[key]; ok {
+				photo.Label = label
+				out = append(out, photo)
+			} else {
+				out = append(out, models.SitePhoto{Key: key, Label: label})
+			}
+			known[key] = true
+		}
+	}
 	return c.JSON(http.StatusOK, out)
 }
 
@@ -119,6 +149,21 @@ func (h *SitePhotoHandler) UpdateSitePhoto(c echo.Context) error {
 			break
 		}
 	}
+	if !found && strings.HasPrefix(key, "voluntariado_") {
+		value := strings.TrimPrefix(key, "voluntariado_")
+		var area models.VolunteerArea
+		// Accept the department key or its optional second photograph.
+		values := []string{value}
+		if strings.HasSuffix(value, "_2") {
+			values = append(values, strings.TrimSuffix(value, "_2"))
+		}
+		if err := h.DB.Where("value IN ?", values).First(&area).Error; err == nil {
+			label = "Voluntariado — " + area.Title
+			found = true
+		} else if err != gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener el departamento."})
+		}
+	}
 	if !found {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Slot de foto desconocido."})
 	}
@@ -130,7 +175,10 @@ func (h *SitePhotoHandler) UpdateSitePhoto(c echo.Context) error {
 
 	var photo models.SitePhoto
 	err := h.DB.Where("key = ?", key).First(&photo).Error
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al obtener la foto."})
+	}
+	if err == gorm.ErrRecordNotFound {
 		photo = models.SitePhoto{Key: key, Label: label, ImageURL: req.ImageURL}
 		if err := h.DB.Create(&photo).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar."})

@@ -7,6 +7,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"casadelrey/backend/models"
 
@@ -28,6 +29,19 @@ func NewSiteSettingHandler(db *gorm.DB) *SiteSettingHandler {
 // mostrar una equivocada; el front invita a coordinar el depósito hasta
 // que el admin ponga la real.
 var knownSettings = []struct{ Key, Label, Default string }{
+	{"about_title", "Nosotros — Título", "Somos Casa del Rey."},
+	{"about_intro", "Nosotros — Presentación", "Una iglesia familiar en Huehuetenango, edificada célula por célula, generación tras generación."},
+	{"about_founders_names", "Nosotros — Nombres de fundadores", "José de León y Desidería López"},
+	{"about_founders_description", "Nosotros — Historia de fundadores", "Sembraron la visión original de Casa del Rey — los cimientos sobre los que la iglesia sigue edificando hoy."},
+	{"about_pastors_names", "Nosotros — Nombres de pastores", "Leonel de León e Ismeina Castillo"},
+	{"about_pastors_description", "Nosotros — Equipo pastoral", "Junto a un equipo pastoral, cubren las células de varones, prejuveniles y la red Mujeres de Palabra."},
+	{"about_mission", "Nosotros — Misión", "Somos una iglesia cristiana familiar, enfocada en cumplir la gran comisión de Jesucristo: ir y hacer discípulos a las naciones, formando líderes capaces de reproducir la obra de Dios."},
+	{"about_vision", "Nosotros — Visión", "Ser una iglesia de restauración familiar, punta de lanza, que proclama la verdad de la Palabra de Dios bajo el poder del Espíritu Santo."},
+	{"about_address", "Nosotros — Dirección", "7ª. Calle 12-66 zona 4, carretera a las Ruinas de Zaculeu, Huehuetenango"},
+	{"about_map_url", "Nosotros — Enlace del mapa", "https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"},
+	{"about_podcast_title", "Nosotros — Nombre del podcast", "Podcast Inusual Youth"},
+	{"about_podcast_schedule", "Nosotros — Horario del podcast", "92.9 FM Radio Stereo Cumbre · Viernes · 3:00 PM"},
+
 	{"bank_name", "Banco", "Banrural"},
 	{"bank_account", "Número de cuenta", ""},
 	{"bank_account_type", "Tipo de cuenta", "Monetaria"},
@@ -72,7 +86,7 @@ func (h *SiteSettingHandler) GetPublic(c echo.Context) error {
 	}
 	out := map[string]string{}
 	for _, s := range knownSettings {
-		if v, ok := stored[s.Key]; ok && v != "" {
+		if v, ok := stored[s.Key]; ok && (v != "" || strings.HasPrefix(s.Key, "about_")) {
 			out[s.Key] = v
 		} else {
 			out[s.Key] = s.Default
@@ -93,15 +107,15 @@ func (h *SiteSettingHandler) GetAll(c echo.Context) error {
 		stored[r.Key] = r.Value
 	}
 	type item struct {
-		Key       string `json:"key"`
-		Label     string `json:"label"`
-		Value     string `json:"value"`
-		UsingDefault bool `json:"using_default"`
+		Key          string `json:"key"`
+		Label        string `json:"label"`
+		Value        string `json:"value"`
+		UsingDefault bool   `json:"using_default"`
 	}
 	var out []item
 	for _, s := range knownSettings {
 		v, ok := stored[s.Key]
-		usingDefault := !ok || v == ""
+		usingDefault := !ok || (v == "" && !strings.HasPrefix(s.Key, "about_"))
 		effective := v
 		if usingDefault {
 			effective = s.Default

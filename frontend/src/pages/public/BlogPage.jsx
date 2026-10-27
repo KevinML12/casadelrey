@@ -13,7 +13,6 @@ import apiClient from '../../lib/apiClient';
 import BlogHero from '../../components/blog/BlogHero';
 import PostCollage from '../../components/blog/PostCollage';
 import ArticleReader from '../../components/blog/ArticleReader';
-import SectionBg from '../../components/ui/SectionBg';
 import CollectionStatus from '../../components/ui/CollectionStatus';
 
 // Mismo fallback de categoría que PostCollage.jsx (p.category vacío no
@@ -92,38 +91,17 @@ export default function BlogPage() {
             DENTRO de BlogHero -> PageHero, acotada al hero -- ya no se
             extiende como capa de página completa detrás del listado. */}
         <BlogHero />
-        <section className="relative overflow-hidden pt-6 pb-28">
-          <SectionBg src="/images/components/bg_blog.jpg" />
-          <div className="relative z-10 max-w-6xl mx-auto px-6">
-          {categories.length > 1 && (
-            <div className="flex flex-wrap justify-center gap-2 mb-10">
-              <button
-                type="button"
-                onClick={() => setActiveCategory(null)}
-                className={`px-4 py-2 rounded-full text-13 font-semibold transition-colors ${
-                  activeCategory === null ? 'bg-white text-bg' : 'bg-white/10 border border-white/15 text-white/70 hover:text-white hover:bg-white/15'
-                }`}
-              >
-                Todo
-              </button>
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-13 font-semibold transition-colors ${
-                    activeCategory === cat ? 'bg-white text-bg' : 'bg-white/10 border border-white/15 text-white/70 hover:text-white hover:bg-white/15'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          )}
+        <section className="relative overflow-clip">
+          {categories.length > 1 && <div className="max-w-4xl mx-auto px-6 pt-8">
+            <label htmlFor="blog-category" className="text-14 text-white/80">Categoría</label>
+              <select id="blog-category" value={activeCategory || ''} onChange={event => setActiveCategory(event.target.value || null)} className="block mt-2 min-h-11 rounded-[12px] bg-bg text-white border border-white/25 px-4 py-2 focus-ring">
+                <option value="">Todas</option>
+                {categories.map(category => <option key={category} value={category}>{category}</option>)}
+              </select>
+          </div>}
           {loading || feedError ? (
             <CollectionStatus loading={loading} label="los mensajes" onRetry={() => setAttempt(v => v + 1)} />
           ) : <PostCollage posts={filteredPosts} />}
-          </div>
         </section>
       </div>
     </main>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useApi } from '../../lib/feed';
 
 // Solo datos CONFIRMADOS (CONTEXTO_IGLESIA jul-2026): dirección real,
 // redes oficiales, podcast y fundadores. Nada inventado — teléfono,
@@ -25,6 +26,7 @@ const SOCIAL = [
 ];
 
 export default function Footer() {
+  const settings = useApi('/settings') || {};
   return (
     <footer className="relative bg-bg pt-20 pb-10 border-t border-white/5 overflow-hidden">
       <div className="relative z-10 max-w-6xl mx-auto px-6">
@@ -43,9 +45,7 @@ export default function Footer() {
                 <span className="block text-13 text-white/50 font-medium">Iglesia cristiana · Huehuetenango</span>
               </div>
             </Link>
-            <p className="text-14 text-white/50 font-medium leading-relaxed max-w-xs">
-              Fundada por el Pastor José de León y Desidería López.
-            </p>
+            {settings.about_founders_names && <p className="text-14 text-white/50 font-medium leading-relaxed max-w-xs">{settings.about_founders_names}</p>}
             <div className="flex flex-wrap items-center gap-2.5">
               {SOCIAL.map(s => (
                 <a
@@ -78,21 +78,8 @@ export default function Footer() {
           {/* Visítanos + podcast */}
           <div>
             <p className="text-13 font-semibold text-white/40 mb-5">Visítanos</p>
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-start gap-3 text-14 text-white/70 hover:text-white transition-colors font-medium leading-relaxed"
-            >
-              <span>7ª. Calle 12-66 zona 4,<br />carretera a las Ruinas de Zaculeu,<br />Huehuetenango</span>
-            </a>
-            <div className="flex items-start gap-3 mt-5 text-14 text-white/70 font-medium leading-relaxed">
-              <span>
-                Podcast <span className="text-white font-bold">Inusual Youth</span><br />
-                92.9 FM Radio Stereo Cumbre<br />
-                Viernes · 3:00 PM
-              </span>
-            </div>
+            {settings.about_address && (settings.about_map_url ? <a href={settings.about_map_url} target="_blank" rel="noopener noreferrer" className="text-14 text-white/70 hover:text-white leading-relaxed">{settings.about_address}</a> : <p className="text-14 text-white/70 leading-relaxed">{settings.about_address}</p>)}
+            {settings.about_podcast_schedule && <div className="mt-5 text-14 text-white/70 leading-relaxed"><p className="font-bold text-white">{settings.about_podcast_title}</p><p>{settings.about_podcast_schedule}</p></div>}
           </div>
         </div>
 

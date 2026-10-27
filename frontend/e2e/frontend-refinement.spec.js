@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { volunteerAreas } from './fixtures/published-content.js';
 
 async function isolate(page) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -6,7 +7,7 @@ async function isolate(page) {
     const url = new URL(route.request().url());
     if (url.pathname.includes('/api/v1')) {
       const path = url.pathname.split('/api/v1')[1];
-      const body = ['/settings', '/site-photos'].includes(path) ? {} : path === '/hero/active' ? null : [];
+      const body = ['/settings', '/site-photos'].includes(path) ? {} : path === '/volunteer-areas' ? volunteerAreas : path === '/hero/active' ? null : [];
       return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
     }
     if (!['127.0.0.1', 'localhost'].includes(url.hostname)) return route.abort();
@@ -56,9 +57,9 @@ test('flat glass windows sit above navigation and restore focus', async ({ page 
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.locator('#root [role="dialog"]')).toHaveCount(0);
   expect(await page.locator('#root').evaluate(el => el.inert)).toBe(true);
-  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Siguiente/ }).click();
   await expect(page.getByRole('dialog')).toHaveAttribute('aria-label', 'Danza');
-  await page.getByRole('button', { name: 'Anterior', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Anterior/ }).click();
   await expect(page.getByRole('dialog')).toHaveAttribute('aria-label', 'Alabanza');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -109,8 +110,8 @@ test('first photo is prioritized and local photos use responsive WebP', async ({
   const heroPhoto = page.locator('.page-hero img');
   await expect(heroPhoto).toHaveAttribute('loading', 'eager');
   await expect(heroPhoto).toHaveAttribute('fetchpriority', 'high');
-  await expect(heroPhoto).toHaveAttribute('srcset', /640.webp.*1600.webp/);
-  expect(await heroPhoto.evaluate(el => el.currentSrc)).toContain('/optimized/');
+  await expect(heroPhoto).toHaveAttribute('srcset', /\.webp 640w, .*\.webp 1600w/);
+  expect(await heroPhoto.evaluate(el => el.currentSrc)).toMatch(/\.webp$/);
   const valid = await heroPhoto.evaluate(el => el.complete && el.naturalWidth > 0);
   expect(valid).toBe(true);
 });

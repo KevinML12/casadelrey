@@ -1,12 +1,11 @@
-import PhotoImage from '../../components/ui/PhotoImage';
 import CollectionStatus from '../../components/ui/CollectionStatus';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { RevealList, RevealItem } from '../../components/ui/Reveal';
-import ParallaxImg from '../../components/ui/ParallaxImg';
+import SceneCarousel from '../../components/ui/SceneCarousel';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
@@ -21,21 +20,10 @@ import PageHero from '../../components/layout/PageHero';
 const btnPrimary = 'flex-1 justify-center inline-flex items-center gap-2 rounded-full bg-bg text-white text-14 font-bold px-5 py-3 shadow-card hover:opacity-90 disabled:opacity-50 transition-opacity';
 const btnGhost = 'inline-flex items-center justify-center gap-2 rounded-full text-bg/55 hover:text-bg hover:bg-bg/5 text-14 font-semibold px-5 py-3 transition-colors';
 
-// Collage estilo Galería para la vista de cuadrícula: variedad de tamaños
-// para TODOS los eventos (no solo el primero), con [grid-auto-flow:dense]
-// en el contenedor para que no queden huecos. Ver GalleryPage.jsx (SPANS/ROT).
-const GRID_SPANS = [
-  'col-span-2 row-span-2',
-  'col-span-2 sm:col-span-1 row-span-1',
-  'col-span-2 sm:col-span-1 row-span-1',
-  'col-span-2 row-span-1',
-];
-
 // Las fechas se imprimen en caja normal, no en versales: `uppercase` con
 // tracking apretado en 9-10px era la fórmula del eyebrow disfrazada de
 // dato, y a ese tamaño además no se leía. es-ES devuelve "ago." / "lunes"
 // en minúscula, así que solo se levanta la inicial.
-const cap = s => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 // BankDetails.jsx es texto blanco a proposito -- lo comparten Donar y
 // Comprobante, paginas oscuras. Aca el modal es claro, asi que se
@@ -397,235 +385,18 @@ function CancelRSVPModal({ event, onClose, onCancelled }) {
   );
 }
 
-function EventCard({ ev, i, onRsvp, onCancelRsvp, highlighted }) {
-  const nodeRef = useRef(null);
-  // Card destacada por deep-link (viene de "Próximos eventos" en el
-  // Home, ?id=<ID>): anillo temporal que se desvanece solo -- confirma
-  // al usuario CUAL evento cargó sin dejar el resaltado pegado para siempre.
-  const [showHighlight, setShowHighlight] = useState(highlighted);
-  useEffect(() => {
-    if (!highlighted) return;
-    nodeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setShowHighlight(true);
-    const t = setTimeout(() => setShowHighlight(false), 2600);
-    return () => clearTimeout(t);
-  }, [highlighted]);
-  // Regla del sitio: cristal blanco (glass-light) para contenido sin foto
-  // propia; cristal oscuro (liquid-glass) para cards que SI muestran una
-  // foto propia (el degradado claro deslavaba el flyer -- feedback real
-  // del usuario). La clasificacion real ya no es "con/sin foto" a ciegas:
-  // es foto->oscuro, sin foto->claro, aplicado consistente en todo el sitio.
-  const hasPhoto = Boolean(ev.cover_image);
-
-  const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
-  const dayNum   = d ? d.getDate() : null;
-  const monthStr = d ? cap(d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')) : null;
-  const weekday  = d ? cap(d.toLocaleDateString('es-ES', { weekday: 'long' })) : 'Evento';
-  const details  = [ev.time, ev.location]
-    .filter(Boolean)
-    .map(s => s[0].toUpperCase() + s.slice(1))
-    .join(' · ');
-  const bentoSpan = GRID_SPANS[i % GRID_SPANS.length];
-  // La card destacada (2x2) es mucho mas alta que las demas -- si el
-  // contenido queda anclado abajo (como en las cards chicas), deja un
-  // tramo enorme de vidrio vacio arriba antes del texto, y a primera
-  // vista (o con scroll a mitad de card) se lee como una card rota/sin
-  // contenido. Centrado vertical solo para esta, sin tocar las demas.
-  const isFeaturedTall = bentoSpan.includes('row-span-2');
-
-  // Tinta segun material: blanca sobre liquid-glass (con foto), navy
-  // sobre glass-light (sin foto).
-  const ink        = hasPhoto ? 'text-white'    : 'text-bg';
-  const ink80      = hasPhoto ? 'text-white/80' : 'text-bg/80';
-  const ink60      = hasPhoto ? 'text-white/60' : 'text-bg/60';
-  const ink50      = hasPhoto ? 'text-white/50' : 'text-bg/50';
-  const ink40      = hasPhoto ? 'text-white/40' : 'text-bg/40';
-  const ink35      = hasPhoto ? 'text-white/35' : 'text-bg/35';
-  const inkHover    = hasPhoto ? 'hover:text-white/60' : 'hover:text-bg/60';
-  const wellBg     = hasPhoto ? 'bg-white/5'  : 'bg-bg/5';
-  const wellBorder = hasPhoto ? 'border-white/10' : 'border-bg/10';
-
-  // La card NO es navegable: no lleva href ni onClick, el que actúa es el
-  // botón de RSVP que vive adentro. El Tilt que la envolvía inclinaba en 3D
-  // una superficie que no responde al click, y eso promete una afordancia
-  // falsa -- se queda solo el motion.div con la entrada/salida (la necesita
-  // el AnimatePresence del grid) y `liquid-shine` a mano, que antes lo
-  // agregaba la prop `glass` de Tilt. El bisel de .liquid-glass/.glass-light
-  // vive en la clase, así que el material no cambia.
-  // Sigue envuelta en un <div> simple (con el ref/id/bentoSpan): scrollIntoView
-  // necesita ese ref para el deep-link desde Home, y el span del grid bento
-  // debe vivir en el elemento que Grid realmente mide.
-  return (
-    <div ref={nodeRef} id={`event-${ev.ID}`} className={`${bentoSpan} w-full h-full`}>
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-      className={`w-full h-full ${hasPhoto ? 'liquid-glass' : 'glass-light'} liquid-shine relative overflow-hidden rounded-[22px] group transition-shadow ${showHighlight ? 'event-highlight' : ''}`}
-    >
-
-      {hasPhoto && (
-        <>
-          {/* Flyer a color pleno: el `opacity-80` que llevaba encima lo
-              entregaba deslavado antes de que el degradado siquiera actuara.
-              El contraste lo pone el scrim, no la opacidad de la foto. */}
-          <PhotoImage src={ev.cover_image} alt={ev.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 " />
-          {/* .scrim-card: el texto de esta card vive anclado al tercio
-              inferior, así que oscurece ahí y deja el flyer visible arriba. */}
-          <div className="scrim-card" />
-        </>
-      )}
-
-      {/* Etiqueta de próximo evento si es el primero -- sin el punto que
-          pulsaba delante: es el mismo pill+punto que se quitó de todo el
-          sitio, un pictograma decorativo pegado a un dato que ya se dice
-          con palabras. */}
-      {i === 0 && (
-        <div className="absolute top-6 left-6 z-20">
-          <span className="bg-bg/90 px-4 py-1.5 rounded-full text-white text-12 font-bold backdrop-blur-md">
-            Próximo evento
-          </span>
-        </div>
-      )}
-
-      {/* Contenido -- antes las cards con foto metian el texto en un
-          panel flotante CON su propio borde/blur (liquid-glass anidado),
-          lo que se leia como dos cajas separadas (foto arriba, panel
-          abajo) en vez de una sola card. Ahora el texto va directo
-          sobre el degradado, sin caja propia -- una sola superficie. */}
-      <div className={hasPhoto
-        ? 'absolute bottom-0 left-0 right-0 z-20 p-5'
-        : `relative z-20 h-full flex flex-col ${isFeaturedTall ? 'justify-center' : 'justify-end'} p-5`
-      }>
-        {/* Contenedor de layout puro (sin fondo ni recorte): el radio que
-            llevaba no dibujaba nada, el que manda es el de la card. */}
-        <div className="flex flex-col gap-4">
-
-          <div className="flex items-center gap-4 w-full min-w-0">
-            {/* Fecha */}
-            {dayNum && (
-              <div className={`text-center shrink-0 flex flex-col items-center justify-center rounded-2xl ${wellBg} border ${wellBorder} shadow-inner w-[60px] h-[60px]`}>
-                <div className={`font-bold leading-none ${ink} tracking-tighter text-24`}>
-                  {dayNum}
-                </div>
-                {/* El mes iba en versales a 9px con 2px de tracking: no era
-                    legible y era la fórmula del eyebrow aplicada a un dato. */}
-                <div className={`font-semibold mt-0.5 ${ink50} text-13`}>
-                  {monthStr}
-                </div>
-              </div>
-            )}
-
-            {/* Detalles */}
-            <div className="min-w-0 flex-1">
-              {/* Sin font-mono: era una tercera familia tipográfica usada
-                  solo para hacer micro-versales, y a 10px no se leía. */}
-              <p className={`text-13 font-semibold ${ink40} mb-1`}>
-                {weekday}
-              </p>
-              <h3 className={`font-bold tracking-tight ${ink} line-clamp-1 text-20 leading-tight`}>
-                {ev.title}
-              </h3>
-            </div>
-          </div>
-
-          {details && (
-            <p className={`truncate ${ink60} text-13`}>
-              {details}
-            </p>
-          )}
-
-          {/* Descripción real del evento -- solo en la card destacada
-              (2x2), que tiene espacio de sobra; el dato ya existe en
-              /admin/events, antes nunca se mostraba en la vista pública. */}
-          {isFeaturedTall && ev.description && (
-            <p className={`${ink60} text-14 leading-relaxed line-clamp-2`}>
-              {ev.description}
-            </p>
-          )}
-
-          <div className={`shrink-0 flex flex-col gap-3 w-full pt-3 border-t ${wellBorder}`}>
-            {/* Gratis vs. pagado: la clasificación real de la card, siempre visible */}
-            <div className="flex flex-wrap gap-2">
-              {ev.requires_payment ? (
-                <span className={`font-bold text-12 ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
-                  Q{Number(ev.price_gtq).toFixed(0)}
-                </span>
-              ) : (
-                <span className={`font-bold text-12 ${ink80} flex items-center gap-1.5 px-3 py-1 ${wellBg} rounded-full border ${wellBorder} w-fit`}>
-                  Gratis
-                </span>
-              )}
-              {ev.spots_remaining != null && (
-                <span className={`font-bold text-12 flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${
-                  ev.is_full ? 'text-rose bg-rose/10 border-rose/25' : `${ink80} ${wellBg} ${wellBorder}`
-                }`}>
-                  {ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupo${ev.spots_remaining === 1 ? '' : 's'} disponible${ev.spots_remaining === 1 ? '' : 's'}`}
-                </span>
-              )}
-            </div>
-            {/* PRESS_PRIMARY: es la acción principal de la card, y ahora se
-                levanta con la misma física que el resto de CTAs del sitio en
-                vez de con una escala inventada acá (1.03/0.95). Con cupo
-                lleno no reacciona: no hay acción que confirmar. */}
-            <motion.button
-              {...(ev.is_full ? {} : PRESS_PRIMARY)}
-              onClick={() => !ev.is_full && onRsvp(ev)}
-              disabled={ev.is_full}
-              className={`rounded-full text-14 font-bold inline-flex items-center justify-center gap-3 group/btn w-full py-3 ${
-                ev.is_full
-                  ? `${wellBg} border ${wellBorder} ${ink40} cursor-not-allowed`
-                  : hasPhoto ? 'bg-white text-bg hover:opacity-90' : 'bg-bg text-white hover:opacity-90'
-              }`}
-            >
-              {ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}
-            </motion.button>
-            <button
-              type="button"
-              onClick={() => onCancelRsvp(ev)}
-              className={`${ink35} ${inkHover} text-12 font-medium transition-colors self-center`}
-            >
-              ¿Ya te registraste? Cancelar mi registro
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-    </motion.div>
-    </div>
-  );
-}
-
-// Card compacta para eventos que ya pasaron -- sin RSVP (no tiene sentido
-// registrarse a un evento que ya ocurrio), sin badge de precio/cupo, mas
-// pequeña y con menos peso visual que las cards de proximos eventos.
-function PastEventCard({ ev }) {
-  const d        = ev.date ? new Date(ev.date + 'T12:00:00') : null;
-  const dayNum   = d ? d.getDate() : null;
-  const monthStr = d ? cap(d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')) : null;
-  const details  = [ev.time, ev.location]
-    .filter(Boolean)
-    .map(cap)
-    .join(' · ');
-
-  return (
-    <div className="glass-light rounded-[22px] p-4 flex items-center gap-4 opacity-80">
-      {dayNum && (
-        <div className="text-center shrink-0 flex flex-col items-center justify-center rounded-xl bg-bg/5 border border-bg/10 w-12 h-12">
-          <div className="font-bold leading-none text-bg/70 text-16">{dayNum}</div>
-          {/* Igual que en la card de próximos: caja normal y un tamaño que
-              se pueda leer (venía en versales a 7px). */}
-          <div className="font-semibold text-bg/40 text-12">{monthStr}</div>
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <h4 className="font-bold text-bg/70 text-15 tracking-tight line-clamp-1">{ev.title}</h4>
-        {details && <p className="text-bg/40 text-12 truncate mt-0.5">{details}</p>}
-      </div>
-    </div>
-  );
+function EventCard({ ev, onRsvp, onCancelRsvp, past = false }) {
+  const date = ev.date ? new Date(`${ev.date}T12:00:00`).toLocaleDateString('es-GT', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  return <div className="text-white" id={`event-${ev.ID}`}>
+    <h2 className="text-28 sm:text-32 font-bold tracking-tight">{ev.title}</h2>
+    <p className="mt-4 text-14 text-white/80">{[date, ev.time, ev.location].filter(Boolean).join(' · ')}</p>
+    {ev.description && <p className="mt-5 text-16 leading-relaxed text-white/85">{ev.description}</p>}
+    {!past && <div className="mt-6 space-y-4">
+      <p className="text-14 font-semibold">{ev.requires_payment ? `Q${Number(ev.price_gtq).toFixed(2)} por persona` : 'Gratis'}{ev.spots_remaining != null ? ` · ${ev.is_full ? 'Cupo lleno' : `${ev.spots_remaining} cupos disponibles`}` : ''}</p>
+      <button type="button" disabled={ev.is_full} onClick={() => onRsvp(ev)} className="min-h-11 rounded-pill bg-white px-6 py-3 text-14 font-bold text-bg disabled:opacity-50 focus-ring">{ev.is_full ? 'Cupo lleno' : ev.requires_payment ? 'Registrarme' : 'Confirmar'}</button>
+      <button type="button" onClick={() => onCancelRsvp(ev)} className="block min-h-11 text-13 text-white/80 underline underline-offset-4 focus-ring rounded-[8px]">¿Ya te registraste? Cancelar mi registro</button>
+    </div>}
+  </div>;
 }
 
 // El ModalWrapper local que vivía acá se migró al compartido
@@ -636,7 +407,7 @@ function PastEventCard({ ev }) {
 // del sitio. El componente compartido ya trae ambas cosas resueltas.
 
 export default function EventsPage() {
-  const heroImg = useSitePhoto('hero_eventos', '/images/bg-eventos.jpg');
+  const heroImg = useSitePhoto('hero_eventos', '/images/backgrounds/congregacion.webp');
   const [searchParams] = useSearchParams();
   const highlightId = searchParams.get('id');
   const [events, setEvents] = useState([]);
@@ -690,7 +461,7 @@ export default function EventsPage() {
       <PageHero title="Eventos" photoSrc={heroImg}
         subtitle="Conéctate con nuestra comunidad en persona. Encuentra tu lugar, adora y crece con nosotros." />
 
-      <div className="relative z-10 mx-auto pb-20 w-full flex-1 max-w-7xl px-6">
+      <div className="relative z-10 mx-auto pb-20 w-full flex-1">
         {loading || feedError ? (
           <CollectionStatus loading={loading} label="los eventos" onRetry={() => setAttempt(v => v + 1)} />
         ) : events.length === 0 ? (
@@ -722,14 +493,7 @@ export default function EventsPage() {
             <p className="text-white/40 text-15 mt-2">Revisa los eventos pasados más abajo.</p>
           </div>
         ) : (
-          /* ── Cuadrícula de próximos eventos ── */
-          <AnimatePresence>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[230px] sm:auto-rows-[250px] gap-6 [grid-auto-flow:dense]">
-              {upcomingEvents.map((ev, i) => (
-                <EventCard key={ev.ID} ev={ev} i={i} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} highlighted={highlightId != null && String(ev.ID) === highlightId} />
-              ))}
-            </div>
-          </AnimatePresence>
+          <SceneCarousel key={highlightId || 'upcoming'} initialKey={upcomingEvents.find(event => String(event.ID) === highlightId)?.ID} items={upcomingEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Próximos eventos" panelClassName="h-[440px]" renderContent={event => <EventCard ev={event} onRsvp={setRsvpEvent} onCancelRsvp={setCancelEvent} />} />
         )}
 
         {/* ── Eventos pasados: compactos, sin RSVP, mas recientes primero ── */}
@@ -740,13 +504,7 @@ export default function EventsPage() {
                 que entra. Y `uppercase tracking-tightish` era la fórmula del
                 eyebrow -- las versales piden MÁS aire, no menos. */}
             <p className="text-13 font-semibold text-white/40 mb-6">Eventos pasados</p>
-            <RevealList className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {pastEvents.map(ev => (
-                <RevealItem key={ev.ID}>
-                  <PastEventCard ev={ev} />
-                </RevealItem>
-              ))}
-            </RevealList>
+            <SceneCarousel items={pastEvents.map(event => ({ ...event, key: event.ID, image: event.cover_image || heroImg }))} label="Eventos pasados" renderContent={event => <EventCard ev={event} past />} />
           </div>
         )}
       </div>

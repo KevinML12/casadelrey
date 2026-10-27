@@ -1,35 +1,18 @@
-import PhotoImage from '../../components/ui/PhotoImage';
-// ============================================================
-//  CelulasPage — módulo de VENTANAS SOBREPUESTAS (filosofía macOS
-//  Liquid Glass). Base: un hero de fondo + las 5 categorías como
-//  recortes de cristal en collage. Al elegir una, se abre una
-//  ventana de cristal flotante SOBRE TODO con la galería de células
-//  de ese tipo; detrás asoman los otros tipos apilados como cartas,
-//  y saltas entre ellos trayéndolos al frente. Este patrón de
-//  ventanas apiladas es el lenguaje de diseño del sitio.
-//
-//  Cada célula muestra solo nombre · líder · zona (PRIVACIDAD: nunca
-//  direcciones exactas — el directorio completo es interno, ver
-//  CONTEXTO_IGLESIA). 100% API (GET /cells + /cell-categories +
-//  /leaders): si la API no trae categorías se pinta un estado vacío
-//  explícito, nunca un directorio hardcodeado — el que vivía aquí ya
-//  tenía nombres desactualizados respecto a la API.
-// ============================================================
+// Directorio administrable; una escena por categoría, sin fotografías dentro del cristal.
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSeo from '../../hooks/useSeo';
-import Reveal from '../../components/ui/Reveal';
 import PageHero from '../../components/layout/PageHero';
-import StatTrio from '../../components/ui/StatTrio';
+import SceneCarousel from '../../components/ui/SceneCarousel';
+import CollectionStatus from '../../components/ui/CollectionStatus';
+import PhotoTabs from '../../components/ui/PhotoTabs';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
-import GlassCard from '../../components/ui/GlassCard';
-import { useApi } from '../../lib/feed';
+import { useApiResource } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
-import SectionBg from '../../components/ui/SectionBg';
 
 const btnPrimary = 'w-full inline-flex items-center justify-center gap-2.5 rounded-pill bg-bg text-white px-6 py-4 text-15 font-bold focus-ring shadow-card hover:opacity-90';
 const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-pill text-bg/55 hover:text-bg hover:bg-bg/5 px-6 py-3.5 text-14 font-semibold transition-colors';
@@ -57,22 +40,7 @@ const btnGhost = 'w-full inline-flex items-center justify-center gap-2 rounded-p
 // Foto genérica para una categoría creada desde el panel que aún no tiene
 // foto propia en /admin/site-photos (mismo fallback genérico que usan los
 // departamentos de voluntariado) -- nunca un hueco en blanco.
-const DEFAULT_CATEGORY_IMAGE = '/images/components/celula_general.jpg';
-
-// COLLAGE base — recortes de tamaños/inclinaciones distintos
-const COLLAGE = [
-  { span: 'col-span-2 row-span-2' },
-  { span: 'col-span-1 row-span-1' },
-  { span: 'col-span-1 row-span-1' },
-  { span: 'col-span-1 row-span-1' },
-  { span: 'col-span-2 row-span-1' },
-  { span: 'col-span-1 row-span-1' },
-];
-
-// Normaliza nombres para matchear célula ↔ directorio de líderes
-// ("Cristian de León" vs "cristian de leon")
-const norm = (s) =>
-  (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+const DEFAULT_CATEGORY_IMAGE = '/images/backgrounds/congregacion.webp';
 
 // El campo `zone` de una célula mezcla la zona con el punto de referencia
 // ("Zona 4, Arco de la Feria", "Hotel Premier, Zona 8"), así que contar
@@ -121,8 +89,8 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
       type="button"
       onClick={() => onSolicitar(cell)}
       aria-label={`Ver la célula ${cell.name}`}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay: 0.05 + index * 0.03 }}
       // .glass-light-nested y no un tinte plano: es la segunda capa del
       // sistema (ver index.css), con su propio bisel y su hairline. Una
@@ -133,34 +101,7 @@ function CellRow({ cell, onSolicitar, index = 0, tone = 'dark' }) {
         dark ? 'bg-white/5 hover:bg-white/10' : 'glass-light-nested'
       }`}
     >
-      {/* La inicial de la célula en su propio cuadro. No es un ícono ni un
-          avatar de relleno: es la primera letra de su nombre, que es dato
-          real y distinto en cada fila. Da un ancla a la izquierda y rompe
-          la lista de puro texto que se leía como hoja de cálculo. */}
-      {cell.leader_photo ? (
-        <PhotoImage
-          src={cell.leader_photo}
-          alt={`Líder ${cell.leader}`}
-          className="shrink-0 w-14 h-14 rounded-full object-cover shadow-sm border border-black/5"
-        />
-      ) : (
-        <span
-          className={`shrink-0 w-12 h-12 rounded-[14px] grid place-items-center text-18 font-bold shadow-sm ${
-            dark ? 'bg-white/10 text-white/80' : 'bg-bg/8 text-bg/70'
-          }`}
-          aria-hidden="true"
-        >
-          {(cell.name || '?').trim()[0].toUpperCase()}
-        </span>
-      )}
 
-      {/* Dos líneas, cada una con un ancla a la izquierda y otra a la
-          derecha. Antes todo se apelotonaba a la izquierda y "Unirme"
-          quedaba solo contra el borde derecho, a 400px del nombre: la fila
-          medía 730px y usaba 300. Con `justify-between` el nombre se
-          empareja con su líder y los chips con la afordancia, y la fila
-          ocupa el ancho que tiene. En pantalla angosta el `flex-wrap` deja
-          caer el líder a su propio renglón. */}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
           <p className={`text-17 font-bold leading-tight truncate ${dark ? 'text-white' : 'text-bg'}`}>
@@ -485,8 +426,8 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
   ].filter(Boolean);
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.18 } }
   };
 
   return (
@@ -506,20 +447,6 @@ function CellDetailCard({ cell, onUnirme, onCerrar }) {
       </motion.button>
 
       <motion.div variants={itemVariants} className="flex items-center gap-4">
-        {cell.leader_photo ? (
-          <PhotoImage
-            src={cell.leader_photo}
-            alt={`Líder ${cell.leader}`}
-            className="shrink-0 w-20 h-20 rounded-full object-cover shadow-sm border border-bg/5"
-          />
-        ) : (
-          <span
-            className="shrink-0 w-16 h-16 rounded-[18px] grid place-items-center text-28 font-bold bg-bg/10 text-bg/75 shadow-sm"
-            aria-hidden="true"
-          >
-            {(cell.name || '?').trim()[0].toUpperCase()}
-          </span>
-        )}
         <h3 className="text-d3 text-bg min-w-0 break-words">{cell.name}</h3>
       </motion.div>
 
@@ -585,8 +512,8 @@ function CellCategoryDetail({ group, onAbrirCelula }) {
     : group.cells;
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.18 } }
   };
 
   return (
@@ -738,11 +665,7 @@ function CellQuizModal({ groups, onViewDetail }) {
             ? `${category.name}${matches[0].zone ? ` · ${matches[0].zone}` : ''}`
             : `${matches.length} células${zone && enZona.length > 0 ? ` en ${zone}` : ''}`}
         </p>
-        {category.image && (
-          <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
-            <PhotoImage src={category.image} alt={`Imagen representativa de ${category.name}`} className="w-full h-full object-cover" />
-          </div>
-        )}
+
 
         {/* Todas las coincidencias como lista divide-y, el mismo patrón
             que la ventana de la categoría -- en tono claro porque el modal
@@ -800,22 +723,11 @@ function CellQuizModal({ groups, onViewDetail }) {
             key={g.key}
             type="button"
             onClick={() => chooseCategory(g)}
-            className="group relative rounded-[22px] overflow-hidden aspect-[4/5] text-left focus-ring"
+            className="rounded-[12px] border border-bg/15 min-h-20 text-left text-bg focus-ring hover:bg-bg/5"
           >
-            {g.image && (
-              <PhotoImage
-                src={g.image}
-                alt="Imagen representativa"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 "
-              />
-            )}
-            {/* Texto anclado abajo → .scrim-card. Antes era un gradiente
-                inline propio de esta ficha; el sitio tenía 25 variantes
-                así, cada una inventada donde tocó escribirla. */}
-            <div className="scrim-card" />
             <div className="relative z-10 h-full flex flex-col justify-end p-3.5">
-              <p className="text-15 font-bold text-white leading-tight">{g.name}</p>
-              {g.age && <p className="text-11 text-white/65 mt-0.5">{g.age}</p>}
+              <p className="text-15 font-bold text-bg leading-tight">{g.name}</p>
+              {g.age && <p className="text-12 text-bg/65 mt-0.5">{g.age}</p>}
             </div>
           </button>
         ))}
@@ -827,8 +739,11 @@ function CellQuizModal({ groups, onViewDetail }) {
 export default function CelulasPage() {
   useSeo('Células', 'Encuentra tu grupo de crecimiento. Células en casas durante la semana para conectar, orar y aprender juntos.');
   const [params] = useSearchParams();
-  const apiCells = useApi('/cells');
-  const apiCategories = useApi('/cell-categories');
+  const cellsResource = useApiResource('/cells');
+  const categoriesResource = useApiResource('/cell-categories');
+  const apiCells = cellsResource.data;
+  const apiCategories = categoriesResource.data;
+  const [panelTab, setPanelTab] = useState('gallery');
   const [openKey, setOpenKey] = useState(null); // ventana abierta (o null)
   // Capa sobrepuesta: la ficha de UNA célula, encima de la ventana de su
   // categoría. `solicitando` la convierte en el formulario sin cerrarla,
@@ -895,31 +810,9 @@ export default function CelulasPage() {
   // repetía la palabra del titular ("Mujeres" sobre "Mujeres"). La edad
   // sigue visible en la tarjeta del collage, en su línea de metadatos.
   const windowItems = useMemo(
-    () => groups.map(g => ({ key: g.key, image: g.image, title: g.name })),
+    () => groups.map(g => ({ key: g.key, image: g.image, fallbackImage: DEFAULT_CATEGORY_IMAGE, title: g.name, description: g.description, meta: `${g.cells.length} ${g.cells.length === 1 ? 'célula' : 'células'}` })),
     [groups]
   );
-
-  // Stats reales (nada inventado): se CUENTAN sobre los grupos ya
-  // resueltos desde la API -- cuántas células hay, cuántos grupos por
-  // edad, en cuántas zonas distintas. La ficha que las pinta es
-  // <StatTrio>, compartida con Voluntariado (antes el markup estaba
-  // duplicado carácter por carácter en los dos archivos); lo que cambia
-  // entre las dos páginas son estos datos, no la caja.
-  const stats = useMemo(() => {
-    const allCells = groups.flatMap(g => g.cells);
-    // Zona CANÓNICA, no el string crudo: contando strings el sitio publicaba
-    // "11 Zonas alcanzadas" porque "Zona 4" y "Zona 4, Arco de la Feria"
-    // contaban como dos. Las zonas reales hoy son 7 (1, 2, 4, 5, 7, 8 y San
-    // Lorenzo). Es una cifra pública sobre el alcance de la iglesia: inflarla
-    // por un descuido de parseo es exactamente el tipo de dato inventado que
-    // este sitio no publica.
-    const zonesCount = zonasDe(allCells).length;
-    return [
-      { n: String(allCells.length), label: allCells.length === 1 ? 'Célula activa' : 'Células activas' },
-      { n: String(groups.length), label: 'Grupos por edad' },
-      { n: String(zonesCount), label: zonesCount === 1 ? 'Zona alcanzada' : 'Zonas alcanzadas' },
-    ];
-  }, [groups]);
 
   return (
     <main className="relative w-full min-h-screen overflow-hidden">
@@ -933,9 +826,9 @@ export default function CelulasPage() {
           sola. */}
       <PageHero
         title="Células"
-        subtitle="Grupos que se reúnen en casas durante la semana. Toca un tipo para abrir su ventana — y salta entre ellas."
+        subtitle="Grupos que se reúnen en casas durante la semana. Conoce un tipo a la vez y encuentra tu comunidad."
         photoSlot="hero_celulas"
-        photoFallback="/images/nosotros/pastores-celulas.jpg"
+        photoFallback="/images/backgrounds/comunidad-templo.webp"
       >
         {/* "Busca por edad y zona", no "Descubre tu célula ideal": es
             literalmente lo que hace el quiz (pregunta 1 = grupo de edad,
@@ -953,100 +846,9 @@ export default function CelulasPage() {
         </motion.button>
       </PageHero>
 
-      <div className="relative z-10">
-        <section className="relative overflow-hidden pb-8">
-          <SectionBg src="/images/public_bg_celulas.jpg" />
-          <div className="relative z-10 max-w-6xl mx-auto px-6">
-            <StatTrio stats={stats} className="mt-10" />
-          </div>
-        </section>
-
-        {/* COLLAGE de tipos — cada recorte abre su ventana */}
-        <section className="relative overflow-hidden pt-6 pb-28">
-          <SectionBg src="/images/public_bg_eventos.jpg" />
-          <div className="relative z-10 max-w-6xl mx-auto px-6">
-          {/* Halo ambiental -- cambia de color según la categoría bajo el
-              cursor, mismo lenguaje que VolunteeringPage. Transición CSS
-              plana (no framer-motion animate): en Voluntariado el
-              animate={{opacity}} de motion.div no se comprometía al
-              inline style de forma confiable, una transición CSS normal
-              funciona igual de bien para un fade así de directo. */}
-
-          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 auto-rows-[150px] sm:auto-rows-[165px] gap-x-5 gap-y-9">
-            {groups.map((g, i) => {
-              const c = COLLAGE[i % COLLAGE.length];
-              const big = c.span.includes('row-span-2');
-              return (
-
-                <div
-                  key={g.key}
-                  className={c.span}
-
-                >
-                  <GlassCard
-                    as="button"
-                    onClick={() => setOpenKey(g.key)}
-
-                    glass
-                    className="liquid-glass group relative w-full h-full rounded-[22px] overflow-hidden text-left focus-ring ring-1 ring-white/10"
-
-                  >
-                    {/* Foto a color pleno. Antes llegaba al 45% (65% en
-                        hover) Y con un degradado navy encima: las caras
-                        de la congregación se leían como textura gris. El
-                        contraste lo pone .scrim-card, que oscurece solo
-                        el tercio de abajo, que es donde vive el texto. */}
-                    <PhotoImage
-                      src={g.image}
-                      alt="Imagen representativa"
-                      className="parallax-layer absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="scrim-card" />
-                    {/* Sin pill de edad encima del <h3>: ese era un eyebrow
-                        (etiqueta sobre titular), la forma que se purgó del
-                        sitio -- y con datos reales repetía la palabra del
-                        titular en 2 de 5 tarjetas (age_group "Mujeres" sobre
-                        el título "Mujeres", "Hombres" sobre "Varones"). La
-                        edad baja a la línea de metadatos, y solo cuando
-                        aporta algo que el nombre no dice ya. */}
-                    <div className="relative z-10 h-full w-full flex flex-col justify-end p-4 sm:p-5">
-                      <h3 className={`font-bold text-white tracking-tight leading-none ${big ? 'text-28 sm:text-34' : 'text-17 sm:text-19'}`}>
-                        {g.name}
-                      </h3>
-                      <p className="text-13 text-white/60 font-medium mt-1.5">
-                        {g.cells.length} {g.cells.length === 1 ? 'célula' : 'células'}
-                        {g.age && norm(g.age) !== norm(g.name) ? ` · ${g.age}` : ''} · abrir
-                      </p>
-                    </div>
-                  </GlassCard>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Contacto — sin exponer direcciones */}
-          <Reveal delay={0.1} depth className="relative z-10 mt-14">
-
-            <div className="glass-light liquid-shine rounded-[28px] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
-              <div>
-                <h3 className="text-22 font-bold text-bg">¿No sabes cuál es para ti?</h3>
-                <p className="text-15 text-bg/70 mt-2 max-w-lg">
-                  Escríbenos y te conectamos con el líder de la célula más cercana a ti.
-                </p>
-              </div>
-              <a
-                href="https://www.instagram.com/ig.casadelrey/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-pill bg-bg text-white text-14 font-bold focus-ring shrink-0"
-              >
-                Escríbenos
-              </a>
-            </div>
-          </Reveal>
-          </div>
-        </section>
-      </div>
+      {cellsResource.loading || categoriesResource.loading || cellsResource.error || categoriesResource.error
+        ? <div className="max-w-4xl mx-auto px-6"><CollectionStatus loading={cellsResource.loading || categoriesResource.loading} label="las células" onRetry={() => { cellsResource.retry(); categoriesResource.retry(); }} /></div>
+        : <SceneCarousel items={windowItems} label="Tipos de células" empty="Sin células publicadas aún." onOpen={key => { setPanelTab('gallery'); setOpenKey(key); }} />}
 
       {/* ═══════ VENTANAS SOBREPUESTAS ═══════ */}
       {/* light: cristal BLANCO. La ventana de una célula es una FICHA que
@@ -1055,7 +857,7 @@ export default function CelulasPage() {
           mejor que blanco sobre cristal oscuro, que es material de
           vitrina. Es la misma decisión que ya tomaba Voluntariado. */}
       <WindowStack
-        light
+        light photoBackdrop animated neighborTitles
         items={windowItems}
         openKey={openKey}
         onChange={setOpenKey}
@@ -1070,7 +872,14 @@ export default function CelulasPage() {
         renderContent={(it) => {
           const g = groups.find(gr => gr.key === it.key);
           if (!g) return null;
-          return <CellCategoryDetail group={g} onAbrirCelula={abrirCelula} />;
+          return <div>
+            <PhotoTabs value={panelTab} onChange={setPanelTab} id="cells" />
+            <div role="tabpanel" id="cells-panel" aria-labelledby={`cells-tab-${panelTab}`} tabIndex={0} className="focus-ring rounded-[8px]">
+              {panelTab === 'gallery' && <button type="button" onClick={() => { setPanelTab('photos'); document.getElementById('cells-tab-photos')?.focus(); }} className="w-full py-5 text-left text-bg focus-ring rounded-[8px]"><span className="block text-20 font-bold">{g.name}</span><span className="block mt-2 text-14 text-bg/70">Ver fotografía</span></button>}
+              {panelTab === 'photos' && <button type="button" onClick={() => { setPanelTab('info'); document.getElementById('cells-tab-info')?.focus(); }} className="min-h-11 text-15 font-semibold text-bg underline focus-ring">Conocer las células</button>}
+              {panelTab === 'info' && <CellCategoryDetail key={g.key} group={g} onAbrirCelula={abrirCelula} />}
+            </div>
+          </div>;
         }}
       />
 
@@ -1081,7 +890,7 @@ export default function CelulasPage() {
           <ModalWrapper onClose={() => setQuizOpen(false)}>
             <CellQuizModal
               groups={groups}
-              onViewDetail={(key) => { setQuizOpen(false); setOpenKey(key); }}
+              onViewDetail={(key) => { setQuizOpen(false); setPanelTab('info'); setOpenKey(key); }}
             />
           </ModalWrapper>
         )}

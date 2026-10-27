@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import PageHero from '../../components/layout/PageHero';
 import GlassCard from '../../components/ui/GlassCard';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
 import { useApi } from '../../lib/feed';
-import { useVolunteerAreas } from '../../lib/volunteerAreas';
+import { useVolunteerAreasResource } from '../../lib/volunteerAreas';
 import { PRESS_PRIMARY, DUR, EASE_OUT } from '../../lib/motion';
 import { VOLUNTEER_BACKGROUNDS } from '../../lib/volunteerBackgrounds';
 import toast from 'react-hot-toast';
 import SectionBg from '../../components/ui/SectionBg';
+import PhotoTabs from '../../components/ui/PhotoTabs';
+import CollectionStatus from '../../components/ui/CollectionStatus';
 
 // Botón/CTA claro (bg-bg text-white) -- ya no hay GlassButton oscuro
 // en este flujo, todo el modal es glass-light.
@@ -75,11 +78,6 @@ const matchOf = (value) => DEPT_MATCH[value] || EMPTY_MATCH;
 // del dueño, así que eran nombres de glifos guardados por si acaso. Se
 // borran para que nadie los "reconecte" pensando que faltaba renderizar
 // algo.
-const PANEL_TABS = [
-  { value: 'gallery', label: 'Galería' },
-  { value: 'photos', label: 'Fotos' },
-  { value: 'info', label: 'Información' },
-];
 const QUIZ_QUESTIONS = [
   {
     q: '¿Qué te describe mejor?',
@@ -493,7 +491,10 @@ export default function VolunteeringPage() {
   // /site-photos, la resolucion de foto por departamento es JS plano (no
   // un hook por item) -- 10 useSitePhoto en un .map violaria las reglas
   // de hooks.
-  const liveAreas = useVolunteerAreas();
+  const { areas: liveAreas, loading, error, retry } = useVolunteerAreasResource();
+  const [params] = useSearchParams();
+  const deepLinkArea = liveAreas.find(area => area.value === params.get('departamento'))?.value;
+  useEffect(() => { if (deepLinkArea) setFormDept(deepLinkArea); }, [deepLinkArea]);
   const sitePhotos = useApi('/site-photos') || {};
   const sectionPhoto = sitePhotos.voluntariado_seccion || VOLUNTEER_BACKGROUND_FALLBACK;
   const areas = liveAreas.map(area => ({
@@ -574,13 +575,13 @@ export default function VolunteeringPage() {
       </PageHero>
 
       <section className="relative min-h-[88svh] py-16 md:py-20 overflow-clip" aria-labelledby="volunteer-departments">
-        <SectionBg src={requestedArea.photo} fallbackSrc={requestedArea.fallbackImage} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-70" viewport animate />
+        <SectionBg sceneKey={requestedArea?.value} src={requestedArea?.photo || sectionPhoto} fallbackSrc={requestedArea?.fallbackImage || sectionPhoto} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-70" viewport animate />
         <div className="relative z-10 max-w-4xl mx-auto px-6">
           <div className="mb-9 max-w-2xl">
             <h2 id="volunteer-departments" className="text-d2 text-white">¿Dónde quieres servir?</h2>
             <p className="mt-4 text-16 text-white/80">Conoce un departamento a la vez y encuentra tu lugar.</p>
           </div>
-          <div role="region" aria-roledescription="carrusel" aria-label="Departamentos de voluntariado" className="max-w-xl"
+          {loading || error ? <CollectionStatus loading={loading} label="los departamentos" onRetry={retry} /> : !currentArea ? <p className="py-12 text-20 text-white/75">Sin departamentos publicados aún.</p> : <div role="region" aria-roledescription="carrusel" aria-label="Departamentos de voluntariado" className="max-w-xl"
             onKeyDown={event => {
               if (event.key === 'ArrowRight') { event.preventDefault(); go(1); }
               if (event.key === 'ArrowLeft') { event.preventDefault(); go(-1); }
@@ -594,7 +595,7 @@ export default function VolunteeringPage() {
               <p role="status" className="shrink-0 text-12 text-white/85">{currentIndex + 1} de {areas.length}</p>
               <button type="button" onClick={() => go(1)} className="min-h-11 min-w-0 flex-1 px-2 rounded-[8px] text-right text-14 font-semibold text-white focus-ring">Siguiente<span className="block truncate text-12 font-normal text-white/75">{nextArea.title}</span></button>
             </nav>}
-          </div>
+          </div>}
         </div>
       </section>
 
@@ -611,29 +612,8 @@ export default function VolunteeringPage() {
         renderContent={area => {
           return (
             <div className="text-bg">
-              <div role="tablist" aria-label="Apartados del departamento" className="flex gap-1 border-b border-bg/15 mb-6">
-                {PANEL_TABS.map((tab, index) => <button
-                  key={tab.value}
-                  id={`volunteer-tab-${tab.value}`}
-                  type="button" role="tab" aria-selected={panelTab === tab.value}
-                  aria-controls="volunteer-department-panel" tabIndex={panelTab === tab.value ? 0 : -1}
-                  onClick={() => setPanelTab(tab.value)}
-                  onKeyDown={event => {
-                    let target;
-                    if (event.key === 'ArrowRight') target = (index + 1) % PANEL_TABS.length;
-                    if (event.key === 'ArrowLeft') target = (index - 1 + PANEL_TABS.length) % PANEL_TABS.length;
-                    if (event.key === 'Home') target = 0;
-                    if (event.key === 'End') target = PANEL_TABS.length - 1;
-                    if (target !== undefined) {
-                      event.preventDefault(); event.stopPropagation();
-                      setPanelTab(PANEL_TABS[target].value);
-                      document.getElementById(`volunteer-tab-${PANEL_TABS[target].value}`)?.focus();
-                    }
-                  }}
-                  className={`min-h-11 px-3 rounded-t-[8px] text-13 font-semibold focus-ring border-b-2 ${panelTab === tab.value ? 'border-bg text-bg' : 'border-transparent text-bg/60 hover:text-bg'}`}
-                >{tab.label}</button>)}
-              </div>
-              <motion.div key={panelTab} id="volunteer-department-panel" role="tabpanel" aria-labelledby={`volunteer-tab-${panelTab}`} tabIndex={0} className="focus-ring rounded-[8px]" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
+              <PhotoTabs value={panelTab} onChange={setPanelTab} id="volunteer" />
+              <motion.div key={panelTab} id="volunteer-panel" role="tabpanel" aria-labelledby={`volunteer-tab-${panelTab}`} tabIndex={0} className="focus-ring rounded-[8px]" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
                 {panelTab === 'gallery' && <ul>
                   <li>
                     <button type="button" onClick={() => { setPanelTab('photos'); document.getElementById('volunteer-tab-photos')?.focus(); }} className="w-full flex items-center justify-between gap-4 py-4 px-1 text-left focus-ring rounded-[8px]">
