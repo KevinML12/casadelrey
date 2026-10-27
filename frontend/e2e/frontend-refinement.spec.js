@@ -114,3 +114,52 @@ test('first photo is prioritized and local photos use responsive WebP', async ({
   const valid = await heroPhoto.evaluate(el => el.complete && el.naturalWidth > 0);
   expect(valid).toBe(true);
 });
+
+for (const width of [390, 1440]) {
+  test(`volunteer detail preserves administered content and background photos at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await isolate(page);
+    await page.route('**/api/v1/volunteer-areas', route => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify([{ value: 'equipo_nuevo', title: 'Equipo administrado', description: 'Descripción publicada desde el panel.', why: 'Motivo actualizado por el administrador.' }]),
+    }));
+    await page.route('**/api/v1/site-photos', route => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ voluntariado_seccion: '/images/components/voluntariado_general.jpg', voluntariado_equipo_nuevo: '/images/components/vol_intercesor.jpg', voluntariado_equipo_nuevo_2: '/images/components/vol_alabanza.jpg' }),
+    }));
+    await page.goto('/volunteering');
+    const trigger = page.getByRole('button', { name: /^Equipo administrado/ });
+    await expect(trigger.locator('img')).toHaveCount(0);
+    await trigger.click();
+    const dialog = page.getByRole('dialog', { name: 'Equipo administrado' });
+    await expect(dialog.getByRole('heading', { name: 'Equipo administrado', exact: true })).toBeVisible();
+    await expect(dialog.getByText('Motivo actualizado por el administrador.')).toBeVisible();
+    await expect(dialog.locator('.glass-light img, .glass-light .glass-light-nested')).toHaveCount(0);
+    const photo = dialog.locator('img');
+    await expect(photo).toHaveAttribute('src', /vol_intercesor/);
+    await dialog.getByRole('button', { name: 'Foto 2', exact: true }).click();
+    await expect(photo).toHaveAttribute('src', /vol_alabanza/);
+    await expect(dialog.getByRole('button', { name: 'Foto 2', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await dialog.getByRole('button', { name: 'Aplicar a Equipo administrado', exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Continuar', exact: true })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Formulario', exact: true }).getByRole('heading', { name: 'Equipo administrado', exact: true })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    expect(await page.locator('#root').evaluate(el => el.inert)).toBe(false);
+  });
+}
+
+test('the wide section photo stays behind the cards while scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await isolate(page);
+  await page.goto('/volunteering');
+  await page.getByRole('button', { name: /^Maestros de Niños/ }).scrollIntoViewIfNeeded();
+  const photo = page.locator('section').filter({ has: page.getByRole('heading', { name: '¿Dónde quieres servir?', exact: true }) }).locator('img');
+  await expect(photo).toHaveCount(1);
+  await expect(photo).toHaveAttribute('src', /backgrounds\/congregacion/);
+  const bounds = await photo.evaluate(el => { const r = el.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: innerHeight }; });
+  expect(bounds.top).toBeLessThanOrEqual(1);
+  expect(bounds.bottom).toBeGreaterThanOrEqual(bounds.height - 1);
+});

@@ -7,7 +7,7 @@ const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]:not([tab
 
 // Shared flat glass dialog. Previous/next changes the content in the same
 // plane. The legacy name remains so existing page integrations stay intact.
-export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80svh, 640px)', light = false, sobrepuesto = null, onCerrarSobrepuesto }) {
+export default function WindowStack({ items, openKey, onChange, renderContent, height = 'min(80svh, 640px)', light = false, photoBackdrop = false, sobrepuesto = null, onCerrarSobrepuesto }) {
   const dialogRef = useRef(null);
   const [photoIdx, setPhotoIdx] = useState(0);
   const active = items.find(it => it.key === openKey);
@@ -65,19 +65,22 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
           className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 outline-none"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
         >
-          <div className="absolute inset-0 bg-bg/65 backdrop-blur-lg" onClick={close} />
-          <div className={`relative w-full max-w-[780px] ${light ? 'glass-light' : 'liquid-glass'} rounded-[28px] flex flex-col overflow-hidden`} style={{ height, maxHeight: 'calc(100svh - 48px)' }}>
+          <div className={`absolute inset-0 ${photoBackdrop ? 'bg-bg' : 'bg-bg/65 backdrop-blur-lg'}`} onClick={close}>
+            {photoBackdrop && photos.length > 0 && <PhotoImage src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover opacity-70" />}
+            {photoBackdrop && <div className="absolute inset-0 bg-bg/55" />}
+          </div>
+          <div className={`relative w-full ${photoBackdrop ? 'max-w-md' : 'max-w-[780px]'} ${light ? 'glass-light' : 'liquid-glass'} rounded-[16px] flex flex-col overflow-hidden`} style={{ height, maxHeight: 'calc(100svh - 48px)' }}>
             <div className={`shrink-0 flex items-center justify-between gap-4 px-5 py-3 border-b ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
               {sobrepuesto ? (
                 <button type="button" onClick={onCerrarSobrepuesto} className="text-13 font-bold focus-ring rounded-full min-h-11 px-2">Volver a {active.title}</button>
-              ) : <p className="text-13 font-semibold truncate">{active.title}</p>}
+              ) : photoBackdrop ? <h2 className="text-26 font-bold tracking-tight">{active.title}</h2> : <p className="text-13 font-semibold truncate">{active.title}</p>}
               <button type="button" onClick={close} className={`shrink-0 rounded-full min-h-11 px-4 text-13 font-bold focus-ring ${light ? 'bg-bg/8' : 'bg-white/10'}`}>Cerrar</button>
             </div>
             {sobrepuesto ? (
               <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7" data-lenis-prevent>{sobrepuesto}</div>
             ) : (
               <>
-                <div className="relative h-32 sm:h-40 shrink-0 bg-bg">
+                {!photoBackdrop && <div className="relative h-32 sm:h-40 shrink-0 bg-bg">
                   {photos.length > 0 && <PhotoImage key={photos[photoIdx % photos.length]} src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="(max-width: 640px) 100vw, 780px" className="absolute inset-0 w-full h-full object-cover" />}
                   <div className="scrim-card" />
                   <div className="absolute bottom-0 left-0 p-5 sm:p-6">
@@ -87,10 +90,13 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                   {photos.length > 1 && <div className="absolute top-2 right-2 flex gap-1">
                     {photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-current={i === photoIdx} className="liquid-glass rounded-full px-3 min-h-11 text-12 text-white focus-ring">Foto {i + 1}</button>)}
                   </div>}
-                </div>
+                </div>}
                 <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 flex flex-col" data-lenis-prevent>
                   <div className="m-auto w-full">{renderContent(active)}</div>
                 </div>
+                {photoBackdrop && photos.length > 1 && <div className={`flex gap-2 px-5 pb-3 ${light ? 'text-bg' : 'text-white'}`} aria-label="Fotos de fondo">
+                  {photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-pressed={i === photoIdx} className="rounded-[8px] border border-current px-3 min-h-11 text-12 font-semibold focus-ring">Foto {i + 1}</button>)}
+                </div>}
                 {items.length > 1 && <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
                   <button type="button" onClick={() => go(-1)} className="min-h-11 px-3 rounded-full text-13 font-bold focus-ring">Anterior</button>
                   <span className="text-12 opacity-70">{index + 1} / {items.length}</span>

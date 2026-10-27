@@ -62,7 +62,7 @@ export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulari
         transition={{ duration: DUR.base, ease: EASE_OUT }}
       >
         <div
-          className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[32px] text-bg"
+          className="glass-light w-full h-full max-h-[90vh] p-6 overflow-y-auto rounded-[16px] text-bg"
           data-lenis-prevent
         >
           {children}

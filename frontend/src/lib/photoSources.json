@@ -922,5 +922,29 @@
       "width": 1600,
       "height": 900
     }
+  ],
+  "/images/backgrounds/congregacion.webp": [
+    {
+      "src": "/images/backgrounds/congregacion-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/congregacion.webp",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "/images/backgrounds/comunidad-templo.webp": [
+    {
+      "src": "/images/backgrounds/comunidad-templo-640.webp",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "src": "/images/backgrounds/comunidad-templo.webp",
+      "width": 1600,
+      "height": 900
+    }
   ]
 }

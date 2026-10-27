@@ -91,13 +91,14 @@ export default function AdminSitePhotos() {
       <div>
         <h1 className="text-headline-s font-bold text-bg">Fotos del sitio</h1>
         <p className="text-body-s text-bg/50 mt-1">
-          Estas fotos aparecen como fondo ambiente en la página pública. Si no subes una,
-          el sitio usa una imagen por defecto — nunca queda un espacio vacío.
+          Para los fondos, utiliza fotos panorámicas o grupales de la congregación y los espacios de la iglesia.
+          Evita retratos y primeros planos: la fotografía acompaña al contenido de las tarjetas de cristal.
+          Mientras no subas una, se conserva una foto real de respaldo.
         </p>
       </div>
 
       <section>
-        <h2 className="text-title-m font-bold text-bg mb-4">Página Nosotros</h2>
+        <h2 className="text-title-m font-bold text-bg mb-4">Fondos y fotografías del sitio</h2>
         <div className="space-y-3">
           {sitePhotos.map(p => (
             <PhotoRow

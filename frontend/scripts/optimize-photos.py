@@ -35,5 +35,10 @@ for source in sorted(photos.rglob('*')):
     manifest['/images/' + relative.as_posix()] = variants
 
 out = root / 'src' / 'lib' / 'photoSources.json'
+# Keep the separately curated backgrounds whose checked-in source is WebP.
+if out.exists():
+    for key, variants in json.loads(out.read_text()).items():
+        if key.endswith('.webp') and all((root / 'public' / item['src'].lstrip('/')).is_file() for item in variants):
+            manifest[key] = variants
 out.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
 print(json.dumps({'photos': len(manifest), 'original_bytes': original_bytes, 'variant_bytes': generated_bytes, 'max_dimension': 1600}))

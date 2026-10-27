@@ -1,4 +1,3 @@
-import PhotoImage from '../../components/ui/PhotoImage';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
@@ -25,6 +24,9 @@ const btnSmallGhost = 'px-4 py-2 rounded-full text-bg/55 hover:text-bg hover:bg-
 // no es que no importe el departamento, es que el POSTULANTE no tiene
 // preferencia y delega la decision en el equipo. Valor real que llega
 // al backend en vez de un department vacio/ambiguo.
+// Toma amplia real; el administrador puede reemplazarla en Fotos del sitio.
+const VOLUNTEER_BACKGROUND_FALLBACK = '/images/backgrounds/congregacion.webp';
+
 const NO_PREFERENCE = 'sin_preferencia';
 const NO_PREFERENCE_LABEL = 'Sin preferencia — que me recomienden';
 const NO_PREFERENCE_WHY = 'Nuestro equipo va a revisar tus talentos e intereses para recomendarte el área donde más puedas servir y crecer.';
@@ -364,38 +366,20 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   );
 }
 
-// Foto a toda vista (sin degradado ni ícono encima) + un chip flotante
-// "glass-light" (blanco escarchado, texto navy -- lo pidió el usuario en
-// vez del degradado navy que traía) con el título/descripción, igual
-// tratamiento que usan los modales claros del sitio. Proporción fija
-// (aspect-[4/5]) en vez del alto suelto que pedía el masonry: todas las
-// tarjetas de una familia miden lo mismo, que es lo que hace que 2 o 3
-// tarjetas se lean como una fila y no como un rompecabezas a medio
-// armar.
-// Tilt (NO rotación estática): se probó el collage con spans/rotate FIJOS
-// y el usuario lo rechazó por verse "torcido". Tilt es distinto -- la
-// card queda perfectamente recta en reposo, solo se inclina en 3D
-// siguiendo al cursor/scroll (vuelve a plano al soltar). Es la misma
-// reactividad de cristal que Home/Células/Galería, sin reintroducir el
-// ángulo fijo que se pidió quitar.
-function DepartmentCard({ title, desc, photo, onClick }) {
+// Cristal sobre el fondo de la sección. La foto del departamento se
+// utiliza en el fondo del detalle, nunca dentro de esta tarjeta.
+function DepartmentCard({ title, desc, onClick }) {
   return (
     <GlassCard
       as="button"
       type="button"
       onClick={onClick}
       glass
-      className="group relative block w-full aspect-[4/5] overflow-hidden rounded-[22px] text-left focus-ring"
+      className="liquid-glass group relative flex flex-col w-full h-full min-h-[180px] rounded-[16px] p-6 text-left focus-ring"
     >
-      <PhotoImage
-        src={photo}
-        alt="Imagen de voluntariado"
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 "
-      />
-      <div className="absolute inset-x-3 bottom-3 glass-light rounded-[16px] px-4 py-3">
-        <h3 className="text-15 font-bold text-bg tracking-tight leading-tight">{title}</h3>
-        {desc && <p className="text-13 text-bg/60 mt-1 leading-snug line-clamp-2">{desc}</p>}
-      </div>
+      <h3 className="text-20 font-bold text-white tracking-tight leading-tight">{title}</h3>
+      {desc && <p className="text-14 text-white/80 mt-3 leading-relaxed">{desc}</p>}
+      <span className="mt-auto pt-5 text-12 font-semibold text-white/65">Conocer el departamento</span>
     </GlassCard>
   );
 }
@@ -446,9 +430,6 @@ function QuizModal({ areas, onViewDetail, onApply }) {
           <ul className="divide-y divide-bg/10 border-y border-bg/10 mb-5">
             {results.map(r => (
               <li key={r.value} className="py-4 flex items-start gap-4">
-                {r.photo && (
-                  <PhotoImage src={r.photo} alt="Imagen de voluntariado" className="w-14 h-14 rounded-[12px] object-cover shrink-0" />
-                )}
                 <div className="min-w-0 flex-1">
                   <p className="text-15 font-bold text-bg">{r.title}</p>
                   <p className="text-13 text-bg/60 leading-snug mt-1">{r.why}</p>
@@ -484,11 +465,6 @@ function QuizModal({ areas, onViewDetail, onApply }) {
             cambiada. Además nombra de dónde sale el resultado. */}
         <p className="text-13 font-semibold text-bg/50 mb-2">Según tus respuestas</p>
         <h3 className="text-24 font-bold text-bg tracking-tight mb-4">{result ? result.title : 'Cualquier departamento'}</h3>
-        {result?.photo && (
-          <div className="w-full h-36 rounded-[16px] overflow-hidden mb-4">
-            <PhotoImage src={result.photo} alt="Imagen de voluntariado" className="w-full h-full object-cover" />
-          </div>
-        )}
         <p className="text-14 text-bg/65 leading-relaxed mb-6">{result ? result.why : NO_PREFERENCE_WHY}</p>
         <div className="flex flex-col gap-2.5">
           <motion.button {...PRESS_PRIMARY} onClick={() => onApply(result?.value || '')} className={btnPrimary}>
@@ -551,7 +527,8 @@ export default function VolunteeringPage() {
   // de hooks.
   const liveAreas = useVolunteerAreas();
   const sitePhotos = useApi('/site-photos') || {};
-  const areas = liveAreas.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || a.photoFallback }));
+  const sectionPhoto = sitePhotos.voluntariado_seccion || VOLUNTEER_BACKGROUND_FALLBACK;
+  const areas = liveAreas.map(a => ({ ...a, photo: sitePhotos[`voluntariado_${a.value}`] || sectionPhoto }));
 
   // Departamentos que el admin agregue y no encajen en ninguna de las 5
   // categorias curadas (values fijos abajo) igual deben aparecer en
@@ -563,7 +540,7 @@ export default function VolunteeringPage() {
     : CATEGORIES;
 
   // images: segunda foto opcional (voluntariado_<value>_2, admin-editable
-  // en /admin/site-photos) para el carrusel del banner -- si no existe,
+  // en /admin/site-photos) para las vistas del fondo -- si no existe,
   // el array queda con 1 sola foto y WindowStack cae a modo estático.
   const windowItems = areas.map(a => ({
     key: a.value,
@@ -609,7 +586,7 @@ export default function VolunteeringPage() {
         title="Voluntariado"
         subtitle="Cada persona tiene algo que aportar. Aquí encuentras el departamento donde lo que sabes hacer sirve a los demás."
         photoSlot="hero_voluntariado"
-        photoFallback="/images/components/voluntariado_general.jpg"
+        photoFallback="/images/backgrounds/comunidad-templo.webp"
       >
         {/* "Dos preguntas y te decimos dónde": son exactamente dos (ver
             QUIZ_QUESTIONS). Antes decía "Descubre tu lugar ideal" y
@@ -633,21 +610,10 @@ export default function VolunteeringPage() {
         </button>
       </PageHero>
 
-      {/* Sin foto de fondo: aquí vivía un ParallaxImg al 40% con un
-          degradado navy encima, o sea una foto de la iglesia entregada al
-          ~18% de su color, puesta DETRÁS de un collage que ya es puras
-          fotos a color pleno. Dos capas de foto compitiendo, y la de
-          abajo perdiendo. El canvas navy deja que el collage sea la
-          imagen de la sección. */}
-      <section className="relative py-4 pb-24 overflow-hidden">
-        <SectionBg src="/images/components/voluntariado_general.jpg" />
-        {/* Halo ambiental -- cambia de color según la categoría bajo el
-            cursor, le da sensación de "vivo" al fondo sin tocar el grid.
-            CSS transition plano en vez de motion.div: el animate={{opacity}}
-            de framer-motion no se comprometía al inline style en pruebas
-            (se quedaba en el opacity por defecto del navegador) -- una
-            transición CSS normal es más simple y funciona igual de bien
-            para un fade tan directo. */}
+      {/* El slot administrado de esta sección reemplaza la foto de
+          respaldo sin cambiar la composición de las tarjetas. */}
+      <section className="relative py-4 pb-24 overflow-clip">
+        <SectionBg src={sectionPhoto} opacity="opacity-70" viewport />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Sin Reveal: el titular de sección es el punto FIJO contra el
@@ -708,22 +674,22 @@ export default function VolunteeringPage() {
                   initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
                   animate={{ opacity: 1, height: 'auto', overflow: 'visible' }}
                   exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                  transition={{ opacity: { duration: 0.2 }, height: { type: 'spring', stiffness: 250, damping: 25 } }}
+                  transition={{ opacity: { duration: 0.2 }, height: { duration: 0.18 } }}
                   key={cat.name} 
 
                 >
                   <p className="text-13 font-semibold text-white/60 mb-4">{cat.name}</p>
-                  <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <AnimatePresence mode="popLayout">
                     {catAreas.map(area => {
                       return (
                         <motion.div
                           layout
                           key={area.value}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.18 }}
                         >
                           <DepartmentCard {...area} onClick={() => setOpenKey(area.value)} />
                         </motion.div>
@@ -747,73 +713,40 @@ export default function VolunteeringPage() {
         </div>
       </section>
 
-      {/* Ventana de cristal por departamento -- foto, por que servir ahi,
-          y el boton que lleva al formulario. Con 10 items, las flechas/
-          dots de WindowStack ya se comportan como un carrusel entre
-          departamentos sin codigo extra. */}
+      {/* La foto administrada ocupa el fondo navy detrás de un único
+          panel de vidrio. Se conservan las dos fotos de cada departamento. */}
       <WindowStack
         items={windowItems}
         openKey={openKey}
         onChange={setOpenKey}
-        height="min(70vh, 560px)"
+        height="auto"
         light
+        photoBackdrop
         renderContent={(it) => {
-          const a = areas.find(x => x.value === it.key);
-          if (!a) return null;
-          const category = categoryOf(a.value);
-          const itemVariants = {
-            hidden: { opacity: 0, y: 16 },
-            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } }
-          };
-
+          const area = areas.find(x => x.value === it.key);
+          if (!area) return null;
+          const category = categoryOf(area.value);
           return (
-            <motion.div 
-              initial="hidden"
-              animate="visible"
-              variants={{
-                visible: {
-                  transition: { staggerChildren: 0.08 }
-                }
-              }}
-              className="grid sm:grid-cols-5 gap-6"
-            >
-              <div className="sm:col-span-3 flex flex-col gap-5">
-                {category && (
-                  <motion.span variants={itemVariants} className="self-start inline-flex items-center bg-bg/5 border border-bg/10 text-bg/65 px-3.5 py-1.5 rounded-full text-12 font-bold tracking-wide uppercase">
-                    {category}
-                  </motion.span>
-                )}
-                {/* Texto más vivo, tamaño base mayor, primera frase sutilmente destacada */}
-                <motion.p variants={itemVariants} className="text-bg/80 text-16 sm:text-17 leading-relaxed font-medium">
-                  {a.desc}
-                </motion.p>
-
-                <motion.div variants={itemVariants} className="mt-auto pt-6">
-                  <motion.button
-                    {...PRESS_PRIMARY}
-                    onClick={() => openForm(a.value)}
-                    className="w-full inline-flex items-center justify-center rounded-pill bg-bg text-white px-6 py-4.5 text-15 font-bold shadow-card hover:opacity-90"
-                  >
-                    Aplicar a {a.title}
-                  </motion.button>
-                </motion.div>
-              </div>
-              <div className="sm:col-span-2 flex flex-col gap-4">
-                {/* Bento box typography sin íconos, solo jerarquía pura */}
-                <motion.div variants={itemVariants} className="glass-light-nested rounded-[20px] p-6 h-fit border-t border-white/40 shadow-sm">
-                  <p className="text-12 font-bold text-bg/50 uppercase tracking-widest mb-3">¿Por qué aquí?</p>
-                  <p className="text-bg/85 text-15 leading-relaxed font-medium">{a.why}</p>
-                </motion.div>
-                {/* Testimonio real -- solo si el admin cargó uno de verdad
-                    (nunca se inventa una cita atribuida a alguien). */}
-                {a.testimonial && (
-                  <div className="glass-light-nested rounded-[16px] p-5 h-fit">
-                    <p className="text-bg/70 text-14 italic leading-relaxed">"{a.testimonial}"</p>
-                    {a.testimonialAuthor && <p className="text-bg/45 text-12 font-semibold mt-2">— {a.testimonialAuthor}</p>}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+            <div className="space-y-6 text-bg">
+              {category && <p className="text-12 font-semibold text-bg/60">{category}</p>}
+              <p className="text-16 leading-relaxed text-bg/85">{area.desc}</p>
+              {area.why && <div className="border-t border-bg/10 pt-5">
+                <h3 className="text-14 font-bold mb-2">¿Por qué aquí?</h3>
+                <p className="text-15 leading-relaxed text-bg/80">{area.why}</p>
+              </div>}
+              {area.testimonial && <blockquote className="border-l border-bg/20 pl-4">
+                <p className="text-14 italic leading-relaxed text-bg/75">“{area.testimonial}”</p>
+                {area.testimonialAuthor && <footer className="text-12 text-bg/60 mt-2">{area.testimonialAuthor}</footer>}
+              </blockquote>}
+              <motion.button
+                {...PRESS_PRIMARY}
+                type="button"
+                onClick={() => openForm(area.value)}
+                className={btnPrimary}
+              >
+                Aplicar a {area.title}
+              </motion.button>
+            </div>
           );
         }}
       />

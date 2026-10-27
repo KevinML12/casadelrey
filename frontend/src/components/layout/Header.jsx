@@ -100,9 +100,7 @@ export default function Header() {
       <nav
         ref={navRef}
         aria-label="Navegación principal"
-        className={`pointer-events-auto w-full max-w-6xl glass-nav transition-all duration-200 ease-spring ${
-          menuOpen ? 'rounded-[22px]' : 'rounded-pill'
-        } ${scrolled ? 'glass-nav--scrolled shadow-card-lg' : 'shadow-whisper'}`}
+        className={`pointer-events-auto w-full max-w-6xl glass-nav rounded-[16px] transition-colors duration-200 ${scrolled ? 'glass-nav--scrolled' : ''}`}
       >
         <div className="flex items-center justify-between pl-4 pr-2 py-2">
           {/* Logo */}

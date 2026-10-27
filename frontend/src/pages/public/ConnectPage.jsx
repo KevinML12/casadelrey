@@ -89,7 +89,7 @@ export default function ConnectPage() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="glass-light rounded-[28px] p-7 md:p-9">
+            <div className="glass-light rounded-[16px] p-7 md:p-9">
               {done ? (
                 <div className="text-center py-8" role="status">
                   <h3 className="text-24 text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
@@ -123,7 +123,7 @@ export default function ConnectPage() {
                             type="button"
                             aria-pressed={selected}
                             onClick={() => setForm((p) => ({ ...p, category: c.value }))}
-                            className={`focus-ring flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[22px] border-2 transition-all ${
+                            className={`focus-ring flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[12px] border-2 transition-all ${
                               selected
                                 ? 'bg-bg/10 border-bg shadow-card'
                                 : 'bg-bg/[0.03] border-bg/10 hover:border-bg/25 hover:bg-bg/[0.06]'

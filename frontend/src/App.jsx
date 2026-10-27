@@ -111,7 +111,7 @@ export default function App() {
   const bgImage = settings[ROUTE_BG_KEYS[bgHit]] || null;
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-hidden" style={bgImage ? { backgroundImage: `linear-gradient(rgba(10,21,38,.8), rgba(10,21,38,.8)), url(${JSON.stringify(photoSource(bgImage))})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
+    <div className="relative min-h-screen flex flex-col bg-bg text-ink overflow-clip" style={bgImage ? { backgroundImage: `linear-gradient(rgba(10,21,38,.8), rgba(10,21,38,.8)), url(${JSON.stringify(photoSource(bgImage))})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
       <a href="#main-content" className="skip-link">Ir al contenido</a>
       <Header />
       <div id="main-content" tabIndex={-1} className="flex-1 w-full relative z-10 outline-none">
