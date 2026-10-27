@@ -3,11 +3,14 @@ import axios from 'axios';
 // Base URL del backend. Debe terminar en /api/v1 para que las rutas coincidan.
 const raw = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:8080')).replace(/\/+$/, '');
 const BASE_URL = raw.endsWith('/api/v1') ? raw : raw.endsWith('/api') ? `${raw}/v1` : `${raw}/api/v1`;
+const configuredTimeout = Number(import.meta.env.VITE_API_TIMEOUT_MS);
+const timeout = Number.isInteger(configuredTimeout) && configuredTimeout >= 1000 && configuredTimeout <= 90000
+  ? configuredTimeout : 15000;
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  // Railway free tier tiene cold starts que pueden tardar hasta 10-15 segundos
-  timeout: 15_000,
+  // El entorno gratuito de pruebas puede necesitar más tiempo para despertar.
+  timeout,
   headers: { 'Content-Type': 'application/json' },
 });
 

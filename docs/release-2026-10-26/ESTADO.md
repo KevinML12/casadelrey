@@ -24,7 +24,7 @@ Supabase fue restaurado por el usuario. La API anterior de Fly vuelve a responde
 
 Se generó y verificó un backup completo en formato pg_dump: `~/.codex/backups/casadelrey/pre-release-2026-10-26.dump`, protegido con permisos 0600 y carpeta 0700. El índice del archivo contiene 669 entradas. No está dentro del repositorio ni se subió al hosting.
 
-Inventario de solo lectura: tres registros de comprobantes con referencias antiguas y tres objetos en el prefijo público `comprobantes/`. El usuario informó haber preparado el bucket privado. La credencial activa de Fly todavía devolvió `AccessDenied` al listar objetos en `casadelreyhue-receipts-private`; falta comprobar PUT/GET con la credencial definitiva. No se cambiaron las referencias de la base ni se eliminaron objetos históricos.
+Inventario de los datos reales: tres registros de comprobantes con referencias antiguas y tres objetos en el prefijo público `comprobantes/`. Después se comprobó desde Brave que el bucket privado faltaba y se creó `casadelreyhue-receipts-private`, con acceso público desactivado. La credencial existente autentica al bucket de medios, pero todavía devuelve `AccessDenied` en el privado; falta ampliar su alcance y comprobar PUT/GET. No se cambiaron las referencias reales ni se eliminaron objetos históricos.
 
 ## Despliegue
 
@@ -36,13 +36,20 @@ Se comprobó HTTP 200 en `/` y `/api/v1/events/` usando el acceso autorizado de 
 
 Fly rechazó la construcción de imagen con HTTP 403 por facturas vencidas. No se actualizó el backend ni se intentó cobrar. El usuario decidió usar Render gratuito para pruebas. La rama `codex/render-qa` está publicada e incluye el blueprint de backend y frontend estático.
 
-Con autorización del usuario se crearon un schema y un usuario exclusivos de pruebas en Supabase. La comprobación de permisos confirmó que el usuario no puede leer ni modificar las tablas de `public`, `auth` o `storage`. El backend completó sus migraciones en ese espacio vacío y respondió health/eventos localmente. Se prepararon un JWT independiente y un pool de tres conexiones; no se copiaron registros ni claves de correo reales. Las credenciales de pruebas están cargadas en el formulario gratuito de Render, pero eso todavía no equivale a una publicación. Falta el almacenamiento exclusivo de pruebas.
+Con autorización del usuario se crearon un schema y un usuario exclusivos de pruebas en Supabase. La comprobación de permisos confirmó que el usuario no puede leer ni modificar las tablas de `public`, `auth` o `storage`. Se prepararon un JWT independiente y un pool de tres conexiones, con una cuarta reservada para mantenimiento; no se copiaron registros ni claves de correo reales. Se crearon fixtures sintéticos, identificados como pruebas, y se dejó vacía la cuenta bancaria.
+
+Backend y frontend están **Live** en Render desde `9b89545`:
+
+- https://casadelrey-api-pruebas.onrender.com
+- https://casadelrey-web-pruebas.onrender.com
+
+Se verificaron CORS, rutas internas, Home con datos sintéticos y 16 comprobaciones funcionales del backend publicado: login, donación sin duplicados y lectura privada exclusiva de admin, entre otras. Los archivos de esa prueba fueron desechables en disco efímero. Por instrucción posterior del usuario se guardaron las variables R2 de Fly mediante **Save only** en Render; no se reinició el backend con esa configuración pendiente del permiso al bucket privado. Los despliegues automáticos quedaron desactivados en ambos servicios. La espera del cliente se está ajustando para el despertar de Render Free; el plazo de producción se conserva.
 
 ## Pasos restantes para publicar
 
-1. Confirmar la nueva app y acceso a su cuenta. Trasladar la configuración necesaria directamente a sus secretos, sin publicarla en el repositorio ni en el chat.
-2. Comprobar acceso de objetos al bucket privado con esa credencial y migrar las tres boletas mediante copia verificada y backup de referencias. Retirar los originales públicos después de verificar la migración y su posible caché.
-3. Construir/desplegar el backend en la nueva cuenta, comprobar migraciones aditivas, health y permisos con fixtures de staging.
-4. Apuntar la API del frontend a la nueva app, construir la entrega definitiva y promoverla a producción. No promover el frontend nuevo contra un backend incompatible con el contrato de comprobantes privados.
+1. Permitir acceso al bucket privado con la credencial R2 autorizada y validar PUT/GET antes de reiniciar el backend de Render con esa configuración.
+2. Preparar la configuración definitiva de producción y migrar las tres boletas mediante copia verificada y backup de referencias. Retirar los originales públicos después de verificar la migración y su posible caché.
+3. Publicar el backend con la base de producción y comprobar migraciones aditivas, health, correo y permisos. Las credenciales actuales de Render son de pruebas.
+4. Construir la entrega definitiva del frontend y conectar el dominio de producción. La publicación actual bajo `*-pruebas.onrender.com` no sustituye este paso.
 
 La auditoría global conserva tareas de autorización por registro, correos reales, metadatos y rendimiento detalladas en el plan de mejora. Esta entrega no certifica que todos esos pendientes estén cerrados.

@@ -1,0 +1,88 @@
+{
+  "base": "https://casadelrey-api-pruebas.onrender.com/api/v1",
+  "storage": "local",
+  "checks": [
+    {
+      "check": "Login admin",
+      "passed": true,
+      "observed": 200
+    },
+    {
+      "check": "Login member",
+      "passed": true,
+      "observed": 200
+    },
+    {
+      "check": "Synthetic event visible",
+      "passed": true,
+      "observed": true
+    },
+    {
+      "check": "Receipt upload (ephemeral test storage)",
+      "passed": true,
+      "observed": 201
+    },
+    {
+      "check": "Private opaque reference",
+      "passed": true,
+      "observed": true
+    },
+    {
+      "check": "Synthetic donation",
+      "passed": true,
+      "observed": 201
+    },
+    {
+      "check": "Idempotent replay",
+      "passed": true,
+      "observed": 200
+    },
+    {
+      "check": "Same donation ID",
+      "passed": true,
+      "observed": 1
+    },
+    {
+      "check": "Changed payload rejected",
+      "passed": true,
+      "observed": 409
+    },
+    {
+      "check": "Admin list receipts",
+      "passed": true,
+      "observed": 200
+    },
+    {
+      "check": "Anonymous receipt blocked",
+      "passed": true,
+      "observed": 401
+    },
+    {
+      "check": "Member receipt blocked",
+      "passed": true,
+      "observed": 403
+    },
+    {
+      "check": "Admin private download",
+      "passed": true,
+      "observed": 200
+    },
+    {
+      "check": "Downloaded bytes match",
+      "passed": true,
+      "observed": true
+    },
+    {
+      "check": "Receipt not cached",
+      "passed": true,
+      "observed": true
+    },
+    {
+      "check": "Legacy public path blocked",
+      "passed": true,
+      "observed": 404
+    }
+  ],
+  "donation_id": 1,
+  "receipt_id": 1
+}

@@ -24,9 +24,9 @@ Para React Router: añadir un rewrite de `/*` a `/index.html`.
 
 Render asigna `PORT`. Go ya lo lee y escucha en todas las interfaces. No hace falta cambiar el código del servidor.
 
-Backend: `DATABASE_URL`, `JWT_SECRET`, `CLIENT_URL` y las seis variables `CF_R2_*` enumeradas en el blueprint. `DB_MAX_OPEN_CONNS=3` limita el pool al máximo del usuario de pruebas. El valor por defecto de producción sigue siendo 10; se admiten valores entre 1 y 10. `BASE_URL` se obtiene de `RENDER_EXTERNAL_URL`. Para la prueba sin correos reales, no configurar `BREVO_API_KEY`: el servicio de email ya omite envíos cuando falta esa clave. Configurar correo de prueba explícitamente si se necesita validar su entrega.
+Backend: `DATABASE_URL`, `JWT_SECRET`, `CLIENT_URL` y las seis variables `CF_R2_*` enumeradas en el blueprint. `DB_MAX_OPEN_CONNS=3` limita el pool de pruebas; el rol permite cuatro conexiones para reservar una de mantenimiento. El valor por defecto de producción sigue siendo 10; se admiten valores entre 1 y 10. `BASE_URL` se obtiene de `RENDER_EXTERNAL_URL`. Para la prueba sin correos reales, no configurar `BREVO_API_KEY`: el servicio de email ya omite envíos cuando falta esa clave. Configurar correo de prueba explícitamente si se necesita validar su entrega.
 
-Frontend: `VITE_API_URL` debe ser la URL HTTPS real del backend Render (puede terminar en `/api/v1`); reconstruir el frontend después de cambiarla. En Static Sites no se ejecuta el middleware de Vercel ni se aplica `vercel.json`, por eso la API debe apuntar al backend directamente. La URL del frontend se configura en `CLIENT_URL` del backend para CORS.
+Frontend: `VITE_API_URL` debe ser la URL HTTPS real del backend Render (puede terminar en `/api/v1`); reconstruir el frontend después de cambiarla. `VITE_API_TIMEOUT_MS=65000` permite esperar el despertar del backend gratuito; sin esa variable se conservan los 15 segundos de producción. En Static Sites no se ejecuta el middleware de Vercel ni se aplica `vercel.json`, por eso la API debe apuntar al backend directamente. La URL del frontend se configura en `CLIENT_URL` del backend para CORS.
 
 Las pruebas con formularios deben usar usuarios y datos sintéticos, una conexión de base de pruebas y buckets de pruebas. El backend ejecuta AutoMigrate al arrancar: no usar la conexión de producción para ensayos destructivos. No reutilizar automáticamente secretos de Fly ni copiar un JWT de producción al blueprint de pruebas.
 
@@ -34,9 +34,16 @@ Las pruebas con formularios deben usar usuarios y datos sintéticos, una conexi�
 
 La rama remota `codex/render-qa` contiene las correcciones de esta entrega; conectar el `main` antiguo no las publica.
 
-Con autorización del usuario se creó el schema vacío `cdr_render_qa` y un usuario exclusivo con contraseña aleatoria, sin privilegios de administración y con límite de tres conexiones. Se verificó que no tiene permisos SELECT/INSERT/UPDATE/DELETE sobre tablas de `public`, `auth` o `storage`. No se copiaron registros reales. El backend arrancó localmente con esa conexión, completó sus migraciones y respondió 200 en health y eventos. El JWT de pruebas es independiente; no se configuró Brevo.
+Con autorización del usuario se creó el schema vacío `cdr_render_qa` y un usuario exclusivo con contraseña aleatoria, sin privilegios de administración y con límite de cuatro conexiones (tres de aplicación y una de mantenimiento). Se verificó que no tiene permisos SELECT/INSERT/UPDATE/DELETE sobre tablas de `public`, `auth` o `storage`. No se copiaron registros reales. El JWT de pruebas es independiente; no se configuró Brevo. Se añadieron usuarios admin/member y contenido sintético claramente identificado para validar los flujos; la cuenta bancaria quedó vacía.
 
-La cuenta de Render está abierta por el usuario y se importaron únicamente estas credenciales de pruebas al formulario de **New Web Service**, con Docker y plan Free. La publicación efectiva sigue pendiente. Los buckets y la clave R2 exclusivos de pruebas aún no están configurados; no reutilizar las claves de producción. Hasta completar ese paso, el fallback local solo sirve para ensayos con archivos desechables y no valida su persistencia.
+Ambos servicios están publicados desde `9b89545`, con despliegues automáticos desactivados:
+
+- Backend Free: https://casadelrey-api-pruebas.onrender.com (`srv-dbfqi0sipgvc739ach60`). La creación manual quedó en Oregon; el blueprint propone Ohio para una futura instancia cercana a Supabase.
+- Frontend Static Site: https://casadelrey-web-pruebas.onrender.com (`srv-dbfqiu3rjlhs73ed9h5g`), con rewrite `/*` → `/index.html` guardado.
+
+El usuario autorizó después reutilizar la configuración de almacenamiento de Fly. Las cinco variables R2 existentes y `CF_R2_PRIVATE_BUCKET=casadelreyhue-receipts-private` se guardaron en Render mediante **Save only**, manteniendo DATABASE_URL/JWT de pruebas. Se creó ese bucket privado en la cuenta Cloudflare abierta en Brave y se verificó **Public Access: Disabled**. La clave existente autentica al bucket de medios, pero devuelve `AccessDenied` en el privado: falta ampliar su alcance antes de activar la configuración/reiniciar el backend. Mientras tanto el servicio activo utiliza almacenamiento local efímero; no valida persistencia.
+
+Las comprobaciones HTTP del despliegue aprobaron salud, CORS, eventos, login admin/member, subida sintética privada, donación, reenvío sin duplicación, conflicto por payload distinto, descarga admin con bytes correctos/no-store y rechazo a anónimo/member/ruta pública. Son pruebas funcionales, no una medición de carga ni una validación de R2. El navegador mostró el despertar de Render Free y después cargó los datos sintéticos del Home.
 
 ## Límites y validación
 

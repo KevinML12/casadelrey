@@ -52,6 +52,8 @@ services:
         value: "24"
       - key: VITE_API_URL
         sync: false
+      - key: VITE_API_TIMEOUT_MS
+        value: "65000"
     routes:
       - type: rewrite
         source: /*
