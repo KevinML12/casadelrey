@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { DUR, EASE_OUT } from '../../lib/motion';
+import { lockDialogBackground, restoreParentDialogFocus } from '../../lib/dialogBackground';
 
 export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulario' }) {
   const dialogRef = useRef(null);
@@ -15,16 +16,13 @@ export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulari
   useEffect(() => { closeRef.current = onClose; }, [onClose]);
   useEffect(() => {
     const previousFocus = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-    const root = document.getElementById('root');
-    const previousInert = root?.inert;
-    document.body.style.overflow = 'hidden';
-    if (root) root.inert = true;
+    const releaseBackground = lockDialogBackground();
     const dialog = dialogRef.current;
     const focusable = () => [...dialog.querySelectorAll('button, input, select, textarea, a[href], [tabindex]')]
       .filter(el => !el.disabled && el.tabIndex >= 0 && el.getClientRects().length > 0);
     (focusable()[0] || dialog).focus();
     const onKeyDown = (event) => {
+      if ([...document.querySelectorAll('[role="dialog"]')].at(-1) !== dialog) return;
       if (event.key === 'Escape') { event.preventDefault(); closeRef.current?.(); }
       if (event.key === 'Tab') {
         const elements = focusable();
@@ -41,9 +39,8 @@ export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulari
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      if (root) root.inert = previousInert;
-      if (previousFocus?.isConnected) previousFocus.focus();
+      releaseBackground();
+      restoreParentDialogFocus(previousFocus);
     };
   }, []);
   return createPortal(

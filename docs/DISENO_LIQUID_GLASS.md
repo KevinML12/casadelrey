@@ -32,6 +32,12 @@ La fotografía guía el material: blanco escarchado sobre fondos predominantemen
 
 Las fotos y textos siguen llegando de la API del administrador. No sustituir URLs guardadas por archivos locales al cambiar la composición. Los archivos incluidos en el proyecto son respaldos; una segunda foto administrada se conserva como vista alternativa del fondo. No borrar ni reescribir registros para conseguir un cambio de estilo.
 
+## Distribución y navegación progresiva
+
+Menos elementos simultáneos. En Voluntariado, la pantalla inicial muestra clasificaciones, no todos los departamentos: dos tarjetas en escritorio y una en móvil, con Anterior/Siguiente. No mostrar contador grande, chips repetidos ni grids de diez tarjetas. Todos los departamentos, incluidos los nuevos del administrador bajo Otros, siguen accesibles.
+
+Cada clasificación abre un único panel de cristal. Galería es el primer apartado y muestra el índice de colecciones/departamentos; Fotos muestra la colección elegida como fotografía de fondo, con sus alternativas administradas; Información reúne descripción, motivo, testimonio real y aplicación. Las pestañas funcionan con teclado y conservan el foco al cambiar de apartado. El quiz entra directamente a Información del departamento recomendado. No añadir tarjetas o fotografías decorativas dentro del panel para rellenar espacio.
+
 ## Componentes compartidos
 
 - `PageHero`: foto administrable con fallback local, scrim y espaciado común. La primera imagen se carga con prioridad.

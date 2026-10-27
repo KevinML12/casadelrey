@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import PhotoImage from './PhotoImage';
+import { lockDialogBackground, restoreParentDialogFocus } from '../../lib/dialogBackground';
 
 const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -16,18 +17,14 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
   const close = () => sobrepuesto ? onCerrarSobrepuesto?.() : onChange(null);
   const go = direction => onChange(items[(index + direction + items.length) % items.length].key);
 
-  useEffect(() => { setPhotoIdx(0); }, [openKey]);
+  useEffect(() => { setPhotoIdx(0); }, [openKey, active?.image]);
   const actions = useRef({ close, go });
   useEffect(() => { actions.current = { close, go }; });
 
   useEffect(() => {
     if (!openKey) return;
     const previousFocus = document.activeElement;
-    const root = document.getElementById('root');
-    const previousInert = root?.inert;
-    const previousOverflow = document.body.style.overflow;
-    if (root) root.inert = true;
-    document.body.style.overflow = 'hidden';
+    const releaseBackground = lockDialogBackground();
     const focusable = () => [...(dialogRef.current?.querySelectorAll(FOCUSABLE) || [])]
       .filter(el => !el.disabled && el.tabIndex >= 0 && el.getClientRects().length > 0);
     (focusable()[0] || dialogRef.current)?.focus();
@@ -51,9 +48,8 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previousOverflow;
-      if (root) root.inert = previousInert;
-      if (previousFocus?.isConnected) previousFocus.focus();
+      releaseBackground();
+      restoreParentDialogFocus(previousFocus);
     };
   }, [openKey, sobrepuesto, items.length]);
 

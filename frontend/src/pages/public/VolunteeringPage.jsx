@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHero from '../../components/layout/PageHero';
-import Reveal from '../../components/ui/Reveal';
-import StatTrio from '../../components/ui/StatTrio';
 import GlassCard from '../../components/ui/GlassCard';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
@@ -104,14 +102,18 @@ const matchOf = (value) => DEPT_MATCH[value] || EMPTY_MATCH;
 // del dueño, así que eran nombres de glifos guardados por si acaso. Se
 // borran para que nadie los "reconecte" pensando que faltaba renderizar
 // algo.
-const INTEREST_TAGS = [
-  { key: 'musica', label: 'Música y arte' },
-  { key: 'personas', label: 'Atender personas' },
-  { key: 'ninos', label: 'Niños' },
-  { key: 'tecnologia', label: 'Tecnología' },
-  { key: 'oracion', label: 'Oración' },
-  { key: 'organizacion', label: 'Organización' },
+const PANEL_TABS = [
+  { value: 'gallery', label: 'Galería' },
+  { value: 'photos', label: 'Fotos' },
+  { value: 'info', label: 'Información' },
 ];
+const subscribeCardLayout = callback => {
+  const query = window.matchMedia('(min-width: 768px)');
+  query.addEventListener('change', callback);
+  return () => query.removeEventListener('change', callback);
+};
+const desktopCards = () => window.matchMedia('(min-width: 768px)').matches;
+const mobileCards = () => false;
 
 const QUIZ_QUESTIONS = [
   {
@@ -366,20 +368,20 @@ function VolunteerForm({ department: initialDepartment, areas, onClose }) {
   );
 }
 
-// Cristal sobre el fondo de la sección. La foto del departamento se
-// utiliza en el fondo del detalle, nunca dentro de esta tarjeta.
-function DepartmentCard({ title, desc, onClick }) {
+// Una clasificación abre sus colecciones; ninguna fotografía vive en la card.
+function ClassificationCard({ title, count, onClick }) {
   return (
     <GlassCard
       as="button"
       type="button"
       onClick={onClick}
+      aria-haspopup="dialog"
       glass
-      className="liquid-glass group relative flex flex-col w-full h-full min-h-[180px] rounded-[16px] p-6 text-left focus-ring"
+      className="liquid-glass relative flex flex-col w-full h-full min-h-[180px] rounded-[16px] p-7 text-left focus-ring"
     >
-      <h3 className="text-20 font-bold text-white tracking-tight leading-tight">{title}</h3>
-      {desc && <p className="text-14 text-white/80 mt-3 leading-relaxed">{desc}</p>}
-      <span className="mt-auto pt-5 text-12 font-semibold text-white/65">Conocer el departamento</span>
+      <h3 className="text-24 font-bold text-white tracking-tight leading-tight">{title}</h3>
+      <p className="text-14 text-white/75 mt-3">{count} {count === 1 ? 'departamento' : 'departamentos'}</p>
+      <span className="mt-auto pt-6 text-13 font-semibold text-white/80">Explorar</span>
     </GlassCard>
   );
 }
@@ -518,7 +520,10 @@ export default function VolunteeringPage() {
   const [openKey, setOpenKey] = useState(null);   // departamento abierto en el WindowStack
   const [formDept, setFormDept] = useState(null);  // null = modal cerrado, '' = abierto sin preseleccion
   const [quizOpen, setQuizOpen] = useState(false);
-  const [activeTag, setActiveTag] = useState(null);   // chip de interés activo (filtra el grid) o null
+  const [cardStart, setCardStart] = useState(0);
+  const [panelTab, setPanelTab] = useState('gallery');
+  const [selectedArea, setSelectedArea] = useState(null);
+  const pageSize = useSyncExternalStore(subscribeCardLayout, desktopCards, mobileCards) ? 2 : 1;
 
   // Departamentos reales desde /volunteer-areas (admin-editable), con
   // fallback local si la API aun no responde. Una sola llamada a
@@ -539,32 +544,33 @@ export default function VolunteeringPage() {
     ? [...CATEGORIES, { name: 'Otros', values: leftover.map(a => a.value) }]
     : CATEGORIES;
 
-  // images: segunda foto opcional (voluntariado_<value>_2, admin-editable
-  // en /admin/site-photos) para las vistas del fondo -- si no existe,
-  // el array queda con 1 sola foto y WindowStack cae a modo estático.
-  const windowItems = areas.map(a => ({
-    key: a.value,
-    image: a.photo,
-    images: [a.photo, sitePhotos[`voluntariado_${a.value}_2`]].filter(Boolean),
-    title: a.title,
-  }));
-
-  // Índice global (no por categoría) para escalonar la entrada de las
-  // tarjetas a lo largo de toda la página, en vez de reiniciar el
-  // retardo en cada familia (donde 1-3 items casi nunca alcanzan a
-  // mostrar la variedad). Ya no decide tamaños -- todas las tarjetas
-  // miden lo mismo desde que el masonry se fue.
-
-  // Única cifra que esta página puede sostener con un dato real: se
-  // CUENTA sobre las áreas ya resueltas desde /volunteer-areas, así que
-  // sigue al admin en vez de quedarse congelada. Mismo criterio que
-  // CelulasPage.
-  const stats = [
-    { n: String(areas.length), label: areas.length === 1 ? 'Departamento' : 'Departamentos' },
-  ];
-  // A qué categoría pertenece cada departamento -- se usa también en el
-  // chip de la ventana de detalle.
-  const categoryOf = value => categoriesWithLeftover.find(c => c.values.includes(value))?.name;
+  const groups = categoriesWithLeftover.map(category => ({
+    key: category.name,
+    title: category.name,
+    areas: areas.filter(area => category.values.includes(area.value)),
+  })).filter(group => group.areas.length > 0);
+  const start = Math.min(cardStart, Math.max(0, groups.length - 1));
+  const visibleGroups = groups.slice(start, start + pageSize);
+  const end = Math.min(start + pageSize, groups.length);
+  const areaOf = group => group.areas.find(area => area.value === selectedArea) || group.areas[0];
+  const photosOf = area => [...new Set([area.photo, sitePhotos[`voluntariado_${area.value}_2`]].filter(Boolean))];
+  const windowItems = groups.map(group => {
+    const area = areaOf(group);
+    const photo = panelTab === 'gallery' ? sectionPhoto : area.photo;
+    return { ...group, image: photo, images: panelTab === 'photos' ? photosOf(area) : [photo] };
+  });
+  const openGroup = key => {
+    setPanelTab('gallery');
+    setSelectedArea(null);
+    setOpenKey(key);
+  };
+  const openAreaDetail = value => {
+    const group = groups.find(item => item.areas.some(area => area.value === value));
+    if (!group) return;
+    setSelectedArea(value);
+    setPanelTab('info');
+    setOpenKey(group.key);
+  };
 
   const openForm = (value = '') => {
     setOpenKey(null);
@@ -610,142 +616,93 @@ export default function VolunteeringPage() {
         </button>
       </PageHero>
 
-      {/* El slot administrado de esta sección reemplaza la foto de
-          respaldo sin cambiar la composición de las tarjetas. */}
-      <section className="relative py-4 pb-24 overflow-clip">
+      <section className="relative min-h-[88svh] py-16 md:py-20 overflow-clip" aria-labelledby="volunteer-classifications">
         <SectionBg src={sectionPhoto} opacity="opacity-70" viewport />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          {/* Sin Reveal: el titular de sección es el punto FIJO contra el
-              que llega el contenido de abajo. Si él también se desliza al
-              entrar, no hay nada quieto en la pantalla y el scroll se
-              siente gelatinoso. Las cards del collage siguen entrando --
-              ahora llegan bajo un título que ya estaba ahí. */}
-          <div className="mb-10 text-center max-w-2xl mx-auto">
-            <h2 className="text-d2 text-white">
-              ¿Dónde quieres servir?
-            </h2>
-            {/* Sin botones aquí: los dos CTA (el quiz y "aplica sin
-                preferencia") ya viven en el hero, que es lo que decidió el
-                cambio de arriba. Repetirlos 300px más abajo, con el mismo
-                texto y el mismo estilo, era justo la duplicación que se
-                estaba quitando. */}
-            <p className="mt-4 text-16 text-white/70">Toca un departamento para conocerlo mejor.</p>
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
+          <div className="mb-9 max-w-2xl">
+            <h2 id="volunteer-classifications" className="text-d2 text-white">¿Dónde quieres servir?</h2>
+            <p className="mt-4 text-16 text-white/80">Elige un área para explorar sus departamentos.</p>
           </div>
-
-          <StatTrio stats={stats} className="mx-auto mb-14" />
-
-          {/* Chips de interés -- filtran el grid de abajo. Reusan los
-              mismos tags que puntúan el quiz, así los dos caminos
-              (explorar vs. que te recomienden) llevan a lo mismo. */}
-          <Reveal className="flex flex-wrap items-center justify-center gap-2 mb-10">
-            <button
-              type="button"
-              onClick={() => setActiveTag(null)}
-              className={`inline-flex items-center gap-1.5 rounded-pill px-3.5 py-2 text-13 font-semibold transition-colors ${!activeTag ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
-            >
-              Todos
-            </button>
-            {INTEREST_TAGS.map(t => (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => setActiveTag(cur => cur === t.key ? null : t.key)}
-                className={`inline-flex items-center gap-1.5 rounded-pill px-3.5 py-2 text-13 font-semibold transition-colors ${activeTag === t.key ? 'bg-white text-bg' : 'bg-white/8 text-white/60 hover:bg-white/14 hover:text-white/85'}`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </Reveal>
-
-          <motion.div layout className="space-y-10">
-            <AnimatePresence>
-            {categoriesWithLeftover.map(cat => {
-              // Filtra por el eje `interes` únicamente: 'frente'/'apoyo'
-              // son visibilidad y no existen como chip, así que mirar el
-              // mapa completo aquí nunca podría acertar y sí podría
-              // colar un falso positivo el día que un chip se llame
-              // igual que una visibilidad.
-              const catAreas = areas.filter(a => cat.values.includes(a.value) && (!activeTag || matchOf(a.value).interes.includes(activeTag)));
-              if (catAreas.length === 0) return null;
-              return (
-                <motion.div 
-                  layout
-                  initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                  animate={{ opacity: 1, height: 'auto', overflow: 'visible' }}
-                  exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                  transition={{ opacity: { duration: 0.2 }, height: { duration: 0.18 } }}
-                  key={cat.name} 
-
-                >
-                  <p className="text-13 font-semibold text-white/60 mb-4">{cat.name}</p>
-                  <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <AnimatePresence mode="popLayout">
-                    {catAreas.map(area => {
-                      return (
-                        <motion.div
-                          layout
-                          key={area.value}
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.18 }}
-                        >
-                          <DepartmentCard {...area} onClick={() => setOpenKey(area.value)} />
-                        </motion.div>
-                      );
-                    })}
-                    </AnimatePresence>
-                  </motion.div>
-                </motion.div>
-              );
-            })}
-            </AnimatePresence>
-            {activeTag && !areas.some(a => matchOf(a.value).interes.includes(activeTag)) && (
-              <div className="text-center py-10">
-                <p className="text-15 text-white/50 mb-3">Ningún departamento coincide con ese interés todavía.</p>
-                <button type="button" onClick={() => setActiveTag(null)} className="text-14 font-semibold text-white/70 hover:text-white underline underline-offset-4 decoration-white/20">
-                  Ver todos los departamentos
-                </button>
-              </div>
-            )}
-          </motion.div>
+          <motion.ul
+            id="volunteer-classification-cards"
+            key={`${start}-${pageSize}`}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}
+            className="grid md:grid-cols-2 gap-5"
+            aria-label="Clasificaciones de voluntariado"
+          >
+            {visibleGroups.map(group => <li key={group.key}>
+              <ClassificationCard title={group.title} count={group.areas.length} onClick={() => openGroup(group.key)} />
+            </li>)}
+          </motion.ul>
+          {groups.length > pageSize && <nav className="mt-7 flex items-center justify-between gap-3" aria-label="Navegar clasificaciones">
+            <button type="button" disabled={start === 0} aria-controls="volunteer-classification-cards" onClick={() => setCardStart(Math.max(0, start - pageSize))} className="min-h-11 px-2 rounded-[8px] text-14 font-semibold text-white disabled:opacity-35 focus-ring">Anterior</button>
+            <p role="status" className="text-12 text-white/75">{start + 1}{end > start + 1 ? `–${end}` : ''} de {groups.length}</p>
+            <button type="button" disabled={end >= groups.length} aria-controls="volunteer-classification-cards" onClick={() => setCardStart(start + pageSize)} className="min-h-11 px-2 rounded-[8px] text-14 font-semibold text-white disabled:opacity-35 focus-ring">Siguiente</button>
+          </nav>}
         </div>
       </section>
 
-      {/* La foto administrada ocupa el fondo navy detrás de un único
-          panel de vidrio. Se conservan las dos fotos de cada departamento. */}
       <WindowStack
         items={windowItems}
         openKey={openKey}
-        onChange={setOpenKey}
+        onChange={key => key ? openGroup(key) : setOpenKey(null)}
         height="auto"
         light
         photoBackdrop
-        renderContent={(it) => {
-          const area = areas.find(x => x.value === it.key);
-          if (!area) return null;
-          const category = categoryOf(area.value);
+        renderContent={group => {
+          const area = areaOf(group);
           return (
-            <div className="space-y-6 text-bg">
-              {category && <p className="text-12 font-semibold text-bg/60">{category}</p>}
-              <p className="text-16 leading-relaxed text-bg/85">{area.desc}</p>
-              {area.why && <div className="border-t border-bg/10 pt-5">
-                <h3 className="text-14 font-bold mb-2">¿Por qué aquí?</h3>
-                <p className="text-15 leading-relaxed text-bg/80">{area.why}</p>
-              </div>}
-              {area.testimonial && <blockquote className="border-l border-bg/20 pl-4">
-                <p className="text-14 italic leading-relaxed text-bg/75">“{area.testimonial}”</p>
-                {area.testimonialAuthor && <footer className="text-12 text-bg/60 mt-2">{area.testimonialAuthor}</footer>}
-              </blockquote>}
-              <motion.button
-                {...PRESS_PRIMARY}
-                type="button"
-                onClick={() => openForm(area.value)}
-                className={btnPrimary}
-              >
-                Aplicar a {area.title}
-              </motion.button>
+            <div className="text-bg">
+              <div role="tablist" aria-label="Apartados de la clasificación" className="flex gap-1 border-b border-bg/15 mb-6">
+                {PANEL_TABS.map((tab, index) => <button
+                  key={tab.value}
+                  id={`volunteer-tab-${tab.value}`}
+                  type="button" role="tab" aria-selected={panelTab === tab.value}
+                  aria-controls="volunteer-category-panel" tabIndex={panelTab === tab.value ? 0 : -1}
+                  onClick={() => setPanelTab(tab.value)}
+                  onKeyDown={event => {
+                    let target;
+                    if (event.key === 'ArrowRight') target = (index + 1) % PANEL_TABS.length;
+                    if (event.key === 'ArrowLeft') target = (index - 1 + PANEL_TABS.length) % PANEL_TABS.length;
+                    if (event.key === 'Home') target = 0;
+                    if (event.key === 'End') target = PANEL_TABS.length - 1;
+                    if (target !== undefined) {
+                      event.preventDefault(); event.stopPropagation();
+                      setPanelTab(PANEL_TABS[target].value);
+                      document.getElementById(`volunteer-tab-${PANEL_TABS[target].value}`)?.focus();
+                    }
+                  }}
+                  className={`min-h-11 px-3 rounded-t-[8px] text-13 font-semibold focus-ring border-b-2 ${panelTab === tab.value ? 'border-bg text-bg' : 'border-transparent text-bg/60 hover:text-bg'}`}
+                >{tab.label}</button>)}
+              </div>
+              <div id="volunteer-category-panel" role="tabpanel" aria-labelledby={`volunteer-tab-${panelTab}`} tabIndex={0} className="focus-ring rounded-[8px]">
+                {panelTab === 'gallery' && <ul className="divide-y divide-bg/15">
+                  {group.areas.map(collection => <li key={collection.value}>
+                    <button type="button" onClick={() => { setSelectedArea(collection.value); setPanelTab('photos'); document.getElementById('volunteer-tab-photos')?.focus(); }} className="w-full flex items-center justify-between gap-4 py-4 px-1 text-left focus-ring rounded-[8px]">
+                      <span className="text-16 font-bold">{collection.title}</span>
+                      <span className="text-12 text-bg/65 shrink-0">Ver fotos</span>
+                    </button>
+                  </li>)}
+                </ul>}
+                {panelTab === 'photos' && <div className="space-y-5">
+                  <h3 className="text-20 font-bold">{area.title}</h3>
+                  <p className="text-14 text-bg/75">{photosOf(area).length} {photosOf(area).length === 1 ? 'fotografía' : 'fotografías'}</p>
+                  <button type="button" onClick={() => { setPanelTab('info'); document.getElementById('volunteer-tab-info')?.focus(); }} className="min-h-11 text-14 font-semibold underline underline-offset-4 focus-ring rounded-[8px]">Conocer {area.title}</button>
+                </div>}
+                {panelTab === 'info' && <div className="space-y-5">
+                  <h3 className="text-20 font-bold">{area.title}</h3>
+                  <p className="text-16 leading-relaxed text-bg/85">{area.desc}</p>
+                  {area.why && <div className="border-t border-bg/10 pt-5">
+                    <h4 className="text-14 font-bold mb-2">¿Por qué aquí?</h4>
+                    <p className="text-15 leading-relaxed text-bg/80">{area.why}</p>
+                  </div>}
+                  {area.testimonial && <blockquote className="border-l border-bg/20 pl-4">
+                    <p className="text-14 italic leading-relaxed text-bg/75">“{area.testimonial}”</p>
+                    {area.testimonialAuthor && <footer className="text-12 text-bg/60 mt-2">{area.testimonialAuthor}</footer>}
+                  </blockquote>}
+                  <motion.button {...PRESS_PRIMARY} type="button" onClick={() => openForm(area.value)} className={btnPrimary}>Aplicar a {area.title}</motion.button>
+                </div>}
+              </div>
             </div>
           );
         }}
@@ -758,7 +715,7 @@ export default function VolunteeringPage() {
           <ModalWrapper onClose={() => setQuizOpen(false)}>
             <QuizModal
               areas={areas}
-              onViewDetail={(value) => { setQuizOpen(false); setOpenKey(value); }}
+              onViewDetail={(value) => { setQuizOpen(false); openAreaDetail(value); }}
               onApply={(value) => { setQuizOpen(false); openForm(value); }}
             />
           </ModalWrapper>

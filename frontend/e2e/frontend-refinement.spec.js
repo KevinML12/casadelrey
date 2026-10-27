@@ -128,12 +128,14 @@ for (const width of [390, 1440]) {
       body: JSON.stringify({ voluntariado_seccion: '/images/components/voluntariado_general.jpg', voluntariado_equipo_nuevo: '/images/components/vol_intercesor.jpg', voluntariado_equipo_nuevo_2: '/images/components/vol_alabanza.jpg' }),
     }));
     await page.goto('/volunteering');
-    const trigger = page.getByRole('button', { name: /^Equipo administrado/ });
+    const trigger = page.getByRole('button', { name: /^Otros/ });
     await expect(trigger.locator('img')).toHaveCount(0);
     await trigger.click();
-    const dialog = page.getByRole('dialog', { name: 'Equipo administrado' });
+    const dialog = page.getByRole('dialog', { name: 'Otros' });
+    await expect(dialog.getByRole('tab', { name: 'Galería', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await dialog.getByRole('button', { name: 'Equipo administrado Ver fotos', exact: true }).click();
+    await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toHaveAttribute('aria-selected', 'true');
     await expect(dialog.getByRole('heading', { name: 'Equipo administrado', exact: true })).toBeVisible();
-    await expect(dialog.getByText('Motivo actualizado por el administrador.')).toBeVisible();
     await expect(dialog.locator('.glass-light img, .glass-light .glass-light-nested')).toHaveCount(0);
     const photo = dialog.locator('img');
     await expect(photo).toHaveAttribute('src', /vol_intercesor/);
@@ -141,6 +143,8 @@ for (const width of [390, 1440]) {
     await expect(photo).toHaveAttribute('src', /vol_alabanza/);
     await expect(dialog.getByRole('button', { name: 'Foto 2', exact: true })).toHaveAttribute('aria-pressed', 'true');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await dialog.getByRole('tab', { name: 'Información', exact: true }).click();
+    await expect(dialog.getByText('Motivo actualizado por el administrador.')).toBeVisible();
     await dialog.getByRole('button', { name: 'Aplicar a Equipo administrado', exact: true }).click();
     await expect(dialog).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Continuar', exact: true })).toBeVisible();
@@ -151,15 +155,58 @@ for (const width of [390, 1440]) {
   });
 }
 
-test('the wide section photo stays behind the cards while scrolling', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('the quiz opens the chosen department information inside its classification', async ({ page }) => {
   await isolate(page);
   await page.goto('/volunteering');
-  await page.getByRole('button', { name: /^Maestros de Niños/ }).scrollIntoViewIfNeeded();
-  const photo = page.locator('section').filter({ has: page.getByRole('heading', { name: '¿Dónde quieres servir?', exact: true }) }).locator('img');
-  await expect(photo).toHaveCount(1);
-  await expect(photo).toHaveAttribute('src', /backgrounds\/congregacion/);
-  const bounds = await photo.evaluate(el => { const r = el.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: innerHeight }; });
-  expect(bounds.top).toBeLessThanOrEqual(1);
-  expect(bounds.bottom).toBeGreaterThanOrEqual(bounds.height - 1);
+  await page.getByRole('button', { name: 'Dos preguntas y te decimos dónde', exact: true }).click();
+  const quiz = page.getByRole('dialog', { name: 'Formulario', exact: true });
+  await quiz.getByRole('button', { name: 'Me encanta la música y el arte', exact: true }).click();
+  await quiz.getByRole('button', { name: 'Al frente, visible', exact: true }).click();
+  await quiz.getByRole('button', { name: 'Ver detalle', exact: true }).first().click();
+  await expect(quiz).toHaveCount(0);
+  const detail = page.getByRole('dialog', { name: 'Alabanza y arte', exact: true });
+  await expect(detail).toBeVisible();
+  await expect(detail.getByRole('tab', { name: 'Información', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await expect(detail.getByRole('heading', { name: 'Alabanza', exact: true })).toBeVisible();
+  expect(await page.locator('#root').evaluate(el => el.inert)).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(detail).toHaveCount(0);
+  expect(await page.locator('#root').evaluate(el => el.inert)).toBe(false);
 });
+
+for (const width of [390, 1440]) {
+  test(`classification cards disclose every area without crowding at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await isolate(page);
+    await page.goto('/volunteering');
+    const cards = page.getByRole('list', { name: 'Clasificaciones de voluntariado' });
+    await expect(cards.getByRole('button')).toHaveCount(width < 768 ? 1 : 2);
+    const nav = page.getByRole('navigation', { name: 'Navegar clasificaciones' });
+    await expect(nav.getByRole('button', { name: 'Anterior', exact: true })).toBeDisabled();
+    const seen = new Set();
+    for (let i = 0; i < 5; i++) {
+      for (const title of await cards.getByRole('heading').allTextContents()) seen.add(title);
+      const next = nav.getByRole('button', { name: 'Siguiente', exact: true });
+      if (await next.isDisabled()) break;
+      await next.click();
+    }
+    expect([...seen]).toEqual(['Alabanza y arte', 'Anfitrionaje y protocolo', 'Niños y enseñanza', 'Multimedia y producción', 'Oración y logística']);
+    await expect(nav.getByRole('button', { name: 'Siguiente', exact: true })).toBeDisabled();
+    const trigger = cards.getByRole('button').last();
+    await trigger.click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toHaveCount(1);
+    const gallery = dialog.getByRole('tab', { name: 'Galería', exact: true });
+    await gallery.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toBeFocused();
+    await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    const photo = page.locator('section[aria-labelledby="volunteer-classifications"] img');
+    await expect(photo).toHaveCount(1);
+    await expect(photo).toHaveAttribute('src', /backgrounds\/congregacion/);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
