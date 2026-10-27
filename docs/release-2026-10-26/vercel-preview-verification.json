@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-10-27T21:03:56.149991+00:00",
+  "preview_url": "https://casadelreyhue-flcvstfop-kevinml12s-projects.vercel.app",
+  "stable_preview_alias": "https://casadelreyhue-git-codex-render-qa-kevinml12s-projects.vercel.app",
+  "deployment": "dpl_ELVtJjmiQ4bfAiLvnXJVaXkmGrog",
+  "sha": "b62cb0be9de8d2546187ca3a1814a83afa2b663f",
+  "state": "READY",
+  "entry_asset": "/assets/index-hRYUkBwV.js",
+  "glass_scenes_present": true,
+  "direct_fly_api_removed_from_frontend": true,
+  "api_proxy_returns_published_departments": 10,
+  "production_url": "https://casadelreyhue.vercel.app",
+  "production_kept_on_main_sha": "01d597dd84f2c2afdf6d102801cbb99d91b4ebfe",
+  "production_backend": "https://casa-del-rey-mvp.fly.dev",
+  "new_backend_contracts_pending_before_main_promotion": true
+}

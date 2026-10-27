@@ -1,33 +1,27 @@
 {
   "frontend": "https://casadelrey-web-pruebas.onrender.com",
-  "commit": "5898e987171342e9b9cabc76f8a12bb6e8fcc3a2",
-  "render_deploy": "dep-dbgd91rl550s73b5a8m0",
-  "page_status": 200,
-  "entry_asset": "/assets/index-DEN5W166.js",
-  "entry_status": 200,
-  "stylesheet": "/assets/index-CvGYXImq.css",
-  "thin_perimeter_reflections_present": true,
+  "backend": "https://casadelrey-api-pruebas.onrender.com",
+  "checked_at": "2026-10-27T21:05:44.041642+00:00",
+  "render_deploy": "dep-dbgh300473hc73e0s58g",
+  "frontend_commit": "b62cb0be9de8d2546187ca3a1814a83afa2b663f",
+  "backend_commit": "9e74735c3c40b8421bd1154ed2dbf949439b72de",
+  "entry_asset": "/assets/index-Dvl76C1Y.js",
+  "stylesheet": "/assets/index-Cj6b1oHT.css",
   "qa_api_configured": true,
-  "group_backgrounds_present": true,
-  "admin_photo_sources_preserved": true,
-  "group_photo_assets": {
-    "congregacion.webp": {
-      "status": 200,
-      "bytes": 99774
-    },
-    "congregacion-640.webp": {
-      "status": 200,
-      "bytes": 25646
-    },
-    "comunidad-templo.webp": {
-      "status": 200,
-      "bytes": 148450
-    },
-    "comunidad-templo-640.webp": {
-      "status": 200,
-      "bytes": 39168
-    }
-  },
-  "classification_controls_present": true,
-  "gallery_tabs_present": true
+  "short_scene_crop_fixed": true,
+  "stationary_scenes_present": true,
+  "gallery_tabs_present": true,
+  "admin_gallery_edit_present": true,
+  "admin_gallery_numeric_order_preserved": true,
+  "thin_perimeter_reflections_present": true,
+  "institutional_settings_present": true,
+  "health_status": "ok",
+  "background_bytes": 106536,
+  "counts": {
+    "gallery/?limit=200": 0,
+    "cell-categories": 0,
+    "volunteer-areas": 0,
+    "blog/": 0,
+    "events/": 1
+  }
 }
