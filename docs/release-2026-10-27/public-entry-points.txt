@@ -1,0 +1,9 @@
+
+Running 1 test using 1 worker
+
+
+(node:9994) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/1] [chromium] › e2e/module-polish.spec.js:84:1 › all public entry points keep a visible main landmark and a single page title
+  1 passed (6.6s)

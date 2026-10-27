@@ -32,11 +32,11 @@ export default function Register() {
   const bg = useSitePhoto('hero_registro', '/images/bg-registro.jpg');
 
   return (
-    <section className="relative min-h-screen pt-32 pb-20 overflow-hidden flex items-center">
+    <main className="relative min-h-screen pt-32 pb-20 overflow-hidden flex items-center">
       {/* Foto a color pleno + .scrim-hero: la composición es centrada, así
           que el óvalo oscuro cae justo donde vive el bloque de texto. Antes
           la foto iba al 40% bajo otro degradado encima. */}
-      <ParallaxImg src={bg} alt="Fondo" />
+      <ParallaxImg src={bg} fallbackSrc="/images/bg-registro.jpg" alt="" />
       <div className="scrim-hero" />
 
       <div className="relative z-10 w-full max-w-2xl mx-auto px-6 text-center">
@@ -54,7 +54,7 @@ export default function Register() {
           {PASOS.map((p, i) => (
             <RevealItem key={p.title} depth>
 
-              <div className="liquid-glass liquid-shine rounded-[22px] p-5 h-full">
+              <div className="liquid-glass liquid-shine rounded-[16px] p-5 h-full">
                 <div className="flex items-center gap-2.5 mb-3">
                   {/* font-bold, no extrabold: Arimo topa en 700 y el 800
                       pintaba el mismo trazo. Radio 22, el de toda card. */}
@@ -88,6 +88,6 @@ export default function Register() {
           </div>
         </Reveal>
       </div>
-    </section>
+    </main>
   );
 }

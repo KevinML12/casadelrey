@@ -81,3 +81,10 @@ test('event preview exposes the background and opens full details without losing
   await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0);
   expect(await page.locator('#root').evaluate(el => el.inert)).toBe(false);
 });
+test('all public entry points keep a visible main landmark and a single page title', async ({ page }) => {
+  await isolate(page); const failures = []; page.on('pageerror', error => failures.push(error.message));
+  for (const route of ['/', '/about', '/celulas', '/volunteering', '/events', '/gallery', '/blog', '/conectate', '/prayer', '/donate', '/comprobante', '/login', '/register', '/forgot-password', '/verify-email', '/reset-password', '/payment-success', '/no-existe']) {
+    await page.goto(route); await expect(page.locator('main'), route).toBeVisible(); await expect(page.locator('h1'), route).toHaveCount(1);
+  }
+  expect(failures).toEqual([]);
+});
