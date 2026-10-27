@@ -1,0 +1,17 @@
+
+Running 9 tests using 1 worker
+
+
+(node:11691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/9] [chromium] › frontend/e2e/responsive-final.spec.js:38:3 › populated public modules fit 320px without horizontal overflow
+[2/9] [chromium] › frontend/e2e/responsive-final.spec.js:38:3 › populated public modules fit 360px without horizontal overflow
+[3/9] [chromium] › frontend/e2e/responsive-final.spec.js:38:3 › populated public modules fit 390px without horizontal overflow
+[4/9] [chromium] › frontend/e2e/responsive-final.spec.js:38:3 › populated public modules fit 768px without horizontal overflow
+[5/9] [chromium] › frontend/e2e/responsive-final.spec.js:38:3 › populated public modules fit 1024px without horizontal overflow
+[6/9] [chromium] › frontend/e2e/responsive-final.spec.js:38:3 › populated public modules fit 1920px without horizontal overflow
+[7/9] [chromium] › frontend/e2e/responsive-final.spec.js:56:3 › photo windows and registration stay usable at 320x568
+[8/9] [chromium] › frontend/e2e/responsive-final.spec.js:56:3 › photo windows and registration stay usable at 844x390
+[9/9] [chromium] › frontend/e2e/responsive-final.spec.js:56:3 › photo windows and registration stay usable at 768x1024
+  9 passed (37.7s)

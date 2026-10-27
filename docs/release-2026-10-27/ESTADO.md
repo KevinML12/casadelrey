@@ -39,3 +39,11 @@ Se eliminaron los registros temporales de estas pruebas. Permanecen cuatro event
 Las pestañas que estaban abiertas conservaban la interfaz anterior en memoria. Se recargó la pestaña de Render y se verificó por interfaz el evento «Noche de adoración», posición 2 de 4, controles nuevos y cambio de fondo. Una nueva pestaña de Vercel muestra y conserva la revisión actual. Captura final: `eventos-interaccion-final.png`.
 
 Pendientes de puesta en servicio definitiva: mantener explícita la separación QA/producción, publicar contenido y cuentas definitivos, configurar y comprobar correo transaccional y los datos bancarios reales. Esta revisión no migra el schema histórico ni certifica carga concurrente de 1000 usuarios. No se compraron planes ni se eliminó infraestructura de Fly; el frontend deja de usarla.
+
+## Cierre de responsividad
+
+Solicitud final: verificar responsividad y guardar el commit de cierre. Nueve pruebas adicionales aprobadas en 37.7 segundos, sin cambios necesarios en el código de aplicación. Los 18 puntos de entrada públicos se revisaron a 320, 360, 390, 768, 1024 y 1920 px, con colecciones pobladas mediante API interceptada. Se comprobó ausencia de desbordamiento horizontal y de excepciones JS.
+
+Galería, cambio de foto y formulario de inscripción se probaron a 320×568, 844×390 y 768×1024: controles dentro de la pantalla, cierre accesible, desplazamiento interno hasta la acción final y recuperación del contenido al cerrar. Estas verificaciones no enviaron formularios ni alteraron datos.
+
+Revisión visual adicional de Eventos publicado en Vercel a 320 y 768 px, esperando la fotografía cargada: `responsive-live-320.png` y `responsive-live-768.png`. La aplicación conserva la versión publicada `2a139ab`; este cierre añade pruebas y evidencia, sin cambios de diseño ni migraciones. Resultado en `responsive-final.txt`.
