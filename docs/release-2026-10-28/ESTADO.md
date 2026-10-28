@@ -7,3 +7,9 @@ Se centralizó el cierre para mover el foco antes de aplicar aria-hidden/inert. 
 Validación local: 26 pruebas aprobadas, incluyendo diez enlaces sucesivos a 320, 768 y 1024 px; captura de advertencias mediante el registro del navegador, Escape, clic fuera y cambio a escritorio. Se conservaron las regresiones de formularios, ventanas y módulos públicos. Build correcto; lint sin errores, con 20 avisos anteriores.
 
 El cambio sólo afecta navegación y foco. No cambia datos, fotografías ni configuración del backend.
+
+## Publicación verificada
+
+Aplicación `9ac23d45232d32da29909b6cf65cd704b65871a0` publicada en Vercel Production READY (`dpl_E5xkqaPRznGa5JpwJAPwgGN9kemL`) y Render Static Live (`dep-dbgpbr0ae00c73d32pqg`).
+
+Se repitieron 30 cambios de módulo por sitio (diez destinos a 320, 768 y 1024 px), sin interceptar la API ni realizar escrituras: 60 navegaciones en total. Se verificaron también Escape y ampliación a escritorio. Ambos canales conservaron el foco fuera del menú oculto, sin advertencias de aria-hidden/foco en el registro Chromium ni excepciones JS. Evidencia: `navigation-live.json`.

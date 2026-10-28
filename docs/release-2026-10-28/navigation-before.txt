@@ -6,7 +6,7 @@ Running 1 test using 1 worker
 (Use `node --trace-warnings ...` to show where the warning was created)
 
 [1/1] [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px
-  1) [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px 
+  1) [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px
 
     Error: expect(locator).toBeFocused() failed
 
@@ -51,4 +51,4 @@ Running 1 test using 1 worker
 
 
   1 failed
-    [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px 
+    [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px
