@@ -1,0 +1,54 @@
+
+Running 1 test using 1 worker
+
+
+(node:11973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/1] [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px
+  1) [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('button', { name: 'Menú', exact: true })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Menú', exact: true })
+        14 × locator resolved to <button aria-label="Menú" aria-expanded="false" aria-controls="mobile-menu" class="xl:hidden grid place-items-center h-10 px-4 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring text-14 font-bold">Menú</button>
+           - unexpected value "inactive"
+
+
+      33 |       await sheet.getByRole('link', { name: label, exact: true }).click();
+      34 |       await expect(menu).toHaveAttribute('aria-expanded', 'false');
+    > 35 |       await expect(menu).toBeFocused();
+         |                          ^
+      36 |       expect(await sheet.evaluate(el => el.contains(document.activeElement))).toBe(false);
+      37 |       expect(await sheet.evaluate(el => el.inert)).toBe(true);
+      38 |       expect(await page.locator('body').evaluate(el => el.style.overflow)).not.toBe('hidden');
+        at /Users/kevv/Documents/proyectos/casadelreyhue/frontend/e2e/navigation-focus.spec.js:35:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    frontend/test-results/navigation-focus-all-mobil-52cc3-ocus-before-hiding-at-768px-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    frontend/test-results/navigation-focus-all-mobil-52cc3-ocus-before-hiding-at-768px-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: frontend/test-results/navigation-focus-all-mobil-52cc3-ocus-before-hiding-at-768px-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    frontend/test-results/navigation-focus-all-mobil-52cc3-ocus-before-hiding-at-768px-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace frontend/test-results/navigation-focus-all-mobil-52cc3-ocus-before-hiding-at-768px-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px 

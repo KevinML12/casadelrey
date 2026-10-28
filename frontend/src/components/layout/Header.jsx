@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -26,6 +26,23 @@ export default function Header() {
   const dropRef = useRef(null);
   const navRef = useRef(null);
   const menuButtonRef = useRef(null);
+  const menuRef = useRef(null);
+
+  // Move focus before React hides/inerts the sheet, including route changes.
+  // At the desktop breakpoint the mobile toggle is hidden too.
+  const closeMobileMenu = useCallback(() => {
+    const focused = document.activeElement;
+    const desktop = window.innerWidth >= 1280;
+    // CSS can clear focus to body before the resize event reaches React.
+    const resizedOpenSheet = desktop && focused === document.body && menuRef.current?.getAttribute('aria-hidden') === 'false';
+    if (menuRef.current?.contains(focused) || (desktop && focused === menuButtonRef.current) || resizedOpenSheet) {
+      const target = desktop
+        ? navRef.current?.querySelector('[data-desktop-navigation] a[aria-current="page"]') || navRef.current?.querySelector('a')
+        : menuButtonRef.current;
+      target?.focus({ preventScroll: true });
+    }
+    setMenuOpen(false);
+  }, []);
 
   // Alto del menu movil en PIXELES reales via window.innerHeight, no vh:
   // 100vh tiene un bug de plataforma conocido en Safari movil real (no
@@ -35,11 +52,11 @@ export default function Header() {
   useEffect(() => {
     const onResize = () => {
       setViewportH(window.innerHeight);
-      if (window.innerWidth >= 1280) setMenuOpen(false);
+      if (window.innerWidth >= 1280) closeMobileMenu();
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, []);
+  }, [closeMobileMenu]);
 
   // El nav se esconde al bajar y reaparece al subir (con resorte)
   const { scrollY } = useScroll();
@@ -57,18 +74,18 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  useEffect(() => { setMenuOpen(false); setDropOpen(false); }, [location]);
+  useEffect(() => { closeMobileMenu(); setDropOpen(false); }, [location, closeMobileMenu]);
 
   useEffect(() => {
     if (!menuOpen && !dropOpen) return;
     const onKey = e => {
       if (e.key !== 'Escape') return;
-      setMenuOpen(false);
+      closeMobileMenu();
       setDropOpen(false);
-      (menuOpen ? menuButtonRef.current : dropRef.current?.querySelector('button'))?.focus();
+      if (!menuOpen) dropRef.current?.querySelector('button')?.focus();
     };
     const onOutside = e => {
-      if (!navRef.current?.contains(e.target)) setMenuOpen(false);
+      if (!navRef.current?.contains(e.target)) closeMobileMenu();
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('pointerdown', onOutside);
@@ -76,7 +93,7 @@ export default function Header() {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onOutside);
     };
-  }, [menuOpen, dropOpen]);
+  }, [menuOpen, dropOpen, closeMobileMenu]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -117,7 +134,7 @@ export default function Header() {
               de la derecha era 0px, sin margen — cualquier nombre de
               usuario un poco más largo lo desbordaba. Subido a xl para
               tener aire real; 1024-1280 usa el menú hamburguesa. */}
-          <div className="hidden xl:flex items-center gap-0.5">
+          <div data-desktop-navigation className="hidden xl:flex items-center gap-0.5">
             {NAV_LINKS.map(n => (
               <NavLink key={n.to} to={n.to} end={n.to === '/'}>
                 {({ isActive }) => (
@@ -224,7 +241,7 @@ export default function Header() {
 
             <button
               ref={menuButtonRef}
-              onClick={() => setMenuOpen(o => !o)}
+              onClick={() => menuOpen ? closeMobileMenu() : setMenuOpen(true)}
               className="xl:hidden grid place-items-center h-10 px-4 rounded-pill bg-bg/5 text-bg hover:bg-bg/10 transition-colors focus-ring text-14 font-bold"
               aria-label="Menú"
               aria-expanded={menuOpen}
@@ -244,6 +261,7 @@ export default function Header() {
             Ahora la altura es relativa al viewport (nunca más grande que
             la pantalla) con scroll interno si aun asi no entra todo. */}
         <div
+          ref={menuRef}
           id="mobile-menu"
           aria-hidden={!menuOpen}
           inert={!menuOpen}
@@ -260,7 +278,7 @@ export default function Header() {
         >
           <div className="px-2 pb-2 pt-1 flex flex-col gap-1">
             {NAV_LINKS.map(n => (
-              <NavLink key={n.to} to={n.to} end={n.to === '/'} onClick={() => setMenuOpen(false)}>
+              <NavLink key={n.to} to={n.to} end={n.to === '/'} onClick={closeMobileMenu}>
                 {({ isActive }) => (
                   <span className={`block px-4 py-3 rounded-md text-15 font-semibold transition-colors ${
                     isActive ? 'bg-bg text-white' : 'text-bg hover:bg-bg/5'
@@ -275,7 +293,7 @@ export default function Header() {
               {!isAuthenticated && (
                 <Link
                   to="/login"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                 >
                   Ingresar
@@ -286,7 +304,7 @@ export default function Header() {
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      onClick={() => setMenuOpen(false)}
+                      onClick={closeMobileMenu}
                       className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                     >
                       Panel Admin
@@ -295,7 +313,7 @@ export default function Header() {
                   {(isAdmin || user?.role === 'leader') && (
                     <Link
                       to="/leader"
-                      onClick={() => setMenuOpen(false)}
+                      onClick={closeMobileMenu}
                       className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                     >
                       Panel Líder
@@ -303,13 +321,13 @@ export default function Header() {
                   )}
                   <Link
                     to="/profile"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={closeMobileMenu}
                     className="px-4 py-2.5 rounded-md text-14 font-medium text-bg hover:bg-bg/5 transition-colors"
                   >
                     Mi perfil
                   </Link>
                   <button
-                    onClick={() => { handleLogout(); setMenuOpen(false); }}
+                    onClick={() => { closeMobileMenu(); handleLogout(); }}
                     className="text-left px-4 py-2.5 rounded-md text-14 font-medium text-rose hover:bg-rose/10 transition-colors"
                   >
                     Cerrar sesión
@@ -318,14 +336,14 @@ export default function Header() {
               )}
                 <Link
                   to="/donate"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill text-bg text-15 font-bold hover:bg-bg/5 transition-colors"
                 >
                   Dar
                 </Link>
                 <Link
                   to="/conectate"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className="mt-1 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-pill bg-bg text-white text-15 font-bold btn-spring hover:bg-bg-soft"
                 >
                   Conéctate

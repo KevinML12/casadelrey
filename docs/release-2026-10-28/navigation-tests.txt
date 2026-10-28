@@ -1,0 +1,34 @@
+
+Running 26 tests using 1 worker
+
+
+(node:14866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 320px
+[2/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 768px
+[3/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:19:3 › main layouts fit at 1024px
+[4/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:31:1 › mobile navigation closes with Escape and removes hidden links from focus
+[5/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:52:1 › flat glass windows sit above navigation and restore focus
+[6/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:70:1 › public surfaces keep the real logo without decorative icons or 3D
+[7/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:87:1 › events keeps its hero visible while loading and can retry a failed feed
+[8/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:106:1 › first photo is prioritized and local photos use responsive WebP
+[9/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 390px
+[10/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:120:3 › volunteer detail preserves administered content and background photos at 1440px
+[11/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:159:1 › the quiz opens the chosen department information in the same slider
+[12/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 390px
+[13/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:179:3 › every department has a successive scene with one glass card at 1440px
+[14/26] [chromium] › frontend/e2e/frontend-refinement.spec.js:224:1 › a failed managed background falls back to the matching department scene
+[15/26] [chromium] › frontend/e2e/module-polish.spec.js:16:1 › empty cell finder offers contact and an accessible close control
+[16/26] [chromium] › frontend/e2e/module-polish.spec.js:27:1 › broken administrator hero uses its local photograph
+[17/26] [chromium] › frontend/e2e/module-polish.spec.js:33:1 › nullable gallery is empty and retry recovers a failed feed
+[18/26] [chromium] › frontend/e2e/module-polish.spec.js:40:1 › captions follow the background, albums reset photos and keyboard retains focus
+[19/26] [chromium] › frontend/e2e/module-polish.spec.js:56:1 › long titles fit mobile and past-event links select the requested event
+[20/26] [chromium] › frontend/e2e/module-polish.spec.js:69:1 › event preview exposes the background and opens full details without losing registration
+[21/26] [chromium] › frontend/e2e/module-polish.spec.js:84:1 › all public entry points keep a visible main landmark and a single page title
+[22/26] [chromium] › frontend/e2e/module-polish.spec.js:91:1 › collection controls identify a browsable scene and give fast press feedback
+[23/26] [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 320px
+[24/26] [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 768px
+[25/26] [chromium] › frontend/e2e/navigation-focus.spec.js:25:3 › all mobile navigation links release focus before hiding at 1024px
+[26/26] [chromium] › frontend/e2e/navigation-focus.spec.js:44:1 › closing by Escape, outside pointer and desktop resize keeps focus visible
+  26 passed (36.0s)
