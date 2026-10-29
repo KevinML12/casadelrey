@@ -44,7 +44,7 @@
   49:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminGallery.jsx
-  77:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  78:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminReceipts.jsx
   201:32  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
@@ -53,7 +53,7 @@
   25:6  warning  React Hook useEffect has a missing dependency: 'isAdmin'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/Home.jsx
-  202:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+  200:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
 
 ✖ 20 problems (0 errors, 20 warnings)
   0 errors and 1 warning potentially fixable with the `--fix` option.

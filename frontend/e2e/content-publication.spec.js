@@ -65,3 +65,29 @@ test('historical cell types and their assigned leader remain editable', async ({
   await page.getByRole('button', { name: 'Actualizar', exact: true }).click();
   expect(writes[0]).toMatchObject({ code: 'V1', type: 'adolescentes', leader_id: 21, name: 'Grupo actualizado' });
 });
+
+test('Home agenda uses upcoming administered records in a photographic scene', async ({ page }) => {
+  await isolate(page, { '/events/': [
+    { ID: 21, title: 'Próxima reunión', date: '2099-11-01', cover_image: photo, is_active: true },
+    { ID: 22, title: 'Reunión pasada', date: '2000-11-01', cover_image: photo, is_active: true },
+    { ID: 23, title: 'Reunión oculta', date: '2099-11-01', cover_image: photo, is_active: false },
+  ] });
+  await page.goto('/');
+  const agenda = page.getByRole('region', { name: 'Agenda de la comunidad', exact: true });
+  await expect(agenda.getByRole('heading', { name: 'Próxima reunión', exact: true })).toBeVisible();
+  await expect(agenda.getByRole('link', { name: 'Ver evento' })).toHaveAttribute('href', '/events?id=21');
+  await expect(agenda.getByText('Reunión pasada')).toHaveCount(0);
+  await expect(agenda.getByText('Reunión oculta')).toHaveCount(0);
+  await expect(agenda.locator('.liquid-glass img')).toHaveCount(0);
+});
+
+test('an album link opens the chosen administrator album after all pages load', async ({ page }) => {
+  await isolate(page, { '/gallery/': { data: [
+    { ID: 1, title: 'Primer álbum - Foto', url: photo },
+    { ID: 2, title: 'Álbum elegido - Foto', url: photo },
+  ], meta: { pages: 1 } } });
+  await page.goto('/gallery?album=%C3%81lbum%20elegido');
+  await expect(page.getByRole('dialog', { name: 'Álbum elegido', exact: true })).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PhotoImage from '../../components/ui/PhotoImage';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
@@ -126,11 +127,11 @@ export default function AdminGallery() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {photos.map(p => (
             <div key={p.ID} className="glass-light rounded-[20px] card-spring group relative overflow-hidden aspect-square">
-              <img
+              <PhotoImage
                 src={p.thumbnail_url || p.url}
                 alt={p.title}
                 className={`w-full h-full object-cover transition-opacity ${p.is_active ? 'opacity-100' : 'opacity-40'}`}
-                onError={e => { e.target.src = 'https://placehold.co/200x200?text=Foto'; }}
+                fallbackSrc={p.thumbnail_url ? p.url : '/images/backgrounds/congregacion.webp'}
               />
               {!p.is_active && (
                 <div className="absolute top-2 left-2 bg-black/60 text-ink text-xs px-2 py-0.5 rounded-full">

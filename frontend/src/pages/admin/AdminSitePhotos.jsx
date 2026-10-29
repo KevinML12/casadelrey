@@ -14,7 +14,7 @@ function PhotoRow({ label, sublabel, imageUrl, uploading, onPick }) {
     <div className="flex items-center gap-4 p-4 rounded-2xl border border-bg/10">
       <div className="bg-bg/8 rounded-[20px] w-20 h-20 overflow-hidden shrink-0">
         {imageUrl
-          ? <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+          ? <img src={imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           : <div className="w-full h-full" />
         }
       </div>

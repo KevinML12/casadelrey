@@ -1,0 +1,14 @@
+Running 7 tests using 1 worker
+
+
+(node:24921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/7] [chromium] › frontend/e2e/content-publication-live.spec.js:10:1 › published records retain their real category, media and department relationships
+[2/7] [chromium] › frontend/e2e/content-publication-live.spec.js:22:1 › a real published cell routes a new request to its assigned leader
+[3/7] [chromium] › frontend/e2e/release-live.spec.js:26:3 › live public modules render without runtime errors at 390px
+[4/7] [chromium] › frontend/e2e/release-live.spec.js:26:3 › live public modules render without runtime errors at 1440px
+[5/7] [chromium] › frontend/e2e/release-live.spec.js:41:1 › live administrator can open every module and member cannot enter administration
+[6/7] [chromium] › frontend/e2e/release-live.spec.js:59:1 › live prayer and connection submissions reach their administrator modules
+[7/7] [chromium] › frontend/e2e/release-live.spec.js:86:1 › live administrator event reaches its photographic preview, registration and payment gate
+  7 passed (4.2m)

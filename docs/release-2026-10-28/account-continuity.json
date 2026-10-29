@@ -1,0 +1,6 @@
+{
+  "historical_accounts_verified": 29,
+  "same_password_hashes": true,
+  "same_roles": true,
+  "session_and_recovery_tokens_not_copied": true
+}

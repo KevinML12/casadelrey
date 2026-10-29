@@ -3,8 +3,7 @@ import PhotoImage from '../../components/ui/PhotoImage';
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
-import apiClient from '../../lib/apiClient';
+import Reveal from '../../components/ui/Reveal';
 import { useApi, useApiResource, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
@@ -14,7 +13,6 @@ import { saludo } from '../../lib/greeting';
 // blanco del hero y a los chips de redes del pie de Ubicación.
 import { EASE_OUT, EASE_IN, PRESS_PRIMARY, PRESS_SECONDARY, PRESS_MICRO } from '../../lib/motion';
 
-import GlassCard from '../../components/ui/GlassCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import SocialSection from '../../components/sections/SocialSection';
 import SectionBg from '../../components/ui/SectionBg';
@@ -484,131 +482,28 @@ function AnnouncementsBar() {
 // ════════════════════════════════════════════════════════════════════
 // 2 · AGENDA (Eventos)
 // ════════════════════════════════════════════════════════════════════
-function Agenda({ bg }) {
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    // Sin fallback inventado: si la API falla o no hay eventos, la sección
-    // no existe (return null abajo) — regla "nada estático" de la guía.
-    // Los eventos de mentira que vivían aquí venían del mockup de Figma.
-    apiClient.get('/events/')
-      .then(res => {
-        const list = Array.isArray(res.data) ? res.data : [];
-        // Fecha local (no UTC -- toISOString() se adelanta un dia cerca de
-        // medianoche en Guatemala, UTC-6), misma logica que EventsPage.jsx.
-        // Sin esto, un evento que ya paso se quedaba pegado como
-        // "Destacado" indefinidamente (bug real: is_featured nunca lo
-        // marca ningun admin -- no hay control en el panel -- asi que
-        // este siempre caia al primer evento de la lista, sin importar
-        // si ya habia ocurrido).
-        const now = new Date(); now.setHours(0, 0, 0, 0);
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const upcoming = list.filter(ev => !ev.date || ev.date >= todayStr);
-        setEvents(upcoming.map(ev => {
-          const date = new Date(ev.date + 'T12:00:00');
-          return {
-            id: ev.ID,
-            day: date.getDate().toString(),
-            month: date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase(),
-            title: ev.title,
-            time: ev.time || 'Por definir',
-            loc: ev.location,
-          };
-        }));
-      })
-      .catch(() => {});
-  }, []);
-
-  if (events.length === 0) return null;
-
-  // El mas proximo (el backend ya ordena ASC por fecha) es el destacado.
-  const featured = events[0];
-  const others = events.slice(1, 4);
-
-  return (
-    <section id="agenda" className="relative min-h-[80svh] overflow-hidden flex items-center border-t border-white/5">
-      <SectionBg src="/images/components/home_agenda.jpg" />
-      {/* La foto va a plena fuerza: el contraste lo pone el scrim en banda,
-          que oscurece la columna izquierda (donde vive el texto) y deja la
-          foto entera a la derecha, debajo del panel. Antes la imagen llegaba
-          al 60% y encima un degradado propio: la congregación se leía gris. */}
-      <ParallaxImg src={bg} alt="Eventos" />
-      <div className="scrim-band" />
-
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-20">
-        <div className="flex flex-col justify-center">
-          {/* El titular NO se revela: es el punto fijo contra el que llegan
-              las cards de abajo. Si también entra animado, no queda nada
-              quieto en pantalla y el scroll se siente gelatinoso. */}
-          <h2 className="text-d2 text-white mb-8">
-            PRÓXIMOS<br />EVENTOS
-          </h2>
-          <MotionLink
-            to="/events"
-            {...PRESS_SECONDARY}
-            className="mb-12 inline-flex items-center gap-3 self-start px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
-          >
-            Ver calendario completo
-          </MotionLink>
-
-          <Reveal delay={0.1}>
-          <GlassCard as={Link} to={`/events?id=${featured.id}`} glass="featured" className="rounded-[22px] p-8 md:p-10 liquid-glass flex flex-col md:flex-row items-center gap-8 block">
-            <div className="text-center shrink-0">
-              {/* Uno de los cuatro trabajos del acento en todo el sitio: el
-                  día del evento destacado. Es el único número que necesita
-                  gritar, y gritarlo con color pesa menos que con tamaño. */}
-              <div className="text-72 font-bold text-acento leading-none tracking-tighter">{featured.day}</div>
-              <div className="text-14 font-bold text-white tracking-widest mt-2">{featured.month}</div>
-            </div>
-            <div className="flex-1 w-full text-center md:text-left">
-              {/* Sin chip "Destacado": que sea el primero, el más grande y el
-                  único con el día en acento ya lo dice. La etiqueta encima
-                  del titular era la misma fórmula del eyebrow que se eliminó. */}
-              <h3 className="text-28 font-bold text-white tracking-tight mb-3">{featured.title}</h3>
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-14 text-white/60">
-                <span>{featured.time}</span>
-                <span>{featured.loc}</span>
-              </div>
-            </div>
-          </GlassCard>
-          </Reveal>
-        </div>
-
-        <Reveal from="right">
-        {/* Panel (contiene cards), no card: por eso el radio mayor. Y sin
-            Tilt: no navega a ningún lado — navegan las filas de adentro. */}
-        <div className="liquid-glass liquid-shine rounded-[28px] p-8 md:p-12 border border-white/10">
-          <div className="text-white/50 text-14 font-semibold mb-8">
-            También este mes
-          </div>
-          <RevealList className="space-y-4">
-            {others.map((ev) => (
-              <RevealItem key={ev.id}>
-                <Link to={`/events?id=${ev.id}`} className="group rounded-[22px] bg-transparent border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-center gap-6 cursor-pointer hover:bg-white/10 transition-colors btn-spring">
-                  <div className="text-center sm:text-left shrink-0">
-                    <div className="text-32 font-bold text-white leading-none">{ev.day}</div>
-                    <div className="text-10 text-white font-bold tracking-widest mt-1">{ev.month}</div>
-                  </div>
-                  <div className="hidden sm:block w-px h-12 bg-white/10" />
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-18 font-bold text-white mb-1">{ev.title}</h3>
-                    <div className="flex items-center justify-center sm:justify-start gap-4 text-13 text-white/50 font-medium">
-                      <span>{ev.time}</span>
-                    </div>
-                  </div>
-                </Link>
-              </RevealItem>
-            ))}
-          </RevealList>
-        </div>
-        </Reveal>
-      </div>
-    </section>
-  );
+function Agenda() {
+  const resource = useApiResource('/events/');
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const events = (Array.isArray(resource.data) ? resource.data : [])
+    .filter(event => event.is_active !== false && (!event.date || event.date >= today))
+    .map(event => ({ ...event, key: event.ID || event.id, image: event.cover_image || '/images/backgrounds/congregacion.webp' }));
+  return <section id="agenda" className="relative border-t border-white/5">
+    <div className="max-w-6xl mx-auto px-6 py-12 flex flex-wrap justify-between items-center gap-6">
+      <h2 className="text-d2 text-white">Próximos eventos</h2>
+      <Link to="/events" className="btn-spring focus-ring inline-flex min-h-11 items-center rounded-pill liquid-glass px-6 py-3 text-14 font-bold text-white">Ver calendario completo</Link>
+    </div>
+    {resource.loading || resource.error
+      ? <div className="px-6 pb-12"><CollectionStatus loading={resource.loading} label="los eventos" onRetry={resource.retry} /></div>
+      : <SceneCarousel items={events} label="Agenda de la comunidad" photoPreview empty="Sin próximos eventos publicados." renderContent={event => <>
+        <h3 className="text-24 sm:text-28 font-bold line-clamp-2">{event.title}</h3>
+        {event.date && <p className="mt-3 text-14 text-white/85">{fmtEventDate(event.date)}{event.time ? ` · ${event.time}` : ''}</p>}
+        {event.location && <p className="mt-2 text-14 text-white/80 line-clamp-1">{event.location}</p>}
+        <Link to={`/events?id=${event.key}`} className="btn-spring focus-ring inline-flex mt-5 min-h-11 items-center rounded-pill bg-white px-5 py-2 text-14 font-bold text-bg">Ver evento</Link>
+      </>} />}
+  </section>;
 }
-
-// Inclinaciones cíclicas para el collage de categorías — mismo lenguaje
-// que CelulasPage/GalleryPage/PostCollage (COLLAGE/ROT determinístico).
 
 // ════════════════════════════════════════════════════════════════════
 // 3 · CÉLULAS Y COMUNIDAD
@@ -821,9 +716,9 @@ function GalleryPreviewSection() {
         </MotionLink>
       </div>
 
-      <SceneCarousel items={topAlbums.map(([title, photos]) => ({ key: title, title, image: photos[0].url, count: photos.length }))} label="Álbumes de la comunidad" empty="Sin álbumes publicados aún." renderContent={album => <>
-        <h3 className="text-28 font-bold">{album.title}</h3><p className="mt-4 text-14 text-white/80">{album.count} fotografías</p>
-        <Link to="/gallery" className="inline-flex mt-6 min-h-11 items-center rounded-pill bg-white px-6 text-14 font-bold text-bg focus-ring">Explorar álbum</Link>
+      <SceneCarousel items={topAlbums.map(([title, photos]) => ({ key: title, title, image: photos[0].url, count: photos.length }))} label="Álbumes de la comunidad" photoPreview empty="Sin álbumes publicados aún." renderContent={album => <>
+        <h3 className="text-24 sm:text-28 font-bold line-clamp-2">{album.title}</h3><p className="mt-4 text-14 text-white/80">Explora las fotografías de este álbum.</p>
+        <Link to={`/gallery?album=${encodeURIComponent(album.title)}`} className="btn-spring inline-flex mt-6 min-h-11 items-center rounded-pill bg-white px-6 text-14 font-bold text-bg focus-ring">Explorar álbum</Link>
       </>} />
     </section>
   );
@@ -833,17 +728,7 @@ function GalleryPreviewSection() {
 // COMPONENTE PRINCIPAL
 // ════════════════════════════════════════════════════════════════════
 export default function Home() {
-  // Fondos de sección — mismo slot directo (AdminSitePhotos) que usa
-  // cada otro módulo del sitio, en vez del emparejamiento indirecto por
-  // palabra clave de álbum que tenía antes. El admin sube una foto y
-  // aparece, igual que en Blog/Galería/Células/Eventos.
-  //
-  // Solo dos secciones llevan foto ambiental, a propósito: el ritmo de la
-  // página es la alternancia entre sección con foto entera y sección sobre
-  // canvas limpio. Células y Mensajes ya son collage/carril de fotos, así
-  // que sus slots (home_celulas / home_mensajes) quedaron sin consumidor —
-  // siguen existiendo en el panel y habría que retirarlos de ahí.
-  const agendaBg    = useSitePhoto('home_agenda',    '/images/bg-eventos.jpg');
+  // The location keeps its administrator-owned background slot.
   const ubicacionBg = useSitePhoto('home_ubicacion', '/images/bg-ubicacion.jpg');
   const navigate = useNavigate();
   // Fallback del CTA del hero (si un slide del backend trae un ctaUrl no
@@ -852,11 +737,9 @@ export default function Home() {
 
   return (
     <main className="w-full">
-      {/* El polvo de luz 3D ("estrellitas") ya vive en App.jsx, global
-          para todas las páginas públicas — aquí no hace falta montarlo */}
       <HeroCarousel onPlan={handlePlan} />
       <AnnouncementsBar />
-      <Agenda bg={agendaBg} />
+      <Agenda />
       <CelulasSection />
       <MensajesCarousel />
       <GalleryPreviewSection />

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import apiClient from '../../lib/apiClient';
+import { useSearchParams } from 'react-router-dom';
 import { groupAlbums } from '../../lib/feed';
 import PageHero from '../../components/layout/PageHero';
 import SceneCarousel from '../../components/ui/SceneCarousel';
@@ -8,6 +9,8 @@ import CollectionStatus from '../../components/ui/CollectionStatus';
 import PhotoTabs from '../../components/ui/PhotoTabs';
 
 export default function GalleryPage() {
+  const [params] = useSearchParams();
+  const requestedAlbum = params.get('album');
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [feedError, setFeedError] = useState(false);
@@ -19,6 +22,11 @@ export default function GalleryPage() {
     images: photos.map(photo => photo.url),
     meta: `${photos.length} ${photos.length === 1 ? 'fotografía' : 'fotografías'}`,
   })), [gallery]);
+
+  useEffect(() => {
+    const album = albums.find(item => item.title === requestedAlbum);
+    if (album) { setTab('gallery'); setOpenKey(album.key); }
+  }, [albums, requestedAlbum]);
 
   useEffect(() => {
     let active = true;
