@@ -1,0 +1,36 @@
+[
+  {
+    "site": "vercel",
+    "url": "https://casadelreyhue.vercel.app",
+    "original_photo": {
+      "source": "https://pub-6dab501bcd5c4b8b9cfdd7aa6ee88595.r2.dev/galeria/1783054527725443400_DSC03904.jpg",
+      "width": 6000,
+      "height": 4000,
+      "fit": "contain"
+    },
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "photo_and_background_synchronized": true,
+    "department_direct_selection": true,
+    "pastor_portrait_visible": true,
+    "podcast_tab": true,
+    "runtime_errors": []
+  },
+  {
+    "site": "render",
+    "url": "https://casadelrey-web-pruebas.onrender.com",
+    "original_photo": {
+      "source": "https://pub-6dab501bcd5c4b8b9cfdd7aa6ee88595.r2.dev/galeria/1783054527725443400_DSC03904.jpg",
+      "width": 6000,
+      "height": 4000,
+      "fit": "contain"
+    },
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "photo_and_background_synchronized": true,
+    "department_direct_selection": true,
+    "pastor_portrait_visible": true,
+    "podcast_tab": true,
+    "runtime_errors": []
+  }
+]

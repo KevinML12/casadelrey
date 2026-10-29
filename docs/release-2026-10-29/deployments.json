@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-29",
+  "application_commit": "b4ca64ffac33479b10043ce45d8642ce5e44b5eb",
+  "vercel": {
+    "state": "READY",
+    "deployment_id": "dpl_ENCpm6XxgeQvKUfgbHMQVzjbgbqJ",
+    "url": "https://casadelreyhue.vercel.app"
+  },
+  "render_frontend": {
+    "state": "Live",
+    "deployment_id": "dep-dbhkajtg1s2s73aa36l0",
+    "url": "https://casadelrey-web-pruebas.onrender.com"
+  },
+  "render_backend": {
+    "live_commit": "c8da35789519021bcb01d02b7526a45791b9a50c",
+    "attempt_commit": "b4ca64ffac33479b10043ce45d8642ce5e44b5eb",
+    "attempt_deployment_id": "dep-dbhk9rqfngtc73bsqfag",
+    "attempt_status": "failed",
+    "cause": "SQLSTATE 53300: too many connections for role cdr_render_qa",
+    "retry_status": "pending manual macOS unlock for Safari",
+    "url": "https://casadelrey-api-pruebas.onrender.com"
+  }
+}
