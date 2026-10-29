@@ -290,7 +290,7 @@ func (h *CellCategoryHandler) UpdateCell(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
 	if req.Code != "" {
-		if !cellCodePattern.MatchString(req.Code) {
+		if req.Code != cell.Code && !cellCodePattern.MatchString(req.Code) {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "El código debe tener el formato [H|M|J|P|N] seguido de un número, ej. H1, M2."})
 		}
 		cell.Code = req.Code

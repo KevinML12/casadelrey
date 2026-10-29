@@ -17,11 +17,13 @@ export const CELL_TYPES = [
   { value: 'hombres', label: 'Hombres',      prefix: 'H' },
   { value: 'mujeres', label: 'Mujeres',      prefix: 'M' },
   { value: 'jovenes', label: 'Jóvenes',      prefix: 'J' },
+  { value: 'adolescentes', label: 'Adolescentes', prefix: 'J' },
   { value: 'prejus',  label: 'Prejuveniles', prefix: 'P' },
   { value: 'ninos',   label: 'Niños',        prefix: 'N' },
 ];
 
-const PREFIX_TO_TYPE = Object.fromEntries(CELL_TYPES.map(t => [t.prefix, t.value]));
+// J is shared by the existing youth groups; an explicit cellType takes precedence.
+const PREFIX_TO_TYPE = { H: 'hombres', V: 'hombres', M: 'mujeres', J: 'jovenes', P: 'prejus', N: 'ninos' };
 
 /** Descompone "H2" → { type: 'hombres', number: '2' } */
 export function parseCode(code = '') {
@@ -44,7 +46,9 @@ export default function CellCodePicker({ cellCode, cellType, onChange, disabled 
   const number   = parsed.number || '';
 
   const emit = (newType, newNumber) => {
-    const code = buildCode(newType, newNumber);
+    const code = newType === parsed.type && cellCode?.startsWith('V') && newNumber
+      ? `V${newNumber}`
+      : buildCode(newType, newNumber);
     onChange?.({ cell_code: code, cell_type: newType });
   };
 
@@ -54,7 +58,7 @@ export default function CellCodePicker({ cellCode, cellType, onChange, disabled 
     emit(type, val);
   };
 
-  const preview = buildCode(type, number);
+  const preview = type === parsed.type && cellCode?.startsWith('V') && number ? `V${number}` : buildCode(type, number);
 
   return (
     <div className={`flex items-center gap-2 flex-wrap ${className}`}>

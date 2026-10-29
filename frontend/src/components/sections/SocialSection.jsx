@@ -1,74 +1,25 @@
-// ============================================================
-//  SocialSection — bento de accesos directos a las redes reales, en
-//  .glass-light (blanco/navy, mismo material que el resto de Nosotros).
-//  Se probó primero con .glass-tint (vidrio a color de marca) pero el
-//  usuario lo prefirió en blanco y negro -- más sobrio, consistente con
-//  el resto de la página en vez de un cuarto material solo para esto.
-//  Antes también intentaba mostrar un grid de posts reales jalados de
-//  /social/feed (duplicado casi exacto de FeedSection en Home.jsx) --
-//  se quitó: sin curaduría real esas fotos no aportaban nada y quedaba
-//  un componente duplicado en dos páginas. Un solo componente, reusado
-//  tanto en Nosotros como en Home.
-// ============================================================
-import Reveal from '../ui/Reveal';
-import GlassCard from '../ui/GlassCard';
-import SectionBg from '../ui/SectionBg';
-
-const NETWORKS = [
-  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram', handle: '@ig.casadelrey',    span: 'col-span-2 row-span-2' },
-  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook',  handle: '/casadelreyhuehue', span: 'col-span-2 row-span-1' },
-  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok',    handle: '@leoneldeleongt',   span: 'col-span-1 row-span-1' },
-  { href: 'https://x.com/pastorleoneli',                label: 'X',         handle: '@pastorleoneli',    span: 'col-span-1 row-span-1' },
-];
+import SceneCarousel from '../ui/SceneCarousel';
+import CollectionStatus from '../ui/CollectionStatus';
+import { useApiResource } from '../../lib/feed';
 
 export default function SocialSection({ title = 'Síguenos en redes' }) {
-  return (
-    <section className="relative py-20 md:py-32 bg-bg border-t border-white/5 overflow-hidden">
-      <SectionBg src="/images/components/bg_conectate.jpg" />
-      {/* El titular no se revela: es el punto fijo contra el que llega el
-          bento de abajo. Cuando también él entraba con Reveal no había
-          nada quieto en la pantalla y el scroll se sentía gelatinoso --
-          ahora el título ya está y las tarjetas aterrizan bajo él. */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h2 className="text-d2 text-white">
-            {title}
-          </h2>
-        </div>
-      </div>
-
-      <Reveal delay={0.05} className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Bento en .glass-light -- blanco y negro, Instagram destacada
-            como red principal, el nombre de cada red se lee grande,
-            como una portada. */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-[120px] sm:auto-rows-[150px] gap-3 md:gap-4">
-          {NETWORKS.map(n => {
-            const big = n.span === 'col-span-2 row-span-2';
-            return (
-              // El DockItem envuelve y escala; el Tilt de adentro conserva
-              // la inclinación al cursor. Sin `whileHover` propio: el
-              // crecimiento ahora lo pone el dock, y dos escalas peleando
-              // por el mismo nodo se multiplican y saltan.
-              <div key={n.label} className={n.span}>
-              <GlassCard
-                as="a"
-                glass
-                href={n.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-light relative flex flex-col justify-end p-4 md:p-6 text-bg rounded-[22px] w-full h-full"
-              >
-                {/* font-bold y no extrabold: Arimo topa en 700, así que el
-                    800 pintaba exactamente el mismo trazo mientras declaraba
-                    una jerarquía que la pantalla nunca llegaba a mostrar. */}
-                <p className={`relative z-10 font-bold leading-none tracking-tight ${big ? 'text-32 md:text-40' : 'text-17'}`}>{n.label}</p>
-                <p className={`relative z-10 text-bg/60 truncate ${big ? 'text-15 mt-2' : 'text-12 mt-1'}`}>{n.handle}</p>
-              </GlassCard>
-              </div>
-            );
-          })}
-        </div>
-      </Reveal>
-    </section>
-  );
+  const resource = useApiResource('/social/feed');
+  const rows = Array.isArray(resource.data) ? resource.data : resource.data?.data || [];
+  const items = rows.filter(post => post.is_active !== false).map(post => ({
+    key: post.ID || post.id,
+    title: post.platform,
+    description: post.caption,
+    image: post.image_url || '/images/backgrounds/congregacion.webp',
+    href: post.post_url,
+  }));
+  return <section className="relative border-t border-white/5">
+    <div className="max-w-6xl mx-auto px-6 py-12"><h2 className="text-d2 text-white">{title}</h2></div>
+    {resource.loading || resource.error
+      ? <div className="px-6 pb-12"><CollectionStatus loading={resource.loading} label="las publicaciones" onRetry={resource.retry} /></div>
+      : <SceneCarousel items={items} label="Publicaciones de la comunidad" photoPreview empty="Sin publicaciones en redes aún." renderContent={post => <>
+        <h3 className="text-24 sm:text-28 font-bold capitalize">{post.title}</h3>
+        {post.description && <p className="mt-3 text-16 text-white/85 line-clamp-3">{post.description}</p>}
+        {post.href && <a href={post.href} target="_blank" rel="noopener noreferrer" className="btn-spring focus-ring inline-flex mt-5 min-h-11 items-center rounded-pill bg-white px-5 py-2 text-14 font-bold text-bg">Ver publicación</a>}
+      </>} />}
+  </section>;
 }

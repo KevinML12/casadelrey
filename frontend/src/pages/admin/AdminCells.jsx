@@ -137,7 +137,9 @@ export default function AdminCells() {
       apiClient.get('/admin/leaders'),
     ]).then(([cellsRes, leadersRes]) => {
       setCells(cellsRes.data || []);
-      setLeaders(leadersRes.data || []);
+      const assigned = (cellsRes.data || []).filter(cell => cell.leader?.name).map(cell => ({ id: cell.leader_id, name: cell.leader.name }));
+      const choices = [...(leadersRes.data || []).map(leader => ({ ...leader, id: leader.id || leader.ID })), ...assigned];
+      setLeaders([...new Map(choices.map(leader => [leader.id, leader])).values()]);
     }).catch(console.error).finally(() => setLoading(false));
   };
 

@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Reveal, { RevealList, RevealItem } from '../../components/ui/Reveal';
 import apiClient from '../../lib/apiClient';
-import { useApi, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
+import { useApi, useApiResource, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
 // Vocabulario de movimiento compartido: la amplitud del press la decide el
@@ -18,6 +18,7 @@ import GlassCard from '../../components/ui/GlassCard';
 import ParallaxImg from '../../components/ui/ParallaxImg';
 import SocialSection from '../../components/sections/SocialSection';
 import SectionBg from '../../components/ui/SectionBg';
+import CollectionStatus from '../../components/ui/CollectionStatus';
 
 const MotionLink = motion.create(Link);
 
@@ -613,114 +614,29 @@ function Agenda({ bg }) {
 // 3 · CÉLULAS Y COMUNIDAD
 // ════════════════════════════════════════════════════════════════════
 function CelulasSection() {
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    apiClient.get('/cell-categories')
-      .then(res => {
-        if (res.data && res.data.length > 0) setCategories(res.data);
-        else throw new Error("No categories");
-      })
-      .catch(() => {
-        // Fallback PERMITIDO por la guía: categorías estructurales reales
-        // de la iglesia (no contenido inventado), con fotos reales.
-        setCategories([
-          { name: 'Adolescentes', age_group: '15 a 24 años', description: 'Reuniones dinámicas para adolescentes.', image_url: '/images/celulas/adolescentes.jpg' },
-          { name: 'Jóvenes Adultos', age_group: 'Solteros', description: 'Comunidad para jóvenes profesionales y universitarios.', image_url: '/images/celulas/jovenes.jpg' },
-          { name: 'Prejuveniles', age_group: '12 a 15 años', description: 'Un espacio seguro y divertido para crecer.', image_url: '/images/celulas/prejuveniles.jpg' },
-          { name: 'Varones', age_group: 'Hombres', description: 'Hombres compartiendo la palabra y construyendo familia.', image_url: '/images/celulas/varones.jpg' },
-          { name: 'Mujeres', age_group: 'Mujeres', description: 'Un espacio de formación espiritual, apoyo mutuo y hermandad.', image_url: '/images/celulas/mujeres.jpg' }
-        ]);
-      });
-  }, []);
-
-  if (categories.length === 0) return null;
-
-  return (
-    // Sin foto ambiental: el collage de abajo YA es puro material fotográfico.
-    // Una foto de fondo detrás de una grilla de fotos no suma atmósfera, le
-    // compite. El ritmo de la página lo hace la alternancia "sección CON foto
-    // entera / sección sobre canvas limpio" — cuando todas llevan foto al 50%,
-    // ninguna significa nada.
-    <section id="celulas" className="relative py-28 md:py-36 border-t border-white/5 overflow-hidden">
-      <SectionBg src="/images/public_bg_celulas.jpg" />
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* El titular es el ancla fija; lo que se revela al entrar son las
-            cards de abajo, que llegan por debajo de él. */}
-        <div className="mb-16 text-center">
-          <h2 className="text-d2 text-white">
-            Células
-          </h2>
-          <p className="mt-6 text-18 text-white/70 max-w-2xl mx-auto">
-            Grupos que se reúnen en casas durante la semana. Cada clasificación
-            tiene sus propias células — entra y encuentra la tuya.
-          </p>
-          <MotionLink
-            to="/celulas"
-            {...PRESS_SECONDARY}
-            className="mt-8 inline-flex items-center gap-3 px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring"
-          >
-            Encuentra tu célula
-          </MotionLink>
-        </div>
-
-        {/* Collage (mismo lenguaje que Células/Galería/Blog): recortes
-            inclinados que se enderezan al pasar el cursor, en vez de un
-            grid parejo repetido. Cada card sigue enlazando directo a su
-            tipo en /celulas (abre esa ventana ahí). */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-[minmax(180px,auto)]">
-          {categories.map((cat, i) => {
-            let gridSpan = 'md:col-span-1';
-            if (i === 0) gridSpan = 'md:col-span-2 md:row-span-2 lg:col-span-2';
-            else if (i === categories.length - 1 && categories.length % 2 !== 0) gridSpan = 'md:col-span-2 lg:col-span-2';
-
-            return (
-              <motion.div
-                key={i}
-                className={gridSpan}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.18, ease: EASE_OUT, delay: (i % 4) * 0.025 }}
-
-              >
-                <GlassCard
-                  as={Link}
-                  to={`/celulas?tipo=${encodeURIComponent(cat.name)}`}
-
-                  glass
-                  className="liquid-glass group relative w-full h-full rounded-[22px] flex flex-col overflow-hidden ring-1 ring-white/10"
-
-                >
-                  {/* Foto a plena fuerza: son las caras de la congregación, lo
-                      único irrepetible que tiene el sitio. El texto se lee por
-                      el scrim anclado abajo, no por apagar la imagen. */}
-                  <div className="absolute inset-0 rounded-[22px] overflow-hidden">
-                    <PhotoImage src={cat.image_url || '/images/components/celula_general.jpg'} alt={cat.name} className="parallax-layer w-full h-full object-cover" />
-                    <div className="scrim-card" />
-                  </div>
-                  <div className="relative z-10 w-full h-full p-8 flex flex-col justify-end text-left min-h-[200px]">
-                    <div>
-                      {/* El rango de edad va DEBAJO del nombre: encima era una
-                          etiqueta de categoría sobre el titular, la misma
-                          fórmula del eyebrow. El dato es real (viene de la
-                          API) así que se conserva, solo cambia de lugar y
-                          pierde la píldora decorativa. */}
-                      <h3 className={`font-bold text-white mb-2 tracking-tight ${i === 0 ? 'text-40' : 'text-24'}`}>{cat.name}</h3>
-                      <p className={`text-white/80 ${i === 0 ? 'text-16 max-w-sm' : 'text-14 max-w-xs'}`}>{cat.description}</p>
-                      {cat.age_group && (
-                        <p className="mt-3 text-13 font-semibold text-white/60">{cat.age_group}</p>
-                      )}
-                    </div>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
+  const resource = useApiResource('/cell-categories');
+  const categories = (Array.isArray(resource.data) ? resource.data : []).filter(category => category.is_active !== false);
+  const items = categories.map(category => ({
+    key: category.ID || category.id,
+    title: category.name,
+    description: category.description,
+    age: category.age_group,
+    image: category.image_url || '/images/backgrounds/congregacion.webp',
+  }));
+  return <section id="celulas" className="relative border-t border-white/5">
+    <div className="max-w-6xl mx-auto px-6 py-12">
+      <h2 className="text-d2 text-white">Células</h2>
+      <p className="mt-4 text-18 text-white/70">Encuentra tu grupo y conoce su comunidad.</p>
+    </div>
+    {resource.loading || resource.error
+      ? <div className="px-6 pb-12"><CollectionStatus loading={resource.loading} label="las categorías de células" onRetry={resource.retry} /></div>
+      : <SceneCarousel items={items} label="Células de la comunidad" photoPreview empty="Sin categorías publicadas aún." renderContent={category => <>
+        <h3 className="text-24 sm:text-28 font-bold line-clamp-2">{category.title}</h3>
+        {category.description && <p className="mt-3 text-16 text-white/85 line-clamp-2">{category.description}</p>}
+        {category.age && <p className="mt-2 text-13 text-white/80">{category.age}</p>}
+        <Link to={`/celulas?tipo=${encodeURIComponent(category.title)}`} className="btn-spring focus-ring inline-flex mt-5 min-h-11 items-center rounded-pill bg-white px-5 py-2 text-14 font-bold text-bg">Conocer las células</Link>
+      </>} />}
+  </section>;
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -732,81 +648,30 @@ function CelulasSection() {
 // sermón real cuando la API falla contradice "nada estático".
 
 function MensajesCarousel() {
-  const [sermons, setSermons] = useState([]);
-
-  useEffect(() => {
-    // Preview del BLOG: lo que los admins publican ahí (incluidos los
-    // posts que redirigen a redes) es lo que se asoma en el Home
-    fetchOnce('/blog/').then(blog => {
-      const posts = (Array.isArray(blog) ? blog : [])
-        .slice(0, 8)
-        .map((p, i) => ({
-          id: p.ID || p.id,
-          title: p.title,
-          date: p.CreatedAt
-            ? new Date(p.CreatedAt).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
-            : '',
-          image: p.cover_image || `/images/predicas/predica-${(i % 3) + 1}.jpg`,
-          ...(p.redirect_url
-            ? { href: p.redirect_url }
-            : { to: p.slug ? `/blog/${p.slug}` : '/blog' }),
-        }));
-      if (posts.length > 0) setSermons(posts);
-    });
-  }, []);
-
-  if (sermons.length === 0) return null;
-
-  return (
-    // Sobre canvas limpio, igual que Células y por la misma razón: el carril
-    // de abajo ya son puras portadas fotográficas. La foto ambiental detrás
-    // solo restaba contraste a las que sí importan.
-    <section id="mensajes" className="relative py-20 md:py-32 border-t border-white/5 overflow-hidden">
-      <SectionBg src="/images/components/about_mision.jpg" />
-      {/* El titular queda quieto; lo que entra al hacer scroll es el carril. */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h2 className="text-d2 text-white">
-            Alimenta tu espíritu.
-          </h2>
-        </div>
-        <MotionLink
-          to="/blog"
-          {...PRESS_SECONDARY}
-          className="inline-flex items-center gap-3 self-start md:self-auto px-6 py-3.5 rounded-pill liquid-glass text-white text-14 font-bold focus-ring shrink-0"
-        >
-          Ver todas las enseñanzas
-        </MotionLink>
-      </div>
-
-      <div className="relative z-10 flex overflow-x-auto gap-6 px-6 pb-12 snap-x snap-mandatory scrollbar-hide" style={{ scrollPaddingLeft: '1.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
-        <div className="w-[1px] shrink-0 md:w-[calc((100vw-72rem)/2)] hidden md:block" />
-
-        {sermons.map((s) => (
-          <GlassCard
-            key={s.id}
-            glass="standard"
-            {...(s.href
-              ? { as: 'a', href: s.href, target: '_blank', rel: 'noopener noreferrer' }
-              : { as: Link, to: s.to })}
-            className="group relative shrink-0 w-[300px] md:w-[400px] aspect-[4/5] md:aspect-video rounded-[22px] liquid-glass hover:border-white/30 snap-start overflow-hidden"
-          >
-            {/* Portada a plena fuerza: el título se lee por el scrim anclado
-                abajo, no porque la foto esté a media luz. */}
-            <PhotoImage src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
-            <div className="scrim-card" />
-
-            <div className="absolute bottom-0 left-0 p-8 w-full z-10">
-              <div className="text-13 font-semibold text-white/70 mb-2">{s.date}</div>
-              <h3 className="text-20 md:text-24 font-bold text-white leading-tight">{s.title}</h3>
-            </div>
-          </GlassCard>
-        ))}
-        <div className="w-6 shrink-0" />
-      </div>
-    </section>
-  );
+  const resource = useApiResource('/blog/');
+  const posts = (Array.isArray(resource.data) ? resource.data : []).map(post => ({
+    key: post.ID || post.id,
+    title: post.title,
+    excerpt: post.excerpt,
+    image: post.cover_image || '/images/backgrounds/congregacion.webp',
+    href: post.redirect_url,
+    to: post.slug ? `/blog/${post.slug}` : '/blog',
+  }));
+  return <section id="mensajes" className="relative border-t border-white/5">
+    <div className="max-w-6xl mx-auto px-6 py-12 flex flex-wrap items-center justify-between gap-6">
+      <h2 className="text-d2 text-white">Alimenta tu espíritu.</h2>
+      <Link to="/blog" className="btn-spring focus-ring inline-flex min-h-11 items-center rounded-pill liquid-glass px-6 py-3 text-14 font-bold text-white">Ver todas las enseñanzas</Link>
+    </div>
+    {resource.loading || resource.error
+      ? <div className="px-6 pb-12"><CollectionStatus loading={resource.loading} label="los mensajes" onRetry={resource.retry} /></div>
+      : <SceneCarousel items={posts} label="Mensajes de la comunidad" photoPreview empty="Sin mensajes publicados aún." renderContent={post => <>
+        <h3 className="text-24 sm:text-28 font-bold line-clamp-2">{post.title}</h3>
+        {post.excerpt && <p className="mt-3 text-16 text-white/85 line-clamp-2">{post.excerpt}</p>}
+        {post.href
+          ? <a href={post.href} target="_blank" rel="noopener noreferrer" className="btn-spring focus-ring inline-flex mt-5 min-h-11 items-center rounded-pill bg-white px-5 py-2 text-14 font-bold text-bg">Leer mensaje</a>
+          : <Link to={post.to} className="btn-spring focus-ring inline-flex mt-5 min-h-11 items-center rounded-pill bg-white px-5 py-2 text-14 font-bold text-bg">Leer mensaje</Link>}
+      </>} />}
+  </section>;
 }
 
 // Accesos directos a redes -- usados en la fila rápida de Ubicación más

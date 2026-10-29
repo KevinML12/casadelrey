@@ -1,0 +1,12 @@
+Running 5 tests using 1 worker
+
+
+(node:24595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/5] [chromium] › frontend/e2e/content-publication.spec.js:16:1 › empty Home uses actual collection state without publishing local categories
+[2/5] [chromium] › frontend/e2e/content-publication.spec.js:24:3 › admin content uses photographic scenes and a single glass panel at 320px
+[3/5] [chromium] › frontend/e2e/content-publication.spec.js:24:3 › admin content uses photographic scenes and a single glass panel at 768px
+[4/5] [chromium] › frontend/e2e/content-publication.spec.js:24:3 › admin content uses photographic scenes and a single glass panel at 1440px
+[5/5] [chromium] › frontend/e2e/content-publication.spec.js:48:1 › historical cell types and their assigned leader remain editable
+  5 passed (4.2s)

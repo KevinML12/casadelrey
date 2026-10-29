@@ -1,6 +1,6 @@
 # Canales del frontend
 
-Actualizado el 27 de octubre de 2026, por decisión del propietario: publicar la revisión en `main`, retirar Fly de la conexión del frontend y utilizar el backend existente de Render conectado a Supabase.
+Actualizado el 28 de octubre de 2026, por decisión del propietario: publicar la revisión en `main`, retirar Fly de la conexión del frontend y utilizar el backend existente de Render conectado a Supabase.
 
 | Canal | Rama | Publicación | API y datos |
 | --- | --- | --- | --- |
@@ -14,7 +14,9 @@ El backend de Render ya incluye los campos institucionales `about_*`, espacios a
 
 ## Datos y alcance
 
-El backend existente mantiene su conexión al proyecto Supabase en el schema aislado `cdr_render_qa`. Publicar el frontend **no migra los registros históricos** del schema de producción ni cambia sus permisos. Las colecciones vacías se muestran como vacías, sin inventar departamentos, álbumes o fotografías. La publicación de contenido real y la habilitación final del correo transaccional siguen siendo tareas separadas de esta revisión.
+El backend mantiene su conexión al schema `cdr_render_qa`, ahora con una importación autorizada del contenido activo histórico y las cuentas no eliminadas. El origen `public` se conserva. Las relaciones usan un mapa de IDs; las sesiones y tokens no se copian. Los administradores pueden editar el contenido importado desde los mismos recursos. La importación no traslada el historial financiero, comprobantes, solicitudes ni reportes del origen.
+
+La galería conserva todos sus registros importados, con duplicados exactos del mismo álbum e imágenes externas de ejemplo archivados en destino. Inicio y los módulos públicos comparten escenas fotográficas administrables y cristal fijo. Ver `release-2026-10-28/CONTENIDO_ACTIVO.md`. Las pruebas de escritura deben identificar y limpiar sus propios registros, sin tratar las colecciones importadas como datos desechables.
 
 Fly deja de ser destino de los dos rewrites activos. No se elimina infraestructura ni datos históricos. Las pruebas de escritura de la revisión se limitan al backend Render QA y usan registros sintéticos con limpieza.
 

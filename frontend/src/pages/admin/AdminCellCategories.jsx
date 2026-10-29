@@ -19,16 +19,10 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import { CELL_TYPES } from '../../components/ui/CellCodePicker';
 import Input, { Select, Textarea } from '../../components/ui/Input';
 
-const TYPE_KEY_OPTIONS = [
-  { value: '', label: 'Sin type key (no agrupa células automáticamente)' },
-  { value: 'hombres', label: 'Hombres' },
-  { value: 'mujeres', label: 'Mujeres' },
-  { value: 'jovenes', label: 'Jóvenes' },
-  { value: 'prejus', label: 'Prejuveniles' },
-  { value: 'ninos', label: 'Niños' },
-];
+const TYPE_KEY_OPTIONS = [{ value: '', label: 'Sin type key (no agrupa células automáticamente)' }, ...CELL_TYPES];
 
 const EMPTY = { name: '', age_group: '', description: '', type_key: '', sort_order: 0 };
 

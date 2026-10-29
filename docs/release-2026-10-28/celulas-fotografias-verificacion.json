@@ -1,0 +1,180 @@
+{
+  "date_local": "2026-10-28",
+  "scope": "Lectura de Supabase, endpoints públicos, metadatos del bucket público y revisión visual; sin cambios de datos o configuración.",
+  "database": {
+    "public": {
+      "active_categories": 5,
+      "active_cells": 16,
+      "active_cells_by_type": {
+        "adolescentes": 4,
+        "mujeres": 4,
+        "prejus": 1,
+        "hombres": 6,
+        "jovenes": 1
+      }
+    },
+    "cdr_render_qa": {
+      "active_categories": 0,
+      "active_cells": 0,
+      "active_cells_by_type": {}
+    }
+  },
+  "live_endpoints": [
+    {
+      "endpoint": "https://casadelreyhue.vercel.app/api/v1/cells",
+      "ok": true,
+      "record_count": 0
+    },
+    {
+      "endpoint": "https://casadelreyhue.vercel.app/api/v1/cell-categories",
+      "ok": true,
+      "record_count": 0
+    },
+    {
+      "endpoint": "https://casadelrey-api-pruebas.onrender.com/api/v1/cells",
+      "ok": true,
+      "record_count": 0
+    },
+    {
+      "endpoint": "https://casadelrey-api-pruebas.onrender.com/api/v1/cell-categories",
+      "ok": true,
+      "record_count": 0
+    }
+  ],
+  "category_photos": [
+    {
+      "name": "adolescentes",
+      "width": 1600,
+      "height": 900,
+      "deployed_assets": [
+        {
+          "path": "/images/celulas/adolescentes.jpg",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/adolescentes-640.webp",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/adolescentes-1600.webp",
+          "status": "200"
+        }
+      ],
+      "visual_review": "Selfie de tres personas; no es una toma panorámica de la célula."
+    },
+    {
+      "name": "jovenes",
+      "width": 1600,
+      "height": 900,
+      "deployed_assets": [
+        {
+          "path": "/images/celulas/jovenes.jpg",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/jovenes-640.webp",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/jovenes-1600.webp",
+          "status": "200"
+        }
+      ],
+      "visual_review": "Selfie con primer plano dominante; no es una toma panorámica de la célula."
+    },
+    {
+      "name": "prejuveniles",
+      "width": 900,
+      "height": 1600,
+      "deployed_assets": [
+        {
+          "path": "/images/celulas/prejuveniles.jpg",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/prejuveniles-640.webp",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/prejuveniles-1600.webp",
+          "status": "200"
+        }
+      ],
+      "visual_review": "Toma vertical de danza, con una persona dominante; no documenta una reunión de célula."
+    },
+    {
+      "name": "varones",
+      "width": 900,
+      "height": 1600,
+      "deployed_assets": [
+        {
+          "path": "/images/celulas/varones.jpg",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/varones-640.webp",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/varones-1600.webp",
+          "status": "200"
+        }
+      ],
+      "visual_review": "Retrato vertical individual; no cumple el encuadre grupal solicitado."
+    },
+    {
+      "name": "mujeres",
+      "width": 1600,
+      "height": 900,
+      "deployed_assets": [
+        {
+          "path": "/images/celulas/mujeres.jpg",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/mujeres-640.webp",
+          "status": "200"
+        },
+        {
+          "path": "/images/optimized/celulas/mujeres-1600.webp",
+          "status": "200"
+        }
+      ],
+      "visual_review": "Grupo cercano de tres personas; conviene una toma más amplia como fondo."
+    }
+  ],
+  "r2": {
+    "bucket": "casadelreyhue-dev",
+    "objects_inventoried": 717,
+    "gallery_objects": 687,
+    "related_objects_visually_reviewed": 18,
+    "category_urls_point_to_r2": false,
+    "related_keys": [
+      "galeria/1783700065136716900_jovenes_1.jpg",
+      "galeria/1783700065898542000_jovenes_2.jpg",
+      "galeria/1783700066707871600_jovenes_3.jpg",
+      "galeria/1783700067585877500_jovenes_4.jpg",
+      "galeria/1783700068328565600_jovenes_5.jpg",
+      "galeria/1783700069103029700_jovenes_6.jpg",
+      "galeria/1783700070283312200_jovenes_7.jpg",
+      "galeria/1783700071098670900_jovenes_8.jpg",
+      "galeria/1783700071939904300_mujeres_1.jpg",
+      "galeria/1783700072831815500_mujeres_2.jpg",
+      "galeria/1783700073587490000_mujeres_3.jpg",
+      "galeria/1783700074418186100_mujeres_4.jpg",
+      "galeria/1783700075342734500_mujeres_5.jpg",
+      "galeria/1783700076228899500_mujeres_6.jpg",
+      "galeria/1783700077102653000_mujeres_7.jpg",
+      "galeria/1783700077912982300_mujeres_8.jpg",
+      "general/1783888575800878606_retiro-jovenes.jpg",
+      "general/1784834115843024243_foto_celular_grande.jpg"
+    ]
+  },
+  "additional_findings": [
+    "Inicio conserva cinco categorías locales de respaldo aunque la API esté vacía; el módulo Células muestra el vacío real.",
+    "Las fotos se asignan a categorías; las células individuales no tienen un campo de fotografía grupal propio.",
+    "Los nombres de R2 jóvenes/mujeres no demuestran pertenencia a una célula concreta.",
+    "El archivo general foto_celular_grande.jpg muestra ruido y no es una fotografía utilizable.",
+    "Las cinco categorías históricas apuntan a /images/celulas/*.jpg; sus originales y variantes desplegadas responden HTTP 200."
+  ]
+}
