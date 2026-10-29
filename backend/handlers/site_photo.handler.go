@@ -23,7 +23,10 @@ func NewSitePhotoHandler(db *gorm.DB) *SitePhotoHandler {
 // verá automáticamente en el panel, con image_url vacío hasta que
 // alguien suba una foto.
 var knownSlots = []struct{ Key, Label string }{
-	{"about_pastores", "Nosotros — Nuestra historia (fundadores y pastores)"},
+	{"about_fundadores", "Nosotros — Retrato de los pastores fundadores"},
+	{"about_pastores", "Nosotros — Retrato de los pastores"},
+	{"about_visitanos", "Nosotros — Fondo de Visítanos"},
+	{"about_podcast", "Nosotros — Fondo del podcast"},
 	{"about_servidores", "Nosotros — Misión y visión"},
 	{"about_comunidad", "Nosotros — Comunidad"},
 	{"about_lideres", "Nosotros — Encuentra tu célula"},

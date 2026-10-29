@@ -39,7 +39,7 @@ for (const width of [390, 1440]) {
     await expect(dialog.getByRole('button', { name: /^Foto \d/ })).toHaveCount(0);
     await dialog.getByRole('button', { name: 'Foto siguiente' }).click();
     await expect(dialog.getByRole('status').first()).toHaveText('2 de 5');
-    await expect(dialog.locator('.glass-light img')).toHaveCount(0);
+    await expect(dialog.getByRole('figure', { name: 'Fotografía ampliada' }).getByRole('img', { name: 'Encuentro nuevo' })).toBeVisible();
     await page.keyboard.press('Escape'); await expect(dialog).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });

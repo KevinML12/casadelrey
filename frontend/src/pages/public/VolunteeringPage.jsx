@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import PageHero from '../../components/layout/PageHero';
 import GlassCard from '../../components/ui/GlassCard';
+import LayeredPanel from '../../components/ui/LayeredPanel';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import apiClient from '../../lib/apiClient';
@@ -337,7 +338,7 @@ function DepartmentSlide({ area, onClick }) {
   const reducedMotion = useReducedMotion();
   return (
     <GlassCard as="button" type="button" onClick={onClick} aria-haspopup="dialog" glass style={{ '--glass-dark-blur': 'blur(5px) saturate(115%)' }}
-      className="liquid-glass relative flex flex-col w-full h-[250px] md:h-[270px] rounded-[16px] p-7 md:p-9 text-left focus-ring"
+      className="liquid-glass relative flex flex-col w-full min-h-[220px] rounded-[16px] p-6 md:p-8 text-left focus-ring"
     >
       <motion.div key={area.value} className="flex flex-col h-full w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
         <h3 className="text-26 font-bold text-white tracking-tight leading-tight">{area.title}</h3>
@@ -512,7 +513,7 @@ export default function VolunteeringPage() {
   const photosOf = area => [...new Set([area.photo, sitePhotos[`voluntariado_${area.value}_2`]].filter(Boolean))];
   const windowItems = areas.map(area => ({
     ...area, key: area.value, image: area.photo,
-    images: panelTab === 'photos' ? photosOf(area) : [area.photo],
+    images: photosOf(area),
   }));
   const go = direction => setSlideIndex(value => (Math.max(0, Math.min(value, areas.length - 1)) + direction + areas.length) % areas.length);
   const openArea = (value, tab = 'gallery') => {
@@ -575,21 +576,28 @@ export default function VolunteeringPage() {
         </button>
       </PageHero>
 
-      <section className="relative min-h-[88svh] py-16 md:py-20 overflow-clip" aria-labelledby="volunteer-departments">
-        <SectionBg sceneKey={requestedArea?.value} src={requestedArea?.photo || sectionPhoto} fallbackSrc={requestedArea?.fallbackImage || sectionPhoto} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-100" scrimClassName="bg-gradient-to-b from-bg/75 via-bg/15 to-bg/90" viewport animate />
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <div className="mb-9 max-w-2xl">
-            <h2 id="volunteer-departments" className="text-d2 text-white">¿Dónde quieres servir?</h2>
+      <section className="relative min-h-[700px] md:min-h-[740px] py-12 md:py-16 overflow-clip flex flex-col" aria-labelledby="volunteer-departments">
+        <SectionBg sceneKey={requestedArea?.value} src={requestedArea?.photo || sectionPhoto} fallbackSrc={requestedArea?.fallbackImage || sectionPhoto} onReady={() => setShownSlide(requestedIndex)} opacity="opacity-100" scrimClassName="bg-gradient-to-b from-bg/65 via-bg/5 to-bg/80" animate />
+        <div className="relative z-10 max-w-6xl w-full mx-auto px-6 flex flex-col flex-1">
+          <div className="mb-12 flex flex-wrap items-start justify-between gap-6">
+            <div className="max-w-xl">
+            <h2 id="volunteer-departments" className="text-32 sm:text-40 font-bold leading-tight text-white">¿Dónde quieres servir?</h2>
             <p className="mt-4 text-16 text-white/80">Conoce un departamento a la vez y encuentra tu lugar.</p>
+            </div>
+            {areas.length > 1 && <label className="liquid-glass rounded-[12px] px-4 py-3 text-12 font-semibold">Elegir departamento
+              <select aria-label="Elegir departamento" value={requestedArea?.value || ''} onChange={event => setSlideIndex(areas.findIndex(area => area.value === event.target.value))} className="block w-full mt-2 bg-transparent text-14 text-white focus-ring rounded-[6px] min-h-8">
+                {areas.map(area => <option key={area.value} value={area.value} className="bg-bg text-white">{area.title}</option>)}
+              </select>
+            </label>}
           </div>
-          {loading || error ? <CollectionStatus loading={loading} label="los departamentos" onRetry={retry} /> : !currentArea ? <p className="py-12 text-20 text-white/75">Sin departamentos publicados aún.</p> : <div role="region" aria-roledescription="carrusel" aria-label="Departamentos de voluntariado" className="max-w-xl"
+          {loading || error ? <CollectionStatus loading={loading} label="los departamentos" onRetry={retry} /> : !currentArea ? <p className="py-12 text-20 text-white/75">Sin departamentos publicados aún.</p> : <div role="region" aria-roledescription="carrusel" aria-label="Departamentos de voluntariado" className="max-w-lg w-full mt-auto"
             onKeyDown={event => {
               if (event.key === 'ArrowRight') { event.preventDefault(); go(1); }
               if (event.key === 'ArrowLeft') { event.preventDefault(); go(-1); }
             }}
           >
             <div role="group" aria-roledescription="diapositiva" aria-label={`${currentIndex + 1} de ${areas.length}`}>
-              <DepartmentSlide area={currentArea} onClick={() => openArea(currentArea.value)} />
+              <LayeredPanel><DepartmentSlide area={currentArea} onClick={() => openArea(currentArea.value)} /></LayeredPanel>
             </div>
             {areas.length > 1 && <CollectionNavigation className="mt-6 flex items-center justify-between gap-4" aria-label="Navegar departamentos">
               <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-2 rounded-[8px] text-left text-14 font-semibold text-white focus-ring">Anterior<span className="block truncate text-12 font-normal text-white/75">{previousArea.title}</span></button>

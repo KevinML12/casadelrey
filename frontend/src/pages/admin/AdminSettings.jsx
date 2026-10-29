@@ -13,6 +13,7 @@ import Button from '../../components/ui/Button';
 const HINTS = {
   bank_account: 'Sin este dato, el sitio invita a coordinar el depósito por contacto (no muestra ninguna cuenta).',
   contact_whatsapp: 'Formato 502XXXXXXXX. Se usa como respaldo cuando no hay cuenta configurada.',
+  about_podcast_url: 'Enlace público http:// o https:// para escuchar. Déjalo vacío si todavía no hay una página de reproducción.',
 };
 
 function SettingField({ multiline, ...props }) {
@@ -110,7 +111,8 @@ export default function AdminSettings() {
               ) : (
                 <div className="flex gap-2 items-end">
                   <div className="flex-1 min-w-0">
-                    <SettingField multiline={s.key.startsWith('about_')}
+                    <SettingField multiline={s.key.startsWith('about_') && !s.key.endsWith('_url')}
+                      type={s.key.endsWith('_url') ? 'url' : 'text'}
                       label={<>{s.label}{s.using_default && s.value === '' && (
                         <span className="ml-2 text-label-s text-amber">· sin configurar</span>
                       )}</>}

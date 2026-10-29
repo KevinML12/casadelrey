@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/layout/PageHero';
-import SceneCarousel from '../../components/ui/SceneCarousel';
+import ChurchStory from '../../components/sections/ChurchStory';
+import VisitExperience from '../../components/sections/VisitExperience';
 import SceneCollection from '../../components/ui/SceneCollection';
 import CollectionStatus from '../../components/ui/CollectionStatus';
 import SocialSection from '../../components/sections/SocialSection';
@@ -21,19 +22,15 @@ export default function AboutPage() {
   const areas = volunteers.areas.map(area => ({ ...area, key: area.value, description: area.desc, image: photos[`voluntariado_${area.value}`] || area.photoFallback, images: [photos[`voluntariado_${area.value}`] || area.photoFallback, photos[`voluntariado_${area.value}_2`]].filter(Boolean) }));
   const cells = (Array.isArray(categories.data) ? categories.data : []).filter(category => category.is_active !== false).map(category => ({ ...category, key: `cat-${category.ID || category.id}`, title: category.name, image: category.image_url || photos.about_comunidad || FALLBACK, meta: category.age_group }));
   const institution = [
-    { key: 'founders', title: settings.about_founders_names, description: settings.about_founders_description, meta: 'Pastores fundadores', image: photos.about_pastores || FALLBACK },
-    { key: 'pastors', title: settings.about_pastors_names, description: settings.about_pastors_description, meta: 'Pastores', image: photos.about_lideres || FALLBACK },
+    { key: 'founders', title: settings.about_founders_names, description: settings.about_founders_description, meta: 'Pastores fundadores', portrait: true, image: photos.about_fundadores || '/images/nosotros/fundadores.jpg', fallbackImage: '/images/nosotros/fundadores.jpg' },
+    { key: 'pastors', title: settings.about_pastors_names, description: settings.about_pastors_description, meta: 'Pastores', portrait: true, image: photos.about_pastores || '/images/nosotros/pastores.jpg', fallbackImage: '/images/nosotros/pastores.jpg' },
     { key: 'mission', title: 'Misión', description: settings.about_mission, image: photos.about_servidores || FALLBACK },
     { key: 'vision', title: 'Visión', description: settings.about_vision, image: photos.about_comunidad || FALLBACK },
   ].filter(item => item.description || item.title && !['mission', 'vision'].includes(item.key));
-  const visit = [
-    { key: 'visit', title: 'Visítanos', description: settings.about_address, image: photos.about_comunidad || FALLBACK, href: settings.about_map_url, action: 'Cómo llegar' },
-    { key: 'podcast', title: settings.about_podcast_title, description: settings.about_podcast_schedule, image: photos.about_lideres || FALLBACK },
-  ].filter(item => item.description);
   return <main className="min-h-screen overflow-clip text-white">
     <PageHero title={settings.about_title || 'Nosotros'} subtitle={settings.about_intro || ''} photoSlot="hero_nosotros" photoFallback="/images/backgrounds/comunidad-templo.webp" />
     {(settingsResource.loading || settingsResource.error) && <div className="max-w-4xl mx-auto px-6"><CollectionStatus loading={settingsResource.loading} label="la información de la iglesia" onRetry={settingsResource.retry} /></div>}
-    {institution.length > 0 && <SceneCarousel items={institution} label="Nuestra iglesia" />}
+    {institution.length > 0 && <ChurchStory items={institution} background={photos.about_comunidad || FALLBACK} />}
     <div className="max-w-4xl mx-auto px-6 pt-12"><h2 className="text-d2">Una familia que sirve.</h2></div>
     {volunteers.loading || volunteers.error ? <div className="max-w-4xl mx-auto px-6"><CollectionStatus loading={volunteers.loading} label="los departamentos" onRetry={volunteers.retry} /></div> : <SceneCollection items={areas} id="about-volunteers" label="Departamentos de voluntariado" empty="Sin departamentos publicados aún." renderInfo={area => <div className="space-y-5">
       {area.desc && <p className="text-16 leading-relaxed">{area.desc}</p>}
@@ -47,10 +44,7 @@ export default function AboutPage() {
       {cell.description && <p className="text-16 leading-relaxed">{cell.description}</p>}
       <Link to={`/celulas?tipo=${encodeURIComponent(cell.name)}`} className={cta}>Ver células de {cell.name}</Link>
     </div>} />}
-    {visit.length > 0 && <SceneCarousel items={visit} label="Visítanos y escucha" renderContent={item => <>
-      <h2 className="text-28 font-bold">{item.title}</h2><p className="mt-5 text-16 text-white/85 leading-relaxed whitespace-pre-line">{item.description}</p>
-      {item.href && <a href={item.href} target="_blank" rel="noopener noreferrer" className="inline-flex mt-6 min-h-11 items-center rounded-pill bg-white px-6 text-bg font-bold text-14 focus-ring">{item.action}</a>}
-    </>} />}
+    <VisitExperience />
     <SocialSection title="Síguenos en redes" />
   </main>;
 }

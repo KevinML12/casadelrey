@@ -137,12 +137,13 @@ for (const width of [390, 1440]) {
     await dialog.getByRole('button', { name: 'Equipo administrado Ver fotos', exact: true }).click();
     await expect(dialog.getByRole('tab', { name: 'Fotos', exact: true })).toHaveAttribute('aria-selected', 'true');
     await expect(dialog.getByRole('heading', { name: 'Equipo administrado', exact: true })).toBeVisible();
-    await expect(dialog.locator('.glass-light img, .glass-light .glass-light-nested')).toHaveCount(0);
-    const photo = dialog.locator('img').last();
+    await expect(dialog.locator('.glass-light .glass-light-nested')).toHaveCount(0);
+    await expect(dialog.getByRole('figure', { name: 'Fotografía ampliada' })).toBeVisible();
+    const photo = dialog.getByRole('figure', { name: 'Fotografía ampliada' }).getByRole('img', { name: 'Equipo administrado' });
     await expect(photo).toHaveAttribute('src', /vol_intercesor/);
-    await dialog.getByRole('button', { name: 'Foto 2', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Foto siguiente', exact: true }).click();
     await expect(photo).toHaveAttribute('src', /vol_alabanza/);
-    await expect(dialog.getByRole('button', { name: 'Foto 2', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(dialog.getByRole('figure').getByRole('status')).toHaveText('2 de 2');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await dialog.getByRole('tab', { name: 'Información', exact: true }).click();
     await expect(dialog.getByText('Motivo actualizado por el administrador.')).toBeVisible();

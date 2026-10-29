@@ -32,6 +32,21 @@ func TestSiteSettings_GetPublic_UsaDefaultsYGuardados(t *testing.T) {
 	assert.Equal(t, "Banco Industrial", out["bank_name"], "usa el valor guardado")
 	assert.Equal(t, "", out["bank_account"], "sin cuenta puesta → vacío, nunca un número falso")
 	assert.Equal(t, "Iglesia Casa del Rey", out["bank_holder"], "default cuando no hay guardado")
+	assert.Empty(t, out["about_podcast_url"], "no inventar un enlace de reproducción")
+}
+
+func TestSiteSettings_PodcastRejectsExecutableLinks(t *testing.T) {
+	for _, value := range []string{"javascript:alert(1)", "data:text/html,test", "/sin-destino", "https://"} {
+		t.Run(value, func(t *testing.T) {
+			db, mock, sqlDB := newMockDB(t)
+			defer sqlDB.Close()
+			h := handlers.NewSiteSettingHandler(db)
+			c, rec := newCtx(t, ctxOpts{method: "PUT", params: map[string]string{"key": "about_podcast_url"}, body: map[string]interface{}{"value": value}})
+			require.NoError(t, h.UpdateSetting(c))
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+			require.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
 }
 
 func TestSiteSettings_Update_LlaveDesconocida_Retorna400(t *testing.T) {

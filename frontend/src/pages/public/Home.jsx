@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Reveal from '../../components/ui/Reveal';
-import { useApi, useApiResource, useSitePhoto, groupAlbums, fetchOnce } from '../../lib/feed';
+import { useApi, useApiResource, groupAlbums, fetchOnce } from '../../lib/feed';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
 // Vocabulario de movimiento compartido: la amplitud del press la decide el
@@ -13,7 +13,7 @@ import { saludo } from '../../lib/greeting';
 // blanco del hero y a los chips de redes del pie de Ubicación.
 import { EASE_OUT, EASE_IN, PRESS_PRIMARY, PRESS_SECONDARY, PRESS_MICRO } from '../../lib/motion';
 
-import ParallaxImg from '../../components/ui/ParallaxImg';
+import VisitExperience from '../../components/sections/VisitExperience';
 import SocialSection from '../../components/sections/SocialSection';
 import SectionBg from '../../components/ui/SectionBg';
 import CollectionStatus from '../../components/ui/CollectionStatus';
@@ -569,122 +569,6 @@ function MensajesCarousel() {
   </section>;
 }
 
-// Accesos directos a redes -- usados en la fila rápida de Ubicación más
-// abajo. Solo nombre y destino: los pictogramas se eliminaron del sitio
-// público (identidad del dueño) y el campo `icon` que quedaba aquí ya no
-// lo leía nadie.
-const NETWORKS = [
-  { href: 'https://www.facebook.com/casadelreyhuehue',  label: 'Facebook' },
-  { href: 'https://www.instagram.com/ig.casadelrey/',   label: 'Instagram' },
-  { href: 'https://www.tiktok.com/@leoneldeleongt',     label: 'TikTok' },
-];
-
-// ════════════════════════════════════════════════════════════════════
-// 5 · UBICACIÓN (Visítanos)
-// ════════════════════════════════════════════════════════════════════
-function Ubicacion({ bg }) {
-  return (
-    <section id="ubicacion" className="relative py-24 md:py-36 border-t border-white/5 overflow-hidden">
-      <SectionBg src="/images/components/about_visitanos.jpg" />
-      {/* Foto entera del templo, con el scrim anclado abajo: el contenido
-          (titular + tarjetas) vive en el tercio inferior y ahí es donde
-          oscurece. Antes la foto llegaba al 50% y encima un degradado propio. */}
-      <ParallaxImg src={bg} alt="Ubicación" />
-      <div className="scrim-card" />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Titular editorial del cierre. Fijo (sin Reveal) y en una sola
-            familia: el acento serif itálico que llevaba "en casa" no tiene
-            @font-face propio en el proyecto (public/fonts solo trae Arimo),
-            así que renderizaba New York, Georgia o Noto Serif según el
-            sistema del visitante -- una firma tipográfica que no controlas
-            no es una firma. Vuelve cuando haya serif auto-hospedada. */}
-        <div className="text-center mb-14">
-          <h2 className="text-d2 text-white">
-            Te esperamos en casa.
-          </h2>
-        </div>
-
-        <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
-          {/* Dirección protagonista */}
-          <Reveal from="left">
-
-          <div className="rounded-[22px] liquid-glass liquid-shine p-10 md:p-14 h-full flex flex-col justify-between gap-10">
-            <div>
-              <div className="text-white/60 text-13 font-semibold mb-6">
-                Huehuetenango, Guatemala
-              </div>
-              <p className="text-d3 text-white">
-                7ª. Calle 12-66 zona 4,<br />
-                carretera a las Ruinas<br />
-                de Zaculeu
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <motion.a
-                href="https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"
-                target="_blank"
-                rel="noopener noreferrer"
-                {...PRESS_PRIMARY}
-                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card"
-              >
-                Cómo llegar
-              </motion.a>
-              {/* Chips terciarios: antes tenían la MISMA física que el botón
-                  blanco de al lado, y cuando todo reacciona igual la reacción
-                  deja de comunicar jerarquía. */}
-              {NETWORKS.map(n => (
-                <motion.a
-                  key={n.label}
-                  href={n.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  {...PRESS_MICRO}
-                  className="inline-flex items-center px-5 h-12 rounded-full liquid-glass text-white text-14 font-bold focus-ring"
-                >
-                  {n.label}
-                </motion.a>
-              ))}
-            </div>
-          </div>
-          </Reveal>
-
-          {/* Primera vez + podcast */}
-          <div className="flex flex-col gap-6">
-            <Reveal from="right" delay={0.05}>
-            <div className="rounded-[22px] glass-light liquid-shine p-9 md:p-10">
-              <h3 className="text-26 font-bold text-bg tracking-tight mb-3">¿Es tu primera vez?</h3>
-              <p className="text-15 text-bg/60 font-medium mb-7">
-                Queremos conocerte. Cuéntanos de ti y te recibimos desde el primer minuto.
-              </p>
-              <MotionLink
-                to="/conectate"
-                {...PRESS_PRIMARY}
-                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-pill bg-white text-bg text-14 font-bold focus-ring shadow-card hover:opacity-90"
-              >
-                Conéctate
-              </MotionLink>
-            </div>
-            </Reveal>
-
-            {/* Dato puro, sin destino: nunca fue tocable, así que tampoco
-                debía inclinarse al cursor. */}
-            <Reveal from="right" delay={0.12}>
-            <div className="rounded-[22px] glass-light liquid-shine p-9 md:p-10">
-              <p className="text-17 font-bold text-bg leading-tight">Podcast Inusual Youth</p>
-              <p className="text-14 text-bg/55 font-semibold mt-1">
-                92.9 FM Radio Stereo Cumbre · Viernes 3:00 PM
-              </p>
-            </div>
-            </Reveal>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ════════════════════════════════════════════════════════════════════
 // 4.5 · GALERÍA (Preview)
 // ════════════════════════════════════════════════════════════════════
@@ -729,7 +613,6 @@ function GalleryPreviewSection() {
 // ════════════════════════════════════════════════════════════════════
 export default function Home() {
   // The location keeps its administrator-owned background slot.
-  const ubicacionBg = useSitePhoto('home_ubicacion', '/images/bg-ubicacion.jpg');
   const navigate = useNavigate();
   // Fallback del CTA del hero (si un slide del backend trae un ctaUrl no
   // navegable): la acción de primer contacto es Conéctate, no un scroll.
@@ -744,7 +627,7 @@ export default function Home() {
       <MensajesCarousel />
       <GalleryPreviewSection />
       <SocialSection title="Lo que está pasando." />
-      <Ubicacion bg={ubicacionBg} />
+      <VisitExperience home />
     </main>
   );
 }

@@ -7,6 +7,7 @@ package handlers
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 
 	"casadelrey/backend/models"
@@ -40,6 +41,7 @@ var knownSettings = []struct{ Key, Label, Default string }{
 	{"about_address", "Nosotros — Dirección", "7ª. Calle 12-66 zona 4, carretera a las Ruinas de Zaculeu, Huehuetenango"},
 	{"about_map_url", "Nosotros — Enlace del mapa", "https://www.google.com/maps/search/?api=1&query=Casa+del+Rey+7a+Calle+12-66+zona+4+Huehuetenango"},
 	{"about_podcast_title", "Nosotros — Nombre del podcast", "Podcast Inusual Youth"},
+	{"about_podcast_url", "Nosotros — Enlace del podcast (opcional)", ""},
 	{"about_podcast_schedule", "Nosotros — Horario del podcast", "92.9 FM Radio Stereo Cumbre · Viernes · 3:00 PM"},
 
 	{"bank_name", "Banco", "Banrural"},
@@ -136,6 +138,13 @@ func (h *SiteSettingHandler) UpdateSetting(c echo.Context) error {
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+	}
+	if key == "about_podcast_url" && strings.TrimSpace(req.Value) != "" {
+		parsed, err := url.Parse(strings.TrimSpace(req.Value))
+		if err != nil || parsed.Host == "" || (parsed.Scheme != "https" && parsed.Scheme != "http") {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Usa un enlace público http:// o https:// para el podcast."})
+		}
+		req.Value = parsed.String()
 	}
 
 	var row models.SiteSetting

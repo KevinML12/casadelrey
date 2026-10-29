@@ -23,6 +23,7 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
   if (photoSelection.owner !== photoOwner) setPhotoSelection({ owner: photoOwner, index: 0 });
   const photoIdx = photoSelection.owner === photoOwner ? (photoSelection.index || 0) % Math.max(photos.length, 1) : 0;
   const setPhotoIdx = value => setPhotoSelection({ owner: photoOwner, index: typeof value === 'function' ? value(photoIdx) : value });
+  const mediaLayout = photoBackdrop && photos.length > 0 && !sobrepuesto;
   const close = () => sobrepuesto ? onCerrarSobrepuesto?.() : onChange(null);
   const go = direction => onChange(items[(index + direction + items.length) % items.length].key);
 
@@ -66,16 +67,16 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
       {active && (
         <motion.div
           ref={dialogRef} role="dialog" aria-modal="true" aria-label={active.title} tabIndex={-1}
-          className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 outline-none"
+          className="fixed inset-0 z-[100] flex items-center justify-center px-3 py-4 sm:px-7 sm:py-6 outline-none"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : DUR.base }}
         >
           <div className={`absolute inset-0 ${photoBackdrop ? 'bg-bg' : 'bg-bg/65 backdrop-blur-lg'}`} onClick={close}>
             {photoBackdrop && photos.length > 0 && (animated
-              ? <CrossfadePhoto src={photos[photoIdx % photos.length]} fallbackSrc={active.fallbackImage || '/images/backgrounds/congregacion.webp'} className="opacity-70" />
-              : <PhotoImage src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover opacity-70" />)}
-            {photoBackdrop && <div className="absolute inset-0 bg-bg/55" />}
+              ? <CrossfadePhoto src={photos[photoIdx % photos.length]} fallbackSrc={active.fallbackImage || '/images/backgrounds/congregacion.webp'} className="opacity-90" />
+              : <PhotoImage src={photos[photoIdx % photos.length]} alt="" loading="eager" sizes="100vw" className="absolute inset-0 w-full h-full object-cover opacity-90" />)}
+            {photoBackdrop && <div className="absolute inset-0 bg-bg/40" />}
           </div>
-          <div className={`relative w-full ${photoBackdrop ? 'max-w-md' : 'max-w-[780px]'} ${light ? 'glass-light' : 'liquid-glass'} rounded-[16px] flex flex-col overflow-hidden`} style={{ height, maxHeight: 'calc(100svh - 48px)' }}>
+          <div className={`relative w-full ${mediaLayout ? 'max-w-[1160px]' : 'max-w-[780px]'} ${light ? 'glass-light' : 'liquid-glass'} rounded-[16px] flex flex-col overflow-hidden`} data-photo-window={mediaLayout || undefined} style={{ height: mediaLayout ? 'min(88svh, 800px)' : height, maxHeight: 'calc(100svh - 32px)' }}>
             <div className={`shrink-0 flex items-center justify-between gap-4 px-5 py-3 border-b ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
               {sobrepuesto ? (
                 <button type="button" onClick={onCerrarSobrepuesto} className="min-w-0 [overflow-wrap:anywhere] text-13 font-bold focus-ring rounded-full min-h-11 px-2">Volver a {active.title}</button>
@@ -97,16 +98,26 @@ export default function WindowStack({ items, openKey, onChange, renderContent, h
                     {photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-current={i === photoIdx} className="liquid-glass rounded-full px-3 min-h-11 text-12 text-white focus-ring">Foto {i + 1}</button>)}
                   </div>}
                 </div>}
-                <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 flex flex-col [overflow-wrap:anywhere]" data-lenis-prevent>
-                  {animated ? <motion.div key={contentKey || active.key} className="m-auto w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>{renderContent(active, { photoIndex: photoIdx, photoCount: photos.length })}</motion.div> : <div className="m-auto w-full">{renderContent(active, { photoIndex: photoIdx, photoCount: photos.length })}</div>}
+                <div className={`flex-1 min-h-0 overflow-y-auto ${mediaLayout ? 'photo-window-body md:grid md:overflow-hidden md:grid-cols-[minmax(0,1.65fr)_minmax(280px,1fr)]' : ''}`} data-lenis-prevent>
+                  {mediaLayout && <figure className="relative min-w-0 min-h-0 m-0 flex flex-col border-b md:border-b-0 md:border-r border-bg/10 bg-bg/10" aria-label="Fotografía ampliada">
+                    <div className="photo-window-frame relative h-[34svh] md:h-auto md:flex-1 min-h-0">
+                      <CrossfadePhoto src={photos[photoIdx]} fallbackSrc={active.fallbackImage || '/images/backgrounds/congregacion.webp'} fit="contain" alt={active.photoAlt || active.title} sizes="(max-width: 767px) 100vw, 760px" />
+                    </div>
+                    <figcaption className={`shrink-0 flex items-center justify-between flex-wrap gap-2 px-4 py-3 text-12 ${light ? 'text-bg' : 'text-white'}`}>
+                      <span className="min-w-0 truncate">{active.title}</span>
+                      {photos.length > 1 && <div className="flex items-center gap-2" aria-label="Fotografías" onKeyDown={event => {
+                        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); setPhotoIdx(value => (value + (event.key === 'ArrowRight' ? 1 : -1) + photos.length) % photos.length); }
+                      }}>
+                        <button type="button" onClick={() => setPhotoIdx(value => (value - 1 + photos.length) % photos.length)} className="min-h-11 px-3 rounded-[8px] text-12 font-semibold focus-ring border border-current/20">Foto anterior</button>
+                        <span className="shrink-0 text-12" role="status">{photoIdx + 1} de {photos.length}</span>
+                        <button type="button" onClick={() => setPhotoIdx(value => (value + 1) % photos.length)} className="min-h-11 px-3 rounded-[8px] text-12 font-semibold focus-ring border border-current/20">Foto siguiente</button>
+                      </div>}
+                    </figcaption>
+                  </figure>}
+                  <div className={`min-w-0 p-5 sm:p-6 ${mediaLayout ? 'md:overflow-y-auto' : ''}`} data-lenis-prevent>
+                    {animated ? <motion.div key={contentKey || active.key} className="w-full" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>{renderContent(active, { photoIndex: photoIdx, photoCount: photos.length })}</motion.div> : <div className="w-full">{renderContent(active, { photoIndex: photoIdx, photoCount: photos.length })}</div>}
+                  </div>
                 </div>
-                {photoBackdrop && photos.length > 1 && <div className={`flex gap-2 px-5 pb-3 ${light ? 'text-bg' : 'text-white'}`} aria-label="Fotos de fondo">
-                  {photos.length <= 2 ? photos.map((_, i) => <button key={i} type="button" onClick={() => setPhotoIdx(i)} aria-pressed={i === photoIdx} className="rounded-[8px] border border-current px-3 min-h-11 text-12 font-semibold focus-ring">Foto {i + 1}</button>) : <>
-                    <button type="button" onClick={() => setPhotoIdx(value => (value - 1 + photos.length) % photos.length)} className="min-h-11 px-2 rounded-[8px] text-12 font-semibold focus-ring">Foto anterior</button>
-                    <span className="m-auto text-12" role="status">{photoIdx + 1} de {photos.length}</span>
-                    <button type="button" onClick={() => setPhotoIdx(value => (value + 1) % photos.length)} className="min-h-11 px-2 rounded-[8px] text-12 font-semibold focus-ring">Foto siguiente</button>
-                  </>}
-                </div>}
                 {items.length > 1 && <div className={`collection-controls shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-t ${light ? 'border-bg/10 text-bg' : 'border-white/15 text-white'}`}>
                   <button type="button" onClick={() => go(-1)} className="min-h-11 min-w-0 flex-1 px-3 rounded-[8px] text-left text-13 font-bold focus-ring">Anterior{neighborTitles && <span className="block truncate text-11 font-normal opacity-70">{items[(index - 1 + items.length) % items.length].title}</span>}</button>
                   <span className="shrink-0 text-12 opacity-70" role="status">{index + 1} / {items.length}</span>
