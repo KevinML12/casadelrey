@@ -30,4 +30,14 @@ Siete pruebas reales aprobadas en 4.2 minutos: inventario publicado (16 células
 
 Verificación adicional de las 29 cuentas importadas: mismos roles y hashes de contraseña; tokens de sesión/recuperación no transferidos. Sólo se guardaron los resultados booleanos en `account-continuity.json`.
 
-El cierre visual amplió la misma escena compacta a la agenda de Inicio, quitó el conteo incompleto del avance de álbumes y enlaza cada avance al álbum elegido. Las imágenes de los paneles administrativos usan carga diferida, y Galería reutiliza el fallback local con control de errores sin peticiones repetidas a un placeholder externo. Catorce regresiones locales posteriores aprobadas y 16 comprobaciones de publicación/responsividad aprobadas; build y lint vuelven a pasar (20 avisos anteriores). Pendiente al redactar: publicar y revisar este último ajuste de frontend. El correo transaccional y una transferencia de dinero no se certifican mediante pruebas de interfaz.
+El cierre visual amplió la misma escena compacta a la agenda de Inicio, quitó el conteo incompleto del avance de álbumes y enlaza cada avance al álbum elegido. Las imágenes de los paneles administrativos usan carga diferida, y Galería reutiliza el fallback local con control de errores sin peticiones repetidas a un placeholder externo. Catorce regresiones locales posteriores aprobadas y 16 comprobaciones de publicación/responsividad aprobadas; build y lint vuelven a pasar (20 avisos anteriores). El correo transaccional y una transferencia de dinero no se certifican mediante pruebas de interfaz.
+
+## Cierre de publicación
+
+El ajuste final de interfaz `81967dec2a5e01f92ad2e761a0410c7204a676f7` quedó publicado en Vercel Production READY (`dpl_4DXjPx49cqMqTjNs9cCBz4ZDBnG4`) y Render Static Live (`dep-dbh94pifngtc73avpob0`). El backend conserva el despliegue Live `c8da357`, que contiene la importación y la corrección de códigos históricos; el último commit sólo modifica frontend, pruebas y documentación.
+
+Dos comprobaciones reales posteriores aprobaron de nuevo el inventario y la solicitud sobre una célula publicada; también se guardó V1 con su mismo contenido y se verificó que conserva código, líder y campos existentes. El registro temporal de solicitud se eliminó al finalizar. Resultado en `content-live-final.txt`.
+
+Revisión final de ambos enlaces públicos: las cinco escenas de Inicio (agenda, células, mensajes, redes y álbumes) muestran los registros del administrador; no contienen imágenes dentro del cristal. El enlace de SABADOS abre ese álbum concreto y la pestaña Fotos conserva el recorrido. En 390 y 1440 píxeles no hubo desbordamiento horizontal ni excepciones de ejecución. Capturas públicas revisadas en `vercel-contenido-publicado.png` y `render-contenido-publicado.png`; resultados en `content-final-sites.json`.
+
+La continuidad de datos y relaciones utiliza los flujos existentes de API, autenticación y permisos. Las comprobaciones anteriores no constituyen una auditoría de seguridad completa ni una prueba de capacidad para mil usuarios simultáneos. No se añadieron planes de pago ni se certificaron envíos de correo o transferencias bancarias.

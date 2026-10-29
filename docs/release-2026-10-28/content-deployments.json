@@ -1,0 +1,30 @@
+{
+  "review_date": "2026-10-28",
+  "vercel": {
+    "url": "https://casadelreyhue.vercel.app",
+    "deployment_id": "dpl_4DXjPx49cqMqTjNs9cCBz4ZDBnG4",
+    "state": "READY",
+    "commit": "81967dec2a5e01f92ad2e761a0410c7204a676f7"
+  },
+  "render_frontend": {
+    "url": "https://casadelrey-web-pruebas.onrender.com",
+    "deployment_id": "dep-dbh94pifngtc73avpob0",
+    "state": "Live",
+    "commit": "81967dec2a5e01f92ad2e761a0410c7204a676f7"
+  },
+  "render_backend": {
+    "url": "https://casadelrey-api-pruebas.onrender.com",
+    "deployment_id": "dep-dbh8ud67bikc73du36ig",
+    "state": "Live",
+    "commit": "c8da35789519021bcb01d02b7526a45791b9a50c",
+    "branch": "main",
+    "auto_deploy": false
+  },
+  "database": {
+    "provider": "Supabase",
+    "active_schema": "cdr_render_qa",
+    "original_schema_preserved": "public",
+    "financial_history_migrated": false
+  },
+  "media": "Cloudflare R2"
+}
