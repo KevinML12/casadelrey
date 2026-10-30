@@ -9,7 +9,8 @@ import SceneCarousel from '../../components/ui/SceneCarousel';
 import WindowStack from '../../components/ui/WindowStack';
 import ModalWrapper from '../../components/ui/ModalWrapper';
 import { useBankInfo } from '../../components/sections/BankDetails';
-import { useSitePhoto } from '../../lib/feed';
+import { useSitePhoto, useApi } from '../../lib/feed';
+import { socialProfiles } from '../../lib/socialProfiles';
 import { PRESS_PRIMARY } from '../../lib/motion';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
 import { submissionKey, clearSubmissionKey } from '../../lib/submissionKey';
@@ -417,6 +418,8 @@ function EventCard({ ev, onRsvp, onCancelRsvp, past = false, preview = false, on
 // del sitio. El componente compartido ya trae ambas cosas resueltas.
 
 export default function EventsPage() {
+  const settings = useApi('/settings') || {};
+  const socialProfile = socialProfiles(settings)[0];
   const reducedMotion = useReducedMotion();
   const heroImg = useSitePhoto('hero_eventos', '/images/backgrounds/congregacion.webp');
   const [searchParams] = useSearchParams();
@@ -491,13 +494,13 @@ export default function EventsPage() {
             <p className="text-white/40 text-16 max-w-md">
               Cuando se publique el próximo, aparece en esta página.
             </p>
-            <a
-              href="https://www.instagram.com/ig.casadelrey/"
+            {socialProfile && <a
+              href={socialProfile.href}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-6 py-3 rounded-pill bg-white text-bg text-14 font-bold hover:opacity-90 transition-opacity focus-ring"
             >
-              Síguenos en Instagram
-            </a>
+              Síguenos en {socialProfile.label}
+            </a>}
           </div>
         ) : upcomingEvents.length === 0 ? (
           <div className="py-16 text-center">

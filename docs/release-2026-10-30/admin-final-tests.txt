@@ -1,0 +1,16 @@
+
+Running 9 tests using 1 worker
+
+(node:42175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/admin-delivery.spec.js:24:3 › cells remain editable and responsive at 320px (1.0s)
+  ✓  2 [chromium] › e2e/admin-delivery.spec.js:24:3 › cells remain editable and responsive at 768px (1.0s)
+  ✓  3 [chromium] › e2e/admin-delivery.spec.js:24:3 › cells remain editable and responsive at 1440px (1.2s)
+  ✓  4 [chromium] › e2e/admin-delivery.spec.js:49:1 › cell load and save failures are explicit and preserve drafts (1.1s)
+  ✓  5 [chromium] › e2e/admin-delivery.spec.js:67:1 › categories upload a photograph and retain their draft on a failed save (1.1s)
+  ✓  6 [chromium] › e2e/admin-delivery.spec.js:85:1 › social text and profiles are editable and hiding a profile hides it everywhere (2.7s)
+  ✓  7 [chromium] › e2e/admin-delivery.spec.js:114:1 › social editor rejects post links and keeps unsaved copy after a failed save (978ms)
+  ✓  8 [chromium] › e2e/admin-delivery.spec.js:128:1 › mobile admin navigation searches without accents and returns keyboard focus (515ms)
+  ✓  9 [chromium] › e2e/admin-delivery.spec.js:137:1 › dashboard shows actual pending reports and requests only received donations (787ms)
+
+  9 passed (11.1s)

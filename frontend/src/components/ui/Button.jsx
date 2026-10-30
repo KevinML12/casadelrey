@@ -13,25 +13,25 @@ import { Link } from 'react-router-dom';
  */
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full border-none ' +
-  'font-bold tracking-tightish leading-tight btn-spring ' +
+  'inline-flex items-center justify-center gap-2 rounded-[12px] border ' +
+  'font-bold tracking-tightish leading-tight transition-colors duration-150 motion-reduce:transition-none ' +
   'cursor-pointer select-none whitespace-nowrap focus-ring ' +
   'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none';
 
 const variants = {
   // Primario — pill navy sólido (mismo CTA que el header público)
-  filled:   'bg-bg text-white shadow-card hover:shadow-card-lg',
+  filled:   'border-transparent bg-bg text-white hover:bg-bg/85 active:bg-bg/75',
   // Escarchado — blanco translúcido con hairline, el más usado
   tonal:    'glass-light text-bg',
   glass:    'glass-light text-bg',
   elevated: 'glass-light text-bg shadow-card-lg',
   outlined: 'bg-transparent text-bg border border-bg/20 hover:bg-bg/5 hover:border-bg/35',
-  text:     'bg-transparent text-bg/60 hover:text-bg hover:bg-bg/5',
+  text:     'border-transparent bg-transparent text-bg/60 hover:text-bg hover:bg-bg/5',
 };
 
 const sizes = {
-  sm: 'text-13 px-3.5 py-1.5',
-  md: 'text-14 px-5 py-2.5',
+  sm: 'min-h-11 text-13 px-3.5 py-2',
+  md: 'min-h-11 text-14 px-5 py-2.5',
   lg: 'text-15 px-6 py-3.5',
 };
 
@@ -65,7 +65,7 @@ export function IconButton({ children, variant = 'standard', className = '', ...
   return (
     <button
       className={
-        'inline-flex items-center justify-center w-10 h-10 rounded-full border-none ' +
+        'inline-flex items-center justify-center w-10 h-10 rounded-[12px] border ' +
         'cursor-pointer btn-spring transition-colors duration-200 ' +
         `${variantCls} ${className}`
       }

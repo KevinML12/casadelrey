@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useApi } from '../../lib/feed';
+import { socialProfiles } from '../../lib/socialProfiles';
 
 // Solo datos CONFIRMADOS (CONTEXTO_IGLESIA jul-2026): dirección real,
 // redes oficiales, podcast y fundadores. Nada inventado — teléfono,
@@ -18,13 +19,6 @@ const NAV = [
 // Sin logo/ícono de plataforma a propósito (ago-2026) -- el nombre de la
 // red como texto identifica igual de bien a dónde lleva cada link, sin
 // pictogramas.
-const SOCIAL = [
-  { label: 'Instagram', href: 'https://www.instagram.com/ig.casadelrey/' },
-  { label: 'Facebook',  href: 'https://www.facebook.com/casadelreyhuehue' },
-  { label: 'TikTok',    href: 'https://www.tiktok.com/@leoneldeleongt' },
-  { label: 'X',         href: 'https://x.com/pastorleoneli' },
-];
-
 export default function Footer() {
   const settings = useApi('/settings') || {};
   return (
@@ -47,7 +41,7 @@ export default function Footer() {
             </Link>
             {settings.about_founders_names && <p className="text-14 text-white/50 font-medium leading-relaxed max-w-xs">{settings.about_founders_names}</p>}
             <div className="flex flex-wrap items-center gap-2.5">
-              {SOCIAL.map(s => (
+              {socialProfiles(settings).map(s => (
                 <a
                   key={s.label}
                   href={s.href}

@@ -22,13 +22,14 @@ export default function Input({ label, error, helperText, size = 'md', className
   // input — rompe lectores de pantalla Y selectores de test getByLabel().
   const generatedId = useId();
   const fieldId = id || generatedId;
+  const messageId = `${fieldId}-message`;
 
   return (
     <div className="w-full">
       {label && <label htmlFor={fieldId} className={labelCls}>{label}</label>}
-      <input id={fieldId} className={`${fieldBase} ${sizeCls} ${errCls} ${className}`} {...props} />
-      {error      && <p className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
-      {helperText && !error && <p className={helperCls}>{helperText}</p>}
+      <input id={fieldId} aria-invalid={error ? true : undefined} aria-describedby={error || helperText ? messageId : undefined} className={`${fieldBase} ${sizeCls} ${errCls} ${className}`} {...props} />
+      {error      && <p id={messageId} className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
+      {helperText && !error && <p id={messageId} className={helperCls}>{helperText}</p>}
     </div>
   );
 }
@@ -37,12 +38,15 @@ export function Select({ label, error, helperText, options = [], placeholder = '
   const errCls = error ? '!border-rose' : '';
   const generatedId = useId();
   const fieldId = id || generatedId;
+  const messageId = `${fieldId}-message`;
 
   return (
     <div className="w-full">
       {label && <label htmlFor={fieldId} className={labelCls}>{label}</label>}
       <select
         id={fieldId}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error || helperText ? messageId : undefined}
         className={`${fieldBase} pr-10 appearance-none cursor-pointer ${errCls} ${className}`}
         style={{
           backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
@@ -57,8 +61,8 @@ export function Select({ label, error, helperText, options = [], placeholder = '
           <option key={value} value={value}>{optLabel}</option>
         ))}
       </select>
-      {error      && <p className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
-      {helperText && !error && <p className={helperCls}>{helperText}</p>}
+      {error      && <p id={messageId} className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
+      {helperText && !error && <p id={messageId} className={helperCls}>{helperText}</p>}
     </div>
   );
 }
@@ -67,18 +71,21 @@ export function Textarea({ label, error, helperText, rows = 4, className = '', i
   const errCls = error ? '!border-rose' : '';
   const generatedId = useId();
   const fieldId = id || generatedId;
+  const messageId = `${fieldId}-message`;
 
   return (
     <div className="w-full">
       {label && <label htmlFor={fieldId} className={labelCls}>{label}</label>}
       <textarea
         id={fieldId}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error || helperText ? messageId : undefined}
         rows={rows}
         className={`${fieldBase} resize-none ${errCls} ${className}`}
         {...props}
       />
-      {error      && <p className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
-      {helperText && !error && <p className={helperCls}>{helperText}</p>}
+      {error      && <p id={messageId} className={errorCls}>{typeof error === 'string' ? error : error.message}</p>}
+      {helperText && !error && <p id={messageId} className={helperCls}>{helperText}</p>}
     </div>
   );
 }

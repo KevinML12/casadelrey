@@ -1,25 +1,29 @@
-import SceneCarousel from '../ui/SceneCarousel';
 import CollectionStatus from '../ui/CollectionStatus';
-import { useApiResource } from '../../lib/feed';
+import SectionBg from '../ui/SectionBg';
+import { useApiResource, useSitePhoto } from '../../lib/feed';
+import { socialProfiles } from '../../lib/socialProfiles';
 
-export default function SocialSection({ title = 'Síguenos en redes' }) {
-  const resource = useApiResource('/social/feed');
-  const rows = Array.isArray(resource.data) ? resource.data : resource.data?.data || [];
-  const items = rows.filter(post => post.is_active !== false).map(post => ({
-    key: post.ID || post.id,
-    title: post.platform,
-    description: post.caption,
-    image: post.image_url || '/images/backgrounds/congregacion.webp',
-    href: post.post_url,
-  }));
-  return <section className="relative border-t border-white/5">
-    <div className="max-w-6xl mx-auto px-6 py-12"><h2 className="text-d2 text-white">{title}</h2></div>
-    {resource.loading || resource.error
-      ? <div className="px-6 pb-12"><CollectionStatus loading={resource.loading} label="las publicaciones" onRetry={resource.retry} /></div>
-      : <SceneCarousel items={items} label="Publicaciones de la comunidad" photoPreview empty="Sin publicaciones en redes aún." renderContent={post => <>
-        <h3 className="text-24 sm:text-28 font-bold capitalize">{post.title}</h3>
-        {post.description && <p className="mt-3 text-16 text-white/85 line-clamp-3">{post.description}</p>}
-        {post.href && <a href={post.href} target="_blank" rel="noopener noreferrer" className="btn-spring focus-ring inline-flex mt-5 min-h-11 items-center rounded-pill bg-white px-5 py-2 text-14 font-bold text-bg">Ver publicación</a>}
-      </>} />}
+export default function SocialSection() {
+  const resource = useApiResource('/settings');
+  const settings = resource.data || {};
+  const profiles = socialProfiles(settings);
+  const photo = useSitePhoto('about_comunidad', '/images/backgrounds/congregacion.webp');
+  if (!resource.loading && !resource.error && !profiles.length) return null;
+  return <section aria-label="Redes de la comunidad" className="relative isolate overflow-hidden border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28">
+    <SectionBg src={photo} opacity="opacity-100" scrimClassName="bg-bg/50" />
+    <div className="relative mx-auto max-w-3xl">
+      {resource.loading || resource.error ? <CollectionStatus loading={resource.loading} label="las redes" onRetry={resource.retry} /> : (
+        <div className="glass-light rounded-[16px] p-6 sm:p-10 text-bg">
+          {settings.social_title && <h2 className="text-28 sm:text-40 font-bold tracking-tightish leading-tight [overflow-wrap:anywhere]">{settings.social_title}</h2>}
+          {settings.social_intro && <p className="mt-4 max-w-xl text-16 leading-relaxed text-bg/70 whitespace-pre-line">{settings.social_intro}</p>}
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            {profiles.map(profile => <a key={profile.key} href={profile.href} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-[12px] border border-bg/20 bg-white/30 px-5 py-4 text-bg transition-colors duration-150 hover:bg-white/65 active:bg-white/80 motion-reduce:transition-none">
+              <span className="flex flex-wrap items-center justify-between gap-2"><span className="text-17 font-bold">{profile.label}</span><span className="text-12 font-semibold text-bg/60">Visitar perfil</span></span>
+              {profile.description && <span className="mt-2 block text-14 leading-relaxed text-bg/70 whitespace-pre-line [overflow-wrap:anywhere]">{profile.description}</span>}
+            </a>)}
+          </div>
+        </div>
+      )}
+    </div>
   </section>;
 }

@@ -1,0 +1,19 @@
+?   	casadelrey/backend	[no test files]
+ok  	casadelrey/backend/auth	1.715s
+?   	casadelrey/backend/cmd/prepare-production	[no test files]
+?   	casadelrey/backend/cmd/seed	[no test files]
+?   	casadelrey/backend/config	[no test files]
+?   	casadelrey/backend/database	[no test files]
+ok  	casadelrey/backend/email	(cached)
+ok  	casadelrey/backend/handlers	0.301s
+ok  	casadelrey/backend/middleware	(cached)
+?   	casadelrey/backend/models	[no test files]
+ok  	casadelrey/backend/routes	2.347s
+?   	casadelrey/backend/scripts/bulk_upload	[no test files]
+?   	casadelrey/backend/scripts/seed_curated_gallery	[no test files]
+?   	casadelrey/backend/scripts/seed_users	[no test files]
+ok  	casadelrey/backend/storage	(cached)
+ok  	casadelrey/backend/tests/e2e	(cached)
+ok  	casadelrey/backend/tests/integration	0.215s
+ok  	casadelrey/backend/tests/security	(cached)
+?   	casadelrey/backend/utils/testutils	[no test files]

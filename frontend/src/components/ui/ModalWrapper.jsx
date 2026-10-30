@@ -10,7 +10,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { DUR, EASE_OUT } from '../../lib/motion';
 import { lockDialogBackground, restoreParentDialogFocus } from '../../lib/dialogBackground';
 
-export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulario', wide = false }) {
+export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulario', wide = false, busy = false }) {
   const reducedMotion = useReducedMotion();
   const dialogRef = useRef(null);
   const closeRef = useRef(onClose);
@@ -52,6 +52,7 @@ export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulari
     >
       <motion.div
         ref={dialogRef} role="dialog" aria-modal="true" aria-label={ariaLabel} tabIndex={-1}
+        style={{ colorScheme: 'light' }}
         className={`glass-light relative w-full ${wide ? "max-w-5xl" : "max-w-md"} max-h-[calc(100svh-32px)] rounded-[16px] flex flex-col overflow-hidden text-bg [overflow-wrap:anywhere]`}
         onClick={e => e.stopPropagation()}
         initial={{ opacity: 0 }}
@@ -60,7 +61,7 @@ export default function ModalWrapper({ children, onClose, ariaLabel = 'Formulari
         transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}
       >
         <div className="shrink-0 flex justify-end px-4 py-2 border-b border-bg/10">
-          <button type="button" onClick={onClose} className="min-h-11 px-4 rounded-[8px] bg-bg/8 text-13 font-bold focus-ring">Cerrar</button>
+          <button type="button" onClick={onClose} disabled={busy} className="min-h-11 px-4 rounded-[8px] bg-bg/8 text-13 font-bold focus-ring disabled:opacity-50">Cerrar</button>
         </div>
         <div className="min-h-0 overflow-y-auto p-6" data-lenis-prevent>
           {children}

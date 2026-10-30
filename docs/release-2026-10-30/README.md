@@ -47,3 +47,7 @@ La clave vence el 30 de octubre de 2027 o tras 90 días de inactividad. Al rotar
 Este cambio no cierra los asuntos históricos registrados en la [preparación del 29 de octubre](../release-2026-10-29/PREPARACION_PRODUCCION.md): tres archivos antiguos potencialmente públicos necesitan clasificación y migración; el historial financiero original sigue pendiente de una decisión de conservación; faltan el cierre de alojamiento, restauración y capacidad operativa. Las mejoras del flujo nuevo no revocan URLs públicas antiguas.
 
 Fuentes oficiales: [límites de Brevo Gratis](https://help.brevo.com/hc/en-us/articles/208580669-FAQs-What-are-the-limits-of-the-Free-plan), [remitentes y dominios](https://developers.brevo.com/docs/getting-started-with-senders-and-domains), [eventos de entrega](https://developers.brevo.com/reference/get-email-event-report).
+
+## Panel y redes administrables
+
+Detalles y validación de la entrega adicional: [Administración y promoción de redes](ADMIN_Y_REDES.md).

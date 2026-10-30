@@ -45,6 +45,6 @@ export default function AboutPage() {
       <Link to={`/celulas?tipo=${encodeURIComponent(cell.name)}`} className={cta}>Ver células de {cell.name}</Link>
     </div>} />}
     <VisitExperience />
-    <SocialSection title="Síguenos en redes" />
+    <SocialSection />
   </main>;
 }

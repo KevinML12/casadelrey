@@ -741,3 +741,12 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   #main-content > main, [role="tabpanel"] { animation: none; }
 }
+
+/* Administrative workspaces share one restrained glass surface and clear spacing. */
+.admin-shell .glass-light, .admin-shell .glass-light-nested {
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 3px 14px rgba(10,21,38,.035);
+}
+.admin-content > :where(div) { padding: 0; }
+.admin-content :where(h1,h2,h3,p,a,td) { overflow-wrap: anywhere; }
+.admin-shell .card-spring:hover { transform: none; }

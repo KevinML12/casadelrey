@@ -21,6 +21,8 @@ import apiClient from './apiClient';
 const CACHE_TTL_MS = 20000;
 const cache = new Map(); // path -> { promise, timestamp }
 
+export function invalidateResource(path) { cache.delete(path); }
+
 /** GET cacheado ~20s — comparte la promesa entre secciones que montan a la vez */
 export function fetchOnce(path) {
   const now = Date.now();

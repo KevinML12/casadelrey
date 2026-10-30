@@ -1,188 +1,105 @@
-// ============================================================
-//  AdminCellCategories — CRUD de las categorías de células que se ven
-//  en /celulas y en la vista previa del Home (Adolescentes, Varones,
-//  Mujeres...). Antes vivían hardcodeadas en CelulasPage.jsx (nombre,
-//  edad, descripción) -- esto es lo que las hace administrables de
-//  verdad: crear, renombrar, describir, reordenar o borrar una
-//  categoría sin tocar código. La FOTO de cada una se sube aparte, en
-//  Fotos del sitio (busca "Categorías de células").
-//
-//  Type key: liga la categoría a uno de los 5 tipos estructurales de
-//  célula (el mismo H/M/J/P/N que usan el código de célula y los
-//  reportes semanales) para saber qué células le pertenecen. Una
-//  categoría sin type key no agrupa células automáticamente -- sirve
-//  para una categoría puramente informativa. Células cuyo tipo no
-//  tenga ninguna categoría activa con ese type key caen en "Otros" en
-//  la página pública, nunca desaparecen en silencio.
-// ============================================================
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import { CELL_TYPES } from '../../components/ui/CellCodePicker';
 import Input, { Select, Textarea } from '../../components/ui/Input';
+import ModalWrapper from '../../components/ui/ModalWrapper';
+import AdminResourceState from '../../components/ui/AdminResourceState';
+import CellAdminNav from '../../components/ui/CellAdminNav';
 
-const TYPE_KEY_OPTIONS = [{ value: '', label: 'Sin type key (no agrupa células automáticamente)' }, ...CELL_TYPES];
+const EMPTY = { name: '', age_group: '', description: '', type_key: '', sort_order: 0, image_url: '' };
 
-const EMPTY = { name: '', age_group: '', description: '', type_key: '', sort_order: 0 };
-
-function CategoryForm({ onSave, onCancel, initialData }) {
-  const [form, setForm] = useState(initialData || EMPTY);
-  const [loading, setLoading] = useState(false);
-  const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name.trim()) {
-      toast.error('El nombre es obligatorio');
-      return;
-    }
-    setLoading(true);
+function CategoryForm({ initialData, onSave, onClose, onBusy }) {
+  const [form, setForm] = useState({ ...EMPTY, ...initialData });
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const set = key => event => setForm(values => ({ ...values, [key]: event.target.value }));
+  const upload = async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) { setError('Elige una imagen de hasta 10 MB.'); return; }
+    setUploading(true); onBusy(true); setError('');
     try {
-      const payload = { ...form, sort_order: Number(form.sort_order) || 0 };
-      if (form.ID) {
-        await apiClient.put(`/admin/cell-categories/${form.ID}`, payload);
-        toast.success('Categoría actualizada');
-      } else {
-        await apiClient.post('/admin/cell-categories', payload);
-        toast.success('Categoría creada');
-      }
-      onSave();
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Error al guardar');
-    } finally { setLoading(false); }
+      const data = new FormData(); data.append('file', file);
+      const response = await apiClient.post('/upload?folder=celulas', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (!response.data.url) throw new Error();
+      setForm(values => ({ ...values, image_url: response.data.url }));
+    } catch { setError('No pudimos subir la fotografía. Puedes volver a intentarlo.'); }
+    finally { setUploading(false); onBusy(false); }
   };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input label="Nombre *" value={form.name} onChange={set('name')} placeholder="ej. Adolescentes" required />
-        <Input label="Grupo de edad" value={form.age_group} onChange={set('age_group')} placeholder="ej. 15 a 24 años" />
-        <Select
-          label="Type key (qué células le pertenecen)"
-          value={form.type_key}
-          onChange={set('type_key')}
-          options={TYPE_KEY_OPTIONS.filter(t => t.value !== '')}
-          placeholder="Sin type key (no agrupa células automáticamente)"
-        />
-        <Input type="number" label="Orden" value={form.sort_order} onChange={set('sort_order')} />
+  const submit = async event => {
+    event.preventDefault();
+    setSaving(true); onBusy(true); setError('');
+    try {
+      const data = { ...form, name: form.name.trim(), sort_order: Number(form.sort_order) || 0 };
+      if (form.ID) await apiClient.put(`/admin/cell-categories/${form.ID}`, data);
+      else await apiClient.post('/admin/cell-categories', data);
+      toast.success('Categoría guardada'); onSave();
+    } catch (err) { setError(err.response?.data?.error || 'No se pudo guardar. Tus cambios siguen en el formulario.'); }
+    finally { setSaving(false); onBusy(false); }
+  };
+  return <form onSubmit={submit}>
+    {error && <p role="alert" className="mb-5 rounded-xl bg-rose/10 p-3 text-14">{error}</p>}
+    <fieldset disabled={saving || uploading} className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input label="Nombre *" value={form.name} onChange={set('name')} required />
+        <Input label="Grupo de edad" value={form.age_group} onChange={set('age_group')} />
+        <Select label="Tipo de célula que agrupa" value={form.type_key} onChange={set('type_key')} options={CELL_TYPES} placeholder="Categoría informativa" helperText="Las células de este tipo aparecerán en esta categoría." />
+        <Input type="number" step="1" label="Orden de aparición" value={form.sort_order} onChange={set('sort_order')} helperText="Los números menores aparecen primero." />
       </div>
-
-      <Textarea
-        label="Descripción"
-        value={form.description}
-        onChange={set('description')}
-        rows={2}
-        placeholder="Qué hace especial a esta clasificación..."
-      />
-
-      <div className="flex gap-3 pt-2 border-t border-bg/10">
-        <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Crear categoría')}
-        </Button>
-        <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
+      <Textarea label="Descripción" value={form.description} onChange={set('description')} rows={3} />
+      <div className="rounded-[12px] border border-bg/15 p-4">
+        <h3 className="text-15 font-bold">Fotografía de la categoría</h3>
+        <p className="mt-2 text-13 text-bg/65">Elige una panorámica o foto grupal. Se usa como fondo en Inicio y Células. Conservamos la calidad de la imagen que subas.</p>
+        {form.image_url && <img src={form.image_url} alt="Vista previa de la categoría" className="mt-4 aspect-video w-full rounded-[10px] object-cover" />}
+        <label className="mt-4 block text-13 font-bold" htmlFor="category-photo">{uploading ? 'Subiendo fotografía…' : 'Subir fotografía'}</label>
+        <input id="category-photo" type="file" accept="image/*" onChange={upload} className="mt-2 block w-full text-13 file:mr-3 file:min-h-11 file:rounded-lg file:border-0 file:bg-bg file:px-4 file:font-semibold file:text-white" />
+        <div className="mt-4"><Input label="Enlace de la fotografía" inputMode="url" value={form.image_url} onChange={set('image_url')} helperText="También puedes pegar el enlace de una imagen que ya tengas publicada." /></div>
       </div>
-    </form>
-  );
+      <div className="flex flex-wrap gap-3 border-t border-bg/10 pt-5"><Button type="submit" disabled={!form.name.trim() || saving || uploading}>{saving ? 'Guardando…' : 'Guardar categoría'}</Button><Button type="button" variant="text" onClick={onClose}>Cancelar</Button></div>
+    </fieldset>
+  </form>;
 }
 
 export default function AdminCellCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [editing, setEditing] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-
-  const load = () => {
-    setLoading(true);
-    apiClient.get('/admin/cell-categories')
-      .then(res => setCategories(res.data || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+  const [busy, setBusy] = useState(false);
+  const [updating, setUpdating] = useState(null);
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const response = await apiClient.get('/admin/cell-categories');
+      if (!Array.isArray(response.data)) throw new Error();
+      setCategories(response.data);
+    } catch { setError('No pudimos cargar las categorías.'); }
+    finally { setLoading(false); }
   };
-
   useEffect(() => { load(); }, []);
-
-  const handleToggle = async (cat) => {
+  const toggle = async category => {
+    setUpdating(category.ID);
     try {
-      await apiClient.put(`/admin/cell-categories/${cat.ID}`, { ...cat, is_active: !cat.is_active });
-      toast.success(cat.is_active ? 'Ocultada del sitio' : 'Visible en el sitio');
-      load();
-    } catch { toast.error('Error al actualizar'); }
+      await apiClient.put(`/admin/cell-categories/${category.ID}`, { is_active: !category.is_active });
+      setCategories(rows => rows.map(row => row.ID === category.ID ? { ...row, is_active: !row.is_active } : row));
+      toast.success(category.is_active ? 'Categoría oculta; sus células siguen disponibles en Otros' : 'Categoría publicada');
+    } catch { toast.error('No se pudo cambiar la visibilidad.'); }
+    finally { setUpdating(null); }
   };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar esta categoría? Las células que apuntaban a su type key seguirán visibles en "Otros".')) return;
-    try {
-      await apiClient.delete(`/admin/cell-categories/${id}`);
-      toast.success('Eliminada');
-      load();
-    } catch { toast.error('Error al eliminar'); }
-  };
-
-  const typeKeyLabel = (value) => TYPE_KEY_OPTIONS.find(t => t.value === value)?.label || value;
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Categorías de células</h1>
-            <p className="text-body-m text-bg/50 mt-0.5">
-              Las clasificaciones que se muestran en /celulas y en la vista previa del Home. La foto
-              de cada una se sube aparte, en Fotos del sitio (busca "Categorías de células").
-            </p>
-          </div>
-        </div>
-        <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          {showForm ? 'Cancelar' : 'Nueva categoría'}
-        </Button>
-      </div>
-
-      {showForm && (
-        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
-          <h2 className="text-title-m mb-4">{editing ? 'Editar categoría' : 'Nueva categoría'}</h2>
-          <CategoryForm
-            initialData={editing}
-            onSave={() => { setShowForm(false); setEditing(null); load(); }}
-            onCancel={() => { setShowForm(false); setEditing(null); }}
-          />
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
-        </div>
-      ) : categories.length === 0 ? (
-        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <p className="text-body-l text-bg font-medium">Sin categorías todavía</p>
-        </div>
-      ) : (
-        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
-          {categories.map(cat => (
-            <div key={cat.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${cat.is_active ? '' : 'opacity-60'}`}>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                  <p className="text-title-s text-bg font-medium">{cat.name}</p>
-                  {cat.age_group && <span className="text-label-s text-bg/50 px-2 py-0.5 rounded-full bg-bg/8">{cat.age_group}</span>}
-                  {cat.type_key && <span className="text-label-s text-bg/50 px-2 py-0.5 rounded-full bg-bg/8 font-mono">{typeKeyLabel(cat.type_key)}</span>}
-                </div>
-                {cat.description && <p className="text-body-s text-bg/50">{cat.description}</p>}
-              </div>
-              <div className="flex items-center gap-3 text-13 font-semibold shrink-0 self-end sm:self-center">
-                <button onClick={() => { setEditing(cat); setShowForm(true); }}
-                  className="text-bg/55 hover:text-bg transition-colors">Editar</button>
-                <span className="text-bg/20">·</span>
-                <button onClick={() => handleToggle(cat)} className="text-bg/55 hover:text-bg transition-colors">
-                  {cat.is_active ? 'Ocultar' : 'Mostrar'}
-                </button>
-                <span className="text-bg/20">·</span>
-                <button onClick={() => handleDelete(cat.ID)} className="text-bg/55 hover:text-rose transition-colors">Eliminar</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  const close = () => { if (!busy) setEditing(null); };
+  return <div className="mx-auto max-w-5xl space-y-6">
+    <header className="flex flex-wrap items-start justify-between gap-4"><div className="max-w-2xl"><h1 className="text-28 font-bold tracking-tightish">Categorías y fotos</h1><p className="mt-2 text-15 leading-relaxed text-bg/65">Organiza las células que se muestran en Inicio y Células. Cambia su nombre, descripción, fotografía y orden desde aquí.</p></div><Button onClick={() => setEditing({})} disabled={loading || !!error}>Nueva categoría</Button></header>
+    <CellAdminNav />
+    {loading || error ? <AdminResourceState loading={loading} error={error} onRetry={load} /> : !categories.length ? <AdminResourceState empty="Todavía no hay categorías. Crea una para agrupar tus células." /> : <div className="glass-light overflow-hidden rounded-[16px] divide-y divide-bg/10">
+      {categories.map(category => <article key={category.ID} aria-label={category.name} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+        {category.image_url ? <img src={category.image_url} alt="" loading="lazy" className="aspect-video w-full rounded-[10px] object-cover sm:w-28 sm:shrink-0" /> : <span className="flex h-16 w-28 shrink-0 items-center justify-center rounded-[10px] border border-bg/10 text-12 text-bg/50">Sin fotografía</span>}
+        <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="text-17 font-bold">{category.name}</h2><span className="rounded-md bg-bg/5 px-2 py-1 text-11 font-semibold">{category.is_active ? 'Publicada' : 'Oculta'}</span></div><p className="mt-2 text-13 text-bg/65">{[category.age_group, CELL_TYPES.find(type => type.value === category.type_key)?.label || category.type_key || 'Informativa', `Orden ${category.sort_order || 0}`].filter(Boolean).join(' · ')}</p>{category.description && <p className="mt-1 line-clamp-2 text-13 text-bg/65">{category.description}</p>}</div>
+        <div className="flex flex-wrap gap-2"><Button variant="outlined" onClick={() => setEditing(category)}>Editar</Button><Button variant="text" disabled={updating === category.ID} onClick={() => toggle(category)}>{updating === category.ID ? 'Guardando…' : category.is_active ? 'Ocultar' : 'Mostrar'}</Button></div>
+      </article>)}
+    </div>}
+    {editing && <ModalWrapper wide busy={busy} ariaLabel={editing.ID ? 'Editar categoría' : 'Nueva categoría'} onClose={close}><h2 className="mb-6 text-24 font-bold">{editing.ID ? 'Editar categoría' : 'Nueva categoría'}</h2><CategoryForm key={editing.ID || 'new'} initialData={editing} onBusy={setBusy} onClose={close} onSave={() => { setEditing(null); load(); }} /></ModalWrapper>}
+  </div>;
 }

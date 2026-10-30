@@ -26,7 +26,7 @@ for (const width of [320, 768, 1440]) {
     await isolate(page, {
       '/cell-categories': [1, 2].map(ID => ({ ID, name: `Grupo administrado ${ID}`, description: 'Comunidad publicada por el administrador.', image_url: photo, is_active: true })),
       '/blog/': [{ ID: 10, title: 'Mensaje administrado', slug: 'mensaje-administrado', cover_image: photo }],
-      '/social/feed': [{ ID: 20, platform: 'instagram', caption: 'Encuentro de la comunidad', image_url: photo, post_url: 'https://www.instagram.com/ig.casadelrey/', is_active: true }],
+      '/settings': { social_title: 'Nuestra comunidad en redes', social_intro: 'Presentación administrada', social_instagram_url: 'https://www.instagram.com/ig.casadelrey/', social_instagram_description: 'Descripción administrada' },
     });
     await page.goto('/');
     const cells = page.getByRole('region', { name: 'Células de la comunidad', exact: true });
@@ -37,9 +37,9 @@ for (const width of [320, 768, 1440]) {
     await expect(cells.getByRole('link', { name: 'Conocer las células' })).toHaveAttribute('href', '/celulas?tipo=Grupo%20administrado%202');
     const messages = page.getByRole('region', { name: 'Mensajes de la comunidad', exact: true });
     await expect(messages.getByRole('link', { name: 'Leer mensaje' })).toHaveAttribute('href', '/blog/mensaje-administrado');
-    const social = page.getByRole('region', { name: 'Publicaciones de la comunidad', exact: true });
-    await expect(social.getByText('Encuentro de la comunidad')).toBeVisible();
-    await expect(social.getByRole('link', { name: 'Ver publicación' })).toHaveAttribute('href', 'https://www.instagram.com/ig.casadelrey/');
+    const social = page.getByRole('region', { name: 'Redes de la comunidad', exact: true });
+    await expect(social.getByText('Descripción administrada')).toBeVisible();
+    await expect(social.getByRole('link', { name: /Instagram.*Visitar perfil/ })).toHaveAttribute('href', 'https://www.instagram.com/ig.casadelrey/');
     await expect(social.locator('.liquid-glass img')).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });

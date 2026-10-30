@@ -626,7 +626,7 @@ export default function Home() {
       <CelulasSection />
       <MensajesCarousel />
       <GalleryPreviewSection />
-      <SocialSection title="Lo que está pasando." />
+      <SocialSection />
       <VisitExperience home />
     </main>
   );

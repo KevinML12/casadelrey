@@ -1,48 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ResponsiveContainer, ComposedChart, Area, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip,
-} from 'recharts';
+import { ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import apiClient from '../../lib/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { saludo } from '../../lib/greeting';
 import Button from '../../components/ui/Button';
-import StatCard from '../../components/ui/StatCard';
-
-const METHOD_LABEL = {
-  transferencia: 'Transferencia',
-  presencial:    'En persona',
-  tigo_money:    'Tigo Money', // histórico (método removido)
-};
-
-function SectionLabel({ children }) {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">{children}</p>
-      <div className="flex-1 h-px bg-bg/10 ml-2" />
-    </div>
-  );
-}
-
-// Card contenedora — agrupa un tema (General, Almas ganadas) en UNA pieza
-// grande en vez de una grilla pareja de cajas sueltas. .glass-light (no
-// .glass-nav — esa es la clase del navbar público y NUNCA recibe el brillo
-// al cursor, useGlassSpecular.js solo escucha .liquid-glass/.glass-light).
-function SectionContainer({ label, children }) {
-  return (
-    <div className="glass-light rounded-[32px] card-spring p-6 md:p-7 mb-8">
-      <SectionLabel>{label}</SectionLabel>
-      {children}
-    </div>
-  );
-}
-
-const Spinner = () => (
-  <div className="flex items-center justify-center py-16">
-    <div className="w-6 h-6 rounded-full border-2 border-bg/12 border-t-acento animate-spin" />
-  </div>
-);
+import AdminResourceState from '../../components/ui/AdminResourceState';
 
 const fmtShortDate = (iso) => {
   const d = new Date(iso + 'T12:00:00');
@@ -72,7 +35,7 @@ function TrendChart({ data, loading }) {
   const avgDaily    = data.length ? totalAmount / data.length : 0;
 
   return (
-    <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 lg:col-span-2 min-w-0">
+    <div className="glass-light rounded-[16px] p-6 md:p-7 lg:col-span-2 min-w-0">
       <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Tendencia · últimos 30 días</p>
@@ -123,191 +86,53 @@ function TrendChart({ data, loading }) {
   );
 }
 
-const QUICK_ACTIONS = [
-  { to: '/admin/events',    label: 'Nuevo evento' },
-  { to: '/admin/blog',      label: 'Nuevo post' },
-  { to: '/admin/receipts',  label: 'Comprobantes', badgeKey: 'pending_receipts' },
-  { to: '/admin/petitions', label: 'Peticiones',   badgeKey: 'unread_petitions' },
-];
 
-// Companero del trend chart en el bento del dashboard — el "objeto" visual
-// distinto a una grilla de numeros: accesos directos con badge de pendientes,
-// reusa /admin/notifications/counts que el dashboard ya pedia.
-function QuickActions({ notifs }) {
-  return (
-    <div className="glass-light rounded-[28px] card-spring p-6 md:p-7 flex flex-col">
-      <div className="mb-4">
-        <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Accesos rápidos</p>
-      </div>
-      <div className="flex-1 flex flex-col gap-1">
-        {QUICK_ACTIONS.map(({ to, label, badgeKey }) => {
-          const badge = badgeKey ? (notifs?.[badgeKey] || 0) : 0;
-          return (
-            <Link key={to} to={to}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-bg/6 transition-colors group">
-              <span className="flex-1 text-14 text-bg font-semibold">{label}</span>
-              {badge > 0 && (
-                <span className="min-w-[20px] h-5 rounded-full bg-rose text-white text-11 font-bold flex items-center justify-center px-1.5">
-                  {badge > 99 ? '99+' : badge}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+const SOURCES = {
+  kpis: '/admin/kpis', cells: '/admin/cell-reports/stats',
+  donations: '/admin/donations?status=received&limit=5',
+  counts: '/admin/notifications/counts', trend: '/admin/kpis/trend?days=30',
+};
+const PENDING = [
+  ['pending_receipts', 'Comprobantes por revisar', '/admin/receipts'],
+  ['pending_reports', 'Reportes de células pendientes', '/admin/cell-reports'],
+  ['unread_petitions', 'Peticiones sin leer', '/admin/petitions'],
+  ['pending_volunteers', 'Solicitudes de voluntariado', '/admin/volunteers'],
+  ['pending_connect_cards', 'Personas por contactar', '/admin/connect-cards'],
+];
+const amount = value => new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(value || 0);
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [kpis,      setKpis]      = useState(null);
-  const [cellStats, setCellStats] = useState(null);
-  const [donations, setDonations] = useState([]);
-  const [notifs,    setNotifs]    = useState(null);
-  const [trend,     setTrend]     = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [trendLoading, setTrendLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      apiClient.get('/admin/kpis').then(r => setKpis(r.data)),
-      apiClient.get('/admin/donations').then(r => setDonations(r.data?.data || r.data || [])),
-      apiClient.get('/admin/cell-reports/stats').then(r => setCellStats(r.data)).catch(() => {}),
-      apiClient.get('/admin/notifications/counts').then(r => setNotifs(r.data)).catch(() => {}),
-    ]).catch(console.error).finally(() => setLoading(false));
-
-    apiClient.get('/admin/kpis/trend?days=30')
-      .then(r => setTrend(r.data || []))
-      .catch(() => setTrend([]))
-      .finally(() => setTrendLoading(false));
-  }, []);
-
-  return (
-    <div className="p-6 max-w-5xl mx-auto">
-
-      {/* Saludo personalizado */}
-      <div className="mb-8">
-        <p className="text-14 text-bg/45 capitalize">
-          {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
-        </p>
-        <h1 className="text-26 text-bg font-black leading-tight mt-0.5">
-          {saludo()}, {(user?.name || 'bienvenido').split(' ')[0]}
-        </h1>
-        <p className="text-14 text-bg/45 mt-1">Este es el resumen de la iglesia hoy.</p>
+  const [data, setData] = useState({});
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [showTrend, setShowTrend] = useState(false);
+  const load = async () => {
+    setLoading(true);
+    const entries = Object.entries(SOURCES);
+    const results = await Promise.allSettled(entries.map(([, path]) => apiClient.get(path)));
+    setData(Object.fromEntries(entries.flatMap(([key], index) => results[index].status === 'fulfilled' ? [[key, results[index].value.data]] : [])));
+    setErrors(Object.fromEntries(entries.filter((_, i) => results[i].status === 'rejected').map(([key]) => [key, true])));
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+  const donations = data.donations?.data || data.donations || [];
+  const pending = PENDING.filter(([key]) => data.counts?.[key] > 0);
+  const metrics = [
+    ['Usuarios', data.kpis?.total_users], ['Donaciones recibidas', data.kpis?.total_donations],
+    ['Total recibido', data.kpis ? amount(data.kpis.total_revenue) : null], ['Peticiones', data.kpis?.total_petitions],
+  ];
+  return <div className="mx-auto max-w-6xl space-y-6">
+    <header><p className="text-13 capitalize text-bg/55">{new Date().toLocaleDateString('es-GT', { timeZone: 'America/Guatemala', weekday: 'long', day: 'numeric', month: 'long' })}</p><h1 className="mt-1 text-28 font-bold tracking-tightish">{saludo()}, {(user?.name || 'bienvenido').split(' ')[0]}</h1><p className="mt-2 text-15 text-bg/65">Tu comunidad, sus novedades y lo que necesita atención.</p></header>
+    {loading ? <AdminResourceState loading /> : <>
+      {!!Object.keys(errors).length && <AdminResourceState error="Algunos datos no están disponibles. Los valores que faltan aparecen como —." onRetry={load} />}
+      <section aria-label="Actividad de la iglesia" className="glass-light grid grid-cols-2 divide-x divide-bg/10 rounded-[16px] lg:grid-cols-4">{metrics.map(([label, value]) => <div key={label} className="p-4 sm:p-6"><p className="text-12 text-bg/60">{label}</p><p className="mt-2 text-24 font-bold">{value ?? '—'}</p></div>)}</section>
+      <div className="grid gap-5 xl:grid-cols-[1.25fr_1fr]">
+        <section className="glass-light rounded-[16px] p-5 sm:p-6"><h2 className="text-18 font-bold">Por atender</h2>{errors.counts ? <p className="mt-4 text-14 text-bg/60">No se pudieron consultar los pendientes.</p> : pending.length ? <div className="mt-4 divide-y divide-bg/10">{pending.map(([key, label, to]) => <Link key={key} to={to} className="focus-ring flex min-h-14 items-center justify-between gap-4 rounded-lg px-2 py-3 text-14 font-semibold hover:bg-white/60"><span>{label}</span><span className="rounded-md bg-bg px-2 py-1 text-12 text-white">{data.counts[key]}</span></Link>)}</div> : <p className="mt-4 text-14 text-bg/60">No hay pendientes de revisión en este momento.</p>}</section>
+        <section className="glass-light rounded-[16px] p-5 sm:p-6"><h2 className="text-18 font-bold">Administrar contenido</h2><p className="mt-2 text-14 text-bg/60">Accede a las tareas habituales.</p><div className="mt-5 grid gap-2 sm:grid-cols-2">{[['/admin/cells', 'Células y reuniones'], ['/admin/cell-categories', 'Categorías y fotos'], ['/admin/events', 'Eventos'], ['/admin/social', 'Redes de la iglesia']].map(([to, label]) => <Button key={to} as="link" to={to} variant="outlined" className="!whitespace-normal text-left">{label}</Button>)}</div></section>
       </div>
-
-      {/* Alertas pendientes */}
-      {!loading && notifs && (notifs.pending_cell_reports > 0 || notifs.unread_petitions > 0 || notifs.pending_volunteers > 0) && (
-        <div className="mb-8 glass-light rounded-[24px] p-4 flex flex-wrap gap-4 items-center border border-rose/30">
-          <div className="flex-1 flex flex-wrap gap-4">
-            {notifs.pending_cell_reports > 0 && (
-              <span className="text-14 text-bg/75 font-medium">
-                <strong className="text-bg">{notifs.pending_cell_reports}</strong> reporte{notifs.pending_cell_reports !== 1 ? 's' : ''} de células pendiente{notifs.pending_cell_reports !== 1 ? 's' : ''}
-              </span>
-            )}
-            {notifs.unread_petitions > 0 && (
-              <span className="text-14 text-bg/75 font-medium">
-                <strong className="text-bg">{notifs.unread_petitions}</strong> petición{notifs.unread_petitions !== 1 ? 'es' : ''} sin leer
-              </span>
-            )}
-            {notifs.pending_volunteers > 0 && (
-              <span className="text-14 text-bg/75 font-medium">
-                <strong className="text-bg">{notifs.pending_volunteers}</strong> voluntario{notifs.pending_volunteers !== 1 ? 's' : ''} pendiente{notifs.pending_volunteers !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Bento: trend chart + accesos rapidos */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <TrendChart data={trend} loading={trendLoading} />
-        <QuickActions notifs={notifs} />
-      </div>
-
-      {/* General KPIs — agrupados en UNA card contenedora grande, las
-          StatCard blancas flotan encima */}
-      <SectionContainer label="General">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatCard nested icon="person"           label="Usuarios"        tint="pri"
-            value={loading ? '…' : kpis?.total_users ?? 0} />
-          <StatCard nested icon="favorite"         label="Donaciones"      tint="err"
-            value={loading ? '…' : kpis?.total_donations ?? 0} />
-          <StatCard nested icon="volunteer_activism" label="Peticiones"    tint="ter"
-            value={loading ? '…' : kpis?.total_petitions ?? 0} />
-          <StatCard nested icon="payments"         label="Recaudado"       tint="sec"
-            value={loading ? '…' : kpis?.total_revenue != null ? `Q${Number(kpis.total_revenue).toFixed(0)}` : 'Q0'} />
-          <StatCard nested icon="visibility"       label="Vistas blog"     tint="pri"
-            value={loading ? '…' : kpis?.total_blog_views ?? 0} />
-          <StatCard nested icon="groups"           label="Rept. células"   tint="ter"
-            value={loading ? '…' : kpis?.total_cell_reports ?? 0} />
-        </div>
-      </SectionContainer>
-
-      {/* Cell KPIs */}
-      <SectionContainer label="Almas ganadas">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard nested icon="person_add"       label="Convertidos"     tint="ter"
-            value={loading ? '…' : cellStats?.total_converts ?? 0}
-            sub="Este período" />
-          <StatCard nested icon="favorite_border"  label="Reconciliados"   tint="sec"
-            value={loading ? '…' : cellStats?.total_reconciled ?? 0}
-            sub="Este período" />
-          <StatCard nested icon="savings"          label="Ofrenda células" tint="pri"
-            value={loading ? '…' : cellStats?.total_offering != null ? `Q${Number(cellStats.total_offering).toFixed(0)}` : 'Q0'}
-            sub="Total acumulado" />
-        </div>
-      </SectionContainer>
-
-      {/* Últimas donaciones */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <p className="text-13 text-bg/45 font-semibold uppercase tracking-widest">Últimas donaciones</p>
-        </div>
-        <Link to="/admin/donations">
-          <Button variant="tonal" size="sm">
-            Ver todas
-          </Button>
-        </Link>
-      </div>
-      <div className="glass-light rounded-[24px] card-spring overflow-hidden">
-        {loading ? <Spinner /> : donations.length === 0 ? (
-          <div className="flex flex-col items-center py-16 text-bg/45 gap-3">
-            <p className="text-14">No hay donaciones registradas.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-bg/10">
-                  {['#', 'Nombre', 'Destino', 'Monto', 'Método', 'Fecha'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 text-11 text-bg/45 uppercase tracking-widest">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-bg/8">
-                {donations.slice(0, 15).map(d => (
-                  <tr key={d.ID} className="hover:bg-bg/4 transition-colors">
-                    <td className="px-5 py-3.5 text-12 text-bg/40 font-mono">{d.ID}</td>
-                    <td className="px-5 py-3.5 text-14 text-bg font-medium">{d.name}</td>
-                    <td className="px-5 py-3.5 text-14 text-bg/55 capitalize">{d.donation_purpose || '—'}</td>
-                    <td className="px-5 py-3.5 text-14 text-bg font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
-                    <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-bg/6 text-bg/60 text-12 font-medium">
-                        {METHOD_LABEL[d.payment_method] || d.payment_method || '—'}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-14 text-bg/50 whitespace-nowrap">
-                      {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+      <section className="glass-light rounded-[16px] p-5 sm:p-6"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-18 font-bold">Últimas donaciones recibidas</h2><Button as="link" to="/admin/donations" variant="text">Ver todas</Button></div>{errors.donations ? <p className="mt-4 text-14 text-bg/60">No se pudieron consultar las donaciones.</p> : !donations.length ? <p className="mt-4 text-14 text-bg/60">Todavía no hay donaciones recibidas.</p> : <div className="mt-4 divide-y divide-bg/10">{donations.slice(0, 5).map(row => <div key={row.ID} className="flex flex-wrap justify-between gap-3 py-4"><div><p className="text-14 font-semibold">{row.name}</p><p className="mt-1 text-12 text-bg/60">{row.donation_purpose || 'Donación'} · {row.CreatedAt ? new Date(row.CreatedAt).toLocaleDateString('es-GT', { timeZone: 'America/Guatemala' }) : 'Fecha no disponible'}</p></div><p className="text-15 font-bold">{row.currency === 'GTQ' ? amount(row.amount) : `${row.currency} ${Number(row.amount).toFixed(2)}`}</p></div>)}</div>}</section>
+      <details onToggle={event => setShowTrend(event.currentTarget.open)} className="glass-light rounded-[16px] p-5 sm:p-6"><summary className="focus-ring cursor-pointer rounded-lg py-2 text-16 font-bold">Más actividad y tendencia</summary><div className="mt-5 space-y-5"><div className="grid gap-5 sm:grid-cols-3">{[['Convertidos', data.cells?.total_converts], ['Reconciliados', data.cells?.total_reconciled], ['Ofrenda acumulada de células', data.cells ? amount(data.cells.total_offering) : null]].map(([label, value]) => <div key={label}><p className="text-13 text-bg/60">{label}</p><p className="mt-2 text-24 font-bold">{value ?? '—'}</p></div>)}</div>{showTrend && !errors.trend && <TrendChart data={data.trend || []} loading={false} />}</div></details>
+    </>}
+  </div>;
 }

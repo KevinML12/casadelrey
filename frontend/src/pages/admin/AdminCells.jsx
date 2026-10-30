@@ -1,21 +1,19 @@
-// ============================================================
-//  AdminCells — CRUD de células individuales (H1, M2, J3...). Antes
-//  no existía forma de editarlas sin tocar código del frontend: vivían
-//  hardcodeadas como fallback en CelulasPage.jsx. Esto es lo que las
-//  hace de verdad administrables, con descripción propia por célula.
-// ============================================================
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import Input, { Select, Textarea } from '../../components/ui/Input';
+import ModalWrapper from '../../components/ui/ModalWrapper';
+import AdminResourceState from '../../components/ui/AdminResourceState';
+import CellAdminNav from '../../components/ui/CellAdminNav';
 import { CELL_TYPES } from '../../components/ui/CellCodePicker';
 
-const EMPTY = { code: '', name: '', type: '', description: '', leader_id: '', zone: '', day: '', time: '', what_to_expect: '' };
+const EMPTY = { code: '', name: '', type: '', description: '', leader_id: '', zone: '', day: '', time: '', what_to_expect: '', address: '', map_url: '' };
 
-function CellForm({ onSave, onCancel, initialData, leaders }) {
-  const [form, setForm] = useState(initialData || EMPTY);
+function CellForm({ onSave, onCancel, initialData, leaders, onBusy }) {
+  const [form, setForm] = useState({ ...EMPTY, ...initialData });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
   const handleSubmit = async (e) => {
@@ -24,7 +22,7 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
       toast.error('Código, nombre, tipo y líder son obligatorios');
       return;
     }
-    setLoading(true);
+    setLoading(true); onBusy(true); setError('');
     try {
       const payload = { ...form, leader_id: Number(form.leader_id) };
       if (form.ID) {
@@ -36,14 +34,17 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
       }
       onSave();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Error al guardar');
-    } finally { setLoading(false); }
+      setError(err.response?.data?.error || 'No se pudo guardar. Tus cambios siguen en el formulario.');
+    } finally { setLoading(false); onBusy(false); }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {error && <p role="alert" className="rounded-xl bg-rose/10 p-3 text-14 text-bg">{error}</p>}
+      <fieldset disabled={loading} className="space-y-5">
+      <h3 className="text-15 font-bold">Identificación y responsable</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input label="Código *" value={form.code} onChange={set('code')} placeholder="Ej. H1" required />
+        <Input label="Código *" value={form.code} onChange={set('code')} placeholder="Ej. H1" helperText="Conserva el código existente; los nuevos usan H, M, J, P o N y un número." required />
         <Input label="Nombre *" value={form.name} onChange={set('name')} placeholder="Ej. Guerreros del Rey" required />
         <Select
           label="Tipo *"
@@ -80,6 +81,8 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
         <Input label="Hora" value={form.time || ''} onChange={set('time')} placeholder="Ej. 7:00 PM" />
       </div>
 
+      <h3 className="text-15 font-bold">Ubicación y reunión</h3>
+      <p className="text-13 text-bg/60">La zona, dirección y mapa que guardes se muestran en la información pública de esta célula.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Textarea
           label="Dirección exacta"
@@ -117,122 +120,85 @@ function CellForm({ onSave, onCancel, initialData, leaders }) {
         <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
           {loading ? 'Guardando…' : (form.ID ? 'Actualizar' : 'Crear célula')}
         </Button>
-        <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
+        <Button type="button" variant="text" onClick={onCancel} disabled={loading}>Cancelar</Button>
       </div>
+      </fieldset>
     </form>
   );
 }
 
+const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 export default function AdminCells() {
-  const [cells,   setCells]   = useState([]);
+  const [cells, setCells] = useState([]);
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [editing, setEditing] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-
-  const load = () => {
-    setLoading(true);
-    Promise.all([
-      apiClient.get('/admin/cells'),
-      apiClient.get('/admin/leaders'),
-    ]).then(([cellsRes, leadersRes]) => {
-      setCells(cellsRes.data || []);
-      const assigned = (cellsRes.data || []).filter(cell => cell.leader?.name).map(cell => ({ id: cell.leader_id, name: cell.leader.name }));
-      const choices = [...(leadersRes.data || []).map(leader => ({ ...leader, id: leader.id || leader.ID })), ...assigned];
+  const [busy, setBusy] = useState(false);
+  const [updating, setUpdating] = useState(null);
+  const [search, setSearch] = useState('');
+  const [type, setType] = useState('');
+  const [visibility, setVisibility] = useState('');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const [cellRes, leaderRes] = await Promise.all([apiClient.get('/admin/cells'), apiClient.get('/admin/leaders')]);
+      if (!Array.isArray(cellRes.data) || !Array.isArray(leaderRes.data)) throw new Error();
+      setCells(cellRes.data);
+      const assigned = cellRes.data.filter(cell => cell.leader?.name).map(cell => ({ id: cell.leader_id, name: cell.leader.name }));
+      const choices = [...leaderRes.data.map(leader => ({ ...leader, id: leader.id || leader.ID })), ...assigned];
       setLeaders([...new Map(choices.map(leader => [leader.id, leader])).values()]);
-    }).catch(console.error).finally(() => setLoading(false));
+    } catch { setError('No pudimos cargar las células y sus responsables.'); }
+    finally { setLoading(false); }
   };
-
   useEffect(() => { load(); }, []);
-
-  const handleToggle = async (cell) => {
+  const toggle = async cell => {
+    setUpdating(cell.ID);
     try {
-      await apiClient.put(`/admin/cells/${cell.ID}`, { ...cell, leader_id: cell.leader_id, is_active: !cell.is_active });
-      toast.success(cell.is_active ? 'Ocultada del sitio' : 'Visible en el sitio');
-      load();
-    } catch { toast.error('Error al actualizar'); }
+      await apiClient.put(`/admin/cells/${cell.ID}`, { ...cell, is_active: !cell.is_active });
+      setCells(rows => rows.map(row => row.ID === cell.ID ? { ...row, is_active: !cell.is_active } : row));
+      toast.success(cell.is_active ? 'Célula oculta' : 'Célula publicada');
+    } catch { toast.error('No se pudo cambiar la visibilidad. Inténtalo de nuevo.'); }
+    finally { setUpdating(null); }
   };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar esta célula?')) return;
-    try {
-      await apiClient.delete(`/admin/cells/${id}`);
-      toast.success('Eliminada');
-      load();
-    } catch { toast.error('Error al eliminar'); }
-  };
-
-  const typeLabel = (value) => CELL_TYPES.find(t => t.value === value)?.label || value;
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Células</h1>
-            <p className="text-body-m text-bg/50 mt-0.5">
-              Cada célula individual (código, líder, descripción) que se muestra en la
-              página pública de Células al abrir un tipo.
-            </p>
-          </div>
+  const filtered = cells.filter(cell => (!type || cell.type === type) && (!visibility || (cell.is_active ? 'visible' : 'hidden') === visibility) && normalize([cell.name, cell.code, cell.zone, cell.leader?.name].join(' ')).includes(normalize(search)));
+  const types = [...CELL_TYPES, ...[...new Set(cells.map(cell => cell.type))].filter(value => value && !CELL_TYPES.some(item => item.value === value)).map(value => ({ value, label: value }))];
+  const close = () => { if (!busy) setEditing(null); };
+  return <div className="mx-auto max-w-5xl space-y-6">
+    <header className="flex flex-wrap items-start justify-between gap-4">
+      <div className="max-w-2xl"><h1 className="text-28 font-bold tracking-tightish">Células</h1><p className="mt-2 text-15 leading-relaxed text-bg/65">Edita grupos, líderes y horarios. Cambia las fotografías en Categorías y fotos.</p></div>
+      <Button onClick={() => setEditing({})} disabled={loading || !!error}>Nueva célula</Button>
+    </header>
+    <CellAdminNav />
+    {loading || error ? <AdminResourceState loading={loading} error={error} onRetry={load} /> : <>
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-14 text-bg/65"><p><strong className="text-bg">{cells.length}</strong> células</p><p><strong className="text-bg">{cells.filter(cell => cell.is_active).length}</strong> publicadas</p><p><strong className="text-bg">{cells.filter(cell => !cell.is_active).length}</strong> ocultas</p></div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+        <div className="flex min-w-0 flex-1 items-end gap-2">
+        <Input label="Buscar células" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Nombre, código, zona o líder" />
+        <Button variant="outlined" className="sm:hidden" aria-expanded={filtersOpen} aria-controls="cell-filters" onClick={() => setFiltersOpen(value => !value)}>Filtrar{type || visibility ? ' ·' : ''}</Button></div>
+        <div id="cell-filters" className={`${filtersOpen ? 'grid' : 'hidden'} min-w-0 gap-4 sm:grid sm:grid-cols-2 lg:w-[45%]`}>
+        <Select label="Tipo de célula" value={type} onChange={event => setType(event.target.value)} options={types} placeholder="Todos los tipos" />
+        <Select label="Visibilidad" value={visibility} onChange={event => setVisibility(event.target.value)} options={[{ value: 'visible', label: 'Publicadas' }, { value: 'hidden', label: 'Ocultas' }]} placeholder="Todas" />
         </div>
-        <Button variant="filled" onClick={() => { setEditing(null); setShowForm(!showForm); }}>
-          {showForm ? 'Cancelar' : 'Nueva célula'}
-        </Button>
       </div>
-
-      {showForm && (
-        <div className="glass-light rounded-[24px] card-spring p-4 sm:p-6">
-          <h2 className="text-title-m mb-4">{editing ? 'Editar célula' : 'Nueva célula'}</h2>
-          <CellForm
-            initialData={editing}
-            leaders={leaders}
-            onSave={() => { setShowForm(false); setEditing(null); load(); }}
-            onCancel={() => { setShowForm(false); setEditing(null); }}
-          />
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
-        </div>
-      ) : cells.length === 0 ? (
-        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-16 gap-4">
-          <p className="text-body-l text-bg font-medium">Sin células todavía</p>
-        </div>
-      ) : (
-        <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
-          {cells.map(cell => (
-            <div key={cell.ID} className={`p-4 flex flex-col sm:flex-row gap-4 sm:items-center hover:bg-bg/6 transition-colors ${cell.is_active ? '' : 'opacity-60'}`}>
-              <div className="w-11 h-11 rounded-xl bg-bg text-white flex items-center justify-center shrink-0 font-mono font-bold text-13">
-                {cell.code}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                  <p className="text-title-s text-bg font-medium">{cell.name}</p>
-                  <span className="text-label-s text-bg/50 px-2 py-0.5 rounded-full bg-bg/8">{typeLabel(cell.type)}</span>
-                  {cell.zone && <span className="text-label-s text-bg/50 px-2 py-0.5 rounded-full bg-bg/8">{cell.zone}</span>}
-                </div>
-                <p className="text-body-s text-bg/50">Líder: {cell.leader?.name || '—'}</p>
-                {cell.description && (
-                  <p className="text-label-s text-bg/45 mt-1 line-clamp-2">{cell.description}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-3 text-13 font-semibold shrink-0 self-end sm:self-center">
-                <button onClick={() => { setEditing({ ...cell, leader_id: cell.leader_id }); setShowForm(true); }}
-                  className="text-bg/55 hover:text-bg transition-colors">Editar</button>
-                <span className="text-bg/20">·</span>
-                <button onClick={() => handleToggle(cell)} className="text-bg/55 hover:text-bg transition-colors">
-                  {cell.is_active ? 'Ocultar' : 'Mostrar'}
-                </button>
-                <span className="text-bg/20">·</span>
-                <button onClick={() => handleDelete(cell.ID)} className="text-bg/55 hover:text-rose transition-colors">Eliminar</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+      <p role="status" className="text-13 text-bg/60">{filtered.length} de {cells.length} células</p>
+      {!filtered.length ? <AdminResourceState empty={cells.length ? 'No hay células con esos filtros.' : 'Todavía no hay células. Crea la primera para publicarla.'} /> : <div className="glass-light overflow-hidden rounded-[16px] divide-y divide-bg/10">
+        {filtered.map(cell => <article key={cell.ID} aria-label={cell.name} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2"><span className="rounded-md bg-bg/5 px-2 py-1 font-mono text-12 font-bold">{cell.code}</span><h2 className="text-17 font-bold">{cell.name}</h2><span className={`rounded-md px-2 py-1 text-11 font-semibold ${cell.is_active ? 'bg-bg text-white' : 'bg-bg/5 text-bg/60'}`}>{cell.is_active ? 'Publicada' : 'Oculta'}</span></div>
+            <p className="mt-2 text-13 text-bg/65">{types.find(item => item.value === cell.type)?.label || cell.type} · {cell.leader?.name || 'Sin responsable'}{cell.zone ? ` · ${cell.zone}` : ''}</p>
+            <p className="mt-1 text-13 text-bg/65">{[cell.day, cell.time].filter(Boolean).join(' · ') || 'Horario pendiente de definir'}</p>
+          </div>
+          <div className="flex flex-wrap gap-2"><Button variant="outlined" onClick={() => setEditing(cell)}>Editar</Button><Button variant="text" onClick={() => toggle(cell)} disabled={updating === cell.ID}>{updating === cell.ID ? 'Guardando…' : cell.is_active ? 'Ocultar' : 'Mostrar'}</Button></div>
+        </article>)}
+      </div>}
+    </>}
+    {editing && <ModalWrapper wide busy={busy} ariaLabel={editing.ID ? 'Editar célula' : 'Nueva célula'} onClose={close}>
+      <h2 className="mb-6 text-24 font-bold">{editing.ID ? 'Editar célula' : 'Nueva célula'}</h2>
+      {!leaders.length && <p className="mb-5 text-14 text-bg/65">Para publicar una célula necesitas asignar un usuario con rol de líder desde Usuarios.</p>}
+      <CellForm key={editing.ID || 'new'} initialData={editing} leaders={leaders} onBusy={setBusy} onCancel={close} onSave={() => { setEditing(null); load(); }} />
+    </ModalWrapper>}
+  </div>;
 }
