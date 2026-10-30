@@ -24,3 +24,14 @@ Entrega del 30 de octubre de 2026.
 ## Alcance de la entrega
 
 Esta entrega mejora administración y contenido editable. No sustituye los pendientes operativos documentados para producción: autenticación del remitente con dominio propio, revisión de comprobantes históricos, restauración de copias, capacidad de alojamiento y aceptación con responsables reales.
+
+## Publicación verificada
+
+- Backend en Render: `e806bcb`, despliegue `dep-dbif2kmi0phs7399qtg0`, Live.
+- Frontend en Vercel y Render: `58b0c82`; Render `dep-dbif46vb9u1s73bn8ir0`, Live. Vercel sirve la misma hoja de estilos compilada y las pantallas nuevas verificadas.
+- Seis pruebas adicionales de lectura en sitios publicados: tres en Vercel y tres en Render. Incluyen todas las rutas públicas en móvil/escritorio, todos los módulos de administración y la denegación del panel a un miembro.
+- Comprobación específica en ambos sitios: cuatro perfiles públicos, ausencia de solicitudes al feed antiguo, textos editables cargados desde el backend, filtros móviles y cero desbordamientos/errores de ejecución.
+- Persistencia real autenticada comprobada en la descripción de YouTube, sin publicar un perfil nuevo. El valor original fue restaurado y leído de nuevo.
+- Backend local restablecido con una sola conexión; `/health` responde correctamente.
+
+Resultados: [Vercel](admin-vercel-live.txt) y [Render](admin-render-live.txt).

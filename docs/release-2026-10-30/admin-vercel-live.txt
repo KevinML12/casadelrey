@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:42458) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/release-live.spec.js:26:3 › live public modules render without runtime errors at 390px (6.6s)
+  ✓  2 [chromium] › e2e/release-live.spec.js:26:3 › live public modules render without runtime errors at 1440px (6.1s)
+  ✓  3 [chromium] › e2e/release-live.spec.js:41:1 › live administrator can open every module and member cannot enter administration (1.2m)
+
+  3 passed (1.4m)
