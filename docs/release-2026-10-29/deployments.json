@@ -3,8 +3,9 @@
   "application_commit": "b4ca64ffac33479b10043ce45d8642ce5e44b5eb",
   "vercel": {
     "state": "READY",
-    "deployment_id": "dpl_ENCpm6XxgeQvKUfgbHMQVzjbgbqJ",
-    "url": "https://casadelreyhue.vercel.app"
+    "deployment_id": "dpl_3vJQTRLzAqKNS8pfu6k1M1rdX3yT",
+    "url": "https://casadelreyhue.vercel.app",
+    "commit": "eab7510a3b0e2ff53646750fe5b4e6be45daaef2"
   },
   "render_frontend": {
     "state": "Live",
@@ -12,12 +13,16 @@
     "url": "https://casadelrey-web-pruebas.onrender.com"
   },
   "render_backend": {
-    "live_commit": "c8da35789519021bcb01d02b7526a45791b9a50c",
-    "attempt_commit": "b4ca64ffac33479b10043ce45d8642ce5e44b5eb",
-    "attempt_deployment_id": "dep-dbhk9rqfngtc73bsqfag",
-    "attempt_status": "failed",
-    "cause": "SQLSTATE 53300: too many connections for role cdr_render_qa",
-    "retry_status": "pending manual macOS unlock for Safari",
-    "url": "https://casadelrey-api-pruebas.onrender.com"
+    "state": "Live",
+    "commit": "eab7510a3b0e2ff53646750fe5b4e6be45daaef2",
+    "application_commit": "b4ca64ffac33479b10043ce45d8642ce5e44b5eb",
+    "deployment_id": "dep-dbhueduc6qcc73f0fgt0",
+    "url": "https://casadelrey-api-pruebas.onrender.com",
+    "previous_attempt": {
+      "deployment_id": "dep-dbhk9rqfngtc73bsqfag",
+      "status": "failed",
+      "cause": "SQLSTATE 53300: too many connections for role cdr_render_qa"
+    },
+    "resolution": "Release the local connection and retry after manual macOS unlock; role connection limit and permissions unchanged"
   }
 }

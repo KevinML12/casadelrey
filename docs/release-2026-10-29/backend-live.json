@@ -1,0 +1,11 @@
+{
+  "backend": "https://casadelrey-api-pruebas.onrender.com",
+  "public_podcast_setting": true,
+  "admin_photo_slots": [
+    "about_fundadores",
+    "about_pastores",
+    "about_visitanos",
+    "about_podcast"
+  ],
+  "admin_podcast_setting": true
+}
