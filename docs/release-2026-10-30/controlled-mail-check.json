@@ -1,0 +1,20 @@
+{
+  "attempts": 1,
+  "checked_at": "2026-10-30T17:50:27.619544Z",
+  "error_code": "",
+  "provider_id": "<202610301750.91733918110@smtp-relay.mailin.fr>",
+  "status": "accepted",
+  "provider_events": [
+    {
+      "event": "delivered",
+      "date": "2026-10-30T11:50:29.000-06:00",
+      "reason": ""
+    },
+    {
+      "event": "requests",
+      "date": "2026-10-30T11:50:27.666-06:00",
+      "reason": ""
+    }
+  ],
+  "mailbox_observation": "Outlook: correo no deseado"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "kind": "service_check",
+    "status": "accepted",
+    "attempts": 1,
+    "last_error": "",
+    "provider_id": "<202610301800.40712150219@smtp-relay.mailin.fr>",
+    "created_at": "2026-10-30T18:00:28.486924Z",
+    "accepted_at": "2026-10-30T18:00:36.651055Z",
+    "provider_events": [
+      {
+        "event": "delivered",
+        "date": "2026-10-30T12:00:39.000-06:00"
+      },
+      {
+        "event": "requests",
+        "date": "2026-10-30T12:00:36.686-06:00"
+      }
+    ]
+  }
+]

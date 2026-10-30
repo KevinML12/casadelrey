@@ -1,0 +1,55 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/BankDetails.jsx
+  11:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/CellReportsPage.jsx
+  61:35  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/CellCodePicker.jsx
+  16:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  29:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  37:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/context/AuthContext.jsx
+  99:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/context/SiteConfigContext.jsx
+  15:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useNotificationCounts.js
+  19:6  warning  React Hook useEffect has missing dependencies: 'fetchCounts' and 'intervalMs'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/main.jsx
+  51:10  warning  Fast refresh only works when a file has exports. Move your component(s) to a separate file  react-refresh/only-export-components
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminActivityLog.jsx
+  43:45  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  44:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminAnnouncements.jsx
+  106:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminBoletas.jsx
+  139:35  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminConnectCards.jsx
+  37:35  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminGallery.jsx
+  78:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminReceipts.jsx
+  199:32  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/LeaderDashboard.jsx
+  25:6  warning  React Hook useEffect has a missing dependency: 'isAdmin'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/Home.jsx
+  200:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+✖ 18 problems (0 errors, 18 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.

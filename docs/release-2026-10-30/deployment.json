@@ -1,0 +1,19 @@
+{
+  "backend": {
+    "commit": "3e5ffe2608a411566a4b21a63605d2a7a84ffc78",
+    "deployment": "dep-dbidiiutlv9c73crphcg",
+    "status": "live",
+    "url": "https://casadelrey-api-pruebas.onrender.com"
+  },
+  "render_frontend": {
+    "commit": "6af9cf8debba87ace9a0d923ce9bef946ce2b00f",
+    "deployment": "dep-dbidngec6qcc73a7akug",
+    "status": "live",
+    "url": "https://casadelrey-web-pruebas.onrender.com"
+  },
+  "vercel": {
+    "deployment": "dpl_AmAVhnwKYh5Y3wpxemGWnRNJQbfC",
+    "status": "ready",
+    "url": "https://casadelreyhue.vercel.app"
+  }
+}

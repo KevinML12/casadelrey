@@ -1,0 +1,82 @@
+[
+  {
+    "name": "donate",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "name": "receipt",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "name": "emails",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "name": "review",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "name": "donate",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "receipt",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "emails",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "review",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "donate",
+    "width": 768,
+    "overflow": false
+  },
+  {
+    "name": "receipt",
+    "width": 768,
+    "overflow": false
+  },
+  {
+    "name": "emails",
+    "width": 768,
+    "overflow": false
+  },
+  {
+    "name": "review",
+    "width": 768,
+    "overflow": false
+  },
+  {
+    "name": "donate",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "name": "receipt",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "name": "emails",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "name": "review",
+    "width": 1440,
+    "overflow": false
+  }
+]

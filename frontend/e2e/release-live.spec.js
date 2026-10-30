@@ -9,7 +9,7 @@ test.skip(!enabled, 'Explicit QA release verification only');
 test.use({ trace: 'off', video: 'off', screenshot: 'off' });
 const publicRoutes = ['/', '/about', '/celulas', '/volunteering', '/events', '/gallery', '/blog', '/conectate', '/prayer', '/donate', '/comprobante', '/login', '/register', '/forgot-password', '/verify-email', '/reset-password', '/payment-success', '/no-existe'];
 const leaderRoutes = ['', 'reports', 'boletas', 'volunteers', 'cell-directory', 'connect-cards', 'events', 'my-cell', 'my-directory', 'profile'];
-const adminRoutes = ['', 'users', 'blog', 'events', 'petitions', 'volunteers', 'cell-reports', 'boletas', 'social', 'announcements', 'gallery', 'faqs', 'leaders', 'cells', 'cell-categories', 'volunteer-areas', 'donation-purposes', 'activity-log', 'receipts', 'donations', 'hero', 'site-photos', 'settings', 'connect-cards', 'profile'];
+const adminRoutes = ['', 'users', 'blog', 'events', 'petitions', 'volunteers', 'cell-reports', 'boletas', 'social', 'announcements', 'gallery', 'faqs', 'leaders', 'cells', 'cell-categories', 'volunteer-areas', 'donation-purposes', 'activity-log', 'receipts', 'donations', 'emails', 'hero', 'site-photos', 'settings', 'connect-cards', 'profile'];
 async function login(page, role = 'admin') {
   const user = accounts.find(account => account.role === role);
   if (!user) throw new Error(`Missing QA account role: ${role}`);

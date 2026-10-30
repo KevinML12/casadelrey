@@ -1,0 +1,62 @@
+[
+  {
+    "name": "verified",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "rejected",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "registration",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "verification",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "reset",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "cancellation",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "verified",
+    "width": 640,
+    "overflow": false
+  },
+  {
+    "name": "rejected",
+    "width": 640,
+    "overflow": false
+  },
+  {
+    "name": "registration",
+    "width": 640,
+    "overflow": false
+  },
+  {
+    "name": "verification",
+    "width": 640,
+    "overflow": false
+  },
+  {
+    "name": "reset",
+    "width": 640,
+    "overflow": false
+  },
+  {
+    "name": "cancellation",
+    "width": 640,
+    "overflow": false
+  }
+]

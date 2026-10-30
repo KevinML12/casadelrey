@@ -1,0 +1,4 @@
+=== RUN   TestDonationConcurrentPostgres
+--- PASS: TestDonationConcurrentPostgres (0.10s)
+PASS
+ok  	casadelrey/backend/tests/integration	1.585s

@@ -1,9 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// E2E contra el sitio REAL desplegado (Vercel + Fly + Supabase), no un
-// mock — la filosofía del proyecto es "nada estático, todo el flujo
-// real". PW_BASE_URL permite apuntar a localhost si se levanta el dev
-// server (`npm run dev`) en otra sesión. ¡Nunca testear directo contra producción!
+// Local by default. Isolated regression suites intercept the API; explicit
+// release suites opt in to the named Render QA backend and controlled accounts.
+// PW_BASE_URL selects the local or published frontend. Never run mutation suites
+// against production without their environment guard and cleanup.
 const baseURL = process.env.PW_BASE_URL || 'http://localhost:5173';
 
 export default defineConfig({

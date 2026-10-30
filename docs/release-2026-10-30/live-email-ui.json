@@ -1,0 +1,14 @@
+[
+  {
+    "site": "vercel",
+    "mail_configured": true,
+    "outbox_visible": true,
+    "overflow": false
+  },
+  {
+    "site": "render",
+    "mail_configured": true,
+    "outbox_visible": true,
+    "overflow": false
+  }
+]

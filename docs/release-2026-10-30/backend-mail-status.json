@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "mail": {
+    "api_key_configured": true,
+    "configured": true,
+    "counts": {},
+    "frontend_configured": true,
+    "local_limit_24h": 250,
+    "provider": "Brevo",
+    "sender_configured": true
+  }
+}
