@@ -1,0 +1,300 @@
+[
+  {
+    "site": "vercel",
+    "departments": 10,
+    "photo_checks": [
+      {
+        "department": "alabanza",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "alabanza",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "danza",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "danza",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "servidores",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "servidores",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "protocolo",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "protocolo",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "pancartas",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "pancartas",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "maestros_ninos",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "maestros_ninos",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "tecnicos_audiovisuales",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "tecnicos_audiovisuales",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "multimedia",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "multimedia",
+        "photo": 2,
+        "width": 1440,
+        "height": 2560,
+        "fit": "contain"
+      },
+      {
+        "department": "oracion",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "oracion",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "logistica",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "logistica",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      }
+    ],
+    "original_admin_photos_preserved": true,
+    "mobile_overflow": false,
+    "runtime_errors": []
+  },
+  {
+    "site": "render",
+    "departments": 10,
+    "photo_checks": [
+      {
+        "department": "alabanza",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "alabanza",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "danza",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "danza",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "servidores",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "servidores",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "protocolo",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "protocolo",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "pancartas",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "pancartas",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "maestros_ninos",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "maestros_ninos",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "tecnicos_audiovisuales",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "tecnicos_audiovisuales",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "multimedia",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "multimedia",
+        "photo": 2,
+        "width": 1440,
+        "height": 2560,
+        "fit": "contain"
+      },
+      {
+        "department": "oracion",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "oracion",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "logistica",
+        "photo": 1,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      },
+      {
+        "department": "logistica",
+        "photo": 2,
+        "width": 2560,
+        "height": 1440,
+        "fit": "contain"
+      }
+    ],
+    "original_admin_photos_preserved": true,
+    "mobile_overflow": false,
+    "runtime_errors": []
+  }
+]

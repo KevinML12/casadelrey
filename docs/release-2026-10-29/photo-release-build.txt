@@ -1,0 +1,62 @@
+
+> frontend@0.0.0 build
+> vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 1685 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                  1.68 kB │ gzip:   0.72 kB
+dist/assets/index-CcJW5nsD.css                  57.05 kB │ gzip:  11.62 kB
+dist/assets/LeaderConnectCards-CE_xR3bz.js       0.23 kB │ gzip:   0.19 kB
+dist/assets/LeaderBoletas-C11NZNI0.js            0.28 kB │ gzip:   0.21 kB
+dist/assets/AdminCellReports-Cfn8GKrh.js         0.32 kB │ gzip:   0.23 kB
+dist/assets/LeaderReports-wc9CxCxd.js            0.32 kB │ gzip:   0.23 kB
+dist/assets/StatCard-CEjapPqp.js                 0.73 kB │ gzip:   0.44 kB
+dist/assets/PaymentSuccess-CzJjm1Jx.js           1.00 kB │ gzip:   0.51 kB
+dist/assets/Chip-ByOH6hsT.js                     1.12 kB │ gzip:   0.54 kB
+dist/assets/Paginator-_jhVWFhz.js                1.22 kB │ gzip:   0.62 kB
+dist/assets/Button-BvN5AoP6.js                   1.57 kB │ gzip:   0.71 kB
+dist/assets/ReceiptPage-bxQd1f9B.js              1.68 kB │ gzip:   0.78 kB
+dist/assets/CellCodePicker-tYUfZusY.js           1.78 kB │ gzip:   0.89 kB
+dist/assets/with-selector-CiHBSkP4.js            1.80 kB │ gzip:   0.84 kB
+dist/assets/Input-D6ZocvJt.js                    2.05 kB │ gzip:   0.85 kB
+dist/assets/LeaderCellDirectory-vboQsDVT.js      2.12 kB │ gzip:   0.84 kB
+dist/assets/LeaderIndex-C17OV7Lu.js              2.86 kB │ gzip:   1.10 kB
+dist/assets/LeaderMyCell-DoKX9Ocb.js             3.40 kB │ gzip:   1.58 kB
+dist/assets/AdminSitePhotos-7lbu_p8z.js          3.54 kB │ gzip:   1.52 kB
+dist/assets/AdminActivityLog-C7LPkVx0.js         3.74 kB │ gzip:   1.44 kB
+dist/assets/LeaderMyProfile-BByweq3E.js          3.84 kB │ gzip:   1.77 kB
+dist/assets/AdminDonations-BVpgQ2Nt.js           3.85 kB │ gzip:   1.65 kB
+dist/assets/LeaderVolunteers-DnOiZ7IG.js         4.04 kB │ gzip:   1.64 kB
+dist/assets/ProfilePage-DjFzollk.js              4.14 kB │ gzip:   1.66 kB
+dist/assets/AdminSettings-F__oZujp.js            4.19 kB │ gzip:   1.94 kB
+dist/assets/LeaderEvents-DSJUnoit.js             4.19 kB │ gzip:   1.61 kB
+dist/assets/AdminVolunteers-Dppxz6Ow.js          4.98 kB │ gzip:   1.94 kB
+dist/assets/AdminConnectCards-DW3eA_xb.js        5.03 kB │ gzip:   2.04 kB
+dist/assets/AdminFAQs-JzPOa1lK.js                5.07 kB │ gzip:   1.96 kB
+dist/assets/AdminDonationPurposes-BHkDXwaP.js    5.37 kB │ gzip:   2.07 kB
+dist/assets/AdminCellCategories-d7nIRwa7.js      5.57 kB │ gzip:   2.17 kB
+dist/assets/AdminGallery-Bnx722pf.js             5.79 kB │ gzip:   2.31 kB
+dist/assets/AdminAnnouncements-BkvM9y28.js       5.94 kB │ gzip:   2.17 kB
+dist/assets/AdminUsers-B57JUQpQ.js               6.09 kB │ gzip:   2.39 kB
+dist/assets/AdminVolunteerAreas-_jYcZT0v.js      6.21 kB │ gzip:   2.35 kB
+dist/assets/AdminLeaders-CI3wJiOC.js             6.44 kB │ gzip:   2.41 kB
+dist/assets/AdminCells-DPcOvMzt.js               6.87 kB │ gzip:   2.60 kB
+dist/assets/AdminProfile-CAJ6Qn-2.js             6.98 kB │ gzip:   2.21 kB
+dist/assets/AdminPetitions-Bjkz2FjV.js           7.03 kB │ gzip:   2.69 kB
+dist/assets/AdminBoletas-jWuAuFAf.js             7.27 kB │ gzip:   2.58 kB
+dist/assets/AdminSocial-ND1E-jBW.js              8.07 kB │ gzip:   2.93 kB
+dist/assets/AdminEvents-Ct3ASYbt.js             10.50 kB │ gzip:   3.66 kB
+dist/assets/AdminHero-TbDaSGgN.js               10.55 kB │ gzip:   3.28 kB
+dist/assets/AdminReceipts-B_7cdky9.js           10.88 kB │ gzip:   3.36 kB
+dist/assets/VolunteerDashboard-D7tBB25T.js      12.26 kB │ gzip:   4.06 kB
+dist/assets/DonatePage-oPYHpPvL.js              12.69 kB │ gzip:   4.51 kB
+dist/assets/CellReportsPage-B3jwW0bZ.js         15.30 kB │ gzip:   4.58 kB
+dist/assets/motion-2GUIi03_.js                 123.64 kB │ gzip:  41.11 kB
+dist/assets/react-BCvQ_d5h.js                  286.39 kB │ gzip:  91.84 kB
+dist/assets/AdminIndex-cb1-fkR0.js             355.21 kB │ gzip: 105.19 kB
+dist/assets/index-C2jdbFGo.js                  377.40 kB │ gzip: 112.53 kB
+dist/assets/AdminBlog-0eZEhnm5.js              406.83 kB │ gzip: 128.49 kB
+✓ built in 3.42s

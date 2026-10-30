@@ -1,0 +1,29 @@
+{
+  "scope": "npm packages only; production and build dependencies",
+  "before_production": {
+    "info": 0,
+    "low": 0,
+    "moderate": 2,
+    "high": 9,
+    "critical": 1,
+    "total": 12
+  },
+  "after_all_dependencies": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "force_used": false,
+  "versions": {
+    "dompurify": "3.4.17",
+    "axios": "1.21.0",
+    "@tiptap/core": "3.32.1",
+    "react-router-dom": "7.18.5",
+    "postcss": "8.5.32",
+    "postcss-selector-parser": "6.1.5"
+  },
+  "notes": "Compatible updates; explicit PostCSS patch and selector-parser 6.x override avoid the suggested incompatible typography downgrade. Browser editor formatting/save and article sanitization verified with intercepted API."
+}

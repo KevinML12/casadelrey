@@ -1,0 +1,19 @@
+{
+  "objects_checked": 3,
+  "publicly_accessible": 3,
+  "downloaded_contents": false,
+  "metadata": [
+    {
+      "http_status": "200",
+      "bytes": 134152
+    },
+    {
+      "http_status": "200",
+      "bytes": 68
+    },
+    {
+      "http_status": "200",
+      "bytes": 211931
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "slots_configured": 34,
+  "unique_photographs": 26,
+  "departments": 10,
+  "photographs_per_department": 2,
+  "minimum_original_landscape_width": 6000,
+  "web_landscape_width": 2560,
+  "original_bytes": 145619550,
+  "web_bytes": 7935198,
+  "byte_reduction_percent": 94.6,
+  "prior_admin_photos_unchanged": true,
+  "images_cropped": false
+}
