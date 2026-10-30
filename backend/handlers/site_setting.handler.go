@@ -43,6 +43,18 @@ var knownSettings = []struct{ Key, Label, Default string }{
 	{"about_podcast_title", "Nosotros — Nombre del podcast", "Podcast Inusual Youth"},
 	{"about_podcast_url", "Nosotros — Enlace del podcast (opcional)", ""},
 	{"about_podcast_schedule", "Nosotros — Horario del podcast", "92.9 FM Radio Stereo Cumbre · Viernes · 3:00 PM"},
+	{"social_title", "Redes — Título del apartado", "Sigamos conectados."},
+	{"social_intro", "Redes — Presentación", "Acompaña la vida de nuestra comunidad en nuestras redes."},
+	{"social_instagram_url", "Redes — Perfil de Instagram", "https://www.instagram.com/ig.casadelrey/"},
+	{"social_instagram_description", "Redes — Descripción de Instagram", ""},
+	{"social_facebook_url", "Redes — Perfil de Facebook", "https://www.facebook.com/casadelreyhuehue"},
+	{"social_facebook_description", "Redes — Descripción de Facebook", ""},
+	{"social_tiktok_url", "Redes — Perfil de TikTok", "https://www.tiktok.com/@leoneldeleongt"},
+	{"social_tiktok_description", "Redes — Descripción de TikTok", ""},
+	{"social_x_url", "Redes — Perfil de X", "https://x.com/pastorleoneli"},
+	{"social_x_description", "Redes — Descripción de X", ""},
+	{"social_youtube_url", "Redes — Canal de YouTube", ""},
+	{"social_youtube_description", "Redes — Descripción de YouTube", ""},
 
 	{"bank_name", "Banco", "Banrural"},
 	{"bank_account", "Número de cuenta", ""},
@@ -88,7 +100,7 @@ func (h *SiteSettingHandler) GetPublic(c echo.Context) error {
 	}
 	out := map[string]string{}
 	for _, s := range knownSettings {
-		if v, ok := stored[s.Key]; ok && (v != "" || strings.HasPrefix(s.Key, "about_")) {
+		if v, ok := stored[s.Key]; ok && (v != "" || optionalSetting(s.Key)) {
 			out[s.Key] = v
 		} else {
 			out[s.Key] = s.Default
@@ -117,7 +129,7 @@ func (h *SiteSettingHandler) GetAll(c echo.Context) error {
 	var out []item
 	for _, s := range knownSettings {
 		v, ok := stored[s.Key]
-		usingDefault := !ok || (v == "" && !strings.HasPrefix(s.Key, "about_"))
+		usingDefault := !ok || (v == "" && !optionalSetting(s.Key))
 		effective := v
 		if usingDefault {
 			effective = s.Default
@@ -138,6 +150,13 @@ func (h *SiteSettingHandler) UpdateSetting(c echo.Context) error {
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+	}
+	if strings.HasPrefix(key, "social_") && strings.HasSuffix(key, "_url") {
+		req.Value = strings.TrimSpace(req.Value)
+		channel := strings.TrimSuffix(strings.TrimPrefix(key, "social_"), "_url")
+		if req.Value != "" && !validSocialProfile(channel, req.Value) {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Usa el enlace https:// del perfil o canal de esta red, sin publicaciones individuales."})
+		}
 	}
 	if key == "about_podcast_url" && strings.TrimSpace(req.Value) != "" {
 		parsed, err := url.Parse(strings.TrimSpace(req.Value))
@@ -163,4 +182,50 @@ func (h *SiteSettingHandler) UpdateSetting(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, row)
+}
+
+func optionalSetting(key string) bool {
+	return strings.HasPrefix(key, "about_") || strings.HasPrefix(key, "social_")
+}
+
+// Profiles are promoted without relying on individual posts. Validate here too:
+// settings may be edited by API clients other than the administration form.
+func validSocialProfile(channel, value string) bool {
+	u, err := url.Parse(value)
+	if err != nil || u.Scheme != "https" || u.User != nil || u.Port() != "" || u.Fragment != "" {
+		return false
+	}
+	host := strings.TrimPrefix(strings.ToLower(u.Hostname()), "www.")
+	parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+	first := strings.ToLower(parts[0])
+	if first == "" {
+		return false
+	}
+	oneOf := func(value string, choices ...string) bool {
+		for _, choice := range choices {
+			if value == choice {
+				return true
+			}
+		}
+		return false
+	}
+	switch channel {
+	case "instagram":
+		return host == "instagram.com" && len(parts) == 1 && !oneOf(first, "p", "reel", "reels", "stories", "explore", "accounts", "direct")
+	case "facebook":
+		if !oneOf(host, "facebook.com", "m.facebook.com") || len(parts) != 1 || u.Query().Has("v") || u.Query().Has("fbid") || u.Query().Has("story_fbid") {
+			return false
+		}
+		if first == "profile.php" {
+			return u.Query().Get("id") != ""
+		}
+		return !oneOf(first, "watch", "photo", "photo.php", "posts", "reel", "reels", "stories", "share", "sharer.php", "permalink.php", "story.php", "events", "groups")
+	case "tiktok":
+		return host == "tiktok.com" && len(parts) == 1 && strings.HasPrefix(first, "@") && len(first) > 1
+	case "x":
+		return oneOf(host, "x.com", "twitter.com") && len(parts) == 1 && !oneOf(first, "home", "explore", "i", "intent", "search", "settings", "messages")
+	case "youtube":
+		return host == "youtube.com" && ((len(parts) == 1 && strings.HasPrefix(first, "@") && len(first) > 1) || (len(parts) == 2 && parts[1] != "" && oneOf(first, "channel", "c", "user")))
+	}
+	return false
 }

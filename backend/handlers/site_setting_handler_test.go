@@ -103,3 +103,84 @@ func TestSiteSettings_AboutContentRespectsEditsAndClearing(t *testing.T) {
 	assert.NotEmpty(t, out["about_intro"], "existing institutional copy remains an editable default")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestSiteSettings_SocialEditsAndHiddenProfiles(t *testing.T) {
+	for _, admin := range []bool{false, true} {
+		db, mock, sqlDB := newMockDB(t)
+		h := handlers.NewSiteSettingHandler(db)
+		mock.ExpectQuery(`SELECT .* FROM "site_settings"`).WillReturnRows(
+			sqlmock.NewRows([]string{"id", "key", "value"}).AddRow(1, "social_title", "Nuestra comunidad").AddRow(2, "social_instagram_url", "").AddRow(3, "social_facebook_description", "Texto del administrador"))
+		c, rec := newCtx(t, ctxOpts{method: "GET"})
+		if admin {
+			require.NoError(t, h.GetAll(c))
+			var out []struct {
+				Key, Value   string
+				UsingDefault bool `json:"using_default"`
+			}
+			decodeBody(t, rec, &out)
+			found := false
+			for _, item := range out {
+				if item.Key == "social_instagram_url" {
+					found = true
+					assert.Empty(t, item.Value)
+					assert.False(t, item.UsingDefault)
+				}
+			}
+			assert.True(t, found)
+		} else {
+			require.NoError(t, h.GetPublic(c))
+			var out map[string]string
+			decodeBody(t, rec, &out)
+			assert.Empty(t, out["social_instagram_url"], "hiding a profile must not republish its default")
+			assert.Equal(t, "Nuestra comunidad", out["social_title"])
+			assert.Equal(t, "Texto del administrador", out["social_facebook_description"])
+			assert.Empty(t, out["social_youtube_url"], "never invent a channel")
+		}
+		require.NoError(t, mock.ExpectationsWereMet())
+		sqlDB.Close()
+	}
+}
+
+func TestSiteSettings_SocialProfilesRejectPostsAndOtherHosts(t *testing.T) {
+	cases := []struct{ channel, value string }{
+		{"instagram", "https://www.instagram.com/p/123/"}, {"instagram", "https://instagram.com/reel/123"},
+		{"instagram", "https://instagram.com.evil.example/church"}, {"instagram", "javascript:alert(1)"},
+		{"facebook", "https://facebook.com/church/posts/123"}, {"facebook", "https://facebook.com/watch?v=123"},
+		{"facebook", "https://facebook.com/profile.php?id=123&story_fbid=456"},
+		{"tiktok", "https://tiktok.com/@church/video/123"}, {"x", "https://x.com/church/status/123"},
+		{"youtube", "https://youtube.com/watch?v=123"}, {"youtube", "https://youtu.be/123"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.value, func(t *testing.T) {
+			db, mock, sqlDB := newMockDB(t)
+			defer sqlDB.Close()
+			c, rec := newCtx(t, ctxOpts{method: "PUT", params: map[string]string{"key": "social_" + tc.channel + "_url"}, body: map[string]interface{}{"value": tc.value}})
+			require.NoError(t, handlers.NewSiteSettingHandler(db).UpdateSetting(c))
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+			require.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSiteSettings_SocialProfilesSaveProfilesAndClearing(t *testing.T) {
+	cases := []struct{ channel, value string }{
+		{"instagram", " https://www.instagram.com/ig.casadelrey/ "}, {"instagram", ""},
+		{"facebook", "https://facebook.com/profile.php?id=123"}, {"facebook", "https://facebook.com/casadelreyhuehue"},
+		{"tiktok", "https://tiktok.com/@leoneldeleongt"}, {"x", "https://x.com/pastorleoneli"},
+		{"youtube", "https://youtube.com/@church"}, {"youtube", "https://youtube.com/channel/UC123"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.channel+tc.value, func(t *testing.T) {
+			db, mock, sqlDB := newMockDB(t)
+			defer sqlDB.Close()
+			mock.ExpectQuery(`SELECT .* FROM "site_settings"`).WillReturnRows(sqlmock.NewRows([]string{"id"}))
+			mock.ExpectBegin()
+			mock.ExpectQuery(`INSERT INTO "site_settings"`).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+			mock.ExpectCommit()
+			c, rec := newCtx(t, ctxOpts{method: "PUT", params: map[string]string{"key": "social_" + tc.channel + "_url"}, body: map[string]interface{}{"value": tc.value}})
+			require.NoError(t, handlers.NewSiteSettingHandler(db).UpdateSetting(c))
+			assert.Equal(t, http.StatusOK, rec.Code)
+			require.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
