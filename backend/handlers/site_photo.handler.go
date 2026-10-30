@@ -37,6 +37,7 @@ var knownSlots = []struct{ Key, Label string }{
 	{"hero_eventos", "Eventos — Fondo del encabezado"},
 	{"hero_donar", "Dar — Fondo del encabezado"},
 	{"hero_oracion", "Oración — Fondo del encabezado"},
+	{"email_fondo", "Correos — Fondo fotográfico"},
 	{"hero_comprobante", "Comprobante — Fondo del encabezado"},
 	{"hero_voluntariado", "Voluntariado — Fondo del encabezado"},
 	{"voluntariado_seccion", "Voluntariado — Fondo de \"¿Dónde quieres servir?\""},

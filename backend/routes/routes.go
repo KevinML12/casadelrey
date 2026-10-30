@@ -25,7 +25,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	authHandler := auth.NewHandler(db)
 	blogHandler := handlers.NewBlogHandler(db)
 	petitionHandler := handlers.NewPetitionHandler(db)
-	donationHandler := handlers.NewDonationHandler(db)
+	donationHandler := handlers.NewDonationHandler(db, store)
 	eventHandler := handlers.NewEventHandler(db)
 	cellCategoryHandler := handlers.NewCellCategoryHandler(db)
 	cellReportHandler := handlers.NewCellReportHandler(db)
@@ -38,6 +38,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	boletaHandler := handlers.NewBoletaHandler(db)
 	uploadHandler := handlers.NewUploadHandler(store)
 	receiptHandler := handlers.NewPaymentReceiptHandler(db, store)
+	mailHandler := &handlers.EmailHandler{DB: db, Config: cfg}
 	heroHandler := handlers.NewHeroHandler(db)
 	sitePhotoHandler := handlers.NewSitePhotoHandler(db)
 	siteSettingHandler := handlers.NewSiteSettingHandler(db)
@@ -46,7 +47,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	galleryHandler := handlers.NewGalleryHandler(db)
 	faqHandler := handlers.NewFAQHandler(db)
 	leaderDirHandler := handlers.NewLeaderDirectoryHandler(db)
-	rsvpHandler := handlers.NewRSVPHandler(db)
+	rsvpHandler := handlers.NewRSVPHandler(db, store)
 	leaderDashHandler := handlers.NewLeaderDashboardHandler(db)
 	activityLogHandler := handlers.NewActivityLogHandler(db)
 	connectCardHandler := handlers.NewConnectCardHandler(db)
@@ -101,7 +102,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// /upload general sigue exigiendo login. Antes ambos formularios
 	// públicos subían a /upload (auth) → un anónimo recibía 401 y NO podía
 	// donar por transferencia ni subir su boleta.
-	api.POST("/receipts", receiptHandler.Submit)
+	api.POST("/receipts", receiptHandler.Submit, middleware.AuthRateLimit())
+	api.POST("/receipts/:id/replacement", receiptHandler.ReplacementInfo, middleware.AuthRateLimit())
+	api.PUT("/receipts/:id/resubmit", receiptHandler.Resubmit, middleware.AuthRateLimit())
 	api.POST("/receipts/upload", uploadHandler.UploadReceipt, middleware.AuthRateLimit())
 
 	// Hero del home — público: obtener el activo
@@ -206,6 +209,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.GET("/kpis", adminHandler.GetKPIs)
 	adminGroup.GET("/kpis/trend", adminHandler.GetKPIsTrend)
 	adminGroup.GET("/donations", adminHandler.GetDonations)
+	adminGroup.PUT("/donations/:id/cash", donationHandler.ConfirmCash)
 	adminGroup.GET("/users", adminHandler.GetUsers)
 	adminGroup.PUT("/users/:id/role", adminHandler.UpdateUserRole)
 	adminGroup.PUT("/users/:id/cell", adminHandler.UpdateUserCell)
@@ -222,6 +226,9 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	adminGroup.GET("/activity-log", activityLogHandler.GetActivityLog)
 
 	// Comprobantes bancarios — admin
+	adminGroup.GET("/email/status", mailHandler.Status)
+	adminGroup.GET("/email/messages", mailHandler.List)
+	adminGroup.POST("/email/messages/:id/retry", mailHandler.Retry)
 	adminGroup.GET("/receipts", receiptHandler.GetAll)
 	adminGroup.GET("/receipts/:id/file", receiptHandler.File)
 	adminGroup.PUT("/receipts/:id/verify", receiptHandler.Verify)

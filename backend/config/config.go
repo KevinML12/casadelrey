@@ -11,24 +11,27 @@ import (
 // Config agrupa toda la configuración de la aplicación, cargada
 // desde variables de entorno o desde un archivo .env en desarrollo.
 type Config struct {
-	DatabaseURL string // Requerida: URL de conexión a PostgreSQL
-	JWTSecret   string // Requerida: clave secreta para firmar tokens JWT
-	ClientURL   string // URL del frontend (para CORS dinámico)
-	BrevoKey    string // Clave API de Brevo (envío de emails transaccionales)
-	SupabaseURL string // URL de Supabase (si se usa como proveedor de auth)
-	SupabaseKey string // Clave de Supabase
-	Port        string // Puerto HTTP del servidor (default: 8080)
-	BaseURL     string // URL pública del backend (para URLs locales de uploads)
+	DatabaseURL   string // Requerida: URL de conexión a PostgreSQL
+	JWTSecret     string // Requerida: clave secreta para firmar tokens JWT
+	ClientURL     string // URL del frontend (para CORS dinámico)
+	BrevoKey      string // Clave API de Brevo (envío de emails transaccionales)
+	MailFromEmail string
+	MailFromName  string
+	MailReplyTo   string
+	SupabaseURL   string // URL de Supabase (si se usa como proveedor de auth)
+	SupabaseKey   string // Clave de Supabase
+	Port          string // Puerto HTTP del servidor (default: 8080)
+	BaseURL       string // URL pública del backend (para URLs locales de uploads)
 
 	// Cloudflare R2 — Storage de archivos (fotos, comprobantes, galería)
 	// Si no están configuradas, el sistema usa almacenamiento local como fallback.
 	// Para usar tu cuenta en dev: pon tus vars en .env
 	// Para usar la cuenta del cliente en prod: setear en Fly.io secrets
-	R2AccountID  string // CF_R2_ACCOUNT_ID
-	R2AccessKey  string // CF_R2_ACCESS_KEY
-	R2SecretKey  string // CF_R2_SECRET_KEY
-	R2Bucket     string // CF_R2_BUCKET       — ej. casadelreyhue-media
-	R2PublicURL  string // CF_R2_PUBLIC_URL   — ej. https://cdn.casadelreyhue.org
+	R2AccountID string // CF_R2_ACCOUNT_ID
+	R2AccessKey string // CF_R2_ACCESS_KEY
+	R2SecretKey string // CF_R2_SECRET_KEY
+	R2Bucket    string // CF_R2_BUCKET       — ej. casadelreyhue-media
+	R2PublicURL string // CF_R2_PUBLIC_URL   — ej. https://cdn.casadelreyhue.org
 }
 
 // AppConfig es la instancia global de configuración.
@@ -40,14 +43,17 @@ var AppConfig *Config
 // También asigna la instancia a AppConfig para acceso global.
 func Load() *Config {
 	cfg := &Config{
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		JWTSecret:   os.Getenv("JWT_SECRET"),
-		ClientURL:   os.Getenv("CLIENT_URL"),
-		BrevoKey:    os.Getenv("BREVO_API_KEY"),
-		SupabaseURL: os.Getenv("SUPABASE_URL"),
-		SupabaseKey: os.Getenv("SUPABASE_KEY"),
-		Port:        getEnvOrDefault("PORT", "8080"),
-		BaseURL:     getEnvOrDefault("BASE_URL", "http://localhost:8080"),
+		DatabaseURL:   os.Getenv("DATABASE_URL"),
+		JWTSecret:     os.Getenv("JWT_SECRET"),
+		ClientURL:     os.Getenv("CLIENT_URL"),
+		BrevoKey:      os.Getenv("BREVO_API_KEY"),
+		MailFromEmail: os.Getenv("MAIL_FROM_EMAIL"),
+		MailFromName:  getEnvOrDefault("MAIL_FROM_NAME", "Casa del Rey"),
+		MailReplyTo:   os.Getenv("MAIL_REPLY_TO"),
+		SupabaseURL:   os.Getenv("SUPABASE_URL"),
+		SupabaseKey:   os.Getenv("SUPABASE_KEY"),
+		Port:          getEnvOrDefault("PORT", "8080"),
+		BaseURL:       getEnvOrDefault("BASE_URL", "http://localhost:8080"),
 		// Cloudflare R2
 		R2AccountID: os.Getenv("CF_R2_ACCOUNT_ID"),
 		R2AccessKey: os.Getenv("CF_R2_ACCESS_KEY"),

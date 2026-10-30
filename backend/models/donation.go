@@ -7,6 +7,9 @@ import (
 )
 
 type Donation struct {
+	Revision      uint       `json:"revision"`
+	ConfirmedByID *uint      `json:"confirmed_by_id"`
+	ConfirmedAt   *time.Time `json:"confirmed_at"`
 	gorm.Model
 	Name             string  `json:"name" gorm:"type:varchar(100);not null"`
 	Email            string  `json:"email" gorm:"type:varchar(100);index"`
@@ -25,6 +28,14 @@ type Donation struct {
 
 // PaymentReceipt verifica comprobantes bancarios para cobros de eventos y donaciones.
 type PaymentReceipt struct {
+	SubmissionKey             *string    `json:"-" gorm:"size:64;uniqueIndex"`
+	RequestHash               string     `json:"-" gorm:"size:64"`
+	Revision                  uint       `json:"revision"`
+	ConsumedReplacementHash   string     `json:"-" gorm:"size:64"`
+	ReplacementRequestHash    string     `json:"-" gorm:"size:64"`
+	ConsumedReplacementExpiry *time.Time `json:"-"`
+	ReplacementTokenHash      string     `json:"-" gorm:"size:64"`
+	ReplacementTokenExpiry    *time.Time `json:"-"`
 	gorm.Model
 	PayerName       string     `json:"payer_name" gorm:"type:varchar(100);not null"`
 	PayerEmail      string     `json:"payer_email" gorm:"type:varchar(100)"`

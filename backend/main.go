@@ -3,9 +3,15 @@
 package main
 
 import (
+	"casadelrey/backend/email"
+	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"casadelrey/backend/config"
@@ -55,6 +61,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("[DB] Error fatal al conectar: %v", err)
 	}
+
+	mailContext, stopMail := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stopMail()
+	mailService := email.NewService(db, cfg)
+	email.SetDefault(mailService)
+	go mailService.Run(mailContext)
 
 	// 4. Crear la instancia de Echo.
 	e := echo.New()
@@ -120,5 +132,13 @@ func main() {
 	// 7. Iniciar el servidor en el puerto configurado.
 	port := cfg.Port
 	fmt.Printf("\n✓ CasaDelRey Backend iniciado → http://0.0.0.0:%s\n\n", port)
-	log.Fatal(e.Start(fmt.Sprintf(":%s", port)))
+	go func() {
+		<-mailContext.Done()
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		_ = e.Shutdown(ctx)
+	}()
+	if err := e.Start(fmt.Sprintf(":%s", port)); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }

@@ -3,8 +3,12 @@ package handlers
 import (
 	"casadelrey/backend/auth"
 	"casadelrey/backend/email"
+	"casadelrey/backend/storage"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -19,11 +23,16 @@ import (
 
 // RSVPHandler gestiona el registro de asistencia a eventos.
 type RSVPHandler struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	store storage.ReceiptStore
 }
 
-func NewRSVPHandler(db *gorm.DB) *RSVPHandler {
-	return &RSVPHandler{DB: db}
+func NewRSVPHandler(db *gorm.DB, stores ...storage.Store) *RSVPHandler {
+	h := &RSVPHandler{DB: db}
+	if len(stores) > 0 {
+		h.store, _ = stores[0].(storage.ReceiptStore)
+	}
+	return h
 }
 
 // RegisterRSVP POST /api/v1/events/:id/rsvp — público.
@@ -36,17 +45,57 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 		Phone         string `json:"phone"`
 		AttendeeCount int    `json:"attendee_count"`
 		Notes         string `json:"notes"`
+		Receipt       *struct {
+			Amount    float64 `json:"amount"`
+			Bank      string  `json:"bank_name"`
+			Reference string  `json:"reference_number"`
+			File      string  `json:"receipt_image_url"`
+		} `json:"receipt"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
-	if req.Name == "" || req.Email == "" {
+	req.Name = strings.TrimSpace(req.Name)
+	req.Email = normalizeEmail(req.Email)
+	if req.Name == "" || len(req.Name) > 100 || !email.ValidAddress(req.Email) {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nombre y correo son obligatorios."})
 	}
 	if req.AttendeeCount < 1 {
 		req.AttendeeCount = 1
 	}
+	if req.AttendeeCount > 100 || len(req.Notes) > 2000 {
+		return c.JSON(400, map[string]string{"error": "Revisa la cantidad de asistentes y las notas."})
+	}
 
+	var submissionKey *string
+	requestHash := ""
+	if key := c.Request().Header.Get("Idempotency-Key"); key != "" {
+		if !donationKeyPattern.MatchString(key) {
+			return c.JSON(400, map[string]string{"error": "Identificador de envío inválido."})
+		}
+		sum := sha256.Sum256([]byte(key))
+		hashed := hex.EncodeToString(sum[:])
+		submissionKey = &hashed
+		data, _ := json.Marshal(req)
+		sum = sha256.Sum256(data)
+		requestHash = hex.EncodeToString(sum[:])
+	}
+	if req.Receipt != nil {
+		if submissionKey == nil || !validMoney(req.Receipt.Amount) {
+			return c.JSON(400, map[string]string{"error": "Revisa los datos del comprobante."})
+		}
+		if _, ok := storage.ReceiptKey(req.Receipt.File); !ok {
+			return c.JSON(400, map[string]string{"error": "Sube el archivo desde el formulario."})
+		}
+		if h.store == nil {
+			return c.JSON(503, map[string]string{"error": "El almacenamiento privado no está disponible."})
+		}
+		f, _, err := h.store.OpenReceipt(c.Request().Context(), req.Receipt.File)
+		if err != nil {
+			return c.JSON(400, map[string]string{"error": "Vuelve a subir el comprobante."})
+		}
+		f.Close()
+	}
 	userID, _ := c.Get("user_id").(uint)
 
 	// Todo el chequeo (duplicado, cupo, pago) + el INSERT van en una sola
@@ -71,7 +120,11 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 
 		// Evitar doble registro
 		var existing models.EventRegistration
-		if tx.Where("event_id = ? AND email = ?", eventID, req.Email).First(&existing).Error == nil {
+		if tx.Where("event_id = ? AND LOWER(email) = ?", eventID, req.Email).First(&existing).Error == nil {
+			if submissionKey != nil && existing.SubmissionKey != nil && *submissionKey == *existing.SubmissionKey && existing.RequestHash == requestHash {
+				status, body = 200, map[string]interface{}{"message": "Registro recibido.", "registration": existing}
+				return nil
+			}
 			status, body = http.StatusConflict, map[string]string{"error": "Ya existe un registro con este correo para este evento."}
 			return nil
 		}
@@ -104,9 +157,28 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 		paymentStatus := "no_requerido"
 		var receiptID *uint
 		if event.RequiresPayment {
+			if paymentDeadlinePassed(event) {
+				status, body = 400, map[string]string{"error": "El plazo de pago de este evento terminó."}
+				return nil
+			}
 			var receipt models.PaymentReceipt
-			err := tx.Where("payer_email = ? AND event_id = ? AND status IN ('pendiente','verificado')", req.Email, event.ID).
-				First(&receipt).Error
+			if req.Receipt != nil {
+				if len(req.Receipt.Bank) > 100 || len(req.Receipt.Reference) > 100 || req.Receipt.Amount+0.005 < event.PriceGTQ*float64(req.AttendeeCount) {
+					return echo.NewHTTPError(400, "El comprobante no cubre el total de asistentes.")
+				}
+				if err := reserveReceipt(tx, req.Receipt.File, 0); err != nil {
+					return err
+				}
+				receipt = models.PaymentReceipt{PayerName: req.Name, PayerEmail: req.Email, PayerPhone: req.Phone, Amount: req.Receipt.Amount, Currency: "GTQ", BankName: req.Receipt.Bank, ReferenceNumber: req.Receipt.Reference, ReceiptImageURL: req.Receipt.File, Purpose: "evento", EventID: &event.ID, Status: "pendiente"}
+				if err := tx.Create(&receipt).Error; err != nil {
+					return err
+				}
+			}
+			var err error
+			if req.Receipt == nil {
+				err = tx.Where("LOWER(payer_email) = ? AND event_id = ? AND status IN ('pendiente','verificado')", req.Email, event.ID).Order("created_at DESC").
+					First(&receipt).Error
+			}
 
 			if err != nil {
 				// No hay boleta → bloquear el registro
@@ -148,7 +220,7 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 			receiptID = &receipt.ID
 		}
 
-		reg := models.EventRegistration{
+		reg := models.EventRegistration{SubmissionKey: submissionKey, RequestHash: requestHash,
 			EventID:       event.ID,
 			Name:          req.Name,
 			Email:         req.Email,
@@ -174,10 +246,14 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 			"message":      msg,
 			"registration": reg,
 		}
-		return nil
+		return email.Enqueue(tx, email.Message{Key: fmt.Sprintf("rsvp:%d:created", reg.ID), Kind: "event_registration", To: reg.Email, Subject: "Tu inscripción — Casa del Rey", HTML: email.GetEventRegistrationTemplate(reg.Name, event.Title, event.Date, event.Time, event.Location, paymentStatus, reg.AttendeeCount)})
 	})
 
 	if err != nil {
+		var he *echo.HTTPError
+		if errors.As(err, &he) {
+			return c.JSON(he.Code, map[string]interface{}{"error": he.Message})
+		}
 		log.Printf("[RSVP] Error al registrar: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al registrar asistencia."})
 	}
@@ -235,7 +311,7 @@ func (h *RSVPHandler) RequestCancellation(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Correo requerido."})
 	}
 	var reg models.EventRegistration
-	err := h.DB.Where("event_id = ? AND email = ?", c.Param("id"), strings.TrimSpace(req.Email)).First(&reg).Error
+	err := h.DB.Where("event_id = ? AND LOWER(email) = ?", c.Param("id"), normalizeEmail(req.Email)).First(&reg).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo procesar la solicitud."})
 	}
@@ -244,10 +320,16 @@ func (h *RSVPHandler) RequestCancellation(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo procesar la solicitud."})
 		}
-		if err := h.DB.Model(&reg).Updates(map[string]interface{}{"cancellation_token_hash": auth.HashToken(token), "cancellation_token_expiry": time.Now().Add(15 * time.Minute)}).Error; err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo procesar la solicitud."})
+		expiry := time.Now().Add(15 * time.Minute)
+		err = h.DB.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Model(&reg).Updates(map[string]interface{}{"cancellation_token_hash": auth.HashToken(token), "cancellation_token_expiry": expiry}).Error; err != nil {
+				return err
+			}
+			return email.Enqueue(tx, email.Message{Key: "rsvp-cancel:" + auth.HashToken(token), Kind: "event_cancellation_code", To: reg.Email, Subject: "Código para cancelar tu inscripción — Casa del Rey", HTML: email.GetCancellationTemplate(token), ExpiresAt: expiry})
+		})
+		if err != nil {
+			return c.JSON(500, map[string]string{"error": "No se pudo procesar la solicitud."})
 		}
-		email.SendEmailAsync(reg.Email, "Código para cancelar tu inscripción — Casa del Rey", "<p>Para cancelar tu inscripción, copia este código en el formulario del evento. Caduca en 15 minutos.</p><p><strong>"+html.EscapeString(token)+"</strong></p><p>Si no lo solicitaste, puedes ignorar este correo.</p>")
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Si existe una inscripción con ese correo, recibirás un código de cancelación."})
 }
@@ -261,12 +343,26 @@ func (h *RSVPHandler) CancelMyRSVP(c echo.Context) error {
 	if err := c.Bind(&req); err != nil || req.Email == "" || req.Token == "" {
 		return c.JSON(http.StatusForbidden, map[string]string{"error": "Se requiere el código enviado a tu correo."})
 	}
-	result := h.DB.Where("event_id = ? AND email = ? AND cancellation_token_hash = ? AND cancellation_token_expiry > ?", c.Param("id"), strings.TrimSpace(req.Email), auth.HashToken(strings.TrimSpace(req.Token)), time.Now()).Delete(&models.EventRegistration{})
-	if result.Error != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo cancelar el registro."})
-	}
-	if result.RowsAffected != 1 {
-		return c.JSON(http.StatusForbidden, map[string]string{"error": "Código inválido o expirado."})
+	err := h.DB.Transaction(func(tx *gorm.DB) error {
+		var reg models.EventRegistration
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Where("event_id = ? AND LOWER(email) = ? AND cancellation_token_hash = ? AND cancellation_token_expiry > ?", c.Param("id"), normalizeEmail(req.Email), auth.HashToken(strings.TrimSpace(req.Token)), time.Now()).First(&reg).Error; err != nil {
+			return echo.NewHTTPError(403, "Código inválido o expirado.")
+		}
+		var ev models.Event
+		if err := tx.First(&ev, reg.EventID).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&reg).Error; err != nil {
+			return err
+		}
+		return email.Enqueue(tx, email.Message{Key: fmt.Sprintf("rsvp:%d:cancelled", reg.ID), Kind: "event_cancelled", To: reg.Email, Subject: "Inscripción cancelada — Casa del Rey", HTML: email.GetEventCancelledTemplate(ev.Title)})
+	})
+	if err != nil {
+		var he *echo.HTTPError
+		if errors.As(err, &he) {
+			return c.JSON(he.Code, map[string]interface{}{"error": he.Message})
+		}
+		return c.JSON(500, map[string]string{"error": "No se pudo cancelar el registro."})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Registro cancelado."})
 }

@@ -270,19 +270,14 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 	user.ResetToken = &resetToken
 	user.ResetTokenExpiry = &expiry
 
-	if result := h.DB.Model(&user).Updates(map[string]interface{}{"reset_token": resetToken, "reset_token_expiry": expiry}); result.Error != nil {
-		log.Printf("[Auth] Error al guardar token de reseteo: %v", result.Error)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Error interno al procesar la solicitud.",
-		})
+	if err := h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&user).Updates(map[string]interface{}{"reset_token": resetToken, "reset_token_expiry": expiry}).Error; err != nil {
+			return err
+		}
+		return email.Enqueue(tx, email.Message{Key: "reset:" + HashToken(resetToken), Kind: "password_reset", To: user.Email, Subject: "Restablecer contraseña — Casa del Rey", HTML: email.GetPasswordResetTemplate(resetToken), ExpiresAt: expiry})
+	}); err != nil {
+		return c.JSON(500, map[string]string{"error": "No se pudo procesar la solicitud."})
 	}
-
-	// Enviar email con el token de reseteo (en background)
-	email.SendEmailAsync(
-		user.Email,
-		"Restablecer contraseña — Casa del Rey",
-		email.GetPasswordResetTemplate(resetToken),
-	)
 
 	return c.JSON(http.StatusOK, genericResponse)
 }

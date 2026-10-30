@@ -7,6 +7,7 @@ package handlers_test
 
 import (
 	"bytes"
+	"casadelrey/backend/config"
 	"database/sql"
 	"encoding/json"
 	"net/http"
@@ -25,6 +26,9 @@ import (
 // El sql.DB debe cerrarse al terminar el test: defer sqlDB.Close().
 func newMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock, *sql.DB) {
 	t.Helper()
+	if config.AppConfig == nil {
+		config.AppConfig = &config.Config{JWTSecret: "unit-test-only-secret", ClientURL: "https://example.invalid"}
+	}
 	sqlDB, mock, err := sqlmock.New()
 	require.NoError(t, err)
 
@@ -75,10 +79,10 @@ func newCtx(t *testing.T, opts ctxOpts) (echo.Context, *httptest.ResponseRecorde
 	}
 	if len(opts.params) > 0 {
 		names := make([]string, 0, len(opts.params))
-		vals  := make([]string, 0, len(opts.params))
+		vals := make([]string, 0, len(opts.params))
 		for k, v := range opts.params {
 			names = append(names, k)
-			vals  = append(vals, v)
+			vals = append(vals, v)
 		}
 		c.SetParamNames(names...)
 		c.SetParamValues(vals...)

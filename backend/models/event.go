@@ -21,6 +21,8 @@ type Event struct {
 }
 
 type EventRegistration struct {
+	SubmissionKey           *string    `json:"-" gorm:"size:64;uniqueIndex"`
+	RequestHash             string     `json:"-" gorm:"size:64"`
 	CancellationTokenHash   string     `json:"-"`
 	CancellationTokenExpiry *time.Time `json:"-"`
 	gorm.Model

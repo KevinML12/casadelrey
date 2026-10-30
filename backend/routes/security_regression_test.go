@@ -28,6 +28,7 @@ import (
 )
 
 type regressionStorage struct {
+	mu           sync.Mutex
 	folder       string
 	receiptReads int
 }
@@ -43,7 +44,9 @@ func (s *regressionStorage) UploadReceipt(_ context.Context, filename string, _ 
 	return storage.ReceiptReference(filename), nil
 }
 func (s *regressionStorage) OpenReceipt(_ context.Context, _ string) (io.ReadCloser, string, error) {
+	s.mu.Lock()
 	s.receiptReads++
+	s.mu.Unlock()
 	return io.NopCloser(bytes.NewReader([]byte("private receipt fixture"))), "image/png", nil
 }
 
@@ -107,7 +110,7 @@ func newSecurityFixture(t *testing.T) *securityFixture {
 	require.NoError(t, err)
 	sqlDB.SetMaxOpenConns(1)
 	t.Cleanup(func() { sqlDB.Close() })
-	require.NoError(t, db.AutoMigrate(&models.User{}, &models.Cell{}, &models.Post{}, &models.Announcement{}, &models.GalleryPhoto{}, &models.SocialPost{}, &models.FAQ{}, &models.CellCategory{}, &models.CellReport{}, &models.VolunteerReport{}, &models.MemberBoleta{}, &models.Event{}, &models.EventRegistration{}, &models.PaymentReceipt{}, &models.Donation{}, &models.DonationPurpose{}, &models.Leader{}, &models.Volunteer{}, &models.VolunteerArea{}, &models.Petition{}, &models.ConnectCard{}, &models.HeroSetting{}, &models.SitePhoto{}, &models.SiteSetting{}, &models.UserGoal{}, &models.ActivityLog{}))
+	require.NoError(t, db.AutoMigrate(&models.User{}, &models.Cell{}, &models.Post{}, &models.Announcement{}, &models.GalleryPhoto{}, &models.SocialPost{}, &models.FAQ{}, &models.CellCategory{}, &models.CellReport{}, &models.VolunteerReport{}, &models.MemberBoleta{}, &models.Event{}, &models.EventRegistration{}, &models.PaymentReceipt{}, &models.Donation{}, &models.DonationPurpose{}, &models.Leader{}, &models.Volunteer{}, &models.VolunteerArea{}, &models.Petition{}, &models.ConnectCard{}, &models.HeroSetting{}, &models.SitePhoto{}, &models.SiteSetting{}, &models.UserGoal{}, &models.ActivityLog{}, &models.EmailMessage{}))
 	f := &securityFixture{e: echo.New(), db: db, tokens: map[string]string{}, users: map[string]models.User{}, store: &regressionStorage{}}
 	hash, err := auth.HashPassword("InitialPassword123!")
 	require.NoError(t, err)
@@ -151,7 +154,7 @@ func (f *securityFixture) req(t *testing.T, method, path, role string, body inte
 
 func TestSecurityRegression_DonationIdempotentRetries(t *testing.T) {
 	f := newSecurityFixture(t)
-	body := map[string]interface{}{"name": "Donor", "amount": 100, "currency": "GTQ", "payment_method": "transferencia", "receipt": map[string]string{"receipt_image_url": "receipt-private:01234567-89ab-4cde-8012-3456789abcde.png"}}
+	body := map[string]interface{}{"name": "Donor", "email": "controlled@example.invalid", "amount": 100, "currency": "GTQ", "payment_method": "transferencia", "receipt": map[string]string{"receipt_image_url": "receipt-private:01234567-89ab-4cde-8012-3456789abcde.png"}}
 	headers := map[string]string{"Idempotency-Key": "donation-retry-fixture-001"}
 	path := "/api/v1/donations/register"
 	first := f.req(t, "POST", path, "", body, headers)
@@ -168,8 +171,10 @@ func TestSecurityRegression_DonationIdempotentRetries(t *testing.T) {
 		require.NoError(t, f.db.Model(model).Count(&count).Error)
 		require.EqualValues(t, 1, count)
 	}
-	// A deliberate second donation gets its own key, even with identical data.
+	// A deliberate second donation needs a distinct receipt, not only a new key.
 	body["amount"] = 100
+	assertStatus(t, f.req(t, "POST", path, "", body, map[string]string{"Idempotency-Key": "donation-retry-fixture-002"}), 409)
+	body["receipt"] = map[string]string{"receipt_image_url": "receipt-private:11234567-89ab-4cde-8012-3456789abcde.png"}
 	assertStatus(t, f.req(t, "POST", path, "", body, map[string]string{"Idempotency-Key": "donation-retry-fixture-002"}), 201)
 	var donation models.Donation
 	require.NoError(t, f.db.First(&donation).Error)
@@ -179,7 +184,7 @@ func TestSecurityRegression_DonationIdempotentRetries(t *testing.T) {
 
 func TestSecurityRegression_DonationIdempotencyRollbackAndConcurrentRequests(t *testing.T) {
 	f := newSecurityFixture(t)
-	body := map[string]interface{}{"name": "Donor", "amount": 100, "currency": "GTQ", "payment_method": "transferencia", "receipt": map[string]string{"receipt_image_url": "receipt-private:01234567-89ab-4cde-8012-3456789abcde.png"}}
+	body := map[string]interface{}{"name": "Donor", "email": "controlled@example.invalid", "amount": 100, "currency": "GTQ", "payment_method": "transferencia", "receipt": map[string]string{"receipt_image_url": "receipt-private:01234567-89ab-4cde-8012-3456789abcde.png"}}
 	headers := map[string]string{"Idempotency-Key": "donation-concurrent-fixture"}
 	path := "/api/v1/donations/register"
 	require.NoError(t, f.db.Exec(`CREATE TRIGGER fail_receipt_insert BEFORE INSERT ON payment_receipts BEGIN SELECT RAISE(FAIL, 'simulated failure'); END`).Error)
@@ -350,7 +355,7 @@ func TestSecurityRegression_DonationReceiptAtomicVerificationAndRollback(t *test
 	for _, failure := range []bool{false, true} {
 		t.Run(fmt.Sprintf("failure=%v", failure), func(t *testing.T) {
 			f := newSecurityFixture(t)
-			body := map[string]interface{}{"name": "Donor", "amount": 100, "currency": "GTQ", "payment_method": "transferencia", "receipt": map[string]string{"receipt_image_url": "receipt-private:01234567-89ab-4cde-8012-3456789abcde.png", "bank_name": "Test"}}
+			body := map[string]interface{}{"name": "Donor", "email": "controlled@example.invalid", "amount": 100, "currency": "GTQ", "payment_method": "transferencia", "receipt": map[string]string{"receipt_image_url": "receipt-private:01234567-89ab-4cde-8012-3456789abcde.png", "bank_name": "Test"}}
 			assertStatus(t, f.req(t, "POST", "/api/v1/donations/register", "", body), 201)
 			var d models.Donation
 			require.NoError(t, f.db.First(&d).Error)
@@ -384,7 +389,7 @@ func TestSecurityRegression_DonationReceiptAtomicVerificationAndRollback(t *test
 		})
 	}
 	f := newSecurityFixture(t)
-	assertStatus(t, f.req(t, "POST", "/api/v1/donations/register", "", map[string]interface{}{"name": "Donor", "amount": 100, "currency": "USD"}), 400)
+	assertStatus(t, f.req(t, "POST", "/api/v1/donations/register", "", map[string]interface{}{"name": "Donor", "email": "controlled@example.invalid", "amount": 100, "currency": "USD"}), 400)
 }
 func TestSecurityRegression_CancellationRequiresValidSingleUseCredential(t *testing.T) {
 	f := newSecurityFixture(t)

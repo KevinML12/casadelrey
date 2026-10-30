@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"casadelrey/backend/email"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
+	"time"
 
 	"casadelrey/backend/models"
 	"casadelrey/backend/storage"
@@ -22,11 +26,16 @@ var errDonationKeyConflict = errors.New("donation idempotency conflict")
 
 // DonationHandler maneja el registro local de donaciones.
 type DonationHandler struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	store storage.ReceiptStore
 }
 
-func NewDonationHandler(db *gorm.DB) *DonationHandler {
-	return &DonationHandler{DB: db}
+func NewDonationHandler(db *gorm.DB, stores ...storage.Store) *DonationHandler {
+	h := &DonationHandler{DB: db}
+	if len(stores) > 0 {
+		h.store, _ = stores[0].(storage.ReceiptStore)
+	}
+	return h
 }
 
 // RegisterDonation POST /api/v1/donations/register
@@ -53,10 +62,15 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos de entrada inválidos."})
 	}
 
-	if req.Amount < 10 {
+	if !validMoney(req.Amount) || req.Amount < 10 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El monto mínimo es Q10."})
 	}
-	if req.Name == "" {
+	req.Name = strings.TrimSpace(req.Name)
+	req.Email = normalizeEmail(req.Email)
+	if req.Email != "" && !email.ValidAddress(req.Email) {
+		return c.JSON(400, map[string]string{"error": "Revisa tu correo electrónico."})
+	}
+	if req.Name == "" || len(req.Name) > 100 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El nombre es obligatorio."})
 	}
 
@@ -91,7 +105,18 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 	if req.Receipt != nil && (req.PaymentMethod != "transferencia" || req.Receipt.ReceiptImageURL == "") {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "El comprobante debe corresponder a una transferencia y tener una imagen."})
 	}
+	if req.Receipt != nil && !email.ValidAddress(req.Email) {
+		return c.JSON(400, map[string]string{"error": "Ingresa tu correo para recibir la revisión del pago."})
+	}
 	if req.Receipt != nil {
+		if h.store == nil {
+			return c.JSON(503, map[string]string{"error": "El almacenamiento privado no está disponible."})
+		}
+		f, _, err := h.store.OpenReceipt(c.Request().Context(), req.Receipt.ReceiptImageURL)
+		if err != nil {
+			return c.JSON(400, map[string]string{"error": "Vuelve a subir el archivo privado."})
+		}
+		f.Close()
 		if _, ok := storage.ReceiptKey(req.Receipt.ReceiptImageURL); !ok {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Sube el comprobante mediante el formulario antes de enviarlo."})
 		}
@@ -142,7 +167,19 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 			replayed = true
 			return nil
 		}
+		if req.DonationPurpose != "" {
+			var n int64
+			if err := tx.Model(&models.DonationPurpose{}).Where("value = ? AND is_active = ?", req.DonationPurpose, true).Count(&n).Error; err != nil {
+				return err
+			}
+			if n != 1 {
+				return echo.NewHTTPError(400, "Selecciona un destino de donación activo.")
+			}
+		}
 		if req.Receipt != nil {
+			if err := reserveReceipt(tx, req.Receipt.ReceiptImageURL, 0); err != nil {
+				return err
+			}
 			receipt := models.PaymentReceipt{
 				PayerName: req.Name, PayerEmail: req.Email, PayerPhone: req.Receipt.PayerPhone,
 				Amount: req.Amount, Currency: "GTQ", BankName: req.Receipt.BankName,
@@ -152,10 +189,18 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 			if err := tx.Create(&receipt).Error; err != nil {
 				return err
 			}
-			return tx.Model(&donation).Update("receipt_id", receipt.ID).Error
+			donation.ReceiptID = &receipt.ID
+			if err := tx.Model(&donation).Update("receipt_id", receipt.ID).Error; err != nil {
+				return err
+			}
+			return queueReceiptNotice(tx, receipt, "pendiente", "")
 		}
-		return nil
+		return email.Enqueue(tx, email.Message{Key: fmt.Sprintf("donation:%d:received", donation.ID), Kind: "donation_intent", To: donation.Email, Subject: "Donación registrada — Casa del Rey", HTML: email.GetPaymentUpdateTemplate(donation.Name, "Donación", "presencial", donation.Amount, "", "")})
 	}); err != nil {
+		var he *echo.HTTPError
+		if errors.As(err, &he) {
+			return c.JSON(he.Code, map[string]interface{}{"error": he.Message})
+		}
 		if errors.Is(err, errDonationKeyConflict) {
 			return c.JSON(http.StatusConflict, map[string]string{"error": "Este envío ya fue utilizado con otros datos. Inicia una nueva donación."})
 		}
@@ -172,4 +217,46 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 		"message": "¡Donación registrada! Un coordinador confirmará el proceso.",
 		"id":      donation.ID,
 	})
+}
+
+// ConfirmCash records a handover; it never moves money or verifies a transfer.
+func (h *DonationHandler) ConfirmCash(c echo.Context) error {
+	var req struct {
+		Received *bool `json:"received"`
+	}
+	if err := c.Bind(&req); err != nil || req.Received == nil {
+		return c.JSON(400, map[string]string{"error": "Indica si el aporte fue recibido."})
+	}
+	var donation models.Donation
+	adminID, _ := c.Get("user_id").(uint)
+	err := h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&donation, c.Param("id")).Error; err != nil {
+			return err
+		}
+		if donation.PaymentMethod != "presencial" || donation.ReceiptID != nil {
+			return echo.NewHTTPError(400, "Los depósitos se confirman desde Comprobantes.")
+		}
+		if donation.IsSuccessful == *req.Received {
+			return nil
+		}
+		donation.IsSuccessful = *req.Received
+		donation.Revision++
+		donation.ConfirmedByID = nil
+		donation.ConfirmedAt = nil
+		state := "presencial_revertida"
+		if *req.Received {
+			now := time.Now()
+			donation.ConfirmedAt = &now
+			donation.ConfirmedByID = &adminID
+			state = "presencial_recibida"
+		}
+		if err := tx.Save(&donation).Error; err != nil {
+			return err
+		}
+		return email.Enqueue(tx, email.Message{Key: fmt.Sprintf("donation:%d:%d:%s", donation.ID, donation.Revision, state), Kind: "donation_" + state, To: donation.Email, Subject: "Tu donación — Casa del Rey", HTML: email.GetPaymentUpdateTemplate(donation.Name, "Donación", state, donation.Amount, "", "")})
+	})
+	if err != nil {
+		return receiptWriteError(c, err)
+	}
+	return c.JSON(200, donation)
 }

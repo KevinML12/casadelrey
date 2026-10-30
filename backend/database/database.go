@@ -118,6 +118,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			// Sistema
 			&models.UserGoal{},
 			&models.ActivityLog{},
+			&models.EmailMessage{},
 		); err != nil {
 			connectErr = err
 			return

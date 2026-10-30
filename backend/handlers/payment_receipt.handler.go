@@ -1,7 +1,12 @@
 package handlers
 
 import (
+	"casadelrey/backend/auth"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"math"
 	"net/http"
@@ -9,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"casadelrey/backend/config"
 	"casadelrey/backend/email"
 	"casadelrey/backend/models"
 	"casadelrey/backend/storage"
@@ -69,47 +75,117 @@ func (h *PaymentReceiptHandler) Submit(c echo.Context) error {
 		BankName        string  `json:"bank_name"`
 		ReferenceNumber string  `json:"reference_number"`
 		ReceiptImageURL string  `json:"receipt_image_url"`
-		Purpose         string  `json:"purpose"` // donacion | evento
+		Purpose         string  `json:"purpose"`
 		EventID         *uint   `json:"event_id"`
 		DonationID      *uint   `json:"donation_id"`
+		DonationPurpose string  `json:"donation_purpose"`
 	}
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
+		return c.JSON(400, map[string]string{"error": "Datos inválidos."})
 	}
-	if req.PayerName == "" || req.Amount <= 0 || req.ReceiptImageURL == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Nombre, monto y foto del comprobante son requeridos.",
-		})
+	req.PayerName = strings.TrimSpace(req.PayerName)
+	req.PayerEmail = normalizeEmail(req.PayerEmail)
+	if req.PayerName == "" || len(req.PayerName) > 100 || !email.ValidAddress(req.PayerEmail) || !validMoney(req.Amount) || len(req.ReferenceNumber) > 100 || len(req.BankName) > 100 {
+		return c.JSON(400, map[string]string{"error": "Revisa tu nombre, correo y monto del depósito."})
+	}
+	if req.Purpose != "evento" && req.Purpose != "donacion" {
+		return c.JSON(400, map[string]string{"error": "Selecciona evento o donación."})
+	}
+	if req.DonationID != nil || (req.Purpose == "donacion" && req.EventID != nil) || (req.Purpose == "evento" && (req.EventID == nil || *req.EventID == 0)) {
+		return c.JSON(400, map[string]string{"error": "El comprobante no corresponde a un destino válido."})
+	}
+	key := c.Request().Header.Get("Idempotency-Key")
+	if key == "" {
+		// Previously loaded clients did not send this header. The already opaque
+		// private-file reference supplies a stable key during the rollout.
+		legacy := sha256.Sum256([]byte("receipt-file:" + req.ReceiptImageURL))
+		key = hex.EncodeToString(legacy[:])
+	}
+	if !donationKeyPattern.MatchString(key) {
+		return c.JSON(400, map[string]string{"error": "No se pudo identificar el envío. Vuelve a intentar desde el formulario."})
 	}
 	if _, ok := storage.ReceiptKey(req.ReceiptImageURL); !ok {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Sube el comprobante mediante el formulario antes de enviarlo."})
+		return c.JSON(400, map[string]string{"error": "Sube el comprobante mediante el formulario antes de enviarlo."})
 	}
-
-	receipt := models.PaymentReceipt{
-		PayerName:       req.PayerName,
-		PayerEmail:      req.PayerEmail,
-		PayerPhone:      req.PayerPhone,
-		Amount:          req.Amount,
-		Currency:        "GTQ",
-		BankName:        req.BankName,
-		ReferenceNumber: req.ReferenceNumber,
-		ReceiptImageURL: req.ReceiptImageURL,
-		Purpose:         req.Purpose,
-		EventID:         req.EventID,
-		DonationID:      req.DonationID,
-		Status:          "pendiente",
+	if h.store == nil {
+		return c.JSON(503, map[string]string{"error": "El almacenamiento privado no está disponible."})
 	}
-
-	if err := h.DB.Create(&receipt).Error; err != nil {
-		log.Printf("[Receipt] Error al guardar: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al registrar el comprobante."})
+	file, _, err := h.store.OpenReceipt(c.Request().Context(), req.ReceiptImageURL)
+	if err != nil {
+		return c.JSON(400, map[string]string{"error": "No encontramos el archivo privado. Vuelve a subirlo."})
 	}
-
-	log.Printf("[Receipt] Nuevo comprobante ID:%d", receipt.ID)
-	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"message": "Comprobante recibido. El equipo lo verificará en 24-48 horas.",
-		"id":      receipt.ID,
+	file.Close()
+	sum := sha256.Sum256([]byte(key))
+	storedKey := hex.EncodeToString(sum[:])
+	data, _ := json.Marshal(req)
+	sum = sha256.Sum256(data)
+	requestHash := hex.EncodeToString(sum[:])
+	var receipt models.PaymentReceipt
+	replayed := false
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		if tx.Dialector.Name() == "postgres" {
+			if err := tx.Exec("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", "receipt-submission:"+storedKey).Error; err != nil {
+				return err
+			}
+		}
+		var existing models.PaymentReceipt
+		find := tx.Unscoped().Where("submission_key = ?", storedKey).First(&existing)
+		if find.Error == nil {
+			if existing.DeletedAt.Valid || existing.RequestHash != requestHash {
+				return echo.NewHTTPError(409, "Este envío ya fue utilizado con otros datos.")
+			}
+			receipt = existing
+			replayed = true
+			return nil
+		}
+		if !errors.Is(find.Error, gorm.ErrRecordNotFound) {
+			return find.Error
+		}
+		if req.Purpose == "evento" {
+			var ev models.Event
+			if err := tx.First(&ev, *req.EventID).Error; err != nil {
+				return err
+			}
+			if !ev.IsActive || !ev.RequiresPayment || paymentDeadlinePassed(ev) || !validMoney(ev.PriceGTQ) || req.Amount+0.005 < ev.PriceGTQ {
+				return echo.NewHTTPError(400, "El evento no acepta este depósito. Revisa el plazo y el importe.")
+			}
+		}
+		if req.Purpose == "donacion" {
+			var n int64
+			if err := tx.Model(&models.DonationPurpose{}).Where("value = ? AND is_active = ?", req.DonationPurpose, true).Count(&n).Error; err != nil {
+				return err
+			}
+			if n != 1 || req.Amount < 10 {
+				return echo.NewHTTPError(400, "Selecciona un destino de donación activo y un monto desde Q10.")
+			}
+		}
+		if err := reserveReceipt(tx, req.ReceiptImageURL, 0); err != nil {
+			return err
+		}
+		receipt = models.PaymentReceipt{SubmissionKey: &storedKey, RequestHash: requestHash, PayerName: req.PayerName, PayerEmail: req.PayerEmail, PayerPhone: req.PayerPhone, Amount: req.Amount, Currency: "GTQ", BankName: req.BankName, ReferenceNumber: req.ReferenceNumber, ReceiptImageURL: req.ReceiptImageURL, Purpose: req.Purpose, EventID: req.EventID, Status: "pendiente"}
+		if err := tx.Create(&receipt).Error; err != nil {
+			return err
+		}
+		if req.Purpose == "donacion" {
+			d := models.Donation{Name: req.PayerName, Email: req.PayerEmail, Amount: req.Amount, Currency: "GTQ", PaymentMethod: "transferencia", ReceiptID: &receipt.ID, DonationPurpose: req.DonationPurpose}
+			if err := tx.Create(&d).Error; err != nil {
+				return err
+			}
+			receipt.DonationID = &d.ID
+			if err := tx.Save(&receipt).Error; err != nil {
+				return err
+			}
+		}
+		return queueReceiptNotice(tx, receipt, "pendiente", "")
 	})
+	if err != nil {
+		return receiptWriteError(c, err)
+	}
+	status := 201
+	if replayed {
+		status = 200
+	}
+	return c.JSON(status, map[string]interface{}{"message": "Comprobante recibido. El pago permanece pendiente de verificación.", "id": receipt.ID})
 }
 
 // GetAll GET /api/v1/admin/receipts — admin ve todos los comprobantes.
@@ -159,34 +235,56 @@ func (h *PaymentReceiptHandler) Verify(c echo.Context) error {
 	}
 
 	var receipt models.PaymentReceipt
+	var replacementToken string
 	adminID, _ := c.Get("user_id").(uint)
 	err = h.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&receipt, id).Error; err != nil {
 			return err
+		}
+		if receipt.Status == req.Status {
+			return nil
+		}
+		if receipt.Status != "pendiente" {
+			return echo.NewHTTPError(409, "Primero devuelve el comprobante a pendiente para cambiar la decisión.")
+		}
+		if req.Status == "rechazado" && strings.TrimSpace(req.RejectionReason) == "" {
+			return echo.NewHTTPError(400, "Escribe el motivo del rechazo.")
+		}
+		if len(req.RejectionReason) > 255 {
+			return echo.NewHTTPError(400, "El motivo admite hasta 255 caracteres.")
+		}
+		receipt.Revision++
+		receipt.ReplacementTokenHash = ""
+		receipt.ReplacementTokenExpiry = nil
+		if req.Status == "rechazado" {
+			receipt.ConsumedReplacementHash = ""
+			receipt.ReplacementRequestHash = ""
+			receipt.ConsumedReplacementExpiry = nil
+			var err error
+			replacementToken, err = auth.GenerateSecureToken(32)
+			if err != nil {
+				return err
+			}
+			expiry := time.Now().Add(7 * 24 * time.Hour)
+			receipt.ReplacementTokenHash = auth.HashToken(replacementToken)
+			receipt.ReplacementTokenExpiry = &expiry
 		}
 		now := time.Now()
 		receipt.Status = req.Status
 		receipt.VerifiedByID = &adminID
 		receipt.VerifiedAt = &now
 		receipt.RejectionReason = req.RejectionReason
-		return persistReceiptStatus(tx, &receipt)
+		if err := persistReceiptStatus(tx, &receipt); err != nil {
+			return err
+		}
+		action := ""
+		if replacementToken != "" {
+			action = strings.TrimRight(config.AppConfig.ClientURL, "/") + fmt.Sprintf("/comprobante?receipt=%d#token=%s", receipt.ID, replacementToken)
+		}
+		return queueReceiptNotice(tx, receipt, req.Status, action)
 	})
 	if err != nil {
 		return receiptWriteError(c, err)
-	}
-
-	// Notificar al pagador -- la UI (AdminReceipts.jsx) le promete al admin
-	// que rechazar "notifica al pagador" y el formulario público le promete
-	// al donante que "recibirás confirmación"; sin este envío ninguna de las
-	// dos ocurría. Solo si dejó correo (el flujo es público, puede quedar vacío).
-	if receipt.PayerEmail != "" {
-		if req.Status == "verificado" {
-			email.SendEmailAsync(receipt.PayerEmail, "Comprobante verificado — Casa del Rey",
-				email.GetReceiptVerifiedTemplate(receipt.PayerName, receipt.Amount))
-		} else {
-			email.SendEmailAsync(receipt.PayerEmail, "Comprobante rechazado — Casa del Rey",
-				email.GetReceiptRejectedTemplate(receipt.PayerName, receipt.Amount, receipt.RejectionReason))
-		}
 	}
 
 	log.Printf("[Receipt] %s por admin %d — ID:%d", req.Status, adminID, receipt.ID)
@@ -215,12 +313,21 @@ func (h *PaymentReceiptHandler) Revert(c echo.Context) error {
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&receipt, id).Error; err != nil {
 			return err
 		}
+		if receipt.Status == "pendiente" {
+			return nil
+		}
+		receipt.Revision++
+		receipt.ReplacementTokenHash = ""
+		receipt.ReplacementTokenExpiry = nil
 		prevStatus = receipt.Status
 		receipt.Status = "pendiente"
 		receipt.VerifiedByID = nil
 		receipt.VerifiedAt = nil
 		receipt.RejectionReason = ""
-		return persistReceiptStatus(tx, &receipt)
+		if err := persistReceiptStatus(tx, &receipt); err != nil {
+			return err
+		}
+		return queueReceiptNotice(tx, receipt, "revertido", "")
 	})
 	if err != nil {
 		return receiptWriteError(c, err)
@@ -281,4 +388,87 @@ func receiptWriteError(c echo.Context, err error) error {
 	}
 	log.Printf("[Receipt] Error al guardar: %v", err)
 	return c.JSON(http.StatusInternalServerError, map[string]string{"error": "No se pudo actualizar el comprobante."})
+}
+
+// ReplacementInfo validates a credential from the rejection email. The token
+// travels in a POST body, never an access-log URL or a public storage link.
+func (h *PaymentReceiptHandler) ReplacementInfo(c echo.Context) error {
+	var req struct {
+		Token string `json:"token"`
+	}
+	if c.Bind(&req) != nil || req.Token == "" {
+		return c.JSON(403, map[string]string{"error": "El enlace no es válido o caducó."})
+	}
+	var r models.PaymentReceipt
+	if err := h.DB.Where("id = ? AND status = ? AND replacement_token_hash = ? AND replacement_token_expiry > ?", c.Param("id"), "rechazado", auth.HashToken(req.Token), time.Now()).First(&r).Error; err != nil {
+		return c.JSON(403, map[string]string{"error": "El enlace no es válido o caducó."})
+	}
+	return c.JSON(200, map[string]interface{}{"payer_name": r.PayerName, "payer_email": r.PayerEmail, "amount": r.Amount, "purpose": r.Purpose, "event_id": r.EventID, "rejection_reason": r.RejectionReason})
+}
+func (h *PaymentReceiptHandler) Resubmit(c echo.Context) error {
+	var req struct {
+		Token     string `json:"token"`
+		Reference string `json:"receipt_image_url"`
+		Bank      string `json:"bank_name"`
+		Number    string `json:"reference_number"`
+	}
+	if c.Bind(&req) != nil || req.Token == "" {
+		return c.JSON(403, map[string]string{"error": "El enlace no es válido o caducó."})
+	}
+	if _, ok := storage.ReceiptKey(req.Reference); !ok || len(req.Bank) > 100 || len(req.Number) > 100 {
+		return c.JSON(400, map[string]string{"error": "Sube un comprobante válido."})
+	}
+	if h.store == nil {
+		return c.JSON(503, map[string]string{"error": "El almacenamiento privado no está disponible."})
+	}
+	file, _, err := h.store.OpenReceipt(c.Request().Context(), req.Reference)
+	if err != nil {
+		return c.JSON(400, map[string]string{"error": "Vuelve a subir el archivo privado."})
+	}
+	file.Close()
+	data, _ := json.Marshal(req)
+	sum := sha256.Sum256(data)
+	requestHash := hex.EncodeToString(sum[:])
+	replayed := false
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		var r models.PaymentReceipt
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Where("id = ?", c.Param("id")).First(&r).Error; err != nil {
+			return echo.NewHTTPError(403, "El enlace no es válido, ya se utilizó o caducó.")
+		}
+		tokenHash := auth.HashToken(req.Token)
+		if r.ConsumedReplacementHash == tokenHash && r.ReplacementRequestHash == requestHash && r.ConsumedReplacementExpiry != nil && r.ConsumedReplacementExpiry.After(time.Now()) {
+			replayed = true
+			return nil
+		}
+		if r.Status != "rechazado" || r.ReplacementTokenHash != tokenHash || r.ReplacementTokenExpiry == nil || !r.ReplacementTokenExpiry.After(time.Now()) {
+			return echo.NewHTTPError(403, "El enlace no es válido, ya se utilizó o caducó.")
+		}
+		r.ConsumedReplacementHash = tokenHash
+		r.ReplacementRequestHash = requestHash
+		r.ConsumedReplacementExpiry = r.ReplacementTokenExpiry
+		if err := reserveReceipt(tx, req.Reference, r.ID); err != nil {
+			return err
+		}
+		r.ReceiptImageURL = req.Reference
+		r.BankName = req.Bank
+		r.ReferenceNumber = req.Number
+		r.Status = "pendiente"
+		r.Revision++
+		r.RejectionReason = ""
+		r.VerifiedByID = nil
+		r.VerifiedAt = nil
+		r.ReplacementTokenHash = ""
+		r.ReplacementTokenExpiry = nil
+		if err := persistReceiptStatus(tx, &r); err != nil {
+			return err
+		}
+		return queueReceiptNotice(tx, r, "pendiente", "")
+	})
+	if err != nil {
+		return receiptWriteError(c, err)
+	}
+	if replayed {
+		return c.JSON(200, map[string]string{"message": "Ya recibimos esta corrección. Consulta la última actualización por correo."})
+	}
+	return c.JSON(200, map[string]string{"message": "Recibimos la corrección. El pago vuelve a estar pendiente de revisión."})
 }

@@ -151,11 +151,16 @@ func (h *AdminHandler) GetKPIsTrend(c echo.Context) error {
 
 // GetDonations godoc
 // GET /api/v1/admin/donations  [Requiere auth + rol admin]
-// Lista donaciones exitosas con búsqueda y paginación.
+// Lista intenciones y aportes recibidos con búsqueda y paginación.
 func (h *AdminHandler) GetDonations(c echo.Context) error {
 	page, limit := parsePage(c)
 
-	q := h.DB.Model(&models.Donation{}).Where("is_successful = ?", true)
+	q := h.DB.Model(&models.Donation{})
+	if status := c.QueryParam("status"); status == "received" {
+		q = q.Where("is_successful = ?", true)
+	} else if status == "pending" {
+		q = q.Where("is_successful = ?", false)
+	}
 	if search := c.QueryParam("q"); search != "" {
 		like := "%" + search + "%"
 		q = q.Where("name ILIKE ? OR email ILIKE ?", like, like)
@@ -323,16 +328,14 @@ func (h *AdminHandler) CreateUser(c echo.Context) error {
 		VerificationToken:       &verificationToken,
 		VerificationTokenExpiry: &verificationExpiry,
 	}
-	if err := h.DB.Create(&user).Error; err != nil {
-		log.Printf("[Admin] Error al crear usuario: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear el usuario."})
+	if err := h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&user).Error; err != nil {
+			return err
+		}
+		return email.Enqueue(tx, email.Message{Key: "verify:" + auth.HashToken(verificationToken), Kind: "verification", To: user.Email, Subject: "Verifica tu correo — Casa del Rey", HTML: email.GetVerificationEmailTemplate(user.Name, verificationToken), ExpiresAt: verificationExpiry})
+	}); err != nil {
+		return c.JSON(500, map[string]string{"error": "No se pudo crear el usuario y preparar su correo."})
 	}
-
-	email.SendEmailAsync(
-		user.Email,
-		"Verifica tu correo — Casa del Rey",
-		email.GetVerificationEmailTemplate(user.Name, verificationToken),
-	)
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "Usuario creado. Se envió un correo de verificación.",

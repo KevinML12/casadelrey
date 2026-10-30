@@ -145,7 +145,7 @@ func isAllowedType(filename string) bool {
 			break
 		}
 	}
-	return allowed[ext]
+	return allowed[strings.ToLower(ext)]
 }
 
 // UploadVolunteerPhoto fixes the destination and only accepts report images.

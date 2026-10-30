@@ -87,6 +87,8 @@ func TestRegisterRSVP_Completo_Retorna201(t *testing.T) {
 	// Insert -- misma transaccion, no una anidada
 	mock.ExpectQuery(`INSERT INTO "event_registrations"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(10))
+	mock.ExpectQuery(`SELECT .* FROM "site_photos"`).WillReturnRows(sqlmock.NewRows([]string{"id", "key", "image_url"}))
+	mock.ExpectQuery(`INSERT INTO "email_messages"`).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(20))
 	mock.ExpectCommit()
 
 	c, rec := newCtx(t, ctxOpts{

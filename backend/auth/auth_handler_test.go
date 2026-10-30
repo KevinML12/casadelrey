@@ -260,6 +260,8 @@ func TestForgotPassword_EmailExiste_GuardaTokenRetorna200(t *testing.T) {
 			AddRow(1, "existe@test.com", "hash", "member"))
 	mock.ExpectBegin()
 	mock.ExpectExec(`UPDATE "users"`).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectQuery(`SELECT .* FROM "site_photos"`).WillReturnRows(sqlmock.NewRows([]string{"id", "key", "image_url"}))
+	mock.ExpectQuery(`INSERT INTO "email_messages"`).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
 
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
