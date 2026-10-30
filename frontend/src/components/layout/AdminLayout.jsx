@@ -60,6 +60,7 @@ const NAV_GROUPS = [
   {
     section: 'Sistema',
     items: [
+      { to: '/admin/emails', label: 'Correos' },
       { to: '/admin/activity-log', icon: 'history', label: 'Actividad' },
       { to: '/admin/profile',      icon: 'person',  label: 'Perfil' },
     ],

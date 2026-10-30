@@ -76,6 +76,7 @@ test('volunteer submits via self-service and the shared close works', async ({ p
 test('donation retries preserve the key and include the receipt in the same request', async ({ page }) => {
   const writes = [];
   await isolatedAPI(page, (path, req) => {
+    if (path === '/donation-purposes') return {body:[{value:'controlled',title:'Destino administrado',description:'Contenido controlado'}]};
     if (req.method() === 'POST') {
       if (path === '/receipts/upload') return { status: 201, body: { url: 'receipt-private:01234567-89ab-4cde-8012-3456789abcde.png' } };
       writes.push({ path, body: req.postDataJSON(), key: req.headers()['idempotency-key'] });
@@ -95,8 +96,11 @@ test('donation retries preserve the key and include the receipt in the same requ
   await expect(next).toHaveCount(1); await expect(next).toBeEnabled(); await next.click();
   await expect(page.getByText('Últimos datos y listo.')).toBeVisible();
   await page.getByPlaceholder('Tu nombre').fill('Fixture donor');
+  await page.getByPlaceholder('Para confirmación').fill('controlled@example.invalid');
   await page.getByRole('button', { name: 'Enviar donación y comprobante', exact: true }).click();
   await expect(page.getByText('Fallo temporal de prueba', { exact: true })).toBeVisible();
+  const attempt = await page.evaluate(() => JSON.parse(sessionStorage.getItem('submission:donation')));
+  expect(attempt).toEqual({ fingerprint: expect.stringMatching(/^[0-9a-f]{64}$/), key: writes[0].key });
   await page.getByRole('button', { name: 'Enviar donación y comprobante', exact: true }).click();
   await expect(page.getByRole('heading', { name: '¡Gracias por sembrar!', exact: true })).toBeVisible();
   expect(writes).toHaveLength(2);
@@ -104,10 +108,9 @@ test('donation retries preserve the key and include the receipt in the same requ
   expect(writes[1]).toEqual(writes[0]);
   expect(writes[0].path).toBe('/donations/register');
   expect(writes[0].body.receipt.receipt_image_url).toBe('receipt-private:01234567-89ab-4cde-8012-3456789abcde.png');
-  const attempt = await page.evaluate(() => JSON.parse(sessionStorage.getItem('donation:attempt')));
-  expect(attempt).toEqual({ fingerprint: expect.stringMatching(/^[0-9a-f]{64}$/), key: writes[0].key });
+  expect(await page.evaluate(() => sessionStorage.getItem('submission:donation'))).toBeNull();
   await page.getByRole('button', { name: 'Hacer otra donación', exact: true }).click();
-  expect(await page.evaluate(() => sessionStorage.getItem('donation:attempt'))).toBeNull();
+  expect(await page.evaluate(() => sessionStorage.getItem('submission:donation'))).toBeNull();
 });
 
 test('admin opens private receipt through an authenticated request and local blob', async ({ page }) => {

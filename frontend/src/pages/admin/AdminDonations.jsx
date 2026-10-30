@@ -1,129 +1,234 @@
-import { useEffect, useState } from 'react';
-import apiClient from '../../lib/apiClient';
-import Paginator from '../../components/ui/Paginator';
-import { FilterChip } from '../../components/ui/Chip';
-
-const METHOD_LABEL = {
-  transferencia: 'Transferencia',
-  presencial:    'En persona',
-  tigo_money:    'Tigo Money', // histórico (método removido)
-};
-
-const PURPOSE_LABEL = {
-  general:   'Fondo General',
-  celulas:   'Células',
-  misionero: 'Misiones',
-  jovenes:   'Ministerio Joven',
-  edificio:  'Edificio',
-};
-
-const PURPOSES = Object.keys(PURPOSE_LABEL);
+import { useCallback, useEffect, useState } from "react";
+import apiClient from "../../lib/apiClient";
+import Paginator from "../../components/ui/Paginator";
+import ModalWrapper from "../../components/ui/ModalWrapper";
+import { useDonationPurposes } from "../../lib/donationPurposes";
 
 export default function AdminDonations() {
+  const purposes = useDonationPurposes();
   const [donations, setDonations] = useState([]);
-  const [meta,       setMeta]      = useState(null);
-  const [page,       setPage]      = useState(1);
-  const [loading,    setLoading]   = useState(true);
-  const [purposeF,   setPurposeF]  = useState('');
-  const [search,     setSearch]    = useState('');
-  const [debounced,  setDebounced] = useState('');
-
-  // Debounce simple: espera 400ms sin tipear antes de buscar en la API.
+  const [meta, setMeta] = useState(null);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [purpose, setPurpose] = useState("");
+  const [status, setStatus] = useState("");
+  const [search, setSearch] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [error, setError] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [saving, setSaving] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(search.trim()), 400);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setDebounced(search.trim()), 350);
+    return () => clearTimeout(timer);
   }, [search]);
-
-  const load = (p = page) => {
+  const load = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams({ page: p, limit: 20 });
-    if (purposeF) params.set('purpose', purposeF);
-    if (debounced) params.set('q', debounced);
-    apiClient.get(`/admin/donations?${params}`)
-      .then(r => { setDonations(r.data?.data || []); setMeta(r.data?.meta || null); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    setError("");
+    const params = new URLSearchParams({ page, limit: 20 });
+    if (purpose) params.set("purpose", purpose);
+    if (status) params.set("status", status);
+    if (debounced) params.set("q", debounced);
+    try {
+      const { data } = await apiClient.get(`/admin/donations?${params}`);
+      setDonations(data.data || []);
+      setMeta(data.meta || null);
+    } catch {
+      setError("No se pudieron consultar las donaciones.");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, purpose, status, debounced]);
+  useEffect(() => {
+    load();
+  }, [load]);
+  const confirm = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      await apiClient.put(`/admin/donations/${selected.ID}/cash`, {
+        received: !selected.is_successful,
+      });
+      setSelected(null);
+      await load();
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "No se pudo registrar la recepción.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
-
-  useEffect(() => { load(1); setPage(1); }, [purposeF, debounced]);
-  useEffect(() => { load(page); }, [page]);
-
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-headline-s text-bg font-black leading-tight">Donaciones</h1>
-        <p className="text-body-s text-bg/50 mt-0.5">{meta?.total ?? 0} {meta?.total === 1 ? 'donación registrada' : 'donaciones registradas'}</p>
+    <div className="max-w-5xl mx-auto space-y-5 text-bg">
+      <div>
+        <h1 className="text-28 font-bold">Donaciones</h1>
+        <p className="mt-2 text-14 text-bg/70">
+          Intenciones y aportes recibidos. Sólo los recibidos se suman a lo
+          recaudado.
+        </p>
       </div>
-
-      {/* Buscador */}
-      <div className="relative mb-4">
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nombre o correo…"
-          className="w-full h-11 px-4 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/40 focus:outline-none focus:border-pri focus:ring-2 focus:ring-pri/15 transition-all"
-        />
-      </div>
-
-      {/* Filtro de destino */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        <FilterChip selected={purposeF === ''} onClick={() => setPurposeF('')}>Todos</FilterChip>
-        {PURPOSES.map(p => (
-          <FilterChip key={p} selected={purposeF === p} onClick={() => setPurposeF(p)}>
-            {PURPOSE_LABEL[p]}
-          </FilterChip>
-        ))}
-      </div>
-
-      {/* Lista */}
-      {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-pri animate-spin" />
-        </div>
-      ) : donations.length === 0 ? (
-        <div className="glass-light rounded-[24px] card-spring flex flex-col items-center py-20 gap-4 text-bg/50">
-          <p className="text-body-l text-bg font-medium">Sin donaciones</p>
-          <p className="text-body-s">No hay registros que coincidan con este filtro.</p>
-        </div>
-      ) : (
-        <div className="glass-light rounded-[24px] card-spring overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-bg/10">
-                  {['#', 'Nombre', 'Destino', 'Monto', 'Método', 'Fecha'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 text-11 text-bg/45 uppercase tracking-widest">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-bg/8">
-                {donations.map(d => (
-                  <tr key={d.ID} className="hover:bg-bg/4 transition-colors">
-                    <td className="px-5 py-3.5 text-12 text-bg/40 font-mono">{d.ID}</td>
-                    <td className="px-5 py-3.5 text-14 text-bg font-medium">
-                      {d.name}
-                      {d.email && <p className="text-12 text-bg/45">{d.email}</p>}
-                    </td>
-                    <td className="px-5 py-3.5 text-14 text-bg/55">{PURPOSE_LABEL[d.donation_purpose] || d.donation_purpose || '—'}</td>
-                    <td className="px-5 py-3.5 text-14 text-bg font-bold">{d.currency} {Number(d.amount).toFixed(2)}</td>
-                    <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-bg/6 text-bg/60 text-12 font-medium">
-                        {METHOD_LABEL[d.payment_method] || d.payment_method || '—'}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-14 text-bg/50 whitespace-nowrap">
-                      {d.CreatedAt ? new Date(d.CreatedAt).toLocaleDateString('es-ES') : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      {error && (
+        <div
+          role="alert"
+          className="rounded-[12px] border border-rose/30 bg-white/70 p-4"
+        >
+          <p>{error}</p>
+          <button
+            onClick={load}
+            className="min-h-11 mt-2 px-4 rounded-[10px] bg-bg text-white text-14 font-semibold focus-ring"
+          >
+            Reintentar
+          </button>
         </div>
       )}
-
+      <div className="grid sm:grid-cols-3 gap-3">
+        <label className="text-13 font-semibold">
+          Buscar
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Nombre o correo"
+            className="input-light mt-2"
+          />
+        </label>
+        <label className="text-13 font-semibold">
+          Destino
+          <select
+            value={purpose}
+            onChange={(e) => {
+              setPurpose(e.target.value);
+              setPage(1);
+            }}
+            className="input-light mt-2"
+          >
+            <option value="">Todos</option>
+            {purposes.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-13 font-semibold">
+          Estado
+          <select
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+            className="input-light mt-2"
+          >
+            <option value="">Todos</option>
+            <option value="pending">Pendientes</option>
+            <option value="received">Recibidos</option>
+          </select>
+        </label>
+      </div>
+      <section
+        aria-label="Listado de donaciones"
+        className="glass-light rounded-[16px] divide-y divide-bg/15 overflow-hidden"
+      >
+        {loading ? (
+          <p role="status" className="p-5 text-14">
+            Cargando donaciones…
+          </p>
+        ) : !donations.length ? (
+          <p className="p-5 text-14">
+            No hay donaciones que coincidan con estos filtros.
+          </p>
+        ) : (
+          donations.map((d) => (
+            <article
+              key={d.ID}
+              className="p-5 flex flex-col sm:flex-row justify-between gap-4"
+            >
+              <div className="min-w-0">
+                <h2 className="text-16 font-bold break-words">{d.name}</h2>
+                {d.email && (
+                  <p className="mt-1 text-13 text-bg/65 break-all">{d.email}</p>
+                )}
+                <p className="mt-3 text-14">
+                  {purposes.find((item) => item.value === d.donation_purpose)
+                    ?.title ||
+                    d.donation_purpose ||
+                    "Sin destino registrado"}{" "}
+                  ·{" "}
+                  {d.payment_method === "presencial"
+                    ? "En persona"
+                    : "Transferencia"}
+                </p>
+                <p className="mt-2 text-12 text-bg/65">
+                  Registro {d.ID} ·{" "}
+                  {new Date(d.CreatedAt).toLocaleDateString("es-GT")}
+                </p>
+              </div>
+              <div className="sm:text-right">
+                <p className="text-22 font-bold">
+                  Q{Number(d.amount).toFixed(2)}
+                </p>
+                <p className="mt-1 text-13 font-semibold">
+                  {d.is_successful ? "Recibido" : "Pendiente"}
+                </p>
+                {d.payment_method === "presencial" ? (
+                  <button
+                    onClick={() => setSelected(d)}
+                    className="mt-3 min-h-11 rounded-[10px] px-4 bg-bg text-white font-semibold text-13 focus-ring"
+                  >
+                    {d.is_successful
+                      ? "Volver a pendiente"
+                      : "Confirmar recepción"}
+                  </button>
+                ) : (
+                  <a
+                    href="/admin/receipts"
+                    className="mt-3 inline-flex min-h-11 items-center text-13 font-semibold underline underline-offset-4 focus-ring"
+                  >
+                    Revisar comprobante
+                  </a>
+                )}
+              </div>
+            </article>
+          ))
+        )}
+      </section>
       <Paginator meta={meta} onPage={setPage} />
+      {selected && (
+        <ModalWrapper
+          onClose={() => {
+            if (!saving) setSelected(null);
+          }}
+          ariaLabel="Recepción de donación"
+        >
+          <h2 className="text-24 font-bold">
+            {selected.is_successful
+              ? "Volver a pendiente"
+              : "Confirmar aporte recibido"}
+          </h2>
+          <p className="mt-4 text-15">
+            {selected.name} · Q{Number(selected.amount).toFixed(2)}
+          </p>
+          <p className="mt-3 text-14 text-bg/75">
+            {selected.is_successful
+              ? "El importe dejará de sumarse a lo recaudado. Se preparará una notificación si hay un correo registrado."
+              : "Confirma únicamente cuando el equipo haya recibido el aporte en persona. Se actualizará lo recaudado y se preparará una confirmación si hay correo registrado."}
+          </p>
+          <button
+            disabled={saving}
+            onClick={confirm}
+            className="mt-6 w-full min-h-12 rounded-[12px] bg-bg text-white font-semibold focus-ring disabled:opacity-50"
+          >
+            {saving
+              ? "Guardando…"
+              : selected.is_successful
+                ? "Confirmar cambio a pendiente"
+                : "Sí, el aporte fue recibido"}
+          </button>
+        </ModalWrapper>
+      )}
     </div>
   );
 }

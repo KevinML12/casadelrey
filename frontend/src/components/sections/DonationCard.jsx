@@ -8,22 +8,22 @@
 //  (nada de cristal anidado: la guía lo prohíbe).
 //  Intención y comprobante se registran juntos; la verificación confirma el importe.
 // ============================================================
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import { FieldLight } from '../ui/Glass';
-import BankDetails from './BankDetails';
-import { compressImageIfNeeded } from '../../lib/compressImage';
-import { useDonationPurposes } from '../../lib/donationPurposes';
+import BankDetails, { useBankInfo } from './BankDetails';
+import { useDonationPurposeResource } from '../../lib/donationPurposes';
 import { PRESS_PRIMARY, PRESS_SECONDARY } from '../../lib/motion';
+import { submissionKey, clearSubmissionKey } from '../../lib/submissionKey';
 import useFilePreview from '../../hooks/useFilePreview';
 
 const AMOUNTS  = [50, 100, 250, 500];
 
 const PAYMENT_METHODS = [
   { label: 'Transferencia bancaria', sub: 'Sube tu boleta y la verificamos', value: 'transferencia' },
-  { label: 'En persona',             sub: 'Te recibimos un domingo',        value: 'presencial' },
+  { label: 'En persona',             sub: 'Coordina la entrega con el equipo',        value: 'presencial' },
 ];
 
 
@@ -31,8 +31,11 @@ export default function DonationCard() {
   const [step,    setStep]    = useState(0);
   const [amount,  setAmount]  = useState(100);
   const [custom,  setCustom]  = useState('');
-  const purposes = useDonationPurposes();
-  const [purpose, setPurpose] = useState('general');
+  const purposeResource = useDonationPurposeResource();
+  const purposes = purposeResource.purposes;
+  const { bankName } = useBankInfo();
+  const [chosenPurpose, setPurpose] = useState('');
+  const purpose = purposes.some(item => item.value === chosenPurpose) ? chosenPurpose : purposes[0]?.value || '';
   const [method,  setMethod]  = useState('transferencia');
   const [name,    setName]    = useState('');
   const [email,   setEmail]   = useState('');
@@ -46,6 +49,8 @@ export default function DonationCard() {
   const [sent,    setSent]    = useState(false);
   const [loading, setLoading] = useState(false);
   const submitting = useRef(false);
+  const upload = useRef(null);
+  useEffect(() => () => upload.current?.abort(), []);
 
   const finalAmount = custom ? parseFloat(custom) : amount;
   const purposeLabel = purposes.find(p => p.value === purpose)?.title || '';
@@ -55,21 +60,28 @@ export default function DonationCard() {
   const handlePhoto = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    upload.current?.abort();
+    const controller = new AbortController();
+    upload.current = controller;
+    setReceiptUrl('');
+    showFile(null);
     setUploading(true);
     try {
-      const compressed = await compressImageIfNeeded(file);
+      if(file.size>10*1024*1024)throw new Error('El archivo supera 10 MB');
       const fd = new FormData();
-      fd.append('file', compressed);
+      fd.append('file', file);
       const res = await apiClient.post('/receipts/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        signal: controller.signal,
       });
+      if (controller.signal.aborted) return;
       setReceiptUrl(res.data.url);
-      showFile(compressed);
+      showFile(file);
       toast.success('Comprobante cargado');
-    } catch {
-      toast.error('Error al subir la imagen');
+    } catch (err) {
+      if (!controller.signal.aborted) toast.error(err.response?.data?.error || err.message || 'Error al subir el archivo');
     } finally {
-      setUploading(false);
+      if (!controller.signal.aborted) setUploading(false);
     }
   };
 
@@ -77,7 +89,9 @@ export default function DonationCard() {
     e.preventDefault();
     if (submitting.current) return;
     if (!finalAmount || finalAmount < 10) { toast.error('El monto mínimo es Q10'); return; }
+    if (!purpose) { toast.error('Selecciona un destino disponible'); return; }
     if (!name.trim())                      { toast.error('Por favor ingresa tu nombre'); return; }
+    if (isTransfer && !email.trim()) { toast.error('Ingresa tu correo para recibir el resultado de revisión'); return; }
     if (isTransfer && !receiptUrl)         { toast.error('Sube tu comprobante de transferencia'); return; }
 
     submitting.current = true;
@@ -90,23 +104,15 @@ export default function DonationCard() {
         donation_purpose: purpose,
         payment_method: method,
         receipt: isTransfer ? {
-          payer_phone: phone, bank_name: 'Banrural', reference_number: referenceNumber,
+          payer_phone: phone, bank_name: bankName, reference_number: referenceNumber,
           receipt_image_url: receiptUrl,
         } : null,
       };
       // Keep the same credential after an ambiguous network failure or reload.
       // Store only a digest and random key, never donor details.
-      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(payload)));
-      const fingerprint = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
-      let attempt;
-      try { attempt = JSON.parse(sessionStorage.getItem('donation:attempt')); } catch { /* Ignore invalid stored state. */ }
-      if (attempt?.fingerprint !== fingerprint || !/^[0-9a-f-]{36}$/.test(attempt?.key || '')) {
-        attempt = { fingerprint, key: crypto.randomUUID() };
-        sessionStorage.setItem('donation:attempt', JSON.stringify(attempt));
-      }
-      await apiClient.post('/donations/register', payload, {
-        headers: { 'Idempotency-Key': attempt.key },
-      });
+      const key=await submissionKey('donation',payload);
+      await apiClient.post('/donations/register',payload,{headers:{'Idempotency-Key':key}});
+      clearSubmissionKey('donation');
 
       setSent(true);
       toast.success('¡Donación registrada! Gracias.');
@@ -119,7 +125,7 @@ export default function DonationCard() {
   };
 
   const resetForm = () => {
-    sessionStorage.removeItem('donation:attempt');
+    clearSubmissionKey('donation');
     setSent(false);
     setStep(0);
     setCustom('');
@@ -130,7 +136,7 @@ export default function DonationCard() {
     showFile(null);
     setReferenceNumber('');
     setAmount(100);
-    setPurpose('general');
+    setPurpose('');
     setMethod('transferencia');
   };
 
@@ -142,24 +148,27 @@ export default function DonationCard() {
 
   // Qué necesita cada paso para dejar avanzar
   const canContinue =
+    step === 1 ? !!purpose :
     step === 0 ? finalAmount >= 10 :
     step === 2 ? (!isTransfer || (receiptUrl && !uploading)) :
     true;
 
+  if (purposeResource.loading || purposeResource.error || !purposes.length) return <div className="glass-light rounded-[16px] p-6 text-bg"><h2 className="text-24 font-bold">Donar</h2><p role={purposeResource.loading?'status':'alert'} className="mt-3 text-15">{purposeResource.loading?'Cargando los destinos…':purposeResource.error?'No se pudieron cargar los destinos de donación.':'El equipo todavía no ha publicado destinos de donación.'}</p>{purposeResource.error&&<button type="button" onClick={purposeResource.retry} className="mt-4 min-h-11 px-5 rounded-[12px] bg-bg text-white font-semibold focus-ring">Reintentar</button>}</div>;
+
   // ── Success state ──────────────────────────────────────────────
   if (sent) {
     return (
-      <div className="glass-light liquid-shine rounded-[22px] p-8 text-center">
+      <div className="glass-light liquid-shine rounded-[16px] p-8 text-center">
         <h3 className="text-d3 text-bg">
           ¡Gracias por sembrar!
         </h3>
         {isTransfer ? (
           <>
             <p className="mt-3 text-15 text-bg/70 leading-relaxed">
-              Recibimos tu donación de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
+              Registramos tu solicitud de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
             </p>
             <p className="mt-1 text-14 text-bg/50">
-              Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.
+              El pago sigue pendiente. Te avisaremos por correo cuando el equipo revise el comprobante.
             </p>
           </>
         ) : (
@@ -168,7 +177,7 @@ export default function DonationCard() {
               Anotamos tu intención de <strong className="text-bg">Q{finalAmount}</strong> para <strong className="text-bg">{purposeLabel}</strong>.
             </p>
             <p className="mt-1 text-14 text-bg/50">
-              Te esperamos este domingo. Un coordinador te recibe en la entrada.
+              El importe permanece pendiente hasta que el equipo registre su recepción.
             </p>
           </>
         )}
@@ -215,7 +224,7 @@ export default function DonationCard() {
         return (
           <div
             key={def.label}
-            className={`glass-light liquid-shine rounded-[22px] overflow-hidden transition-all duration-500 ${
+            className={`glass-light liquid-shine rounded-[16px] overflow-hidden transition-all duration-200 ${
               current ? 'border-bg/25' : ''
             } ${i > step ? 'opacity-40' : ''}`}
           >
@@ -250,7 +259,7 @@ export default function DonationCard() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 240, damping: 30 }}
+                  transition={{ duration: 0.18 }}
                   className="overflow-hidden"
                 >
                   <div className="px-5 pb-5">
@@ -268,7 +277,7 @@ export default function DonationCard() {
                                 type="button"
                                 whileHover={{ scale: 1.04 }}
                                 whileTap={{ scale: 0.95 }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                                transition={{ duration: 0.14 }}
                                 onClick={() => { setAmount(a); setCustom(''); }}
                                 className={`py-4 rounded-pill text-17 font-bold transition-colors focus-ring ${
                                   active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
@@ -301,9 +310,9 @@ export default function DonationCard() {
                               <motion.button
                                 key={p.value}
                                 type="button"
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.97 }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                                whileHover={{ opacity: 0.9 }}
+                                whileTap={{ opacity: 0.8 }}
+                                transition={{ duration: 0.14 }}
                                 onClick={() => setPurpose(p.value)}
                                 className={`rounded-pill px-5 py-3.5 text-14 font-bold transition-colors focus-ring ${
                                   active ? 'bg-bg text-white shadow-card' : 'bg-bg/6 text-bg/70 border border-bg/10 hover:bg-bg/10'
@@ -328,9 +337,9 @@ export default function DonationCard() {
                               <motion.button
                                 key={m.value}
                                 type="button"
-                                whileHover={{ scale: 1.01 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                                whileHover={{ opacity: 0.9 }}
+                                whileTap={{ opacity: 0.8 }}
+                                transition={{ duration: 0.14 }}
                                 onClick={() => setMethod(m.value)}
                                 className={`w-full flex items-center rounded-[16px] px-4 py-3.5 text-left transition-all border focus-ring ${
                                   active ? 'bg-bg/8 border-bg/25' : 'bg-bg/4 border-bg/10 hover:border-bg/20'
@@ -402,7 +411,7 @@ export default function DonationCard() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <FieldLight label="Nombre *" type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Tu nombre" />
-                          <FieldLight label="Correo" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Para confirmación" />
+                          <FieldLight label={isTransfer ? "Correo *" : "Correo"} required={isTransfer} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Para confirmación" />
                         </div>
 
                         {isTransfer && (
@@ -423,8 +432,8 @@ export default function DonationCard() {
 
                         <p className="text-13 text-bg/50">
                           {isTransfer
-                            ? 'Verificamos tu comprobante en 24-48 horas y te confirmamos por correo.'
-                            : 'Un coordinador te recibirá este domingo en la entrada.'}
+                            ? 'El pago sigue pendiente. Te avisaremos por correo cuando el equipo revise el comprobante.'
+                            : 'El importe permanece pendiente hasta que el equipo lo reciba.'}
                         </p>
                       </div>
                     )}

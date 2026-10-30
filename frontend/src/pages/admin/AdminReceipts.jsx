@@ -1,3 +1,4 @@
+import ModalWrapper from '../../components/ui/ModalWrapper';
 import { useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
@@ -77,21 +78,17 @@ function VerifyModal({ receipt, onClose, onDone }) {
       toast.success(status === 'verificado' ? 'Comprobante verificado' : 'Comprobante rechazado');
       onDone();
       onClose();
-    } catch { toast.error('Error al verificar'); }
+    } catch (err) { toast.error(err.response?.data?.error || 'Error al verificar'); }
     finally { setLoading(false); }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-bg/40" onClick={onClose} />
-      <div className="relative glass-light rounded-2xl w-full max-w-lg animate-fade-in overflow-hidden">
+    <ModalWrapper onClose={onClose} ariaLabel="Revisión de comprobante" wide>
+      <div className="grid md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] gap-5">
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-bg/10">
+        <div className="md:col-span-2 border-b border-bg/15 pb-4">
           <h3 className="text-title-l text-bg font-bold">Verificar comprobante</h3>
-          <button onClick={onClose} className="text-13 font-semibold text-bg/55 hover:text-bg transition-colors">
-            Cerrar
-          </button>
+
         </div>
 
         {/* Foto del comprobante */}
@@ -102,8 +99,8 @@ function VerifyModal({ receipt, onClose, onDone }) {
           </div>
         )}
 
-        {/* Datos */}
-        <div className="px-6 py-4 space-y-2">
+        <div className="min-w-0">
+        <div className="py-4 space-y-2">
           {[
             { label: 'Pagador',    value: receipt.payer_name },
             { label: 'Teléfono',   value: receipt.payer_phone || '—' },
@@ -120,7 +117,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
         </div>
 
         {/* Decisión */}
-        <div className="px-6 pb-6 space-y-3 border-t border-bg/10 pt-4">
+        <div className="pb-3 space-y-3 border-t border-bg/10 pt-4">
 
           {/* Solo mostrar selección si el comprobante está pendiente */}
           {receipt.status === 'pendiente' && !confirmStep && (
@@ -139,10 +136,10 @@ function VerifyModal({ receipt, onClose, onDone }) {
               </div>
               {status === 'rechazado' && (
                 <textarea rows={2} value={reason} onChange={e => setReason(e.target.value)}
-                  placeholder="Razón del rechazo (opcional)…"
+                  aria-label="Motivo del rechazo" maxLength={255} placeholder="Explica qué debe corregirse…"
                   className="w-full px-4 py-2.5 rounded-xl border border-bg/10 bg-transparent text-body-s text-bg placeholder:text-bg/50 focus:outline-none focus:border-pri resize-none" />
               )}
-              <button onClick={handleAction} disabled={loading}
+              <button onClick={handleAction} disabled={loading || (status === 'rechazado' && !reason.trim())}
                 className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl text-label-l font-semibold transition-opacity disabled:opacity-50 ${
                   status === 'rechazado' ? 'bg-err text-ink hover:opacity-90' : 'bg-bg text-white hover:opacity-90'
                 }`}>
@@ -156,7 +153,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
             <div className="rounded-2xl border-2 border-err bg-err-con/20 p-4 space-y-3 animate-fade-in">
               <p className="text-body-s text-bg font-semibold">¿Confirmas el rechazo?</p>
               <p className="text-body-s text-bg/50">
-                Esta acción notifica al pagador que su comprobante fue rechazado.
+                Esta acción guarda el rechazo y prepara un correo con un enlace seguro para corregir el comprobante.
                 Puedes revertirla después si cometiste un error.
               </p>
               {reason && <p className="text-label-s text-err">Razón: {reason}</p>}
@@ -178,8 +175,9 @@ function VerifyModal({ receipt, onClose, onDone }) {
             <RevertSection receipt={receipt} onDone={onDone} onClose={onClose} />
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }
 

@@ -44,7 +44,7 @@ export default function ReceiptFile({ receipt, thumbnail = false, onClick }) {
   );
   return (
     <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-14 text-bg font-semibold">
-      {image ? <img src={file.url} alt="comprobante" className="w-full max-h-64 object-contain rounded-xl border border-bg/10" />
+      {image ? <img src={file.url} alt="comprobante" className="w-full max-h-[65svh] object-contain rounded-xl border border-bg/10" />
         : 'Abrir comprobante PDF'}
     </a>
   );

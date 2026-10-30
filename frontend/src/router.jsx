@@ -55,6 +55,7 @@ const AdminReceipts      = lazy(() => import('./pages/admin/AdminReceipts'));
 const AdminDonations     = lazy(() => import('./pages/admin/AdminDonations'));
 const AdminHero          = lazy(() => import('./pages/admin/AdminHero'));
 const AdminSitePhotos    = lazy(() => import('./pages/admin/AdminSitePhotos'));
+const AdminEmails = lazy(() => import('./pages/admin/AdminEmails'));
 const AdminSettings      = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminConnectCards  = lazy(() => import('./pages/admin/AdminConnectCards'));
 const ReceiptPage        = lazy(() => import('./pages/public/ReceiptPage'));
@@ -114,6 +115,7 @@ export const router = createBrowserRouter([
       { path: 'donations',       element: <Suspense fallback={<PageFallback panel />}><AdminDonations /></Suspense> },
       { path: 'hero',            element: <Suspense fallback={<PageFallback panel />}><AdminHero /></Suspense> },
       { path: 'site-photos',     element: <Suspense fallback={<PageFallback panel />}><AdminSitePhotos /></Suspense> },
+      { path: 'emails', element: <Suspense fallback={<PageFallback panel />}><AdminEmails /></Suspense> },
       { path: 'settings',        element: <Suspense fallback={<PageFallback panel />}><AdminSettings /></Suspense> },
       { path: 'connect-cards',   element: <Suspense fallback={<PageFallback panel />}><AdminConnectCards /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<PageFallback panel />}><AdminProfile /></Suspense> },

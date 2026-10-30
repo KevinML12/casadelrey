@@ -12,6 +12,7 @@ import { useBankInfo } from '../../components/sections/BankDetails';
 import { useSitePhoto } from '../../lib/feed';
 import { PRESS_PRIMARY } from '../../lib/motion';
 import ReceiptUploadForm from '../../components/sections/ReceiptUploadForm';
+import { submissionKey, clearSubmissionKey } from '../../lib/submissionKey';
 import PageHero from '../../components/layout/PageHero';
 
 // El modal de RSVP es glass-light (blanco/translucido) -- .input-light es
@@ -147,10 +148,13 @@ function RSVPModal({ event, onClose }) {
   // volvia a intentar el registro: el usuario subia su boleta y quedaba
   // con un comprobante huerfano, sin RSVP real hasta que regresara a
   // reintentar a mano.
-  const attemptRSVP = async () => {
+  const attemptRSVP = async (receipt = null) => {
     setLoading(true);
     try {
-      const res = await apiClient.post(`/events/${event.ID}/rsvp`, form);
+      const data = receipt ? {...form, receipt: {amount:receipt.amount, bank_name:receipt.bank_name, reference_number:receipt.reference_number, receipt_image_url:receipt.receipt_image_url}} : form;
+      const key = await submissionKey(`rsvp:${event.ID}`,data);
+      const res = await apiClient.post(`/events/${event.ID}/rsvp`, data, {headers:{'Idempotency-Key':key}});
+      clearSubmissionKey(`rsvp:${event.ID}`);
       const msg = res.data?.message || '¡Registro confirmado!';
       const payStatus = res.data?.registration?.payment_status;
 
@@ -179,9 +183,9 @@ function RSVPModal({ event, onClose }) {
 
   // El comprobante ya quedó creado (status "pendiente") -- reintentar el
   // registro de inmediato, sin que el usuario tenga que hacer nada más.
-  const handleReceiptUploaded = async () => {
-    const ok = await attemptRSVP();
-    if (!ok) setStep('retry_failed');
+  const handleReceiptUploaded = async data => {
+    const ok = await attemptRSVP(data);
+    if (!ok) throw new Error('No se pudo completar la inscripción. Conservamos el archivo para reintentar.');
   };
 
   // ── Pantalla: el evento cobra pero no hay cuenta bancaria configurada --
@@ -255,7 +259,8 @@ function RSVPModal({ event, onClose }) {
           defaultName={form.name}
           defaultEmail={form.email}
           defaultPhone={form.phone}
-          onSuccess={handleReceiptUploaded}
+          onSubmitReceipt={handleReceiptUploaded}
+          lockIdentity
         />
 
         <button onClick={() => setStep('form')}
@@ -274,7 +279,7 @@ function RSVPModal({ event, onClose }) {
       <div className="text-center py-6">
         <h3 className="text-19 text-bg font-bold mb-2">Comprobante guardado</h3>
         <p className="text-14 text-bg/60 mb-5">No se pudo completar el registro automáticamente. Intenta de nuevo.</p>
-        <button onClick={attemptRSVP} disabled={loading}
+        <button onClick={() => attemptRSVP()} disabled={loading}
           className="w-full flex items-center justify-center gap-2 h-11 rounded-full bg-bg text-white text-14 font-semibold shadow-card hover:opacity-90 disabled:opacity-50">
           {loading ? 'Completando…' : 'Completar registro'}
         </button>
