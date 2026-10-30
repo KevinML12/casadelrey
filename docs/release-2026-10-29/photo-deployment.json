@@ -1,0 +1,45 @@
+{
+  "application_commit": "fd06c26bcc3543aadd0bd4a6327ecc95b1d4f752",
+  "vercel": {
+    "deployment_id": "dpl_FcUM9qSemEtLXPecMHNudwboj1hG",
+    "status": "READY",
+    "url": "https://casadelreyhue.vercel.app"
+  },
+  "render_frontend": {
+    "deployment_id": "dep-dbi1o93bc2fs739rts70",
+    "status": "Live",
+    "url": "https://casadelrey-web-pruebas.onrender.com"
+  },
+  "render_backend": {
+    "deployment_id": "dep-dbhueduc6qcc73f0fgt0",
+    "status": "Live; health HTTP 200",
+    "unchanged_in_this_release": true,
+    "url": "https://casadelrey-api-pruebas.onrender.com"
+  },
+  "post_deployment_browser_checks": [
+    {
+      "site": "vercel",
+      "status": 200,
+      "module": "/assets/index-DIAehNhf.js",
+      "image": {
+        "width": 1440,
+        "height": 2560,
+        "fit": "contain"
+      },
+      "mobile_overflow": false,
+      "runtime_errors": []
+    },
+    {
+      "site": "render",
+      "status": 200,
+      "module": "/assets/index-DuzX_yGy.js",
+      "image": {
+        "width": 1440,
+        "height": 2560,
+        "fit": "contain"
+      },
+      "mobile_overflow": false,
+      "runtime_errors": []
+    }
+  ]
+}

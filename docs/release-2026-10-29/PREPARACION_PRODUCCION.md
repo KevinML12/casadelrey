@@ -27,3 +27,7 @@ El trabajo restante se concentra en seguridad histórica, integraciones y operac
 Las limitaciones del plan gratuito se verificaron en [Render: Deploy for Free](https://render.com/docs/free). Para respaldo y recuperación, [Supabase: Database Backups](https://supabase.com/docs/guides/platform/backups) recomienda exportaciones periódicas fuera del servicio para proyectos Free; los respaldos de base de datos no incluyen los objetos de storage. La clasificación de archivos de R2 necesita su propio control.
 
 La evidencia de los archivos legados contiene sólo estados y tamaños, sin enlaces de comprobantes ni contenidos (`legacy-public-object-check.json`). La selección visual y sus fuentes están en `SELECCION_FOTOGRAFICA.md` y `seleccion-fotografica.json`; el análisis de dependencias en `dependency-security.json`.
+
+## Publicación verificada
+
+La versión `fd06c26` quedó READY en Vercel y Live en Render Static (`dep-dbi1o93bc2fs739rts70`). Las dos vistas publicadas respondieron HTTP 200 y mostraron la fotografía administrada de Multimedia completa, con 1440 × 2560 px, sin desbordamiento a 390 px ni excepciones de JavaScript. El backend no necesitó otro despliegue y su health respondió HTTP 200. Identificadores y comprobaciones en `photo-deployment.json`.
