@@ -64,7 +64,7 @@ EXPOSE 8080
 # Healthcheck: Dokploy y Docker lo usan para saber si el contenedor está listo.
 # Verifica el endpoint /health cada 30 segundos.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget -qO- http://localhost:8080/health || exit 1
+    CMD wget -qO- http://localhost:${PORT:-8080}/ready || exit 1
 
 # Comando de arranque del servidor
 CMD ["./casadelrey-backend"]

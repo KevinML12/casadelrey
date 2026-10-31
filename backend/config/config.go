@@ -26,7 +26,7 @@ type Config struct {
 	// Cloudflare R2 — Storage de archivos (fotos, comprobantes, galería)
 	// Si no están configuradas, el sistema usa almacenamiento local como fallback.
 	// Para usar tu cuenta en dev: pon tus vars en .env
-	// Para usar la cuenta del cliente en prod: setear en Fly.io secrets
+	// Para producción: configurar el entorno del servicio de Render.
 	R2AccountID string // CF_R2_ACCOUNT_ID
 	R2AccessKey string // CF_R2_ACCESS_KEY
 	R2SecretKey string // CF_R2_SECRET_KEY

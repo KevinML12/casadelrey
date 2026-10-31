@@ -177,6 +177,12 @@ func New() Store {
 	secretKey := os.Getenv("CF_R2_SECRET_KEY")
 	bucket := os.Getenv("CF_R2_BUCKET")
 	publicURL := os.Getenv("CF_R2_PUBLIC_URL")
+	if os.Getenv("ENV") == "production" {
+		privateBucket := os.Getenv("CF_R2_PRIVATE_BUCKET")
+		if accountID == "" || accessKey == "" || secretKey == "" || bucket == "" || !strings.HasPrefix(publicURL, "https://") || privateBucket == "" || privateBucket == bucket {
+			panic("production requires R2 media and a separate private receipt bucket; ephemeral local storage is disabled")
+		}
+	}
 
 	// Si todas las vars R2 están presentes → usar R2
 	if accountID != "" && accessKey != "" && secretKey != "" && bucket != "" {

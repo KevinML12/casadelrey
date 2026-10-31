@@ -12,7 +12,7 @@ import (
 // Permite 50 peticiones por segundo por IP, con ráfagas de hasta 100.
 func GlobalRateLimit() echo.MiddlewareFunc {
 	config := middleware.RateLimiterConfig{
-		Skipper: middleware.DefaultSkipper,
+		Skipper: func(c echo.Context) bool { return c.Path() == "/health" },
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
 			middleware.RateLimiterMemoryStoreConfig{
 				Rate:      rate.Limit(50),

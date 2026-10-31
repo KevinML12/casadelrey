@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"net/url"
@@ -60,9 +61,11 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	authRateLimit := middleware.AuthRateLimit()
 	// Cache-Control por tipo de contenido: lo que cambia poco (categorías de
 	// células) cachea más tiempo que lo que el admin edita seguido (hero, feed)
-	cacheShort := middleware.PublicCache(20) // hero, eventos, feed, anuncios
-	cacheMed := middleware.PublicCache(60)   // blog, galería
-	cacheLong := middleware.PublicCache(300) // categorías de células (casi estáticas)
+	responseCache := middleware.NewPublicResponseCache()
+	e.Use(responseCache.InvalidateAfterWrite)
+	cacheShort := []echo.MiddlewareFunc{middleware.PublicCache(20), responseCache.Middleware(5 * time.Second)}
+	cacheMed := []echo.MiddlewareFunc{middleware.PublicCache(60), responseCache.Middleware(10 * time.Second)}
+	cacheLong := []echo.MiddlewareFunc{middleware.PublicCache(300), responseCache.Middleware(20 * time.Second)}
 
 	// Aplicar Rate Limiter Global a todo el servidor
 	e.Use(globalRateLimit)
@@ -74,6 +77,17 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 			"service": "CasaDelRey Backend",
 			"version": "3.0.0",
 		})
+	})
+
+	e.GET("/ready", func(c echo.Context) error {
+		c.Response().Header().Set("Cache-Control", "no-store")
+		ctx, cancel := context.WithTimeout(c.Request().Context(), 2*time.Second)
+		defer cancel()
+		sqlDB, err := db.DB()
+		if err != nil || sqlDB.PingContext(ctx) != nil {
+			return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "unavailable"})
+		}
+		return c.JSON(http.StatusOK, map[string]string{"status": "ready"})
 	})
 
 	// Historical local receipts must not remain accessible through the public
@@ -108,20 +122,20 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	api.POST("/receipts/upload", uploadHandler.UploadReceipt, middleware.AuthRateLimit())
 
 	// Hero del home — público: obtener el activo
-	api.GET("/hero/active", heroHandler.GetActive, cacheShort)
+	api.GET("/hero/active", heroHandler.GetActive, cacheShort...)
 
 	// Fotos del sitio — público: solo los slots con foto subida
-	api.GET("/site-photos", sitePhotoHandler.GetSitePhotos, cacheLong)
+	api.GET("/site-photos", sitePhotoHandler.GetSitePhotos, cacheLong...)
 
 	// Configuración pública (datos bancarios, contacto) — administrable
-	api.GET("/settings", siteSettingHandler.GetPublic, cacheShort)
+	api.GET("/settings", siteSettingHandler.GetPublic, cacheShort...)
 
 	// Voluntariado
 	api.POST("/volunteer/register", volunteerHandler.Register, authRateLimit)
 	api.GET("/volunteer/departments", volunteerHandler.GetDepartments)
 	api.GET("/volunteer/me", volunteerHandler.GetMyInfo, authMW)
-	api.GET("/volunteer-areas", volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong)
-	api.GET("/donation-purposes", donationPurposeHandler.GetPublicDonationPurposes, cacheLong)
+	api.GET("/volunteer-areas", volunteerAreaHandler.GetPublicVolunteerAreas, cacheLong...)
+	api.GET("/donation-purposes", donationPurposeHandler.GetPublicDonationPurposes, cacheLong...)
 
 	// Auth
 	authGroup := api.Group("/auth", authRateLimit)
@@ -134,8 +148,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Blog (público: lectura)
 	blogGroup := api.Group("/blog")
-	blogGroup.GET("/", blogHandler.GetPublishedPosts, cacheMed)
-	blogGroup.GET("/:slug", blogHandler.GetPostBySlug, cacheMed)
+	blogGroup.GET("/", blogHandler.GetPublishedPosts, cacheMed...)
+	blogGroup.GET("/:slug", blogHandler.GetPostBySlug, cacheMed...)
 
 	// Peticiones de oración
 	contactGroup := api.Group("/contact")
@@ -153,8 +167,8 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Eventos (público: lectura + RSVP) — con y sin slash final:
 	// Echo no redirige entre ambos y el frontend histórico usa /events
 	eventsGroup := api.Group("/events")
-	eventsGroup.GET("", eventHandler.GetEvents, cacheShort)
-	eventsGroup.GET("/", eventHandler.GetEvents, cacheShort)
+	eventsGroup.GET("", eventHandler.GetEvents, cacheShort...)
+	eventsGroup.GET("/", eventHandler.GetEvents, cacheShort...)
 	eventsGroup.POST("/:id/rsvp", rsvpHandler.RegisterRSVP)
 	eventsGroup.DELETE("/:id/rsvp", rsvpHandler.CancelMyRSVP, authRateLimit)
 
@@ -162,26 +176,26 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// Células (público: lectura de categorías + listado seguro de células)
 	cellsGroup := api.Group("/cell-categories")
-	cellsGroup.GET("", cellCategoryHandler.GetCellCategories, cacheLong)
-	cellsGroup.GET("/", cellCategoryHandler.GetCellCategories, cacheLong)
-	api.GET("/cells", cellCategoryHandler.GetPublicCells, cacheLong)
+	cellsGroup.GET("", cellCategoryHandler.GetCellCategories, cacheLong...)
+	cellsGroup.GET("/", cellCategoryHandler.GetCellCategories, cacheLong...)
+	api.GET("/cells", cellCategoryHandler.GetPublicCells, cacheLong...)
 
 	// Feed social
-	api.GET("/social/feed", socialHandler.GetSocialFeed, cacheShort)
+	api.GET("/social/feed", socialHandler.GetSocialFeed, cacheShort...)
 
 	// Anuncios (público — authMW opcional para filtrar por rol)
-	api.GET("/announcements", announcementHandler.GetAnnouncements, cacheShort)
+	api.GET("/announcements", announcementHandler.GetAnnouncements, cacheShort...)
 
 	// Galería pública
 	galleryGroup := api.Group("/gallery")
-	galleryGroup.GET("/", galleryHandler.GetPhotos, cacheMed)
+	galleryGroup.GET("/", galleryHandler.GetPhotos, cacheMed...)
 
 	// FAQs públicas
 	faqGroup := api.Group("/faqs")
-	faqGroup.GET("/", faqHandler.GetFAQs, cacheLong)
+	faqGroup.GET("/", faqHandler.GetFAQs, cacheLong...)
 
 	// Directorio de líderes (foto + contacto) — público solo activos
-	api.GET("/leaders", leaderDirHandler.GetPublic, cacheShort)
+	api.GET("/leaders", leaderDirHandler.GetPublic, cacheShort...)
 
 	// Perfil y metas (usuario autenticado)
 	profileGroup := api.Group("/profile", authMW)

@@ -82,3 +82,10 @@ fotos/
 fotos/
 .vercel
 .env*
+
+# Local recovery artifacts and Python caches never belong in this public repo.
+__pycache__/
+*.dump
+*.dump.aes
+*.manifest.aes
+ops/private/
