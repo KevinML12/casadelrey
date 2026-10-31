@@ -1,7 +1,9 @@
 name: Encrypted recovery backup
-# Scheduled execution is enabled only after the owner authorizes GitHub secrets.
+# Daily at 03:00 America/Guatemala (09:00 UTC), following a successful manual run.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'
 permissions:
   contents: read
 concurrency:
