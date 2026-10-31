@@ -47,4 +47,6 @@ Realizar una sesión con un administrador y un líder institucionales. Dejar con
 - Confirmar los datos bancarios y perfiles oficiales.
 - Identificar al responsable de respaldos, soporte y renovación de servicios.
 
+Los respaldos diarios están en **GitHub → Actions → Encrypted recovery backup**, programados a las 03:00 de Guatemala. La primera ejecución ya terminó correctamente y no requieren el Mac encendido. El responsable debe comprobar que haya ejecuciones recientes y atender los fallos; si GitHub desactiva el horario por inactividad del repositorio, debe reactivarlo y verificar una ejecución manual. Las instrucciones de recuperación están en [Operación](../ops/README.md).
+
 Esta sesión requiere participación de la iglesia; las verificaciones técnicas no sustituyen su aceptación.

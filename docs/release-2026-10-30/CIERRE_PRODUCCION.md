@@ -33,7 +33,9 @@ La restauración final comprobó 28 tablas activas (1.653 filas, incluidas las a
 
 ## Automatización y límites abiertos
 
-El respaldo diario local está programado a las 03:00 Guatemala y sólo avisa por fallos; requiere que el Mac y Codex estén disponibles. La plantilla GitHub está preparada en `ops/github-recovery-backup.yml`, sin workflow instalado, cron activo ni secretos compartidos. GitHub rechazó publicar el workflow por faltar ese permiso en la conexión OAuth actual. Sigue pendiente habilitar esa publicación y autorizar las credenciales mínimas del respaldo para dejar la tarea independiente del Mac.
+El titular autorizó el respaldo independiente: GitHub guarda únicamente la conexión dedicada de lectura de la base activa, las claves R2 y la clave de cifrado en secretos del repositorio. La credencial administrativa del historial permanece fuera de GitHub. La [primera ejecución completa](https://github.com/KevinML12/casadelrey/actions/runs/41165501659) terminó correctamente con 28 tablas y 749 archivos. Después se activó el horario diario de las 03:00 Guatemala (09:00 UTC) y se pausó la automatización local duplicada. Ya no depende del Mac encendido.
+
+El responsable debe comprobar que los respaldos sigan recientes y revisar Actions: GitHub puede retrasar los horarios y desactiva la programación de repositorios públicos tras 60 días sin actividad. El procedimiento está en la guía de operación. Evidencia de activación y permisos: [respaldo de GitHub](operations/github-backup-verification.json).
 
 El lanzamiento público sostenido aún requiere decisión de alojamiento, dominio para correo y medios, confirmación bancaria y aceptación de la iglesia. Render Free y `r2.dev` conservan sus limitaciones; la carga medida no elimina esas condiciones. Tarjetas requiere una afiliación y credenciales de procesador que todavía no se proporcionaron.
 

@@ -1,0 +1,49 @@
+{
+  "manual_run": {
+    "url": "https://github.com/KevinML12/casadelrey/actions/runs/41165501659",
+    "headSha": "388b60e943d827f5a99d161a0b73d2de0a590010",
+    "createdAt": "2026-10-31T03:42:12Z",
+    "updatedAt": "2026-10-31T03:44:26Z",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "database": {
+    "active_tables": 28,
+    "privileges": {
+      "role_safe": true,
+      "default_readonly": "on",
+      "active_tables_readable": 28,
+      "writable_application_tables": 0,
+      "outside_schema_select": 0,
+      "create_in_user_schemas": 0,
+      "callable_security_definers": 0
+    },
+    "historical_administrative_connection_shared": false,
+    "application_role_connection_limit_unchanged": true,
+    "existing_administrator_membership_restored": true
+  },
+  "storage": {
+    "objects": 749,
+    "bytes": 2815028018,
+    "complete": true,
+    "encrypted_private_r2": true
+  },
+  "schedule": {
+    "cron_utc": "0 9 * * *",
+    "timezone": "America/Guatemala",
+    "local_time": "03:00",
+    "enabled": true,
+    "activation_commit": "563c23cfc3d6740f1610749c11cd97710249d367",
+    "local_duplicate_status": "PAUSED"
+  },
+  "secrets": {
+    "repository": "KevinML12/casadelrey",
+    "count": 8,
+    "values_published": false
+  },
+  "notes": [
+    "GitHub can delay scheduled runs and disable public-repository schedules after 60 days without repository activity.",
+    "Historical snapshots remain separately encrypted; daily jobs back up only the active schema.",
+    "File recovery from local encrypted copies was tested previously; this run verifies backups, not a full remote restore drill."
+  ]
+}
