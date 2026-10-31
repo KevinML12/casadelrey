@@ -44,10 +44,14 @@ La clave vence el 30 de octubre de 2027 o tras 90 días de inactividad. Al rotar
 
 ## Pendientes del cierre general
 
-Este cambio no cierra los asuntos históricos registrados en la [preparación del 29 de octubre](../release-2026-10-29/PREPARACION_PRODUCCION.md): tres archivos antiguos potencialmente públicos necesitan clasificación y migración; el historial financiero original sigue pendiente de una decisión de conservación; faltan el cierre de alojamiento, restauración y capacidad operativa. Las mejoras del flujo nuevo no revocan URLs públicas antiguas.
+El cierre posterior, con migración privada de los tres archivos históricos, archivo cifrado del origen, saneamiento, ensayo de restauración y carga, está documentado en [Cierre técnico de producción](CIERRE_PRODUCCION.md). Ese documento sustituye la lista de pendientes históricos de la preparación del 29 de octubre. Persisten las decisiones institucionales y de alojamiento allí indicadas.
 
 Fuentes oficiales: [límites de Brevo Gratis](https://help.brevo.com/hc/en-us/articles/208580669-FAQs-What-are-the-limits-of-the-Free-plan), [remitentes y dominios](https://developers.brevo.com/docs/getting-started-with-senders-and-domains), [eventos de entrega](https://developers.brevo.com/reference/get-email-event-report).
 
 ## Panel y redes administrables
 
 Detalles y validación de la entrega adicional: [Administración y promoción de redes](ADMIN_Y_REDES.md).
+
+## Cierre operativo posterior
+
+El estado actualizado de comprobantes históricos, archivos, recuperación, saneamiento, capacidad y tareas externas está en [Cierre técnico de producción](CIERRE_PRODUCCION.md). Las observaciones históricas de este documento deben leerse con esa actualización.

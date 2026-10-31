@@ -1,0 +1,51 @@
+{
+  "legacy_receipts": {
+    "objects": 3,
+    "references": 3,
+    "applied": true,
+    "public_originals_retired": true,
+    "recovery_copies_verified": true
+  },
+  "demonstration_data": {
+    "documented_demo_events": 4,
+    "controlled_qa_accounts": 2,
+    "institutional_admins_remaining": 4,
+    "applied": true
+  },
+  "synthetic_pending_payment": {
+    "synthetic_unreceived_donation_archived": 1,
+    "synthetic_pending_receipt_archived": 1,
+    "verified_financial_records_changed": 0,
+    "encrypted_recovery_copy_verified": true
+  },
+  "bank_configuration": {
+    "inconsistent_test_bank_fields_archived": 4,
+    "public_account_withheld_until_institutional_confirmation": true,
+    "previous_values_preserved_encrypted": true
+  },
+  "fly_retirement": {
+    "machines_stopped": 2,
+    "remote_autostart_disabled": false,
+    "blocked_reason": "Fly requires billing information to update machine configuration"
+  },
+  "readiness": {
+    "render_http_status": 200,
+    "render_json": {
+      "status": "ready"
+    }
+  },
+  "backend_deployment": {
+    "commit": "bc5593351ba56180484e8e49f57bf07cab930983",
+    "render_deploy": "dep-dbijchmtlv9c73at6bs0",
+    "status": "live"
+  },
+  "vet": {
+    "exit_status": 0
+  },
+  "backup_schedule": {
+    "kind": "local Codex heartbeat",
+    "time": "03:00 America/Guatemala",
+    "requires_mac_and_codex": true,
+    "github_schedule_active": false
+  }
+}

@@ -1,5 +1,7 @@
 # Preparación para producción — 29 de octubre de 2026
 
+> Registro histórico. El saneamiento, los respaldos, la restauración y la carga posteriores están en [Cierre técnico del 30 de octubre](../release-2026-10-30/CIERRE_PRODUCCION.md); consultar allí el estado actual de los pendientes.
+
 **Valoración técnica: 7/10 listo; aproximadamente 3/10 pendiente.** Es una estimación de cierre, no un porcentaje medido ni una promesa de capacidad. Se excluyen capacitación, aceptación y pruebas con personas reales. Se incluyen todavía las verificaciones técnicas con cuentas controladas, restauración y carga sintética.
 
 ## Verificado

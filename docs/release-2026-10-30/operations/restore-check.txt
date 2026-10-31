@@ -1,0 +1,10 @@
+Restoration verified: active; 28 tables
+Restoration verified: historical; 28 tables
+Storage recovery verified: 100
+Storage recovery verified: 200
+Storage recovery verified: 300
+Storage recovery verified: 400
+Storage recovery verified: 500
+Storage recovery verified: 600
+Storage recovery verified: 700
+{"databases": [{"source": "active", "tables": 28, "rows": 1653, "restored": true}, {"source": "historical", "tables": 28, "rows": 882, "restored": true}], "storage_objects_verified": 749, "verified_at": "2026-10-31T01:17:38.261157+00:00"}

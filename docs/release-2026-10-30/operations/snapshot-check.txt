@@ -1,0 +1,7 @@
+Encrypted remote database snapshot verified
+Encrypted remote database snapshot verified
+Database protected: active; 28 tables
+Encrypted remote database snapshot verified
+Encrypted remote database snapshot verified
+Database protected: historical; 28 tables
+{"created_at": "20261031T011628520591Z", "databases": [{"source": "active", "tables": 28, "rows": 1653, "snapshot": "active-20261031T011628520591Z.dump.aes"}, {"source": "historical", "tables": 28, "rows": 882, "snapshot": "historical-20261031T011628520591Z.dump.aes"}], "storage_included": false}

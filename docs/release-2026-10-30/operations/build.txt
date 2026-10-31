@@ -1,0 +1,67 @@
+
+> frontend@0.0.0 build
+> vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 1691 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                  1.68 kB │ gzip:   0.72 kB
+dist/assets/index-CIdW_s4j.css                  59.72 kB │ gzip:  12.21 kB
+dist/assets/LeaderConnectCards-pP_kja1A.js       0.23 kB │ gzip:   0.18 kB
+dist/assets/LeaderBoletas-QdiIl4rh.js            0.28 kB │ gzip:   0.21 kB
+dist/assets/AdminCellReports-CR4FFLF5.js         0.36 kB │ gzip:   0.25 kB
+dist/assets/LeaderReports-Dat3kQ1e.js            0.36 kB │ gzip:   0.25 kB
+dist/assets/AdminResourceState-BXb5BmJZ.js       0.44 kB │ gzip:   0.33 kB
+dist/assets/CellAdminNav-CwKcx-49.js             0.56 kB │ gzip:   0.40 kB
+dist/assets/compressImage-CbLzxOvQ.js            0.58 kB │ gzip:   0.39 kB
+dist/assets/StatCard-w2hN8oGv.js                 0.73 kB │ gzip:   0.44 kB
+dist/assets/PaymentSuccess-WgiYxva6.js           1.00 kB │ gzip:   0.51 kB
+dist/assets/Chip-DzvCu7n6.js                     1.12 kB │ gzip:   0.54 kB
+dist/assets/useSettingsEditor-BCXQGsNt.js        1.21 kB │ gzip:   0.76 kB
+dist/assets/Paginator-B_rOkazg.js                1.22 kB │ gzip:   0.63 kB
+dist/assets/Button-r1HYZYQH.js                   1.67 kB │ gzip:   0.75 kB
+dist/assets/CellCodePicker-hxs_6Pyw.js           1.78 kB │ gzip:   0.89 kB
+dist/assets/with-selector-CWcCY2ZX.js            1.80 kB │ gzip:   0.84 kB
+dist/assets/LeaderCellDirectory-D0a1WQro.js      2.12 kB │ gzip:   0.84 kB
+dist/assets/Input-BWUCKNEB.js                    2.31 kB │ gzip:   0.92 kB
+dist/assets/LeaderIndex-CsRFF5MH.js              2.86 kB │ gzip:   1.10 kB
+dist/assets/AdminSocial-DjyI05p7.js              3.18 kB │ gzip:   1.48 kB
+dist/assets/LeaderMyCell-DGq-7R8o.js             3.40 kB │ gzip:   1.58 kB
+dist/assets/AdminSitePhotos-swdcram-.js          3.58 kB │ gzip:   1.54 kB
+dist/assets/AdminActivityLog-C-H3lCG1.js         3.74 kB │ gzip:   1.44 kB
+dist/assets/LeaderMyProfile-DNxAqQoP.js          3.88 kB │ gzip:   1.79 kB
+dist/assets/AdminSettings-DyKEux1p.js            3.98 kB │ gzip:   1.99 kB
+dist/assets/ReceiptPage-DpOuy4oI.js              4.03 kB │ gzip:   1.93 kB
+dist/assets/LeaderVolunteers-DM_h0yHC.js         4.04 kB │ gzip:   1.65 kB
+dist/assets/ProfilePage-C31XE_zG.js              4.14 kB │ gzip:   1.66 kB
+dist/assets/LeaderEvents-C8ZoduDf.js             4.19 kB │ gzip:   1.61 kB
+dist/assets/AdminVolunteers-BTMu7hwT.js          4.98 kB │ gzip:   1.95 kB
+dist/assets/AdminConnectCards-B7wL-yh9.js        5.03 kB │ gzip:   2.03 kB
+dist/assets/AdminFAQs-CarGxldJ.js                5.07 kB │ gzip:   1.97 kB
+dist/assets/AdminDonations-_pQOWEAc.js           5.18 kB │ gzip:   2.04 kB
+dist/assets/AdminEmails-DDsRqrAd.js              5.35 kB │ gzip:   2.19 kB
+dist/assets/AdminDonationPurposes-BgyrKlQL.js    5.37 kB │ gzip:   2.07 kB
+dist/assets/AdminGallery-_vvlwcnK.js             5.79 kB │ gzip:   2.32 kB
+dist/assets/AdminAnnouncements-DxgjMI5d.js       5.94 kB │ gzip:   2.18 kB
+dist/assets/AdminUsers-QeEMuve9.js               6.09 kB │ gzip:   2.39 kB
+dist/assets/AdminVolunteerAreas-BJ7qWM3s.js      6.21 kB │ gzip:   2.36 kB
+dist/assets/AdminLeaders-BZXKdc5h.js             6.48 kB │ gzip:   2.44 kB
+dist/assets/AdminCellCategories-CiyhIyBF.js      6.84 kB │ gzip:   2.85 kB
+dist/assets/AdminProfile-Bs4WHSUY.js             6.98 kB │ gzip:   2.21 kB
+dist/assets/AdminPetitions-DOs2oDsS.js           7.03 kB │ gzip:   2.69 kB
+dist/assets/AdminBoletas-_pUjlrf1.js             7.27 kB │ gzip:   2.59 kB
+dist/assets/AdminCells-CeYPwflT.js               8.98 kB │ gzip:   3.57 kB
+dist/assets/AdminEvents-C1MF6i2x.js             10.54 kB │ gzip:   3.68 kB
+dist/assets/AdminHero-sHwC__d9.js               10.59 kB │ gzip:   3.30 kB
+dist/assets/AdminReceipts-DhgLkOm3.js           10.80 kB │ gzip:   3.43 kB
+dist/assets/VolunteerDashboard-7mE0D-on.js      12.31 kB │ gzip:   4.08 kB
+dist/assets/DonatePage-DArTuDou.js              12.46 kB │ gzip:   4.29 kB
+dist/assets/CellReportsPage-Cv4fG6-i.js         15.35 kB │ gzip:   4.60 kB
+dist/assets/motion-Bw53sGz3.js                 123.64 kB │ gzip:  41.11 kB
+dist/assets/react--TPgFEs-.js                  286.39 kB │ gzip:  91.84 kB
+dist/assets/AdminIndex-NyYikAZF.js             353.71 kB │ gzip: 105.16 kB
+dist/assets/index-Cy38p7zG.js                  382.77 kB │ gzip: 114.79 kB
+dist/assets/AdminBlog-BY1CO1Oz.js              406.87 kB │ gzip: 128.51 kB
+✓ built in 3.76s

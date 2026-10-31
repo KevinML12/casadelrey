@@ -1,0 +1,19 @@
+{
+  "cache_hits": 5844,
+  "elapsed_seconds": 240.243436375,
+  "equivalent_visits": 1000,
+  "errors": 0,
+  "max_ms": 118.725,
+  "max_workers": 50,
+  "p50_ms": 0.929,
+  "p95_ms": 2.991,
+  "p99_ms": 5.577,
+  "paced_rps": 25,
+  "requests": 6000,
+  "response_bytes": 27790000,
+  "statuses": {
+    "200": 6000
+  },
+  "target": "127.0.0.1",
+  "verified_at": "2026-10-31T00:18:51Z"
+}

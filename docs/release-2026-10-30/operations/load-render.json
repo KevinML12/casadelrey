@@ -1,0 +1,19 @@
+{
+  "cache_hits": 5852,
+  "elapsed_seconds": 240.164270042,
+  "equivalent_visits": 1000,
+  "errors": 0,
+  "max_ms": 3151.475,
+  "max_workers": 50,
+  "p50_ms": 186.495,
+  "p95_ms": 608.265,
+  "p99_ms": 1129.595,
+  "paced_rps": 25,
+  "requests": 6000,
+  "response_bytes": 27330000,
+  "statuses": {
+    "200": 6000
+  },
+  "target": "casadelrey-api-pruebas.onrender.com",
+  "verified_at": "2026-10-31T00:35:57Z"
+}

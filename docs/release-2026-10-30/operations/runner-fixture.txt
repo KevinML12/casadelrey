@@ -1,0 +1,6 @@
+Prepared CI runtime with dummy values only.
+Private directory 0700; key and environment 0600; independent key 32 bytes.
+Historical administrative connection absent from runner configuration.
+Workflow YAML, Python and shell syntax validated.
+No GitHub credentials uploaded, workflow not installed or executed, daily cron inactive.
+Current OAuth connection cannot publish workflows; template retained in ops/.

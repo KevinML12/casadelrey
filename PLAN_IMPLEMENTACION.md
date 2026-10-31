@@ -1,3 +1,5 @@
+> Documento histórico de alcance (mayo de 2026). Para el estado actual y las tareas que requieren al titular, consultar [el cierre técnico del 30 de octubre](docs/release-2026-10-30/CIERRE_PRODUCCION.md). Varias tareas de esta lista ya están implementadas; no usar sus casillas como inventario de pendientes vigente.
+
 # Plan de Implementación — Nuevos Requerimientos
 # Casa del Rey · Mayo 2026
 

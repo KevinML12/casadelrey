@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+# Only the protected runner temporary directory is mounted into the client.
+exec docker run --rm --interactive --network host --user "$(id -u):$(id -g)" \
+  -e PGHOST -e PGPORT -e PGUSER -e PGPASSWORD -e PGDATABASE -e PGSSLMODE -e PGCONNECT_TIMEOUT -e PGOPTIONS \
+  -v "$RUNNER_TEMP:$RUNNER_TEMP" postgres:18-alpine "$(basename "$0")" "$@"

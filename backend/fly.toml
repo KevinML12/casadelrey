@@ -1,3 +1,6 @@
+# Retired backend. Current deployment uses Render; do not deploy this manifest.
+# Both Fly machines were stopped. Updating their remote autostart configuration
+# was rejected by Fly billing; these local values do not change that remote state.
 app = "casa-del-rey-mvp"
 primary_region = "dfw"
 
@@ -8,9 +11,6 @@ primary_region = "dfw"
   internal_port = 8080
   force_https = true
   auto_stop_machines = true
-  auto_start_machines = true
-  # 1 máquina siempre despierta: evita que el primer visitante después de
-  # inactividad pague ~60s de AutoMigrate + reconexión a Postgres. Sigue
-  # dentro del tier gratuito de Fly (shared-cpu-1x:256MB, hasta 3 gratis).
-  min_machines_running = 1
+  auto_start_machines = false
+  min_machines_running = 0
   processes = ["app"]

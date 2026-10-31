@@ -87,22 +87,45 @@ def maintenance(env, *args, timeout=5400):
         raise RuntimeError('Storage/encryption maintenance failed; no further operations were performed')
 
 
-def backup(env, storage=False):
+def copy_counts(data):
+    """Count rows from the exported snapshot, not a different live transaction."""
+    result={};current=None
+    header=re.compile(rb'^COPY "?([a-z_][a-z0-9_]*)"?\."?([a-z_][a-z0-9_]*)"? \(.*\) FROM stdin;$')
+    for line in data.splitlines():
+        if current is not None:
+            if line==b'\\.': current=None
+            else: result[current]+=1
+        else:
+            match=header.match(line)
+            if match:
+                current=(match[1].decode(),match[2].decode());result[current]=0
+    if current is not None:raise RuntimeError('Truncated COPY data in backup')
+    return result
+
+
+def backup(env, storage=False, active_only=False):
     directory = Path(env['BACKUP_HOME']); directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    sources = [('active', env['DATABASE_URL'], 'cdr_render_qa'), ('historical', env['SOURCE_DATABASE_URL'], 'public')]
+    sources = [('active', env.get('BACKUP_DATABASE_URL', env['DATABASE_URL']), 'cdr_render_qa')]
+    if not active_only: sources.append(('historical', env['SOURCE_DATABASE_URL'], 'public'))
     report = {'created_at': stamp, 'databases': []}
     for label, connection, schema in sources:
         private = Path(tempfile.mkdtemp(prefix='.db-', dir=directory)); private.chmod(0o700)
         try:
-            before = counts(connection, schema)
-            dependencies = [{'schema':'auth','tables':counts(connection,'auth')}] if label=='historical' else []
+            dependencies = [{'schema':'auth'}] if label=='historical' else []
             schemas = [schema] + [row['schema'] for row in dependencies]
             roles = query(connection, "SELECT DISTINCT unnest(roles) FROM pg_policies WHERE schemaname IN (" + ','.join(literal(value) for value in schemas) + ");").splitlines()
 
             dump = private / 'database.dump'
             dump.touch(mode=0o600)
             run(['pg_dump', '--format=custom', '--no-owner', '--no-acl'] + ['--schema='+value for value in schemas] + ['--file='+str(dump)], pg_env(connection), timeout=900)
+            snapshot_counts=copy_counts(run(['pg_restore','--data-only','--file=-',str(dump)],timeout=900))
+            def table_counts(name):
+                rows=[{'table':table,'rows':number} for (namespace,table),number in sorted(snapshot_counts.items()) if namespace==name]
+                if not rows:raise RuntimeError('Snapshot contains no table data for the expected schema')
+                return rows
+            before=table_counts(schema)
+            for dependency in dependencies: dependency['tables']=table_counts(dependency['schema'])
             digest = hashlib.sha256(dump.read_bytes()).hexdigest()
             sealed = directory / f'{label}-{stamp}.dump.aes'
             maintenance(env, 'seal', dump, sealed)
@@ -143,8 +166,13 @@ def restore_check(env):
     try:
         run([str(pg_bin/'initdb'), '-D', str(temp/'pg'), '--auth=scram-sha-256', '--pwfile='+str(password_file), '--no-locale', '--encoding=UTF8', '--username=cdr_restore'])
         run([str(pg_bin/'pg_ctl'), '-D', str(temp/'pg'), '-l', str(temp/'server.log'), '-o', f'-h 127.0.0.1 -p {port} -k {temp}', '-w', 'start']); started=True
+        if not list(directory.glob('active-*.dump.aes')):
+            raise RuntimeError('An active database snapshot is required for the restore drill')
         for label in ['active', 'historical']:
-            snapshot = sorted(directory.glob(f'{label}-*.dump.aes'))[-1]
+            snapshots = sorted(directory.glob(f'{label}-*.dump.aes'))
+            if not snapshots:
+                continue
+            snapshot = snapshots[-1]
             manifest = snapshot.with_name(snapshot.name.replace('.dump.aes','.manifest.aes'))
             decoded = temp/f'{label}.json'; maintenance(env,'open',manifest,decoded)
             metadata=json.loads(decoded.read_text())
@@ -192,13 +220,14 @@ def main():
     parser.add_argument('command', choices=['backup','restore-check'])
     parser.add_argument('--environment',type=Path,default=DEFAULT_ENV)
     parser.add_argument('--storage',action='store_true')
+    parser.add_argument('--active-only',action='store_true')
     args=parser.parse_args();env=config(args.environment)
     lock_path=Path(env['BACKUP_KEY_FILE']).parent/'maintenance.lock'
     with lock_path.open('w') as lock:
         os.chmod(lock_path,0o600)
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: raise SystemExit('Another maintenance operation is already running')
-        if args.command=='backup':backup(env,args.storage)
+        if args.command=='backup':backup(env,args.storage,args.active_only)
         else:restore_check(env)
 
 if __name__=='__main__':

@@ -9,7 +9,7 @@ services:
     rootDir: backend
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    healthCheckPath: /health
+    healthCheckPath: /ready
     autoDeployTrigger: "off"
     envVars:
       - key: ENV
