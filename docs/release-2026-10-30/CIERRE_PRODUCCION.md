@@ -1,5 +1,7 @@
 # Cierre técnico de producción — 30 de octubre de 2026
 
+> Actualización del 1 de noviembre: se eliminan los valores bancarios de ejemplo y pasa una recuperación completa descargada desde R2. Evidencia y estado actualizado en [cierre adicional](../release-2026-11-01/README.md).
+
 La aplicación conserva Vercel y Render Static como frontends, Render como API y Supabase como base activa. El historial original se conserva separado y cifrado. No se contrataron planes, dominios o procesadores de tarjeta ni se realizaron transferencias.
 
 ## Trabajo ejecutado

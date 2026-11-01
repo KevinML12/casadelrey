@@ -33,6 +33,7 @@ async function isolate(page, custom) {
               bank_account: "CONTROLLED-ACCOUNT",
               bank_name: "Banco configurado",
               bank_holder: "Casa del Rey",
+              bank_account_type: "Tipo configurado",
             }
           : path === "/site-photos"
             ? {}

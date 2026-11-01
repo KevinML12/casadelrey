@@ -5,9 +5,13 @@ import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import AdminResourceState from '../../components/ui/AdminResourceState';
 import useSettingsEditor from '../../hooks/useSettingsEditor';
+import { bankInfo } from '../../lib/bankInfo';
 
 const HINTS = {
-  bank_account: 'Si no hay cuenta, el sitio invita a coordinar el depósito por contacto.',
+  bank_name: 'Nombre oficial del banco. No se completa automáticamente.',
+  bank_account: 'El destino se muestra al público cuando banco, cuenta, tipo y titular están guardados.',
+  bank_account_type: 'Tipo indicado por el banco para esta cuenta.',
+  bank_holder: 'Titular exacto de la cuenta, confirmado por la iglesia.',
   contact_whatsapp: 'Número de WhatsApp con código de país, por ejemplo 502 seguido de 8 dígitos.',
   about_podcast_url: 'Enlace público para escuchar. Déjalo vacío si todavía no tienen uno.',
 };
@@ -24,6 +28,7 @@ export default function AdminSettings() {
   const [uploadError, setUploadError] = useState('');
   const groups = GROUPS.filter(group => settings.some(item => group.includes(item.key)));
   const selected = groups.find(item => item.key === group) || groups[0];
+  const savedBank = bankInfo(Object.fromEntries(settings.map(item => [item.key, item.value])));
   const photo = async (key, file) => {
     if (!file) return;
     if (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) { setUploadError('Elige una imagen de hasta 10 MB.'); return; }
@@ -42,7 +47,11 @@ export default function AdminSettings() {
     {loading ? <AdminResourceState loading /> : !settings.length ? <AdminResourceState error={error || 'No pudimos cargar la configuración.'} onRetry={load} /> : <>
       {(error || uploadError) && <AdminResourceState error={error || uploadError} />}
       <div role="group" aria-label="Tipo de configuración" className="flex flex-wrap gap-2">{groups.map(item => <Button key={item.key} variant={selected?.key === item.key ? 'filled' : 'outlined'} aria-pressed={selected?.key === item.key} onClick={() => setGroup(item.key)}>{item.label}</Button>)}</div>
-      {selected?.key === 'contact' && !draft.bank_account && <p className="rounded-[12px] border border-bg/15 bg-white/50 p-4 text-14">La cuenta bancaria está vacía. El sitio mostrará la opción de coordinar el depósito.</p>}
+      {selected?.key === 'contact' && <aside aria-label="Estado de los datos bancarios" className="rounded-[12px] border border-bg/15 bg-white/50 p-4 text-14">
+        <p className="font-bold">{savedBank.hasAccount ? 'Datos bancarios completos y guardados' : 'Depósitos por contacto'}</p>
+        <p className="mt-1">{savedBank.hasAccount ? 'El sitio muestra los datos guardados. Confirma con la iglesia que corresponden a su cuenta oficial.' : `Falta guardar: ${savedBank.missing.join(', ')}. Mientras tanto, el sitio invita a coordinar el depósito por contacto.`}</p>
+        <p className="mt-2 text-13 text-bg/65">Los cambios sin guardar todavía no se publican. No se sustituyen los campos vacíos con datos de ejemplo.</p>
+      </aside>}
       <div className="glass-light divide-y divide-bg/10 rounded-[16px]">
         {settings.filter(item => selected?.includes(item.key)).map(item => {
           const isPhoto = item.key.endsWith('_bg') || item.key.startsWith('public_bg_');

@@ -6,6 +6,8 @@ Sitio principal: [casadelreyhue.vercel.app](https://casadelreyhue.vercel.app). E
 
 Un responsable de la iglesia debe verificar los datos bancarios, titular, tipo de cuenta y WhatsApp en **Configuración → Depósitos y contacto**. La configuración mezclaba datos importados y etiquetas de pruebas; se conservó una copia cifrada y el número no se publica hasta que lo reingresen confirmado. Nunca se debe inventar o copiar un número de un ejemplo. Mientras está vacío, el sitio permite coordinar el depósito por contacto.
 
+El panel indica qué campos faltan **guardar**. El sitio muestra un destino bancario cuando están completos banco, cuenta, tipo y titular; si falta uno, ofrece contacto. Los campos vacíos no se completan con nombres o tipos de ejemplo. Cambiar un campo sin guardarlo no publica ese cambio ni completa el estado del panel.
+
 Confirmar también los perfiles sociales, fechas y precios de eventos. Los cuatro eventos de demostración quedaron ocultos. El historial real conservado sigue disponible según su fecha; no se presenta una convocatoria nueva sin que un administrador la publique.
 
 ## Publicar contenido

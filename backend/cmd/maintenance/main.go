@@ -73,6 +73,10 @@ func (c *client) list(ctx context.Context, bucket, prefix string) ([]object, err
 	return rows, nil
 }
 func (c *client) read(ctx context.Context, bucket, key string) ([]byte, error) {
+	return c.readLimited(ctx, bucket, key, 128<<20)
+}
+
+func (c *client) readLimited(ctx context.Context, bucket, key string, limit int64) ([]byte, error) {
 	var last error
 	for attempt := 0; attempt < 3; attempt++ {
 		o, err := c.s3.GetObject(ctx, &s3.GetObjectInput{Bucket: aws.String(bucket), Key: aws.String(key)})
@@ -80,9 +84,9 @@ func (c *client) read(ctx context.Context, bucket, key string) ([]byte, error) {
 			last = errors.New("storage object request failed")
 			continue
 		}
-		data, readErr := io.ReadAll(io.LimitReader(o.Body, (128<<20)+1))
+		data, readErr := io.ReadAll(io.LimitReader(o.Body, limit+1))
 		o.Body.Close()
-		if len(data) > 128<<20 {
+		if int64(len(data)) > limit {
 			return nil, errors.New("storage object exceeds 128 MB recovery limit")
 		}
 		if readErr == nil {
@@ -359,7 +363,7 @@ func (c *client) retire(ctx context.Context, path string) error {
 }
 func run() error {
 	if len(os.Args) < 2 {
-		return errors.New("use seal, open, storage-backup, legacy-stage or legacy-retire")
+		return errors.New("use seal, open, storage-backup, remote-fetch, legacy-stage or legacy-retire")
 	}
 	if os.Args[1] == "seal" || os.Args[1] == "open" {
 		if len(os.Args) != 4 {
@@ -414,6 +418,8 @@ func run() error {
 		return nil
 	case "storage-backup":
 		return c.backup(ctx, os.Args[2])
+	case "remote-fetch":
+		return c.fetchRecovery(ctx, os.Args[2])
 	case "legacy-stage":
 		return c.stage(ctx, os.Args[2])
 	case "legacy-retire":

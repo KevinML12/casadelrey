@@ -7,22 +7,10 @@
 //  banner de pago de Eventos.
 // ============================================================
 import { useApi } from '../../lib/feed';
+import { bankInfo } from '../../lib/bankInfo';
 
 export function useBankInfo() {
-  const s = useApi('/settings') || {};
-  const account = (s.bank_account || '').trim();
-  return {
-    hasAccount: account !== '',
-    whatsapp: (s.contact_whatsapp || '').trim(),
-    bankName: s.bank_name || 'Banrural',
-    holder: s.bank_holder || 'Iglesia Casa del Rey',
-    rows: [
-      { label: 'Banco', value: s.bank_name || 'Banrural' },
-      { label: 'Cuenta', value: account },
-      { label: 'Tipo', value: s.bank_account_type || 'Monetaria' },
-      { label: 'A nombre de', value: s.bank_holder || 'Iglesia Casa del Rey' },
-    ].filter(r => r.value),
-  };
+  return bankInfo(useApi('/settings') || {});
 }
 
 // `on="light"` cuando el contenedor que lo envuelve es glass-light
@@ -52,9 +40,9 @@ export default function BankDetails({ on = 'dark' }) {
   return (
     <div className="space-y-2">
       {rows.map(({ label, value }) => (
-        <div key={label} className={`flex items-center justify-between rounded-[12px] ${dim} px-4 py-3`}>
-          <span className={`text-13 font-semibold ${inkMuted}`}>{label}</span>
-          <span className={`text-15 font-bold ${ink}`}>{value}</span>
+        <div key={label} className={`flex items-center justify-between gap-4 rounded-[12px] ${dim} px-4 py-3`}>
+          <span className={`shrink-0 text-13 font-semibold ${inkMuted}`}>{label}</span>
+          <span className={`min-w-0 break-words text-right text-15 font-bold ${ink}`}>{value}</span>
         </div>
       ))}
     </div>

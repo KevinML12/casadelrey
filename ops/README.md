@@ -20,7 +20,7 @@ Sin `--active-only` se incluye también el historial original y sus dependencias
 
 La base se exporta en formato PostgreSQL custom. Cada dump se descifra y compara antes de confirmar su subida privada. Los objetos se cifran por contenido y se deduplican; se verifica el manifiesto remoto y no se sobrescriben snapshots existentes. En ejecuciones incrementales se comprueba la integridad de los objetos locales y sus metadatos de origen. No se eliminan copias antiguas automáticamente; revisar almacenamiento y retención con el responsable institucional.
 
-El inventario de filas se obtiene del mismo snapshot exportado, evitando diferencias si entran registros durante el respaldo. La instalación local usa `BACKUP_DATABASE_URL` con la conexión de mantenimiento existente, separada del rol limitado de la aplicación; esa credencial administrativa no se ha entregado a GitHub. El ensayo final restauró las dos bases y comprobó los 749 objetos actuales desde las copias cifradas locales. Las subidas de bases y manifiestos se descargan de R2 para compararlas; los blobs de archivos tienen comprobación remota de tamaño y validación criptográfica local, no un ensayo de descarga integral desde R2.
+El inventario de filas se obtiene del mismo snapshot exportado, evitando diferencias si entran registros durante el respaldo. La instalación local usa `BACKUP_DATABASE_URL` con la conexión de mantenimiento existente, separada del rol limitado de la aplicación; esa credencial administrativa no se ha entregado a GitHub. Las subidas de bases y manifiestos se descargan de R2 para compararlas. El 1 de noviembre también pasó un ensayo íntegro desde R2: ambas bases y 749 referencias de archivos, con 536 contenidos cifrados distintos, descargados y autenticados antes de restaurar y comprobar sus hashes.
 
 La automatización local de Codex, `respaldos-diarios-de-casa-del-rey`, quedó **pausada** después de comprobar el ejecutor de GitHub. Se conserva como alternativa manual; no se ejecutan dos tareas diarias duplicadas. Las copias locales existentes permanecen disponibles.
 
@@ -41,6 +41,14 @@ python3 ops/recovery.py restore-check
 ```
 
 El programa crea un PostgreSQL local desechable, con contraseña aleatoria, ligado a loopback. No acepta una URL remota de destino ni sobrescribe una base de producción. Restaura las tablas y dependencias, compara inventarios y restricciones y descifra todos los objetos de la última copia para comparar tamaño y SHA-256. El servidor y sus archivos temporales se retiran al terminar.
+
+Para ensayar la recuperación **exclusivamente desde R2**, sin reutilizar los archivos locales:
+
+```sh
+python3 ops/recovery.py remote-restore-check
+```
+
+Recompilar antes `backend/cmd/maintenance` en el directorio privado si se actualizó la herramienta. La operación sólo descarga de `backups/` en el bucket privado; no consulta la base activa ni modifica objetos. Selecciona los últimos manifiestos autenticados, valida las referencias y descarga cada contenido cifrado una sola vez. No admite un directorio de recuperación existente ni referencias fuera de su espacio de respaldo. Después restaura ambas bases disponibles en un PostgreSQL local nuevo, comprueba todos los archivos y elimina el material temporal. Conserva únicamente el informe agregado privado `remote-restore-result.json`. Requiere PostgreSQL local y espacio temporal para los archivos cifrados descargados; el ensayo actual leyó aproximadamente 2,8 GB de contenido sin cambiar producción.
 
 Para un incidente real, preparar un destino nuevo, recuperar el dump y manifiesto desde almacenamiento privado y conservar los servicios anteriores hasta validar las cuentas, datos y archivos recuperados. No servir un dump antes de comprobar accesos y sesiones. Mantener protegidas las claves de aplicación de Render que sean necesarias para datos cifrados dentro de la base.
 

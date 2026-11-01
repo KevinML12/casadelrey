@@ -1,0 +1,20 @@
+{
+  "databases": [
+    {
+      "source": "active",
+      "tables": 28,
+      "rows": 1653,
+      "restored": true
+    },
+    {
+      "source": "historical",
+      "tables": 28,
+      "rows": 882,
+      "restored": true
+    }
+  ],
+  "storage_objects_verified": 749,
+  "verified_at": "2026-11-01T21:31:29.553697+00:00",
+  "origin": "private_r2",
+  "distinct_encrypted_files_downloaded": 536
+}

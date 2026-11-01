@@ -1,0 +1,24 @@
+Remote database recovery verified: active
+Remote database recovery verified: historical
+Remote encrypted files verified: 50/536
+Remote encrypted files verified: 100/536
+Remote encrypted files verified: 150/536
+Remote encrypted files verified: 200/536
+Remote encrypted files verified: 250/536
+Remote encrypted files verified: 300/536
+Remote encrypted files verified: 350/536
+Remote encrypted files verified: 400/536
+Remote encrypted files verified: 450/536
+Remote encrypted files verified: 500/536
+{"database_sources":["active","historical"],"distinct_encrypted_files_downloaded":536,"storage_objects_verified":749,"verified_at":"2026-11-01T21:31:08.803521Z"}
+Restoration verified: active; 28 tables
+Restoration verified: historical; 28 tables
+Storage recovery verified: 100
+Storage recovery verified: 200
+Storage recovery verified: 300
+Storage recovery verified: 400
+Storage recovery verified: 500
+Storage recovery verified: 600
+Storage recovery verified: 700
+{"databases": [{"source": "active", "tables": 28, "rows": 1653, "restored": true}, {"source": "historical", "tables": 28, "rows": 882, "restored": true}], "storage_objects_verified": 749, "verified_at": "2026-11-01T21:31:29.553697+00:00"}
+{"databases": [{"source": "active", "tables": 28, "rows": 1653, "restored": true}, {"source": "historical", "tables": 28, "rows": 882, "restored": true}], "storage_objects_verified": 749, "verified_at": "2026-11-01T21:31:29.553697+00:00", "origin": "private_r2", "distinct_encrypted_files_downloaded": 536}

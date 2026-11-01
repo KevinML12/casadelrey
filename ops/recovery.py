@@ -210,14 +210,30 @@ def restore_check(env):
         result['verified_at']=dt.datetime.now(dt.timezone.utc).isoformat()
         output=directory/'restore-result.json';output.write_text(json.dumps(result,indent=2));output.chmod(0o600)
         print(json.dumps(result),flush=True)
+        return result
     finally:
         if started: run([str(pg_bin/'pg_ctl'),'-D',str(temp/'pg'),'-m','fast','-w','stop'])
         shutil.rmtree(temp)
 
 
+def remote_restore_check(env):
+    directory = Path(env['BACKUP_HOME'])
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with tempfile.TemporaryDirectory(prefix='.remote-drill-', dir=directory) as staging:
+        destination = Path(staging) / 'recovery'
+        maintenance(env, 'remote-fetch', destination)
+        fetched = json.loads((destination / 'remote-result.json').read_text())
+        restored = restore_check({**env, 'BACKUP_HOME': str(destination)})
+        result = {**restored, 'origin': 'private_r2',
+                  'distinct_encrypted_files_downloaded': fetched['distinct_encrypted_files_downloaded']}
+        output = directory / 'remote-restore-result.json'
+        output.write_text(json.dumps(result, indent=2)); output.chmod(0o600)
+        print(json.dumps(result), flush=True)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['backup','restore-check'])
+    parser.add_argument('command', choices=['backup','restore-check','remote-restore-check'])
     parser.add_argument('--environment',type=Path,default=DEFAULT_ENV)
     parser.add_argument('--storage',action='store_true')
     parser.add_argument('--active-only',action='store_true')
@@ -228,6 +244,7 @@ def main():
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: raise SystemExit('Another maintenance operation is already running')
         if args.command=='backup':backup(env,args.storage,args.active_only)
+        elif args.command=='remote-restore-check':remote_restore_check(env)
         else:restore_check(env)
 
 if __name__=='__main__':

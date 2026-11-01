@@ -31,8 +31,48 @@ func TestSiteSettings_GetPublic_UsaDefaultsYGuardados(t *testing.T) {
 	decodeBody(t, rec, &out)
 	assert.Equal(t, "Banco Industrial", out["bank_name"], "usa el valor guardado")
 	assert.Equal(t, "", out["bank_account"], "sin cuenta puesta → vacío, nunca un número falso")
-	assert.Equal(t, "Iglesia Casa del Rey", out["bank_holder"], "default cuando no hay guardado")
+	assert.Empty(t, out["bank_holder"], "no inferir el titular de la cuenta")
+	assert.Empty(t, out["bank_account_type"], "no inferir el tipo de cuenta")
 	assert.Empty(t, out["about_podcast_url"], "no inventar un enlace de reproducción")
+}
+
+func TestSiteSettings_ClearedBankDetailsStayEmpty(t *testing.T) {
+	for _, admin := range []bool{false, true} {
+		db, mock, sqlDB := newMockDB(t)
+		keys := []string{"bank_name", "bank_account", "bank_account_type", "bank_holder"}
+		rows := sqlmock.NewRows([]string{"id", "key", "value"})
+		for index, key := range keys {
+			rows.AddRow(index+1, key, "")
+		}
+		mock.ExpectQuery(`SELECT .* FROM "site_settings"`).WillReturnRows(rows)
+		c, rec := newCtx(t, ctxOpts{method: "GET"})
+		h := handlers.NewSiteSettingHandler(db)
+		if admin {
+			require.NoError(t, h.GetAll(c))
+			var items []struct {
+				Key, Value   string
+				UsingDefault bool `json:"using_default"`
+			}
+			decodeBody(t, rec, &items)
+			for _, item := range items {
+				for _, key := range keys {
+					if item.Key == key {
+						assert.Empty(t, item.Value)
+						assert.False(t, item.UsingDefault)
+					}
+				}
+			}
+		} else {
+			require.NoError(t, h.GetPublic(c))
+			var settings map[string]string
+			decodeBody(t, rec, &settings)
+			for _, key := range keys {
+				assert.Empty(t, settings[key], "bank data must be supplied by its administrator")
+			}
+		}
+		require.NoError(t, mock.ExpectationsWereMet())
+		sqlDB.Close()
+	}
 }
 
 func TestSiteSettings_PodcastRejectsExecutableLinks(t *testing.T) {

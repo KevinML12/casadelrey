@@ -56,10 +56,10 @@ var knownSettings = []struct{ Key, Label, Default string }{
 	{"social_youtube_url", "Redes — Canal de YouTube", ""},
 	{"social_youtube_description", "Redes — Descripción de YouTube", ""},
 
-	{"bank_name", "Banco", "Banrural"},
+	{"bank_name", "Banco", ""},
 	{"bank_account", "Número de cuenta", ""},
-	{"bank_account_type", "Tipo de cuenta", "Monetaria"},
-	{"bank_holder", "A nombre de", "Iglesia Casa del Rey"},
+	{"bank_account_type", "Tipo de cuenta", ""},
+	{"bank_holder", "A nombre de", ""},
 	{"contact_whatsapp", "WhatsApp de contacto (con 502)", ""},
 	{"admin_bg", "Fondo Panel Admin (URL)", "/images/bg-admin.png"},
 	{"leader_bg", "Fondo Panel Líder (URL)", "/images/bg-leader.png"},
@@ -151,6 +151,9 @@ func (h *SiteSettingHandler) UpdateSetting(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
+	if strings.HasPrefix(key, "bank_") {
+		req.Value = strings.TrimSpace(req.Value)
+	}
 	if strings.HasPrefix(key, "social_") && strings.HasSuffix(key, "_url") {
 		req.Value = strings.TrimSpace(req.Value)
 		channel := strings.TrimSuffix(strings.TrimPrefix(key, "social_"), "_url")
@@ -185,7 +188,7 @@ func (h *SiteSettingHandler) UpdateSetting(c echo.Context) error {
 }
 
 func optionalSetting(key string) bool {
-	return strings.HasPrefix(key, "about_") || strings.HasPrefix(key, "social_")
+	return strings.HasPrefix(key, "about_") || strings.HasPrefix(key, "social_") || strings.HasPrefix(key, "bank_")
 }
 
 // Profiles are promoted without relying on individual posts. Validate here too:
