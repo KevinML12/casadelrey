@@ -1,0 +1,31 @@
+{
+  "backend": {
+    "commit": "470c31fc3246db6f04a5e055baa13d9c2b1c5830",
+    "render_deploy": "dep-dbjr0tss728c738iuk10",
+    "status": "deploy_succeeded"
+  },
+  "frontend": {
+    "commit": "9ae8133c7a00cd8c034784f537f4cce3d2014a35",
+    "render_deploy": "dep-dbjr7lc9v7es73au6v30",
+    "render_status": "deploy_succeeded",
+    "vercel_status": "success",
+    "vercel_deployment": "https://vercel.com/kevinml12s-projects/casadelreyhue/98bcyLWA188XyrTxashcn1tfy4UF"
+  },
+  "bank_destination": {
+    "all_four_public_fields_empty": true,
+    "requires_institutional_confirmation": true,
+    "example_defaults_removed": true
+  },
+  "checks": {
+    "public_route_tests": 4,
+    "payment_preview_checks": 4,
+    "widths": [
+      320,
+      1440
+    ],
+    "controlled_payment_ui_regressions": 10,
+    "real_payments_or_receipt_submissions": 0,
+    "remote_recovery_passed": true,
+    "temporary_remote_download_directories_remaining": 0
+  }
+}

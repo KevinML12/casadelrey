@@ -1,0 +1,29 @@
+[
+  {
+    "conclusion": "success",
+    "createdAt": "2026-11-01T15:39:22Z",
+    "databaseId": 41322321286,
+    "event": "schedule",
+    "status": "completed",
+    "updatedAt": "2026-11-01T15:41:28Z",
+    "url": "https://github.com/KevinML12/casadelrey/actions/runs/41322321286"
+  },
+  {
+    "conclusion": "success",
+    "createdAt": "2026-10-31T14:56:22Z",
+    "databaseId": 41212440830,
+    "event": "schedule",
+    "status": "completed",
+    "updatedAt": "2026-10-31T14:58:37Z",
+    "url": "https://github.com/KevinML12/casadelrey/actions/runs/41212440830"
+  },
+  {
+    "conclusion": "success",
+    "createdAt": "2026-10-31T03:42:12Z",
+    "databaseId": 41165501659,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "updatedAt": "2026-10-31T03:44:26Z",
+    "url": "https://github.com/KevinML12/casadelrey/actions/runs/41165501659"
+  }
+]

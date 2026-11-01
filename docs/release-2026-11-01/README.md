@@ -23,7 +23,10 @@ Los respaldos automáticos del 31 de octubre y del 1 de noviembre también termi
 - Backend completo con detector de carreras y `go vet`: correctos. Casos adicionales para campos bancarios vacíos y recuperación cifrada.
 - Diez regresiones de interfaz correctas: datos bancarios incompletos/completos, guardado y borrado desde administración, doble activación durante la transición, pago por evento, donación, corrección de comprobante, estados de correo y recepción presencial. Usan datos controlados e interceptan la API.
 - Build correcto; lint sin errores y con los 18 avisos anteriores.
-- La revisión publicada se registra después del despliegue, sin reutilizar cuentas QA retiradas ni crear pagos ficticios.
+- Vercel y Render Static: cuatro pruebas de rutas públicas, a 390 y 1440 px, sin errores de ejecución o desbordamiento. Se ejecutan sin credenciales ni cuentas QA retiradas.
+- Cuatro comprobaciones adicionales del formulario público de donación a 320 y 1440 px, en ambos sitios: doble activación sin salto de pasos, contacto visible y cero envíos de donaciones o comprobantes. Utilizan los destinos publicados reales y permiten únicamente consultas.
+
+El backend quedó publicado desde `470c31f`; ambos frontends contienen `9ae8133`, que añade la corrección de doble activación. Identificadores de despliegue y resultados en [deployment.json](deployment.json), [vista de pago](payment-preview.json), [Vercel](vercel-public.txt), [Render](render-public.txt), [recuperación remota](remote-restore.json) y [respaldos programados](scheduled-backups.json).
 
 ## Decisiones de la iglesia
 

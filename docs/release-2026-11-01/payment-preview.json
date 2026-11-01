@@ -1,0 +1,38 @@
+[
+  {
+    "origin": "https://casadelreyhue.vercel.app",
+    "width": 320,
+    "repeated_activation_does_not_skip": true,
+    "contact_fallback_visible": true,
+    "horizontal_overflow": false,
+    "runtime_errors": 0,
+    "business_writes": 0
+  },
+  {
+    "origin": "https://casadelreyhue.vercel.app",
+    "width": 1440,
+    "repeated_activation_does_not_skip": true,
+    "contact_fallback_visible": true,
+    "horizontal_overflow": false,
+    "runtime_errors": 0,
+    "business_writes": 0
+  },
+  {
+    "origin": "https://casadelrey-web-pruebas.onrender.com",
+    "width": 320,
+    "repeated_activation_does_not_skip": true,
+    "contact_fallback_visible": true,
+    "horizontal_overflow": false,
+    "runtime_errors": 0,
+    "business_writes": 0
+  },
+  {
+    "origin": "https://casadelrey-web-pruebas.onrender.com",
+    "width": 1440,
+    "repeated_activation_does_not_skip": true,
+    "contact_fallback_visible": true,
+    "horizontal_overflow": false,
+    "runtime_errors": 0,
+    "business_writes": 0
+  }
+]
