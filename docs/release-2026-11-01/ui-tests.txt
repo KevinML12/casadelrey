@@ -1,16 +1,17 @@
 
-Running 9 tests using 1 worker
+Running 10 tests using 1 worker
 
-(node:57740) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:59272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ✓  1 [chromium] › e2e/bank-configuration.spec.js:28:1 › an account alone never publishes inferred bank details (1.3s)
-  ✓  2 [chromium] › e2e/bank-configuration.spec.js:35:1 › complete administrator data fits a narrow screen without substituting examples (1.2s)
-  ✓  3 [chromium] › e2e/bank-configuration.spec.js:44:1 › administrator readiness follows saved fields and clearing removes the public destination (2.0s)
-  ✓  4 [chromium] › e2e/payment-mail-flow.spec.js:84:1 › paid event commits receipt and registration through one request on mobile (825ms)
-  ✓  5 [chromium] › e2e/payment-mail-flow.spec.js:149:1 › standalone donation receipt includes managed destination and retains idempotency after ambiguous response (895ms)
-  ✓  6 [chromium] › e2e/payment-mail-flow.spec.js:186:1 › secure correction consumes a fragment credential without exposing it in a URL or upload (814ms)
-  ✓  7 [chromium] › e2e/payment-mail-flow.spec.js:230:1 › mail administration distinguishes provider acceptance from uncertain delivery (702ms)
-  ✓  8 [chromium] › e2e/payment-mail-flow.spec.js:307:1 › cash donation needs an explicit receipt confirmation and keeps admin history responsive (829ms)
-  ✓  9 [chromium] › e2e/payment-mail-flow.spec.js:372:1 › a failed destinations request never shows invented donation purposes (832ms)
+  ✓   1 [chromium] › e2e/bank-configuration.spec.js:28:1 › an account alone never publishes inferred bank details (1.2s)
+  ✓   2 [chromium] › e2e/bank-configuration.spec.js:35:1 › repeated activation during the transition cannot skip the destination step (855ms)
+  ✓   3 [chromium] › e2e/bank-configuration.spec.js:42:1 › complete administrator data fits a narrow screen without substituting examples (1.0s)
+  ✓   4 [chromium] › e2e/bank-configuration.spec.js:51:1 › administrator readiness follows saved fields and clearing removes the public destination (2.4s)
+  ✓   5 [chromium] › e2e/payment-mail-flow.spec.js:84:1 › paid event commits receipt and registration through one request on mobile (737ms)
+  ✓   6 [chromium] › e2e/payment-mail-flow.spec.js:149:1 › standalone donation receipt includes managed destination and retains idempotency after ambiguous response (939ms)
+  ✓   7 [chromium] › e2e/payment-mail-flow.spec.js:186:1 › secure correction consumes a fragment credential without exposing it in a URL or upload (777ms)
+  ✓   8 [chromium] › e2e/payment-mail-flow.spec.js:230:1 › mail administration distinguishes provider acceptance from uncertain delivery (701ms)
+  ✓   9 [chromium] › e2e/payment-mail-flow.spec.js:307:1 › cash donation needs an explicit receipt confirmation and keeps admin history responsive (788ms)
+  ✓  10 [chromium] › e2e/payment-mail-flow.spec.js:372:1 › a failed destinations request never shows invented donation purposes (791ms)
 
-  9 passed (9.8s)
+  10 passed (10.7s)

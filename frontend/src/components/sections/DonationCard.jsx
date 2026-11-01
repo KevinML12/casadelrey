@@ -143,7 +143,8 @@ export default function DonationCard() {
   const next = () => {
     if (step === 0 && (!finalAmount || finalAmount < 10)) { toast.error('El monto mínimo es Q10'); return; }
     if (step === 2 && isTransfer && !receiptUrl) { toast.error('Sube tu comprobante para continuar'); return; }
-    setStep(s => Math.min(s + 1, 3));
+    // Ignore a second activation from a step that is already animating out.
+    setStep(current => current === step ? Math.min(current + 1, 3) : current);
   };
 
   // Qué necesita cada paso para dejar avanzar

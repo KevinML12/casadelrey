@@ -32,6 +32,13 @@ test('an account alone never publishes inferred bank details', async ({ page }) 
   await expect(page.getByText(/Banrural|Monetaria/, { exact: true })).toHaveCount(0);
 });
 
+test('repeated activation during the transition cannot skip the destination step', async ({ page }) => {
+  await isolate(page, complete); await page.goto('/donate');
+  await page.getByRole('button', { name: 'Continuar', exact: true }).evaluate(button => { button.click(); button.click(); });
+  await expect(page.getByText('¿A dónde va tu siembra?')).toBeVisible();
+  await expect(page.getByText('¿Cómo quieres darlo?')).toHaveCount(0);
+});
+
 test('complete administrator data fits a narrow screen without substituting examples', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   const settings = { ...complete, bank_account: '1234567890123456789012345678901234567890', bank_holder: 'Nombre completo del titular confirmado por la iglesia y registrado en el banco' };

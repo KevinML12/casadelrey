@@ -8,6 +8,8 @@ Banco, cuenta, tipo y titular deben provenir de valores guardados por administra
 
 La confirmación de la cuenta oficial sigue correspondiendo a la iglesia. La aplicación no puede deducirla ni validar que el banco haya recibido dinero a partir de una imagen.
 
+También se reprodujo y corrigió una doble activación de «Continuar» durante la transición: ahora no puede saltarse la selección del destino de una donación. La regresión específica falló antes de la corrección y pasó después.
+
 ## Recuperación íntegra desde R2
 
 La nueva operación `remote-restore-check` descarga sólo respaldos cifrados del bucket privado en un espacio temporal nuevo. Valida autenticación, nombres, referencias, tamaños y SHA-256; rechaza corrupción, rutas fuera del respaldo y destinos existentes. No consulta ni restaura una base remota y no modifica objetos de R2.
@@ -19,7 +21,7 @@ Los respaldos automáticos del 31 de octubre y del 1 de noviembre también termi
 ## Validación
 
 - Backend completo con detector de carreras y `go vet`: correctos. Casos adicionales para campos bancarios vacíos y recuperación cifrada.
-- Nueve regresiones de interfaz correctas: datos bancarios incompletos/completos, guardado y borrado desde administración, pago por evento, donación, corrección de comprobante, estados de correo y recepción presencial. Usan datos controlados e interceptan la API.
+- Diez regresiones de interfaz correctas: datos bancarios incompletos/completos, guardado y borrado desde administración, doble activación durante la transición, pago por evento, donación, corrección de comprobante, estados de correo y recepción presencial. Usan datos controlados e interceptan la API.
 - Build correcto; lint sin errores y con los 18 avisos anteriores.
 - La revisión publicada se registra después del despliegue, sin reutilizar cuentas QA retiradas ni crear pagos ficticios.
 

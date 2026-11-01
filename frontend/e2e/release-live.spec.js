@@ -4,7 +4,8 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 const API = 'https://casadelrey-api-pruebas.onrender.com/api/v1';
 const enabled = process.env.E2E_RENDER_LIVE === '1';
-const accounts = enabled ? JSON.parse(readFileSync(process.env.E2E_QA_USERS_FILE, 'utf8')) : [];
+// Public GET-only checks do not require or load administrator credentials.
+const accounts = enabled && process.env.E2E_QA_USERS_FILE ? JSON.parse(readFileSync(process.env.E2E_QA_USERS_FILE, 'utf8')) : [];
 test.skip(!enabled, 'Explicit QA release verification only');
 test.use({ trace: 'off', video: 'off', screenshot: 'off' });
 const publicRoutes = ['/', '/about', '/celulas', '/volunteering', '/events', '/gallery', '/blog', '/conectate', '/prayer', '/donate', '/comprobante', '/login', '/register', '/forgot-password', '/verify-email', '/reset-password', '/payment-success', '/no-existe'];
