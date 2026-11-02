@@ -146,7 +146,7 @@ func (h *PaymentReceiptHandler) Submit(c echo.Context) error {
 			if err := tx.First(&ev, *req.EventID).Error; err != nil {
 				return err
 			}
-			if !ev.IsActive || !ev.RequiresPayment || paymentDeadlinePassed(ev) || !validMoney(ev.PriceGTQ) || req.Amount+0.005 < ev.PriceGTQ {
+			if eventClosed(ev) || !ev.RequiresPayment || paymentDeadlinePassed(ev) || !validMoney(ev.PriceGTQ) || req.Amount+0.005 < ev.PriceGTQ {
 				return echo.NewHTTPError(400, "El evento no acepta este depósito. Revisa el plazo y el importe.")
 			}
 		}
@@ -238,7 +238,7 @@ func (h *PaymentReceiptHandler) Verify(c echo.Context) error {
 	var replacementToken string
 	adminID, _ := c.Get("user_id").(uint)
 	err = h.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&receipt, id).Error; err != nil {
+		if err := lockReceipt(tx, id, &receipt); err != nil {
 			return err
 		}
 		if receipt.Status == req.Status {
@@ -253,6 +253,7 @@ func (h *PaymentReceiptHandler) Verify(c echo.Context) error {
 		if len(req.RejectionReason) > 255 {
 			return echo.NewHTTPError(400, "El motivo admite hasta 255 caracteres.")
 		}
+		previous := receipt.Status
 		receipt.Revision++
 		receipt.ReplacementTokenHash = ""
 		receipt.ReplacementTokenExpiry = nil
@@ -275,6 +276,9 @@ func (h *PaymentReceiptHandler) Verify(c echo.Context) error {
 		receipt.VerifiedAt = &now
 		receipt.RejectionReason = req.RejectionReason
 		if err := persistReceiptStatus(tx, &receipt); err != nil {
+			return err
+		}
+		if err := recordPaymentDecision(tx, c, "receipt", receipt.ID, receipt.Revision, previous, req.Status, req.RejectionReason); err != nil {
 			return err
 		}
 		action := ""
@@ -309,8 +313,17 @@ func (h *PaymentReceiptHandler) Revert(c echo.Context) error {
 	var receipt models.PaymentReceipt
 	var prevStatus string
 	adminID, _ := c.Get("user_id").(uint)
+	var req struct {
+		Reason string `json:"reason"`
+	}
+	if c.Request().ContentLength > 0 && c.Bind(&req) != nil {
+		return c.JSON(400, map[string]string{"error": "Indica el motivo de la revisión."})
+	}
+	if len(req.Reason) > 255 {
+		return c.JSON(400, map[string]string{"error": "El motivo admite hasta 255 caracteres."})
+	}
 	err = h.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&receipt, id).Error; err != nil {
+		if err := lockReceipt(tx, id, &receipt); err != nil {
 			return err
 		}
 		if receipt.Status == "pendiente" {
@@ -325,6 +338,9 @@ func (h *PaymentReceiptHandler) Revert(c echo.Context) error {
 		receipt.VerifiedAt = nil
 		receipt.RejectionReason = ""
 		if err := persistReceiptStatus(tx, &receipt); err != nil {
+			return err
+		}
+		if err := recordPaymentDecision(tx, c, "receipt", receipt.ID, receipt.Revision, prevStatus, "pendiente", req.Reason); err != nil {
 			return err
 		}
 		return queueReceiptNotice(tx, receipt, "revertido", "")
@@ -344,13 +360,32 @@ func persistReceiptStatus(tx *gorm.DB, receipt *models.PaymentReceipt) error {
 		if err := tx.Preload("Event").Where("receipt_id = ?", receipt.ID).Find(&registrations).Error; err != nil {
 			return err
 		}
-		if receipt.Status == "verificado" {
+		if receipt.Status == "verificado" || receipt.Status == "pendiente" {
 			if len(registrations) > 1 {
 				return echo.NewHTTPError(http.StatusConflict, "El comprobante está asociado a más de una inscripción. Revisa los datos antes de verificar.")
 			}
 			for _, reg := range registrations {
 				if receipt.EventID == nil || *receipt.EventID != reg.EventID || receipt.Currency != "GTQ" || receipt.Amount+0.005 < reg.Event.PriceGTQ*float64(reg.AttendeeCount) {
 					return echo.NewHTTPError(http.StatusBadRequest, "El comprobante no cubre el importe del evento.")
+				}
+				var event models.Event
+				if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&event, reg.EventID).Error; err != nil {
+					return err
+				}
+				// A late approval can recognize a real payment, but cannot oversell seats.
+				occupied, err := occupiedSeats(tx, event.ID, reg.ID)
+				if err != nil {
+					return err
+				}
+				if event.Capacity > 0 && occupied+int64(reg.AttendeeCount) > int64(event.Capacity) {
+					return echo.NewHTTPError(409, "El cupo ya fue ocupado. Revisa la inscripción y el aforo antes de recuperar esta reserva.")
+				}
+				var expiry *time.Time
+				if receipt.Status == "pendiente" {
+					expiry = reservationExpiry(event)
+				}
+				if err := tx.Model(&reg).Update("reservation_expires_at", expiry).Error; err != nil {
+					return err
 				}
 			}
 		}
@@ -432,7 +467,7 @@ func (h *PaymentReceiptHandler) Resubmit(c echo.Context) error {
 	replayed := false
 	err = h.DB.Transaction(func(tx *gorm.DB) error {
 		var r models.PaymentReceipt
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Where("id = ?", c.Param("id")).First(&r).Error; err != nil {
+		if err := lockReceipt(tx, c.Param("id"), &r); err != nil {
 			return echo.NewHTTPError(403, "El enlace no es válido, ya se utilizó o caducó.")
 		}
 		tokenHash := auth.HashToken(req.Token)
@@ -460,6 +495,9 @@ func (h *PaymentReceiptHandler) Resubmit(c echo.Context) error {
 		r.ReplacementTokenHash = ""
 		r.ReplacementTokenExpiry = nil
 		if err := persistReceiptStatus(tx, &r); err != nil {
+			return err
+		}
+		if err := recordPaymentDecision(tx, c, "receipt", r.ID, r.Revision, "rechazado", "pendiente", "Comprobante corregido mediante enlace privado"); err != nil {
 			return err
 		}
 		return queueReceiptNotice(tx, r, "pendiente", "")

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -12,7 +13,7 @@ import (
 // Permite 50 peticiones por segundo por IP, con ráfagas de hasta 100.
 func GlobalRateLimit() echo.MiddlewareFunc {
 	config := middleware.RateLimiterConfig{
-		Skipper: func(c echo.Context) bool { return c.Path() == "/health" },
+		Skipper: func(c echo.Context) bool { return c.Path() == "/health" || c.Path() == "/ready" },
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
 			middleware.RateLimiterMemoryStoreConfig{
 				Rate:      rate.Limit(50),
@@ -35,6 +36,25 @@ func GlobalRateLimit() echo.MiddlewareFunc {
 		},
 	}
 	return middleware.RateLimiterWithConfig(config)
+}
+
+// SubmissionRateLimit is shared per operation, with a small human-sized burst.
+// It limits writes without restricting anonymous public browsing.
+func SubmissionRateLimit() echo.MiddlewareFunc {
+	return middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
+		Store:               middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(1.0 / 10), Burst: 5, ExpiresIn: time.Hour}),
+		IdentifierExtractor: func(c echo.Context) (string, error) { return c.RealIP(), nil },
+		DenyHandler: func(c echo.Context, _ string, _ error) error {
+			c.Response().Header().Set("Retry-After", "10")
+			return c.JSON(429, map[string]string{"error": "Espera unos segundos antes de realizar otro envío."})
+		},
+	})
+}
+
+// ConfigureClientIP reads XFF from right to left only behind internal proxies.
+// Direct public peers cannot select their identity by supplying an HTTP header.
+func ConfigureClientIP(e *echo.Echo) {
+	e.IPExtractor = echo.ExtractIPFromXFFHeader(echo.TrustLinkLocal(false))
 }
 
 // TTSRateLimit protege el endpoint público de síntesis de voz (/tts).

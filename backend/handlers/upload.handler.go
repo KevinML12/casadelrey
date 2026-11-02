@@ -11,8 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"casadelrey/backend/models"
 	"casadelrey/backend/storage"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,11 +23,16 @@ import (
 // Delega al Store (R2 o local) — intercambiable sin tocar este código.
 type UploadHandler struct {
 	store storage.Store
+	DB    *gorm.DB
 }
 
 // NewUploadHandler crea el handler con el Store ya inicializado.
-func NewUploadHandler(store storage.Store) *UploadHandler {
-	return &UploadHandler{store: store}
+func NewUploadHandler(store storage.Store, dbs ...*gorm.DB) *UploadHandler {
+	h := &UploadHandler{store: store}
+	if len(dbs) > 0 {
+		h.DB = dbs[0]
+	}
+	return h
 }
 
 // Carpetas permitidas para el upload autenticado (paneles admin/líder).
@@ -94,6 +101,11 @@ func (h *UploadHandler) saveUpload(c echo.Context, folder string) error {
 			return c.JSON(http.StatusServiceUnavailable, map[string]string{"error": "El almacenamiento privado no está disponible."})
 		}
 		uniqueName = uuid.NewString() + strings.ToLower(filepath.Ext(file.Filename))
+		if h.DB != nil {
+			if err := h.reserveUpload(c, storage.ReceiptReference(uniqueName), int64(len(data))); err != nil {
+				return receiptWriteError(c, err)
+			}
+		}
 		url, err = private.UploadReceipt(c.Request().Context(), uniqueName, bytes.NewReader(data), int64(len(data)), contentType)
 	} else {
 		url, err = h.store.Upload(c.Request().Context(), folder, uniqueName, bytes.NewReader(data), int64(len(data)), contentType)
@@ -102,6 +114,11 @@ func (h *UploadHandler) saveUpload(c echo.Context, folder string) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Error al guardar el archivo.",
 		})
+	}
+	if folder == "comprobantes" && h.DB != nil {
+		if err := h.DB.Model(&models.ReceiptUpload{}).Where("reference = ? AND status = ?", url, "uploading").Update("status", "staged").Error; err != nil {
+			return c.JSON(503, map[string]string{"error": "No se pudo preparar el archivo. Intenta de nuevo."})
+		}
 	}
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"casadelrey/backend/models"
 
@@ -29,6 +30,13 @@ func (h *ActivityLogHandler) GetActivityLog(c echo.Context) error {
 	}
 	if resource := c.QueryParam("resource"); resource != "" {
 		q = q.Where("resource = ?", resource)
+	}
+	if value := c.QueryParam("resource_id"); value != "" {
+		id, err := strconv.ParseUint(value, 10, 32)
+		if err != nil || id == 0 {
+			return c.JSON(400, map[string]string{"error": "Registro inválido."})
+		}
+		q = q.Where("resource_id = ?", id)
 	}
 	if userID := c.QueryParam("user_id"); userID != "" {
 		q = q.Where("user_id = ?", userID)

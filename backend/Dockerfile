@@ -2,12 +2,9 @@
 # STAGE 1 — Builder
 # Compila el binario Go con todas las optimizaciones de tamaño activadas.
 # El binario resultante es estático (CGO_ENABLED=0) y no necesita libc.
-# Version EXACTA (no "1.25-alpine" flotante): govulncheck detecto 15 CVEs de
-# stdlib (TLS/x509/html-template/net) parcheadas entre 1.25.3 y 1.25.12 --
-# un tag fijo hace el build reproducible; revisar y subir el patch de vez en
-# cuando (govulncheck ./... en backend/ lo confirma).
+# Toolchain con versión fija; CI comprueba avisos aplicables con govulncheck.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM golang:1.25.12-alpine AS builder
+FROM golang:1.26.10-alpine AS builder
 
 # git es necesario para go mod download con dependencias de VCS
 RUN apk add --no-cache git
@@ -34,11 +31,11 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 # STAGE 2 — Runtime
 # Imagen final mínima (~5MB base). Solo contiene el binario compilado.
 # scratch sería más pequeño, pero scratch-alpine permite usar ca-certificates
-# para conexiones TLS (necesario para Supabase, SendGrid, Stripe).
+# para conexiones TLS (necesario para Supabase, R2 y Brevo).
 # ─────────────────────────────────────────────────────────────────────────────
-FROM alpine:3.20
+FROM alpine:3.24
 
-# ca-certificates: necesario para conexiones HTTPS salientes (Stripe, SendGrid, etc.)
+# ca-certificates: necesario para conexiones HTTPS salientes
 # tzdata: soporte para zonas horarias (logs con hora local)
 RUN apk add --no-cache ca-certificates tzdata
 

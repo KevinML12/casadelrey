@@ -71,12 +71,16 @@ func main() {
 	// 4. Crear la instancia de Echo.
 	e := echo.New()
 	e.HideBanner = true // Silenciar el banner ASCII en producción
+	e.Server.ReadHeaderTimeout = 10 * time.Second
+	e.Server.ReadTimeout = 45 * time.Second
+	e.Server.WriteTimeout = 90 * time.Second
+	e.Server.IdleTimeout = 60 * time.Second
 
 	// 5. ─── Middlewares Globales ────────────────────────────────────────────
 
 	// Logger: registra cada petición HTTP con método, ruta, status y latencia.
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${time_rfc3339} | ${status} | ${latency_human} | ${remote_ip} | ${method} ${uri}\n",
+		Format: "${time_rfc3339} | ${status} | ${latency_human} | ${remote_ip} | ${method} ${path}\n",
 	}))
 
 	// Recover: captura panics inesperados y responde 500 en lugar de crashear.
@@ -121,6 +125,7 @@ func main() {
 
 	// 6. Registrar todas las rutas (públicas y protegidas).
 	routes.Register(e, db, cfg, store)
+	go handlers.RunReceiptCleanup(mailContext, db, store)
 
 	// 6b. TTS — registrado aquí explícitamente para asegurar que esté en el
 	// deploy. Rate-limit propio: es público (lector del blog) pero manda

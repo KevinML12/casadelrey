@@ -72,7 +72,7 @@ export default function AdminVolunteers() {
   };
 
   const handleCreateUser = async () => {
-    if (!createModal || password.length < 6) { toast.error('Contraseña mínimo 6 caracteres'); return; }
+    if (!createModal || password.length < 10) { toast.error('Contraseña mínimo 10 caracteres'); return; }
     try {
       await apiClient.post(`/admin/volunteers/${createModal}/create-user`, { password });
       toast.success('Usuario creado. Se envió correo de verificación.');
@@ -168,7 +168,7 @@ export default function AdminVolunteers() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                helperText="Mínimo 6 caracteres"
+                helperText="Mínimo 10 caracteres"
                 autoFocus
               />
 
@@ -178,7 +178,7 @@ export default function AdminVolunteers() {
                   Cancelar
                 </Button>
                 <Button variant="filled" className="flex-1 justify-center"
-                  onClick={handleCreateUser} disabled={password.length < 6}>
+                  onClick={handleCreateUser} disabled={password.length < 10}>
                   Crear
                 </Button>
               </div>

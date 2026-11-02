@@ -134,7 +134,7 @@ func Enqueue(tx *gorm.DB, m Message) error {
 		m.Key = uuid.NewString()
 	}
 	if m.ExpiresAt.IsZero() {
-		m.ExpiresAt = time.Now().Add(24 * time.Hour)
+		m.ExpiresAt = time.Now().Add(7 * 24 * time.Hour)
 	}
 	if strings.Contains(m.HTML, "__CDR_EMAIL_BG__") {
 		var rows []models.SitePhoto
@@ -167,7 +167,22 @@ func Enqueue(tx *gorm.DB, m Message) error {
 		return err
 	}
 	row := models.EmailMessage{EventKey: m.Key, SendKey: uuid.NewString(), Kind: m.Kind, Recipient: strings.TrimSpace(m.To), Subject: m.Subject, Payload: base64.StdEncoding.EncodeToString(sealed), Status: "pending", NextAttemptAt: time.Now(), ExpiresAt: m.ExpiresAt}
-	return tx.Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "event_key"}}, DoNothing: true}).Create(&row).Error
+	result := tx.Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "event_key"}}, DoNothing: true}).Create(&row)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil
+	}
+	// Keep only the latest unsent business state when a backlog accumulates.
+	parts := strings.Split(m.Key, ":")
+	if len(parts) >= 3 && (parts[0] == "receipt" || parts[0] == "donation" || parts[0] == "rsvp") {
+		prefix := parts[0] + ":" + parts[1] + ":"
+		if err := tx.Model(&models.EmailMessage{}).Where("event_key LIKE ? AND event_key <> ? AND status = ?", prefix+"%", m.Key, "pending").Updates(map[string]interface{}{"status": "superseded", "payload": ""}).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 type Service struct {
@@ -252,6 +267,11 @@ func (s *Service) Tick(ctx context.Context) error {
 			return query.Error
 		}
 		if query.RowsAffected == 0 {
+			return gorm.ErrRecordNotFound
+		}
+		// Keep 25 sends available for short-lived account/cancellation actions.
+		security := row.Kind == "password_reset" || row.Kind == "verification" || row.Kind == "event_cancellation_code"
+		if !security && reserved >= 225 {
 			return gorm.ErrRecordNotFound
 		}
 		lease := now.Add(time.Minute)

@@ -1,9 +1,10 @@
 import ModalWrapper from '../../components/ui/ModalWrapper';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Chip, { FilterChip } from '../../components/ui/Chip';
 import ReceiptFile from '../../components/sections/ReceiptFile';
+import { Link } from 'react-router-dom';
 
 const STATUS = {
   pendiente:  { label: 'Pendiente',  color: 'default' },
@@ -14,11 +15,12 @@ const STATUS = {
 function RevertSection({ receipt, onDone, onClose }) {
   const [confirm, setConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [reason,setReason]=useState('');
 
   const revert = async () => {
     setLoading(true);
     try {
-      await apiClient.put(`/admin/receipts/${receipt.ID}/revert`);
+      await apiClient.put(`/admin/receipts/${receipt.ID}/revert`,{reason:reason.trim()});
       toast.success('Comprobante revertido a pendiente');
       onDone();
       onClose();
@@ -38,8 +40,9 @@ function RevertSection({ receipt, onDone, onClose }) {
     <div className="glass-light rounded-[24px] card-spring p-4 space-y-3 animate-fade-in">
       <p className="text-body-s text-bg font-semibold">¿Revertir este comprobante a pendiente?</p>
       <p className="text-body-s text-bg/50">Volverá a aparecer en la cola de verificación y deberás revisarlo nuevamente.</p>
+      <label className="block text-14 font-semibold">Motivo de la revisión<textarea value={reason} onChange={event=>setReason(event.target.value)} maxLength={255} className="input-light mt-2" rows={2} required /></label>
       <div className="flex gap-2">
-        <button onClick={revert} disabled={loading}
+        <button onClick={revert} disabled={loading || !reason.trim()}
           className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-bg text-white text-label-l font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
           {loading ? 'Revirtiendo…' : 'Sí, revertir'}
         </button>
@@ -88,6 +91,7 @@ function VerifyModal({ receipt, onClose, onDone }) {
 
         <div className="md:col-span-2 border-b border-bg/15 pb-4">
           <h3 className="text-title-l text-bg font-bold">Verificar comprobante</h3>
+          <Link className="inline-flex min-h-11 items-center text-14 font-semibold underline focus-ring" to={`/admin/activity-log?resource=receipt&resource_id=${receipt.ID}`}>Ver historial de decisiones</Link>
 
         </div>
 
@@ -186,17 +190,19 @@ export default function AdminReceipts() {
   const [loading,  setLoading]  = useState(true);
   const [filter,   setFilter]   = useState('');
   const [selected, setSelected] = useState(null);
+  const [error,setError]=useState('');
 
-  const load = () => {
+  const load = useCallback(() => {
+    setError('');
     setLoading(true);
     const params = filter ? `?status=${filter}` : '';
     apiClient.get(`/admin/receipts${params}`)
       .then(r => setReceipts(r.data?.data || r.data || []))
-      .catch(console.error)
+      .catch(()=>setError('No se pudieron cargar los comprobantes. Vuelve a intentarlo.'))
       .finally(() => setLoading(false));
-  };
+  },[filter]);
 
-  useEffect(() => { load(); }, [filter]);
+  useEffect(() => { load(); }, [load]);
 
   const pending   = receipts.filter(r => r.status === 'pendiente').length;
   const counts    = { pendiente: 0, verificado: 0, rechazado: 0 };
@@ -206,6 +212,7 @@ export default function AdminReceipts() {
     <div className="p-6 max-w-4xl mx-auto">
       {selected && <VerifyModal receipt={selected} onClose={() => setSelected(null)} onDone={load} />}
 
+      {error && <div role="alert" className="border border-rose/30 p-4 mb-5 rounded-xl">{error}<button type="button" className="min-h-11 ml-3 underline focus-ring" onClick={load}>Reintentar</button></div>}
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div>

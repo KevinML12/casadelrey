@@ -103,6 +103,7 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 			&models.EventRegistration{},
 			// Pagos
 			&models.PaymentReceipt{}, // NUEVA — verifica comprobantes bancarios
+			&models.ReceiptUpload{},
 			&models.Donation{},
 			&models.DonationPurpose{}, // NUEVA — destinos de donación editables desde el admin
 			// Personas
@@ -125,6 +126,10 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		}
 
 		log.Println("[DB] Conexión y migraciones completadas exitosamente.")
+		if err := migrateDiscovery(db); err != nil {
+			connectErr = err
+			return
+		}
 		instance = db
 	})
 

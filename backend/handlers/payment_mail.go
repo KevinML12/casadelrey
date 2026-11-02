@@ -32,7 +32,7 @@ func reserveReceipt(tx *gorm.DB, reference string, except uint) error {
 	if count > 0 {
 		return echo.NewHTTPError(http.StatusConflict, "Este archivo ya está asociado a otro comprobante. Revisa tu envío anterior.")
 	}
-	return nil
+	return claimUpload(tx, reference)
 }
 func queueReceiptNotice(tx *gorm.DB, r models.PaymentReceipt, state, action string) error {
 	label := "Donación"

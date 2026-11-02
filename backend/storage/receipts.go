@@ -21,6 +21,40 @@ type ReceiptStore interface {
 	OpenReceipt(context.Context, string) (io.ReadCloser, string, error)
 }
 
+// ReceiptCleaner deliberately cannot delete objects from the public bucket.
+type ReceiptCleaner interface {
+	DeleteReceipt(context.Context, string) error
+}
+
+func (s *r2Store) DeleteReceipt(ctx context.Context, reference string) error {
+	key, ok := ReceiptKey(reference)
+	if !ok {
+		return fmt.Errorf("invalid receipt reference")
+	}
+	bucket, err := s.receiptBucket()
+	if err != nil {
+		return err
+	}
+	_, err = s.client.DeleteObject(ctx, &s3.DeleteObjectInput{Bucket: aws.String(bucket), Key: aws.String(key)})
+	return err
+}
+func (s *localStore) DeleteReceipt(_ context.Context, reference string) error {
+	key, ok := ReceiptKey(reference)
+	if !ok {
+		return fmt.Errorf("invalid receipt reference")
+	}
+	root, err := os.OpenRoot(s.dir + "-private")
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	err = root.Remove(filepath.Base(key))
+	if os.IsNotExist(err) {
+		return nil
+	}
+	return err
+}
+
 var receiptName = regexp.MustCompile(`^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\.(png|jpg|jpeg|webp|gif|pdf)$`)
 
 const receiptPrefix = "receipt-private:"

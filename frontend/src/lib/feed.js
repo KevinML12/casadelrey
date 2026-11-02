@@ -48,7 +48,7 @@ export function useApi(path) {
 export function groupAlbums(photos) {
   const grouped = Object.create(null);
   (photos || []).forEach(p => {
-    const name = p.title?.includes(' - ') ? p.title.split(' - ')[0].trim() : 'Otros';
+    const name = p.album?.trim() || (p.title?.includes(' - ') ? p.title.split(' - ')[0].trim() : 'Otros');
     (grouped[name] ||= []).push(p);
   });
   return grouped;

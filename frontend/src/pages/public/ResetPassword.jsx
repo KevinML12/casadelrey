@@ -18,7 +18,7 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirm) { toast.error('Las contraseñas no coinciden'); return; }
-    if (password.length < 6)  { toast.error('Mínimo 6 caracteres'); return; }
+    if (password.length < 10)  { toast.error('Mínimo 10 caracteres'); return; }
     setLoading(true);
     const { success, error } = await resetPassword(token, password);
     setLoading(false);
@@ -40,7 +40,7 @@ export default function ResetPassword() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           placeholder="••••••••"
-          helperText="Mínimo 6 caracteres"
+          helperText="Mínimo 10 caracteres"
           required
         />
         <GlassField

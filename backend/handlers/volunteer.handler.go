@@ -194,8 +194,8 @@ func (h *VolunteerHandler) CreateUserFromVolunteer(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
-	if len(req.Password) < 6 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "La contraseña debe tener mínimo 6 caracteres."})
+	if !auth.ValidNewPassword(req.Password) {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "La contraseña debe tener entre 10 caracteres y 72 bytes."})
 	}
 
 	var v models.Volunteer

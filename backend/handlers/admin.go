@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // AdminHandler centraliza los endpoints del panel de administración.
@@ -197,8 +198,29 @@ func (h *AdminHandler) UpdateUserRole(c echo.Context) error {
 	if !validRoles[req.Role] {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Rol debe ser member, leader, volunteer o admin."})
 	}
-	if result := h.DB.Model(&models.User{}).Where("id = ?", id).Updates(map[string]interface{}{"role": req.Role, "session_version": gorm.Expr("session_version + 1"), "refresh_token": nil, "refresh_token_expiry": nil}); result.Error != nil || result.RowsAffected == 0 {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Usuario no encontrado."})
+	if err := h.DB.Transaction(func(tx *gorm.DB) error {
+		// Serialize changes to the administrator set, including concurrent demotions.
+		if tx.Dialector.Name() == "postgres" {
+			if err := tx.Exec("SELECT pg_advisory_xact_lock(739012651)").Error; err != nil {
+				return err
+			}
+		}
+		var target models.User
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&target, id).Error; err != nil {
+			return err
+		}
+		if target.Role == "admin" && req.Role != "admin" {
+			var count int64
+			if err := tx.Model(&models.User{}).Where("role = ?", "admin").Count(&count).Error; err != nil {
+				return err
+			}
+			if count <= 1 {
+				return echo.NewHTTPError(409, "Debe quedar al menos un administrador. Asigna otro antes de cambiar este rol.")
+			}
+		}
+		return tx.Model(&target).Updates(map[string]interface{}{"role": req.Role, "session_version": gorm.Expr("session_version + 1"), "refresh_token": nil, "refresh_token_expiry": nil}).Error
+	}); err != nil {
+		return receiptWriteError(c, err)
 	}
 
 	adminID, _ := c.Get("user_id").(uint)
@@ -286,9 +308,9 @@ func (h *AdminHandler) CreateUser(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
-	if req.Name == "" || req.Email == "" || len(req.Password) < 6 {
+	if req.Name == "" || req.Email == "" || !auth.ValidNewPassword(req.Password) {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Nombre, email y contraseña (mín. 6 caracteres) son requeridos.",
+			"error": "Nombre, email y contraseña (entre 10 caracteres y 72 bytes) son requeridos.",
 		})
 	}
 	role := req.Role

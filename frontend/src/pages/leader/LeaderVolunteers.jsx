@@ -34,7 +34,7 @@ export default function LeaderVolunteers() {
   useEffect(() => { load(); }, []);
 
   const handleCreateUser = async () => {
-    if (!createModal || password.length < 6) { toast.error('Contraseña mínimo 6 caracteres'); return; }
+    if (!createModal || password.length < 10) { toast.error('Contraseña mínimo 10 caracteres'); return; }
     try {
       await apiClient.post(`/admin/volunteers/${createModal}/create-user`, { password });
       toast.success('Usuario creado. Se envió correo de verificación.');
@@ -108,14 +108,14 @@ export default function LeaderVolunteers() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                helperText="Mínimo 6 caracteres"
+                helperText="Mínimo 10 caracteres"
                 autoFocus
               />
               <div className="flex gap-2 mt-6">
                 <Button variant="outlined" className="flex-1" onClick={() => { setCreateModal(null); setPassword(''); }}>
                   Cancelar
                 </Button>
-                <Button variant="filled" className="flex-1" onClick={handleCreateUser} disabled={password.length < 6}>
+                <Button variant="filled" className="flex-1" onClick={handleCreateUser} disabled={password.length < 10}>
                   Crear usuario
                 </Button>
               </div>

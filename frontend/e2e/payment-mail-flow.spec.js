@@ -365,7 +365,7 @@ test("cash donation needs an explicit receipt confirmation and keeps admin histo
   await expect(
     page.getByRole("button", { name: "Volver a pendiente", exact: true }),
   ).toBeVisible();
-  expect(writes).toEqual([{ received: true }]);
+  expect(writes).toEqual([expect.objectContaining({ received: true })]);
   await noOverflow(page);
 });
 

@@ -222,10 +222,14 @@ func (h *DonationHandler) RegisterDonation(c echo.Context) error {
 // ConfirmCash records a handover; it never moves money or verifies a transfer.
 func (h *DonationHandler) ConfirmCash(c echo.Context) error {
 	var req struct {
-		Received *bool `json:"received"`
+		Received *bool  `json:"received"`
+		Reason   string `json:"reason"`
 	}
 	if err := c.Bind(&req); err != nil || req.Received == nil {
 		return c.JSON(400, map[string]string{"error": "Indica si el aporte fue recibido."})
+	}
+	if len(req.Reason) > 255 {
+		return c.JSON(400, map[string]string{"error": "El motivo admite hasta 255 caracteres."})
 	}
 	var donation models.Donation
 	adminID, _ := c.Get("user_id").(uint)
@@ -239,6 +243,10 @@ func (h *DonationHandler) ConfirmCash(c echo.Context) error {
 		if donation.IsSuccessful == *req.Received {
 			return nil
 		}
+		previous := "pendiente"
+		if donation.IsSuccessful {
+			previous = "recibida"
+		}
 		donation.IsSuccessful = *req.Received
 		donation.Revision++
 		donation.ConfirmedByID = nil
@@ -251,6 +259,13 @@ func (h *DonationHandler) ConfirmCash(c echo.Context) error {
 			state = "presencial_recibida"
 		}
 		if err := tx.Save(&donation).Error; err != nil {
+			return err
+		}
+		next := "pendiente"
+		if *req.Received {
+			next = "recibida"
+		}
+		if err := recordPaymentDecision(tx, c, "donation", donation.ID, donation.Revision, previous, next, req.Reason); err != nil {
 			return err
 		}
 		return email.Enqueue(tx, email.Message{Key: fmt.Sprintf("donation:%d:%d:%s", donation.ID, donation.Revision, state), Kind: "donation_" + state, To: donation.Email, Subject: "Tu donación — Casa del Rey", HTML: email.GetPaymentUpdateTemplate(donation.Name, "Donación", state, donation.Amount, "", "")})

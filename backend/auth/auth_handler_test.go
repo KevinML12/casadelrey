@@ -87,7 +87,7 @@ func TestRegister_CamposVacios_Retorna400(t *testing.T) {
 		{},
 		{"name": "Ana"},
 		{"name": "Ana", "email": "ana@test.com"},
-		{"email": "ana@test.com", "password": "segura123"},
+		{"email": "ana@test.com", "password": "segura12345"},
 	}
 	for _, body := range casos {
 		db, _, sqlDB := newAuthMockDB(t)
@@ -122,7 +122,7 @@ func TestRegister_EmailDuplicado_Retorna409(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id", "email"}).AddRow(1, "ana@test.com"))
 
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
-		"name": "Ana", "email": "ana@test.com", "password": "segura123",
+		"name": "Ana", "email": "ana@test.com", "password": "segura12345",
 	}, nil)
 	require.NoError(t, h.Register(c))
 	assert.Equal(t, http.StatusConflict, rec.Code)
@@ -143,7 +143,7 @@ func TestRegister_Exito_Retorna201(t *testing.T) {
 	mock.ExpectCommit()
 
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
-		"name": "Nuevo", "email": "nuevo@test.com", "password": "segura123",
+		"name": "Nuevo", "email": "nuevo@test.com", "password": "segura12345",
 	}, nil)
 	require.NoError(t, h.Register(c))
 	assert.Equal(t, http.StatusCreated, rec.Code)
@@ -192,13 +192,13 @@ func TestLogin_EmailNoVerificado_Retorna403(t *testing.T) {
 	defer sqlDB.Close()
 	h := auth.NewHandler(db)
 
-	hash, _ := auth.HashPassword("password123")
+	hash, _ := auth.HashPassword("password12345")
 	mock.ExpectQuery(`SELECT .* FROM "users"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password", "email_verified"}).
 			AddRow(1, "user@test.com", hash, false))
 
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
-		"email": "user@test.com", "password": "password123",
+		"email": "user@test.com", "password": "password12345",
 	}, nil)
 	require.NoError(t, h.Login(c))
 	assert.Equal(t, http.StatusForbidden, rec.Code)
@@ -209,7 +209,7 @@ func TestLogin_Exito_Retorna200ConToken(t *testing.T) {
 	defer sqlDB.Close()
 	h := auth.NewHandler(db)
 
-	hash, _ := auth.HashPassword("password123")
+	hash, _ := auth.HashPassword("password12345")
 	mock.ExpectQuery(`SELECT .* FROM "users"`).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "password", "role", "email_verified"}).
 			AddRow(1, "Admin", "admin@test.com", hash, "admin", true))
@@ -219,7 +219,7 @@ func TestLogin_Exito_Retorna200ConToken(t *testing.T) {
 	mock.ExpectCommit()
 
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
-		"email": "admin@test.com", "password": "password123",
+		"email": "admin@test.com", "password": "password12345",
 	}, nil)
 	require.NoError(t, h.Login(c))
 	assert.Equal(t, http.StatusOK, rec.Code)
@@ -242,7 +242,7 @@ func TestRegister_ErrorDB_Retorna500(t *testing.T) {
 	mock.ExpectRollback()
 
 	c, rec := newAuthCtx(t, "POST", map[string]interface{}{
-		"name": "Test", "email": "test@t.com", "password": "password123",
+		"name": "Test", "email": "test@t.com", "password": "password12345",
 	}, nil)
 	require.NoError(t, h.Register(c))
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)

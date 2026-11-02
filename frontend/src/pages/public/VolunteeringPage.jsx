@@ -38,43 +38,6 @@ const NO_PREFERENCE_WHY = 'Nuestro equipo va a revisar tus talentos e intereses 
 // Todos los departamentos de la API participan en el recorrido, en su
 // orden de publicación; los nuevos no requieren una clasificación local.
 
-// Match por departamento (frontend-only, no vive en la DB -- es una capa
-// de descubrimiento, no contenido administrable). Dos ejes distintos,
-// separados a propósito:
-//   interes     -- de qué se trata el departamento. Es lo que filtran
-//                  los chips de arriba y lo que pregunta la pregunta 1.
-//   visibilidad -- 'frente' o 'apoyo'. Solo lo usa la pregunta 2.
-// Antes era UN array plano por departamento con los dos ejes mezclados y
-// el quiz los puntuaba igual, que es de donde salía el resultado que
-// contradecía la respuesta ("amo trabajar con niños" + "detrás" caía en
-// Servidores, porque 'apoyo' pesaba lo mismo que 'ninos').
-//
-// 'pancartas' pasó de 'apoyo' a 'frente' -- no es un ajuste cosmético
-// para desempatar: la propia área dice "servir con entusiasmo VISIBLE y
-// ser parte activa del ambiente de cada culto" (campo `why` en la API).
-// Estaba mal clasificada, y de paso era indistinguible de 'servidores'.
-const DEPT_MATCH = {
-  alabanza: { interes: ['musica'], visibilidad: ['frente'] },
-  danza: { interes: ['musica'], visibilidad: ['frente'] },
-  servidores: { interes: ['personas'], visibilidad: ['apoyo'] },
-  protocolo: { interes: ['personas'], visibilidad: ['frente'] },
-  pancartas: { interes: ['personas'], visibilidad: ['frente'] },
-  maestros_ninos: { interes: ['ninos'], visibilidad: ['frente'] },
-  tecnicos_audiovisuales: { interes: ['tecnologia'], visibilidad: ['apoyo'] },
-  multimedia: { interes: ['tecnologia'], visibilidad: ['apoyo'] },
-  oracion: { interes: ['oracion'], visibilidad: ['apoyo'] },
-  logistica: { interes: ['organizacion'], visibilidad: ['apoyo'] },
-};
-
-// Un departamento que el dueño cree en /admin/volunteer-areas NO tiene
-// entrada aquí (este mapa es de código, la lista es de la DB). No es un
-// caso de error: es lo normal el día que agregue uno. Sin tags queda
-// fuera de los chips de interés y el quiz nunca lo recomienda, pero
-// aparece en el recorrido y se puede aplicar desde ahí. Este
-// helper es el que garantiza que "sin tags" no reviente nada.
-const EMPTY_MATCH = { interes: [], visibilidad: [] };
-const matchOf = (value) => DEPT_MATCH[value] || EMPTY_MATCH;
-
 // Cada entrada tenía además un campo `icon` ('mic', 'heart', 'book'…)
 // que NADIE leía: el sitio público no dibuja pictogramas por decisión
 // del dueño, así que eran nombres de glifos guardados por si acaso. Se
@@ -131,7 +94,7 @@ function bestMatches(areas, selectedTags) {
   let bestScore = 0;
   let best = [];
   for (const a of areas) {
-    const { interes, visibilidad } = matchOf(a.value);
+    const interes = a.interests || []; const visibilidad = a.visibility || [];
     const score =
       interes.filter(t => selectedTags.includes(t)).length * PESO_INTERES +
       visibilidad.filter(t => selectedTags.includes(t)).length * PESO_VISIBILIDAD;

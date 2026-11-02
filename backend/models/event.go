@@ -7,17 +7,18 @@ import (
 
 type Event struct {
 	gorm.Model
-	Title           string  `json:"title" gorm:"type:varchar(255);not null"`
-	Date            string  `json:"date" gorm:"type:varchar(20)"`
-	Time            string  `json:"time" gorm:"type:varchar(10)"` // "10:00"
-	Location        string  `json:"location" gorm:"type:varchar(255)"`
-	Description     string  `json:"description" gorm:"type:text"`
-	CoverImage      string  `json:"cover_image" gorm:"type:varchar(500)"`
-	IsActive        bool    `json:"is_active" gorm:"default:true"`
-	RequiresPayment bool    `json:"requires_payment" gorm:"default:false"`
-	PriceGTQ        float64 `json:"price_gtq" gorm:"type:decimal(10,2);default:0"`
-	PaymentDeadline string  `json:"payment_deadline" gorm:"type:varchar(20)"`
-	Capacity        int     `json:"capacity" gorm:"default:0"` // 0 = sin limite de cupo
+	Title            string  `json:"title" gorm:"type:varchar(255);not null"`
+	Date             string  `json:"date" gorm:"type:varchar(20)"`
+	Time             string  `json:"time" gorm:"type:varchar(10)"` // "10:00"
+	Location         string  `json:"location" gorm:"type:varchar(255)"`
+	Description      string  `json:"description" gorm:"type:text"`
+	CoverImage       string  `json:"cover_image" gorm:"type:varchar(500)"`
+	IsActive         bool    `json:"is_active" gorm:"default:true"`
+	RequiresPayment  bool    `json:"requires_payment" gorm:"default:false"`
+	PriceGTQ         float64 `json:"price_gtq" gorm:"type:decimal(10,2);default:0"`
+	PaymentDeadline  string  `json:"payment_deadline" gorm:"type:varchar(20)"`
+	Capacity         int     `json:"capacity" gorm:"default:0"` // 0 = sin limite de cupo
+	ReservationHours int     `json:"reservation_hours" gorm:"default:24"`
 }
 
 type EventRegistration struct {
@@ -25,6 +26,7 @@ type EventRegistration struct {
 	RequestHash             string     `json:"-" gorm:"size:64"`
 	CancellationTokenHash   string     `json:"-"`
 	CancellationTokenExpiry *time.Time `json:"-"`
+	ReservationExpiresAt    *time.Time `json:"reservation_expires_at" gorm:"index"`
 	gorm.Model
 	EventID       uint   `json:"event_id" gorm:"not null;index"`
 	Event         Event  `json:"event" gorm:"foreignKey:EventID"`

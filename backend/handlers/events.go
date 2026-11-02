@@ -9,6 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // EventHandler maneja el CRUD de eventos de la iglesia.
@@ -32,17 +33,11 @@ type eventWithAvailability struct {
 	IsFull         bool  `json:"is_full"`
 }
 
-func attendeeCountFor(db *gorm.DB, eventID uint) int64 {
-	var count int64
-	db.Model(&models.EventRegistration{}).
-		Where("event_id = ?", eventID).
-		Select("COALESCE(SUM(attendee_count), 0)").
-		Scan(&count)
-	return count
-}
-
-func withAvailability(db *gorm.DB, ev models.Event) eventWithAvailability {
-	attendeeCount := attendeeCountFor(db, ev.ID)
+func withAvailability(db *gorm.DB, ev models.Event) (eventWithAvailability, error) {
+	attendeeCount, err := occupiedSeats(db, ev.ID, 0)
+	if err != nil {
+		return eventWithAvailability{}, err
+	}
 	item := eventWithAvailability{Event: ev, AttendeeCount: attendeeCount}
 	if ev.Capacity > 0 {
 		remaining := ev.Capacity - int(attendeeCount)
@@ -52,18 +47,24 @@ func withAvailability(db *gorm.DB, ev models.Event) eventWithAvailability {
 		item.SpotsRemaining = &remaining
 		item.IsFull = remaining <= 0
 	}
-	return item
+	return item, nil
 }
 
 // GetEvents godoc
 // GET /api/v1/events/
 // Lista todos los eventos activos, ordenados por fecha ascendente.
-func (h *EventHandler) GetEvents(c echo.Context) error {
+func (h *EventHandler) GetEvents(c echo.Context) error { return h.listEvents(c, true) }
+
+// GetAdminEvents includes unpublished events so administrators can reactivate them.
+func (h *EventHandler) GetAdminEvents(c echo.Context) error { return h.listEvents(c, false) }
+
+func (h *EventHandler) listEvents(c echo.Context, activeOnly bool) error {
 	var events []models.Event
-	result := h.DB.
-		Where("is_active = ?", true).
-		Order("date ASC").
-		Find(&events)
+	query := h.DB.Order("date ASC")
+	if activeOnly {
+		query = query.Where("is_active = ?", true)
+	}
+	result := query.Find(&events)
 
 	if result.Error != nil {
 		log.Printf("[Events] Error al obtener eventos: %v", result.Error)
@@ -74,7 +75,11 @@ func (h *EventHandler) GetEvents(c echo.Context) error {
 
 	out := make([]eventWithAvailability, 0, len(events))
 	for _, ev := range events {
-		out = append(out, withAvailability(h.DB, ev))
+		item, err := withAvailability(h.DB, ev)
+		if err != nil {
+			return c.JSON(503, map[string]string{"error": "No se pudo comprobar la disponibilidad. Vuelve a intentarlo."})
+		}
+		out = append(out, item)
 	}
 
 	return c.JSON(http.StatusOK, out)
@@ -91,11 +96,10 @@ func (h *EventHandler) CreateEvent(c echo.Context) error {
 		})
 	}
 
-	if event.Title == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "El título del evento es obligatorio.",
-		})
+	if err := validateEvent(event); err != nil {
+		return receiptWriteError(c, err)
 	}
+	event.Model = gorm.Model{}
 
 	event.IsActive = true
 
@@ -130,23 +134,25 @@ func (h *EventHandler) UpdateEvent(c echo.Context) error {
 			"error": "Evento no encontrado.",
 		})
 	}
+	original := event
 
 	// Bind sobre un struct aparte -- ver nota en faq.handler.go UpdateFAQ:
 	// c.Bind(&event) directo permitia pisar ID/CreatedAt/DeletedAt via el
 	// body (AdminEvents.jsx manda el form completo, que puede incluir el
 	// ID) y arriesgaba que Save() tocara otra fila en vez del :id pedido.
 	var req struct {
-		Title           *string  `json:"title"`
-		Date            *string  `json:"date"`
-		Time            *string  `json:"time"`
-		Location        *string  `json:"location"`
-		Description     *string  `json:"description"`
-		CoverImage      *string  `json:"cover_image"`
-		IsActive        *bool    `json:"is_active"`
-		RequiresPayment *bool    `json:"requires_payment"`
-		PriceGTQ        *float64 `json:"price_gtq"`
-		PaymentDeadline *string  `json:"payment_deadline"`
-		Capacity        *int     `json:"capacity"`
+		Title            *string  `json:"title"`
+		Date             *string  `json:"date"`
+		Time             *string  `json:"time"`
+		Location         *string  `json:"location"`
+		Description      *string  `json:"description"`
+		CoverImage       *string  `json:"cover_image"`
+		IsActive         *bool    `json:"is_active"`
+		RequiresPayment  *bool    `json:"requires_payment"`
+		PriceGTQ         *float64 `json:"price_gtq"`
+		PaymentDeadline  *string  `json:"payment_deadline"`
+		Capacity         *int     `json:"capacity"`
+		ReservationHours *int     `json:"reservation_hours"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -186,11 +192,42 @@ func (h *EventHandler) UpdateEvent(c echo.Context) error {
 	if req.Capacity != nil {
 		event.Capacity = *req.Capacity
 	}
+	if req.ReservationHours != nil {
+		event.ReservationHours = *req.ReservationHours
+	}
+	if err := validateEvent(&event); err != nil {
+		return receiptWriteError(c, err)
+	}
 
-	if result := h.DB.Save(&event); result.Error != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "No se pudo actualizar el evento.",
-		})
+	if err := h.DB.Transaction(func(tx *gorm.DB) error {
+		var current models.Event
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&current, event.ID).Error; err != nil {
+			return err
+		}
+		if !current.UpdatedAt.Equal(original.UpdatedAt) {
+			return echo.NewHTTPError(409, "El evento cambió mientras lo editabas. Recarga antes de guardar.")
+		}
+		if event.RequiresPayment != current.RequiresPayment || event.PriceGTQ != current.PriceGTQ {
+			var n int64
+			if err := tx.Model(&models.EventRegistration{}).Where("event_id = ?", event.ID).Count(&n).Error; err != nil {
+				return err
+			}
+			if n > 0 {
+				return echo.NewHTTPError(409, "Con inscripciones guardadas no se puede cambiar el precio o el método de cobro. Crea otra convocatoria.")
+			}
+		}
+		if event.Capacity > 0 {
+			occupied, err := occupiedSeats(tx, event.ID, 0)
+			if err != nil {
+				return err
+			}
+			if occupied > int64(event.Capacity) {
+				return echo.NewHTTPError(409, "El cupo no puede ser menor que las plazas ya reservadas.")
+			}
+		}
+		return tx.Save(&event).Error
+	}); err != nil {
+		return receiptWriteError(c, err)
 	}
 
 	userID, _ := c.Get("user_id").(uint)

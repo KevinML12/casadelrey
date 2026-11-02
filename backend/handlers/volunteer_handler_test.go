@@ -268,7 +268,7 @@ func TestCreateUserFromVolunteer_EmailYaExiste_Retorna409(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id", "email"}).AddRow(5, "ana@test.com"))
 
 	c, rec := newCtx(t, ctxOpts{
-		body:   map[string]interface{}{"password": "segura123"},
+		body:   map[string]interface{}{"password": "segura12345"},
 		params: map[string]string{"id": "1"},
 		role:   "admin",
 	})
@@ -327,7 +327,7 @@ func TestCreateUserFromVolunteer_PasswordCorta_Retorna400(t *testing.T) {
 
 	var resp map[string]string
 	decodeBody(t, rec, &resp)
-	assert.Contains(t, resp["error"], "6")
+	assert.Contains(t, resp["error"], "10")
 }
 
 func TestCreateUserFromVolunteer_VoluntarioNoEncontrado_Retorna404(t *testing.T) {
@@ -339,7 +339,7 @@ func TestCreateUserFromVolunteer_VoluntarioNoEncontrado_Retorna404(t *testing.T)
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 
 	c, rec := newCtx(t, ctxOpts{
-		body:   map[string]interface{}{"password": "segura123"},
+		body:   map[string]interface{}{"password": "segura12345"},
 		params: map[string]string{"id": "999"},
 		role:   "admin",
 	})

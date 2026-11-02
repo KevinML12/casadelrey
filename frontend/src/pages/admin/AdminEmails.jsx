@@ -21,6 +21,7 @@ const LABELS = {
   failed: "Falló",
   uncertain: "Revisar en Brevo",
   expired: "Caducado",
+  superseded: "Sustituido por una actualización",
 };
 export default function AdminEmails() {
   const [status, setStatus] = useState(null);
@@ -97,7 +98,7 @@ export default function AdminEmails() {
           </h2>
           <p className="mt-2 text-14 leading-relaxed text-bg/75">
             {status.configured
-              ? "El servidor conserva los envíos en cola y procesa los reintentos seguros."
+              ? "El servidor conserva los avisos ordinarios hasta siete días y procesa los reintentos seguros, con un máximo total de 250 envíos por 24 horas: hasta 225 avisos ordinarios y 25 lugares reservados para acciones de cuenta. Un aviso más reciente sustituye al anterior que todavía no se haya enviado."
               : "Los mensajes permanecen guardados. Configura la clave API, un remitente verificado y el frontend definitivo en Render para empezar a enviar."}
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-13">

@@ -169,3 +169,50 @@ func TestPreviewTemplates(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, name+".html"), []byte(body), 0600))
 	}
 }
+
+func TestBusinessBacklogRetainsLatestStateWithoutDuplicateSuppressingIt(t *testing.T) {
+	s := fixture(t)
+	before := time.Now()
+	first := queue(t, s, "receipt:42:pending:0")
+	require.WithinDuration(t, before.Add(7*24*time.Hour), first.ExpiresAt, time.Second)
+	latest := queue(t, s, "receipt:42:verified:1")
+	require.NoError(t, s.DB.First(&first, first.ID).Error)
+	require.Equal(t, "superseded", first.Status)
+	require.Empty(t, first.Payload)
+	queue(t, s, "receipt:42:pending:0") // delayed replay must not suppress the latest notice
+	require.NoError(t, s.DB.First(&latest, latest.ID).Error)
+	require.Equal(t, "pending", latest.Status)
+	require.NotEmpty(t, latest.Payload)
+	expiry := time.Now().Add(time.Hour)
+	require.NoError(t, Enqueue(s.DB, Message{Key: "reset:42", To: "controlled@example.invalid", HTML: "reset", ExpiresAt: expiry}))
+	var reset models.EmailMessage
+	require.NoError(t, s.DB.Where("event_key = ?", "reset:42").First(&reset).Error)
+	require.WithinDuration(t, expiry, reset.ExpiresAt, time.Millisecond)
+}
+
+func TestSecurityMessagesHaveReservedFreeBudget(t *testing.T) {
+	s := fixture(t)
+	now := time.Now()
+	rows := make([]models.EmailMessage, 225)
+	for i := range rows {
+		rows[i] = models.EmailMessage{EventKey: fmt.Sprintf("budget:%d", i), SendKey: fmt.Sprint(i), Status: "accepted", AcceptedAt: &now, ExpiresAt: now.Add(time.Hour), NextAttemptAt: now}
+	}
+	require.NoError(t, s.DB.CreateInBatches(rows, 50).Error)
+	business := queue(t, s, "business:remaining")
+	calls := 0
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		w.WriteHeader(201)
+		fmt.Fprint(w, `{"messageId":"controlled-security"}`)
+	}))
+	defer provider.Close()
+	s.endpoint = provider.URL
+	require.NoError(t, s.Tick(context.Background()))
+	require.Zero(t, calls)
+	require.NoError(t, Enqueue(s.DB, Message{Key: "reset:reserve", Kind: "password_reset", To: "controlled@example.invalid", HTML: "Reset", ExpiresAt: now.Add(time.Hour)}))
+	require.NoError(t, s.Tick(context.Background()))
+	require.Equal(t, 1, calls)
+	require.NoError(t, s.DB.First(&business, business.ID).Error)
+	require.Equal(t, "pending", business.Status)
+	require.Zero(t, business.Attempts)
+}

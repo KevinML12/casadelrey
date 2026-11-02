@@ -45,7 +45,15 @@ export function AuthProvider({ children }) {
 
   const login = (newToken, newRefreshToken = null) => saveToken(newToken, newRefreshToken);
 
-  const logout = () => clearToken();
+  const logout = () => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    clearToken();
+    if (refreshToken) return apiClient.post('/auth/logout', { refresh_token: refreshToken }).catch(() => {
+      // Local sign-out still works offline; never restore a discarded credential.
+      window.dispatchEvent(new Event('auth:logout-offline'));
+    });
+    return Promise.resolve();
+  };
 
   const register = async (email, password, name) => {
     try {

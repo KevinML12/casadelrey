@@ -50,6 +50,8 @@ func TestUpdateUserRole_RolesValidos_Retorna200(t *testing.T) {
 		h := handlers.NewAdminHandler(db)
 
 		mock.ExpectBegin()
+		mock.ExpectExec(`SELECT pg_advisory_xact_lock`).WillReturnResult(sqlmock.NewResult(0, 1))
+		mock.ExpectQuery(`SELECT .* FROM "users"`).WillReturnRows(sqlmock.NewRows([]string{"id", "role"}).AddRow(3, "member"))
 		mock.ExpectExec(`UPDATE "users"`).WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
@@ -68,10 +70,10 @@ func TestUpdateUserRole_UsuarioNoEncontrado_Retorna404(t *testing.T) {
 	defer sqlDB.Close()
 	h := handlers.NewAdminHandler(db)
 
-	// RowsAffected = 0 → usuario no encontrado
 	mock.ExpectBegin()
-	mock.ExpectExec(`UPDATE "users"`).WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectCommit()
+	mock.ExpectExec(`SELECT pg_advisory_xact_lock`).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectQuery(`SELECT .* FROM "users"`).WillReturnRows(sqlmock.NewRows([]string{"id", "role"}))
+	mock.ExpectRollback()
 
 	c, rec := newCtx(t, ctxOpts{
 		body:   map[string]interface{}{"role": "member"},
@@ -153,7 +155,7 @@ func TestCreateUser_RolInvalido_Retorna400(t *testing.T) {
 
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{
-			"name": "Ana", "email": "ana@test.com", "password": "segura123", "role": "superadmin",
+			"name": "Ana", "email": "ana@test.com", "password": "segura12345", "role": "superadmin",
 		},
 		role: "admin",
 	})
@@ -168,7 +170,7 @@ func TestCreateUser_LiderIntentaCrearAdmin_Retorna403(t *testing.T) {
 
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{
-			"name": "Pedro", "email": "pedro@test.com", "password": "segura123", "role": "admin",
+			"name": "Pedro", "email": "pedro@test.com", "password": "segura12345", "role": "admin",
 		},
 		role: "leader",
 	})

@@ -15,6 +15,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"casadelrey/backend/handlers"
 	"casadelrey/backend/models"
@@ -57,7 +58,7 @@ func TestDonationConcurrentPostgres(t *testing.T) {
 	pool.SetMaxOpenConns(12)
 	db, err := gorm.Open(postgres.New(postgres.Config{Conn: pool}), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	require.NoError(t, err)
-	require.NoError(t, db.AutoMigrate(&models.Donation{}, &models.PaymentReceipt{}, &models.EmailMessage{}, &models.SitePhoto{}))
+	require.NoError(t, db.AutoMigrate(&models.Donation{}, &models.PaymentReceipt{}, &models.ReceiptUpload{}, &models.EmailMessage{}, &models.SitePhoto{}))
 	e := echo.New()
 	previous := config.AppConfig
 	config.AppConfig = &config.Config{JWTSecret: "controlled-postgres-test-secret", ClientURL: "https://example.invalid"}
@@ -134,6 +135,82 @@ func TestDonationConcurrentPostgres(t *testing.T) {
 	var accepted int64
 	require.NoError(t, db.Model(&models.EmailMessage{}).Where("status = ?", "accepted").Count(&accepted).Error)
 	require.EqualValues(t, 1, accepted)
+
+	t.Run("simultaneous administrator demotions preserve one administrator", func(t *testing.T) {
+		require.NoError(t, db.AutoMigrate(&models.User{}, &models.ActivityLog{}))
+		users := []models.User{{Name: "One", Email: "one@example.invalid", Password: "unused", Role: "admin"}, {Name: "Two", Email: "two@example.invalid", Password: "unused", Role: "admin"}}
+		require.NoError(t, db.Create(&users).Error)
+		app := echo.New()
+		app.PUT("/roles/:id", handlers.NewAdminHandler(db).UpdateUserRole)
+		results := make(chan int, 2)
+		start := make(chan struct{})
+		for _, user := range users {
+			wg.Add(1)
+			go func(id uint) {
+				defer wg.Done()
+				<-start
+				req := httptest.NewRequest("PUT", fmt.Sprintf("/roles/%d", id), strings.NewReader(`{"role":"member"}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Idempotency-Key", "controlled-seat-race")
+				rec := httptest.NewRecorder()
+				app.ServeHTTP(rec, req)
+				results <- rec.Code
+			}(user.ID)
+		}
+		close(start)
+		wg.Wait()
+		close(results)
+		statuses := map[int]int{}
+		for result := range results {
+			statuses[result]++
+		}
+		require.Equal(t, map[int]int{200: 1, 409: 1}, statuses)
+		var admins int64
+		require.NoError(t, db.Model(&models.User{}).Where("role = ?", "admin").Count(&admins).Error)
+		require.EqualValues(t, 1, admins)
+	})
+	t.Run("late payment approval competes safely with a new reservation", func(t *testing.T) {
+		require.NoError(t, db.AutoMigrate(&models.Event{}, &models.EventRegistration{}, &models.ActivityLog{}))
+		event := models.Event{Title: "Controlled race", Date: "2099-12-01", IsActive: true, RequiresPayment: true, PriceGTQ: 50, Capacity: 1}
+		require.NoError(t, db.Create(&event).Error)
+		receipt := models.PaymentReceipt{PayerName: "Earlier", PayerEmail: "earlier@example.invalid", Amount: 50, Currency: "GTQ", Purpose: "evento", EventID: &event.ID, Status: "pendiente"}
+		require.NoError(t, db.Create(&receipt).Error)
+		expires := time.Now().Add(-time.Minute)
+		require.NoError(t, db.Create(&models.EventRegistration{EventID: event.ID, Name: "Earlier", Email: receipt.PayerEmail, AttendeeCount: 1, PaymentStatus: "pendiente", ReceiptID: &receipt.ID, ReservationExpiresAt: &expires}).Error)
+		app := echo.New()
+		app.PUT("/receipts/:id/verify", handlers.NewPaymentReceiptHandler(db, controlledReceiptStore{}).Verify)
+		app.POST("/events/:id/rsvp", handlers.NewRSVPHandler(db, controlledReceiptStore{}).RegisterRSVP)
+		bodies := []struct{ method, path, body string }{{"PUT", fmt.Sprintf("/receipts/%d/verify", receipt.ID), `{"status":"verificado"}`}, {"POST", fmt.Sprintf("/events/%d/rsvp", event.ID), `{"name":"New attendee","email":"new@example.invalid","attendee_count":1,"receipt":{"amount":50,"receipt_image_url":"receipt-private:31234567-89ab-4cde-8012-3456789abcde.png"}}`}}
+		results := make(chan int, 2)
+		start := make(chan struct{})
+		for _, body := range bodies {
+			wg.Add(1)
+			go func(method, path, body string) {
+				defer wg.Done()
+				<-start
+				req := httptest.NewRequest(method, path, strings.NewReader(body))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Idempotency-Key", "controlled-seat-race")
+				rec := httptest.NewRecorder()
+				app.ServeHTTP(rec, req)
+				results <- rec.Code
+			}(body.method, body.path, body.body)
+		}
+		close(start)
+		wg.Wait()
+		close(results)
+		success, conflict := 0, 0
+		for status := range results {
+			if status == 200 || status == 201 {
+				success++
+			} else {
+				require.Equal(t, 409, status)
+				conflict++
+			}
+		}
+		require.Equal(t, 1, success)
+		require.Equal(t, 1, conflict)
+	})
 }
 
 // Route the production client's request to a local fake without exposing a

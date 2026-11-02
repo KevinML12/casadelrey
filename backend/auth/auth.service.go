@@ -6,12 +6,18 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"time"
+	"unicode/utf8"
 
 	"casadelrey/backend/config"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
+
+// Bcrypt supports at most 72 bytes. Existing passwords remain valid at login.
+func ValidNewPassword(value string) bool {
+	return utf8.RuneCountInString(value) >= 10 && len(value) <= 72
+}
 
 // JWTClaims define los claims personalizados del JWT
 type JWTClaims struct {

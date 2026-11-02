@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"casadelrey/backend/models"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
@@ -17,7 +18,9 @@ import (
 
 func hash(pw string) string {
 	b, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-	if err != nil { log.Fatal(err) }
+	if err != nil {
+		log.Fatal(err)
+	}
 	return string(b)
 }
 
@@ -38,10 +41,18 @@ func seedPassword(envKey string) string {
 func main() {
 	_ = godotenv.Load()
 	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" { log.Fatal("DATABASE_URL no configurada") }
+	if dsn == "" {
+		log.Fatal("DATABASE_URL no configurada")
+	}
 
+	parsed, err := pgx.ParseConfig(dsn)
+	if err != nil || os.Getenv("CDR_ALLOW_LOCAL_SEED") != "1" || (parsed.Host != "127.0.0.1" && parsed.Host != "localhost" && parsed.Host != "::1") {
+		log.Fatal("Semilla desactivada: requiere una base local desechable y CDR_ALLOW_LOCAL_SEED=1. Las cuentas reales se crean en el panel.")
+	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
-	if err != nil { log.Fatalf("Error BD: %v", err) }
+	if err != nil {
+		log.Fatalf("Error BD: %v", err)
+	}
 
 	db.AutoMigrate(
 		&models.User{}, &models.Post{}, &models.Event{}, &models.CellReport{}, &models.VolunteerReport{},
@@ -52,19 +63,19 @@ func main() {
 	)
 	fmt.Println("Tablas migradas")
 
-	adminPw  := seedPassword("SEED_ADMIN_PASSWORD")
+	adminPw := seedPassword("SEED_ADMIN_PASSWORD")
 	leaderPw := seedPassword("SEED_LEADER_PASSWORD")
-	volPw    := seedPassword("SEED_VOLUNTEER_PASSWORD")
+	volPw := seedPassword("SEED_VOLUNTEER_PASSWORD")
 
 	users := []models.User{
-		{Name: "Pastor Roberto Mendez", Email: "pastor@casadelrey.org", Password: adminPw,  Role: "admin",     EmailVerified: true},
-		{Name: "Carlos Mendez",         Email: "carlos@casadelrey.org", Password: adminPw,  Role: "admin",     EmailVerified: true},
-		{Name: "Leonel Garcia",         Email: "leonel@casadelrey.org", Password: leaderPw, Role: "leader",    CellCode: "H1", CellType: "hombres", EmailVerified: true},
-		{Name: "Ana Perez",             Email: "ana@casadelrey.org",    Password: leaderPw, Role: "leader",    CellCode: "M1", CellType: "mujeres", EmailVerified: true},
-		{Name: "Diego Rodriguez",       Email: "diego@casadelrey.org",  Password: leaderPw, Role: "leader",    CellCode: "J1", CellType: "jovenes", EmailVerified: true},
-		{Name: "Josue Ramirez",         Email: "josue@casadelrey.org",  Password: leaderPw, Role: "leader",    CellCode: "H2", CellType: "hombres", EmailVerified: true},
-		{Name: "Sofia Castillo",        Email: "sofia@casadelrey.org",  Password: leaderPw, Role: "leader",    CellCode: "P1", CellType: "prejus",  EmailVerified: true},
-		{Name: "Juan Voluntario",       Email: "juan.v@casadelrey.org", Password: volPw,    Role: "volunteer", EmailVerified: true},
+		{Name: "Pastor Roberto Mendez", Email: "pastor@casadelrey.org", Password: adminPw, Role: "admin", EmailVerified: true},
+		{Name: "Carlos Mendez", Email: "carlos@casadelrey.org", Password: adminPw, Role: "admin", EmailVerified: true},
+		{Name: "Leonel Garcia", Email: "leonel@casadelrey.org", Password: leaderPw, Role: "leader", CellCode: "H1", CellType: "hombres", EmailVerified: true},
+		{Name: "Ana Perez", Email: "ana@casadelrey.org", Password: leaderPw, Role: "leader", CellCode: "M1", CellType: "mujeres", EmailVerified: true},
+		{Name: "Diego Rodriguez", Email: "diego@casadelrey.org", Password: leaderPw, Role: "leader", CellCode: "J1", CellType: "jovenes", EmailVerified: true},
+		{Name: "Josue Ramirez", Email: "josue@casadelrey.org", Password: leaderPw, Role: "leader", CellCode: "H2", CellType: "hombres", EmailVerified: true},
+		{Name: "Sofia Castillo", Email: "sofia@casadelrey.org", Password: leaderPw, Role: "leader", CellCode: "P1", CellType: "prejus", EmailVerified: true},
+		{Name: "Juan Voluntario", Email: "juan.v@casadelrey.org", Password: volPw, Role: "volunteer", EmailVerified: true},
 	}
 	for i := range users {
 		var ex models.User
@@ -103,9 +114,9 @@ func main() {
 	}
 
 	events := []models.Event{
-		{Title: "Culto de Avivamiento",   Date: "2026-06-15", Location: "Templo Central, Zona 1, Huehuetenango", Description: "Una noche especial de adoracion y milagros. Ven con expectativa.", IsActive: true},
-		{Title: "Campamento de Jovenes",  Date: "2026-07-04", Location: "Campamento El Retiro, km 45",          Description: "3 dias de encuentro para jovenes de 15 a 30 anos.", IsActive: true},
-		{Title: "Conferencia de Lideres", Date: "2026-06-28", Location: "Salon de Eventos Casa del Rey",        Description: "Capacitacion para lideres de celula. Obligatorio.", IsActive: true},
+		{Title: "Culto de Avivamiento", Date: "2026-06-15", Location: "Templo Central, Zona 1, Huehuetenango", Description: "Una noche especial de adoracion y milagros. Ven con expectativa.", IsActive: true},
+		{Title: "Campamento de Jovenes", Date: "2026-07-04", Location: "Campamento El Retiro, km 45", Description: "3 dias de encuentro para jovenes de 15 a 30 anos.", IsActive: true},
+		{Title: "Conferencia de Lideres", Date: "2026-06-28", Location: "Salon de Eventos Casa del Rey", Description: "Capacitacion para lideres de celula. Obligatorio.", IsActive: true},
 	}
 	for i := range events {
 		var ex models.Event
@@ -144,10 +155,10 @@ func main() {
 	d3 := time.Now().AddDate(0, 0, -3).Format("2006-01-02")
 
 	reports := []models.CellReport{
-		{CellCode: "H1", CellName: "Guerreros del Rey",          CellType: "hombres", MeetingDate: d1, LeaderID: &leonel.ID, LeaderName: "Leonel Garcia", PastorName: "Pastor Roberto Mendez", HostName: "Don Francisco Alvarado", HostPhone: "+502 5555-1234", Address: "6a calle 3-45 Zona 3", Topic: "El varon conforme al corazon de Dios", TotalAttendees: 18, Converts: 2, Reconciled: 1, NewMembers: 3, Offering: 350.00, PhotoURL: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600", Status: "aprobado", ApprovedByID: &pastor.ID},
-		{CellCode: "M1", CellName: "Esther Mujeres de Proposito",CellType: "mujeres", MeetingDate: d1, LeaderName: "Ana Perez",       PastorName: "Pastor Roberto Mendez", HostName: "Dona Carmen Perez",     HostPhone: "+502 5566-7890", Address: "Residencial Las Palmas",   Topic: "Mujer virtuosa Proverbios 31",         TotalAttendees: 23, Converts: 1, Reconciled: 3, NewMembers: 4, Offering: 420.00, PhotoURL: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600", Status: "aprobado", ApprovedByID: &pastor.ID},
-		{CellCode: "J1", CellName: "Generacion Fuego",           CellType: "jovenes", MeetingDate: d2, LeaderName: "Diego Rodriguez", PastorName: "Pastor Roberto Mendez", HostName: "Familia Gonzalez",      HostPhone: "+502 5577-4321", Address: "Colonia El Maestro",       Topic: "Identidad en Cristo",                 TotalAttendees: 31, Converts: 4, Reconciled: 2, NewMembers: 6, Offering: 280.00, Status: "aprobado", ApprovedByID: &pastor.ID},
-		{CellCode: "P1", CellName: "Nueva Generacion",           CellType: "prejus",  MeetingDate: d3, LeaderName: "Sofia Castillo",  PastorName: "Pastor Roberto Mendez", HostName: "Familia Mendez",        HostPhone: "+502 5588-9999", Address: "5a Avenida 10-22 Zona 1", Topic: "Proposito de Dios para jovenes",      TotalAttendees: 15, Converts: 3, Reconciled: 0, NewMembers: 3, Offering: 150.00, Status: "pendiente"},
+		{CellCode: "H1", CellName: "Guerreros del Rey", CellType: "hombres", MeetingDate: d1, LeaderID: &leonel.ID, LeaderName: "Leonel Garcia", PastorName: "Pastor Roberto Mendez", HostName: "Don Francisco Alvarado", HostPhone: "+502 5555-1234", Address: "6a calle 3-45 Zona 3", Topic: "El varon conforme al corazon de Dios", TotalAttendees: 18, Converts: 2, Reconciled: 1, NewMembers: 3, Offering: 350.00, PhotoURL: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600", Status: "aprobado", ApprovedByID: &pastor.ID},
+		{CellCode: "M1", CellName: "Esther Mujeres de Proposito", CellType: "mujeres", MeetingDate: d1, LeaderName: "Ana Perez", PastorName: "Pastor Roberto Mendez", HostName: "Dona Carmen Perez", HostPhone: "+502 5566-7890", Address: "Residencial Las Palmas", Topic: "Mujer virtuosa Proverbios 31", TotalAttendees: 23, Converts: 1, Reconciled: 3, NewMembers: 4, Offering: 420.00, PhotoURL: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600", Status: "aprobado", ApprovedByID: &pastor.ID},
+		{CellCode: "J1", CellName: "Generacion Fuego", CellType: "jovenes", MeetingDate: d2, LeaderName: "Diego Rodriguez", PastorName: "Pastor Roberto Mendez", HostName: "Familia Gonzalez", HostPhone: "+502 5577-4321", Address: "Colonia El Maestro", Topic: "Identidad en Cristo", TotalAttendees: 31, Converts: 4, Reconciled: 2, NewMembers: 6, Offering: 280.00, Status: "aprobado", ApprovedByID: &pastor.ID},
+		{CellCode: "P1", CellName: "Nueva Generacion", CellType: "prejus", MeetingDate: d3, LeaderName: "Sofia Castillo", PastorName: "Pastor Roberto Mendez", HostName: "Familia Mendez", HostPhone: "+502 5588-9999", Address: "5a Avenida 10-22 Zona 1", Topic: "Proposito de Dios para jovenes", TotalAttendees: 15, Converts: 3, Reconciled: 0, NewMembers: 3, Offering: 150.00, Status: "pendiente"},
 	}
 	for i := range reports {
 		var ex models.CellReport
@@ -160,10 +171,10 @@ func main() {
 	}
 
 	boletas := []models.MemberBoleta{
-		{Date: d1, InviterName: "Leonel Garcia",   InviterPhone: "+502 5555-0001", GuestName: "Ernesto Barrios",  GuestPhone: "+502 5512-3456", Address: "Zona 3, Huehue", Category: "convertido",   LeaderID: &leonel.ID},
-		{Date: d1, InviterName: "Ana Perez",       InviterPhone: "+502 5555-0002", GuestName: "Lucia Hernandez", GuestPhone: "+502 5523-4567", Address: "Zona 5, Huehue", Category: "reconciliado", LeaderID: &leonel.ID},
-		{Date: d2, InviterName: "Diego Rodriguez", InviterPhone: "+502 5555-0003", GuestName: "Marco Aju",       GuestPhone: "+502 5534-5678", Address: "Chiantla",        Category: "convertido",   LeaderID: &leonel.ID},
-		{Date: d3, InviterName: "Sofia Castillo",  InviterPhone: "+502 5555-0004", GuestName: "Valeria Gomez",   GuestPhone: "+502 5545-6789", Address: "Zona 1, Huehue", Category: "nuevo",        LeaderID: &leonel.ID},
+		{Date: d1, InviterName: "Leonel Garcia", InviterPhone: "+502 5555-0001", GuestName: "Ernesto Barrios", GuestPhone: "+502 5512-3456", Address: "Zona 3, Huehue", Category: "convertido", LeaderID: &leonel.ID},
+		{Date: d1, InviterName: "Ana Perez", InviterPhone: "+502 5555-0002", GuestName: "Lucia Hernandez", GuestPhone: "+502 5523-4567", Address: "Zona 5, Huehue", Category: "reconciliado", LeaderID: &leonel.ID},
+		{Date: d2, InviterName: "Diego Rodriguez", InviterPhone: "+502 5555-0003", GuestName: "Marco Aju", GuestPhone: "+502 5534-5678", Address: "Chiantla", Category: "convertido", LeaderID: &leonel.ID},
+		{Date: d3, InviterName: "Sofia Castillo", InviterPhone: "+502 5555-0004", GuestName: "Valeria Gomez", GuestPhone: "+502 5545-6789", Address: "Zona 1, Huehue", Category: "nuevo", LeaderID: &leonel.ID},
 	}
 	for i := range boletas {
 		var ex models.MemberBoleta
@@ -176,10 +187,10 @@ func main() {
 	}
 
 	volunteers := []models.Volunteer{
-		{Name: "Kevin Aju",        Email: "kevin.aju@gmail.com",  Phone: "+502 5561-1111", Department: "alabanza",               Message: "Toco guitarra desde los 12 anos",   Status: "pendiente"},
-		{Name: "Patricia Orozco",  Email: "patricia.o@gmail.com", Phone: "+502 5562-2222", Department: "danza",                  Message: "Dance en mi iglesia anterior 3 anos", Status: "pendiente"},
-		{Name: "Rene Alvarado",    Email: "rene.a@gmail.com",     Phone: "+502 5563-3333", Department: "tecnicos_audiovisuales", Message: "Tecnico en sonido profesional",     Status: "asignado", AssignedLeaderID: &leonel.ID},
-		{Name: "Gloria Cifuentes", Email: "gloria.c@gmail.com",   Phone: "+502 5564-4444", Department: "servidores",             Message: "Quiero servir con hospitalidad",    Status: "pendiente"},
+		{Name: "Kevin Aju", Email: "kevin.aju@gmail.com", Phone: "+502 5561-1111", Department: "alabanza", Message: "Toco guitarra desde los 12 anos", Status: "pendiente"},
+		{Name: "Patricia Orozco", Email: "patricia.o@gmail.com", Phone: "+502 5562-2222", Department: "danza", Message: "Dance en mi iglesia anterior 3 anos", Status: "pendiente"},
+		{Name: "Rene Alvarado", Email: "rene.a@gmail.com", Phone: "+502 5563-3333", Department: "tecnicos_audiovisuales", Message: "Tecnico en sonido profesional", Status: "asignado", AssignedLeaderID: &leonel.ID},
+		{Name: "Gloria Cifuentes", Email: "gloria.c@gmail.com", Phone: "+502 5564-4444", Department: "servidores", Message: "Quiero servir con hospitalidad", Status: "pendiente"},
 	}
 	for i := range volunteers {
 		var ex models.Volunteer
@@ -193,8 +204,8 @@ func main() {
 
 	now := time.Now()
 	announcements := []models.Announcement{
-		{Title: "Ayuno y oracion 3 dias",         Content: "Del 16 al 18 de junio estaremos en ayuno congregacional. Transmision en vivo a las 7pm.", RoleTarget: "all",    IsActive: true, PublishedAt: &now, CreatedByID: pastor.ID},
-		{Title: "Reunion obligatoria de lideres",  Content: "Sabado 22 de junio a las 9am en el salon principal. Traer reporte del mes.",              RoleTarget: "leader", IsActive: true, PublishedAt: &now, CreatedByID: pastor.ID},
+		{Title: "Ayuno y oracion 3 dias", Content: "Del 16 al 18 de junio estaremos en ayuno congregacional. Transmision en vivo a las 7pm.", RoleTarget: "all", IsActive: true, PublishedAt: &now, CreatedByID: pastor.ID},
+		{Title: "Reunion obligatoria de lideres", Content: "Sabado 22 de junio a las 9am en el salon principal. Traer reporte del mes.", RoleTarget: "leader", IsActive: true, PublishedAt: &now, CreatedByID: pastor.ID},
 	}
 	for i := range announcements {
 		var ex models.Announcement
@@ -207,9 +218,9 @@ func main() {
 	}
 
 	petitions := []models.Petition{
-		{Name: "Maria Gonzalez", Email: "maria.g@email.com",  Category: "salud",      Subject: "Sanidad para mi mama",          Message: "Mi mama tiene cancer. Creo en el poder de Dios para sanarla.",        IsAnswered: false},
-		{Name: "Carlos Ramos",   Email: "carlos.r@email.com", Category: "familia",    Subject: "Restauracion de mi matrimonio", Message: "Mi esposa y yo estamos en crisis. Necesitamos restauracion familiar.", IsAnswered: false},
-		{Name: "Jorge Mendez",   Email: "jorge.m@email.com",  Category: "ministerio", Subject: "Direccion para mi llamado",     Message: "Siento el llamado de Dios pero no se en que area servir.",            IsAnswered: false},
+		{Name: "Maria Gonzalez", Email: "maria.g@email.com", Category: "salud", Subject: "Sanidad para mi mama", Message: "Mi mama tiene cancer. Creo en el poder de Dios para sanarla.", IsAnswered: false},
+		{Name: "Carlos Ramos", Email: "carlos.r@email.com", Category: "familia", Subject: "Restauracion de mi matrimonio", Message: "Mi esposa y yo estamos en crisis. Necesitamos restauracion familiar.", IsAnswered: false},
+		{Name: "Jorge Mendez", Email: "jorge.m@email.com", Category: "ministerio", Subject: "Direccion para mi llamado", Message: "Siento el llamado de Dios pero no se en que area servir.", IsAnswered: false},
 	}
 	for i := range petitions {
 		var ex models.Petition
@@ -223,9 +234,9 @@ func main() {
 
 	photos := []models.GalleryPhoto{
 		{Title: "Culto Avivamiento Mayo 2026", URL: "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=800", IsActive: true, UploadedByID: pastor.ID},
-		{Title: "Campamento Jovenes 2025",     URL: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800", IsActive: true, UploadedByID: pastor.ID},
-		{Title: "Celulas en accion",           URL: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800", IsActive: true, UploadedByID: pastor.ID},
-		{Title: "Bautismos Abril 2026",        URL: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800", IsActive: true, UploadedByID: pastor.ID},
+		{Title: "Campamento Jovenes 2025", URL: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800", IsActive: true, UploadedByID: pastor.ID},
+		{Title: "Celulas en accion", URL: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800", IsActive: true, UploadedByID: pastor.ID},
+		{Title: "Bautismos Abril 2026", URL: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800", IsActive: true, UploadedByID: pastor.ID},
 	}
 	for i := range photos {
 		var ex models.GalleryPhoto
@@ -238,9 +249,9 @@ func main() {
 	}
 
 	donations := []models.Donation{
-		{Name: "Pedro Alvarado",  Email: "pedro.a@email.com",  Amount: 500.00,  Currency: "GTQ", PaymentMethod: "transferencia", PaymentReference: "TRF-2026-001", IsSuccessful: true, DonationPurpose: "Diezmo"},
-		{Name: "Sandra Lopez",    Email: "sandra.l@email.com", Amount: 200.00,  Currency: "GTQ", PaymentMethod: "transferencia", PaymentReference: "TR-2026-002",  IsSuccessful: true, DonationPurpose: "Ofrenda"},
-		{Name: "Familia Ramirez", Email: "fam.r@email.com",    Amount: 1000.00, Currency: "GTQ", PaymentMethod: "presencial",    PaymentReference: "PRES-2026-003",IsSuccessful: true, DonationPurpose: "Construccion"},
+		{Name: "Pedro Alvarado", Email: "pedro.a@email.com", Amount: 500.00, Currency: "GTQ", PaymentMethod: "transferencia", PaymentReference: "TRF-2026-001", IsSuccessful: true, DonationPurpose: "Diezmo"},
+		{Name: "Sandra Lopez", Email: "sandra.l@email.com", Amount: 200.00, Currency: "GTQ", PaymentMethod: "transferencia", PaymentReference: "TR-2026-002", IsSuccessful: true, DonationPurpose: "Ofrenda"},
+		{Name: "Familia Ramirez", Email: "fam.r@email.com", Amount: 1000.00, Currency: "GTQ", PaymentMethod: "presencial", PaymentReference: "PRES-2026-003", IsSuccessful: true, DonationPurpose: "Construccion"},
 	}
 	for i := range donations {
 		var ex models.Donation
@@ -254,10 +265,10 @@ func main() {
 
 	db.Where("1 = 1").Delete(&models.HeroSetting{})
 	hero := models.HeroSetting{
-		LabelTop:         "● IGLESIA CRISTIANA · HUEHUETENANGO",
-		TitleLine1:       "LUZ PARA",
-		TitleLine2:       "LAS NACIONES",
-		Subtitle:         "Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.",
+		LabelTop:           "● IGLESIA CRISTIANA · HUEHUETENANGO",
+		TitleLine1:         "LUZ PARA",
+		TitleLine2:         "LAS NACIONES",
+		Subtitle:           "Una generación encendida que adora, sirve y lleva esperanza a cada rincón de la ciudad.",
 		CTAPrimaryText:     "Planifica tu visita",
 		CTAPrimaryURL:      "/visita",
 		BackgroundImageURL: "/images/bg-hero.jpg",

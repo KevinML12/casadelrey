@@ -90,8 +90,8 @@ func (h *ProfileHandler) ChangePassword(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
 	}
-	if len(req.NewPassword) < 6 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "La nueva contraseña debe tener mínimo 6 caracteres."})
+	if !auth.ValidNewPassword(req.NewPassword) {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "La nueva contraseña debe tener entre 10 caracteres y 72 bytes."})
 	}
 
 	var user models.User

@@ -53,6 +53,9 @@ func (h *VolunteerAreaHandler) CreateVolunteerArea(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Value y título son obligatorios."})
 	}
 	area.IsActive = true
+	if err := validateDiscovery(&area); err != nil {
+		return receiptWriteError(c, err)
+	}
 	if err := h.DB.Create(&area).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al crear. ¿Ya existe ese value?"})
 	}
@@ -71,15 +74,17 @@ func (h *VolunteerAreaHandler) UpdateVolunteerArea(c echo.Context) error {
 	}
 
 	var req struct {
-		Value             string `json:"value"`
-		Icon              string `json:"icon"`
-		Title             string `json:"title"`
-		Description       string `json:"description"`
-		Why               string `json:"why"`
-		Testimonial       string `json:"testimonial"`
-		TestimonialAuthor string `json:"testimonial_author"`
-		SortOrder         *int   `json:"sort_order"`
-		IsActive          *bool  `json:"is_active"`
+		Value             string    `json:"value"`
+		Icon              string    `json:"icon"`
+		Title             string    `json:"title"`
+		Description       string    `json:"description"`
+		Why               string    `json:"why"`
+		Testimonial       string    `json:"testimonial"`
+		TestimonialAuthor string    `json:"testimonial_author"`
+		SortOrder         *int      `json:"sort_order"`
+		IsActive          *bool     `json:"is_active"`
+		Interests         *[]string `json:"interests"`
+		Visibility        *[]string `json:"visibility"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -101,11 +106,45 @@ func (h *VolunteerAreaHandler) UpdateVolunteerArea(c echo.Context) error {
 	if req.IsActive != nil {
 		area.IsActive = *req.IsActive
 	}
+	if req.Interests != nil {
+		area.Interests = *req.Interests
+	}
+	if req.Visibility != nil {
+		area.Visibility = *req.Visibility
+	}
+	if err := validateDiscovery(&area); err != nil {
+		return receiptWriteError(c, err)
+	}
 
 	if err := h.DB.Save(&area).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar."})
 	}
 	return c.JSON(http.StatusOK, area)
+}
+
+func validateDiscovery(area *models.VolunteerArea) error {
+	if area.Interests == nil {
+		area.Interests = []string{}
+	}
+	if area.Visibility == nil {
+		area.Visibility = []string{}
+	}
+	for _, group := range []struct {
+		values  []string
+		allowed map[string]bool
+	}{
+		{area.Interests, map[string]bool{"musica": true, "personas": true, "ninos": true, "tecnologia": true, "oracion": true, "organizacion": true}},
+		{area.Visibility, map[string]bool{"frente": true, "apoyo": true}},
+	} {
+		seen := map[string]bool{}
+		for _, value := range group.values {
+			if !group.allowed[value] || seen[value] {
+				return echo.NewHTTPError(400, "Selecciona etiquetas de recomendación válidas, sin repetir.")
+			}
+			seen[value] = true
+		}
+	}
+	return nil
 }
 
 // DeleteVolunteerArea DELETE /api/v1/admin/volunteer-areas/:id — admin,

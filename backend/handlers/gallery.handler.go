@@ -1,13 +1,18 @@
 package handlers
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"log"
 	"net/http"
+	"sort"
+	"strings"
 
 	"casadelrey/backend/models"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // GalleryHandler gestiona la galería de fotos de la iglesia.
@@ -59,6 +64,7 @@ func (h *GalleryHandler) GetAllPhotos(c echo.Context) error {
 // CreatePhoto POST /api/v1/admin/gallery — admin.
 func (h *GalleryHandler) CreatePhoto(c echo.Context) error {
 	var req struct {
+		Album        string `json:"album"`
 		Title        string `json:"title"`
 		Description  string `json:"description"`
 		URL          string `json:"url"`
@@ -73,6 +79,9 @@ func (h *GalleryHandler) CreatePhoto(c echo.Context) error {
 	if req.URL == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "La URL de la foto es obligatoria."})
 	}
+	if len(req.Album) > 150 {
+		return c.JSON(400, map[string]string{"error": "El álbum admite hasta 150 caracteres."})
+	}
 
 	userID, _ := c.Get("user_id").(uint)
 	active := true
@@ -81,6 +90,7 @@ func (h *GalleryHandler) CreatePhoto(c echo.Context) error {
 	}
 
 	photo := models.GalleryPhoto{
+		Album:        strings.TrimSpace(req.Album),
 		Title:        req.Title,
 		Description:  req.Description,
 		URL:          req.URL,
@@ -91,9 +101,28 @@ func (h *GalleryHandler) CreatePhoto(c echo.Context) error {
 		IsActive:     active,
 	}
 
-	if err := h.DB.Create(&photo).Error; err != nil {
+	if key := c.Request().Header.Get("Idempotency-Key"); key != "" {
+		if !donationKeyPattern.MatchString(key) {
+			return c.JSON(400, map[string]string{"error": "Identificador de carga inválido."})
+		}
+		sum := sha256.Sum256([]byte(key))
+		stored := hex.EncodeToString(sum[:])
+		photo.SubmissionKey = &stored
+	}
+	result := h.DB.Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "submission_key"}}, DoNothing: true}).Create(&photo)
+	if err := result.Error; err != nil {
 		log.Printf("[Gallery] Error al crear foto: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al guardar la foto."})
+	}
+	if result.RowsAffected == 0 && photo.SubmissionKey != nil {
+		var previous models.GalleryPhoto
+		if err := h.DB.Where("submission_key = ?", *photo.SubmissionKey).First(&previous).Error; err != nil {
+			return receiptWriteError(c, err)
+		}
+		if previous.URL != photo.URL || previous.Album != photo.Album || previous.Title != photo.Title || previous.UploadedByID != userID {
+			return c.JSON(409, map[string]string{"error": "La carga ya se utilizó con otros datos."})
+		}
+		return c.JSON(200, previous)
 	}
 
 	userName, _ := c.Get("user_name").(string)
@@ -116,6 +145,7 @@ func (h *GalleryHandler) UpdatePhoto(c echo.Context) error {
 	// incluye el ID completo) y arriesgaba que Save() tocara otra fila.
 	// UploadedByID tampoco es editable -- se fija en CreatePhoto.
 	var req struct {
+		Album        *string `json:"album"`
 		Title        *string `json:"title"`
 		Description  *string `json:"description"`
 		URL          *string `json:"url"`
@@ -129,6 +159,12 @@ func (h *GalleryHandler) UpdatePhoto(c echo.Context) error {
 	}
 	if req.Title != nil {
 		photo.Title = *req.Title
+	}
+	if req.Album != nil {
+		if len(*req.Album) > 150 {
+			return c.JSON(400, map[string]string{"error": "El álbum admite hasta 150 caracteres."})
+		}
+		photo.Album = strings.TrimSpace(*req.Album)
 	}
 	if req.Description != nil {
 		photo.Description = *req.Description
@@ -172,4 +208,30 @@ func (h *GalleryHandler) DeletePhoto(c echo.Context) error {
 	LogActivity(h.DB, userID, userName, "delete", "gallery", photo.ID, photo.Title, c.RealIP())
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Foto eliminada."})
+}
+
+// GetAlbums includes existing title-based albums without altering old records.
+func (h *GalleryHandler) GetAlbums(c echo.Context) error {
+	var rows []models.GalleryPhoto
+	if err := h.DB.Select("album", "title").Find(&rows).Error; err != nil {
+		return c.JSON(503, map[string]string{"error": "No se pudieron consultar los álbumes."})
+	}
+	set := map[string]bool{}
+	for _, row := range rows {
+		name := strings.TrimSpace(row.Album)
+		if name == "" {
+			if parts := strings.SplitN(row.Title, " - ", 2); len(parts) == 2 {
+				name = strings.TrimSpace(parts[0])
+			} else {
+				name = "Otros"
+			}
+		}
+		set[name] = true
+	}
+	names := make([]string, 0, len(set))
+	for name := range set {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return c.JSON(200, names)
 }

@@ -113,7 +113,7 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 			status, body = http.StatusNotFound, map[string]string{"error": "Evento no encontrado."}
 			return nil
 		}
-		if !event.IsActive {
+		if eventClosed(event) {
 			status, body = http.StatusBadRequest, map[string]string{"error": "Este evento ya no está activo."}
 			return nil
 		}
@@ -131,7 +131,10 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 
 		// Cupo — 0 = sin limite
 		if event.Capacity > 0 {
-			current := attendeeCountFor(tx, event.ID)
+			current, err := occupiedSeats(tx, event.ID, 0)
+			if err != nil {
+				return err
+			}
 			remaining := event.Capacity - int(current)
 			if remaining <= 0 {
 				status, body = http.StatusConflict, map[string]interface{}{
@@ -229,6 +232,9 @@ func (h *RSVPHandler) RegisterRSVP(c echo.Context) error {
 			Notes:         req.Notes,
 			PaymentStatus: paymentStatus,
 			ReceiptID:     receiptID,
+		}
+		if paymentStatus == "pendiente" {
+			reg.ReservationExpiresAt = reservationExpiry(event)
 		}
 		if userID != 0 {
 			reg.UserID = &userID

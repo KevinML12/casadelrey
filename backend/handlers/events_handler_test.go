@@ -23,6 +23,9 @@ func TestGetEvents_Retorna200(t *testing.T) {
 			AddRow(1, "Retiro 2024", true).
 			AddRow(2, "Culto especial", true))
 
+	for range 2 {
+		mock.ExpectQuery(`SELECT COALESCE\(SUM\(attendee_count\),0\) FROM "event_registrations"`).WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(0))
+	}
 	c, rec := newCtx(t, ctxOpts{method: "GET"})
 	require.NoError(t, h.GetEvents(c))
 	assert.Equal(t, http.StatusOK, rec.Code)
@@ -71,6 +74,7 @@ func TestCreateEvent_ConTitulo_Retorna201(t *testing.T) {
 	c, rec := newCtx(t, ctxOpts{
 		body: map[string]interface{}{
 			"title":    "Retiro de verano",
+			"date":     "2099-12-01",
 			"location": "Centro de retiros",
 		},
 	})
@@ -115,9 +119,10 @@ func TestUpdateEvent_OK_Retorna200(t *testing.T) {
 	h := handlers.NewEventHandler(db)
 
 	mock.ExpectQuery(`SELECT .* FROM "events"`).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "is_active"}).
-			AddRow(1, "Evento viejo", true))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "is_active", "date"}).
+			AddRow(1, "Evento viejo", true, "2099-12-01"))
 	mock.ExpectBegin()
+	mock.ExpectQuery(`SELECT .* FROM "events"`).WillReturnRows(sqlmock.NewRows([]string{"id", "title", "is_active", "date"}).AddRow(1, "Evento viejo", true, "2099-12-01"))
 	mock.ExpectExec(`UPDATE "events"`).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 

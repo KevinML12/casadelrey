@@ -63,7 +63,7 @@ function ChangePasswordForm({ onClose }) {
 
   const submit = async (e) => {
     e.preventDefault();
-    if (next.length < 6) { toast.error('La nueva contraseña debe tener mínimo 6 caracteres'); return; }
+    if (next.length < 10) { toast.error('La nueva contraseña debe tener mínimo 10 caracteres'); return; }
     if (next !== confirm) { toast.error('Las contraseñas no coinciden'); return; }
     setSaving(true);
     try {
@@ -85,11 +85,11 @@ function ChangePasswordForm({ onClose }) {
       </div>
       <div>
         <label className="block text-label-l text-bg/50 mb-1.5">Nueva contraseña</label>
-        <Input type="password" value={next} onChange={e => setNext(e.target.value)} required minLength={6} />
+        <Input type="password" value={next} onChange={e => setNext(e.target.value)} required minLength={10} />
       </div>
       <div>
         <label className="block text-label-l text-bg/50 mb-1.5">Confirmar nueva contraseña</label>
-        <Input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={6} />
+        <Input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={10} />
       </div>
       <div className="flex gap-3 pt-1">
         <Button type="submit" variant="filled" disabled={saving}>

@@ -109,7 +109,7 @@ function PaymentBanner({ event, attendeeCount = 1 }) {
         </p>
       </div>
       <p className="text-14 text-bg/60 leading-relaxed">
-        Este evento requiere pago previo. Realiza el depósito y sube tu comprobante.
+        Este evento requiere pago previo. Realiza el depósito y sube tu comprobante. El cupo se reserva durante {event.reservation_hours || 24} horas mientras se revisa el pago; un rechazo libera los lugares.
       </p>
       {/* Datos bancarios administrables (nunca un número inventado) */}
       <div className="pt-1 border-t border-bg/10">

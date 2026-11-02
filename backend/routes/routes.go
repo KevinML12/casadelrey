@@ -21,6 +21,7 @@ import (
 )
 
 func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store) {
+	middleware.ConfigureClientIP(e)
 
 	// ── Handlers ─────────────────────────────────────────────────────────────────
 	authHandler := auth.NewHandler(db)
@@ -37,7 +38,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	volunteerAreaHandler := handlers.NewVolunteerAreaHandler(db)
 	donationPurposeHandler := handlers.NewDonationPurposeHandler(db)
 	boletaHandler := handlers.NewBoletaHandler(db)
-	uploadHandler := handlers.NewUploadHandler(store)
+	uploadHandler := handlers.NewUploadHandler(store, db)
 	receiptHandler := handlers.NewPaymentReceiptHandler(db, store)
 	mailHandler := &handlers.EmailHandler{DB: db, Config: cfg}
 	heroHandler := handlers.NewHeroHandler(db)
@@ -142,6 +143,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	authGroup.POST("/register", authHandler.RegisterDisabled)
 	authGroup.POST("/login", authHandler.Login)
 	authGroup.POST("/refresh", authHandler.Refresh)
+	authGroup.POST("/logout", authHandler.Logout)
 	authGroup.GET("/verify-email", authHandler.VerifyEmail)
 	authGroup.POST("/forgot-password", authHandler.ForgotPassword)
 	authGroup.POST("/reset-password", authHandler.ResetPassword)
@@ -162,14 +164,14 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// rutas se quitaron para no ocupar el router ni el rate-limit; los
 	// handlers 410 Gone quedan solo por si un cliente viejo los llama.
 	donationsGroup := api.Group("/donations")
-	donationsGroup.POST("/register", donationHandler.RegisterDonation)
+	donationsGroup.POST("/register", donationHandler.RegisterDonation, middleware.SubmissionRateLimit())
 
 	// Eventos (público: lectura + RSVP) — con y sin slash final:
 	// Echo no redirige entre ambos y el frontend histórico usa /events
 	eventsGroup := api.Group("/events")
 	eventsGroup.GET("", eventHandler.GetEvents, cacheShort...)
 	eventsGroup.GET("/", eventHandler.GetEvents, cacheShort...)
-	eventsGroup.POST("/:id/rsvp", rsvpHandler.RegisterRSVP)
+	eventsGroup.POST("/:id/rsvp", rsvpHandler.RegisterRSVP, middleware.SubmissionRateLimit())
 	eventsGroup.DELETE("/:id/rsvp", rsvpHandler.CancelMyRSVP, authRateLimit)
 
 	eventsGroup.POST("/:id/rsvp/cancellation", rsvpHandler.RequestCancellation, authRateLimit)
@@ -218,6 +220,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 
 	// ── Admin (requiere auth + rol admin) ─────────────────────────────────────────
 	adminGroup := api.Group("/admin", authMW, adminMW)
+	adminGroup.GET("/events", eventHandler.GetAdminEvents)
 
 	// Dashboard y KPIs
 	adminGroup.GET("/kpis", adminHandler.GetKPIs)
@@ -341,6 +344,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Galería admin
 	adminGallery := adminGroup.Group("/gallery")
 	adminGallery.GET("/", galleryHandler.GetAllPhotos)
+	adminGallery.GET("/albums", galleryHandler.GetAlbums)
 	adminGallery.POST("/", galleryHandler.CreatePhoto)
 	adminGallery.PUT("/:id", galleryHandler.UpdatePhoto)
 	adminGallery.DELETE("/:id", galleryHandler.DeletePhoto)

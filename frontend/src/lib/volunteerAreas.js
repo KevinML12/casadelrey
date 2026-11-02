@@ -7,6 +7,8 @@ export function useVolunteerAreasResource() {
   const resource = useApiResource('/volunteer-areas');
   const areas = (Array.isArray(resource.data) ? resource.data : []).map(area => ({
     value: area.value,
+	interests: Array.isArray(area.interests) ? area.interests : [],
+	visibility: Array.isArray(area.visibility) ? area.visibility : [],
     title: area.title,
     desc: area.description,
     why: area.why,

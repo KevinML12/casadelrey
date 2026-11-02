@@ -5,18 +5,20 @@
 //  administrables de verdad, sin tocar código. La FOTO de cada uno se
 //  administra aparte, en /admin/site-photos (key voluntariado_<value>).
 // ============================================================
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import Input, { Textarea } from '../../components/ui/Input';
 
-const EMPTY = { value: '', title: '', description: '', why: '', testimonial: '', testimonial_author: '', sort_order: 0 };
+const EMPTY = { value: '', title: '', description: '', why: '', testimonial: '', testimonial_author: '', sort_order: 0, interests: [], visibility: [] };
+const INTERESTS = [['musica','Música y arte'],['personas','Atención a personas'],['ninos','Niñez'],['tecnologia','Tecnología'],['oracion','Oración'],['organizacion','Organización']];
 
 function AreaForm({ onSave, onCancel, initialData }) {
-  const [form, setForm] = useState(initialData || EMPTY);
+  const [form, setForm] = useState({ ...EMPTY, ...initialData });
   const [loading, setLoading] = useState(false);
   const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
+  const toggle = (key,value) => setForm(previous => ({...previous,[key]:(previous[key] || []).includes(value) ? previous[key].filter(item=>item!==value) : [...(previous[key] || []),value]}));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +65,13 @@ function AreaForm({ onSave, onCancel, initialData }) {
         placeholder="Qué hace este departamento..."
       />
 
+      <fieldset className="rounded-[12px] border border-bg/15 p-4">
+        <legend className="px-2 text-14 font-semibold">Recomendaciones del cuestionario</legend>
+        <p className="text-13 text-bg/70 mb-3">Elige cómo descubrir este departamento. Sin etiquetas seguirá visible en el recorrido.</p>
+        <div className="grid sm:grid-cols-2 gap-3">{INTERESTS.map(([value,label])=><label key={value} className="flex items-center gap-3 min-h-11"><input type="checkbox" checked={(form.interests || []).includes(value)} onChange={()=>toggle('interests',value)} />{label}</label>)}</div>
+
+      <div className="flex flex-wrap gap-4 border-t border-bg/10 mt-3 pt-3">{[['frente','Al frente'],['apoyo','Entre bastidores']].map(([value,label])=><label key={value} className="flex items-center gap-3 min-h-11"><input type="checkbox" checked={(form.visibility || []).includes(value)} onChange={()=>toggle('visibility',value)} />{label}</label>)}</div>
+      </fieldset>
       <Textarea
         label="¿Por qué aquí? (se muestra al abrir el departamento)"
         value={form.why}
@@ -107,16 +116,18 @@ export default function AdminVolunteerAreas() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [error,setError]=useState('');
 
-  const load = () => {
+  const load = useCallback(() => {
+    setError('');
     setLoading(true);
     apiClient.get('/admin/volunteer-areas')
       .then(res => setAreas(res.data || []))
-      .catch(console.error)
+      .catch(()=>setError('No se pudieron cargar los departamentos. Vuelve a intentarlo.'))
       .finally(() => setLoading(false));
-  };
+  },[]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const handleToggle = async (area) => {
     try {
@@ -137,6 +148,7 @@ export default function AdminVolunteerAreas() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
+      {error && <div role="alert" className="border border-rose/30 p-4 mb-5 rounded-xl">{error}<button type="button" className="min-h-11 ml-3 underline focus-ring" onClick={load}>Reintentar</button></div>}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-headline-s text-bg font-black leading-tight">Voluntariado — Departamentos</h1>

@@ -110,7 +110,7 @@ func newSecurityFixture(t *testing.T) *securityFixture {
 	require.NoError(t, err)
 	sqlDB.SetMaxOpenConns(1)
 	t.Cleanup(func() { sqlDB.Close() })
-	require.NoError(t, db.AutoMigrate(&models.User{}, &models.Cell{}, &models.Post{}, &models.Announcement{}, &models.GalleryPhoto{}, &models.SocialPost{}, &models.FAQ{}, &models.CellCategory{}, &models.CellReport{}, &models.VolunteerReport{}, &models.MemberBoleta{}, &models.Event{}, &models.EventRegistration{}, &models.PaymentReceipt{}, &models.Donation{}, &models.DonationPurpose{}, &models.Leader{}, &models.Volunteer{}, &models.VolunteerArea{}, &models.Petition{}, &models.ConnectCard{}, &models.HeroSetting{}, &models.SitePhoto{}, &models.SiteSetting{}, &models.UserGoal{}, &models.ActivityLog{}, &models.EmailMessage{}))
+	require.NoError(t, db.AutoMigrate(&models.User{}, &models.Cell{}, &models.Post{}, &models.Announcement{}, &models.GalleryPhoto{}, &models.SocialPost{}, &models.FAQ{}, &models.CellCategory{}, &models.CellReport{}, &models.VolunteerReport{}, &models.MemberBoleta{}, &models.Event{}, &models.EventRegistration{}, &models.PaymentReceipt{}, &models.ReceiptUpload{}, &models.Donation{}, &models.DonationPurpose{}, &models.Leader{}, &models.Volunteer{}, &models.VolunteerArea{}, &models.Petition{}, &models.ConnectCard{}, &models.HeroSetting{}, &models.SitePhoto{}, &models.SiteSetting{}, &models.UserGoal{}, &models.ActivityLog{}, &models.EmailMessage{}))
 	f := &securityFixture{e: echo.New(), db: db, tokens: map[string]string{}, users: map[string]models.User{}, store: &regressionStorage{}}
 	hash, err := auth.HashPassword("InitialPassword123!")
 	require.NoError(t, err)
@@ -266,6 +266,7 @@ func TestSecurityRegression_PublicIDsAndAuthorPrivacy(t *testing.T) {
 }
 func TestSecurityRegression_RoleAndDeletedAccountInvalidateJWT(t *testing.T) {
 	f := newSecurityFixture(t)
+	require.NoError(t, f.db.Create(&models.User{Name: "Second administrator", Email: "second@example.invalid", Role: "admin", Password: "unused", EmailVerified: true}).Error)
 	u := f.users["admin"]
 	assertStatus(t, f.req(t, "PUT", fmt.Sprintf("/api/v1/admin/users/%d/role", u.ID), "admin", map[string]string{"role": "member"}), 200)
 	assertStatus(t, f.req(t, "GET", "/api/v1/admin/kpis", "admin", nil), 401)

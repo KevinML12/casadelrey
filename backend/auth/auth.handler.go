@@ -48,9 +48,9 @@ func (h *Handler) Register(c echo.Context) error {
 	}
 
 	// Validación básica de campos requeridos
-	if req.Name == "" || req.Email == "" || len(req.Password) < 6 {
+	if req.Name == "" || req.Email == "" || !ValidNewPassword(req.Password) {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Nombre y email son requeridos. La contraseña debe tener mínimo 6 caracteres.",
+			"error": "Nombre y email son requeridos. La contraseña debe tener entre 10 caracteres y 72 bytes.",
 		})
 	}
 
@@ -238,6 +238,26 @@ func (h *Handler) Refresh(c echo.Context) error {
 	})
 }
 
+// Logout revokes the opaque renewal credential and all access tokens issued
+// for that session version. Missing/already revoked credentials are idempotent.
+func (h *Handler) Logout(c echo.Context) error {
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	if c.Bind(&req) != nil || len(req.RefreshToken) > 256 {
+		return c.NoContent(http.StatusBadRequest)
+	}
+	if req.RefreshToken != "" {
+		result := h.DB.Model(&User{}).Where("refresh_token = ? OR (length(refresh_token) <> 64 AND refresh_token = ?)", HashToken(req.RefreshToken), req.RefreshToken).Updates(map[string]interface{}{
+			"refresh_token": nil, "refresh_token_expiry": nil, "session_version": gorm.Expr("session_version + 1"),
+		})
+		if result.Error != nil {
+			return c.JSON(503, map[string]string{"error": "No se pudo cerrar la sesión en el servidor."})
+		}
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 // ForgotPassword godoc
 // POST /api/v1/auth/forgot-password
 // Genera un token de reseteo (UUID) y envía un email con el enlace.
@@ -298,9 +318,9 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 		})
 	}
 
-	if req.Token == "" || len(req.NewPassword) < 6 {
+	if req.Token == "" || !ValidNewPassword(req.NewPassword) {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Token y nueva contraseña (mín. 6 caracteres) son requeridos.",
+			"error": "Token y nueva contraseña (entre 10 caracteres y 72 bytes) son requeridos.",
 		})
 	}
 

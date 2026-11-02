@@ -20,28 +20,30 @@ type Volunteer struct {
 
 type VolunteerReport struct {
 	gorm.Model
-	VolunteerID   *uint  `json:"volunteer_id" gorm:"index"`
-	VolunteerName string `json:"volunteer_name" gorm:"type:varchar(100);not null"`
-	Area          string `json:"area" gorm:"type:varchar(50);not null"`
-	ServiceDate   string `json:"service_date" gorm:"type:varchar(20);not null"`
-	LeaderName    string `json:"leader_name" gorm:"type:varchar(100)"`
-	TeamAttendance int    `json:"team_attendance" gorm:"default:0"`
-	Notes          string `json:"notes" gorm:"type:text"`
-	PhotoURL       string `json:"photo_url" gorm:"type:varchar(500)"`
-	Status       string     `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|aprobado|rechazado
-	ApprovedByID *uint      `json:"approved_by_id" gorm:"index"`
-	ApprovedAt   *time.Time `json:"approved_at"`
+	VolunteerID    *uint      `json:"volunteer_id" gorm:"index"`
+	VolunteerName  string     `json:"volunteer_name" gorm:"type:varchar(100);not null"`
+	Area           string     `json:"area" gorm:"type:varchar(50);not null"`
+	ServiceDate    string     `json:"service_date" gorm:"type:varchar(20);not null"`
+	LeaderName     string     `json:"leader_name" gorm:"type:varchar(100)"`
+	TeamAttendance int        `json:"team_attendance" gorm:"default:0"`
+	Notes          string     `json:"notes" gorm:"type:text"`
+	PhotoURL       string     `json:"photo_url" gorm:"type:varchar(500)"`
+	Status         string     `json:"status" gorm:"type:varchar(20);default:pendiente"` // pendiente|aprobado|rechazado
+	ApprovedByID   *uint      `json:"approved_by_id" gorm:"index"`
+	ApprovedAt     *time.Time `json:"approved_at"`
 }
 
 type VolunteerArea struct {
 	gorm.Model
-	Value             string `json:"value" gorm:"type:varchar(50);uniqueIndex;not null"` // alabanza, danza...
-	Icon              string `json:"icon" gorm:"type:varchar(30)"`                       // nombre del icono del set ya existente (Glass.jsx)
-	Title             string `json:"title" gorm:"type:varchar(100);not null"`
-	Description       string `json:"description" gorm:"type:text"`
-	Why               string `json:"why" gorm:"type:text"`                        // "por que aqui"
-	Testimonial       string `json:"testimonial" gorm:"type:text"`                // cita real de un voluntario
-	TestimonialAuthor string `json:"testimonial_author" gorm:"type:varchar(100)"` // "Nombre, rol/tiempo sirviendo"
-	SortOrder         int    `json:"sort_order" gorm:"default:0"`
-	IsActive          bool   `json:"is_active" gorm:"default:true"`
+	Interests         []string `json:"interests" gorm:"serializer:json;type:text"`
+	Visibility        []string `json:"visibility" gorm:"serializer:json;type:text"`
+	Value             string   `json:"value" gorm:"type:varchar(50);uniqueIndex;not null"` // alabanza, danza...
+	Icon              string   `json:"icon" gorm:"type:varchar(30)"`                       // nombre del icono del set ya existente (Glass.jsx)
+	Title             string   `json:"title" gorm:"type:varchar(100);not null"`
+	Description       string   `json:"description" gorm:"type:text"`
+	Why               string   `json:"why" gorm:"type:text"`                        // "por que aqui"
+	Testimonial       string   `json:"testimonial" gorm:"type:text"`                // cita real de un voluntario
+	TestimonialAuthor string   `json:"testimonial_author" gorm:"type:varchar(100)"` // "Nombre, rol/tiempo sirviendo"
+	SortOrder         int      `json:"sort_order" gorm:"default:0"`
+	IsActive          bool     `json:"is_active" gorm:"default:true"`
 }

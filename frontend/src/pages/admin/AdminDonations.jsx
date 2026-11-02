@@ -3,6 +3,7 @@ import apiClient from "../../lib/apiClient";
 import Paginator from "../../components/ui/Paginator";
 import ModalWrapper from "../../components/ui/ModalWrapper";
 import { useDonationPurposes } from "../../lib/donationPurposes";
+import { Link } from 'react-router-dom';
 
 export default function AdminDonations() {
   const purposes = useDonationPurposes();
@@ -17,6 +18,8 @@ export default function AdminDonations() {
   const [error, setError] = useState("");
   const [selected, setSelected] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [reason,setReason]=useState('');
+  useEffect(()=>setReason(''),[selected?.ID]);
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(search.trim()), 350);
     return () => clearTimeout(timer);
@@ -47,6 +50,7 @@ export default function AdminDonations() {
     try {
       await apiClient.put(`/admin/donations/${selected.ID}/cash`, {
         received: !selected.is_successful,
+        reason: selected.is_successful ? reason.trim() : '',
       });
       setSelected(null);
       await load();
@@ -216,8 +220,10 @@ export default function AdminDonations() {
               ? "El importe dejará de sumarse a lo recaudado. Se preparará una notificación si hay un correo registrado."
               : "Confirma únicamente cuando el equipo haya recibido el aporte en persona. Se actualizará lo recaudado y se preparará una confirmación si hay correo registrado."}
           </p>
+          <Link to={`/admin/activity-log?resource=donation&resource_id=${selected.ID}`} className="inline-flex min-h-11 items-center underline text-14 font-semibold focus-ring">Ver historial de decisiones</Link>
+          {selected.is_successful && <label className="block mt-3 text-14 font-semibold">Motivo de la corrección<textarea className="input-light mt-2" value={reason} onChange={event=>setReason(event.target.value)} maxLength={255} rows={2} required /></label>}
           <button
-            disabled={saving}
+            disabled={saving || (selected.is_successful && !reason.trim())}
             onClick={confirm}
             className="mt-6 w-full min-h-12 rounded-[12px] bg-bg text-white font-semibold focus-ring disabled:opacity-50"
           >

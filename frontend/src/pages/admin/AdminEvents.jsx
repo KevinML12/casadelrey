@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 import Input, { Textarea } from '../../components/ui/Input';
@@ -9,6 +9,7 @@ import { compressImageIfNeeded } from '../../lib/compressImage';
 const EMPTY = {
   title: '', date: '', time: '', location: '', description: '', cover_image: '',
   requires_payment: false, price_gtq: '', payment_deadline: '', capacity: '',
+  reservation_hours: 24,
 };
 
 function EventForm({ initial, onSave, onCancel, loading }) {
@@ -39,6 +40,7 @@ function EventForm({ initial, onSave, onCancel, loading }) {
       price_gtq: form.requires_payment ? Number(form.price_gtq) || 0 : 0,
       payment_deadline: form.requires_payment ? form.payment_deadline : '',
       capacity: Number(form.capacity) || 0,
+      reservation_hours: Number(form.reservation_hours),
     });
   };
 
@@ -97,6 +99,7 @@ function EventForm({ initial, onSave, onCancel, loading }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-1 border-l-2 border-acento/30 pl-4">
             <Input label="Precio (Q)" type="number" min="0" step="0.01" value={form.price_gtq} onChange={set('price_gtq')} />
             <Input label="Fecha límite de pago" type="date" value={form.payment_deadline} onChange={set('payment_deadline')} />
+            <Input label="Reserva de cupo (horas)" type="number" min="1" max="168" value={form.reservation_hours} onChange={set('reservation_hours')} helperText="Un pago pendiente reserva el lugar durante este plazo. Al rechazarlo se libera; una corrección necesita cupo disponible." />
           </div>
         )}
 
@@ -137,17 +140,20 @@ function EventRSVPs({ eventId, onChanged }) {
   const [loading,  setLoading]  = useState(true);
   const [totAtts,  setTotAtts]  = useState(0);
   const [removing, setRemoving] = useState(null);
+  const [error,setError]=useState('');
+  const [retry,setRetry]=useState(0);
 
   useEffect(() => {
+    setLoading(true);setError('');
     apiClient.get(`/admin/events/${eventId}/rsvps`)
       .then(r => {
         const data = r.data?.data || [];
         setRsvps(data);
         setTotAtts(r.data?.total_attendees || data.reduce((s, x) => s + (x.attendee_count || 1), 0));
       })
-      .catch(() => setRsvps([]))
+      .catch(() => setError('No se pudieron cargar los registros.'))
       .finally(() => setLoading(false));
-  }, [eventId]);
+  }, [eventId,retry]);
 
   const handleCancel = async (rsvp) => {
     if (!confirm(`¿Cancelar el registro de ${rsvp.name}?`)) return;
@@ -170,6 +176,7 @@ function EventRSVPs({ eventId, onChanged }) {
     </div>
   );
 
+  if(error) return <div role="alert" className="px-5 pb-4 text-rose">{error}<button className="min-h-11 ml-3 underline focus-ring" onClick={()=>setRetry(value=>value+1)}>Reintentar</button></div>;
   if (!rsvps?.length) return (
     <p className="px-5 pb-4 text-body-s text-bg/50">Sin confirmaciones aún.</p>
   );
@@ -186,7 +193,8 @@ function EventRSVPs({ eventId, onChanged }) {
           <div key={r.ID} className="flex items-center gap-3 px-4 py-3">
             <div className="flex-1 min-w-0">
               <p className="text-body-s text-bg font-medium">{r.name}</p>
-              <p className="text-label-s text-bg/50">{r.email}{r.phone ? ` · ${r.phone}` : ''}</p>
+              <p className="text-label-s text-bg/50 [overflow-wrap:anywhere]">{r.email}{r.phone ? ` · ${r.phone}` : ''}</p>
+              <p className="text-12 text-bg/70 mt-1">{r.payment_status === 'pendiente' ? ((r.reservation_expires_at ? new Date(r.reservation_expires_at).getTime() : new Date(r.CreatedAt).getTime()+86400000) > Date.now() ? 'Pago pendiente · reserva temporal' : 'Reserva vencida · sin cupo retenido') : r.payment_status === 'rechazado' ? 'Pago rechazado · cupo liberado' : r.payment_status === 'verificado' ? 'Pago verificado' : 'Registro confirmado'}</p>
             </div>
             <Chip color="secondary">{r.attendee_count || 1} {r.attendee_count === 1 ? 'pers.' : 'pers.'}</Chip>
             <button
@@ -210,22 +218,18 @@ export default function AdminEvents() {
   const [showForm, setShowForm] = useState(false);
   const [editing,  setEditing]  = useState(null);
   const [expanded, setExpanded] = useState(null);
+  const [error,setError]=useState('');
 
-  // /events/ es el endpoint PÚBLICO con Cache-Control de 20s (para que la
-  // página pública no golpee la DB en cada visita) — el panel admin lo
-  // reutiliza porque no hay uno propio, pero eso significa que crear/
-  // editar/borrar un evento y refrescar puede devolver la respuesta
-  // cacheada de hace segundos, sin el cambio recién hecho. Cache-bust
-  // con un query param propio para que el admin SIEMPRE vea el estado
-  // real tras guardar (detectado por la suite E2E: el evento creado no
-  // aparecía en la lista hasta pasados ~20s).
-  const load = () =>
-    apiClient.get(`/events/?_t=${Date.now()}`)
+  // Admin reads include unpublished events and bypass the public cache.
+  const load = useCallback(() => {
+    setError('');
+    return apiClient.get('/admin/events')
       .then(r => setEvents(r.data || []))
-      .catch(console.error)
+      .catch(()=>setError('No se pudieron cargar los eventos. Vuelve a intentarlo.'))
       .finally(() => setLoading(false));
+  },[]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const handleSave = async (form) => {
     setSaving(true);
@@ -257,6 +261,7 @@ export default function AdminEvents() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
 
+      {error && <div role="alert" className="border border-rose/30 p-4 mb-5 rounded-xl">{error}<button className="min-h-11 ml-3 underline focus-ring" onClick={load}>Reintentar</button></div>}
       {/* Page header */}
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div>
