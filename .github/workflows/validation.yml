@@ -1,0 +1,64 @@
+name: Validation
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: cdr_test
+          POSTGRES_PASSWORD: controlled-local-ci-only
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U cdr_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      CDR_TEST_POSTGRES_DSN: postgres://cdr_test:controlled-local-ci-only@127.0.0.1:5432/postgres?sslmode=disable
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: "1.26.10"
+          cache-dependency-path: backend/go.sum
+      - run: go test -race ./...
+      - run: go vet ./...
+      - name: Check the deployed Linux binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /tmp/cdr-api .
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -mode=binary /tmp/cdr-api
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Isolated browser regressions (no production writes)
+        run: npx playwright test adaptive-viewer.spec.js admin-delivery.spec.js bank-configuration.spec.js payment-mail-flow.spec.js navigation-focus.spec.js responsive-final.spec.js scene-modules.spec.js closeout.spec.js
