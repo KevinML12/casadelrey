@@ -77,7 +77,7 @@ func newR2Store(accountID, accessKey, secretKey, bucket, publicURL string) (*r2S
 }
 
 func (s *r2Store) Upload(ctx context.Context, folder, filename string, data io.Reader, size int64, contentType string) (string, error) {
-	if strings.Trim(folder, "/") == "comprobantes" {
+	if strings.Trim(folder, "/") == "comprobantes" || strings.Trim(folder, "/") == "soporte" {
 		return "", fmt.Errorf("receipts require private storage")
 	}
 	key := buildKey(folder, filename)
@@ -129,7 +129,7 @@ func newLocalStore(dir, baseURL string) (*localStore, error) {
 }
 
 func (s *localStore) Upload(_ context.Context, folder, filename string, data io.Reader, _ int64, _ string) (string, error) {
-	if strings.Trim(folder, "/") == "comprobantes" {
+	if strings.Trim(folder, "/") == "comprobantes" || strings.Trim(folder, "/") == "soporte" {
 		return "", fmt.Errorf("receipts require private storage")
 	}
 	subDir := filepath.Join(s.dir, folder)

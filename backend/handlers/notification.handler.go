@@ -30,6 +30,7 @@ func (h *NotificationHandler) GetCounts(c echo.Context) error {
 	var pendingVolunteers int64
 	var pendingReceipts int64
 	var pendingConnectCards int64
+	var pendingSupport int64
 
 	if err := h.DB.Model(&models.Petition{}).Where("is_answered = ?", false).Count(&unreadPetitions).Error; err != nil {
 		log.Printf("[Notifications] Error petitions: %v", err)
@@ -63,12 +64,22 @@ func (h *NotificationHandler) GetCounts(c echo.Context) error {
 		log.Printf("[Notifications] Error connect cards: %v", err)
 	}
 
+	supportQ := h.DB.Model(&models.SupportTicket{})
+	if role == "admin" {
+		supportQ = supportQ.Where("status IN ?", []string{"abierto", "en_revision"})
+	} else {
+		supportQ = supportQ.Where("owner_id = ? AND status = ?", uid, "esperando_respuesta")
+	}
+	if err := supportQ.Count(&pendingSupport).Error; err != nil {
+		log.Print("[Notifications] Support count unavailable")
+	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"unread_petitions":      unreadPetitions,
 		"pending_reports":       pendingReports,
 		"pending_volunteers":    pendingVolunteers,
 		"pending_receipts":      pendingReceipts,
 		"pending_connect_cards": pendingConnectCards,
-		"total":                 unreadPetitions + pendingReports + pendingVolunteers + pendingReceipts + pendingConnectCards,
+		"pending_support":       pendingSupport,
+		"total":                 unreadPetitions + pendingReports + pendingVolunteers + pendingReceipts + pendingConnectCards + pendingSupport,
 	})
 }

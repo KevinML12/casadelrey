@@ -18,6 +18,7 @@ const NAV = [
   // anti-iconos (ya no se renderiza ninguno). No se replica en los nuevos.
   { to: '/leader/my-cell', label: 'Mi célula' },
   { to: '/leader/my-directory',      icon: 'badge',        label: 'Mi ficha' },
+  { to: '/leader/support', label: 'Soporte', badge: 'pending_support' },
   { to: '/leader/profile',           icon: 'person',       label: 'Perfil' },
 ];
 

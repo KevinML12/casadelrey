@@ -74,3 +74,18 @@ func TestPublicCacheNeverSharesAuthenticatedOrFailedResponses(t *testing.T) {
 		t.Fatal("personalized content leaked into public cache")
 	}
 }
+
+func TestSupportWritesPreservePublicContentCache(t *testing.T) {
+	e := echo.New()
+	cache := NewPublicResponseCache()
+	e.Use(cache.InvalidateAfterWrite)
+	calls := 0
+	e.GET("/feed", func(c echo.Context) error { calls++; return c.JSON(200, []string{"published"}) }, cache.Middleware(time.Minute))
+	e.POST("/api/v1/support/tickets", func(c echo.Context) error { return c.NoContent(201) })
+	for _, request := range []*http.Request{httptest.NewRequest("GET", "/feed", nil), httptest.NewRequest("POST", "/api/v1/support/tickets", nil), httptest.NewRequest("GET", "/feed", nil)} {
+		e.ServeHTTP(httptest.NewRecorder(), request)
+	}
+	if calls != 1 {
+		t.Fatalf("private support write invalidated public feed (%d reads)", calls)
+	}
+}

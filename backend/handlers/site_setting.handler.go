@@ -61,6 +61,7 @@ var knownSettings = []struct{ Key, Label, Default string }{
 	{"bank_account_type", "Tipo de cuenta", ""},
 	{"bank_holder", "A nombre de", ""},
 	{"contact_whatsapp", "WhatsApp de contacto (con 502)", ""},
+	{"support_intro", "Soporte — Indicaciones para reportar un problema", "Cuéntanos qué estabas intentando hacer, qué ocurrió y los pasos para reproducirlo. Puedes agregar capturas del problema."},
 	{"admin_bg", "Fondo Panel Admin (URL)", "/images/bg-admin.png"},
 	{"leader_bg", "Fondo Panel Líder (URL)", "/images/bg-leader.png"},
 	{"volunteer_bg", "Fondo Panel Voluntario (URL)", "/images/bg-volunteer.png"},

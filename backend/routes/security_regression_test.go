@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -28,9 +29,12 @@ import (
 )
 
 type regressionStorage struct {
-	mu           sync.Mutex
-	folder       string
-	receiptReads int
+	mu            sync.Mutex
+	folder        string
+	receiptReads  int
+	supportReads  int
+	supportWrites int
+	supportFail   bool
 }
 
 func (s *regressionStorage) Upload(_ context.Context, folder, filename string, _ io.Reader, _ int64, _ string) (string, error) {
@@ -48,6 +52,22 @@ func (s *regressionStorage) OpenReceipt(_ context.Context, _ string) (io.ReadClo
 	s.receiptReads++
 	s.mu.Unlock()
 	return io.NopCloser(bytes.NewReader([]byte("private receipt fixture"))), "image/png", nil
+}
+
+func (s *regressionStorage) UploadSupport(_ context.Context, name string, _ io.Reader, _ int64, _ string) (string, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.supportWrites++
+	if s.supportFail {
+		return "", fmt.Errorf("controlled upload failure")
+	}
+	return storage.SupportReference(name), nil
+}
+func (s *regressionStorage) OpenSupport(_ context.Context, _ string) (io.ReadCloser, string, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.supportReads++
+	return io.NopCloser(strings.NewReader("private support fixture")), "image/png", nil
 }
 
 func TestSecurityRegression_ReceiptFileRequiresLiveAdmin(t *testing.T) {
@@ -110,7 +130,7 @@ func newSecurityFixture(t *testing.T) *securityFixture {
 	require.NoError(t, err)
 	sqlDB.SetMaxOpenConns(1)
 	t.Cleanup(func() { sqlDB.Close() })
-	require.NoError(t, db.AutoMigrate(&models.User{}, &models.Cell{}, &models.Post{}, &models.Announcement{}, &models.GalleryPhoto{}, &models.SocialPost{}, &models.FAQ{}, &models.CellCategory{}, &models.CellReport{}, &models.VolunteerReport{}, &models.MemberBoleta{}, &models.Event{}, &models.EventRegistration{}, &models.PaymentReceipt{}, &models.ReceiptUpload{}, &models.Donation{}, &models.DonationPurpose{}, &models.Leader{}, &models.Volunteer{}, &models.VolunteerArea{}, &models.Petition{}, &models.ConnectCard{}, &models.HeroSetting{}, &models.SitePhoto{}, &models.SiteSetting{}, &models.UserGoal{}, &models.ActivityLog{}, &models.EmailMessage{}))
+	require.NoError(t, db.AutoMigrate(&models.User{}, &models.Cell{}, &models.Post{}, &models.Announcement{}, &models.GalleryPhoto{}, &models.SocialPost{}, &models.FAQ{}, &models.CellCategory{}, &models.CellReport{}, &models.VolunteerReport{}, &models.MemberBoleta{}, &models.Event{}, &models.EventRegistration{}, &models.PaymentReceipt{}, &models.ReceiptUpload{}, &models.Donation{}, &models.DonationPurpose{}, &models.Leader{}, &models.Volunteer{}, &models.VolunteerArea{}, &models.Petition{}, &models.ConnectCard{}, &models.HeroSetting{}, &models.SitePhoto{}, &models.SiteSetting{}, &models.UserGoal{}, &models.ActivityLog{}, &models.EmailMessage{}, &models.SupportTicket{}, &models.SupportMessage{}, &models.SupportAttachment{}))
 	f := &securityFixture{e: echo.New(), db: db, tokens: map[string]string{}, users: map[string]models.User{}, store: &regressionStorage{}}
 	hash, err := auth.HashPassword("InitialPassword123!")
 	require.NoError(t, err)
