@@ -31,4 +31,15 @@ La iglesia todavía no tiene dominio y proporcionará sus propios datos bancario
 5. Separar base y almacenamiento de QA antes de hacer pruebas destructivas o con personas. Hoy ambos frontends son ventanas al mismo servicio activo.
 6. Capacitación, aceptación con responsables y prueba de una transferencia/comprobante auténticos por la iglesia. No se integra una pasarela de tarjetas sin proveedor contratado; el flujo actual es depósito/transferencia con revisión manual y aportes presenciales.
 
-Los respaldos diarios cifrados ya estaban activos y la restauración remota completa se verificó el 1 de noviembre. Se prepara además una instantánea de base antes de este despliegue. Los registros de despliegue y verificaciones posteriores se agregan al cerrar la publicación.
+Los respaldos diarios cifrados ya estaban activos y la restauración remota completa se verificó el 1 de noviembre. Se prepara además una instantánea de base antes de este despliegue. Las instantáneas de base anterior (28 tablas) y posterior (29 tablas) se cifraron y verificaron de vuelta desde R2, ambas con 1653 filas; la nueva tabla de cargas está vacía. La cuenta de respaldo puede leerla y las diez áreas existentes tienen etiquetas migradas.
+
+## Publicación y operación
+
+- Código funcional: `3f3060a`; validación automática: `4fc67f5`. La [primera ejecución completa de Backend y Frontend](https://github.com/KevinML12/casadelrey/actions/runs/41407056124) terminó correctamente, incluyendo las 53 pruebas de navegador.
+- Backend Render: `dep-dbk3q3gu01pc738vil6g`, commit `4fc67f5`, publicado y `/ready` correcto.
+- Frontend Render: `dep-dbk3r3tg1s2s7397lv5g`, commit `4fc67f5`, despliegue correcto. Vercel también contiene la ruta nueva de administración y las correcciones de este cierre.
+- Las respuestas de ambos frontends incluyen CSP, `nosniff`, protección contra marcos y política de referente. La página pública de Vercel se recargó con datos reales y sin errores ni advertencias de consola.
+- Los recursos públicos de eventos, células, departamentos, galería, blog, destinos y configuración respondieron correctamente. El administrador y el archivo privado siguen rechazando visitantes anónimos (401). Véase `consultas-publicas.json`.
+- `main` queda protegida por los controles Backend y Frontend; las integraciones futuras pasan por una propuesta de cambio con pruebas aprobadas, sin exigir un segundo aprobador en este repositorio personal. Se impide forzar o borrar la rama.
+- Se conserva el despliegue **manual** de los dos servicios de Render. Después de integrar un cambio funcional y comprobar los controles, publicar el último commit del backend y luego del frontend desde Manual Deploy. Vercel sigue su integración existente. No se habilitaron despliegues automáticos ni se cambió el plan de alojamiento. La configuración de Render para esperar comprobaciones está documentada en [su referencia oficial](https://render.com/docs/blueprint-spec#autodeploytrigger), pero no se aplicó ese ajuste.
+- Conservar las copias privadas y la clave de recuperación institucional. No ejecutar pruebas de escritura contra ninguno de los dos frontends actuales: comparten los datos activos.

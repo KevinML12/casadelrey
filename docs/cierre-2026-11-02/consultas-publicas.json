@@ -1,0 +1,68 @@
+[
+  {
+    "path": "/health",
+    "status": 200,
+    "valid_json": true,
+    "records": null
+  },
+  {
+    "path": "/ready",
+    "status": 200,
+    "valid_json": true,
+    "records": null
+  },
+  {
+    "path": "/api/v1/events",
+    "status": 200,
+    "valid_json": true,
+    "records": 7
+  },
+  {
+    "path": "/api/v1/cells",
+    "status": 200,
+    "valid_json": true,
+    "records": 16
+  },
+  {
+    "path": "/api/v1/volunteer-areas",
+    "status": 200,
+    "valid_json": true,
+    "records": 10
+  },
+  {
+    "path": "/api/v1/gallery/?limit=1",
+    "status": 200,
+    "valid_json": true,
+    "records": 1
+  },
+  {
+    "path": "/api/v1/blog/",
+    "status": 200,
+    "valid_json": true,
+    "records": 1
+  },
+  {
+    "path": "/api/v1/donation-purposes",
+    "status": 200,
+    "valid_json": true,
+    "records": 5
+  },
+  {
+    "path": "/api/v1/settings",
+    "status": 200,
+    "valid_json": true,
+    "records": null
+  },
+  {
+    "path": "/api/v1/admin/events",
+    "status": 401,
+    "valid_json": true,
+    "records": null
+  },
+  {
+    "path": "/api/v1/admin/receipts/1/file",
+    "status": 401,
+    "valid_json": true,
+    "records": null
+  }
+]
