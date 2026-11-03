@@ -12,7 +12,7 @@ export default function Paginator({ meta, onPage }) {
   }
 
   return (
-    <div className="flex items-center justify-center gap-1 py-4 flex-wrap">
+    <nav aria-label="Paginación" className="flex items-center justify-center gap-1 py-4 flex-wrap">
       <Button variant="text" size="sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>
         Anterior
       </Button>
@@ -42,9 +42,9 @@ export default function Paginator({ meta, onPage }) {
       </Button>
 
       <span className="text-12 text-bg/45 ml-2">
-        {meta.total} total
+        {meta.total} registros
       </span>
-    </div>
+    </nav>
   );
 }
 
@@ -52,9 +52,11 @@ function PageBtn({ num, active, onClick }) {
   return (
     <button
       onClick={() => onClick(num)}
-      className={`w-9 h-9 rounded-full text-14 font-semibold transition-colors ${
+      aria-label={`Página ${num}`}
+      aria-current={active ? 'page' : undefined}
+      className={`w-11 h-11 rounded-[12px] text-14 font-semibold focus-ring transition-colors duration-150 motion-reduce:transition-none ${
         active
-          ? 'bg-acento text-bg'
+          ? 'bg-bg text-white'
           : 'text-bg/55 hover:bg-bg/6 hover:text-bg'
       }`}
     >

@@ -6,7 +6,7 @@ import { DUR, EASE_OUT } from '../../lib/motion';
 
 // Keep the last loaded scene opaque until the next photograph is ready.
 // Only opacity changes; the camera and glass surfaces stay in place.
-export default function CrossfadePhoto({ src, fallbackSrc, className = '', style, onReady, sceneKey, fit = 'cover', alt = '', sizes = '100vw' }) {
+export default function CrossfadePhoto({ src, fallbackSrc, className = '', style, onReady, sceneKey, fit = 'cover', alt = '', sizes = '100vw', priority = false }) {
   const [frame, setFrame] = useState({ current: src, previous: null });
   const reducedMotion = useReducedMotion();
   const onReadyRef = useRef(onReady);
@@ -15,6 +15,7 @@ export default function CrossfadePhoto({ src, fallbackSrc, className = '', style
   useEffect(() => {
     let cancelled = false;
     const image = new Image();
+    image.fetchPriority = priority ? 'high' : 'auto';
     const load = candidate => {
       const variants = photoVariants(candidate);
       image.onload = () => {
@@ -34,7 +35,7 @@ export default function CrossfadePhoto({ src, fallbackSrc, className = '', style
     };
     load(src);
     return () => { cancelled = true; image.onload = null; image.onerror = null; };
-  }, [src, fallbackSrc, sceneKey, sizes]);
+  }, [src, fallbackSrc, sceneKey, sizes, priority]);
 
   return (
     <div className={`absolute inset-0 ${className}`} style={style} aria-hidden={alt ? undefined : true} data-scene-photo={frame.current}>
@@ -47,7 +48,7 @@ export default function CrossfadePhoto({ src, fallbackSrc, className = '', style
         transition={{ duration: reducedMotion ? 0 : DUR.slow, ease: EASE_OUT }}
         onAnimationComplete={() => setFrame(old => old.current === frame.current && old.previous ? { ...old, previous: null } : old)}
       >
-        <PhotoImage src={frame.current} alt={alt} fallbackSrc={fallbackSrc} loading="eager" sizes={sizes} className="absolute inset-0 w-full h-full" style={{ objectFit: fit }} />
+        <PhotoImage src={frame.current} alt={alt} fallbackSrc={fallbackSrc} loading="eager" fetchPriority={priority ? 'high' : 'auto'} sizes={sizes} className="absolute inset-0 w-full h-full" style={{ objectFit: fit }} />
       </motion.div>
     </div>
   );

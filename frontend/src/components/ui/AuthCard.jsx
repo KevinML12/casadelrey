@@ -16,14 +16,14 @@ import { useSitePhoto } from '../../lib/feed';
 export default function AuthCard({ children, className = '' }) {
   const bg = useSitePhoto('hero_auth', '/images/backgrounds/comunidad-templo.webp');
   return (
-    <main className="min-h-screen bg-bg flex items-center justify-center p-6 relative overflow-hidden">
+    <main className="min-h-[100svh] bg-bg flex items-center justify-center px-5 pt-32 pb-16 sm:px-6 relative overflow-hidden">
       {/* Foto a color pleno + .scrim-hero: llevaba `opacity-45` MÁS un
           degradado de tres paradas encima, así que llegaba a ~un cuarto de
           su color real. El contraste lo pone el scrim, que oscurece el
           óvalo central donde vive la card y deja respirar los bordes. */}
       <ParallaxImg src={bg} fallbackSrc="/images/backgrounds/comunidad-templo.webp" alt="" />
       <div className="scrim-hero" />
-      <Reveal className={`relative z-10 w-full max-w-md liquid-glass rounded-[16px] p-8 md:p-10 ${className}`}>
+      <Reveal className={`relative z-10 w-full max-w-md liquid-glass rounded-[16px] p-6 sm:p-8 md:p-10 ${className}`}>
         {children}
       </Reveal>
     </main>

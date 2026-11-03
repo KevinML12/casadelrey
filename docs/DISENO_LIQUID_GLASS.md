@@ -1,8 +1,12 @@
 # Frontend Casa del Rey — dirección vigente
 
-Actualizado el 29 de octubre de 2026 con las indicaciones del usuario. Esta dirección sustituye las exploraciones anteriores con inclinación, perspectiva, ventanas apiladas o reflejos al cursor.
+Actualizado el 3 de noviembre de 2026 con las indicaciones del usuario. Esta dirección sustituye las exploraciones anteriores con inclinación, perspectiva, ventanas apiladas o reflejos al cursor.
 
 ## Identidad
+
+El acabado final mantiene una apertura de Inicio con una sola acción principal, foto fija y navegación manual por disolución. No desplazar la fotografía lateralmente ni rotar el contenido mientras alguien lee. La ficha lateral de escritorio sólo aparece con un próximo evento real y enlaza a ese evento concreto; no repetir «Conéctate» dentro de otra tarjeta vacía.
+
+Conéctate es una sola ficha clara sobre la fotografía administrada `hero_conectate`, sin un hero separado, bloque promocional, pasos ilustrados ni tarjetas de clasificación. Nombre, teléfono y motivo se completan directamente; correo y procedencia quedan en un desplegable opcional. Conservar el envío a solicitudes, sus valores de categoría, errores con borrador y seguimiento del equipo.
 
 - Inicio es la referencia para las páginas principales: fotografía real administrada, tipografía Arimo, fondo navy y cristal blanco/oscuro.
 - Composición objetivo: la fotografía vive en el fondo navy de la sección y el contenido en tarjetas de vidrio superpuestas. Las fichas de vista previa permanecen sobre el fondo. Al abrir un panel, desplegable o galería, sí mostrar fotos dentro: amplias y nítidas, junto a los detalles, conservando también el fondo visible. Siempre mantener una fotografía real en el fondo de la sección. Priorizar tomas amplias, grupos, congregación e infraestructura; evitar primeros planos o composiciones dominadas por un solo rostro. Mientras no haya fotos subidas, elegir respaldos reales del repositorio con ese criterio. Depurar los módulos existentes uno por uno, conservando contenido, fuentes y edición del administrador.

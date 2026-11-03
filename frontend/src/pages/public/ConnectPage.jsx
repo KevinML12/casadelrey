@@ -1,204 +1,197 @@
-// ============================================================
-//  ConnectPage — tarjeta de conexión: un visitante nuevo se registra
-//  él mismo (público, sin cuenta) y el equipo de seguimiento lo
-//  contacta. POST /connect-cards. Ver docs/DISENO_LIQUID_GLASS.md.
-// ============================================================
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import apiClient from '../../lib/apiClient';
-import { FieldLight } from '../../components/ui/Glass';
-import Reveal from '../../components/ui/Reveal';
-import PageHero from '../../components/layout/PageHero';
-import { PRESS_PRIMARY } from '../../lib/motion';
-import { useSitePhoto } from '../../lib/feed';
-import SectionBg from '../../components/ui/SectionBg';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import apiClient from "../../lib/apiClient";
+import { FieldLight } from "../../components/ui/Glass";
+import Reveal from "../../components/ui/Reveal";
+import { useSitePhoto } from "../../lib/feed";
+import SectionBg from "../../components/ui/SectionBg";
 
 const CATEGORIES = [
-  { value: 'primera_vez',  label: 'Es mi primera vez',           helper: 'Quiero conocer la iglesia' },
-  { value: 'reconciliado', label: 'Vuelvo después de un tiempo', helper: 'Ya fui parte antes' },
-  { value: 'busco_celula', label: 'Busco una célula',            helper: 'Quiero unirme a un grupo' },
+  { value: "primera_vez", label: "Es mi primera vez" },
+  { value: "reconciliado", label: "Vuelvo después de un tiempo" },
+  { value: "busco_celula", label: "Busco una célula" },
 ];
-
 const HOW_FOUND = [
-  { value: 'invitacion', label: 'Invitación de un amigo' },
-  { value: 'redes',      label: 'Redes sociales' },
-  { value: 'publicidad', label: 'Publicidad' },
-  { value: 'otro',       label: 'Otro' },
-];
-
-// Pasos reales del flujo (no ilustrativos): ConnectCard entra al panel
-// admin/líder, se asigna a un líder real y avanza de estado hasta el
-// contacto -- ver AdminConnectCards.jsx / LeaderConnectCards.jsx.
-const STEPS = [
-  { text: 'Llenas el formulario con tus datos' },
-  { text: 'Un líder de nuestro equipo revisa tu información' },
-  { text: 'Te contactamos por WhatsApp o llamada para conocerte' },
+  { value: "invitacion", label: "Invitación de un amigo" },
+  { value: "redes", label: "Redes sociales" },
+  { value: "publicidad", label: "Publicidad" },
+  { value: "otro", label: "Otro" },
 ];
 
 export default function ConnectPage() {
-  const photo = useSitePhoto('hero_conectate', '/images/backgrounds/congregacion.webp');
-  const [form, setForm] = useState({ name: '', phone: '', email: '', category: '', how_found: '' });
+  const photo = useSitePhoto(
+    "hero_conectate",
+    "/images/backgrounds/congregacion.webp",
+  );
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    category: "",
+    how_found: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [done, setDone] = useState(false);
-
-  const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.phone || !form.category) {
-      setError('Nombre, teléfono y una opción de abajo son obligatorios.');
+  const set = (key) => (event) =>
+    setForm((previous) => ({ ...previous, [key]: event.target.value }));
+  const submit = async (event) => {
+    event.preventDefault();
+    if (loading) return;
+    if (!form.name.trim() || !form.phone.trim() || !form.category) {
+      setError("Escribe tu nombre, teléfono y elige qué te trae por aquí.");
       return;
     }
-    setError('');
     setLoading(true);
+    setError("");
     try {
-      await apiClient.post('/connect-cards', form);
+      await apiClient.post("/connect-cards", {
+        ...form,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+      });
       setDone(true);
-    } catch (err) {
-      setError(err.response?.data?.error || 'No se pudo enviar. Inténtalo de nuevo.');
+    } catch (failure) {
+      setError(
+        failure.response?.data?.error ||
+          "No se pudo enviar. Conservamos tus datos para que puedas reintentar.",
+      );
     } finally {
       setLoading(false);
     }
   };
-
   return (
-    <main className="relative w-full min-h-screen overflow-hidden">
-      <PageHero
-        title="Conéctate"
-        subtitle="Cuéntanos un poco de ti — alguien de nuestro equipo te va a escribir para darte la bienvenida."
-        photoSlot="hero_conectate"
-        photoFallback="/images/bg-ministerios.jpg"
+    <main className="relative isolate min-h-[100svh] overflow-hidden px-5 pt-32 pb-16 sm:px-8 sm:pt-36 sm:pb-20">
+      <SectionBg
+        src={photo}
+        fallbackSrc="/images/backgrounds/congregacion.webp"
+        opacity="opacity-100"
+        scrimClassName="bg-gradient-to-r from-bg/20 via-bg/30 to-bg/60"
       />
-
-      <section className="relative overflow-hidden py-16 md:py-24">
-        <SectionBg src={photo} fallbackSrc="/images/backgrounds/congregacion.webp" />
-        <div className="relative z-10 px-6 max-w-6xl mx-auto grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-20 items-start">
-          <Reveal className="lg:sticky lg:top-28">
-            <h2 className="text-d2 text-white">Queremos conocerte.</h2>
-            <p className="mt-5 text-17 text-white/80 leading-relaxed max-w-md">
-              Ya sea tu primera visita o un nuevo comienzo, hay un lugar para ti en esta casa.
-            </p>
-            <ol className="mt-9 space-y-0">
-              {STEPS.map((s, i) => (
-                <li key={s.text} className="relative flex gap-5 pb-8 last:pb-0">
-                  {i < STEPS.length - 1 && <span className="absolute left-[17px] top-9 bottom-0 w-px bg-white/20" aria-hidden="true" />}
-                  <span className="relative shrink-0 grid place-items-center w-9 h-9 rounded-full liquid-glass text-white text-14 font-bold" aria-hidden="true">{i + 1}</span>
-                  <p className="text-15 text-white/80 leading-relaxed pt-1 max-w-xs">{s.text}</p>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-
-          <Reveal delay={0.1}>
-            <div className="glass-light rounded-[16px] p-7 md:p-9">
-              {done ? (
-                <div className="text-center py-8" role="status">
-                  <h3 className="text-24 text-bg font-bold mb-2">¡Gracias por registrarte!</h3>
-                  <p className="text-14 text-bg/60 max-w-sm mx-auto leading-relaxed">
-                    Alguien de nuestro equipo te contactará pronto. Nos alegra que estés aquí.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-7">
-                  {/* La pregunta de "por qué" va primero -- es mas natural
-                      empezar una conversacion asi que con un formulario de
-                      campos; tambien es la que mas cambia el seguimiento que
-                      hace el lider, tiene sentido que sea lo primero que se
-                      decide. Tarjetas en vez de una lista de botones finitos
-                      -- eso se leia como una version fea de un <select>. */}
-                  <div>
-                    {/* En caja normal, no versales: micro-mayúsculas con
-                        tracking encima de un bloque es la fórmula del eyebrow
-                        que el sitio ya desterró, y a 12px las versales piden
-                        MÁS aire del que caben. Es una pregunta, que se lea
-                        como una pregunta. */}
-                    <p className="text-13 font-semibold text-bg/60 mb-3">
-                      ¿Qué te trae por aquí? <span className="text-rose">*</span>
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="group" aria-label="¿Qué te trae por aquí?">
-                      {CATEGORIES.map((c) => {
-                        const selected = form.category === c.value;
-                        return (
-                          <button
-                            key={c.value}
-                            type="button"
-                            aria-pressed={selected}
-                            onClick={() => setForm((p) => ({ ...p, category: c.value }))}
-                            className={`focus-ring flex flex-col items-center text-center gap-2 px-4 py-5 rounded-[12px] border-2 transition-all ${
-                              selected
-                                ? 'bg-bg/10 border-bg shadow-card'
-                                : 'bg-bg/[0.03] border-bg/10 hover:border-bg/25 hover:bg-bg/[0.06]'
-                            }`}
-                          >
-                            <span className={`text-14 font-bold ${selected ? 'text-bg' : 'text-bg/80'}`}>{c.label}</span>
-                            <span className="text-11 text-bg/50 leading-snug">{c.helper}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Datos de contacto agrupados bajo su propio encabezado --
-                      separa visualmente "la decision" de "como te contactamos",
-                      en vez de que todo sea un solo bloque de campos. */}
-                  <div className="pt-1 border-t border-bg/10">
-                    <p className="text-13 font-semibold text-bg/60 mt-5 mb-3">Tus datos</p>
-                    <div className="space-y-4">
-                      <FieldLight name="name" autoComplete="name" label="Nombre *" value={form.name} onChange={set('name')} placeholder="Tu nombre completo" required />
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FieldLight name="phone" type="tel" autoComplete="tel" label="Teléfono *" value={form.phone} onChange={set('phone')} placeholder="+502 …" required />
-                        <FieldLight name="email" autoComplete="email" label="Correo" type="email" value={form.email} onChange={set('email')} placeholder="Opcional" />
-                      </div>
-
-                      <div>
-                        <p className="block text-12 font-bold text-bg/60 mb-2">¿Cómo nos conociste?</p>
-                        <div className="flex flex-wrap gap-2" role="group" aria-label="¿Cómo nos conociste?">
-                          {HOW_FOUND.map((h) => (
-                            <button
-                              key={h.value}
-                              type="button"
-                              aria-pressed={form.how_found === h.value}
-                              onClick={() => setForm((p) => ({ ...p, how_found: p.how_found === h.value ? '' : h.value }))}
-                              className={`focus-ring px-3.5 py-2 rounded-full text-13 font-semibold border transition-colors ${
-                                form.how_found === h.value
-                                  ? 'bg-bg text-white border-bg'
-                                  : 'bg-bg/[0.03] text-bg/65 border-bg/12 hover:bg-bg/[0.06]'
-                              }`}
-                            >
-                              {h.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {error && (
-                    <p className="text-13 text-rose" role="alert">
-                      {error}
-                    </p>
-                  )}
-
-                  {/* PRESS_PRIMARY: es LA acción de la pantalla, así que usa el
-                      único press que sale del plano. El scale 1.02 al hover que
-                      tenía antes era un gesto inventado aquí mismo, distinto al
-                      de los demás CTA del sitio. */}
-                  <motion.button
-                    type="submit"
-                    disabled={loading}
-                    {...PRESS_PRIMARY}
-                    className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-bg text-white text-15 font-bold disabled:opacity-50"
-                  >
-                    {loading ? 'Enviando…' : 'Enviar'}
-                  </motion.button>
-                </form>
-              )}
+      <div className="relative z-10 mx-auto flex max-w-5xl justify-center lg:justify-end">
+        <Reveal className="w-full max-w-lg glass-light rounded-[16px] p-6 sm:p-8 text-bg [color-scheme:light]">
+          <h1 className="text-32 sm:text-40 font-bold tracking-tight leading-tight">
+            Conéctate
+          </h1>
+          {done ? (
+            <div role="status" className="pt-7 pb-2">
+              <h2 className="text-24 font-bold">Ya recibimos tus datos.</h2>
+              <p className="mt-4 text-16 leading-relaxed text-bg/75">
+                El equipo se pondrá en contacto contigo por teléfono o WhatsApp.
+              </p>
+              <Link
+                to="/"
+                className="ui-action mt-7 inline-flex min-h-11 items-center justify-center rounded-[12px] bg-bg px-5 py-3 text-14 font-bold text-white focus-ring"
+              >
+                Volver al inicio
+              </Link>
             </div>
-          </Reveal>
-        </div>
-      </section>
+          ) : (
+            <>
+              <p className="mt-3 mb-7 max-w-sm text-15 leading-relaxed text-bg/75">
+                Déjanos tus datos para que podamos contactarte.
+              </p>
+              <form
+                onSubmit={submit}
+                aria-label="Formulario de conexión"
+                className="space-y-5"
+              >
+                <fieldset disabled={loading}>
+                  <legend className="sr-only">Datos de contacto</legend>
+                  <div className="space-y-5">
+                    <FieldLight
+                      name="name"
+                      autoComplete="name"
+                      label="Nombre *"
+                      value={form.name}
+                      onChange={set("name")}
+                      maxLength={100}
+                      placeholder="Tu nombre completo"
+                      required
+                    />
+                    <FieldLight
+                      name="phone"
+                      type="tel"
+                      autoComplete="tel"
+                      inputMode="tel"
+                      label="Teléfono *"
+                      value={form.phone}
+                      onChange={set("phone")}
+                      maxLength={30}
+                      placeholder="Tu número o WhatsApp"
+                      required
+                    />
+                    <FieldLight
+                      as="select"
+                      name="category"
+                      label="¿Qué te trae por aquí? *"
+                      value={form.category}
+                      onChange={set("category")}
+                      required
+                    >
+                      <option value="" disabled>
+                        Selecciona una opción
+                      </option>
+                      {CATEGORIES.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </FieldLight>
+                    <details className="border-t border-bg/15 pt-1">
+                      <summary className="min-h-11 list-item py-3 cursor-pointer rounded-lg text-14 font-semibold text-bg/70 focus-ring marker:text-bg/50">
+                        Más información (opcional)
+                      </summary>
+                      <div className="space-y-4 pt-3 pb-1">
+                        <FieldLight
+                          name="email"
+                          autoComplete="email"
+                          type="email"
+                          label="Correo"
+                          value={form.email}
+                          onChange={set("email")}
+                          maxLength={100}
+                          placeholder="tu@correo.com"
+                        />
+                        <FieldLight
+                          as="select"
+                          name="how_found"
+                          label="¿Cómo nos conociste?"
+                          value={form.how_found}
+                          onChange={set("how_found")}
+                        >
+                          <option value="">Prefiero no indicar</option>
+                          {HOW_FOUND.map((item) => (
+                            <option key={item.value} value={item.value}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </FieldLight>
+                      </div>
+                    </details>
+                    {error && (
+                      <p
+                        className="rounded-[12px] border border-rose/30 bg-white/40 px-4 py-3 text-14 text-bg"
+                        role="alert"
+                      >
+                        {error}
+                      </p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="ui-action w-full min-h-12 rounded-[12px] bg-bg px-5 py-3.5 text-15 font-bold text-white focus-ring disabled:opacity-50"
+                    >
+                      {loading ? "Enviando…" : "Enviar"}
+                    </button>
+                  </div>
+                </fieldset>
+              </form>
+            </>
+          )}
+        </Reveal>
+      </div>
     </main>
   );
 }
