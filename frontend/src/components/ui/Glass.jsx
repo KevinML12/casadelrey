@@ -35,7 +35,7 @@ export const GlassButton = forwardRef(function GlassButton(
   { children, variant = 'primary', className = '', as: As = 'button', ...props },
   ref,
 ) {
-  const base = 'group inline-flex items-center justify-center gap-2 rounded-pill font-bold tracking-tightish btn-spring select-none cursor-pointer focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
+  const base = 'group inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-pill text-center whitespace-normal font-bold tracking-tightish btn-spring select-none cursor-pointer focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
   const variants = {
     // Primario — pill blanco sobre navy (el CTA estándar del sitio)
     primary: 'px-6 py-3.5 text-15 text-bg bg-white shadow-card hover:shadow-card-lg',
@@ -112,25 +112,28 @@ export function Field({ label, type = 'text', name, value, onChange, error, plac
    baja no lo tapa -- el campo se ve gris oscuro sólido en vez de claro.
    Bug real encontrado en producción; `.input-light` (blanco ~75% opaco) es
    lo mínimo que lo cubre de forma confiable. */
-export function FieldLight({ label, type = 'text', name, value, onChange, error, placeholder, as = 'input', children, ...rest }) {
+export function FieldLight({ label, type = 'text', name, value, onChange, error, placeholder, as = 'input', children, id, ...rest }) {
   const cls = `input-light ${error ? '!border-rose' : ''}`;
+  const generatedId = useId();
+  const fieldId = id || generatedId;
+  const messageId = `${fieldId}-error`;
   // error acepta string simple O el objeto {message} que devuelve
   // react-hook-form (PrayerForm.jsx) -- mismo criterio que ya usa
   // components/ui/Input.jsx del panel.
   const errorMsg = typeof error === 'string' ? error : error?.message;
   return (
-    <label className="block">
-      <span className="block mb-2 text-13 font-bold tracking-tightish text-bg/60">{label}</span>
+    <div className="block [color-scheme:light]">
+      <label htmlFor={fieldId} className="block mb-2 text-13 font-bold tracking-tightish text-bg/60">{label}</label>
       {as === 'select' ? (
-        <select name={name} value={value} onChange={onChange} className={`${cls} appearance-none cursor-pointer pr-10`} {...rest}>
+        <select id={fieldId} aria-invalid={errorMsg ? true : undefined} aria-describedby={errorMsg ? messageId : undefined} name={name} value={value} onChange={onChange} className={`${cls} cursor-pointer pr-4`} {...rest}>
           {children}
         </select>
       ) : as === 'textarea' ? (
-        <textarea name={name} value={value} onChange={onChange} placeholder={placeholder} rows={4} className={`${cls} resize-none`} {...rest} />
+        <textarea id={fieldId} aria-invalid={errorMsg ? true : undefined} aria-describedby={errorMsg ? messageId : undefined} name={name} value={value} onChange={onChange} placeholder={placeholder} rows={4} className={`${cls} resize-none`} {...rest} />
       ) : (
-        <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} className={cls} {...rest} />
+        <input id={fieldId} aria-invalid={errorMsg ? true : undefined} aria-describedby={errorMsg ? messageId : undefined} type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} className={cls} {...rest} />
       )}
-      {errorMsg && <span className="mt-1.5 block text-13 text-rose font-bold">{errorMsg}</span>}
-    </label>
+      {errorMsg && <span id={messageId} className="mt-1.5 block text-13 text-rose font-bold">{errorMsg}</span>}
+    </div>
   );
 }

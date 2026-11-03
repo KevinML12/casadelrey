@@ -22,24 +22,24 @@ const NAV = [
 export default function Footer() {
   const settings = useApi('/settings') || {};
   return (
-    <footer className="relative bg-bg pt-20 pb-10 border-t border-white/5 overflow-hidden">
+    <footer className="relative bg-bg pt-14 sm:pt-20 pb-8 border-t border-white/5 overflow-hidden">
       <div className="relative z-10 max-w-6xl mx-auto px-6">
 
-        <div className="grid md:grid-cols-[1.2fr_1fr_1fr] gap-12 mb-14">
+        <div className="grid md:grid-cols-[1.2fr_1fr_1fr] gap-10 md:gap-12 mb-10 sm:mb-14">
           {/* Marca */}
           <div className="flex flex-col items-start gap-5">
-            <Link to="/" className="flex items-center gap-4 group">
+            <Link to="/" className="flex items-center gap-4 rounded-lg focus-ring">
               <img
                 src="/logo.png"
                 alt="Casa del Rey"
-                className="w-16 h-16 object-contain group-hover:scale-105 transition-transform duration-500"
+                className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
               />
               <div>
                 <span className="block text-20 font-bold tracking-tightish text-white">Casa del Rey</span>
-                <span className="block text-13 text-white/50 font-medium">Iglesia cristiana · Huehuetenango</span>
+                <span className="block text-13 text-white/70 font-medium">Iglesia cristiana · Huehuetenango</span>
               </div>
             </Link>
-            {settings.about_founders_names && <p className="text-14 text-white/50 font-medium leading-relaxed max-w-xs">{settings.about_founders_names}</p>}
+            {settings.about_founders_names && <p className="text-14 text-white/70 font-medium leading-relaxed max-w-xs">{settings.about_founders_names}</p>}
             <div className="flex flex-wrap items-center gap-2.5">
               {socialProfiles(settings).map(s => (
                 <a
@@ -47,7 +47,7 @@ export default function Footer() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full liquid-glass text-13 font-bold text-white/70 hover:text-white transition-all duration-300"
+                  className="ui-action min-h-11 inline-flex items-center justify-center px-4 py-2 rounded-[12px] liquid-glass text-13 font-semibold text-white/85 hover:text-white focus-ring"
                 >
                   {s.label}
                 </a>
@@ -56,29 +56,29 @@ export default function Footer() {
           </div>
 
           {/* Navegación */}
-          <div>
-            <p className="text-13 font-semibold text-white/40 mb-5">Explora</p>
-            <ul className="space-y-3">
+          <nav aria-label="Explora la iglesia">
+            <p className="text-13 font-semibold text-white/60 mb-3">Explora</p>
+            <ul className="grid grid-cols-2 md:grid-cols-1 gap-x-5">
               {NAV.map(n => (
                 <li key={n.id}>
-                  <Link to={n.id} className="text-15 font-semibold text-white/70 hover:text-white transition-colors">
+                  <Link to={n.id} className="inline-flex min-h-11 items-center rounded-lg text-14 font-semibold text-white/80 hover:text-white transition-colors duration-150 focus-ring">
                     {n.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Visítanos + podcast */}
           <div>
-            <p className="text-13 font-semibold text-white/40 mb-5">Visítanos</p>
-            {settings.about_address && (settings.about_map_url ? <a href={settings.about_map_url} target="_blank" rel="noopener noreferrer" className="text-14 text-white/70 hover:text-white leading-relaxed">{settings.about_address}</a> : <p className="text-14 text-white/70 leading-relaxed">{settings.about_address}</p>)}
+            <p className="text-13 font-semibold text-white/60 mb-5">Visítanos</p>
+            {settings.about_address && (settings.about_map_url ? <a href={settings.about_map_url} target="_blank" rel="noopener noreferrer" className="block min-h-11 rounded-lg text-14 text-white/80 hover:text-white leading-relaxed focus-ring">{settings.about_address}</a> : <p className="text-14 text-white/70 leading-relaxed">{settings.about_address}</p>)}
             {settings.about_podcast_schedule && <div className="mt-5 text-14 text-white/70 leading-relaxed"><p className="font-bold text-white">{settings.about_podcast_title}</p><p>{settings.about_podcast_schedule}</p></div>}
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="text-center text-white/40 text-13 font-medium border-t border-white/5 pt-8">
+        <div className="text-center text-white/60 text-13 font-medium border-t border-white/5 pt-8">
           <p>© {new Date().getFullYear()} Iglesia Cristiana Casa del Rey. Todos los derechos reservados.</p>
         </div>
       </div>

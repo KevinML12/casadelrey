@@ -1,6 +1,6 @@
 export default function CollectionStatus({ loading, label, onRetry }) {
   return (
-    <div className="liquid-glass rounded-[22px] px-7 py-10 md:px-10 md:py-14 my-6" role={loading ? 'status' : 'alert'} aria-live="polite">
+    <div className="liquid-glass rounded-[16px] px-7 py-10 md:px-10 md:py-14 my-6" role={loading ? 'status' : 'alert'} aria-live="polite">
       <p className="text-20 md:text-24 font-bold text-white">
         {loading ? `Cargando ${label}…` : `No pudimos cargar ${label}.`}
       </p>

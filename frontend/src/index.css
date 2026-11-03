@@ -721,7 +721,7 @@ html.lenis, html.lenis body { height: auto; }
   :where(button):disabled { cursor: not-allowed; }
   .collection-navigation { flex-wrap: wrap; }
   :where(.collection-navigation, .collection-controls) > button {
-    border: 1px solid currentColor;
+    border: 1px solid color-mix(in srgb, currentColor 38%, transparent);
     background: color-mix(in srgb, currentColor 7%, transparent);
     padding-top: .5rem;
     padding-bottom: .5rem;
@@ -730,7 +730,7 @@ html.lenis, html.lenis body { height: auto; }
   @media (hover: hover) {
     :where(.collection-navigation, .collection-controls) > button:hover {
       background: color-mix(in srgb, currentColor 15%, transparent);
-      box-shadow: inset 0 0 0 1px currentColor;
+      border-color: color-mix(in srgb, currentColor 65%, transparent);
     }
   }
   #main-content > main, [role="tabpanel"] {
@@ -750,3 +750,13 @@ html.lenis, html.lenis body { height: auto; }
 .admin-content > :where(div) { padding: 0; }
 .admin-content :where(h1,h2,h3,p,a,td) { overflow-wrap: anywhere; }
 .admin-shell .card-spring:hover { transform: none; }
+
+/* Readable controls on touch devices; 16px also avoids iOS form zoom. */
+@media (max-width: 767px) {
+  .input-light, .input-squircle, main input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), main select, main textarea, [role="dialog"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), [role="dialog"] select, [role="dialog"] textarea {
+    font-size: 16px;
+  }
+}
+
+.home-hero p { text-wrap: pretty; }
+.home-hero h1, .page-hero h1 { text-wrap: balance; overflow-wrap: anywhere; }

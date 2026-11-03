@@ -1662,3 +1662,60 @@ test("user search and role changes operate beyond the first page and revoke the 
   await expect(page).toHaveURL(/\/profile$/);
   expect(member.email).toContain("@example.invalid");
 });
+
+test("compact public connection form reaches administration and its assigned leader", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/conectate");
+  const form = page.getByRole("form", { name: "Formulario de conexión" });
+  await form
+    .getByLabel("Nombre *", { exact: true })
+    .fill("Conexión directa E2E");
+  await form.getByLabel("Teléfono *", { exact: true }).fill("00000000");
+  await form
+    .getByLabel("¿Qué te trae por aquí? *", { exact: true })
+    .selectOption("primera_vez");
+  const created = page.waitForResponse(
+    (response) =>
+      response.url() === API + "/connect-cards" &&
+      response.request().method() === "POST",
+  );
+  await form.getByRole("button", { name: "Enviar", exact: true }).click();
+  expect((await created).status()).toBe(201);
+  await expect(
+    page.getByRole("heading", { name: "Ya recibimos tus datos.", exact: true }),
+  ).toBeVisible();
+  await login(page);
+  await page.goto("/admin/connect-cards");
+  const field = page.getByLabel("Líder asignado a Conexión directa E2E", {
+    exact: true,
+  });
+  const assignment = page.waitForResponse(
+    (response) =>
+      response.request().method() === "PUT" &&
+      response.url().includes("/admin/connect-cards/"),
+  );
+  await field.selectOption({ label: "Líder E2E" });
+  expect((await assignment).ok()).toBe(true);
+  await login(page, "leader");
+  await page.goto("/leader/connect-cards");
+  const row = page
+    .getByText("Conexión directa E2E", { exact: true })
+    .locator(
+      'xpath=ancestor::*[.//button[normalize-space()="Marcar como contactado"]][1]',
+    );
+  await row
+    .getByRole("button", { name: "Marcar como contactado", exact: true })
+    .click();
+  await expect(
+    page.getByText("Conexión directa E2E", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("button", { name: "Marcar como integrado", exact: true })
+      .last(),
+  ).toBeVisible();
+});

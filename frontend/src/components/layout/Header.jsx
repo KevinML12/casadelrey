@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import { motion, useScroll, useMotionValueEvent, useReducedMotion } from 'framer-motion';
+import { DUR, EASE_OUT } from '../../lib/motion';
 import { useAuth } from '../../context/AuthContext';
 
 // Espeja las secciones reales del sitio (mismo orden que el Footer).
@@ -19,6 +20,7 @@ export default function Header() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const reducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -63,7 +65,7 @@ export default function Header() {
   useMotionValueEvent(scrollY, 'change', (y) => {
     const prev = scrollY.getPrevious() ?? 0;
     setScrolled(y > 24);
-    setHidden(y > prev && y > 350 && !menuOpen);
+    setHidden(y > prev && y > 350 && !menuOpen && !navRef.current?.contains(document.activeElement));
   });
 
   useEffect(() => {
@@ -111,7 +113,8 @@ export default function Header() {
   return (
     <motion.header
       animate={{ y: hidden ? '-130%' : '0%' }}
-      transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+      transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}
+      onFocusCapture={() => setHidden(false)}
       className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-4 pointer-events-none"
     >
       <nav
@@ -122,7 +125,7 @@ export default function Header() {
         <div className="flex items-center justify-between pl-4 pr-2 py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group rounded-pill pl-1.5 pr-3 py-1">
-            <span className="grid place-items-center w-10 h-10 rounded-md bg-bg transition-transform duration-400 ease-spring group-hover:scale-105">
+            <span className="grid place-items-center w-10 h-10 rounded-md bg-bg">
               <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
             </span>
             <span className="text-15 font-bold tracking-tightish text-bg">Casa del Rey</span>
@@ -136,10 +139,10 @@ export default function Header() {
               tener aire real; 1024-1280 usa el menú hamburguesa. */}
           <div data-desktop-navigation className="hidden xl:flex items-center gap-0.5">
             {NAV_LINKS.map(n => (
-              <NavLink key={n.to} to={n.to} end={n.to === '/'}>
+              <NavLink key={n.to} to={n.to} end={n.to === '/'} className="rounded-pill focus-ring">
                 {({ isActive }) => (
                   <span
-                    className={`px-3.5 py-2 rounded-pill text-14 font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 ${
+                    className={`inline-flex items-center min-h-11 px-3 py-2 rounded-pill text-14 font-semibold cursor-pointer whitespace-nowrap transition-colors duration-150 motion-reduce:transition-none ${
                       isActive
                         ? 'bg-white text-bg shadow-card'
                         : 'text-bg/70 hover:text-bg hover:bg-bg/5'
@@ -160,7 +163,7 @@ export default function Header() {
                   onClick={() => setDropOpen(p => !p)}
                   aria-expanded={dropOpen}
                   aria-controls="account-menu"
-                  className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-13 hover:bg-bg/5 transition-all duration-300 focus-ring"
+                  className="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-pill text-13 hover:bg-bg/5 transition-all duration-150 focus-ring"
                 >
                   <span className="grid place-items-center w-7 h-7 rounded-full bg-bg text-white text-12 font-bold">
                     {(user?.name || user?.email || '?')[0].toUpperCase()}
@@ -172,7 +175,7 @@ export default function Header() {
                   <div
                     id="account-menu"
                     className="absolute right-0 top-full mt-3 w-60 glass-light rounded-[20px] p-2 z-50 animate-rise"
-                    style={{ animationDuration: '300ms' }}
+                    style={{ animationDuration: reducedMotion ? '0ms' : '180ms' }}
                   >
                     <div className="px-3 py-2.5 border-b border-bg/10 mb-1">
                       <p className="text-13 font-bold text-bg truncate">{user?.name || 'Usuario'}</p>
@@ -219,7 +222,7 @@ export default function Header() {
             {!isAuthenticated && (
               <Link
                 to="/login"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-300 focus-ring"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-150 focus-ring"
               >
                 Ingresar
               </Link>
@@ -227,7 +230,7 @@ export default function Header() {
 
             <Link
               to="/donate"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-300 focus-ring"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-bg/70 hover:text-bg hover:bg-bg/5 text-14 font-bold transition-all duration-150 focus-ring"
             >
               Dar
             </Link>

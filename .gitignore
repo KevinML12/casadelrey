@@ -93,3 +93,4 @@ ops/private/
 # Disposable browser diagnostics can contain expired test tokens/passwords.
 docs/e2e-*/**/artifacts/
 docs/e2e-*/**/report.json
+docs/pulido-*/diagnosticos/

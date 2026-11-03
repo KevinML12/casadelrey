@@ -30,7 +30,7 @@ for (const width of [390, 1440]) {
 
 test('dark glass stays almost transparent without pointer-follow reflections', async ({ page }) => {
   await isolate(page);
-  await page.goto('/');
+  await page.goto('/login');
   const card = page.locator('.liquid-glass').first();
   await expect(card).toBeVisible();
   const material = await card.evaluate(el => ({ background: getComputedStyle(el).backgroundImage, after: getComputedStyle(el, '::after').content }));

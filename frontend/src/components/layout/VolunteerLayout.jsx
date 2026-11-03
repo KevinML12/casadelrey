@@ -13,18 +13,18 @@ export default function VolunteerLayout() {
   const handleLogout = () => {
     logout();
     toast.success('Sesión cerrada');
-    navigate('/auth');
+    navigate('/login');
   };
 
   const initial = (user?.name || user?.email || '?')[0].toUpperCase();
 
   return (
-    <div className="admin-light relative min-h-screen bg-paper text-bg flex flex-col">
+    <div className="admin-shell admin-light relative min-h-screen bg-paper text-bg flex flex-col">
       <PhotoImage src={bgImage} sizes="100vw" className="fixed inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-multiply pointer-events-none" alt="" />
 
       {/* Topbar — panel de cristal flotante */}
-      <header className="relative z-10 m-3 mb-0 glass-light rounded-[24px] h-16 flex items-center px-6 gap-4 shrink-0 sticky top-3">
-        <Link to="/" className="flex items-center gap-2.5 mr-auto group">
+      <header className="relative z-10 m-3 mb-0 glass-light rounded-[16px] min-h-[64px] flex items-center px-4 sm:px-6 gap-4 shrink-0 sticky top-3">
+        <Link to="/" className="flex items-center gap-2.5 mr-auto rounded-lg focus-ring">
           <span className="grid place-items-center w-10 h-10 rounded-2xl bg-bg shadow-card">
             <img src="/logo.png" alt="Casa del Rey" className="w-8 h-8 object-contain" />
           </span>
@@ -44,7 +44,7 @@ export default function VolunteerLayout() {
           </span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-13 font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors"
+            className="flex items-center gap-1.5 min-h-11 px-3 py-2 rounded-[12px] text-13 font-semibold text-bg/60 hover:text-rose hover:bg-rose/8 transition-colors duration-150 focus-ring"
           >
             Salir
           </button>

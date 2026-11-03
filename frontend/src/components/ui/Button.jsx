@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom';
 const base =
   'inline-flex items-center justify-center gap-2 rounded-[12px] border ' +
   'font-bold tracking-tightish leading-tight transition-colors duration-150 motion-reduce:transition-none ' +
-  'cursor-pointer select-none whitespace-nowrap focus-ring ' +
+  'cursor-pointer select-none whitespace-normal text-center max-w-full focus-ring ' +
   'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none';
 
 const variants = {
@@ -65,7 +65,7 @@ export function IconButton({ children, variant = 'standard', className = '', ...
   return (
     <button
       className={
-        'inline-flex items-center justify-center w-10 h-10 rounded-[12px] border ' +
+        'inline-flex items-center justify-center w-11 h-11 rounded-[12px] border ' +
         'cursor-pointer btn-spring transition-colors duration-200 ' +
         `${variantCls} ${className}`
       }
