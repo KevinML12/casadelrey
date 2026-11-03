@@ -124,3 +124,181 @@ test('administrator can edit an existing gallery record and institutional settin
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
   expect(writes.at(-1)).toEqual({ path: '/admin/settings/about_mission', data: { value: 'Misión editada' } });
 });
+
+
+test.describe('Oración y lectura editorial', () => {
+
+const photo = '/e2e/editorial/one.webp';
+const nextPhoto = '/e2e/editorial/two.webp';
+const imageFile = new URL('../public/images/backgrounds/congregacion.webp', import.meta.url).pathname;
+const posts = [
+  { ID: 71, slug: 'mensaje-administrado', title: 'Un mensaje administrado para caminar juntos como comunidad', category: 'Comunidad', cover_image: photo, excerpt: 'Un resumen editado desde el panel.', content: '<p>Contenido administrado con suficiente extensión para la lectura.</p>', CreatedAt: '2026-10-15T12:00:00Z' },
+  { ID: 72, slug: 'otra-ensenanza', title: 'Otra enseñanza publicada', category: 'Enseñanza', cover_image: nextPhoto, content: '<p>Un segundo mensaje publicado por administración.</p>' },
+];
+
+async function isolate(page, custom = () => undefined) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.route('**/*', async route => {
+    const url = new URL(route.request().url());
+    if (url.pathname.startsWith('/e2e/editorial/')) return route.fulfill({ path: imageFile, contentType: 'image/webp' });
+    if (url.pathname.includes('/api/v1')) {
+      const path = url.pathname.split('/api/v1')[1];
+      const response = await custom(path, route.request());
+      const body = response?.body ?? (path === '/blog/' ? posts : path.startsWith('/blog/') ? posts.find(post => path === `/blog/${post.slug}`) : path === '/site-photos' ? { hero_oracion: photo, hero_blog: photo } : path === '/settings' ? {} : []);
+      return route.fulfill({ status: response?.status || 200, contentType: 'application/json', body: JSON.stringify(body ?? {}) });
+    }
+    if (!['localhost', '127.0.0.1'].includes(url.hostname)) return route.abort();
+    return route.continue();
+  });
+}
+
+for (const viewport of [{ width: 320, height: 568 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
+  test(`prayer keeps one usable form, private draft and retry at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    const writes = [];
+    await isolate(page, (path, request) => {
+      if (path !== '/contact/petition') return;
+      writes.push(request.postDataJSON());
+      return writes.length === 1 ? { status: 503, body: { error: 'Inténtalo de nuevo en un momento.' } } : { status: 201, body: { id: 51 } };
+    });
+    await page.goto('/prayer');
+    await expect(page.getByRole('heading', { level: 1, name: 'Oración' })).toBeVisible();
+    expect(await page.locator('h1').evaluate(el => el.getBoundingClientRect().top)).toBeGreaterThan(90);
+    await expect(page.locator('main .glass-light')).toHaveCount(1);
+    await expect(page.locator('main img')).toHaveAttribute('src', photo);
+    await expect(page.getByLabel('Correo electrónico', { exact: true })).toBeHidden();
+    await page.getByLabel('Nombre *', { exact: true }).fill('  Visitante de revisión  ');
+    await page.getByLabel('Asunto *', { exact: true }).fill('Una petición de la comunidad');
+    await page.getByLabel('Petición *', { exact: true }).fill('Una petición privada que debe conservarse si falla el envío.');
+    const submit = page.getByRole('button', { name: 'Enviar petición', exact: true });
+    await submit.click();
+    await expect(page.getByRole('alert')).toHaveText('Inténtalo de nuevo en un momento.');
+    await expect(page.getByLabel('Petición *', { exact: true })).toHaveValue('Una petición privada que debe conservarse si falla el envío.');
+    await submit.click();
+    await expect(page.getByRole('status')).toContainText('Petición recibida.');
+    expect(writes[1]).toEqual({ name: 'Visitante de revisión', subject: 'Una petición de la comunidad', message: 'Una petición privada que debe conservarse si falla el envío.', category: '', email: '' });
+    await page.getByRole('button', { name: 'Enviar otra petición' }).click();
+    await expect(page.getByLabel('Nombre *', { exact: true })).toHaveValue('');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+
+  test(`blog gives the real message priority and preserves filters and links at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await isolate(page);
+    await page.goto('/blog');
+    const scene = page.getByRole('region', { name: 'Mensajes', exact: true });
+    await expect(scene.getByRole('heading', { name: posts[0].title })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Blog', exact: true })).toBeVisible();
+    await expect(scene.locator('.liquid-glass img')).toHaveCount(0);
+    const next = scene.getByRole('button', { name: /^Siguiente/ });
+    await next.click();
+    await expect(scene.getByRole('heading', { name: posts[1].title })).toBeVisible();
+    await expect(next).toBeFocused();
+    await page.getByLabel('Categoría', { exact: true }).selectOption('Comunidad');
+    await expect(scene.getByRole('heading', { name: posts[0].title })).toBeVisible();
+    await expect(scene.getByRole('link', { name: 'Leer mensaje' })).toHaveAttribute('href', `/blog/${posts[0].slug}`);
+    await expect(scene.locator('.collection-navigation')).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+
+  test(`article keeps its complete photograph inside the reader and in the background at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await isolate(page);
+    await page.goto(`/blog/${posts[0].slug}`);
+    const article = page.getByRole('article');
+    await expect(article.getByRole('heading', { level: 1, name: posts[0].title })).toBeVisible();
+    await expect(article).toContainText('Contenido administrado');
+    const cover = page.getByRole('figure', { name: 'Portada del mensaje' }).getByRole('img');
+    await expect(cover).toHaveAttribute('src', photo);
+    expect(await cover.evaluate(el => getComputedStyle(el).objectFit)).toBe('contain');
+    await expect(page.locator('main > [aria-hidden="true"] img')).toHaveAttribute('src', photo);
+    await expect(article.locator('time')).toHaveAttribute('datetime', '2026-10-15T12:00:00.000Z');
+    await expect(page.getByRole('button', { name: 'Escuchar', exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
+
+test('an invalid optional email opens and focuses its field without losing the prayer', async ({ page }) => {
+  await isolate(page);
+  await page.goto('/prayer');
+  await page.getByLabel('Nombre *', { exact: true }).fill('Visitante');
+  await page.getByLabel('Asunto *', { exact: true }).fill('Asunto privado');
+  await page.getByLabel('Petición *', { exact: true }).fill('Contenido privado de la petición.');
+  await page.getByText('Datos opcionales', { exact: true }).click();
+  await page.getByLabel('Correo electrónico', { exact: true }).fill('correo-incompleto');
+  await page.getByText('Datos opcionales', { exact: true }).click();
+  await page.getByRole('button', { name: 'Enviar petición', exact: true }).click();
+  await expect(page.getByLabel('Correo electrónico', { exact: true })).toBeFocused();
+  await expect(page.getByText('Revisa el correo electrónico.', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Petición *', { exact: true })).toHaveValue('Contenido privado de la petición.');
+});
+
+test('blog failure, retry and empty do not publish invented messages or dates', async ({ page }) => {
+  let failing = true;
+  await isolate(page, path => path === '/blog/' ? (failing ? { status: 503, body: {} } : { body: [] }) : undefined);
+  await page.goto('/blog');
+  await expect(page.getByRole('alert')).toContainText('No pudimos cargar los mensajes.');
+  failing = false;
+  await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
+  await expect(page.getByText('Sin mensajes publicados aún.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Leer mensaje' })).toHaveCount(0);
+});
+
+test('an article without cover, date or body keeps the managed background without fabricated metadata', async ({ page }) => {
+  await isolate(page, path => path === '/blog/sin-portada' ? { body: { ID: 90, slug: 'sin-portada', title: 'Mensaje sin portada', CreatedAt: 'invalid', redirect_url: null } } : undefined);
+  await page.goto('/blog/sin-portada');
+  await expect(page.getByRole('article')).toBeVisible();
+  await expect(page.locator('main > [aria-hidden="true"] img')).toHaveAttribute('src', photo);
+  await expect(page.locator('article time')).toHaveCount(0);
+  await expect(page.getByRole('figure')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Escuchar' })).toHaveCount(0);
+});
+
+test('audio controls wrap, pause and release playback when leaving the article', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.addInitScript(() => {
+    window.editorialAudio = [];
+    window.Audio = class {
+      constructor() { this.paused = true; this.duration = 60; this.currentTime = 0; window.editorialAudio.push(this); }
+      async play() { this.paused = false; this.onplay?.(); }
+      pause() { this.paused = true; this.onpause?.(); }
+    };
+  });
+  await isolate(page, path => path === '/tts' ? { body: { audio: 'AA==', engine: 'fixture' } } : undefined);
+  await page.goto(`/blog/${posts[0].slug}`);
+  const player = page.getByRole('group', { name: 'Lectura en voz alta' });
+  await player.getByRole('button', { name: 'Escuchar', exact: true }).click();
+  await expect(player).toContainText('Leyendo el mensaje');
+  await player.getByRole('button', { name: 'Pausar', exact: true }).click();
+  await expect(player).toContainText('Lectura en pausa');
+  await player.getByRole('button', { name: 'Continuar', exact: true }).click();
+  await expect(player).toContainText('Leyendo el mensaje');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('link', { name: 'Volver al blog', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Blog', exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.editorialAudio.every(audio => audio.paused))).toBe(true);
+});
+
+test('stopping an audio request prevents late playback and permits retry', async ({ page }) => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  let requests = 0;
+  await page.addInitScript(() => { window.editorialAudioStarts = 0; window.Audio = class { async play() { window.editorialAudioStarts += 1; } pause() {} }; });
+  await isolate(page, async path => {
+    if (path !== '/tts') return;
+    requests += 1;
+    if (requests === 1) await gate;
+    return { status: 503, body: { error: 'Audio no disponible' } };
+  });
+  await page.goto(`/blog/${posts[0].slug}`);
+  await page.getByRole('button', { name: 'Escuchar', exact: true }).click();
+  await expect.poll(() => requests).toBe(1);
+  await page.getByRole('button', { name: 'Detener', exact: true }).click();
+  release();
+  await expect(page.getByRole('button', { name: 'Escuchar', exact: true })).toBeVisible();
+  expect(await page.evaluate(() => window.editorialAudioStarts)).toBe(0);
+  await page.getByRole('button', { name: 'Escuchar', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Reintentar audio', exact: true })).toBeVisible();
+});
+
+});

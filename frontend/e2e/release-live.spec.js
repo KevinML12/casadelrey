@@ -69,7 +69,7 @@ test('live prayer and connection submissions reach their administrator modules',
     await page.getByRole('button', { name: 'Enviar petición', exact: true }).click();
     const response = await prayerResponse; expect(response.status()).toBe(201);
     const petition = await response.json(); created.push(`/admin/petitions/${petition.id || petition.ID}`);
-    await expect(page.getByText('¡Recibida con amor!')).toBeVisible();
+    await expect(page.getByText('Petición recibida.', { exact: true })).toBeVisible();
     await page.goto('/admin/petitions'); await expect(page.locator('main').getByText(stamp, { exact: false })).toBeVisible();
     await page.goto('/conectate'); await page.getByLabel('¿Qué te trae por aquí? *', { exact: true }).selectOption('primera_vez');
     await page.getByLabel('Nombre *', { exact: true }).fill(stamp);
