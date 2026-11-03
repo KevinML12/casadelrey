@@ -5,6 +5,7 @@ import (
 	"mime"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,6 +38,9 @@ func (cache *PublicResponseCache) InvalidateAfterWrite(next echo.HandlerFunc) ec
 	return func(c echo.Context) error {
 		err := next(c)
 		method := c.Request().Method
+		if strings.HasPrefix(c.Request().URL.Path, "/api/v1/support/") {
+			return err
+		}
 		if err == nil && method != http.MethodGet && method != http.MethodHead && method != http.MethodOptions && c.Response().Status >= 200 && c.Response().Status < 300 {
 			cache.mu.Lock()
 			cache.generation++

@@ -1,53 +1,76 @@
-import { useEffect, useState } from 'react';
-import apiClient from '../../lib/apiClient';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
-import Button from '../../components/ui/Button';
-import Input, { Textarea } from '../../components/ui/Input';
-import Chip, { FilterChip } from '../../components/ui/Chip';
+import Paginator from "../../components/ui/Paginator";
+import { useCallback, useEffect, useState } from "react";
+import apiClient from "../../lib/apiClient";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
+import Button from "../../components/ui/Button";
+import Input, { Textarea } from "../../components/ui/Input";
+import Chip, { FilterChip } from "../../components/ui/Chip";
+import CreateUserDialog from "../../components/sections/CreateUserDialog";
 
 const CATEGORIES = [
-  { value: 'convertido',   label: 'Convertido',   color: 'tertiary',  icon: 'church' },
-  { value: 'reconciliado', label: 'Reconciliado',  color: 'primary',   icon: 'favorite' },
-  { value: 'nuevo',        label: 'Nuevo',         color: 'secondary', icon: 'person_add' },
+  {
+    value: "convertido",
+    label: "Convertido",
+    color: "tertiary",
+    icon: "church",
+  },
+  {
+    value: "reconciliado",
+    label: "Reconciliado",
+    color: "primary",
+    icon: "favorite",
+  },
+  { value: "nuevo", label: "Nuevo", color: "secondary", icon: "person_add" },
 ];
 
-const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.value, c]));
+const CAT_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.value, c]));
 
-const EMPTY = { date: '', inviter_name: '', inviter_phone: '', guest_name: '', guest_phone: '', address: '', category: 'nuevo', notes: '' };
+const EMPTY = {
+  date: "",
+  inviter_name: "",
+  inviter_phone: "",
+  guest_name: "",
+  guest_phone: "",
+  address: "",
+  category: "nuevo",
+  notes: "",
+};
 
 function FieldLabel({ children, required }) {
   return (
     <label className="block text-label-l text-bg/50 mb-1.5">
-      {children}{required && <span className="text-rose ml-0.5">*</span>}
+      {children}
+      {required && <span className="text-rose ml-0.5">*</span>}
     </label>
   );
 }
 
 function SectionHeader({ children }) {
-  return (
-    <p className="text-label-l text-bg font-semibold mb-4">{children}</p>
-  );
+  return <p className="text-label-l text-bg font-semibold mb-4">{children}</p>;
 }
 
 function BoletaForm({ onSave, onCancel }) {
-  const [form, setForm] = useState({ ...EMPTY, date: new Date().toISOString().slice(0, 10) });
+  const [form, setForm] = useState({
+    ...EMPTY,
+    date: new Date().toISOString().slice(0, 10),
+  });
   const [loading, setLoading] = useState(false);
-  const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
+  const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.guest_name || !form.date || !form.category) {
-      toast.error('Nombre del invitado, fecha y categoría son obligatorios');
+      toast.error("Nombre del invitado, fecha y categoría son obligatorios");
       return;
     }
     setLoading(true);
     try {
-      await apiClient.post('/admin/boletas', form);
-      toast.success('Boleta registrada');
+      await apiClient.post("/admin/boletas", form);
+      toast.success("Boleta registrada");
       onSave();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Error al guardar');
+      toast.error(err.response?.data?.error || "Error al guardar");
     } finally {
       setLoading(false);
     }
@@ -55,18 +78,31 @@ function BoletaForm({ onSave, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-
       {/* Fecha + Categoría */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <Input type="date" label={<>Fecha<span className="text-rose ml-0.5">*</span></>} value={form.date} onChange={set('date')} required />
+          <Input
+            type="date"
+            label={
+              <>
+                Fecha<span className="text-rose ml-0.5">*</span>
+              </>
+            }
+            value={form.date}
+            onChange={set("date")}
+            required
+          />
         </div>
         <div>
           <FieldLabel required>Categoría</FieldLabel>
           <div className="flex gap-2 flex-wrap pt-1">
-            {CATEGORIES.map(c => (
-              <FilterChip key={c.value} selected={form.category === c.value}
-                icon={c.icon} onClick={() => setForm(p => ({ ...p, category: c.value }))}>
+            {CATEGORIES.map((c) => (
+              <FilterChip
+                key={c.value}
+                selected={form.category === c.value}
+                icon={c.icon}
+                onClick={() => setForm((p) => ({ ...p, category: c.value }))}
+              >
                 {c.label}
               </FilterChip>
             ))}
@@ -79,10 +115,20 @@ function BoletaForm({ onSave, onCancel }) {
         <SectionHeader>Quien invitó</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Input label="Nombre" value={form.inviter_name} onChange={set('inviter_name')} placeholder="Nombre del invitador" />
+            <Input
+              label="Nombre"
+              value={form.inviter_name}
+              onChange={set("inviter_name")}
+              placeholder="Nombre del invitador"
+            />
           </div>
           <div>
-            <Input label="Teléfono" value={form.inviter_phone} onChange={set('inviter_phone')} placeholder="+502 5555 0000" />
+            <Input
+              label="Teléfono"
+              value={form.inviter_phone}
+              onChange={set("inviter_phone")}
+              placeholder="+502 5555 0000"
+            />
           </div>
         </div>
       </div>
@@ -92,27 +138,60 @@ function BoletaForm({ onSave, onCancel }) {
         <SectionHeader>Invitado</SectionHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Input label={<>Nombre<span className="text-rose ml-0.5">*</span></>} value={form.guest_name} onChange={set('guest_name')} placeholder="Nombre del invitado" required />
+            <Input
+              label={
+                <>
+                  Nombre<span className="text-rose ml-0.5">*</span>
+                </>
+              }
+              value={form.guest_name}
+              onChange={set("guest_name")}
+              placeholder="Nombre del invitado"
+              required
+            />
           </div>
           <div>
-            <Input label="Teléfono" value={form.guest_phone} onChange={set('guest_phone')} placeholder="+502 5555 0000" />
+            <Input
+              label="Teléfono"
+              value={form.guest_phone}
+              onChange={set("guest_phone")}
+              placeholder="+502 5555 0000"
+            />
           </div>
         </div>
         <div>
-          <Input label="Dirección" value={form.address} onChange={set('address')} placeholder="Zona, colonia, municipio…" />
+          <Input
+            label="Dirección"
+            value={form.address}
+            onChange={set("address")}
+            placeholder="Zona, colonia, municipio…"
+          />
         </div>
       </div>
 
       {/* Notas */}
       <div>
-        <Textarea rows={2} label="Notas" value={form.notes} onChange={set('notes')} placeholder="Observaciones adicionales…" />
+        <Textarea
+          rows={2}
+          label="Notas"
+          value={form.notes}
+          onChange={set("notes")}
+          placeholder="Observaciones adicionales…"
+        />
       </div>
 
       <div className="flex gap-3 pt-2 border-t border-bg/10">
-        <Button type="submit" variant="filled" disabled={loading} className="flex-1 justify-center">
-          {loading ? 'Guardando…' : 'Guardar boleta'}
+        <Button
+          type="submit"
+          variant="filled"
+          disabled={loading}
+          className="flex-1 justify-center"
+        >
+          {loading ? "Guardando…" : "Guardar boleta"}
         </Button>
-        <Button type="button" variant="text" onClick={onCancel}>Cancelar</Button>
+        <Button type="button" variant="text" onClick={onCancel}>
+          Cancelar
+        </Button>
       </div>
     </form>
   );
@@ -120,76 +199,119 @@ function BoletaForm({ onSave, onCancel }) {
 
 export default function AdminBoletas() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === "admin";
 
-  const [boletas,   setBoletas]   = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [showForm,  setShowForm]  = useState(false);
-  const [catFilter, setCatFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState(null);
+  const [boletas, setBoletas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [catFilter, setCatFilter] = useState("");
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setLoading(true);
-    const params = catFilter ? `?category=${catFilter}` : '';
-    apiClient.get(`/admin/boletas${params}`)
-      .then(r => setBoletas(r.data?.data || r.data || []))
+    const params = `?page=${page}&category=${catFilter}`;
+    apiClient
+      .get(`/admin/boletas${params}`)
+      .then((r) => {
+        setBoletas(r.data?.data || r.data || []);
+        setMeta(r.data?.meta || null);
+        if (r.data?.meta?.pages && page > r.data.meta.pages)
+          setPage(r.data.meta.pages);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
-  };
+  }, [page, catFilter]);
 
-  useEffect(() => { refresh(); }, [catFilter]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const deleteBoleta = async (id) => {
-    if (!confirm('¿Eliminar esta boleta?')) return;
+    if (!confirm("¿Eliminar esta boleta?")) return;
     try {
       await apiClient.delete(`/admin/boletas/${id}`);
-      toast.success('Boleta eliminada');
+      toast.success("Boleta eliminada");
       refresh();
-    } catch { toast.error('Error al eliminar'); }
+    } catch {
+      toast.error("Error al eliminar");
+    }
   };
 
   const counts = CATEGORIES.reduce((acc, c) => {
-    acc[c.value] = boletas.filter(b => b.category === c.value).length;
+    acc[c.value] = boletas.filter((b) => b.category === c.value).length;
     return acc;
   }, {});
-  const total = boletas.length;
+  const total = meta?.total || 0;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-headline-s text-bg font-black leading-tight">Boletas de Nuevos</h1>
+            <h1 className="text-headline-s text-bg font-black leading-tight">
+              Boletas de Nuevos
+            </h1>
             <p className="text-body-s text-bg/50 mt-0.5">
-              {total} registros · {counts.convertido || 0} conv. · {counts.reconciliado || 0} rec. · {counts.nuevo || 0} nuevos
+              {total} registros · En esta página: {counts.convertido || 0} conv.
+              · {counts.reconciliado || 0} rec. · {counts.nuevo || 0} nuevos
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="filled" onClick={() => setShowForm(s => !s)}>
-            {showForm ? 'Cancelar' : 'Nueva boleta'}
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outlined" onClick={() => setCreatingUser(true)}>
+            Crear cuenta
+          </Button>
+          <Button variant="filled" onClick={() => setShowForm((s) => !s)}>
+            {showForm ? "Cancelar" : "Nueva boleta"}
           </Button>
         </div>
       </div>
 
       {/* Formulario inline */}
+      {creatingUser && (
+        <CreateUserDialog onClose={() => setCreatingUser(false)} />
+      )}
       {showForm && (
         <div className="glass-light rounded-[24px] card-spring mb-8 p-6">
-          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest mb-5">Registrar nuevo miembro</p>
-          <BoletaForm onSave={() => { setShowForm(false); refresh(); }} onCancel={() => setShowForm(false)} />
+          <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest mb-5">
+            Registrar nuevo miembro
+          </p>
+          <BoletaForm
+            onSave={() => {
+              setShowForm(false);
+              if (page !== 1) setPage(1);
+              else refresh();
+            }}
+            onCancel={() => setShowForm(false)}
+          />
         </div>
       )}
 
       {/* Filter chips */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        <FilterChip selected={catFilter === ''} onClick={() => setCatFilter('')} icon="apps">
+        <FilterChip
+          selected={catFilter === ""}
+          onClick={() => {
+            setPage(1);
+            setCatFilter("");
+          }}
+          icon="apps"
+        >
           Todas
         </FilterChip>
-        {CATEGORIES.map(c => (
-          <FilterChip key={c.value} selected={catFilter === c.value} icon={c.icon}
-            count={counts[c.value] || 0}
-            onClick={() => setCatFilter(c.value)}>
+        {CATEGORIES.map((c) => (
+          <FilterChip
+            key={c.value}
+            selected={catFilter === c.value}
+            icon={c.icon}
+            onClick={() => {
+              setPage(1);
+              setCatFilter(c.value);
+            }}
+          >
             {c.label}
           </FilterChip>
         ))}
@@ -205,33 +327,38 @@ export default function AdminBoletas() {
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin boletas</p>
             <p className="text-body-s text-bg/50 mt-1">
-              {catFilter ? `No hay registros con categoría "${catFilter}".` : 'Crea la primera boleta con el botón de arriba.'}
+              {catFilter
+                ? `No hay registros con categoría "${catFilter}".`
+                : "Crea la primera boleta con el botón de arriba."}
             </p>
           </div>
         </div>
       ) : (
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
-          {boletas.map(b => {
+          {boletas.map((b) => {
             const cat = CAT_MAP[b.category];
             return (
-              <div key={b.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
-
+              <div
+                key={b.ID}
+                className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors"
+              >
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-body-l text-bg font-medium">{b.guest_name}</span>
+                    <span className="text-body-l text-bg font-medium">
+                      {b.guest_name}
+                    </span>
                     {cat && <Chip color={cat.color}>{cat.label}</Chip>}
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-bg/50">
-                    {b.guest_phone && (
-                      <span>{b.guest_phone}</span>
-                    )}
-                    {b.address && (
-                      <span>{b.address}</span>
-                    )}
+                    {b.guest_phone && <span>{b.guest_phone}</span>}
+                    {b.address && <span>{b.address}</span>}
                     {b.inviter_name && (
                       <span>
-                        Invitado por <strong className="text-bg ml-1">{b.inviter_name}</strong>
+                        Invitado por{" "}
+                        <strong className="text-bg ml-1">
+                          {b.inviter_name}
+                        </strong>
                         {b.inviter_phone && ` · ${b.inviter_phone}`}
                       </span>
                     )}
@@ -246,11 +373,18 @@ export default function AdminBoletas() {
                 {/* Trailing */}
                 <div className="flex items-start gap-2 shrink-0">
                   <p className="text-label-s text-bg/50 whitespace-nowrap">
-                    {b.date ? new Date(b.date + 'T12:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
+                    {b.date
+                      ? new Date(b.date + "T12:00").toLocaleDateString(
+                          "es-ES",
+                          { day: "2-digit", month: "short" },
+                        )
+                      : "—"}
                   </p>
                   {isAdmin && (
-                    <button onClick={() => deleteBoleta(b.ID)}
-                      className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors">
+                    <button
+                      onClick={() => deleteBoleta(b.ID)}
+                      className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors"
+                    >
                       Eliminar
                     </button>
                   )}
@@ -260,6 +394,7 @@ export default function AdminBoletas() {
           })}
         </div>
       )}
+      {!loading && <Paginator meta={meta} onPage={setPage} />}
     </div>
   );
 }

@@ -16,6 +16,7 @@ const HINTS = {
   about_podcast_url: 'Enlace público para escuchar. Déjalo vacío si todavía no tienen uno.',
 };
 const GROUPS = [
+  {key:'support',label:'Soporte',includes:key=>key.startsWith('support_')},
   { key: 'about', label: 'Información de la iglesia', includes: key => key.startsWith('about_') },
   { key: 'contact', label: 'Depósitos y contacto', includes: key => key.startsWith('bank_') || key === 'contact_whatsapp' },
   { key: 'backgrounds', label: 'Fondos', includes: key => key.endsWith('_bg') || key.startsWith('public_bg_') },
@@ -55,7 +56,7 @@ export default function AdminSettings() {
       <div className="glass-light divide-y divide-bg/10 rounded-[16px]">
         {settings.filter(item => selected?.includes(item.key)).map(item => {
           const isPhoto = item.key.endsWith('_bg') || item.key.startsWith('public_bg_');
-          const Field = item.key.startsWith('about_') && !item.key.endsWith('_url') ? Textarea : Input;
+          const Field = (item.key.startsWith('about_') && !item.key.endsWith('_url')) || item.key.startsWith('support_') ? Textarea : Input;
           return <form key={item.key} className="p-5 sm:p-6" onSubmit={event => { event.preventDefault(); save([item.key]); }}>
             <fieldset disabled={saving || !!uploading} className="space-y-4">
               {isPhoto && <div className="flex flex-wrap items-center gap-4">

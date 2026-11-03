@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import apiClient from '../../lib/apiClient';
 import AuthCard from '../../components/ui/AuthCard';
@@ -8,6 +8,7 @@ export default function VerifyEmail() {
   const token = searchParams.get('token');
   const [status,  setStatus]  = useState('loading');
   const [message, setMessage] = useState('');
+  const verification = useRef(null);
 
   useEffect(() => {
     if (!token) {
@@ -15,15 +16,25 @@ export default function VerifyEmail() {
       setMessage('Falta el token de verificación.');
       return;
     }
-    apiClient.get('/auth/verify-email', { params: { token } })
+    // The link is single-use. Reuse its in-flight request when React checks
+    // effect cleanup, so a second response cannot overwrite a successful one.
+    let active = true;
+    setStatus('loading');
+    if (verification.current?.token !== token) verification.current = {
+      token, request: apiClient.get('/auth/verify-email', { params: { token } }),
+    };
+    verification.current.request
       .then(res => {
+        if (!active) return;
         setStatus('success');
         setMessage(res.data?.message || 'Correo verificado correctamente.');
       })
       .catch(err => {
+        if (!active) return;
         setStatus('error');
         setMessage(err.response?.data?.error || 'Token inválido o expirado.');
       });
+    return () => { active = false; };
   }, [token]);
 
   return (

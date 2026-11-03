@@ -4,7 +4,7 @@
 //  Apple HIG · Lienzo blanco · Squircles · Spring physics
 // ============================================================
 
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 
 /* ---------- Pill badge (chip) — sapphire tint. Sin ícono a propósito
    (ago-2026) -- solo texto, `icon` se ignora si algún caller viejo aún
@@ -61,14 +61,17 @@ const glassFieldStyle = {
   color: '#fff',
 };
 
-export function GlassField({ label, error, helperText, className = '', ...props }) {
+export function GlassField({ label, error, helperText, className = '', id, ...props }) {
+  const generatedId = useId();
+  const fieldId = id || generatedId;
+  const descriptionId = `${fieldId}-description`;
   return (
-    <label className="block text-left">
-      {label && <span className="block text-13 font-semibold text-white/60 mb-2">{label}</span>}
-      <input className={`input-squircle ${className}`} style={glassFieldStyle} {...props} />
-      {error && <span className="block text-13 font-medium text-rose mt-1.5">{error}</span>}
-      {helperText && !error && <span className="block text-13 text-white/40 mt-1.5">{helperText}</span>}
-    </label>
+    <div className="block text-left">
+      {label && <label htmlFor={fieldId} className="block text-13 font-semibold text-white/60 mb-2">{label}</label>}
+      <input id={fieldId} aria-invalid={error ? true : undefined} aria-describedby={error || helperText ? descriptionId : undefined} className={`input-squircle ${className}`} style={glassFieldStyle} {...props} />
+      {error && <span id={descriptionId} className="block text-13 font-medium text-rose mt-1.5">{error}</span>}
+      {helperText && !error && <span id={descriptionId} className="block text-13 text-white/40 mt-1.5">{helperText}</span>}
+    </div>
   );
 }
 

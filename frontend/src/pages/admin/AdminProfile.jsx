@@ -37,12 +37,10 @@ function EditProfileForm({ user, onClose, onSaved }) {
     <form onSubmit={submit} className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6 space-y-4 animate-fade-in">
       <h2 className="text-16 font-bold text-bg tracking-tightish">Editar perfil</h2>
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Nombre</label>
-        <Input value={name} onChange={e => setName(e.target.value)} required />
+        <Input label="Nombre" value={name} onChange={e => setName(e.target.value)} required />
       </div>
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Correo</label>
-        <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <Input label="Correo" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
       </div>
       <div className="flex gap-3 pt-1">
         <Button type="submit" variant="filled" disabled={saving}>
@@ -80,16 +78,13 @@ function ChangePasswordForm({ onClose }) {
     <form onSubmit={submit} className="glass-light rounded-[24px] card-spring p-6 md:p-7 mb-6 space-y-4 animate-fade-in">
       <h2 className="text-16 font-bold text-bg tracking-tightish">Cambiar contraseña</h2>
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Contraseña actual</label>
-        <Input type="password" value={current} onChange={e => setCurrent(e.target.value)} required />
+        <Input label="Contraseña actual" type="password" value={current} onChange={e => setCurrent(e.target.value)} required />
       </div>
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Nueva contraseña</label>
-        <Input type="password" value={next} onChange={e => setNext(e.target.value)} required minLength={10} />
+        <Input label="Nueva contraseña" type="password" value={next} onChange={e => setNext(e.target.value)} required minLength={10} />
       </div>
       <div>
-        <label className="block text-label-l text-bg/50 mb-1.5">Confirmar nueva contraseña</label>
-        <Input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={10} />
+        <Input label="Confirmar nueva contraseña" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={10} />
       </div>
       <div className="flex gap-3 pt-1">
         <Button type="submit" variant="filled" disabled={saving}>

@@ -1,92 +1,134 @@
-import { useEffect, useState } from 'react';
-import apiClient from '../../lib/apiClient';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
-import Chip, { FilterChip } from '../../components/ui/Chip';
+import Paginator from "../../components/ui/Paginator";
+import { useCallback, useEffect, useState } from "react";
+import apiClient from "../../lib/apiClient";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
+import Chip, { FilterChip } from "../../components/ui/Chip";
 
 const CATEGORIES = {
-  primera_vez:  { label: 'Primera vez',    color: 'secondary' },
-  reconciliado: { label: 'Reconciliado',   color: 'primary' },
-  busco_celula: { label: 'Busca célula',   color: 'tertiary' },
+  primera_vez: { label: "Primera vez", color: "secondary" },
+  reconciliado: { label: "Reconciliado", color: "primary" },
+  busco_celula: { label: "Busca célula", color: "tertiary" },
 };
 const HOW_FOUND = {
-  invitacion: 'Invitación', redes: 'Redes sociales', publicidad: 'Publicidad', otro: 'Otro',
+  invitacion: "Invitación",
+  redes: "Redes sociales",
+  publicidad: "Publicidad",
+  otro: "Otro",
 };
-const STATUS_FLOW = ['nuevo', 'contactado', 'integrado'];
-const STATUS_LABEL = { nuevo: 'Nuevo', contactado: 'Contactado', integrado: 'Integrado' };
-const STATUS_COLOR = { nuevo: 'error', contactado: 'secondary', integrado: 'primary' };
+const STATUS_FLOW = ["nuevo", "contactado", "integrado"];
+const STATUS_LABEL = {
+  nuevo: "Nuevo",
+  contactado: "Contactado",
+  integrado: "Integrado",
+};
+const STATUS_COLOR = {
+  nuevo: "error",
+  contactado: "secondary",
+  integrado: "primary",
+};
 
 export default function AdminConnectCards() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === "admin";
 
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState(null);
   const [cards, setCards] = useState([]);
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setLoading(true);
-    const params = statusFilter ? `?status=${statusFilter}` : '';
-    apiClient.get(`/admin/connect-cards${params}`)
-      .then(r => setCards(r.data?.data || r.data || []))
+    const params = `?page=${page}&status=${statusFilter}`;
+    apiClient
+      .get(`/admin/connect-cards${params}`)
+      .then((r) => {
+        setCards(r.data?.data || r.data || []);
+        setMeta(r.data?.meta || null);
+        if (r.data?.meta?.pages && page > r.data.meta.pages)
+          setPage(r.data.meta.pages);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
-  };
+  }, [page, statusFilter]);
 
-  useEffect(() => { refresh(); }, [statusFilter]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     if (!isAdmin) return;
-    apiClient.get('/admin/leaders').then(r => setLeaders(r.data || [])).catch(() => {});
+    apiClient
+      .get("/admin/leaders")
+      .then((r) => setLeaders(r.data || []))
+      .catch(() => {});
   }, [isAdmin]);
 
   const updateCard = async (id, patch) => {
     try {
       await apiClient.put(`/admin/connect-cards/${id}`, patch);
-      toast.success('Actualizado');
+      toast.success("Actualizado");
       refresh();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Error al actualizar');
+      toast.error(err.response?.data?.error || "Error al actualizar");
     }
   };
 
   const deleteCard = async (id) => {
-    if (!confirm('¿Eliminar esta tarjeta?')) return;
+    if (!confirm("¿Eliminar esta tarjeta?")) return;
     try {
       await apiClient.delete(`/admin/connect-cards/${id}`);
-      toast.success('Tarjeta eliminada');
+      toast.success("Tarjeta eliminada");
       refresh();
-    } catch { toast.error('Error al eliminar'); }
+    } catch {
+      toast.error("Error al eliminar");
+    }
   };
 
   const counts = STATUS_FLOW.reduce((acc, s) => {
-    acc[s] = cards.filter(c => c.status === s).length;
+    acc[s] = cards.filter((c) => c.status === s).length;
     return acc;
   }, {});
-  const total = cards.length;
+  const total = meta?.total || 0;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-
       {/* Page header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div>
-          <h1 className="text-headline-s text-bg font-black leading-tight">Conéctate</h1>
+          <h1 className="text-headline-s text-bg font-black leading-tight">
+            Conéctate
+          </h1>
           <p className="text-body-s text-bg/50 mt-0.5">
-            {total} registros · {counts.nuevo || 0} sin contactar · {counts.contactado || 0} en seguimiento · {counts.integrado || 0} integrados
+            {total} registros · En esta página: {counts.nuevo || 0} sin
+            contactar · {counts.contactado || 0} en seguimiento ·{" "}
+            {counts.integrado || 0} integrados
           </p>
         </div>
       </div>
 
       {/* Filter chips */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        <FilterChip selected={statusFilter === ''} onClick={() => setStatusFilter('')}>
+        <FilterChip
+          selected={statusFilter === ""}
+          onClick={() => {
+            setPage(1);
+            setStatusFilter("");
+          }}
+        >
           Todas
         </FilterChip>
-        {STATUS_FLOW.map(s => (
-          <FilterChip key={s} selected={statusFilter === s}
-            count={counts[s] || 0} onClick={() => setStatusFilter(s)}>
+        {STATUS_FLOW.map((s) => (
+          <FilterChip
+            key={s}
+            selected={statusFilter === s}
+            onClick={() => {
+              setPage(1);
+              setStatusFilter(s);
+            }}
+          >
             {STATUS_LABEL[s]}
           </FilterChip>
         ))}
@@ -102,28 +144,39 @@ export default function AdminConnectCards() {
           <div className="text-center">
             <p className="text-body-l text-bg font-medium">Sin tarjetas</p>
             <p className="text-body-s text-bg/50 mt-1">
-              {statusFilter ? `No hay registros con estado "${STATUS_LABEL[statusFilter]}".` : 'Aquí aparecerán los visitantes que se registren en /conectate.'}
+              {statusFilter
+                ? `No hay registros con estado "${STATUS_LABEL[statusFilter]}".`
+                : "Aquí aparecerán los visitantes que se registren en /conectate."}
             </p>
           </div>
         </div>
       ) : (
         <div className="glass-light rounded-[24px] card-spring overflow-hidden divide-y divide-bg/8">
-          {cards.map(card => {
+          {cards.map((card) => {
             const cat = CATEGORIES[card.category];
-            const nextStatus = STATUS_FLOW[STATUS_FLOW.indexOf(card.status) + 1];
+            const nextStatus =
+              STATUS_FLOW[STATUS_FLOW.indexOf(card.status) + 1];
             return (
-              <div key={card.ID} className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors">
-
+              <div
+                key={card.ID}
+                className="flex items-start gap-4 p-5 hover:bg-bg/8 transition-colors"
+              >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-body-l text-bg font-medium">{card.name}</span>
+                    <span className="text-body-l text-bg font-medium">
+                      {card.name}
+                    </span>
                     {cat && <Chip color={cat.color}>{cat.label}</Chip>}
-                    <Chip color={STATUS_COLOR[card.status]}>{STATUS_LABEL[card.status]}</Chip>
+                    <Chip color={STATUS_COLOR[card.status]}>
+                      {STATUS_LABEL[card.status]}
+                    </Chip>
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-body-s text-bg/50">
                     {card.phone && <span>{card.phone}</span>}
                     {card.email && <span>{card.email}</span>}
-                    {card.how_found && <span>{HOW_FOUND[card.how_found] || card.how_found}</span>}
+                    {card.how_found && (
+                      <span>{HOW_FOUND[card.how_found] || card.how_found}</span>
+                    )}
                   </div>
 
                   {/* La célula que la persona pidió desde /celulas. Es el
@@ -134,8 +187,11 @@ export default function AdminConnectCards() {
                       normalmente el select de arriba ya viene resuelto. */}
                   {card.cell && (
                     <p className="text-body-s text-bg mt-1.5">
-                      Pidió entrar a <strong className="font-semibold">{card.cell.name}</strong>
-                      {card.cell.zone ? ` · ${card.cell.zone}` : ''}
+                      Pidió entrar a{" "}
+                      <strong className="font-semibold">
+                        {card.cell.name}
+                      </strong>
+                      {card.cell.zone ? ` · ${card.cell.zone}` : ""}
                     </p>
                   )}
 
@@ -153,20 +209,35 @@ export default function AdminConnectCards() {
                   <div className="flex items-center gap-2 flex-wrap mt-3">
                     {isAdmin && (
                       <select
-                        value={card.leader_assigned_id || ''}
-                        onChange={e => updateCard(card.ID, { leader_assigned_id: e.target.value ? Number(e.target.value) : null })}
+                        aria-label={`Líder asignado a ${card.name}`}
+                        value={card.leader_assigned_id || ""}
+                        onChange={(e) =>
+                          updateCard(card.ID, {
+                            leader_assigned_id: e.target.value
+                              ? Number(e.target.value)
+                              : null,
+                          })
+                        }
                         className="text-label-m px-2.5 py-1.5 rounded-lg border border-bg/10 bg-transparent text-bg/50 focus:outline-none focus:border-pri"
                       >
                         <option value="">Sin asignar</option>
-                        {leaders.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                        {leaders.map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.name}
+                          </option>
+                        ))}
                       </select>
                     )}
                     {!isAdmin && card.leader_assigned && (
-                      <span className="text-label-m text-bg/50">Asignado a {card.leader_assigned.name}</span>
+                      <span className="text-label-m text-bg/50">
+                        Asignado a {card.leader_assigned.name}
+                      </span>
                     )}
                     {nextStatus && (
                       <button
-                        onClick={() => updateCard(card.ID, { status: nextStatus })}
+                        onClick={() =>
+                          updateCard(card.ID, { status: nextStatus })
+                        }
                         className="text-label-m px-2.5 py-1.5 rounded-lg border border-bg/10 text-bg hover:bg-bg/8 transition-colors"
                       >
                         Marcar como {STATUS_LABEL[nextStatus].toLowerCase()}
@@ -177,10 +248,18 @@ export default function AdminConnectCards() {
 
                 <div className="flex items-start gap-2 shrink-0">
                   <p className="text-label-s text-bg/50 whitespace-nowrap">
-                    {card.CreatedAt ? new Date(card.CreatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
+                    {card.CreatedAt
+                      ? new Date(card.CreatedAt).toLocaleDateString("es-ES", {
+                          day: "2-digit",
+                          month: "short",
+                        })
+                      : "—"}
                   </p>
                   {isAdmin && (
-                    <button onClick={() => deleteCard(card.ID)} className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors">
+                    <button
+                      onClick={() => deleteCard(card.ID)}
+                      className="text-13 font-semibold text-bg/55 hover:text-rose transition-colors"
+                    >
                       Eliminar
                     </button>
                   )}
@@ -190,6 +269,7 @@ export default function AdminConnectCards() {
           })}
         </div>
       )}
+      {!loading && <Paginator meta={meta} onPage={setPage} />}
     </div>
   );
 }

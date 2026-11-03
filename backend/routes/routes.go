@@ -40,6 +40,7 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	boletaHandler := handlers.NewBoletaHandler(db)
 	uploadHandler := handlers.NewUploadHandler(store, db)
 	receiptHandler := handlers.NewPaymentReceiptHandler(db, store)
+	supportHandler := handlers.NewSupportHandler(db, store)
 	mailHandler := &handlers.EmailHandler{DB: db, Config: cfg}
 	heroHandler := handlers.NewHeroHandler(db)
 	sitePhotoHandler := handlers.NewSitePhotoHandler(db)
@@ -185,8 +186,20 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Feed social
 	api.GET("/social/feed", socialHandler.GetSocialFeed, cacheShort...)
 
-	// Anuncios (público — authMW opcional para filtrar por rol)
-	api.GET("/announcements", announcementHandler.GetAnnouncements, cacheShort...)
+	// Anonymous visitors keep the public feed. A supplied session must be checked
+	// against the database, and its role-specific response must never enter a CDN.
+	announcementMiddleware := append([]echo.MiddlewareFunc{}, cacheShort...)
+	announcementMiddleware = append(announcementMiddleware, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Request().Header.Get("Authorization") == "" {
+				return next(c)
+			}
+			c.Response().Header().Set("Cache-Control", "private, no-store")
+			c.Response().Header().Add("Vary", "Authorization")
+			return authMW(next)(c)
+		}
+	})
+	api.GET("/announcements", announcementHandler.GetAnnouncements, announcementMiddleware...)
 
 	// Galería pública
 	galleryGroup := api.Group("/gallery")
@@ -217,6 +230,22 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// de basura. adminOrLeaderMW cierra eso sin romper el flujo real.
 	uploadGroup := api.Group("/upload", authMW, adminOrLeaderMW)
 	uploadGroup.POST("", uploadHandler.UploadFile)
+
+	// Private support uses the same session/role checks for every endpoint.
+	supportGroup := api.Group("/support", authMW, adminOrLeaderMW, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Response().Header().Set("Cache-Control", "private, no-store")
+			return next(c)
+		}
+	})
+	supportGroup.GET("/options", supportHandler.Options)
+	supportGroup.GET("/tickets", supportHandler.List)
+	supportGroup.POST("/tickets", supportHandler.Create, middleware.SubmissionRateLimit())
+	supportGroup.GET("/tickets/:id", supportHandler.Detail)
+	supportGroup.POST("/tickets/:id/messages", supportHandler.Reply, middleware.SubmissionRateLimit())
+	supportGroup.PATCH("/tickets/:id/status", supportHandler.ChangeStatus, middleware.SubmissionRateLimit())
+	supportGroup.POST("/tickets/:id/attachments", supportHandler.Upload, middleware.SubmissionRateLimit())
+	supportGroup.GET("/tickets/:id/attachments/:attachment/file", supportHandler.File)
 
 	// ── Admin (requiere auth + rol admin) ─────────────────────────────────────────
 	adminGroup := api.Group("/admin", authMW, adminMW)

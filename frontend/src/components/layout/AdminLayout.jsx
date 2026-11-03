@@ -32,6 +32,7 @@ const NAV_GROUPS = [
     { to: '/admin/donations', label: 'Donaciones' }, { to: '/admin/donation-purposes', label: 'Destinos de donación' },
   ] },
   { section: 'Sistema', items: [
+    { to: '/admin/support', label: 'Soporte', badge: 'pending_support' },
     { to: '/admin/emails', label: 'Correos' }, { to: '/admin/activity-log', label: 'Actividad' },
     { to: '/admin/profile', label: 'Perfil' },
   ] },
