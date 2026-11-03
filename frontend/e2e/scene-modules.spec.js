@@ -245,7 +245,7 @@ test('blog failure, retry and empty do not publish invented messages or dates', 
 });
 
 test('an article without cover, date or body keeps the managed background without fabricated metadata', async ({ page }) => {
-  await isolate(page, path => path === '/blog/sin-portada' ? { body: { ID: 90, slug: 'sin-portada', title: 'Mensaje sin portada', CreatedAt: 'invalid' } } : undefined);
+  await isolate(page, path => path === '/blog/sin-portada' ? { body: { ID: 90, slug: 'sin-portada', title: 'Mensaje sin portada', CreatedAt: 'invalid', redirect_url: null } } : undefined);
   await page.goto('/blog/sin-portada');
   await expect(page.getByRole('article')).toBeVisible();
   await expect(page.locator('main > [aria-hidden="true"] img')).toHaveAttribute('src', photo);

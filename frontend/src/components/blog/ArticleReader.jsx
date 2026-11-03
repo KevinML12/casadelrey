@@ -8,6 +8,7 @@ import { useSitePhoto } from '../../lib/feed';
 import TTSPlayer from './TTSPlayer';
 
 function getSocialPlatform(url = '') {
+  if (!url) return null;
   if (url.includes('instagram.com')) return 'Instagram';
   if (url.includes('facebook.com')) return 'Facebook';
   if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
