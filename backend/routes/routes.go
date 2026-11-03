@@ -186,8 +186,20 @@ func Register(e *echo.Echo, db *gorm.DB, cfg *config.Config, store storage.Store
 	// Feed social
 	api.GET("/social/feed", socialHandler.GetSocialFeed, cacheShort...)
 
-	// Anuncios (público — authMW opcional para filtrar por rol)
-	api.GET("/announcements", announcementHandler.GetAnnouncements, cacheShort...)
+	// Anonymous visitors keep the public feed. A supplied session must be checked
+	// against the database, and its role-specific response must never enter a CDN.
+	announcementMiddleware := append([]echo.MiddlewareFunc{}, cacheShort...)
+	announcementMiddleware = append(announcementMiddleware, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Request().Header.Get("Authorization") == "" {
+				return next(c)
+			}
+			c.Response().Header().Set("Cache-Control", "private, no-store")
+			c.Response().Header().Add("Vary", "Authorization")
+			return authMW(next)(c)
+		}
+	})
+	api.GET("/announcements", announcementHandler.GetAnnouncements, announcementMiddleware...)
 
 	// Galería pública
 	galleryGroup := api.Group("/gallery")

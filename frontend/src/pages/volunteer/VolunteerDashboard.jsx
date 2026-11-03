@@ -8,6 +8,7 @@ import StatCard from '../../components/ui/StatCard';
 import { useVolunteerAreas } from '../../lib/volunteerAreas';
 import VolunteerReportForm from '../../components/sections/VolunteerReportForm';
 import ModalWrapper from '../../components/ui/ModalWrapper';
+import VolunteerReports from '../../components/sections/VolunteerReports';
 const Spinner = () => (
   <div className="flex items-center justify-center py-12">
     <div className="w-6 h-6 rounded-full border-2 border-bg/10 border-t-acento animate-spin" />
@@ -105,6 +106,7 @@ export default function VolunteerDashboard() {
   const [loading,   setLoading]   = useState(true);
   const [showForm,  setShowForm]  = useState(false);
   const [showReportForm, setShowReportForm] = useState(false);
+  const [reportRevision, setReportRevision] = useState(0);
 
   const loadData = async () => {
     setLoading(true);
@@ -234,9 +236,11 @@ export default function VolunteerDashboard() {
       
       {showReportForm && (
         <ModalWrapper onClose={() => setShowReportForm(false)} ariaLabel="Reporte de servicio">
-          <VolunteerReportForm onSuccess={() => setShowReportForm(false)} />
+          <VolunteerReportForm onSuccess={() => { setShowReportForm(false); setReportRevision(value => value + 1); }} />
         </ModalWrapper>
       )}
+
+      <VolunteerReports revision={reportRevision} />
 
       <div className="grid grid-cols-2 gap-4">
         <StatCard icon="task_alt" label="Pendientes" value={pending} tint="pri" />

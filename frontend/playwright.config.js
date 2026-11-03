@@ -12,7 +12,7 @@ export default defineConfig({
   fullyParallel: false, // los tests de admin comparten estado (login, eventos creados)
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: [['list']],
+  reporter: process.env.CDR_E2E_OUTPUT ? [['list'],['json',{outputFile: `${process.env.CDR_E2E_OUTPUT}/report.json`}]] : [['list']],
   timeout: 45_000,
   use: {
     baseURL,

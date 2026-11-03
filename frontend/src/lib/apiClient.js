@@ -16,6 +16,9 @@ const apiClient = axios.create({
 
 // Agrega el token JWT a cada request
 apiClient.interceptors.request.use((config) => {
+  // Let the browser supply the multipart boundary. Keeping the JSON default
+  // here serializes FormData as JSON and drops receipt files on the server.
+  if (config.data instanceof FormData) config.headers.delete('Content-Type');
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   else delete config.headers.Authorization;

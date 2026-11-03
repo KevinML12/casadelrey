@@ -20,7 +20,12 @@ func PublicCache(maxAgeSeconds int) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if c.Request().Method == http.MethodGet {
-				c.Response().Header().Set("Cache-Control", value)
+				c.Response().Header().Add("Vary", "Authorization")
+				if c.Request().Header.Get("Authorization") != "" {
+					c.Response().Header().Set("Cache-Control", "private, no-store")
+				} else {
+					c.Response().Header().Set("Cache-Control", value)
+				}
 			}
 			return next(c)
 		}

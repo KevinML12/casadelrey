@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -54,7 +55,7 @@ func (h *ConnectCardHandler) Create(c echo.Context) error {
 	card := models.ConnectCard{
 		Name: req.Name, Phone: req.Phone, Email: req.Email,
 		HowFound: req.HowFound, Category: req.Category, Status: "nuevo",
-		Message:  req.Message,
+		Message: req.Message,
 	}
 
 	// Solicitud dirigida a una célula concreta (viene de /celulas): se
@@ -99,6 +100,10 @@ func (h *ConnectCardHandler) GetAll(c echo.Context) error {
 	page, limit := parsePage(c)
 
 	q := h.DB.Model(&models.ConnectCard{}).Preload("LeaderAssigned").Preload("Cell")
+	if c.Get("user_role") == "leader" {
+		uid, _ := c.Get("user_id").(uint)
+		q = q.Where("leader_assigned_id = ?", uid)
+	}
 	if status := c.QueryParam("status"); status != "" {
 		q = q.Where("status = ?", status)
 	}
@@ -124,14 +129,19 @@ func (h *ConnectCardHandler) Update(c echo.Context) error {
 	}
 
 	var card models.ConnectCard
-	if err := h.DB.Where("id = ?", id).First(&card).Error; err != nil {
+	q := h.DB.Where("id = ?", id)
+	if c.Get("user_role") == "leader" {
+		uid, _ := c.Get("user_id").(uint)
+		q = q.Where("leader_assigned_id = ?", uid)
+	}
+	if err := q.First(&card).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Tarjeta no encontrada."})
 	}
 
 	var req struct {
-		Status           *string `json:"status"`
-		LeaderAssignedID *uint   `json:"leader_assigned_id"`
-		Notes            *string `json:"notes"`
+		Status           *string         `json:"status"`
+		LeaderAssignedID json.RawMessage `json:"leader_assigned_id"`
+		Notes            *string         `json:"notes"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos."})
@@ -143,8 +153,23 @@ func (h *ConnectCardHandler) Update(c echo.Context) error {
 		}
 		card.Status = *req.Status
 	}
-	if req.LeaderAssignedID != nil {
-		card.LeaderAssignedID = req.LeaderAssignedID
+	if len(req.LeaderAssignedID) != 0 {
+		if c.Get("user_role") != "admin" {
+			return c.JSON(http.StatusForbidden, map[string]string{"error": "Solo administración puede cambiar al responsable."})
+		}
+		if string(req.LeaderAssignedID) == "null" {
+			card.LeaderAssignedID = nil
+		} else {
+			var assignedID uint
+			if err := json.Unmarshal(req.LeaderAssignedID, &assignedID); err != nil || assignedID == 0 {
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Elige un líder válido."})
+			}
+			var leader models.User
+			if err := h.DB.Where("id = ? AND role IN ?", assignedID, []string{"leader", "admin"}).First(&leader).Error; err != nil {
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Elige un líder válido."})
+			}
+			card.LeaderAssignedID = &assignedID
+		}
 	}
 	if req.Notes != nil {
 		card.Notes = *req.Notes

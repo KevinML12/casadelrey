@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApi, useApiResource } from '../../lib/feed';
@@ -70,10 +70,10 @@ function Capture({ticketId,file,onClose}){
 function CaseDetail({id,options,onClose,onChanged}){
   const {isAdmin}=useAuth();const [data,setData]=useState(null);const [loading,setLoading]=useState(true);const [loadError,setLoadError]=useState('');const [error,setError]=useState('');
   const [page,setPage]=useState(1);const [attempt,setAttempt]=useState(0);const [reply,setReply]=useState('');const [status,setStatus]=useState('');const [note,setNote]=useState('');
-  const [busy,setBusy]=useState(false);const [jobs,setJobs]=useState([]);const [capture,setCapture]=useState(null);
+  const [busy,setBusy]=useState(false);const [jobs,setJobs]=useState([]);const [capture,setCapture]=useState(null);const statusEdited=useRef(false);
   useEffect(()=>{
     const controller=new AbortController();let active=true;setLoading(true);setLoadError('');
-    apiClient.get(`/support/tickets/${id}?page=${page}&limit=20`,{signal:controller.signal}).then(response=>{if(active){setData(response.data);setStatus(response.data.ticket.status);}}).catch(error=>{if(active)setLoadError(errorText(error,'No se pudo cargar el caso.'));}).finally(()=>{if(active)setLoading(false);});
+    apiClient.get(`/support/tickets/${id}?page=${page}&limit=20`,{signal:controller.signal}).then(response=>{if(active){setData(response.data);if(!statusEdited.current)setStatus(response.data.ticket.status);}}).catch(error=>{if(active)setLoadError(errorText(error,'No se pudo cargar el caso.'));}).finally(()=>{if(active)setLoading(false);});
     return()=>{active=false;controller.abort();};
   },[id,page,attempt]);
   const refresh=()=>{setPage(1);setAttempt(value=>value+1);onChanged();refreshSupportCounts();};
@@ -85,7 +85,7 @@ function CaseDetail({id,options,onClose,onChanged}){
   };
   const update=async(next)=>{
     if(busy)return;setBusy(true);setError('');
-    try{await apiClient.patch(`/support/tickets/${id}/status`,{status:next,revision:data.ticket.revision,note});setNote('');refresh();}catch(error){setError(errorText(error,'No se pudo cambiar el estado.'));if(error.response?.status===409)setAttempt(value=>value+1);}finally{setBusy(false);}
+    try{await apiClient.patch(`/support/tickets/${id}/status`,{status:next,revision:data.ticket.revision,note});statusEdited.current=false;setStatus(next);setNote('');refresh();}catch(error){setError(errorText(error,'No se pudo cambiar el estado.'));if(error.response?.status===409){statusEdited.current=false;setAttempt(value=>value+1);}}finally{setBusy(false);}
   };
   const upload=async()=>{if(busy)return;setBusy(true);setError('');try{const complete=await uploadSupportFiles(id,jobs,change);if(complete)setJobs([]);refresh();}finally{setBusy(false);}};
   const ticket=data?.ticket;
@@ -110,7 +110,7 @@ function CaseDetail({id,options,onClose,onChanged}){
           {ticket.status!=='resuelto' && <><FileSelection jobs={jobs} disabled={busy || loading} onSelect={event=>{try{setJobs(supportFiles(event.target.files));setError('');}catch(error){setError(error.message);}}} />{jobs.length>0 && <Button onClick={upload} disabled={busy || loading || !jobs.some(job=>!job.done)}>{busy?'Guardando…':'Guardar capturas'}</Button>}</>}
         </section>
         {ticket.status!=='resuelto'?<form onSubmit={send} className="space-y-3 border-t border-bg/10 pt-5"><Textarea label="Tu respuesta" value={reply} onChange={event=>setReply(event.target.value)} minLength={2} maxLength={5000} rows={4} required disabled={busy || loading} /><Button type="submit" disabled={busy || loading || !reply.trim()}>{busy?'Guardando…':'Enviar respuesta'}</Button></form>:<div className="rounded-[12px] border border-bg/15 bg-white/50 p-4"><p className="text-14">El caso está resuelto. Puedes reabrirlo si el problema continúa.</p><Button className="mt-3" variant="outlined" onClick={()=>update('abierto')} disabled={busy || loading}>Reabrir caso</Button></div>}
-        {isAdmin && <form className="space-y-3 border-t border-bg/10 pt-5" onSubmit={event=>{event.preventDefault();update(status);}}><h3 className="text-16 font-bold">Seguimiento</h3><Select label="Estado del caso" value={status} onChange={event=>setStatus(event.target.value)} disabled={busy || loading} options={options.states} required /><Textarea label={status==='resuelto'?'Solución aplicada':status==='esperando_respuesta'?'Información que necesitas':'Nota de seguimiento (opcional)'} value={note} onChange={event=>setNote(event.target.value)} required={['resuelto','esperando_respuesta'].includes(status)} minLength={['resuelto','esperando_respuesta'].includes(status)?5:undefined} maxLength={2000} rows={3} disabled={busy || loading} /><Button type="submit" disabled={busy || loading || status===ticket.status}>{busy?'Guardando…':'Guardar estado'}</Button></form>}
+        {isAdmin && <form className="space-y-3 border-t border-bg/10 pt-5" onSubmit={event=>{event.preventDefault();update(status);}}><h3 className="text-16 font-bold">Seguimiento</h3><Select label="Estado del caso" value={status} onChange={event=>{statusEdited.current=true;setStatus(event.target.value);}} disabled={busy || loading} options={options.states} required /><Textarea label={status==='resuelto'?'Solución aplicada':status==='esperando_respuesta'?'Información que necesitas':'Nota de seguimiento (opcional)'} value={note} onChange={event=>setNote(event.target.value)} required={['resuelto','esperando_respuesta'].includes(status)} minLength={['resuelto','esperando_respuesta'].includes(status)?5:undefined} maxLength={2000} rows={3} disabled={busy || loading} /><Button type="submit" disabled={busy || loading || status===ticket.status}>{busy?'Guardando…':'Guardar estado'}</Button></form>}
       </>}
     </div>
     {capture && <Capture ticketId={id} file={capture} onClose={()=>setCapture(null)} />}

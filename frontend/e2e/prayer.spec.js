@@ -10,21 +10,18 @@
 //
 //  Correr contra el stack local: PW_BASE_URL=http://localhost:5173
 //  (frontend dev) + backend local en :8080. Contra producción usa los
-//  defaults (Vercel + Fly).
+//  Ejecutar mediante ops/test_fullstack.py con recursos temporales.
 // ============================================================
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './fixtures/auth.js';
 
 const stamp = Date.now();
 
-// El API vive aparte del frontend (Fly vs Vercel). Para stack local,
+// El API vive aparte del frontend. Para el stack aislado,
 // el backend corre en :8080.
-const API_URL = (
-  process.env.PW_API_URL ||
-  (process.env.PW_BASE_URL?.includes('localhost')
-    ? 'http://localhost:8080'
-    : 'https://casa-del-rey-mvp.fly.dev')
-).replace(/\/$/, '') + '/api/v1';
+test.skip(process.env.CDR_LOCAL_E2E !== '1', 'Run through ops/test_fullstack.py');
+test.use({trace:'off',video:'off'});
+const API_URL = process.env.PW_API_URL + '/api/v1';
 
 test.describe('Peticiones de oración — flujo completo (público → admin)', () => {
   test('la página es pública, el formulario envía, llega al panel y se limpia', async ({ page }) => {
@@ -34,11 +31,11 @@ test.describe('Peticiones de oración — flujo completo (público → admin)', 
     //     detrás de ProtectedRoute por error)
     await page.goto('/prayer');
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(page.getByText('Petición de Oración')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: 'Clama y Él responde.', exact: true })).toBeVisible({ timeout: 15_000 });
 
     // 2 · Enviar la petición como visitante anónimo
     await page.getByLabel(/nombre \*/i).fill('Visitante E2E');
-    await page.getByLabel(/correo/i).fill(`e2e.prayer.${stamp}@example.com`);
+    await page.getByLabel(/correo/i).fill(`e2e.prayer.${stamp}@example.invalid`);
     await page.getByLabel(/asunto \*/i).fill(subject);
     await page.getByLabel(/petición \*/i).fill('Petición creada automáticamente por la suite E2E. Puede ignorarse.');
 

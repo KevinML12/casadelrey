@@ -31,10 +31,10 @@ func (h *AnnouncementHandler) GetAnnouncements(c echo.Context) error {
 		Where("expires_at IS NULL OR expires_at > ?", time.Now()).
 		Order("published_at DESC, created_at DESC")
 
-	if role == "" || role == "member" {
-		q = q.Where("role_target IN ?", []string{"all", "member"})
-	} else if role == "leader" {
+	if role == "leader" {
 		q = q.Where("role_target IN ?", []string{"all", "member", "leader"})
+	} else if role != "admin" {
+		q = q.Where("role_target IN ?", []string{"all", "member"})
 	}
 	// admin ve todos
 

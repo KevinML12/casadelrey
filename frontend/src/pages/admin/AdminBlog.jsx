@@ -1,23 +1,25 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import DOMPurify from 'dompurify';
-import apiClient from '../../lib/apiClient';
-import toast from 'react-hot-toast';
-import Button from '../../components/ui/Button';
-import Input, { Textarea } from '../../components/ui/Input';
-import { compressImageIfNeeded } from '../../lib/compressImage';
+import Paginator from "../../components/ui/Paginator";
+import { useEffect, useState, useCallback } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import DOMPurify from "dompurify";
+import apiClient from "../../lib/apiClient";
+import toast from "react-hot-toast";
+import Button from "../../components/ui/Button";
+import Input, { Textarea } from "../../components/ui/Input";
+import { compressImageIfNeeded } from "../../lib/compressImage";
 
 function slugify(text) {
   return text
     .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, '-');
+    .replace(/\s+/g, "-");
 }
 
 function EditorToolbar({ editor }) {
@@ -25,9 +27,10 @@ function EditorToolbar({ editor }) {
 
   const btn = (active, onClick, label) => (
     <button
-      type="button" onClick={onClick}
+      type="button"
+      onClick={onClick}
       className={`px-2 py-1 rounded-md text-12 font-semibold transition-colors ${
-        active ? 'bg-bg text-white' : 'text-bg/50 hover:bg-bg/8 hover:text-bg'
+        active ? "bg-bg text-white" : "text-bg/50 hover:bg-bg/8 hover:text-bg"
       }`}
     >
       {label}
@@ -35,40 +38,71 @@ function EditorToolbar({ editor }) {
   );
 
   const addLink = () => {
-    const url = window.prompt('URL del enlace:');
+    const url = window.prompt("URL del enlace:");
     if (url) editor.chain().focus().setLink({ href: url }).run();
   };
 
   return (
     <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-bg/10 bg-bg/4 rounded-t-lg">
-      {btn(editor.isActive('bold'),            () => editor.chain().focus().toggleBold().run(),           'Negrita')}
-      {btn(editor.isActive('italic'),          () => editor.chain().focus().toggleItalic().run(),         'Cursiva')}
+      {btn(
+        editor.isActive("bold"),
+        () => editor.chain().focus().toggleBold().run(),
+        "Negrita",
+      )}
+      {btn(
+        editor.isActive("italic"),
+        () => editor.chain().focus().toggleItalic().run(),
+        "Cursiva",
+      )}
       <div className="w-px h-4 bg-bg/10 mx-1" />
-      {btn(editor.isActive('heading', {level:2}), () => editor.chain().focus().toggleHeading({level:2}).run(), 'Título H2')}
-      {btn(editor.isActive('bulletList'),      () => editor.chain().focus().toggleBulletList().run(),     'Lista')}
-      {btn(editor.isActive('orderedList'),     () => editor.chain().focus().toggleOrderedList().run(),    'Numerada')}
+      {btn(
+        editor.isActive("heading", { level: 2 }),
+        () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+        "Título H2",
+      )}
+      {btn(
+        editor.isActive("bulletList"),
+        () => editor.chain().focus().toggleBulletList().run(),
+        "Lista",
+      )}
+      {btn(
+        editor.isActive("orderedList"),
+        () => editor.chain().focus().toggleOrderedList().run(),
+        "Numerada",
+      )}
       <div className="w-px h-4 bg-bg/10 mx-1" />
-      {btn(editor.isActive('link'),            addLink,                                                   'Enlace')}
-      {btn(false,                              () => editor.chain().focus().undo().run(),                  'Deshacer')}
-      {btn(false,                              () => editor.chain().focus().redo().run(),                  'Rehacer')}
+      {btn(editor.isActive("link"), addLink, "Enlace")}
+      {btn(false, () => editor.chain().focus().undo().run(), "Deshacer")}
+      {btn(false, () => editor.chain().focus().redo().run(), "Rehacer")}
       <div className="w-px h-4 bg-bg/10 mx-1" />
-      {btn(editor.isActive('blockquote'),      () => editor.chain().focus().toggleBlockquote().run(),     'Cita')}
+      {btn(
+        editor.isActive("blockquote"),
+        () => editor.chain().focus().toggleBlockquote().run(),
+        "Cita",
+      )}
     </div>
   );
 }
 
-const EMPTY = { title: '', slug: '', excerpt: '', cover_image: '', redirect_url: '', status: 'draft' };
+const EMPTY = {
+  title: "",
+  slug: "",
+  excerpt: "",
+  cover_image: "",
+  redirect_url: "",
+  status: "draft",
+};
 
 function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
-  const [form,      setForm]      = useState({ ...EMPTY, ...initial });
-  const [preview,   setPreview]   = useState(false);
+  const [form, setForm] = useState({ ...EMPTY, ...initial });
+  const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const set = (k) => (e) => {
     const val = e.target.value;
-    setForm(prev => {
+    setForm((prev) => {
       const next = { ...prev, [k]: val };
-      if (k === 'title' && !initial.ID) next.slug = slugify(val);
+      if (k === "title" && !initial.ID) next.slug = slugify(val);
       return next;
     });
   };
@@ -77,13 +111,19 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
     extensions: [
       StarterKit,
       Image.configure({ inline: false, allowBase64: true }),
-      Link.configure({ openOnClick: false, HTMLAttributes: { class: 'text-bg underline' } }),
-      Placeholder.configure({ placeholder: 'Escribe el contenido del post aquí…' }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: { class: "text-bg underline" },
+      }),
+      Placeholder.configure({
+        placeholder: "Escribe el contenido del post aquí…",
+      }),
     ],
-    content: initial.content || '',
+    content: initial.content || "",
     editorProps: {
       attributes: {
-        class: 'prose max-w-none min-h-[280px] px-4 py-3 focus:outline-none text-bg text-body-s leading-relaxed',
+        class:
+          "prose max-w-none min-h-[280px] px-4 py-3 focus:outline-none text-bg text-body-s leading-relaxed",
       },
     },
   });
@@ -91,7 +131,10 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) { toast.error('Solo se aceptan imágenes'); return; }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Solo se aceptan imágenes");
+      return;
+    }
     setUploading(true);
     try {
       // Comprime ANTES de validar el tamaño -- una foto real de celular
@@ -99,18 +142,26 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
       // darle chance a comprimirse primero. Tambien es la causa real de que
       // la subida se sintiera "lenta": sin esto se sube el archivo entero.
       const compressed = await compressImageIfNeeded(file);
-      if (compressed.size > 8 * 1024 * 1024) { toast.error('Imagen demasiado grande incluso comprimida (máx 8 MB)'); return; }
+      if (compressed.size > 8 * 1024 * 1024) {
+        toast.error("Imagen demasiado grande incluso comprimida (máx 8 MB)");
+        return;
+      }
       const fd = new FormData();
-      fd.append('file', compressed);
-      const res = await apiClient.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setForm(p => ({ ...p, cover_image: res.data.url }));
-      toast.success('Imagen subida');
-    } catch { toast.error('Error al subir'); }
-    finally { setUploading(false); }
+      fd.append("file", compressed);
+      const res = await apiClient.post("/upload", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setForm((p) => ({ ...p, cover_image: res.data.url }));
+      toast.success("Imagen subida");
+    } catch {
+      toast.error("Error al subir");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const insertContentImage = useCallback(() => {
-    const url = window.prompt('URL de la imagen:');
+    const url = window.prompt("URL de la imagen:");
     if (url) editor?.chain().focus().setImage({ src: url }).run();
   }, [editor]);
 
@@ -122,34 +173,74 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
   return (
     <div className="glass-light rounded-[24px] card-spring p-6 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-5">
-        <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">{initial.ID ? 'Editar post' : 'Nuevo post'}</p>
-        <button onClick={onCancel} className="text-20 leading-none text-bg/50 hover:text-bg transition-colors" aria-label="Cerrar">
+        <p className="text-label-l text-bg/45 font-semibold uppercase tracking-widest">
+          {initial.ID ? "Editar post" : "Nuevo post"}
+        </p>
+        <button
+          onClick={onCancel}
+          className="text-20 leading-none text-bg/50 hover:text-bg transition-colors"
+          aria-label="Cerrar"
+        >
           ×
         </button>
       </div>
 
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="Título *" value={form.title} onChange={set('title')} required />
-          <Input label="Slug" value={form.slug} onChange={set('slug')} helperText="url-del-post" required />
+          <Input
+            label="Título *"
+            value={form.title}
+            onChange={set("title")}
+            required
+          />
+          <Input
+            label="Slug"
+            value={form.slug}
+            onChange={set("slug")}
+            helperText="url-del-post"
+            required
+          />
         </div>
 
         <div>
-          <label className="block text-label-l text-bg/50 mb-1.5">Imagen de portada</label>
+          <label className="block text-label-l text-bg/50 mb-1.5">
+            Imagen de portada
+          </label>
           <div className="flex gap-2">
             <div className="flex-1 min-w-0">
-              <Input type="text" placeholder="https://..." value={form.cover_image} onChange={set('cover_image')} />
+              <Input
+                type="text"
+                placeholder="https://..."
+                value={form.cover_image}
+                onChange={set("cover_image")}
+              />
             </div>
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? 'opacity-50' : 'hover:border-acento/40 hover:text-bg'} text-bg/50`}>
-              {uploading ? 'Subiendo…' : 'Subir'}
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+            <label
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-bg/10 text-label-m font-medium cursor-pointer transition-colors ${uploading ? "opacity-50" : "hover:border-acento/40 hover:text-bg"} text-bg/50`}
+            >
+              {uploading ? "Subiendo…" : "Subir"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+                disabled={uploading}
+              />
             </label>
           </div>
           {form.cover_image && (
             <div className="mt-2 relative">
-              <img src={form.cover_image} alt="Portada" className="w-full max-h-40 object-cover rounded-lg border border-bg/10" />
-              <button type="button" onClick={() => setForm(p => ({ ...p, cover_image: '' }))}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center text-14 leading-none hover:bg-black/70" aria-label="Quitar imagen">
+              <img
+                src={form.cover_image}
+                alt="Portada"
+                className="w-full max-h-40 object-cover rounded-lg border border-bg/10"
+              />
+              <button
+                type="button"
+                onClick={() => setForm((p) => ({ ...p, cover_image: "" }))}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-bg/40 text-ink flex items-center justify-center text-14 leading-none hover:bg-black/70"
+                aria-label="Quitar imagen"
+              >
                 ×
               </button>
             </div>
@@ -157,33 +248,71 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         </div>
 
         <div>
-          <Input type="url" label={<>Enlace a red social <span className="font-normal text-bg/40">(opcional — redirige al hacer clic)</span></>}
-            placeholder="https://facebook.com/..." value={form.redirect_url} onChange={set('redirect_url')} />
+          <Input
+            type="url"
+            label={
+              <>
+                Enlace a red social{" "}
+                <span className="font-normal text-bg/40">
+                  (opcional — redirige al hacer clic)
+                </span>
+              </>
+            }
+            placeholder="https://facebook.com/..."
+            value={form.redirect_url}
+            onChange={set("redirect_url")}
+          />
         </div>
 
         <div>
-          <Textarea rows={2} label={<>Extracto <span className="font-normal">(resumen visible en la lista)</span></>}
-            value={form.excerpt} onChange={set('excerpt')}
-            placeholder="Breve descripción del post…" />
+          <Textarea
+            rows={2}
+            label={
+              <>
+                Extracto{" "}
+                <span className="font-normal">
+                  (resumen visible en la lista)
+                </span>
+              </>
+            }
+            value={form.excerpt}
+            onChange={set("excerpt")}
+            placeholder="Breve descripción del post…"
+          />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-label-l text-bg/50">Contenido <span className="font-normal text-bg/40">(opcional si hay enlace)</span></label>
+            <label className="text-label-l text-bg/50">
+              Contenido{" "}
+              <span className="font-normal text-bg/40">
+                (opcional si hay enlace)
+              </span>
+            </label>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={insertContentImage}
-                className="text-label-s text-bg/50 hover:text-bg transition-colors">
+              <button
+                type="button"
+                onClick={insertContentImage}
+                className="text-label-s text-bg/50 hover:text-bg transition-colors"
+              >
                 Insertar imagen
               </button>
-              <button type="button" onClick={() => setPreview(p => !p)}
-                className="text-label-s text-bg/50 hover:text-bg transition-colors">
-                {preview ? 'Editor' : 'Preview'}
+              <button
+                type="button"
+                onClick={() => setPreview((p) => !p)}
+                className="text-label-s text-bg/50 hover:text-bg transition-colors"
+              >
+                {preview ? "Editor" : "Preview"}
               </button>
             </div>
           </div>
           {preview ? (
-            <div className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-bg/10 bg-bg/4 text-body-s leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editor?.getHTML() || '') }} />
+            <div
+              className="prose max-w-none min-h-[200px] px-4 py-3 rounded-lg border border-bg/10 bg-bg/4 text-body-s leading-relaxed"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(editor?.getHTML() || ""),
+              }}
+            />
           ) : (
             <div className="rounded-lg border border-bg/10 overflow-hidden focus-within:border-acento focus-within:ring-2 focus-within:ring-acento/15 transition-all">
               <EditorToolbar editor={editor} />
@@ -193,15 +322,28 @@ function PostForm({ initial = EMPTY, onSave, onCancel, loading }) {
         </div>
 
         <label className="flex items-center gap-2 text-body-s text-bg cursor-pointer select-none">
-          <input type="checkbox" checked={form.status === 'published'}
-            onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'published' : 'draft' }))}
-            className="rounded border-bg/10 accent-acento w-4 h-4" />
+          <input
+            type="checkbox"
+            checked={form.status === "published"}
+            onChange={(e) =>
+              setForm((p) => ({
+                ...p,
+                status: e.target.checked ? "published" : "draft",
+              }))
+            }
+            className="rounded border-bg/10 accent-acento w-4 h-4"
+          />
           Publicar inmediatamente
         </label>
 
         <div className="flex gap-2 pt-1 border-t border-bg/10">
-          <Button size="sm" variant="filled" onClick={handleSave} disabled={loading}>
-            {loading ? 'Guardando…' : 'Guardar'}
+          <Button
+            size="sm"
+            variant="filled"
+            onClick={handleSave}
+            disabled={loading}
+          >
+            {loading ? "Guardando…" : "Guardar"}
           </Button>
           <Button size="sm" variant="text" onClick={onCancel}>
             Cancelar
@@ -219,55 +361,75 @@ const Spinner = () => (
 );
 
 export default function AdminBlog() {
-  const [posts,    setPosts]    = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [editing,  setEditing]  = useState(null);
+  const [editing, setEditing] = useState(null);
 
-  const load = () =>
-    apiClient.get('/admin/blog/')
-      .then(r => setPosts(r.data?.data || r.data || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+  const load = useCallback(
+    () =>
+      apiClient
+        .get(`/admin/blog/?page=${page}`)
+        .then((r) => {
+          setPosts(r.data?.data || r.data || []);
+          setMeta(r.data?.meta || null);
+          if (r.data?.meta?.pages && page > r.data.meta.pages)
+            setPage(r.data.meta.pages);
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false)),
+    [page],
+  );
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleSave = async (form) => {
     setSaving(true);
     try {
       if (editing) {
         await apiClient.put(`/admin/blog/${editing.ID}`, form);
-        toast.success('Post actualizado');
+        toast.success("Post actualizado");
       } else {
-        await apiClient.post('/admin/blog/', form);
-        toast.success('Post creado');
+        await apiClient.post("/admin/blog/", form);
+        toast.success("Post creado");
       }
       setShowForm(false);
       setEditing(null);
-      load();
+      if (page !== 1 && !editing) setPage(1);
+      else load();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Error al guardar');
+      toast.error(err.response?.data?.error || "Error al guardar");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este post permanentemente?')) return;
+    if (!confirm("¿Eliminar este post permanentemente?")) return;
     try {
       await apiClient.delete(`/admin/blog/${id}`);
-      toast.success('Post eliminado');
-      setPosts(prev => prev.filter(p => p.ID !== id));
-    } catch { toast.error('Error al eliminar'); }
+      toast.success("Post eliminado");
+      load();
+    } catch {
+      toast.error("Error al eliminar");
+    }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div>
-          <h1 className="text-headline-s text-bg font-black leading-tight">Blog</h1>
-          <p className="text-body-s text-bg/50 mt-0.5">{posts.length} publicaciones</p>
+          <h1 className="text-headline-s text-bg font-black leading-tight">
+            Blog
+          </h1>
+          <p className="text-body-s text-bg/50 mt-0.5">
+            {meta?.total || 0} publicaciones
+          </p>
         </div>
         {!showForm && !editing && (
           <Button variant="filled" onClick={() => setShowForm(true)}>
@@ -277,72 +439,102 @@ export default function AdminBlog() {
       </div>
 
       {showForm && !editing && (
-        <PostForm onSave={handleSave} onCancel={() => setShowForm(false)} loading={saving} />
+        <PostForm
+          onSave={handleSave}
+          onCancel={() => setShowForm(false)}
+          loading={saving}
+        />
       )}
 
-      {loading ? <Spinner /> : (
+      {loading ? (
+        <Spinner />
+      ) : (
         <div className="glass-light rounded-[24px] card-spring overflow-hidden">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center py-20 gap-4 text-bg/50">
               <div className="text-center">
                 <p className="text-body-l text-bg font-medium">Sin posts</p>
-                <p className="text-body-s text-bg/50 mt-1">Crea el primero con el botón de arriba.</p>
+                <p className="text-body-s text-bg/50 mt-1">
+                  Crea el primero con el botón de arriba.
+                </p>
               </div>
             </div>
-          ) : posts.map(post => (
-            <div key={post.ID} className="divide-y divide-bg/8">
-              {editing?.ID === post.ID ? (
-                <div className="p-5">
-                  <PostForm initial={{ ...post }} onSave={handleSave}
-                    onCancel={() => setEditing(null)} loading={saving} />
-                </div>
-              ) : (
-                <div className="flex items-center gap-4 px-5 py-4 border-b border-bg/10 last:border-0 hover:bg-bg/8 transition-colors group">
-                  {post.cover_image ? (
-                    <img src={post.cover_image} alt="" className="w-12 h-10 rounded-lg object-cover shrink-0 border border-bg/10" />
-                  ) : (
-                    <div className="w-12 h-10 rounded-lg bg-bg/8 border border-bg/10 shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-body-m text-bg font-medium truncate">{post.title}</p>
-                    <p className="text-label-s text-bg/50 mt-0.5 truncate font-mono">{post.slug}</p>
+          ) : (
+            posts.map((post) => (
+              <div key={post.ID} className="divide-y divide-bg/8">
+                {editing?.ID === post.ID ? (
+                  <div className="p-5">
+                    <PostForm
+                      initial={{ ...post }}
+                      onSave={handleSave}
+                      onCancel={() => setEditing(null)}
+                      loading={saving}
+                    />
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-label-s text-bg/50 hidden sm:block">{post.view_count ?? 0} vistas</span>
-                    <span className={`inline-flex items-center h-7 px-3 rounded-lg text-label-m font-medium ${
-                      post.status === 'published'
-                        ? 'bg-emerald text-white'
-                        : 'bg-bg/8 text-bg/50'
-                    }`}>
-                      {post.status === 'published' ? 'Publicado' : 'Borrador'}
-                    </span>
-                    {post.redirect_url && (
-                      <span className="inline-flex items-center h-7 px-3 rounded-lg bg-bg text-white text-label-m font-medium">
-                        Externo
-                      </span>
+                ) : (
+                  <div className="flex items-center gap-4 px-5 py-4 border-b border-bg/10 last:border-0 hover:bg-bg/8 transition-colors group">
+                    {post.cover_image ? (
+                      <img
+                        src={post.cover_image}
+                        alt=""
+                        className="w-12 h-10 rounded-lg object-cover shrink-0 border border-bg/10"
+                      />
+                    ) : (
+                      <div className="w-12 h-10 rounded-lg bg-bg/8 border border-bg/10 shrink-0" />
                     )}
-                    <div className="flex items-center gap-3 text-13 font-semibold opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => { setEditing(post); setShowForm(false); }}
-                        className="text-bg/55 hover:text-bg transition-colors"
+                    <div className="flex-1 min-w-0">
+                      <p className="text-body-m text-bg font-medium truncate">
+                        {post.title}
+                      </p>
+                      <p className="text-label-s text-bg/50 mt-0.5 truncate font-mono">
+                        {post.slug}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-label-s text-bg/50 hidden sm:block">
+                        {post.view_count ?? 0} vistas
+                      </span>
+                      <span
+                        className={`inline-flex items-center h-7 px-3 rounded-lg text-label-m font-medium ${
+                          post.status === "published"
+                            ? "bg-emerald text-white"
+                            : "bg-bg/8 text-bg/50"
+                        }`}
                       >
-                        Editar
-                      </button>
-                      <span className="text-bg/20">·</span>
-                      <button
-                        onClick={() => handleDelete(post.ID)}
-                        className="text-bg/55 hover:text-rose transition-colors"
-                      >
-                        Eliminar
-                      </button>
+                        {post.status === "published" ? "Publicado" : "Borrador"}
+                      </span>
+                      {post.redirect_url && (
+                        <span className="inline-flex items-center h-7 px-3 rounded-lg bg-bg text-white text-label-m font-medium">
+                          Externo
+                        </span>
+                      )}
+                      <div className="flex items-center gap-3 text-13 font-semibold opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => {
+                            setEditing(post);
+                            setShowForm(false);
+                          }}
+                          className="text-bg/55 hover:text-bg transition-colors"
+                        >
+                          Editar
+                        </button>
+                        <span className="text-bg/20">·</span>
+                        <button
+                          onClick={() => handleDelete(post.ID)}
+                          className="text-bg/55 hover:text-rose transition-colors"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))
+          )}
         </div>
       )}
+      {!loading && <Paginator meta={meta} onPage={setPage} />}
     </div>
   );
 }

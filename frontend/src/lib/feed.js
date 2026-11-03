@@ -7,6 +7,7 @@
 // ============================================================
 import { useState, useEffect } from 'react';
 import apiClient from './apiClient';
+import { useAuth } from '../context/AuthContext';
 
 // BUG REAL reportado por el usuario: bank_account se veía desactualizado
 // en /donate justo después de guardarlo en Admin > Configuración, aunque
@@ -20,11 +21,17 @@ import apiClient from './apiClient';
 // sin perder el dedupe de llamadas simultáneas al montar varias secciones.
 const CACHE_TTL_MS = 20000;
 const cache = new Map(); // path -> { promise, timestamp }
+let cacheSession;
 
 export function invalidateResource(path) { cache.delete(path); }
 
 /** GET cacheado ~20s — comparte la promesa entre secciones que montan a la vez */
 export function fetchOnce(path) {
+  const session = localStorage.getItem('token');
+  if (session !== cacheSession) {
+    cache.clear();
+    cacheSession = session;
+  }
   const now = Date.now();
   const entry = cache.get(path);
   if (!entry || now - entry.timestamp > CACHE_TTL_MS) {
@@ -35,13 +42,14 @@ export function fetchOnce(path) {
 
 /** Hook: data del endpoint (null mientras carga o si la API falla) */
 export function useApi(path) {
-  const [data, setData] = useState(null);
+  const { token } = useAuth();
+  const [state, setState] = useState(null);
   useEffect(() => {
     let on = true;
-    fetchOnce(path).then(d => { if (on) setData(d); });
+    fetchOnce(path).then(data => { if (on) setState({ token, data, path }); });
     return () => { on = false; };
-  }, [path]);
-  return data;
+  }, [path, token]);
+  return state?.token === token && state.path === path ? state.data : null;
 }
 
 /** Agrupa fotos de galería por álbum (convención "Álbum - Foto") */
@@ -66,16 +74,18 @@ export function useSitePhoto(key, fallback) {
 
 /** Resource state for public collections: empty and failed are distinct. */
 export function useApiResource(path) {
+  const { token } = useAuth();
   const [state, setState] = useState({ data: null, loading: true, error: false });
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let active = true;
     setState({ data: null, loading: true, error: false });
     fetchOnce(path).then(data => {
-      if (active) setState({ data, loading: false, error: data === null });
+      if (active) setState({ data, loading: false, error: data === null, token, path });
     });
     return () => { active = false; };
-  }, [path, attempt]);
+  }, [path, attempt, token]);
   const retry = () => { cache.delete(path); setAttempt(value => value + 1); };
-  return { ...state, retry };
+  const current = state.token === token && state.path === path;
+  return { ...(current ? state : { data: null, loading: true, error: false }), retry };
 }
