@@ -8,6 +8,10 @@ El acabado final mantiene una apertura de Inicio con una sola acción principal,
 
 Conéctate es una sola ficha clara sobre la fotografía administrada `hero_conectate`, sin un hero separado, bloque promocional, pasos ilustrados ni tarjetas de clasificación. Nombre, teléfono y motivo se completan directamente; correo y procedencia quedan en un desplegable opcional. Conservar el envío a solicitudes, sus valores de categoría, errores con borrador y seguimiento del equipo.
 
+Oración comparte esa composición con su foto `hero_oracion`: una ficha blanca, nombre, asunto y petición; correo y categoría en datos opcionales. Una sola explicación de privacidad, sin etiquetas promocionales ni segunda portada. Conservar validación, borrador al fallar, confirmación y lectura de la petición por los roles autorizados.
+
+El Blog abre sobre la fotografía del mensaje elegido. La cabecera «Blog» es discreta y el filtro deriva de categorías publicadas; el título del mensaje tiene la mayor jerarquía. En la lectura, la portada completa vive dentro del artículo y también como fondo. Conservar la ruta compartible, el contenido sanitizado, los enlaces administrados y la lectura en voz alta. Sólo mostrar fecha y categoría cuando existan. El audio se detiene al salir; una respuesta tardía no debe reproducirse después de cerrar la lectura.
+
 - Inicio es la referencia para las páginas principales: fotografía real administrada, tipografía Arimo, fondo navy y cristal blanco/oscuro.
 - Composición objetivo: la fotografía vive en el fondo navy de la sección y el contenido en tarjetas de vidrio superpuestas. Las fichas de vista previa permanecen sobre el fondo. Al abrir un panel, desplegable o galería, sí mostrar fotos dentro: amplias y nítidas, junto a los detalles, conservando también el fondo visible. Siempre mantener una fotografía real en el fondo de la sección. Priorizar tomas amplias, grupos, congregación e infraestructura; evitar primeros planos o composiciones dominadas por un solo rostro. Mientras no haya fotos subidas, elegir respaldos reales del repositorio con ese criterio. Depurar los módulos existentes uno por uno, conservando contenido, fuentes y edición del administrador.
 - Cero emojis y cero iconos decorativos, incluidos los de carga. El único símbolo de marca es el logo existente de la iglesia. Los controles llevan texto.
@@ -31,6 +35,8 @@ Conéctate es una sola ficha clara sobre la fotografía administrada `hero_conec
 | Navegación | Cristal claro, radio de 16 px y mismo tono existente; más cobertura al desplazarse para mantener legibilidad |
 
 No convertir el cristal oscuro en una caja opaca ni modificar el blanco para simular una nueva estética. La preferencia del sistema para reducir transparencia tiene su propio fallback accesible. Reducir movimiento no obliga a cambiar la transparencia.
+
+En formularios breves y mensajes editoriales, usar títulos contenidos de 30–44 px, peso 600 y un interlineado menos comprimido (alrededor de 1.12). Mantener Arimo local y los materiales actuales; la identidad también depende de la composición, la fotografía y el ritmo de lectura. No forzar un titular de portada grande en cada módulo.
 
 La fotografía guía el material: blanco escarchado sobre fondos predominantemente azules; transparente sobre fotos muy oscuras o de otros colores. Es un criterio visual, sujeto a luminosidad, textura y contraste real del texto; no una regla automática basada sólo en el color. La transparencia por sí sola no produce el efecto plástico: evitar brillo continuo, exceso de relieve y curvas exageradas. La primera captura aportada por el usuario el 27 de octubre (formulario de Oración sobre la página de Voluntariado) es la referencia de panel continuo; no copiar el banner y el recuadro anidado de la segunda.
 

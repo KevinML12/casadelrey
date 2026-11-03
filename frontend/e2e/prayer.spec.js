@@ -31,10 +31,11 @@ test.describe('Peticiones de oración — flujo completo (público → admin)', 
     //     detrás de ProtectedRoute por error)
     await page.goto('/prayer');
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: 'Clama y Él responde.', exact: true })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: 'Oración', exact: true })).toBeVisible({ timeout: 15_000 });
 
     // 2 · Enviar la petición como visitante anónimo
     await page.getByLabel(/nombre \*/i).fill('Visitante E2E');
+    await page.getByText('Datos opcionales', { exact: true }).click();
     await page.getByLabel(/correo/i).fill(`e2e.prayer.${stamp}@example.invalid`);
     await page.getByLabel(/asunto \*/i).fill(subject);
     await page.getByLabel(/petición \*/i).fill('Petición creada automáticamente por la suite E2E. Puede ignorarse.');
@@ -47,7 +48,7 @@ test.describe('Peticiones de oración — flujo completo (público → admin)', 
     const { id: petitionId } = await resp.json();
     expect(petitionId, 'el backend debe devolver el id de la petición').toBeTruthy();
 
-    await expect(page.getByText('¡Recibida con amor!')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('Petición recibida.', { exact: true })).toBeVisible({ timeout: 15_000 });
 
     // 3 · La petición aparece en el panel admin
     await loginAsAdmin(page);

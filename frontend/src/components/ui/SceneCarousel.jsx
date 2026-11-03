@@ -9,7 +9,7 @@ const FALLBACK = '/images/backgrounds/congregacion.webp';
 
 // One stationary glass surface over the current admin-owned photograph.
 // Identity (rather than position) survives insertions, filtering and reordering.
-export default function SceneCarousel({ items, label, onOpen, renderContent, empty = 'Sin contenido publicado aún.', initialKey, className = '', photoPreview = Boolean(onOpen), panelClassName = 'h-[310px]' }) {
+export default function SceneCarousel({ items, label, onOpen, renderContent, empty = 'Sin contenido publicado aún.', initialKey, className = '', photoPreview = Boolean(onOpen), panelClassName = 'h-[310px]', header, fallbackImage = FALLBACK, previewPanelClassName = 'h-[264px]' }) {
   const navigationRef = useRef(null);
   const [selected, setSelected] = useState(initialKey);
   const [shown, setShown] = useState(initialKey);
@@ -20,15 +20,16 @@ export default function SceneCarousel({ items, label, onOpen, renderContent, emp
   const current = items[currentIndex];
   const go = direction => setSelected(items[(requestedIndex + direction + items.length) % items.length].key);
 
-  return <section className={`relative isolate overflow-clip ${photoPreview ? 'pt-56 pb-10 md:pt-64 md:pb-12' : 'py-16 md:py-20'} ${className}`} aria-label={label}>
-    <SectionBg sceneKey={requested?.key} src={requested?.image || FALLBACK} fallbackSrc={FALLBACK} opacity={photoPreview ? "opacity-100" : "opacity-70"} scrimClassName={photoPreview ? "bg-gradient-to-t from-bg/90 via-bg/25 to-bg/5" : "bg-bg/60"} animate onReady={() => setShown(requested?.key)} />
-    <div className="relative z-10 max-w-4xl mx-auto px-6">
+  return <section className={`relative isolate overflow-clip ${header ? 'min-h-[100svh] flex flex-col pt-32 pb-10 sm:pt-36 sm:pb-12' : photoPreview ? 'pt-56 pb-10 md:pt-64 md:pb-12' : 'py-16 md:py-20'} ${className}`} aria-label={label}>
+    <SectionBg sceneKey={requested?.key} src={requested?.image || fallbackImage} fallbackSrc={fallbackImage} opacity={photoPreview ? "opacity-100" : "opacity-70"} scrimClassName={header ? "bg-gradient-to-b from-bg/70 via-bg/5 to-bg/90" : photoPreview ? "bg-gradient-to-t from-bg/90 via-bg/25 to-bg/5" : "bg-bg/60"} animate onReady={() => setShown(requested?.key)} />
+    {header && <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-8">{header}</div>}
+    <div className={`relative z-10 mx-auto w-full px-6 ${header ? 'max-w-6xl md:px-8 mt-auto pt-24 sm:pt-36' : 'max-w-4xl'}`}>
       {!current ? <p className="py-12 text-20 text-white/75">{empty}</p> : <div role="region" aria-roledescription="carrusel" aria-label={label} className="max-w-xl" onKeyDown={event => {
         if (event.target.closest('input, select, textarea, [role="tablist"], a[href], [contenteditable="true"]') || event.defaultPrevented) return;
         if (items.length > 1 && event.key === 'ArrowRight') { event.preventDefault(); navigationRef.current?.focus(); go(1); }
         if (items.length > 1 && event.key === 'ArrowLeft') { event.preventDefault(); navigationRef.current?.focus(); go(-1); }
       }}>
-        <GlassCard as={onOpen ? 'button' : 'div'} {...(onOpen ? { type: 'button', onClick: () => onOpen(current.key), 'aria-haspopup': 'dialog' } : {})} glass data-lenis-prevent style={photoPreview ? { '--glass-dark-blur': 'blur(5px) saturate(115%)' } : undefined} className={`liquid-glass block w-full ${photoPreview ? 'h-[264px] p-5 sm:p-6' : `${panelClassName} p-7 sm:p-9`} overflow-y-auto [overflow-wrap:anywhere] rounded-[16px] text-left text-white focus-ring`}>
+        <GlassCard as={onOpen ? 'button' : 'div'} {...(onOpen ? { type: 'button', onClick: () => onOpen(current.key), 'aria-haspopup': 'dialog' } : {})} glass data-lenis-prevent style={photoPreview ? { '--glass-dark-blur': 'blur(5px) saturate(115%)' } : undefined} className={`liquid-glass block w-full ${photoPreview ? `${previewPanelClassName} p-5 sm:p-6` : `${panelClassName} p-7 sm:p-9`} overflow-y-auto [overflow-wrap:anywhere] rounded-[16px] text-left text-white focus-ring`}>
           <motion.div key={current.key} initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : DUR.base, ease: EASE_OUT }}>
             {renderContent ? renderContent(current) : <>
               <h2 className={photoPreview ? "text-24 sm:text-28 font-bold tracking-tight line-clamp-2" : "text-28 sm:text-32 font-bold tracking-tight"}>{current.title}</h2>
