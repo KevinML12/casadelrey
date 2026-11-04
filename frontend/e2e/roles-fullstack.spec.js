@@ -382,7 +382,25 @@ for (const catalog of catalogs)
     );
     await row.getByRole("button", { name: "Eliminar", exact: true }).click();
     expect((await deletion).ok()).toBe(true);
-    await expect(page.getByText(updated, { exact: true })).toHaveCount(0);
+    if (catalog.route === "donation-purposes") {
+      // Destinations are deactivated to preserve the financial history. Wait
+      // for the refreshed row, rather than accidentally passing on the loader.
+      await expect(
+        catalogRow(page, updated).getByRole("button", {
+          name: "Mostrar",
+          exact: true,
+        }),
+      ).toBeVisible();
+      const retained = await (
+        await page.request.get(API + catalog.api, { headers: await headers(page) })
+      ).json();
+      expect(retained.find((item) => item.ID === id)).toMatchObject({
+        title: updated,
+        is_active: false,
+      });
+    } else {
+      await expect(page.getByText(updated, { exact: true })).toHaveCount(0);
+    }
     expect(
       await (await page.request.get(API + catalog.feed)).text(),
     ).not.toContain(updated);
