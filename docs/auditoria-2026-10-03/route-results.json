@@ -1,0 +1,1928 @@
+[
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/",
+    "url": "http://127.0.0.1:5173/",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "CASADEL REY"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nIglesi",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/about",
+    "url": "http://127.0.0.1:5173/about",
+    "errors": [],
+    "title": "Nosotros · Casa del Rey",
+    "h1": [
+      "Somos Casa del Rey."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nSomos ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/celulas",
+    "url": "http://127.0.0.1:5173/celulas",
+    "errors": [],
+    "title": "Células · Casa del Rey",
+    "h1": [
+      "Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nCélula",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/volunteering",
+    "url": "http://127.0.0.1:5173/volunteering",
+    "errors": [],
+    "title": "Voluntariado · Casa del Rey",
+    "h1": [
+      "Voluntariado"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nVolunt",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/events",
+    "url": "http://127.0.0.1:5173/events",
+    "errors": [],
+    "title": "Eventos · Casa del Rey",
+    "h1": [
+      "Eventos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nEvento",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/blog",
+    "url": "http://127.0.0.1:5173/blog",
+    "errors": [],
+    "title": "Blog · Casa del Rey",
+    "h1": [
+      "Blog"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nBlog\n\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/gallery",
+    "url": "http://127.0.0.1:5173/gallery",
+    "errors": [],
+    "title": "Galería · Casa del Rey",
+    "h1": [
+      "Galería"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nGalerí",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/conectate",
+    "url": "http://127.0.0.1:5173/conectate",
+    "errors": [],
+    "title": "Conéctate · Casa del Rey",
+    "h1": [
+      "Conéctate"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nConéct",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/prayer",
+    "url": "http://127.0.0.1:5173/prayer",
+    "errors": [],
+    "title": "Oración · Casa del Rey",
+    "h1": [
+      "Clama y Él responde."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nClama ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/donate",
+    "url": "http://127.0.0.1:5173/donate",
+    "errors": [],
+    "title": "Dar · Casa del Rey",
+    "h1": [
+      "Tu generosidad transforma."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nTu gen",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": "Otro monto (mínimo Q10)"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/comprobante",
+    "url": "http://127.0.0.1:5173/comprobante",
+    "errors": [],
+    "title": "Comprobante · Casa del Rey",
+    "h1": [
+      "Sube tu depósito."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nSube t",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/login",
+    "url": "http://127.0.0.1:5173/login",
+    "errors": [],
+    "title": "Iniciar sesión · Casa del Rey",
+    "h1": [
+      "Bienvenido de vuelta."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nBienve",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/register",
+    "url": "http://127.0.0.1:5173/register",
+    "errors": [],
+    "title": "Crear cuenta · Casa del Rey",
+    "h1": [
+      "Obtener una cuenta."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nObtene",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/forgot-password",
+    "url": "http://127.0.0.1:5173/forgot-password",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Recuperar contraseña"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nVolver",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/reset-password/audit-token",
+    "url": "http://127.0.0.1:5173/reset-password/audit-token",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Nueva contraseña"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nNueva ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/verify-email",
+    "url": "http://127.0.0.1:5173/verify-email",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Error de verificación"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nError ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/payment-success",
+    "url": "http://127.0.0.1:5173/payment-success",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "¡Donación registrada!"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\n¡Donac",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/404-audit",
+    "url": "http://127.0.0.1:5173/404-audit",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Página no encontrada"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\n\n404\n\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "anonymous",
+    "path": "/profile",
+    "url": "http://127.0.0.1:5173/login",
+    "errors": [],
+    "title": "Iniciar sesión · Casa del Rey",
+    "h1": [
+      "Bienvenido de vuelta."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nBienve",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin",
+    "url": "http://127.0.0.1:5173/admin",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Buenos días, Auditor"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 1
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/users",
+    "url": "http://127.0.0.1:5173/admin/users",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Usuarios"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Buscar por nombre o correo…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/blog",
+    "url": "http://127.0.0.1:5173/admin/blog",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Blog"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/events",
+    "url": "http://127.0.0.1:5173/admin/events",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Eventos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/petitions",
+    "url": "http://127.0.0.1:5173/admin/petitions",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Peticiones"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/volunteers",
+    "url": "http://127.0.0.1:5173/admin/volunteers",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Voluntarios"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/cell-reports",
+    "url": "http://127.0.0.1:5173/admin/cell-reports",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Reportes de Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/boletas",
+    "url": "http://127.0.0.1:5173/admin/boletas",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Boletas de Nuevos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/social",
+    "url": "http://127.0.0.1:5173/admin/social",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Galería desde redes"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/announcements",
+    "url": "http://127.0.0.1:5173/admin/announcements",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Anuncios"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/gallery",
+    "url": "http://127.0.0.1:5173/admin/gallery",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Galería"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/faqs",
+    "url": "http://127.0.0.1:5173/admin/faqs",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Preguntas Frecuentes (FAQs)"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/leaders",
+    "url": "http://127.0.0.1:5173/admin/leaders",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Directorio de líderes"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/cells",
+    "url": "http://127.0.0.1:5173/admin/cells",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/cell-categories",
+    "url": "http://127.0.0.1:5173/admin/cell-categories",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Categorías de células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/volunteer-areas",
+    "url": "http://127.0.0.1:5173/admin/volunteer-areas",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Voluntariado — Departamentos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/donation-purposes",
+    "url": "http://127.0.0.1:5173/admin/donation-purposes",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Donaciones — Destinos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/activity-log",
+    "url": "http://127.0.0.1:5173/admin/activity-log",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Historial de Actividad"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/receipts",
+    "url": "http://127.0.0.1:5173/admin/receipts",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Comprobantes"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/donations",
+    "url": "http://127.0.0.1:5173/admin/donations",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Donaciones"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Buscar por nombre o correo…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/hero",
+    "url": "http://127.0.0.1:5173/admin/hero",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Hero del sitio"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/site-photos",
+    "url": "http://127.0.0.1:5173/admin/site-photos",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Fotos del sitio"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/settings",
+    "url": "http://127.0.0.1:5173/admin/settings",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Configuración"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/connect-cards",
+    "url": "http://127.0.0.1:5173/admin/connect-cards",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Conéctate"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "admin",
+    "path": "/admin/profile",
+    "url": "http://127.0.0.1:5173/admin/profile",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mi Perfil"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL ADMIN\n\nDashboard\n\nSITIO WEB\n\nHero\nFotos del sitio\nConfiguración\n\nCONTENIDO\n\nBlog",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Nueva meta…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader",
+    "url": "http://127.0.0.1:5173/leader",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mis Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/reports",
+    "url": "http://127.0.0.1:5173/leader/reports",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Reportes de Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/boletas",
+    "url": "http://127.0.0.1:5173/leader/boletas",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Boletas de Nuevos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/volunteers",
+    "url": "http://127.0.0.1:5173/leader/volunteers",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Voluntarios asignados"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/cell-directory",
+    "url": "http://127.0.0.1:5173/leader/cell-directory",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Directorio de Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/connect-cards",
+    "url": "http://127.0.0.1:5173/leader/connect-cards",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Conéctate"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/events",
+    "url": "http://127.0.0.1:5173/leader/events",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Eventos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/my-directory",
+    "url": "http://127.0.0.1:5173/leader/my-directory",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/my-cell",
+    "url": "http://127.0.0.1:5173/leader/my-cell",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mi célula"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "leader",
+    "path": "/leader/profile",
+    "url": "http://127.0.0.1:5173/leader/profile",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mi Perfil"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nPANEL LÍDER\n\nInicio\nConéctate\nCélulas\nNuevos\nVoluntarios\nDirectorio\nEventos\nMi célula\n",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Nueva meta…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "desktop",
+    "role": "volunteer",
+    "path": "/volunteer/dashboard",
+    "url": "http://127.0.0.1:5173/volunteer/dashboard",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Auditor local"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\n\nVOLUNTARIO\n\nAuditor local\n\naudit@example.invalid\n\nA\nSalir\n\nBienvenido,\n\nAuditor local\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/",
+    "url": "http://127.0.0.1:5173/",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "CASADEL REY"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nI",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/about",
+    "url": "http://127.0.0.1:5173/about",
+    "errors": [],
+    "title": "Nosotros · Casa del Rey",
+    "h1": [
+      "Somos Casa del Rey."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nS",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/celulas",
+    "url": "http://127.0.0.1:5173/celulas",
+    "errors": [],
+    "title": "Células · Casa del Rey",
+    "h1": [
+      "Células"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nC",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/volunteering",
+    "url": "http://127.0.0.1:5173/volunteering",
+    "errors": [],
+    "title": "Voluntariado · Casa del Rey",
+    "h1": [
+      "Voluntariado"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nV",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/events",
+    "url": "http://127.0.0.1:5173/events",
+    "errors": [],
+    "title": "Eventos · Casa del Rey",
+    "h1": [
+      "Eventos"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nE",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/blog",
+    "url": "http://127.0.0.1:5173/blog",
+    "errors": [],
+    "title": "Blog · Casa del Rey",
+    "h1": [
+      "Blog"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nB",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/gallery",
+    "url": "http://127.0.0.1:5173/gallery",
+    "errors": [],
+    "title": "Galería · Casa del Rey",
+    "h1": [
+      "Galería"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nG",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/conectate",
+    "url": "http://127.0.0.1:5173/conectate",
+    "errors": [],
+    "title": "Conéctate · Casa del Rey",
+    "h1": [
+      "Conéctate"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nC",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/prayer",
+    "url": "http://127.0.0.1:5173/prayer",
+    "errors": [],
+    "title": "Oración · Casa del Rey",
+    "h1": [
+      "Clama y Él responde."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nC",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/donate",
+    "url": "http://127.0.0.1:5173/donate",
+    "errors": [],
+    "title": "Dar · Casa del Rey",
+    "h1": [
+      "Tu generosidad transforma."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nT",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": "Otro monto (mínimo Q10)"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/comprobante",
+    "url": "http://127.0.0.1:5173/comprobante",
+    "errors": [],
+    "title": "Comprobante · Casa del Rey",
+    "h1": [
+      "Sube tu depósito."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nS",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/login",
+    "url": "http://127.0.0.1:5173/login",
+    "errors": [],
+    "title": "Iniciar sesión · Casa del Rey",
+    "h1": [
+      "Bienvenido de vuelta."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nB",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/register",
+    "url": "http://127.0.0.1:5173/register",
+    "errors": [],
+    "title": "Crear cuenta · Casa del Rey",
+    "h1": [
+      "Obtener una cuenta."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nO",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/forgot-password",
+    "url": "http://127.0.0.1:5173/forgot-password",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Recuperar contraseña"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nV",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/reset-password/audit-token",
+    "url": "http://127.0.0.1:5173/reset-password/audit-token",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Nueva contraseña"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nN",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/verify-email",
+    "url": "http://127.0.0.1:5173/verify-email",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Error de verificación"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nE",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/payment-success",
+    "url": "http://127.0.0.1:5173/payment-success",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "¡Donación registrada!"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\n¡",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/404-audit",
+    "url": "http://127.0.0.1:5173/404-audit",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Página no encontrada"
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\n\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "anonymous",
+    "path": "/profile",
+    "url": "http://127.0.0.1:5173/login",
+    "errors": [],
+    "title": "Iniciar sesión · Casa del Rey",
+    "h1": [
+      "Bienvenido de vuelta."
+    ],
+    "overflow": false,
+    "body": "Casa del Rey\nMenú\nInicio\nNosotros\nCélulas\nVoluntariado\nEventos\nBlog\nGalería\nIngresar\nDar\nConéctate\nB",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin",
+    "url": "http://127.0.0.1:5173/admin",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Buenos días, Auditor"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\n\nSábado, 3 De Octubre\n\nBuenos días, Auditor\n\nEste es el resumen de la iglesia hoy.\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 1
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/users",
+    "url": "http://127.0.0.1:5173/admin/users",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Usuarios"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nUsuarios\n\n0 personas registradas\n\nTodos\nMiembro\n0\nLíder\n0\nVoluntario\n0\nAdmin\n0\n\nSin",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Buscar por nombre o correo…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/blog",
+    "url": "http://127.0.0.1:5173/admin/blog",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Blog"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nBlog\n\n0 publicaciones\n\nNuevo post\n\nSin posts\n\nCrea el primero con el botón de arrib",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/events",
+    "url": "http://127.0.0.1:5173/admin/events",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Eventos"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nEventos\n\n0 eventos programados\n\nNuevo evento\n\nSin eventos\n\nCrea el primero con el b",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/petitions",
+    "url": "http://127.0.0.1:5173/admin/petitions",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Peticiones"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nPeticiones\n\nTodas respondidas\n\nPDF semanal\nEnviar por correo\n\nSin peticiones\n\nLas p",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/volunteers",
+    "url": "http://127.0.0.1:5173/admin/volunteers",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Voluntarios"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nVoluntarios\n\nInscripciones de interés. Asigna a un líder y crea usuarios.\n\nSin volu",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/cell-reports",
+    "url": "http://127.0.0.1:5173/admin/cell-reports",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Reportes de Células"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nReportes de Células\n\n0 reportes\n\nNuevo reporte\n\nREPORTES\n\n0\n\nASISTENTES\n\n0\n\nCONVERT",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/boletas",
+    "url": "http://127.0.0.1:5173/admin/boletas",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Boletas de Nuevos"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nBoletas de Nuevos\n\n0 registros · 0 conv. · 0 rec. · 0 nuevos\n\nNueva boleta\nTodas\nCo",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/social",
+    "url": "http://127.0.0.1:5173/admin/social",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Galería desde redes"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nGalería desde redes\n\nSube fotos de tus posts de Instagram, Facebook, YouTube o TikT",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/announcements",
+    "url": "http://127.0.0.1:5173/admin/announcements",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Anuncios"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nAnuncios\n\n0 anuncios\n\nNuevo anuncio\n\nSin anuncios\n\nCrea el primero con el botón de ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/gallery",
+    "url": "http://127.0.0.1:5173/admin/gallery",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Galería"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nGalería\n\n0 fotos\n\nAgregar foto\n\nSin fotos\n\nAgrega la primera foto con el botón de a",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/faqs",
+    "url": "http://127.0.0.1:5173/admin/faqs",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Preguntas Frecuentes (FAQs)"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nPreguntas Frecuentes (FAQs)\n\nGestiona las preguntas comunes que aparecen en la pági",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/leaders",
+    "url": "http://127.0.0.1:5173/admin/leaders",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Directorio de líderes"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nDirectorio de líderes\n\nFoto y contacto de cada líder. Aparecen en Células (público)",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/cells",
+    "url": "http://127.0.0.1:5173/admin/cells",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Células"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nCélulas\n\nCada célula individual (código, líder, descripción) que se muestra en la p",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/cell-categories",
+    "url": "http://127.0.0.1:5173/admin/cell-categories",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Categorías de células"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nCategorías de células\n\nLas clasificaciones que se muestran en /celulas y en la vist",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/volunteer-areas",
+    "url": "http://127.0.0.1:5173/admin/volunteer-areas",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Voluntariado — Departamentos"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nVoluntariado — Departamentos\n\nLos departamentos que se muestran en la página públic",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/donation-purposes",
+    "url": "http://127.0.0.1:5173/admin/donation-purposes",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Donaciones — Destinos"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nDonaciones — Destinos\n\nA dónde puede dirigir su siembra un donante -- se muestran e",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/activity-log",
+    "url": "http://127.0.0.1:5173/admin/activity-log",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Historial de Actividad"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nHistorial de Actividad\n\n0 eventos registrados\n\nACCIÓN\n\nTodas\ncreate\nupdate\ndelete\na",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/receipts",
+    "url": "http://127.0.0.1:5173/admin/receipts",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Comprobantes"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nComprobantes\n\nTodos verificados\n\nTodos\nPendientes\n0\nVerificados\n0\nRechazados\n0\n\nSin",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/donations",
+    "url": "http://127.0.0.1:5173/admin/donations",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Donaciones"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nDonaciones\n\n0 donaciones registradas\n\nTodos\nFondo General\nCélulas\nMisiones\nMinister",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Buscar por nombre o correo…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/hero",
+    "url": "http://127.0.0.1:5173/admin/hero",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Hero del sitio"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nHero del sitio\n\nControla lo que ven los visitantes al entrar\n\nNuevo hero\n\nSin heroe",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/site-photos",
+    "url": "http://127.0.0.1:5173/admin/site-photos",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Fotos del sitio"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nFotos del sitio\n\nEstas fotos aparecen como fondo ambiente en la página pública. Si ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/settings",
+    "url": "http://127.0.0.1:5173/admin/settings",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Configuración"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nConfiguración\n\nDatos bancarios y de contacto del sitio. Se actualizan al instante, ",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/connect-cards",
+    "url": "http://127.0.0.1:5173/admin/connect-cards",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Conéctate"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nConéctate\n\n0 registros · 0 sin contactar · 0 en seguimiento · 0 integrados\n\nTodas\nN",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "admin",
+    "path": "/admin/profile",
+    "url": "http://127.0.0.1:5173/admin/profile",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mi Perfil"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Admin\nMi Perfil\n\nTu cuenta y tus metas\n\nA\n\nAuditor local\n\naudit@example.invalid\n\nAdmin · ",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Nueva meta…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader",
+    "url": "http://127.0.0.1:5173/leader",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mis Células"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nMis Células\n\nResumen de tus reportes\n\nREPORTES\n\n0\n\nASISTENTES\n\n0\n\nCONVERSIONES\n\n0\n\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/reports",
+    "url": "http://127.0.0.1:5173/leader/reports",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Reportes de Células"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nReportes de Células\n\n0 reportes\n\nNuevo reporte\n\nREPORTES\n\n0\n\nASISTENTES\n\n0\n\nCONVERT",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/boletas",
+    "url": "http://127.0.0.1:5173/leader/boletas",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Boletas de Nuevos"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nBoletas de Nuevos\n\n0 registros · 0 conv. · 0 rec. · 0 nuevos\n\nNueva boleta\nTodas\nCo",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/volunteers",
+    "url": "http://127.0.0.1:5173/leader/volunteers",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Voluntarios asignados"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nVoluntarios asignados\n\nCoordina con estos voluntarios. Cuando estén listos, crea su",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/cell-directory",
+    "url": "http://127.0.0.1:5173/leader/cell-directory",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Directorio de Células"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nDirectorio de Células\n\nTu célula asignada\n\nSin células asignadas",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/connect-cards",
+    "url": "http://127.0.0.1:5173/leader/connect-cards",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Conéctate"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nConéctate\n\n0 registros · 0 sin contactar · 0 en seguimiento · 0 integrados\n\nTodas\nN",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/events",
+    "url": "http://127.0.0.1:5173/leader/events",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Eventos"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nEventos\n\nConsulta quién se registró — crear o editar eventos lo hace un admin.\n\nSin",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/my-directory",
+    "url": "http://127.0.0.1:5173/leader/my-directory",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nNo se pudo cargar tu ficha\nNo se pudo cargar tu ficha",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/my-cell",
+    "url": "http://127.0.0.1:5173/leader/my-cell",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mi célula"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nMi célula\n\nTodavía no tienes una célula asignada. Un administrador te la asigna des",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "leader",
+    "path": "/leader/profile",
+    "url": "http://127.0.0.1:5173/leader/profile",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Mi Perfil"
+    ],
+    "overflow": false,
+    "body": "Menú\nPanel Líder\nMi Perfil\n\nTu cuenta y tus metas\n\nA\n\nAuditor local\n\naudit@example.invalid\n\nLeader ·",
+    "brokenImages": [],
+    "unlabelledFields": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Nueva meta…"
+      }
+    ],
+    "smallButtons": [],
+    "svgCount": 0
+  },
+  {
+    "mode": "mobile",
+    "role": "volunteer",
+    "path": "/volunteer/dashboard",
+    "url": "http://127.0.0.1:5173/volunteer/dashboard",
+    "errors": [],
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "Auditor local"
+    ],
+    "overflow": false,
+    "body": "A\nSalir\n\nBienvenido,\n\nAuditor local\nResumen\nNuevo Reporte\n\nPENDIENTES\n\n0\n\nCOMPLETADAS\n\n0\n\nMis metas\n",
+    "brokenImages": [],
+    "unlabelledFields": [],
+    "smallButtons": [],
+    "svgCount": 0
+  }
+]

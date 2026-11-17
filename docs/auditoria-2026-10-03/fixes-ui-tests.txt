@@ -1,0 +1,13 @@
+
+Running 6 tests using 1 worker
+
+(node:51789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/audit-fixes.spec.js:21:1 › reset accepts emailed query URL and sends the backend contract (955ms)
+  ✓  2 [chromium] › e2e/audit-fixes.spec.js:35:1 › shared dialog traps focus, closes on Escape and restores the trigger (1.9s)
+  ✓  3 [chromium] › e2e/audit-fixes.spec.js:55:1 › volunteer submits via self-service and the shared close works (1.3s)
+  ✓  4 [chromium] › e2e/audit-fixes.spec.js:76:1 › donation retries preserve the key and include the receipt in the same request (3.5s)
+  ✓  5 [chromium] › e2e/audit-fixes.spec.js:113:1 › admin opens private receipt through an authenticated request and local blob (1.0s)
+  ✓  6 [chromium] › e2e/audit-fixes.spec.js:133:1 › refresh updates the rendered account and stale defaults cannot survive logout (883ms)
+
+  6 passed (10.0s)

@@ -1,0 +1,12 @@
+RSVP cancellation without authentication: HTTP 200 {"message":"Registro cancelado."}
+
+RSVP rows remaining: 0
+Unparsed event id SQL: SELECT * FROM `events` WHERE 1=1 AND `events`.`deleted_at` IS NULL ORDER BY `events`.`id` LIMIT 1 vars: []
+Public RSVP injected condition 1=1: HTTP 201 {"message":"Registro confirmado.","registration":{"ID":2,"CreatedAt":"2026-10-03T09:00:14.164418-06:00","UpdatedAt":"2026-10-03T09:00:14.164418-06:00","DeletedAt":null,"event_id":1,"event":{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"","date":"","time":"","location":"","description":"","cover_image":"","is_active":false,"requires_payment":false,"price_gtq":0,"payment_deadline":"","capacity":0},"user_id":null,"name":"Local audit","email":"audit-0@example.invalid","phone":"","attendee_count":1,"notes":"","payment_status":"no_requerido","receipt_id":null}}
+
+Public RSVP injected condition 1=0: HTTP 404 {"error":"Evento no encontrado."}
+
+Invalid image bytes: HTTP 201; stored MIME=image/jpeg; bytes=AUDIT: plain text, not an image
+Public blog author payload: HTTP 200 [{"CreatedAt":"2026-10-03T09:00:14.164772-06:00","DeletedAt":null,"ID":1,"UpdatedAt":"2026-10-03T09:00:14.164772-06:00","author":{"CreatedAt":"2026-10-03T09:00:14.164695-06:00","DeletedAt":null,"ID":1,"UpdatedAt":"2026-10-03T09:00:14.164695-06:00","address":"private address","cell_code":"","cell_id":null,"cell_type":"","email":"private@example.invalid","email_verified":false,"name":"Local author","phone":"private phone","role":"admin"},"author_id":1,"content":"","cover_image":"","excerpt":"","redirect_url":"","slug":"audit","social_platform":"","status":"published","title":"Local post","view_count":0}]
+2026/10/03 09:00:14 [Donation] Registrada: Local audit only — GTQ 999999.00 vía presencial
+Unverified donation: HTTP 201; successful=true; currency=USD; amount=999999

@@ -1,0 +1,88 @@
+package routes_test
+
+import (
+ "encoding/json"
+ "fmt"
+ "net/http"
+ "net/http/httptest"
+ "testing"
+ "casadelrey/backend/middleware"
+ "casadelrey/backend/models"
+ "github.com/labstack/echo/v4"
+ "github.com/stretchr/testify/require"
+)
+
+// Audit probes document current behavior using isolated in-memory fixtures only.
+func TestDetailedAudit_LastAdministratorCanDemoteSelf(t *testing.T) {
+ f:=newSecurityFixture(t)
+ result:=f.req(t,"PUT",fmt.Sprintf("/api/v1/admin/users/%d/role",f.users["admin"].ID),"admin",map[string]string{"role":"member"})
+ require.Equal(t,200,result.Code)
+ var count int64
+ require.NoError(t,f.db.Model(&models.User{}).Where("role = ?","admin").Count(&count).Error)
+ require.Zero(t,count)
+ require.Equal(t,401,f.req(t,"GET","/api/v1/admin/users","admin",nil).Code)
+ t.Log("CONFIRMED: the last administrator can remove their own access; no administrators remain")
+}
+func TestDetailedAudit_FinancialReversalLosesActorHistory(t *testing.T) {
+ f:=newSecurityFixture(t)
+ d:=models.Donation{Name:"Controlled",Amount:50,Currency:"GTQ",PaymentMethod:"presencial"}
+ require.NoError(t,f.db.Create(&d).Error)
+ path:=fmt.Sprintf("/api/v1/admin/donations/%d/cash",d.ID)
+ require.Equal(t,200,f.req(t,"PUT",path,"admin",map[string]bool{"received":true}).Code)
+ require.NoError(t,f.db.First(&d,d.ID).Error)
+ require.NotNil(t,d.ConfirmedByID)
+ require.Equal(t,200,f.req(t,"PUT",path,"admin",map[string]bool{"received":false}).Code)
+ id:=d.ID; d=models.Donation{}
+ require.NoError(t,f.db.First(&d,id).Error)
+ require.Nil(t,d.ConfirmedByID)
+ require.Nil(t,d.ConfirmedAt)
+ var count int64
+ require.NoError(t,f.db.Model(&models.ActivityLog{}).Count(&count).Error)
+ require.Zero(t,count)
+ t.Log("CONFIRMED: confirm and revert leave revision 2 but no actor history in activity_log")
+}
+func TestDetailedAudit_RejectedRegistrationStillConsumesCapacity(t *testing.T) {
+ f:=newSecurityFixture(t)
+ ev:=models.Event{Title:"Controlled",IsActive:true,RequiresPayment:true,PriceGTQ:50,Capacity:1}
+ require.NoError(t,f.db.Create(&ev).Error)
+ r:=models.PaymentReceipt{PayerName:"Controlled",PayerEmail:"controlled@example.invalid",Amount:50,Currency:"GTQ",Purpose:"evento",EventID:&ev.ID,Status:"pendiente"}
+ require.NoError(t,f.db.Create(&r).Error)
+ reg:=models.EventRegistration{EventID:ev.ID,Name:"Controlled",Email:"controlled@example.invalid",AttendeeCount:1,PaymentStatus:"pendiente",ReceiptID:&r.ID}
+ require.NoError(t,f.db.Create(&reg).Error)
+ require.Equal(t,200,f.req(t,"PUT",fmt.Sprintf("/api/v1/admin/receipts/%d/verify",r.ID),"admin",map[string]string{"status":"rechazado","rejection_reason":"Controlled rejection"}).Code)
+ result:=f.req(t,"GET","/api/v1/events","",nil)
+ require.Equal(t,200,result.Code)
+ var events []struct {IsFull bool `json:"is_full"`; Spots int `json:"spots_remaining"`}
+ require.NoError(t,json.Unmarshal(result.Body.Bytes(),&events))
+ require.True(t,events[0].IsFull)
+ require.Zero(t,events[0].Spots)
+ t.Log("CONFIRMED: rejected payment continues consuming capacity; no reservation expiry exists")
+}
+func TestDetailedAudit_ForwardedHeaderCanChangeRateLimitIdentity(t *testing.T) {
+ probe:=func(change bool) int {
+   e:=echo.New(); e.Use(middleware.AuthRateLimit()); e.GET("/controlled",func(c echo.Context)error{return c.NoContent(200)})
+   accepted:=0
+   for i:=0;i<8;i++ {
+    req:=httptest.NewRequest(http.MethodGet,"/controlled",nil); req.RemoteAddr="192.0.2.10:1000"
+    if change {req.Header.Set("X-Forwarded-For",fmt.Sprintf("198.51.100.%d",i+1))}
+    rec:=httptest.NewRecorder();e.ServeHTTP(rec,req);if rec.Code==200 {accepted++}
+   }
+   return accepted
+ }
+ require.Equal(t,5,probe(false));require.Equal(t,8,probe(true))
+ t.Log("CONFIRMED locally: untrusted X-Forwarded-For changes limiter identity; deployed proxy sanitization not tested")
+}
+func TestDetailedAudit_PastEventStillAcceptsRegistrationByAPI(t *testing.T) {
+ f:=newSecurityFixture(t)
+ ev:=models.Event{Title:"Controlled past event",Date:"2000-01-01",IsActive:true}
+ require.NoError(t,f.db.Create(&ev).Error)
+ result:=f.req(t,"POST",fmt.Sprintf("/api/v1/events/%d/rsvp",ev.ID),"",map[string]interface{}{"name":"Controlled","email":"controlled@example.invalid","attendee_count":1})
+ require.Equal(t,201,result.Code)
+ t.Log("CONFIRMED: API accepts registration for a past active event, although the UI hides its registration action")
+}
+func TestDetailedAudit_AdminCanSaveInvalidPaidEvent(t *testing.T) {
+ f:=newSecurityFixture(t)
+ result:=f.req(t,"POST","/api/v1/admin/events/","admin",map[string]interface{}{"title":"Controlled invalid event","date":"not-a-date","requires_payment":true,"price_gtq":-1,"capacity":-1,"payment_deadline":"not-a-date"})
+ require.Equal(t,201,result.Code)
+ t.Log("CONFIRMED: backend accepts malformed dates, a negative price and a negative capacity")
+}

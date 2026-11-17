@@ -1,0 +1,69 @@
+
+> frontend@0.0.0 build
+> vite build
+
+vite v7.3.6 building client environment for production...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming...
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 3447 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                  1.53 kB │ gzip:   0.68 kB
+dist/assets/index-p2Vrm8ng.css                  56.16 kB │ gzip:  11.57 kB
+dist/assets/LeaderConnectCards-BJMrqjah.js       0.17 kB │ gzip:   0.16 kB
+dist/assets/LeaderBoletas-D66guzQU.js            0.22 kB │ gzip:   0.18 kB
+dist/assets/AdminCellReports-DxF9JJ5C.js         0.27 kB │ gzip:   0.20 kB
+dist/assets/LeaderReports-CWPpUPGv.js            0.27 kB │ gzip:   0.20 kB
+dist/assets/StatCard-BSC9wcQF.js                 0.73 kB │ gzip:   0.45 kB
+dist/assets/PaymentSuccess-5rEtHl1O.js           1.07 kB │ gzip:   0.53 kB
+dist/assets/Chip-XAePGiR7.js                     1.12 kB │ gzip:   0.54 kB
+dist/assets/Paginator-D2bw8eIW.js                1.22 kB │ gzip:   0.63 kB
+dist/assets/Button-CfCESN99.js                   1.57 kB │ gzip:   0.71 kB
+dist/assets/CellCodePicker-DT709miI.js           1.62 kB │ gzip:   0.84 kB
+dist/assets/ReceiptPage-BEmZqiSH.js              1.62 kB │ gzip:   0.74 kB
+dist/assets/with-selector-DR-UIBZq.js            1.80 kB │ gzip:   0.84 kB
+dist/assets/Input-DKSeoz9N.js                    2.05 kB │ gzip:   0.85 kB
+dist/assets/LeaderCellDirectory-CuKPXqAB.js      2.06 kB │ gzip:   0.81 kB
+dist/assets/LeaderIndex-CEapXpQF.js              2.80 kB │ gzip:   1.07 kB
+dist/assets/AdminSitePhotos-y6jYYRiE.js          3.31 kB │ gzip:   1.40 kB
+dist/assets/LeaderMyCell-Dmkkk5JA.js             3.34 kB │ gzip:   1.55 kB
+dist/assets/AdminActivityLog-BfGlGMlP.js         3.68 kB │ gzip:   1.41 kB
+dist/assets/AdminSettings-BTp_-N54.js            3.77 kB │ gzip:   1.74 kB
+dist/assets/LeaderMyProfile-D1zjQHps.js          3.78 kB │ gzip:   1.74 kB
+dist/assets/AdminDonations-D8DEH5xp.js           3.79 kB │ gzip:   1.62 kB
+dist/assets/LeaderVolunteers-10axYnio.js         3.97 kB │ gzip:   1.62 kB
+dist/assets/ProfilePage-BY4gUqBh.js              4.07 kB │ gzip:   1.63 kB
+dist/assets/LeaderEvents-B8vxNIlL.js             4.13 kB │ gzip:   1.58 kB
+dist/assets/AdminVolunteers-BCpF3pyL.js          4.92 kB │ gzip:   1.91 kB
+dist/assets/AdminConnectCards-B8Mfl8Kw.js        4.97 kB │ gzip:   2.01 kB
+dist/assets/AdminFAQs-8rL4pUcs.js                5.00 kB │ gzip:   1.93 kB
+dist/assets/AdminDonationPurposes-CuS5unz7.js    5.31 kB │ gzip:   2.04 kB
+dist/assets/AdminGallery-BqzV2zpf.js             5.42 kB │ gzip:   2.15 kB
+dist/assets/AdminCellCategories-CV1IFDyM.js      5.63 kB │ gzip:   2.16 kB
+dist/assets/AdminAnnouncements-BDR3b9Hu.js       5.87 kB │ gzip:   2.14 kB
+dist/assets/AdminUsers-D2ZGGgiT.js               6.03 kB │ gzip:   2.36 kB
+dist/assets/AdminVolunteerAreas-CbFoAt0z.js      6.15 kB │ gzip:   2.33 kB
+dist/assets/AdminLeaders-DfBB3hxf.js             6.38 kB │ gzip:   2.38 kB
+dist/assets/AdminCells-CpqZKaNt.js               6.63 kB │ gzip:   2.49 kB
+dist/assets/AdminProfile-BcMJ3slg.js             6.92 kB │ gzip:   2.18 kB
+dist/assets/AdminPetitions-ZJBiGpN7.js           6.97 kB │ gzip:   2.66 kB
+dist/assets/AdminBoletas-DJa6Zqpr.js             7.20 kB │ gzip:   2.55 kB
+dist/assets/AdminSocial-90JGGfo0.js              8.00 kB │ gzip:   2.90 kB
+dist/assets/AdminEvents-CIt_a28c.js             10.44 kB │ gzip:   3.64 kB
+dist/assets/AdminHero-CBo2XvBH.js               10.48 kB │ gzip:   3.25 kB
+dist/assets/AdminReceipts-DBu7f2GH.js           10.82 kB │ gzip:   3.33 kB
+dist/assets/VolunteerDashboard-C76FgUzb.js      12.20 kB │ gzip:   4.03 kB
+dist/assets/DonatePage-BjVvuWf_.js              12.62 kB │ gzip:   4.47 kB
+dist/assets/CellReportsPage-C6FsCFox.js         15.27 kB │ gzip:   4.56 kB
+dist/assets/AdminIndex-DUnJrJj0.js             355.15 kB │ gzip: 105.16 kB
+dist/assets/AdminBlog-qw-h2QRI.js              388.50 kB │ gzip: 123.00 kB
+dist/assets/index-CXMYcXeg.js                  793.58 kB │ gzip: 248.06 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.73s

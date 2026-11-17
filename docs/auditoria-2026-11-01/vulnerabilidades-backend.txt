@@ -1,0 +1,312 @@
+=== Symbol Results ===
+
+Vulnerability #1: GO-2026-6860
+    Avoid quadratic complexity when coalescing text nodes in html in
+    golang.org/x/net
+  More info: https://pkg.go.dev/vuln/GO-2026-6860
+  Module: golang.org/x/net
+    Found in: golang.org/x/net@v0.57.0
+    Fixed in: golang.org/x/net@v0.62.0
+    Vulnerable symbols found:
+      #1: html.Parse
+      #2: html.ParseWithOptions
+
+Vulnerability #2: GO-2026-6809
+    Distrust compromised intermediate certificates in crypto/x509
+  More info: https://pkg.go.dev/vuln/GO-2026-6809
+  Standard library
+    Found in: crypto/x509@go1.25.12
+    Fixed in: crypto/x509@go1.26.10
+    Vulnerable symbols found:
+      #1: x509.Certificate.Verify
+
+Vulnerability #3: GO-2026-6629
+    Panic parsing crafted input in x/text/secure/precis in golang.org/x/text
+  More info: https://pkg.go.dev/vuln/GO-2026-6629
+  Module: golang.org/x/text
+    Found in: golang.org/x/text@v0.40.0
+    Fixed in: golang.org/x/text@v0.41.0
+    Vulnerable symbols found:
+      #1: precis.Profile.String
+      #2: precis.nickAdditionalMapping.Transform
+
+Vulnerability #4: GO-2026-6617
+    HTTP/2 server crash due to HPACK encoder race in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6617
+  Module: golang.org/x/net
+    Found in: golang.org/x/net@v0.57.0
+    Fixed in: golang.org/x/net@v0.60.0
+    Vulnerable symbols found:
+      #1: http2.ConnectionError.Error
+      #2: http2.ErrCode.String
+      #3: http2.FrameHeader.String
+      #4: http2.FrameType.String
+      #5: http2.FrameWriteRequest.String
+      Use '-show traces' to see the other 48 found symbols
+
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.CanonicalHeaderKey
+      #2: http.CanonicalHeaderKey
+      #3: http.Client.CloseIdleConnections
+      #4: http.Client.CloseIdleConnections
+      #5: http.Client.Do
+      Use '-show traces' to see the other 347 found symbols
+
+Vulnerability #5: GO-2026-6613
+    HTTP/1 server connection desynchronization after 2xx CONNECT response in
+    net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6613
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.CanonicalHeaderKey
+      #2: http.Client.CloseIdleConnections
+      #3: http.Client.Do
+      #4: http.Client.Get
+      #5: http.Client.Head
+      Use '-show traces' to see the other 104 found symbols
+
+Vulnerability #6: GO-2026-6612
+    Double flow control refund on HTTP/2 server streams in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6612
+  Module: golang.org/x/net
+    Found in: golang.org/x/net@v0.57.0
+    Fixed in: golang.org/x/net@v0.60.0
+    Vulnerable symbols found:
+      #1: http2.ConnectionError.Error
+      #2: http2.ErrCode.String
+      #3: http2.FrameHeader.String
+      #4: http2.FrameType.String
+      #5: http2.FrameWriteRequest.String
+      Use '-show traces' to see the other 48 found symbols
+
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.CanonicalHeaderKey
+      #2: http.CanonicalHeaderKey
+      #3: http.Client.CloseIdleConnections
+      #4: http.Client.CloseIdleConnections
+      #5: http.Client.Do
+      Use '-show traces' to see the other 347 found symbols
+
+Vulnerability #7: GO-2026-6611
+    Excessive CPU consumption from repeated initial window changes in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6611
+  Module: golang.org/x/net
+    Found in: golang.org/x/net@v0.57.0
+    Fixed in: golang.org/x/net@v0.60.0
+    Vulnerable symbols found:
+      #1: http2.ConnectionError.Error
+      #2: http2.ErrCode.String
+      #3: http2.FrameHeader.String
+      #4: http2.FrameType.String
+      #5: http2.FrameWriteRequest.Consume
+      Use '-show traces' to see the other 51 found symbols
+
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.CanonicalHeaderKey
+      #2: http.CanonicalHeaderKey
+      #3: http.Client.CloseIdleConnections
+      #4: http.Client.CloseIdleConnections
+      #5: http.Client.Do
+      Use '-show traces' to see the other 351 found symbols
+
+Vulnerability #8: GO-2026-6610
+    HTTP/2 transport accepts malformed framing-related headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6610
+  Module: golang.org/x/net
+    Found in: golang.org/x/net@v0.57.0
+    Fixed in: golang.org/x/net@v0.60.0
+
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.Client.CloseIdleConnections
+      #2: http.Client.CloseIdleConnections
+      #3: http.Client.Do
+      #4: http.Client.Do
+      #5: http.Client.Get
+      Use '-show traces' to see the other 29 found symbols
+
+Vulnerability #9: GO-2026-6609
+    Lack of limit on size of parsed Range headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6609
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.ServeContent
+
+Vulnerability #10: GO-2026-6608
+    Memory limit bypass when parsing MIME headers in net/textproto,
+    mime/multipart
+  More info: https://pkg.go.dev/vuln/GO-2026-6608
+  Standard library
+    Found in: net/textproto@go1.25.12
+    Fixed in: net/textproto@go1.26.9
+    Vulnerable symbols found:
+      #1: multipart.Reader.NextPart
+      #2: multipart.Reader.NextRawPart
+      #3: multipart.Reader.ReadForm
+      #4: textproto.Reader.ReadContinuedLine
+      #5: textproto.Reader.ReadContinuedLineBytes
+      Use '-show traces' to see the other 1 found symbols
+
+Vulnerability #11: GO-2026-6607
+    Reject malformed ECH outer extension references in crypto/tls
+  More info: https://pkg.go.dev/vuln/GO-2026-6607
+  Standard library
+    Found in: crypto/tls@go1.25.12
+    Fixed in: crypto/tls@go1.26.9
+    Vulnerable symbols found:
+      #1: tls.Conn.Handshake
+      #2: tls.Conn.HandshakeContext
+      #3: tls.Conn.Read
+      #4: tls.Conn.Write
+      #5: tls.Dialer.DialContext
+
+Vulnerability #12: GO-2026-6605
+    HTTP/1 client connection desynchronization after CONNECT rejection in
+    net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6605
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.Client.CloseIdleConnections
+      #2: http.Client.Do
+      #3: http.Client.Get
+      #4: http.Client.Head
+      #5: http.Client.Post
+      Use '-show traces' to see the other 5 found symbols
+
+Vulnerability #13: GO-2026-6603
+    HTTP/2 server memory exhaustion due to Trailer headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6603
+  Module: golang.org/x/net
+    Found in: golang.org/x/net@v0.57.0
+    Fixed in: golang.org/x/net@v0.60.0
+    Vulnerable symbols found:
+      #1: http2.ConnectionError.Error
+      #2: http2.ErrCode.String
+      #3: http2.FrameHeader.String
+      #4: http2.FrameType.String
+      #5: http2.FrameWriteRequest.String
+      Use '-show traces' to see the other 48 found symbols
+
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.26.9
+    Vulnerable symbols found:
+      #1: http.CanonicalHeaderKey
+      #2: http.CanonicalHeaderKey
+      #3: http.Client.CloseIdleConnections
+      #4: http.Client.CloseIdleConnections
+      #5: http.Client.Do
+      Use '-show traces' to see the other 347 found symbols
+
+Vulnerability #14: GO-2026-6293
+    Encoded slash (%2F) bypasses route-level protection and exposes static files
+    in github.com/labstack/echo/v4 and github.com/labstack/echo/v5
+  More info: https://pkg.go.dev/vuln/GO-2026-6293
+  Module: github.com/labstack/echo/v4
+    Found in: github.com/labstack/echo/v4@v4.15.1
+    Fixed in: github.com/labstack/echo/v4@v4.15.3
+    Vulnerable symbols found:
+      #1: echo.Echo.Static
+      #2: echo.Echo.StaticFS
+      #3: echo.Group.Static
+      #4: echo.Group.StaticFS
+      #5: echo.StaticDirectoryHandler
+
+Vulnerability #15: GO-2026-6218
+    Avoid quadratic complexity in resolvePath in net/url
+  More info: https://pkg.go.dev/vuln/GO-2026-6218
+  Standard library
+    Found in: net/url@go1.25.12
+    Fixed in: net/url@go1.25.13
+    Vulnerable symbols found:
+      #1: url.URL.Parse
+      #2: url.URL.ResolveReference
+
+Vulnerability #16: GO-2026-6090
+    Limit handshake messages we are willing to accept post-handshake in
+    crypto/tls
+  More info: https://pkg.go.dev/vuln/GO-2026-6090
+  Standard library
+    Found in: crypto/tls@go1.25.12
+    Fixed in: crypto/tls@go1.25.13
+    Vulnerable symbols found:
+      #1: tls.Conn.Handshake
+      #2: tls.Conn.HandshakeContext
+      #3: tls.Conn.Read
+      #4: tls.Conn.Write
+      #5: tls.Dialer.DialContext
+
+Vulnerability #17: GO-2026-6089
+    Apply ReadHeaderTimeout when doing unencrypted HTTP/2 check in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6089
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.25.13
+    Vulnerable symbols found:
+      #1: http.Server.ListenAndServe
+      #2: http.Server.ListenAndServeTLS
+      #3: http.Server.Serve
+      #4: http.Server.ServeTLS
+
+Vulnerability #18: GO-2026-6088
+    Add recursion depth guard during decode in encoding/xml
+  More info: https://pkg.go.dev/vuln/GO-2026-6088
+  Standard library
+    Found in: encoding/xml@go1.25.12
+    Fixed in: encoding/xml@go1.25.13
+    Vulnerable symbols found:
+      #1: xml.Decoder.Decode
+      #2: xml.Decoder.DecodeElement
+      #3: xml.Decoder.RawToken
+      #4: xml.Decoder.Skip
+      #5: xml.Decoder.Token
+      Use '-show traces' to see the other 1 found symbols
+
+Vulnerability #19: GO-2026-5972
+    Enforce maximum recursion depth in encoding/asn1
+  More info: https://pkg.go.dev/vuln/GO-2026-5972
+  Standard library
+    Found in: encoding/asn1@go1.25.12
+    Fixed in: encoding/asn1@go1.25.13
+    Vulnerable symbols found:
+      #1: asn1.Unmarshal
+      #2: asn1.UnmarshalWithParams
+
+Vulnerability #20: GO-2026-5026
+    Invoking failure to reject ASCII-only Punycode-encoded labels in
+    golang.org/x/net/idna
+  More info: https://pkg.go.dev/vuln/GO-2026-5026
+  Standard library
+    Found in: net/http@go1.25.12
+    Fixed in: net/http@go1.25.13
+    Vulnerable symbols found:
+      #1: http.Client.CloseIdleConnections
+      #2: http.Client.Do
+      #3: http.Client.Get
+      #4: http.Client.Head
+      #5: http.Client.Post
+      Use '-show traces' to see the other 5 found symbols
+
+Your code is affected by 20 vulnerabilities from 3 modules and the Go standard library.
+This scan also found 4 vulnerabilities in packages you import and 4
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
+exit status 3

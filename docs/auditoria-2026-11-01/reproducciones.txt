@@ -1,0 +1,21 @@
+=== RUN   TestDetailedAudit_LastAdministratorCanDemoteSelf
+    detailed_audit_repro_test.go:24: CONFIRMED: the last administrator can remove their own access; no administrators remain
+--- PASS: TestDetailedAudit_LastAdministratorCanDemoteSelf (0.08s)
+=== RUN   TestDetailedAudit_FinancialReversalLosesActorHistory
+    detailed_audit_repro_test.go:42: CONFIRMED: confirm and revert leave revision 2 but no actor history in activity_log
+--- PASS: TestDetailedAudit_FinancialReversalLosesActorHistory (0.07s)
+=== RUN   TestDetailedAudit_RejectedRegistrationStillConsumesCapacity
+2026/11/01 20:28:39 [Receipt] rechazado por admin 1 — ID:1
+    detailed_audit_repro_test.go:59: CONFIRMED: rejected payment continues consuming capacity; no reservation expiry exists
+--- PASS: TestDetailedAudit_RejectedRegistrationStillConsumesCapacity (0.07s)
+=== RUN   TestDetailedAudit_ForwardedHeaderCanChangeRateLimitIdentity
+    detailed_audit_repro_test.go:73: CONFIRMED locally: untrusted X-Forwarded-For changes limiter identity; deployed proxy sanitization not tested
+--- PASS: TestDetailedAudit_ForwardedHeaderCanChangeRateLimitIdentity (0.00s)
+=== RUN   TestDetailedAudit_PastEventStillAcceptsRegistrationByAPI
+    detailed_audit_repro_test.go:81: CONFIRMED: API accepts registration for a past active event, although the UI hides its registration action
+--- PASS: TestDetailedAudit_PastEventStillAcceptsRegistrationByAPI (0.07s)
+=== RUN   TestDetailedAudit_AdminCanSaveInvalidPaidEvent
+    detailed_audit_repro_test.go:87: CONFIRMED: backend accepts malformed dates, a negative price and a negative capacity
+--- PASS: TestDetailedAudit_AdminCanSaveInvalidPaidEvent (0.07s)
+PASS
+ok  	casadelrey/backend/routes	0.801s

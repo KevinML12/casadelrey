@@ -1,0 +1,99 @@
+
+Running 14 tests using 1 worker
+
+
+(node:37235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/14] [chromium] › e2e/design-rules.spec.js:60:3 › Reglas de diseño — anti-iconos › ninguna página pública renderiza un ícono SVG
+[2/14] [chromium] › e2e/design-rules.spec.js:70:3 › Reglas de diseño — anti-iconos › el código fuente no reintroduce <Icon> fuera de los 2 spinners permitidos
+[3/14] [chromium] › e2e/design-rules.spec.js:84:3 › Reglas de diseño — anti-iconos › el código fuente no usa emojis en la interfaz
+[4/14] [chromium] › e2e/design-rules.spec.js:105:3 › Reglas de diseño — anti-eyebrow › el componente Eyebrow no existe en el código
+[5/14] [chromium] › e2e/design-rules.spec.js:110:3 › Reglas de diseño — anti-eyebrow › PageHero no acepta un prop eyebrow
+[6/14] [chromium] › e2e/design-rules.spec.js:120:3 › Reglas de diseño — las fotos van a color › ninguna imagen del sitio público lleva filtro grayscale
+[7/14] [chromium] › e2e/design-rules.spec.js:133:3 › Reglas de diseño — las fotos van a color › el código fuente no aplica grayscale a imágenes
+[8/14] [chromium] › e2e/design-rules.spec.js:150:3 › Reglas de diseño — estructura editorial › cada página pública tiene exactamente un h1
+[9/14] [chromium] › e2e/design-rules.spec.js:162:3 › Reglas de diseño — estructura editorial › las secciones con foto de fondo la cargan de verdad
+[10/14] [chromium] › e2e/public-smoke.spec.js:10:3 › Sitio público — smoke › el header muestra "Ingresar" sin sesión y lleva a /login
+[11/14] [chromium] › e2e/public-smoke.spec.js:19:3 › Sitio público — smoke › las páginas públicas clave renderizan su contenido
+[12/14] [chromium] › e2e/public-smoke.spec.js:36:3 › Sitio público — smoke › login y registro tienen foto real de fondo (no navy plano)
+[13/14] [chromium] › e2e/public-smoke.spec.js:49:3 › Sitio público — smoke › células abre su ventana sobrepuesta (WindowStack) accesible
+  1) [chromium] › e2e/public-smoke.spec.js:49:3 › Sitio público — smoke › células abre su ventana sobrepuesta (WindowStack) accesible 
+
+    TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+    Call log:
+      - waiting for locator('button.liquid-glass').first() to be visible
+
+
+      51 |     // Abrir la primera card del collage
+      52 |     const card = page.locator('button.liquid-glass').first();
+    > 53 |     await card.waitFor({ state: 'visible', timeout: 15_000 });
+         |                ^
+      54 |     await card.click();
+      55 |     // La ventana es un dialog modal real (focus trap + aria)
+      56 |     const dialog = page.locator('[role="dialog"][aria-modal="true"]');
+        at /Users/kevv/Documents/proyectos/casadelreyhue/frontend/e2e/public-smoke.spec.js:53:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/public-smoke-Sitio-público-e4017-uesta-WindowStack-accesible-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/public-smoke-Sitio-público-e4017-uesta-WindowStack-accesible-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/public-smoke-Sitio-público-e4017-uesta-WindowStack-accesible-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/public-smoke-Sitio-público-e4017-uesta-WindowStack-accesible-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/public-smoke-Sitio-público-e4017-uesta-WindowStack-accesible-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+(node:37343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[14/14] [chromium] › e2e/public-smoke.spec.js:63:3 › Sitio público — smoke › cada célula ofrece una salida real: "Unirme" abre la solicitud
+  2) [chromium] › e2e/public-smoke.spec.js:63:3 › Sitio público — smoke › cada célula ofrece una salida real: "Unirme" abre la solicitud 
+
+    TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+    Call log:
+      - waiting for locator('button.liquid-glass').first() to be visible
+
+
+      76 |     await page.goto('/celulas');
+      77 |     const card = page.locator('button.liquid-glass').first();
+    > 78 |     await card.waitFor({ state: 'visible', timeout: 15_000 });
+         |                ^
+      79 |     await card.click();
+      80 |
+      81 |     const dialog = page.locator('[role="dialog"][aria-modal="true"]');
+        at /Users/kevv/Documents/proyectos/casadelreyhue/frontend/e2e/public-smoke.spec.js:78:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/public-smoke-Sitio-público-a5a8f-al-Unirme-abre-la-solicitud-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/public-smoke-Sitio-público-a5a8f-al-Unirme-abre-la-solicitud-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/public-smoke-Sitio-público-a5a8f-al-Unirme-abre-la-solicitud-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/public-smoke-Sitio-público-a5a8f-al-Unirme-abre-la-solicitud-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/public-smoke-Sitio-público-a5a8f-al-Unirme-abre-la-solicitud-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2 failed
+    [chromium] › e2e/public-smoke.spec.js:49:3 › Sitio público — smoke › células abre su ventana sobrepuesta (WindowStack) accesible 
+    [chromium] › e2e/public-smoke.spec.js:63:3 › Sitio público — smoke › cada célula ofrece una salida real: "Unirme" abre la solicitud 
+  12 passed (1.0m)

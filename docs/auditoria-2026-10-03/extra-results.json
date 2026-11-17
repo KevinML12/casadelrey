@@ -1,0 +1,222 @@
+[
+  {
+    "mode": "desktop",
+    "path": "/profile",
+    "title": "Mi perfil · Casa del Rey",
+    "h1": [
+      "Mi Perfil"
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-hero.jpg"
+    ]
+  },
+  {
+    "mode": "desktop",
+    "path": "/blog/audit",
+    "title": "Artículo de auditoría local · Casa del Rey",
+    "h1": [
+      "Artículo de auditoría local"
+    ],
+    "images": [
+      "/logo.png"
+    ]
+  },
+  {
+    "mode": "desktop",
+    "path": "/",
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "CASADEL REY"
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-hero.jpg",
+      "/images/public_bg_celulas.jpg",
+      "/images/celulas/adolescentes.jpg",
+      "/images/celulas/jovenes.jpg",
+      "/images/celulas/prejuveniles.jpg",
+      "/images/celulas/varones.jpg",
+      "/images/celulas/mujeres.jpg",
+      "/images/components/bg_galeria.jpg",
+      "/images/albums/alabanza.jpg",
+      "/images/albums/danza.jpg",
+      "/images/albums/ninos.jpg",
+      "/images/albums/miembros.jpg",
+      "/images/components/bg_conectate.jpg",
+      "/images/components/about_visitanos.jpg",
+      "/images/bg-ubicacion.jpg"
+    ]
+  },
+  {
+    "mode": "desktop",
+    "path": "/about",
+    "title": "Nosotros · Casa del Rey",
+    "h1": [
+      "Somos Casa del Rey."
+    ],
+    "images": [
+      "/logo.png",
+      "/images/nosotros/comunidad.jpg",
+      "/images/public_bg_nosotros.jpg",
+      "/images/nosotros/pastores.jpg",
+      "/images/nosotros/fundadores.jpg",
+      "/images/nosotros/pastores-celulas.jpg",
+      "/images/components/about_mision.jpg",
+      "/images/components/about_vision.jpg",
+      "/images/components/home_comunidad.jpg",
+      "/images/components/vol_alabanza.jpg",
+      "/images/components/vol_danza.jpg",
+      "/images/components/vol_limpieza.jpg",
+      "/images/components/vol_bienvenida.jpg",
+      "/images/components/vol_ujieres.jpg",
+      "/images/components/vol_ninos.jpg",
+      "/images/components/vol_multimedia.jpg",
+      "/images/components/vol_intercesor.jpg",
+      "/images/components/vol_admin.jpg",
+      "/images/celulas/adolescentes.jpg",
+      "/images/components/bg_conectate.jpg",
+      "/images/celulas/jovenes.jpg",
+      "/images/celulas/prejuveniles.jpg",
+      "/images/celulas/varones.jpg",
+      "/images/celulas/mujeres.jpg",
+      "/images/components/about_podcast.jpg",
+      "/images/components/about_visitanos.jpg"
+    ]
+  },
+  {
+    "mode": "desktop",
+    "path": "/login",
+    "title": "Iniciar sesión · Casa del Rey",
+    "h1": [
+      "Bienvenido de vuelta."
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-auth.jpg"
+    ]
+  },
+  {
+    "mode": "desktop",
+    "path": "/prayer",
+    "title": "Oración · Casa del Rey",
+    "h1": [
+      "Clama y Él responde."
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-ensenanzas.jpg",
+      "/images/components/bg_oracion.jpg"
+    ]
+  },
+  {
+    "mode": "mobile",
+    "path": "/profile",
+    "title": "Mi perfil · Casa del Rey",
+    "h1": [
+      "Mi Perfil"
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-hero.jpg"
+    ]
+  },
+  {
+    "mode": "mobile",
+    "path": "/blog/audit",
+    "title": "Artículo de auditoría local · Casa del Rey",
+    "h1": [
+      "Artículo de auditoría local"
+    ],
+    "images": [
+      "/logo.png"
+    ]
+  },
+  {
+    "mode": "mobile",
+    "path": "/",
+    "title": "Casa del Rey — Huehuetenango",
+    "h1": [
+      "CASADEL REY"
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-hero.jpg",
+      "/images/public_bg_celulas.jpg",
+      "/images/celulas/adolescentes.jpg",
+      "/images/celulas/jovenes.jpg",
+      "/images/celulas/prejuveniles.jpg",
+      "/images/celulas/varones.jpg",
+      "/images/celulas/mujeres.jpg",
+      "/images/components/bg_galeria.jpg",
+      "/images/albums/alabanza.jpg",
+      "/images/albums/danza.jpg",
+      "/images/albums/ninos.jpg",
+      "/images/albums/miembros.jpg",
+      "/images/components/bg_conectate.jpg",
+      "/images/components/about_visitanos.jpg",
+      "/images/bg-ubicacion.jpg"
+    ]
+  },
+  {
+    "mode": "mobile",
+    "path": "/about",
+    "title": "Nosotros · Casa del Rey",
+    "h1": [
+      "Somos Casa del Rey."
+    ],
+    "images": [
+      "/logo.png",
+      "/images/nosotros/comunidad.jpg",
+      "/images/public_bg_nosotros.jpg",
+      "/images/nosotros/pastores.jpg",
+      "/images/nosotros/fundadores.jpg",
+      "/images/nosotros/pastores-celulas.jpg",
+      "/images/components/about_mision.jpg",
+      "/images/components/about_vision.jpg",
+      "/images/components/home_comunidad.jpg",
+      "/images/components/vol_alabanza.jpg",
+      "/images/components/vol_danza.jpg",
+      "/images/components/vol_limpieza.jpg",
+      "/images/components/vol_bienvenida.jpg",
+      "/images/components/vol_ujieres.jpg",
+      "/images/components/vol_ninos.jpg",
+      "/images/components/vol_multimedia.jpg",
+      "/images/components/vol_intercesor.jpg",
+      "/images/components/vol_admin.jpg",
+      "/images/celulas/adolescentes.jpg",
+      "/images/components/bg_conectate.jpg",
+      "/images/celulas/jovenes.jpg",
+      "/images/celulas/prejuveniles.jpg",
+      "/images/celulas/varones.jpg",
+      "/images/celulas/mujeres.jpg",
+      "/images/components/about_podcast.jpg",
+      "/images/components/about_visitanos.jpg"
+    ]
+  },
+  {
+    "mode": "mobile",
+    "path": "/login",
+    "title": "Iniciar sesión · Casa del Rey",
+    "h1": [
+      "Bienvenido de vuelta."
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-auth.jpg"
+    ]
+  },
+  {
+    "mode": "mobile",
+    "path": "/prayer",
+    "title": "Oración · Casa del Rey",
+    "h1": [
+      "Clama y Él responde."
+    ],
+    "images": [
+      "/logo.png",
+      "/images/bg-ensenanzas.jpg",
+      "/images/components/bg_oracion.jpg"
+    ]
+  }
+]
