@@ -1,0 +1,20 @@
+# casadelrey/backend/scripts/seed_users
+scripts/seed_users/main.go:7:2: "strings" imported and not used
+?   	casadelrey/backend	[no test files]
+ok  	casadelrey/backend/auth	2.574s
+?   	casadelrey/backend/cmd/seed	[no test files]
+?   	casadelrey/backend/config	[no test files]
+?   	casadelrey/backend/database	[no test files]
+?   	casadelrey/backend/email	[no test files]
+ok  	casadelrey/backend/handlers	0.694s
+ok  	casadelrey/backend/middleware	0.473s
+?   	casadelrey/backend/models	[no test files]
+ok  	casadelrey/backend/routes	0.552s
+?   	casadelrey/backend/scripts/bulk_upload	[no test files]
+?   	casadelrey/backend/scripts/seed_curated_gallery	[no test files]
+FAIL	casadelrey/backend/scripts/seed_users [build failed]
+ok  	casadelrey/backend/storage	0.468s
+ok  	casadelrey/backend/tests/e2e	0.776s
+ok  	casadelrey/backend/tests/security	0.647s
+?   	casadelrey/backend/utils/testutils	[no test files]
+FAIL

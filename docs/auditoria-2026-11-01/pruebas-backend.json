@@ -1,0 +1,16 @@
+{
+  "results": {
+    "pass": 338,
+    "skip": 2
+  },
+  "skipped_tests": [
+    "TestPreviewTemplates",
+    "TestDonationConcurrentPostgres"
+  ],
+  "vet": "passed",
+  "source_commit": "aab1316041955348520b15ad2b5a3ff695933e74",
+  "production_compilation": "go1.25.12 linux amd64 CGO_ENABLED=0",
+  "production_binary_advisories": 20,
+  "reproduction_probes": 6,
+  "reproduction_probes_scope": "SQLite aislado y almacenamiento simulado; las pruebas confirman comportamientos pendientes, no correcciones."
+}

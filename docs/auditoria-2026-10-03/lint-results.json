@@ -1,0 +1,1397 @@
+[
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/eslint.config.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/middleware.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/postcss.config.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/scripts/capture.mjs",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/scripts/gen-landmask.mjs",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/scripts/seed_backgrounds.mjs",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/App.jsx",
+    "errorCount": 2,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'isDashboard' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 81,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 81,
+        "endColumn": 20,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "isDashboard"
+            },
+            "fix": {
+              "range": [
+                3506,
+                3637
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'isDashboard'."
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has an unnecessary dependency: 'location.pathname'. Either exclude it or remove the dependency array. Outer scope values like 'location.pathname' aren't valid dependencies because mutating them doesn't re-render the component.",
+        "line": 104,
+        "column": 6,
+        "nodeType": "ArrayExpression",
+        "endLine": 104,
+        "endColumn": 25,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: []",
+            "fix": {
+              "range": [
+                4435,
+                4454
+              ],
+              "text": "[]"
+            }
+          }
+        ]
+      },
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'bgImage' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 112,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 112,
+        "endColumn": 16,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "bgImage"
+            },
+            "fix": {
+              "range": [
+                4829,
+                4902
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'bgImage'."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/blog/ArticleReader.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/blog/BlogHero.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/blog/PostCollage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/blog/TTSPlayer.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/AdminLayout.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/Footer.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/Header.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/LeaderLayout.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/PageHero.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/ProtectedRoute.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/layout/VolunteerLayout.jsx",
+    "errorCount": 1,
+    "warningCount": 0,
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'useLocation' is defined but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 1,
+        "column": 37,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 1,
+        "endColumn": 48,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "useLocation"
+            },
+            "fix": {
+              "range": [
+                34,
+                47
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'useLocation'."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/BankDetails.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "line": 11,
+        "column": 17,
+        "nodeType": "Identifier",
+        "messageId": "namedExport",
+        "endLine": 11,
+        "endColumn": 28
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/CellReportForm.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/CellReportsPage.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array.",
+        "line": 61,
+        "column": 35,
+        "nodeType": "ArrayExpression",
+        "endLine": 61,
+        "endColumn": 43,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [filter, refresh]",
+            "fix": {
+              "range": [
+                2155,
+                2163
+              ],
+              "text": "[filter, refresh]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/DonationCard.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/PrayerForm.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/ReceiptUploadForm.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/SocialSection.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/sections/VolunteerReportForm.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/AuthCard.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Button.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/CellCodePicker.jsx",
+    "errorCount": 0,
+    "warningCount": 3,
+    "messages": [
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "line": 16,
+        "column": 14,
+        "nodeType": "Identifier",
+        "messageId": "namedExport",
+        "endLine": 16,
+        "endColumn": 24
+      },
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "line": 27,
+        "column": 17,
+        "nodeType": "Identifier",
+        "messageId": "namedExport",
+        "endLine": 27,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "line": 35,
+        "column": 17,
+        "nodeType": "Identifier",
+        "messageId": "namedExport",
+        "endLine": 35,
+        "endColumn": 26
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Chip.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Dock.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Glass.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Input.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/ModalWrapper.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/PageFallback.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Paginator.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/ParallaxImg.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/PhotoBentoTile.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/PhotoHeaderCard.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Reveal.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/SectionBg.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Splash.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/StatCard.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/StatTrio.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/Tilt.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/components/ui/WindowStack.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/context/AuthContext.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "line": 93,
+        "column": 14,
+        "nodeType": "Identifier",
+        "messageId": "namedExport",
+        "endLine": 93,
+        "endColumn": 21
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/context/SiteConfigContext.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.",
+        "line": 15,
+        "column": 14,
+        "nodeType": "Identifier",
+        "messageId": "namedExport",
+        "endLine": 15,
+        "endColumn": 27
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useDarkMode.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useDeviceTier.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useGlassSpecular.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useNotificationCounts.js",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has missing dependencies: 'fetchCounts' and 'intervalMs'. Either include them or remove the dependency array.",
+        "line": 19,
+        "column": 6,
+        "nodeType": "ArrayExpression",
+        "endLine": 19,
+        "endColumn": 12,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [fetchCounts, intervalMs, user]",
+            "fix": {
+              "range": [
+                770,
+                776
+              ],
+              "text": "[fetchCounts, intervalMs, user]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useSeo.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/hooks/useTTS.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/apiClient.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/compressImage.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/donationPurposes.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/feed.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/greeting.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/motion.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/lib/volunteerAreas.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/main.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-refresh/only-export-components",
+        "severity": 1,
+        "message": "Fast refresh only works when a file has exports. Move your component(s) to a separate file.",
+        "line": 51,
+        "column": 10,
+        "nodeType": "Identifier",
+        "messageId": "noExport",
+        "endLine": 51,
+        "endColumn": 17
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/NotFound.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminActivityLog.jsx",
+    "errorCount": 0,
+    "warningCount": 2,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 43,
+        "column": 45,
+        "nodeType": "ArrayExpression",
+        "endLine": 43,
+        "endColumn": 65,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [actionF, load, resourceF]",
+            "fix": {
+              "range": [
+                1481,
+                1501
+              ],
+              "text": "[actionF, load, resourceF]"
+            }
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 44,
+        "column": 36,
+        "nodeType": "ArrayExpression",
+        "endLine": 44,
+        "endColumn": 42,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [load, page]",
+            "fix": {
+              "range": [
+                1539,
+                1545
+              ],
+              "text": "[load, page]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminAnnouncements.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 106,
+        "column": 36,
+        "nodeType": "ArrayExpression",
+        "endLine": 106,
+        "endColumn": 42,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [load, page]",
+            "fix": {
+              "range": [
+                4245,
+                4251
+              ],
+              "text": "[load, page]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminBlog.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminBoletas.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array.",
+        "line": 139,
+        "column": 35,
+        "nodeType": "ArrayExpression",
+        "endLine": 139,
+        "endColumn": 46,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [catFilter, refresh]",
+            "fix": {
+              "range": [
+                5165,
+                5176
+              ],
+              "text": "[catFilter, refresh]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminCellCategories.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminCellReports.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminCells.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminConnectCards.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array.",
+        "line": 37,
+        "column": 35,
+        "nodeType": "ArrayExpression",
+        "endLine": 37,
+        "endColumn": 49,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [refresh, statusFilter]",
+            "fix": {
+              "range": [
+                1455,
+                1469
+              ],
+              "text": "[refresh, statusFilter]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminDonationPurposes.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminDonations.jsx",
+    "errorCount": 0,
+    "warningCount": 2,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 48,
+        "column": 45,
+        "nodeType": "ArrayExpression",
+        "endLine": 48,
+        "endColumn": 66,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [purposeF, debounced, load]",
+            "fix": {
+              "range": [
+                1648,
+                1669
+              ],
+              "text": "[purposeF, debounced, load]"
+            }
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 49,
+        "column": 36,
+        "nodeType": "ArrayExpression",
+        "endLine": 49,
+        "endColumn": 42,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [load, page]",
+            "fix": {
+              "range": [
+                1707,
+                1713
+              ],
+              "text": "[load, page]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminEvents.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminFAQs.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminGallery.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 75,
+        "column": 36,
+        "nodeType": "ArrayExpression",
+        "endLine": 75,
+        "endColumn": 42,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [load, page]",
+            "fix": {
+              "range": [
+                3197,
+                3203
+              ],
+              "text": "[load, page]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminHero.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminIndex.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminLeaders.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminPetitions.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminProfile.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminReceipts.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.",
+        "line": 203,
+        "column": 32,
+        "nodeType": "ArrayExpression",
+        "endLine": 203,
+        "endColumn": 40,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [filter, load]",
+            "fix": {
+              "range": [
+                8976,
+                8984
+              ],
+              "text": "[filter, load]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminSettings.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminSitePhotos.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminSocial.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminUsers.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminVolunteerAreas.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/AdminVolunteers.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/Dashboard.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/admin/LeaderDashboard.jsx",
+    "errorCount": 0,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'isAdmin'. Either include it or remove the dependency array.",
+        "line": 25,
+        "column": 6,
+        "nodeType": "ArrayExpression",
+        "endLine": 25,
+        "endColumn": 8,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [isAdmin]",
+            "fix": {
+              "range": [
+                827,
+                829
+              ],
+              "text": "[isAdmin]"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderBoletas.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderCellDirectory.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderConnectCards.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderEvents.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderIndex.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderMyCell.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderMyProfile.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderReports.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/leader/LeaderVolunteers.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/AboutPage.jsx",
+    "errorCount": 4,
+    "warningCount": 0,
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'settings' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 60,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 60,
+        "endColumn": 17,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "settings"
+            },
+            "fix": {
+              "range": [
+                3219,
+                3252
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'settings'."
+          }
+        ]
+      },
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'servidoresImg' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 70,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 70,
+        "endColumn": 22,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "servidoresImg"
+            },
+            "fix": {
+              "range": [
+                3952,
+                4042
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'servidoresImg'."
+          }
+        ]
+      },
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'comunidadImg' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 71,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 71,
+        "endColumn": 21,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "comunidadImg"
+            },
+            "fix": {
+              "range": [
+                4045,
+                4134
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'comunidadImg'."
+          }
+        ]
+      },
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'findPhoto' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 89,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 89,
+        "endColumn": 18,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "findPhoto"
+            },
+            "fix": {
+              "range": [
+                5207,
+                5332
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'findPhoto'."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/BlogPage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/CelulasPage.jsx",
+    "errorCount": 1,
+    "warningCount": 0,
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'pendiente' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 233,
+        "column": 10,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 233,
+        "endColumn": 19,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "pendiente"
+            },
+            "fix": {
+              "range": [
+                12131,
+                12140
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'pendiente'."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/ConnectPage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/DonatePage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/EventsPage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/ForgotPassword.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/GalleryPage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/Home.jsx",
+    "errorCount": 1,
+    "warningCount": 1,
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'useSeo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 9,
+        "column": 8,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 9,
+        "endColumn": 14,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "useSeo"
+            },
+            "fix": {
+              "range": [
+                495,
+                507
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'useSeo'."
+          }
+        ]
+      },
+      {
+        "ruleId": null,
+        "message": "Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps').",
+        "line": 200,
+        "column": 5,
+        "severity": 1,
+        "nodeType": null,
+        "fix": {
+          "range": [
+            9210,
+            9265
+          ],
+          "text": " "
+        }
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/Login.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/PaymentSuccess.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/PrayerPage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/ProfilePage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/ReceiptPage.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/Register.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/ResetPassword.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/VerifyEmail.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/public/VolunteeringPage.jsx",
+    "errorCount": 1,
+    "warningCount": 0,
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'globalIndex' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u.",
+        "line": 590,
+        "column": 9,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 590,
+        "endColumn": 20,
+        "suggestions": [
+          {
+            "messageId": "removeVar",
+            "data": {
+              "varName": "globalIndex"
+            },
+            "fix": {
+              "range": [
+                29175,
+                29249
+              ],
+              "text": ""
+            },
+            "desc": "Remove unused variable 'globalIndex'."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/pages/volunteer/VolunteerDashboard.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/src/router.jsx",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/tailwind.config.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  },
+  {
+    "filePath": "/Users/kevv/Documents/proyectos/casadelreyhue/frontend/vite.config.js",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": []
+  }
+]

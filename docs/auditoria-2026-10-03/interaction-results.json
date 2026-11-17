@@ -1,0 +1,30 @@
+[
+  {
+    "scenario": "Cell quiz modal",
+    "dialogs": 0,
+    "visible": 1,
+    "bodyOverflow": ""
+  },
+  {
+    "scenario": "Cell quiz after Escape",
+    "visible": 1
+  },
+  {
+    "scenario": "Email reset URL",
+    "h1": [
+      "Página no encontrada"
+    ]
+  },
+  {
+    "scenario": "Reset API payload",
+    "captured": {
+      "token": "audit-token",
+      "password": "AuditPassword123!"
+    }
+  },
+  {
+    "scenario": "Volunteer shared close button",
+    "modalRemaining": 1,
+    "dialogs": 0
+  }
+]

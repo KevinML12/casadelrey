@@ -1,0 +1,1051 @@
+{
+  "case_count": 31,
+  "cases": [
+    {
+      "name": "admin KPIs role=anonymous",
+      "status": 401,
+      "expected_current_status": 401,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "admin KPIs role=member",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "admin KPIs role=volunteer",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "admin KPIs role=leader",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "admin KPIs role=admin",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "forged JWT rejected",
+      "status": 401,
+      "expected_current_status": 401,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "leader KPIs role=member",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "leader KPIs role=volunteer",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "leader KPIs role=leader",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "leader KPIs role=admin",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "create service report role=volunteer",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "create service report role=leader",
+      "status": 201,
+      "expected_current_status": 201,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "create service report role=admin",
+      "status": 201,
+      "expected_current_status": 201,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "upload invalid JPEG role=volunteer",
+      "status": 403,
+      "expected_current_status": 403,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "upload invalid JPEG role=leader",
+      "status": 201,
+      "expected_current_status": 201,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "leader approves another user's service report",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true,
+      "detail": {
+        "actor_id": 2,
+        "owner_id": 3,
+        "stored_status": "aprobado"
+      }
+    },
+    {
+      "name": "leader can list cards assigned elsewhere",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true,
+      "detail": {
+        "other_record_visible": true
+      }
+    },
+    {
+      "name": "leader modifies card assigned elsewhere",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true,
+      "detail": {
+        "stored_notes": "Changed by another leader"
+      }
+    },
+    {
+      "name": "Q1 verified receipt reserves five Q100 seats",
+      "status": 201,
+      "expected_current_status": 201,
+      "matches_current_behavior": true,
+      "detail": {
+        "paid_amount": 1,
+        "payment_status": "verificado",
+        "registered_attendees": 5,
+        "required_amount": 500
+      }
+    },
+    {
+      "name": "anonymous cancellation of another registration",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true,
+      "detail": {
+        "rows_remaining": 0
+      }
+    },
+    {
+      "name": "public donation counted successful",
+      "status": 201,
+      "expected_current_status": 201,
+      "matches_current_behavior": true,
+      "detail": {
+        "currency": "USD",
+        "successful": true
+      }
+    },
+    {
+      "name": "frontend reset payload rejected",
+      "status": 400,
+      "expected_current_status": 400,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "backend reset payload accepted",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "old refresh survives password reset",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "old access JWT survives password reset",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "admin role demoted in DB",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "old admin JWT still accesses admin after demotion",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "public blog returns private author data",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true,
+      "detail": {
+        "address_visible": true,
+        "email_visible": true,
+        "phone_visible": true
+      }
+    },
+    {
+      "name": "leader JWT ignored on public announcements",
+      "status": 200,
+      "expected_current_status": 200,
+      "matches_current_behavior": true,
+      "detail": {
+        "author_private_address_visible": true,
+        "cache_control": "public, max-age=20, stale-while-revalidate=80",
+        "leader_announcement_visible": false
+      }
+    },
+    {
+      "name": "OG backend route absent",
+      "status": 404,
+      "expected_current_status": 404,
+      "matches_current_behavior": true
+    },
+    {
+      "name": "Postgres dialect inserts string ID as raw condition",
+      "status": 0,
+      "expected_current_status": 0,
+      "matches_current_behavior": true,
+      "detail": {
+        "live_database_execution": false,
+        "sql": "SELECT * FROM \"events\" WHERE 1=1 AND \"events\".\"deleted_at\" IS NULL ORDER BY \"events\".\"id\" LIMIT $1",
+        "vars": [
+          1
+        ]
+      }
+    }
+  ],
+  "environment": "real Echo router; signed fixture JWTs; SQLite memory; external network blocked",
+  "registered_routes": [
+    {
+      "handler": "casadelrey/backend/handlers.(*GalleryHandler).DeletePhoto-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/gallery/:id"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/faqs"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/profile/*"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*HeroHandler).Delete-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/hero/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SocialHandler).UpdateSocialPost-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/social/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*GalleryHandler).CreatePhoto-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/gallery/"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/faqs/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellReportHandler).CreateCellReport-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/cell-reports"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).GetPublic-fm",
+      "method": "GET",
+      "path": "/api/v1/leaders"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/profile"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*HeroHandler).Update-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/hero/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BoletaHandler).DeleteBoleta-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/boletas/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellReportHandler).GetAllCellReports-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/cell-reports"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellReportHandler).GetCellStats-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/cell-reports/stats"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BoletaHandler).UpdateBoleta-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/boletas/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*RSVPHandler).GetEventRSVPs-fm",
+      "method": "GET",
+      "path": "/api/v1/leader/events/:id/rsvps"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BlogHandler).GetPostBySlug-fm",
+      "method": "GET",
+      "path": "/api/v1/blog/:slug"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).GetCellCategories-fm",
+      "method": "GET",
+      "path": "/api/v1/cell-categories"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).GetPublicCells-fm",
+      "method": "GET",
+      "path": "/api/v1/cells"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/blog/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AnnouncementHandler).UpdateAnnouncement-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/announcements/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*FAQHandler).GetAllFAQs-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/faqs/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BoletaHandler).CreateBoleta-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/boletas"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*NotificationHandler).GetCounts-fm",
+      "method": "GET",
+      "path": "/api/v1/leader/notifications/counts"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SocialHandler).GetSocialFeed-fm",
+      "method": "GET",
+      "path": "/api/v1/social/feed"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*HeroHandler).Activate-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/hero/:id/activate"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SitePhotoHandler).GetAllSitePhotos-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/site-photos"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerAreaHandler).GetAllVolunteerAreasAdmin-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/volunteer-areas"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*FAQHandler).DeleteFAQ-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/faqs/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PetitionHandler).SendWeeklyDigestNow-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/petitions/weekly/send"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerHandler).GetDepartments-fm",
+      "method": "GET",
+      "path": "/api/v1/volunteer/departments"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*DonationPurposeHandler).GetPublicDonationPurposes-fm",
+      "method": "GET",
+      "path": "/api/v1/donation-purposes"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).UpdateUserRole-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/users/:id/role"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ActivityLogHandler).GetActivityLog-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/activity-log"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).CreateCellCategory-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/cell-categories"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ConnectCardHandler).GetAll-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/connect-cards"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ProfileHandler).GetGoals-fm",
+      "method": "GET",
+      "path": "/api/v1/profile/goals"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*HeroHandler).Create-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/hero"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*RSVPHandler).DeleteRSVP-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/rsvps/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*DonationHandler).RegisterDonation-fm",
+      "method": "POST",
+      "path": "/api/v1/donations/register"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*RSVPHandler).CancelMyRSVP-fm",
+      "method": "DELETE",
+      "path": "/api/v1/events/:id/rsvp"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/upload"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerAreaHandler).UpdateVolunteerArea-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/volunteer-areas/:id"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/upload/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*FAQHandler).CreateFAQ-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/faqs/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerHandler).CreateUserFromVolunteer-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/volunteers/:id/create-user"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerHandler).GetMyInfo-fm",
+      "method": "GET",
+      "path": "/api/v1/volunteer/me"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).GetKPIsTrend-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/kpis/trend"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).GetLeaders-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/leaders"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*NotificationHandler).GetCounts-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/notifications/counts"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PaymentReceiptHandler).Verify-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/receipts/:id/verify"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerAreaHandler).CreateVolunteerArea-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/volunteer-areas"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ConnectCardHandler).Update-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/connect-cards/:id"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/auth/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*HeroHandler).GetActive-fm",
+      "method": "GET",
+      "path": "/api/v1/hero/active"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PetitionHandler).CreatePetition-fm",
+      "method": "POST",
+      "path": "/api/v1/contact/petition"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PaymentReceiptHandler).Revert-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/receipts/:id/revert"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BlogHandler).GetAllPosts-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/blog/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*EventHandler).DeleteEvent-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/events/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*RSVPHandler).GetEventRSVPs-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/events/:id/rsvps"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).UpdateMyCell-fm",
+      "method": "PUT",
+      "path": "/api/v1/leader/my-cell"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*EventHandler).GetEvents-fm",
+      "method": "GET",
+      "path": "/api/v1/events/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*HeroHandler).GetAll-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/hero"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).UpdateCell-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/cells/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellReportHandler).ApproveReport-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/cell-reports/:id/approve"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).GetAll-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/leader-directory"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PetitionHandler).MarkAsRead-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/petitions/:id/read"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/social/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AnnouncementHandler).GetAllAnnouncements-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/announcements/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BlogHandler).GetPublishedPosts-fm",
+      "method": "GET",
+      "path": "/api/v1/blog/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*GalleryHandler).GetPhotos-fm",
+      "method": "GET",
+      "path": "/api/v1/gallery/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerHandler).Assign-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/volunteers/:id/assign"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).Create-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/leader-directory"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/events/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PetitionHandler).GetWeeklyPetitions-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/petitions/weekly"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/leader/*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDashboardHandler).GetLeaderKPIs-fm",
+      "method": "GET",
+      "path": "/api/v1/leader/kpis"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).GetUsers-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/users"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerReportHandler).ApproveReport-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/volunteer-reports/:id/approve"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDashboardHandler).GetCellDirectory-fm",
+      "method": "GET",
+      "path": "/api/v1/leader/cell-directory"
+    },
+    {
+      "handler": "casadelrey/backend/auth.(*Handler).ForgotPassword-fm",
+      "method": "POST",
+      "path": "/api/v1/auth/forgot-password"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).Update-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/leader-directory/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*EventHandler).CreateEvent-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/events/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SocialHandler).DeleteSocialPost-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/social/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AnnouncementHandler).CreateAnnouncement-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/announcements/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).UpdateMine-fm",
+      "method": "PUT",
+      "path": "/api/v1/leader/my-directory-entry"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ProfileHandler).ChangePassword-fm",
+      "method": "PUT",
+      "path": "/api/v1/profile/password"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).GetAllCellCategoriesAdmin-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/cell-categories"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).DeleteCell-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/cells/:id"
+    },
+    {
+      "handler": "casadelrey/backend/routes.Register.func1",
+      "method": "GET",
+      "path": "/health"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.(*Echo).Static.StaticDirectoryHandler.func1",
+      "method": "GET",
+      "path": "/uploads*"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).GetCellCategories-fm",
+      "method": "GET",
+      "path": "/api/v1/cell-categories/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).CreateUser-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/users"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PaymentReceiptHandler).Submit-fm",
+      "method": "POST",
+      "path": "/api/v1/receipts"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SiteSettingHandler).GetPublic-fm",
+      "method": "GET",
+      "path": "/api/v1/settings"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*EventHandler).GetEvents-fm",
+      "method": "GET",
+      "path": "/api/v1/events"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).GetKPIs-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/kpis"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).GetDonations-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/donations"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerHandler).GetAll-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/volunteers"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).GetMine-fm",
+      "method": "GET",
+      "path": "/api/v1/leader/my-directory-entry"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*RSVPHandler).RegisterRSVP-fm",
+      "method": "POST",
+      "path": "/api/v1/events/:id/rsvp"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*FAQHandler).GetFAQs-fm",
+      "method": "GET",
+      "path": "/api/v1/faqs/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BlogHandler).DeletePost-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/blog/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerAreaHandler).GetPublicVolunteerAreas-fm",
+      "method": "GET",
+      "path": "/api/v1/volunteer-areas"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PaymentReceiptHandler).GetAll-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/receipts"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SiteSettingHandler).GetAll-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/settings"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerAreaHandler).DeleteVolunteerArea-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/volunteer-areas/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*GalleryHandler).GetAllPhotos-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/gallery/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*FAQHandler).UpdateFAQ-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/faqs/:id"
+    },
+    {
+      "handler": "casadelrey/backend/auth.(*Handler).ResetPassword-fm",
+      "method": "POST",
+      "path": "/api/v1/auth/reset-password"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SitePhotoHandler).GetSitePhotos-fm",
+      "method": "GET",
+      "path": "/api/v1/site-photos"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/auth"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ProfileHandler).CreateGoal-fm",
+      "method": "POST",
+      "path": "/api/v1/profile/goals"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).UpdateCellCategory-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/cell-categories/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).GetAllCellsAdmin-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/cells"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PetitionHandler).DeletePetition-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/petitions/:id"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/gallery"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AnnouncementHandler).DeleteAnnouncement-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/announcements/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerReportHandler).GetAllVolunteerReports-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/volunteer-reports"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ProfileHandler).DeleteGoal-fm",
+      "method": "DELETE",
+      "path": "/api/v1/profile/goals/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AdminHandler).UpdateUserCell-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/users/:id/cell"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/gallery/*"
+    },
+    {
+      "handler": "casadelrey/backend/auth.(*Handler).Refresh-fm",
+      "method": "POST",
+      "path": "/api/v1/auth/refresh"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ProfileHandler).UpdateGoal-fm",
+      "method": "PUT",
+      "path": "/api/v1/profile/goals/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SiteSettingHandler).UpdateSetting-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/settings/:key"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).DeleteCellCategory-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/cell-categories/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PetitionHandler).GetAllPetitions-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/petitions"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/announcements/*"
+    },
+    {
+      "handler": "casadelrey/backend/auth.(*Handler).VerifyEmail-fm",
+      "method": "GET",
+      "path": "/api/v1/auth/verify-email"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDashboardHandler).GetCellDirectory-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/cell-directory"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*PaymentReceiptHandler).GetPendingCount-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/receipts/count"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*DonationPurposeHandler).CreateDonationPurpose-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/donation-purposes"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/leader"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerHandler).Register-fm",
+      "method": "POST",
+      "path": "/api/v1/volunteer/register"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/blog"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*EventHandler).UpdateEvent-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/events/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SocialHandler).CreateSocialPost-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/social/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).GetMyCell-fm",
+      "method": "GET",
+      "path": "/api/v1/leader/my-cell"
+    },
+    {
+      "handler": "casadelrey/backend/auth.(*Handler).Login-fm",
+      "method": "POST",
+      "path": "/api/v1/auth/login"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*UploadHandler).UploadFile-fm",
+      "method": "POST",
+      "path": "/api/v1/upload"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*CellCategoryHandler).CreateCell-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/cells"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BlogHandler).UpdatePost-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/blog/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*LeaderDirectoryHandler).Delete-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/leader-directory/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*GalleryHandler).UpdatePhoto-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/gallery/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*DonationPurposeHandler).GetAllDonationPurposesAdmin-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/donation-purposes"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/events"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BoletaHandler).GetBoletas-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/boletas"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SitePhotoHandler).UpdateSitePhoto-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/site-photos/:key"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*DonationPurposeHandler).UpdateDonationPurpose-fm",
+      "method": "PUT",
+      "path": "/api/v1/admin/donation-purposes/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*BlogHandler).CreatePost-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/blog/"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/announcements"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*VolunteerReportHandler).CreateVolunteerReport-fm",
+      "method": "POST",
+      "path": "/api/v1/admin/volunteer-reports"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*UploadHandler).UploadReceipt-fm",
+      "method": "POST",
+      "path": "/api/v1/receipts/upload"
+    },
+    {
+      "handler": "casadelrey/backend/auth.(*Handler).RegisterDisabled-fm",
+      "method": "POST",
+      "path": "/api/v1/auth/register"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ConnectCardHandler).Create-fm",
+      "method": "POST",
+      "path": "/api/v1/connect-cards"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ProfileHandler).UpdateProfile-fm",
+      "method": "PUT",
+      "path": "/api/v1/profile"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*DonationPurposeHandler).DeleteDonationPurpose-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/donation-purposes/:id"
+    },
+    {
+      "handler": "github.com/labstack/echo/v4.init.func1",
+      "method": "echo_route_not_found",
+      "path": "/api/v1/admin/social"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*SocialHandler).GetAllSocialPosts-fm",
+      "method": "GET",
+      "path": "/api/v1/admin/social/"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*ConnectCardHandler).Delete-fm",
+      "method": "DELETE",
+      "path": "/api/v1/admin/connect-cards/:id"
+    },
+    {
+      "handler": "casadelrey/backend/handlers.(*AnnouncementHandler).GetAnnouncements-fm",
+      "method": "GET",
+      "path": "/api/v1/announcements"
+    }
+  ],
+  "unexpected_results": 0
+}

@@ -1,0 +1,19 @@
+{
+  "branch": "main",
+  "classic_protection": "not_protected",
+  "rulesets": [],
+  "commit_statuses": [
+    "Vercel: success"
+  ],
+  "test_workflows": [],
+  "backup_workflow": "recovery-backup.yml",
+  "latest_scheduled_run": {
+    "id": 41322321286,
+    "conclusion": "success",
+    "url": "https://github.com/KevinML12/casadelrey/actions/runs/41322321286"
+  },
+  "preceding_scheduled_run": {
+    "id": 41212440830,
+    "conclusion": "success"
+  }
+}

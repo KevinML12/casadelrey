@@ -1,0 +1,100 @@
+Vercel CLI 59.5.0 (Node.js 26.7.0)
+Fetching deployment "casadelreyhue-flo7e0ux1-kevinml12s-projects.vercel.app" in kevinml12s-projects
+2026-10-26T15:48:52.575Z  Running build in Washington, D.C., USA (East) – iad1
+2026-10-26T15:48:52.575Z  Build machine configuration: 2 cores, 8 GB
+2026-10-26T15:48:52.588Z  Retrieving list of deployment files...
+2026-10-26T15:48:52.689Z  Previous build caches not available.
+2026-10-26T15:48:52.969Z  Downloading 247 deployment files...
+2026-10-26T15:48:55.464Z  Running "vercel build"
+2026-10-26T15:48:55.480Z  Vercel CLI 65.1.0
+2026-10-26T15:48:56.466Z  Installing dependencies...
+2026-10-26T15:48:57.185Z  npm warn Unknown env config "cache-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+2026-10-26T15:49:07.555Z  
+2026-10-26T15:49:07.555Z  added 510 packages in 11s
+2026-10-26T15:49:07.556Z  
+2026-10-26T15:49:07.556Z  172 packages are looking for funding
+2026-10-26T15:49:07.556Z  run `npm fund` for details
+2026-10-26T15:49:07.557Z  npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+2026-10-26T15:49:07.557Z  npm warn install-scripts   esbuild@0.28.1 (postinstall: node install.js)
+2026-10-26T15:49:07.557Z  npm warn install-scripts
+2026-10-26T15:49:07.557Z  npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+2026-10-26T15:49:07.663Z  Running "npm run build"
+2026-10-26T15:49:07.809Z  npm warn Unknown env config "cache-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+2026-10-26T15:49:07.834Z  
+2026-10-26T15:49:07.834Z  > frontend@0.0.0 build
+2026-10-26T15:49:07.834Z  > vite build
+2026-10-26T15:49:07.834Z  
+2026-10-26T15:49:08.106Z  vite v7.3.6 building client environment for production...
+2026-10-26T15:49:08.360Z  [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+2026-10-26T15:49:08.506Z  transforming...
+2026-10-26T15:49:08.567Z  Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+2026-10-26T15:49:08.567Z  npx update-browserslist-db@latest
+2026-10-26T15:49:08.567Z  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-10-26T15:49:17.835Z  ✓ 3447 modules transformed.
+2026-10-26T15:49:18.324Z  rendering chunks...
+2026-10-26T15:49:18.896Z  computing gzip size...
+2026-10-26T15:49:18.966Z  dist/index.html                                  1.53 kB │ gzip:   0.67 kB
+2026-10-26T15:49:18.967Z  dist/assets/index-p2Vrm8ng.css                  56.16 kB │ gzip:  11.61 kB
+2026-10-26T15:49:18.967Z  dist/assets/LeaderConnectCards-CFiOcFTz.js       0.17 kB │ gzip:   0.16 kB
+2026-10-26T15:49:18.968Z  dist/assets/LeaderBoletas-J--t9S5b.js            0.22 kB │ gzip:   0.18 kB
+2026-10-26T15:49:18.968Z  dist/assets/AdminCellReports-D2iiKD85.js         0.27 kB │ gzip:   0.20 kB
+2026-10-26T15:49:18.968Z  dist/assets/LeaderReports-uGtOQRha.js            0.27 kB │ gzip:   0.20 kB
+2026-10-26T15:49:18.968Z  dist/assets/StatCard-DBYYdChZ.js                 0.73 kB │ gzip:   0.45 kB
+2026-10-26T15:49:18.968Z  dist/assets/PaymentSuccess-XFHa4p7y.js           1.07 kB │ gzip:   0.52 kB
+2026-10-26T15:49:18.968Z  dist/assets/Chip-CtF8-diN.js                     1.12 kB │ gzip:   0.55 kB
+2026-10-26T15:49:18.969Z  dist/assets/Paginator-CA1NfvCY.js                1.22 kB │ gzip:   0.63 kB
+2026-10-26T15:49:18.969Z  dist/assets/Button-DqqU7gJB.js                   1.57 kB │ gzip:   0.71 kB
+2026-10-26T15:49:18.969Z  dist/assets/CellCodePicker-Dxmv-A7F.js           1.62 kB │ gzip:   0.84 kB
+2026-10-26T15:49:18.969Z  dist/assets/ReceiptPage-5doS0wFk.js              1.62 kB │ gzip:   0.74 kB
+2026-10-26T15:49:18.973Z  dist/assets/with-selector-C0AVyLFH.js            1.80 kB │ gzip:   0.83 kB
+2026-10-26T15:49:18.973Z  dist/assets/Input-CXlxBISw.js                    2.05 kB │ gzip:   0.86 kB
+2026-10-26T15:49:18.973Z  dist/assets/LeaderCellDirectory-BeUZDcPl.js      2.06 kB │ gzip:   0.81 kB
+2026-10-26T15:49:18.974Z  dist/assets/LeaderIndex-CK0BPAoA.js              2.80 kB │ gzip:   1.07 kB
+2026-10-26T15:49:18.974Z  dist/assets/AdminSitePhotos-Bmpo4Tse.js          3.31 kB │ gzip:   1.40 kB
+2026-10-26T15:49:18.974Z  dist/assets/LeaderMyCell-Bb_U12Ha.js             3.34 kB │ gzip:   1.54 kB
+2026-10-26T15:49:18.974Z  dist/assets/AdminActivityLog-D681NsDd.js         3.68 kB │ gzip:   1.42 kB
+2026-10-26T15:49:18.974Z  dist/assets/AdminSettings-ZOx1ktmp.js            3.77 kB │ gzip:   1.75 kB
+2026-10-26T15:49:18.974Z  dist/assets/LeaderMyProfile-CCOHlqRU.js          3.78 kB │ gzip:   1.74 kB
+2026-10-26T15:49:18.974Z  dist/assets/AdminDonations-CHtxew5J.js           3.79 kB │ gzip:   1.62 kB
+2026-10-26T15:49:18.976Z  dist/assets/LeaderVolunteers-0PoD02Xt.js         3.97 kB │ gzip:   1.62 kB
+2026-10-26T15:49:18.976Z  dist/assets/ProfilePage-hDZA0tjt.js              4.07 kB │ gzip:   1.62 kB
+2026-10-26T15:49:18.976Z  dist/assets/LeaderEvents-DqxInvF-.js             4.13 kB │ gzip:   1.58 kB
+2026-10-26T15:49:18.977Z  dist/assets/AdminVolunteers-_08jproz.js          4.92 kB │ gzip:   1.91 kB
+2026-10-26T15:49:18.977Z  dist/assets/AdminConnectCards-Bw7JOOOJ.js        4.97 kB │ gzip:   2.00 kB
+2026-10-26T15:49:18.977Z  dist/assets/AdminFAQs-DHaKPV1Z.js                5.00 kB │ gzip:   1.93 kB
+2026-10-26T15:49:18.977Z  dist/assets/AdminDonationPurposes-Cil6FuBN.js    5.31 kB │ gzip:   2.04 kB
+2026-10-26T15:49:18.977Z  dist/assets/AdminGallery-BCEf_FpS.js             5.42 kB │ gzip:   2.15 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminCellCategories-DRfOW1qR.js      5.63 kB │ gzip:   2.17 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminAnnouncements-BSZvm4eX.js       5.87 kB │ gzip:   2.14 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminUsers-CbgK8syk.js               6.03 kB │ gzip:   2.35 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminVolunteerAreas-3CdePa9r.js      6.15 kB │ gzip:   2.32 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminLeaders-hwUDxLsH.js             6.38 kB │ gzip:   2.38 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminCells-Csof-azE.js               6.63 kB │ gzip:   2.48 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminProfile-D1OZnT5_.js             6.92 kB │ gzip:   2.18 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminPetitions-CwqeOEDJ.js           6.97 kB │ gzip:   2.67 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminBoletas-BoBZTqRA.js             7.20 kB │ gzip:   2.55 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminSocial-LAwr8Rup.js              8.00 kB │ gzip:   2.89 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminEvents-CJ7zR74b.js             10.44 kB │ gzip:   3.64 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminHero-B9YRO9b8.js               10.48 kB │ gzip:   3.24 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminReceipts-C2B_J2vZ.js           10.82 kB │ gzip:   3.31 kB
+2026-10-26T15:49:18.978Z  dist/assets/VolunteerDashboard-B6dCok6a.js      12.20 kB │ gzip:   4.02 kB
+2026-10-26T15:49:18.978Z  dist/assets/DonatePage-HDiyF2ji.js              12.62 kB │ gzip:   4.47 kB
+2026-10-26T15:49:18.978Z  dist/assets/CellReportsPage-CEn-lmIb.js         15.27 kB │ gzip:   4.55 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminIndex-CMLLwm_4.js             355.15 kB │ gzip: 105.50 kB
+2026-10-26T15:49:18.978Z  dist/assets/AdminBlog-BCYWpSO4.js              388.50 kB │ gzip: 123.45 kB
+2026-10-26T15:49:18.978Z  dist/assets/index-DbFz8fpU.js                  793.48 kB │ gzip: 248.63 kB
+2026-10-26T15:49:18.979Z  ✓ built in 10.82s
+2026-10-26T15:49:18.979Z  
+2026-10-26T15:49:18.979Z  (!) Some chunks are larger than 500 kB after minification. Consider:
+2026-10-26T15:49:18.979Z  - Using dynamic import() to code-split the application
+2026-10-26T15:49:18.979Z  - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2026-10-26T15:49:18.979Z  - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+2026-10-26T15:49:19.248Z  WARNING! middleware.js uses the deprecated "edge" runtime. Migrate to the Node.js runtime for better performance and reliability by exporting `const config = { runtime: 'nodejs' }`. Learn more: https://vercel.com/docs/routing-middleware#runtime-options
+2026-10-26T15:49:20.142Z  Build Completed in /vercel/output [24s]
+2026-10-26T15:49:20.175Z  Deploying outputs...
+2026-10-26T15:49:24.489Z  Deployment completed
+2026-10-26T15:49:24.494Z  Creating build cache...
+2026-10-26T15:49:45.604Z  Created build cache: 21s
+2026-10-26T15:49:45.604Z  Uploading build cache [55.08 MB]
+2026-10-26T15:49:46.793Z  Build cache uploaded: 1.188s
+status	● Ready

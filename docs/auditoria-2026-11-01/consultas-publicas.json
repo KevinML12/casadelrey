@@ -1,0 +1,298 @@
+{
+  "checked_at": "2026-11-02T02:25:21Z",
+  "endpoints": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "seconds": 0.266,
+      "bytes": 2667,
+      "cache_control": "public, max-age=20, stale-while-revalidate=80",
+      "official_bank_fields_present": {
+        "bank_name": false,
+        "bank_account": false,
+        "bank_account_type": false,
+        "bank_holder": false
+      },
+      "podcast_link_present": false
+    },
+    {
+      "path": "/site-photos",
+      "status": 200,
+      "seconds": 0.254,
+      "bytes": 4807,
+      "cache_control": "public, max-age=300, stale-while-revalidate=1200",
+      "configured_slots": 36
+    },
+    {
+      "path": "/hero/active",
+      "status": 200,
+      "seconds": 0.298,
+      "bytes": 469,
+      "cache_control": "public, max-age=20, stale-while-revalidate=80",
+      "count": 1
+    },
+    {
+      "path": "/cell-categories",
+      "status": 200,
+      "seconds": 0.354,
+      "bytes": 1951,
+      "cache_control": "public, max-age=300, stale-while-revalidate=1200",
+      "count": 5
+    },
+    {
+      "path": "/cells",
+      "status": 200,
+      "seconds": 0.412,
+      "bytes": 3521,
+      "cache_control": "public, max-age=300, stale-while-revalidate=1200",
+      "count": 16
+    },
+    {
+      "path": "/volunteer-areas",
+      "status": 200,
+      "seconds": 0.355,
+      "bytes": 4286,
+      "cache_control": "public, max-age=300, stale-while-revalidate=1200",
+      "count": 10
+    },
+    {
+      "path": "/donation-purposes",
+      "status": 200,
+      "seconds": 0.274,
+      "bytes": 1295,
+      "cache_control": "public, max-age=300, stale-while-revalidate=1200",
+      "count": 5
+    },
+    {
+      "path": "/events",
+      "status": 200,
+      "seconds": 0.599,
+      "bytes": 3831,
+      "cache_control": "public, max-age=20, stale-while-revalidate=80",
+      "count": 7,
+      "past_dates": 7,
+      "missing_dates": 0,
+      "paid_events": 1,
+      "missing_cover_photographs": 3
+    },
+    {
+      "path": "/blog/?limit=100",
+      "status": 200,
+      "seconds": 0.272,
+      "bytes": 664,
+      "cache_control": "public, max-age=60, stale-while-revalidate=240",
+      "count": 1
+    },
+    {
+      "path": "/gallery/?limit=200&page=1",
+      "status": 200,
+      "seconds": 0.212,
+      "bytes": 73678,
+      "cache_control": "public, max-age=60, stale-while-revalidate=240",
+      "count": 200,
+      "meta": {
+        "total": 495,
+        "page": 1,
+        "limit": 200,
+        "pages": 3
+      }
+    },
+    {
+      "path": "/leaders",
+      "status": 200,
+      "seconds": 0.237,
+      "bytes": 81,
+      "cache_control": "public, max-age=20, stale-while-revalidate=80",
+      "count": 1
+    },
+    {
+      "path": "/faqs/",
+      "status": 200,
+      "seconds": 0.16,
+      "bytes": 3,
+      "cache_control": "public, max-age=300, stale-while-revalidate=1200",
+      "count": 0
+    }
+  ],
+  "frontends": [
+    {
+      "site": "https://casadelreyhue.vercel.app",
+      "status": 200,
+      "seconds": 0.214,
+      "security_headers": {
+        "Content-Security-Policy": null,
+        "Content-Security-Policy-Report-Only": null,
+        "X-Frame-Options": null,
+        "X-Content-Type-Options": null,
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "Referrer-Policy": null
+      },
+      "bundle": [
+        "/assets/index-B1AbuQM_.js"
+      ]
+    },
+    {
+      "site": "https://casadelrey-web-pruebas.onrender.com",
+      "status": 200,
+      "seconds": 0.075,
+      "security_headers": {
+        "Content-Security-Policy": null,
+        "Content-Security-Policy-Report-Only": null,
+        "X-Frame-Options": null,
+        "X-Content-Type-Options": "nosniff",
+        "Strict-Transport-Security": "max-age=315360000; includeSubdomains; preload",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      },
+      "bundle": [
+        "/assets/index-CWQ-AZ_E.js"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 385836,
+      "content_type": "image/webp",
+      "seconds": 0.248
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 191469,
+      "content_type": "image/jpeg",
+      "seconds": 0.248
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 112792,
+      "content_type": "image/webp",
+      "seconds": 0.275
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 192081,
+      "content_type": "image/jpeg",
+      "seconds": 0.217
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 304204,
+      "content_type": "image/webp",
+      "seconds": 0.25
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 200098,
+      "content_type": "image/webp",
+      "seconds": 0.192
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 433708,
+      "content_type": "image/webp",
+      "seconds": 0.227
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 347024,
+      "content_type": "image/webp",
+      "seconds": 0.204
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 429100,
+      "content_type": "image/webp",
+      "seconds": 0.213
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 342050,
+      "content_type": "image/webp",
+      "seconds": 0.173
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 430164,
+      "content_type": "image/webp",
+      "seconds": 0.207
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 462822,
+      "content_type": "image/webp",
+      "seconds": 0.168
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 203083,
+      "content_type": "image/jpeg",
+      "seconds": 0.208
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 222586,
+      "content_type": "image/jpeg",
+      "seconds": 0.2
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 191133,
+      "content_type": "image/jpeg",
+      "seconds": 0.205
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 203303,
+      "content_type": "image/jpeg",
+      "seconds": 0.462
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 203810,
+      "content_type": "image/jpeg",
+      "seconds": 0.221
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 171532,
+      "content_type": "image/jpeg",
+      "seconds": 0.196
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 214246,
+      "content_type": "image/jpeg",
+      "seconds": 0.239
+    },
+    {
+      "source": "r2.dev",
+      "status": 200,
+      "bytes": 233295,
+      "content_type": "image/jpeg",
+      "seconds": 0.173
+    }
+  ],
+  "readiness": {
+    "status": 200,
+    "seconds": 0.487
+  },
+  "images_discovered_in_sampled_responses": 232
+}
